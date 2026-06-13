@@ -88,3 +88,40 @@
 .equ OAM_SPRITE_ATTR_CLR_BITS20_17,  0xffe1ffff  @ AND mask clearing OAM attr bits[20:17] (equip_state 4-bit field); setup_equip_slot_sprite_attr_by_card; 5 raw refs
 .equ OAM_SPRITE_ATTR_CLR_BITS25_22,  0xfc3fffff  @ AND mask clearing OAM attr bits[25:22] (mode 4-bit field); setup_equip_slot_sprite_attr_by_card; 6 raw refs
 .equ OAM_SPRITE_ATTR_CLR_BIT26,      0xfbffffff  @ AND mask clearing OAM attr bit26; setup_equip_slot_sprite_attr_by_card; 1559 raw refs
+
+@ =============================================================================
+@ file 05 Seg-1 additions: LP/zone/equip/effect slot sprite P1 tile attr0 values
+@ Y-coordinate encodes sprite group; bit15 set = OBJ_DIS (P1 convention)
+@ Source: asm/05_equip_eligibility_a.s, Seg-1 (0x08049014..0x0804a5b8)
+@ =============================================================================
+@ Sprite tile attr0 P2/P1 pairs (bit15=OBJ_DISABLE for P1 odd convention)
+.equ OAM_LP_ZONE_SPRITE_P2,           0x00000024  @ LP zone sprite tile P2 (Y=0x24)
+.equ OAM_LP_ZONE_SPRITE_P1,           0x00008024  @ LP zone sprite tile P1 (Y=0x24 | OBJ_DIS)
+.equ OAM_LP_COUNTER_P2,               0x00000053  @ LP counter sprite P2 (Y=0x53)
+.equ OAM_LP_COUNTER_P1,               0x00008053  @ LP counter sprite P1 (Y=0x53 | OBJ_DIS)
+.equ OAM_ZONE_UPDATE_SPRITE_P2,       0x00000054  @ Zone update sprite tile P2 (Y=0x54)
+.equ OAM_ZONE_UPDATE_SPRITE_P1,       0x00008054  @ Zone update sprite tile P1 (Y=0x54 | OBJ_DIS)
+.equ OAM_EQUIP_SLOT_TILE_P2,          0x00000055  @ Equip slot tile P2 (Y=0x55)
+.equ OAM_EQUIP_SLOT_TILE_P1,          0x00008055  @ Equip slot tile P1 (Y=0x55 | OBJ_DIS)
+.equ OAM_EFFECT_SLOT_TILE_P2,         0x00000056  @ Effect slot tile P2 (Y=0x56)
+.equ OAM_EFFECT_SLOT_TILE_P1,         0x00008056  @ Effect slot tile P1 (Y=0x56 | OBJ_DIS)
+.equ OAM_LP_FIELD_STATE_P2,           0x00000057  @ LP field state sprite P2 (Y=0x57)
+.equ OAM_LP_FIELD_STATE_P1,           0x00008057  @ LP field state sprite P1 (Y=0x57 | OBJ_DIS)
+.equ OAM_DUEL_CARD_SLOT_P2,           0x0000004d  @ Duel card slot sprite P2 (Y=0x4d)
+.equ OAM_DUEL_CARD_SLOT_P1,           0x0000804d  @ Duel card slot sprite P1 (Y=0x4d | OBJ_DIS)
+.equ OAM_SLOT_SPRITE_BY_PLAYER_P2,    0x0000004f  @ Slot sprite by player P2 (Y=0x4f)
+.equ OAM_SLOT_SPRITE_BY_PLAYER_P1,    0x0000804f  @ Slot sprite by player P1 (Y=0x4f | OBJ_DIS)
+.equ OAM_SPRITE_TYPE_SEL_P2,          0x00000050  @ Sprite type select P2 (Y=0x50)
+.equ OAM_SPRITE_TYPE_SEL_P1,          0x00008050  @ Sprite type select P1 (Y=0x50 | OBJ_DIS)
+.equ OAM_ZONE_ELIGIBLE_P2,            0x00000051  @ Zone eligible sprite P2 (Y=0x51)
+.equ OAM_ZONE_ELIGIBLE_P1,            0x00008051  @ Zone eligible sprite P1 (Y=0x51 | OBJ_DIS)
+.equ OAM_CARD_SLOT_SPRITE,            0x00000058  @ Card slot sprite (Y=0x58; enqueue_sprite_attr_for_card_slot)
+@ Bit-clear masks (complement existing OAM_SPRITE_ATTR_CLR_BIT* series)
+.equ OAM_SPRITE_ATTR_CLR_BIT11,       0xfffff7ff  @ AND mask clearing bit11 of OAM sprite attr word
+.equ OAM_SPRITE_ATTR_CLR_BIT10,       0xfffffbff  @ AND mask clearing bit10 of OAM sprite attr word
+.equ OAM_ATTR2_PAL_CLEAR,             0xffff0fff  @ AND mask clearing OAM attr2 bits[15:12] (palette field)
+@ attr2 OR masks for sprite palette/shape configuration (hi16 applied as OR mask)
+.equ OAM_ATTR2_OR_0X3250,             0x32500000  @ OAM attr2 packed OR mask hi16=0x3250
+.equ OAM_ATTR2_OR_0X3220,             0x32200000  @ OAM attr2 packed OR mask hi16=0x3220
+.equ OAM_ATTR2_OR_0X384E,             0x384e0000  @ OAM attr2 packed OR mask hi16=0x384e
+.equ OAM_ATTR2_OR_0X3C4E,             0x3c4e0000  @ OAM attr2 packed OR mask hi16=0x3c4e

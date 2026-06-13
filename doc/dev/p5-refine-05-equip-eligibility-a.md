@@ -93,7 +93,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ⬜ | — |
+| 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | (pending) |
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ⬜ | — |
 | 3 | 0x4ad48..0x4b4f4 | 24 | 73 | — | ⬜ | — |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
@@ -114,6 +114,43 @@ switchD_/switchdataD_ 自动名 (Seg-2/4/5/6 含) 是 switch 派发数据块, �
 ## 四、逐段完成记录
 
 (各段落地后由 fixer 追加 4.0N 小节: 函数列表 / 符号化统计 / 新建 constants / carve / 踩坑 / commit)
+
+### 4.01 Seg-1 完成记录 (0x08049014..0x0804a5b8, 24 fn, 152 slots)
+
+**函数列表 (24)**:
+submit_effect_zone_lp_and_shape_sprites / tick_duel_field_zone_sprite_update_pipeline /
+tick_zone_sprite_pipeline_with_update_flag / enqueue_slot_sprite_attr_by_player /
+enqueue_equip_zone_sprite_attr_full / render_spell_zone_card_sprite_with_id_tree /
+render_pair_zone_sprites_if_field_card_present / render_spell_zone_sprite_with_field_copy_check /
+render_matched_pair_zone_sprites / enqueue_equip_zone_sprite_with_mode /
+enqueue_pair_zone_sprite_attr_by_card_id / enqueue_effect_slot_sprites_descending /
+enqueue_equip_slot_sprite_with_card_check / submit_equip_slot_sprite_zone11 /
+enqueue_equip_slot_sprite_zone13 / enqueue_equip_slot_sprite_zone12 /
+render_monster_slot_card_with_lp_bar / enqueue_sprite_attr_type11 /
+enqueue_sprite_attr_with_type_select / check_zone_eligible_with_deck_flag /
+enqueue_lp_field_state_sprite_by_player / enqueue_lp_counter_sprite_by_player /
+enqueue_duel_field_card_slot_sprite / enqueue_sprite_attr_for_card_slot
+
+**符号化统计**: EQ=99 / REF=14 / RENAME=39 / FUNC_RENAME=0 / PLATE=33 fn_subs
+
+**新建 constants**:
+- card_info.inc +16 CID (PENGUIN_KNIGHT / BAD_REACTION_TO_SIMOCHI / HIROS_SHADOW_SCOUT /
+  CRUSH_CARD / APPROPRIATE / PROTECTOR_OF_THE_SANCTUARY / HEART_OF_THE_UNDERDOG /
+  REGENERATING_MUMMY / GREED / PETEN_THE_DARK_CLOWN / DECK_DEVASTATION_VIRUS /
+  PIKERU_SECOND_SIGHT / CYBER_ARCHFIEND / BUBBLE_ILLUSION / DANDYLION / KAISER_GLIDER)
+- oam_attr.inc +21 (10 P1/P2 tile attr0 pairs + OAM_CARD_SLOT_SPRITE + 3 CLR masks + 4 ATTR2_OR)
+
+**carve**: 0 (no ROM_INCBIN in this segment)
+
+**踩坑**: fn-ptr +1 periodic fix (7 slots in asm/03 x4 + asm/04 x3) after re-export; all recovered
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**plate FUN_ residual**: 4 instances remain in plates; all are cross-references to functions in
+other segments (0x08073d84, 0x0806d960, 0x08049e44, 0x080718c4) not in Seg-1 mapping list;
+will be resolved when those segments are refined.
+
+**commit**: (pending)
 
 ---
 

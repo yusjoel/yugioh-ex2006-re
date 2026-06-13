@@ -608,3 +608,24 @@
 .equ BRRON_MAD_KING_OF_DARK_WORLD_CID,0x00001967 @ Brron, Mad King of Dark World (pw=06214884; card_1973); setup_equip_slot_sprite_attr_by_card dispatch
 .equ DOOM_DOZER_CID,                 0x000019ca  @ Doom Dozer (pw=76039636; card_2045); setup_equip_slot_sprite_attr_by_card dispatch
 .equ BEGONE_KNAVE_CID,               0x0000171e  @ Begone, Knave! (pw=20374520; card_1494); setup_equip_slot_sprite_attr_by_card dispatch
+
+@ =============================================================================
+@ file 05 Seg-1 additions: equip slot sprite + LP/shape sprite dispatch card IDs
+@ Source: asm/05_equip_eligibility_a.s, Seg-1 (0x08049014..0x0804a5b8)
+@ =============================================================================
+.equ PENGUIN_KNIGHT_CID,              0x0000106d  @ Penguin Knight         (pw=36039163)
+.equ BAD_REACTION_TO_SIMOCHI_CID,     0x00001256  @ Bad Reaction to Simochi (pw=40633297)
+.equ HIROS_SHADOW_SCOUT_CID,          0x00001209  @ Hiro's Shadow Scout     (pw=81863068)
+.equ CRUSH_CARD_CID,                  0x0000123b  @ Crush Card              (pw=57728570)
+.equ APPROPRIATE_CID,                 0x00001353  @ Appropriate             (pw=48539234)
+.equ PROTECTOR_OF_THE_SANCTUARY_CID,  0x0000178b  @ Protector of the Sanctuary (pw=24221739)
+.equ HEART_OF_THE_UNDERDOG_CID,       0x000016cd  @ Heart of the Underdog   (pw=35762283)
+.equ REGENERATING_MUMMY_CID,          0x00001799  @ Regenerating Mummy      (pw=70821187)
+.equ GREED_CID,                       0x00001802  @ Greed                   (pw=89405199)
+.equ PETEN_THE_DARK_CLOWN_CID,        0x000017c5  @ Peten the Dark Clown    (pw=52624755)
+.equ DECK_DEVASTATION_VIRUS_CID,      0x0000188c  @ Deck Devastation Virus  (pw=35027493)
+.equ PIKERU_SECOND_SIGHT_CID,         0x000018d5  @ Pikeru's Second Sight   (pw=58015506)
+.equ CYBER_ARCHFIEND_CID,             0x00001911  @ Cyber Archfiend         (pw=59907935)
+.equ BUBBLE_ILLUSION_CID,             0x0000198a  @ Bubble Illusion         (pw=80075749)
+.equ DANDYLION_CID,                   0x000019fe  @ Dandylion               (pw=15341821)
+.equ KAISER_GLIDER_CID,               0x000014e9  @ Kaiser Glider           (pw=52824910)

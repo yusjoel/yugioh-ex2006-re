@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `05_equip_eligibility_a.s` (0x08049014..0x080537c0; 已拆 Seg-1..10 (239 named fn / 1010 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 05 Seg-1 0x49014..0x4a5b8 (24 fn, 152 槽 [重段]; 效果区 LP/shape sprite 提交 + equip slot sprite + monster zone equip sprite/lp counter 簇)。
+> **下一任务**: file 05 Seg-2 0x4a5b8..0x4ad48 (24 fn, 68 槽; monster zone equip sprite 尾 + switchD_0804a9ee 派发 + card field5 查询簇头)。
 
-上次更新: 2026-06-13 file 05 活动 doc 建成 + 地址拆 10 段 (`doc/dev/p5-refine-05-equip-eligibility-a.md`): 239 named fn, 1010 DAT_/DWORD_/PTR_ 槽, **0 ROM_INCBIN/inter-function 数据块** (全代码 + 函数内 literal pool + switchD/switchdataD 函数内跳转表); 10 段地址序均分 ~24 fn/段 (重段 Seg-4 200 槽 / Seg-1 152 槽 / Seg-6 128 槽 / Seg-9 117 槽); 待开始 Seg-1。**file 04 全 10 段完成 ✅** (Seg-10: EQ=87/REF=25/PLATE=8fn; 新建 oam_attr x10 + card_info x26 + duel_field x2; byte-identical 9689337d, commit cb54638)。
+上次更新: 2026-06-13 **file 05 Seg-1 完成** (EQ=99/REF=14/RENAME=39/PLATE=33; card_info.inc +16 CID + oam_attr.inc +21; byte-identical 9689337d; fn-ptr +1 periodic fix 7 slots); 下一任务: Seg-2。file 04 全 10 段完成 ✅ (Seg-10: EQ=87/REF=25/PLATE=8fn; 新建 oam_attr x10 + card_info x26 + duel_field x2; byte-identical 9689337d, commit cb54638)。
 
 ---
 
@@ -24,7 +24,7 @@
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-04-card-zone-sprite.md` |
-| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (0/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
+| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (1/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |
 | 08 | equip_oam_neodaed | 0x080643e0..0x0806e76c | 未拆 | ⬜ | |

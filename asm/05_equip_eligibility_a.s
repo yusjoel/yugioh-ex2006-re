@@ -1,7 +1,7 @@
 @ ==== 05_equip_eligibility_a.s ====
 @ 效果区 LP/形状 sprite + 装备 slot 资格判定 (一)
 .thumb
-@ Called by 13 callers (indeg=13) including duel_field. Receives player_side (r7=r0) and effect_count (r4=r1). Returns immediately if effect_count==0. Computes opponent_side=1-player_side (r6), calls count_available_effect_zones(opponent_side, slot_id=0x1256, -1). If zones available: calls enqueue_sprite_attr_by_sign(opponent_side, r8 sign_value) for sign sprite, then submit_lp_change_indicator_with_chain_check(player_side, effect_count, 1, r12) for LP indicator. Otherwise: caps effect_count, selects OAM attr by player (0x24 P1 / 0x8024 P2), calls enqueue_sprite_attr_record for base sprite, submit_lp_bar_sprite_row_by_type(type=0x11), and enqueue_active_card_shape_sprites_in_zone (FUN_0808ee80). r0=u8 player_side [0..1], r1=u16 effect_count [0..0xffff]. Returns void. Prologue: .hword 0x464f=mov r7,r0; no non-APCS high-reg inputs. Constants: OAM_P1=0x24, OAM_P2=0x8024, slot_id=0x1256, lp_row_type=0x11. Callers: FUN_080655ec, FUN_08067160, FUN_0806a884, FUN_0806b31c, FUN_0806b56c (+ 8 more).
+@ Called by 13 callers (indeg=13) including duel_field. Receives player_side (r7=r0) and effect_count (r4=r1). Returns immediately if effect_count==0. Computes opponent_side=1-player_side (r6), calls count_available_effect_zones(opponent_side, slot_id=0x1256, -1). If zones available: calls enqueue_sprite_attr_by_sign(opponent_side, r8 sign_value) for sign sprite, then submit_lp_change_indicator_with_chain_check(player_side, effect_count, 1, r12) for LP indicator. Otherwise: caps effect_count, selects OAM attr by player (0x24 P1 / 0x8024 P2), calls enqueue_sprite_attr_record for base sprite, submit_lp_bar_sprite_row_by_type(type=0x11), and enqueue_active_card_shape_sprites_in_zone (enqueue_active_card_shape_sprites_in_zone). r0=u8 player_side [0..1], r1=u16 effect_count [0..0xffff]. Returns void. Prologue: .hword 0x464f=mov r7,r0; no non-APCS high-reg inputs. Constants: OAM_P1=0x24, OAM_P2=0x8024, slot_id=0x1256, lp_row_type=0x11. Callers: submit_equip_lp_indicators_with_bar, dispatch_effect_zone_lp_sprites_by_slot_flags, tick_zone_sprite_pipeline_for_lp_shape_enqueue, dispatch_neo_daedalus_effect_display_by_state, dispatch_numinous_healer_lp_zone_sprites (+ 8 more).
 submit_effect_zone_lp_and_shape_sprites:
     push {r4,r5,r6,r7,lr}                    @ 08049014 f0b5
     .hword 0x464f    @ 08049016 4f46
@@ -14,7 +14,7 @@ submit_effect_zone_lp_and_shape_sprites:
     movs r0,#0x1    @ 08049024 0120
     .hword 0x4681    @ 08049026 8146
     subs r6,r0,r7    @ 08049028 c61b
-    ldr r1, DAT_08049054                     @ 0804902a 0a49
+    ldr r1, submit_effect_zone_lp_and_shape_sprites_bad_reaction_cid @ 0804902a 0a49
     .hword 0x4688    @ 0804902c 8846
     movs r2,#0x1    @ 0804902e 0122
     rsbs r2,r2,#0    @ 08049030 5242
@@ -32,10 +32,10 @@ submit_effect_zone_lp_and_shape_sprites:
     bl submit_lp_change_indicator_with_chain_check @ 0804904c fff7c6fb
     b LAB_08049098                           @ 08049050 22e0
     .zero  0x2
-DAT_08049054:
-    .word  0x00001256                     @ 08049054 56120000
+submit_effect_zone_lp_and_shape_sprites_bad_reaction_cid:
+    .word  BAD_REACTION_TO_SIMOCHI_CID    @ 08049054 56120000
 LAB_08049058:
-    ldr r0, DAT_080490a4                     @ 08049058 1248
+    ldr r0, submit_effect_zone_lp_and_shape_sprites_u16max @ 08049058 1248
     cmp r4,r0                                @ 0804905a 8442
     ble LAB_08049060                         @ 0804905c 00dd
     adds r4,r0,#0x0    @ 0804905e 041c
@@ -43,7 +43,7 @@ LAB_08049060:
     movs r0,#0x24    @ 08049060 2420
     cmp r7,#0x0                              @ 08049062 002f
     beq LAB_08049068                         @ 08049064 00d0
-    ldr r0, DAT_080490a8                     @ 08049066 1048
+    ldr r0, submit_effect_zone_lp_and_shape_sprites_oam_p1 @ 08049066 1048
 LAB_08049068:
     lsls r4,r4,#0x10    @ 08049068 2404
     lsrs r4,r4,#0x10    @ 0804906a 240c
@@ -55,10 +55,10 @@ LAB_08049068:
     .hword 0x4649    @ 08049078 4946
     ands r0,r1    @ 0804907a 0840
     lsls r0,r0,#0x10    @ 0804907c 0004
-    ldr r1, DAT_080490ac                     @ 0804907e 0b49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_clr_bit16 @ 0804907e 0b49
     ands r5,r1    @ 08049080 0d40
     orrs r5,r0    @ 08049082 0543
-    ldr r0, DAT_080490b0                     @ 08049084 0a48
+    ldr r0, submit_effect_zone_lp_and_shape_sprites_hi16_clr @ 08049084 0a48
     ands r5,r0    @ 08049086 0540
     orrs r5,r4    @ 08049088 2543
     movs r0,#0x11    @ 0804908a 1120
@@ -73,16 +73,16 @@ LAB_08049098:
     pop {r4,r5,r6,r7}                        @ 0804909e f0bc
     pop {r0}                                 @ 080490a0 01bc
     bx r0                                    @ 080490a2 0047
-DAT_080490a4:
-    .word  0x0000ffff                     @ 080490a4 ffff0000
-DAT_080490a8:
-    .word  0x00008024                     @ 080490a8 24800000
-DAT_080490ac:
-    .word  0xfffeffff                     @ 080490ac fffffeff
-DAT_080490b0:
-    .word  0xffff0000                     @ 080490b0 0000ffff
+submit_effect_zone_lp_and_shape_sprites_u16max:
+    .word  0x0000ffff                     @ 080490a4 ffff0000  0xffff: lp_bar effect_count clamp cap (u16 max)
+submit_effect_zone_lp_and_shape_sprites_oam_p1:
+    .word  OAM_LP_ZONE_SPRITE_P1          @ 080490a8 24800000
+tick_duel_field_zone_sprite_update_pipeline_clr_bit16:
+    .word  0xfffeffff                     @ 080490ac fffffeff  OAM_SPRITE_ATTR_CLR_BIT16: clears bit16 (flip flag)
+submit_effect_zone_lp_and_shape_sprites_hi16_clr:
+    .word  0xffff0000                     @ 080490b0 0000ffff  hi16 clear mask for lp_bar sprite pack (AND clears bits[31:16])
 
-@ Called by FUN_080495d0/FUN_08067750/FUN_0809bfd4 (all with duel_field tag, indeg=3). Complex prologue: push {r4,r5,r6,r7,lr}; .hword 0x4657/0x464e/0x4645 (r7=r0,r6=r1,r5=r2 callee-save); sub sp,#0x28; .hword 0x4680 (r8=r0). Calls check_value_in_slot_chain three times: icid 0x123b (slot=0xb) / icid 0x188c (slot=0xb) / icid 0x18d5 (slot=0xb), OR-combines results. If r1 (sp[0x4], i.e. r1 APCS input) <= 0 returns 0 immediately. Reads [gP1LifePoints+0x1cf4] for equip branch; if condition met: calls count_equip_eligible_slots_for_player + enqueue_sprite_attr_by_sign; else -> increment_lp_bar_display_counter; enters main loop for zone sprites and finally calls enqueue_zone_sprite_by_activation_flags (0x0808ed2c). Acts as duel field zone sprite update pipeline tick, integrating slot chain detection + sprite attr enqueue + LP bar refresh.
+@ Called by tick_zone_sprite_pipeline_with_update_flag/tick_equip_chain_banisher_sprite_state/dispatch_equip_action_sprite_by_phase_state (all with duel_field tag, indeg=3). Complex prologue: push {r4,r5,r6,r7,lr}; .hword 0x4657/0x464e/0x4645 (r7=r0,r6=r1,r5=r2 callee-save); sub sp,#0x28; .hword 0x4680 (r8=r0). Calls check_value_in_slot_chain three times: icid 0x123b (slot=0xb) / icid 0x188c (slot=0xb) / icid 0x18d5 (slot=0xb), OR-combines results. If r1 (sp[0x4], i.e. r1 APCS input) <= 0 returns 0 immediately. Reads [gP1LifePoints+0x1cf4] for equip branch; if condition met: calls count_equip_eligible_slots_for_player + enqueue_sprite_attr_by_sign; else -> increment_lp_bar_display_counter; enters main loop for zone sprites and finally calls enqueue_zone_sprite_by_activation_flags (0x0808ed2c). Acts as duel field zone sprite update pipeline tick, integrating slot chain detection + sprite attr enqueue + LP bar refresh.
 @ Constants: icid_a=0x123b, icid_b=0x188c, icid_c=0x18d5, slot=0xb, player_stride=0x868, phase_offset=0x1cf4, gP1LifePoints=0x0201c4e0, DAT_08049120=0x1209, DAT_08049154=0x1cf4.
 tick_duel_field_zone_sprite_update_pipeline:
     push {r4,r5,r6,r7,lr}                    @ 080490b4 f0b5
@@ -94,23 +94,23 @@ tick_duel_field_zone_sprite_update_pipeline:
     .hword 0x4680    @ 080490c0 8046
     str r1,[sp,#0x4]                         @ 080490c2 0191
     str r2,[sp,#0x8]                         @ 080490c4 0292
-    ldr r2, DAT_08049114                     @ 080490c6 134a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_crush_card_cid @ 080490c6 134a
     movs r1,#0xb    @ 080490c8 0b21
     bl check_value_in_slot_chain             @ 080490ca e6f7e1fd
     str r0,[sp,#0xc]                         @ 080490ce 0390
-    ldr r2, DAT_08049118                     @ 080490d0 114a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_dek_dev_virus_cid @ 080490d0 114a
     .hword 0x4640    @ 080490d2 4046
     movs r1,#0xb    @ 080490d4 0b21
     bl check_value_in_slot_chain             @ 080490d6 e6f7dbfd
     str r0,[sp,#0x10]                        @ 080490da 0490
-    ldr r2, DAT_0804911c                     @ 080490dc 0f4a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_pikeru_cid @ 080490dc 0f4a
     .hword 0x4640    @ 080490de 4046
     movs r1,#0xb    @ 080490e0 0b21
     bl check_value_in_slot_chain             @ 080490e2 e6f7d5fd
     adds r1,r0,#0x0    @ 080490e6 011c
     movs r0,#0x0    @ 080490e8 0020
     str r0,[sp,#0x14]                        @ 080490ea 0590
-    ldr r0, DAT_08049120                     @ 080490ec 0c48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_hiro_scout_cid @ 080490ec 0c48
     ldr r2,[sp,#0x8]                         @ 080490ee 029a
     cmp r2,r0                                @ 080490f0 8242
     bne LAB_080490f8                         @ 080490f2 01d1
@@ -131,17 +131,17 @@ LAB_080490f8:
     bgt LAB_08049124                         @ 0804910e 09dc
     movs r0,#0x0    @ 08049110 0020
     b LAB_08049588                           @ 08049112 39e2
-DAT_08049114:
-    .word  0x0000123b                     @ 08049114 3b120000
-DAT_08049118:
-    .word  0x0000188c                     @ 08049118 8c180000
-DAT_0804911c:
-    .word  0x000018d5                     @ 0804911c d5180000
-DAT_08049120:
-    .word  0x00001209                     @ 08049120 09120000
+tick_duel_field_zone_sprite_update_pipeline_crush_card_cid:
+    .word  CRUSH_CARD_CID                 @ 08049114 3b120000
+tick_duel_field_zone_sprite_update_pipeline_dek_dev_virus_cid:
+    .word  DECK_DEVASTATION_VIRUS_CID     @ 08049118 8c180000
+tick_duel_field_zone_sprite_update_pipeline_pikeru_cid:
+    .word  PIKERU_SECOND_SIGHT_CID        @ 0804911c d5180000
+tick_duel_field_zone_sprite_update_pipeline_hiro_scout_cid:
+    .word  HIROS_SHADOW_SCOUT_CID         @ 08049120 09120000
 LAB_08049124:
     ldr r0, PTR_gP1LifePoints_08049150       @ 08049124 0a48
-    ldr r1, DAT_08049154                     @ 08049126 0b49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_field_state_off @ 08049126 0b49
     adds r0,r0,r1    @ 08049128 4018
     ldr r0,[r0,#0x0]                         @ 0804912a 0068
     cmp r0,#0x0                              @ 0804912c 0028
@@ -149,7 +149,7 @@ LAB_08049124:
     movs r0,#0x1    @ 08049130 0120
     .hword 0x4642    @ 08049132 4246
     subs r4,r0,r2    @ 08049134 841a
-    ldr r5, DAT_08049158                     @ 08049136 084d
+    ldr r5, tick_duel_field_zone_sprite_update_pipeline_sanctuary_cid @ 08049136 084d
     adds r0,r4,#0x0    @ 08049138 201c
     adds r1,r5,#0x0    @ 0804913a 291c
     bl count_equip_eligible_slots_for_player @ 0804913c e9f710fc
@@ -162,10 +162,10 @@ LAB_08049124:
     b LAB_08049588                           @ 0804914e 1be2
 PTR_gP1LifePoints_08049150:
     .word  gP1LifePoints                  @ 08049150 e0c40102
-DAT_08049154:
-    .word  0x00001cf4                     @ 08049154 f41c0000
-DAT_08049158:
-    .word  0x0000178b                     @ 08049158 8b170000
+tick_duel_field_zone_sprite_update_pipeline_field_state_off:
+    .word  FIELD_STATE_OFF                @ 08049154 f41c0000
+tick_duel_field_zone_sprite_update_pipeline_sanctuary_cid:
+    .word  PROTECTOR_OF_THE_SANCTUARY_CID @ 08049158 8b170000
 LAB_0804915c:
     bl increment_lp_bar_display_counter      @ 0804915c 01f006fb
     movs r7,#0x0    @ 08049160 0027
@@ -184,11 +184,11 @@ LAB_0804916a:
     lsls r1,r1,#0x1f    @ 08049178 c907
     str r1,[sp,#0x20]                        @ 0804917a 0891
 LAB_0804917c:
-    ldr r0, DAT_080492a4                     @ 0804917c 4948
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_player_stride @ 0804917c 4948
     ldr r2,[sp,#0x18]                        @ 0804917e 069a
     adds r1,r2,#0x0    @ 08049180 111c
     muls r1,r0    @ 08049182 4143
-    ldr r0, DAT_080492a8                     @ 08049184 4848
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_slot_code_arr @ 08049184 4848
     adds r1,r1,r0    @ 08049186 0918
     lsls r0,r7,#0x2    @ 08049188 b800
     adds r5,r1,r0    @ 0804918a 0d18
@@ -196,13 +196,13 @@ LAB_0804917c:
     .hword 0x4641    @ 0804918e 4146
     cmp r1,#0x0                              @ 08049190 0029
     beq LAB_08049196                         @ 08049192 00d0
-    ldr r0, DAT_080492ac                     @ 08049194 4548
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_oam_p1 @ 08049194 4548
 LAB_08049196:
     movs r1,#0x1    @ 08049196 0121
     movs r2,#0x1    @ 08049198 0122
     movs r3,#0x0    @ 0804919a 0023
     bl enqueue_sprite_attr_record            @ 0804919c f2f7c6fd
-    ldr r0, DAT_080492b0                     @ 080491a0 4348
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_clr_bit9 @ 080491a0 4348
     ands r6,r0    @ 080491a2 0640
     ldr r2,[sp,#0x1c]                        @ 080491a4 079a
     orrs r6,r2    @ 080491a6 1643
@@ -213,7 +213,7 @@ LAB_08049196:
     movs r2,#0x1    @ 080491b0 0122
     ands r0,r2    @ 080491b2 1040
     lsls r0,r0,#0xa    @ 080491b4 8002
-    ldr r1, DAT_080492b4                     @ 080491b6 3f49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_clr_bit10 @ 080491b6 3f49
     ands r6,r1    @ 080491b8 0e40
     orrs r6,r0    @ 080491ba 0643
     ldr r1,[r5,#0x0]                         @ 080491bc 2968
@@ -223,7 +223,7 @@ LAB_08049196:
     lsls r1,r1,#0x12    @ 080491c4 8904
     lsrs r1,r1,#0x1f    @ 080491c6 c90f
     orrs r0,r1    @ 080491c8 0843
-    ldr r1, DAT_080492b8                     @ 080491ca 3b49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_clr_x9 @ 080491ca 3b49
     ands r6,r1    @ 080491cc 0e40
     orrs r6,r0    @ 080491ce 0643
     movs r0,#0x19    @ 080491d0 1920
@@ -256,7 +256,7 @@ LAB_08049196:
     beq LAB_08049234                         @ 0804920e 11d0
     adds r0,r4,#0x0    @ 08049210 201c
     bl get_card_extended_stat_field3         @ 08049212 a5f05ffe
-    ldr r1, DAT_080492bc                     @ 08049216 2949
+    ldr r1, tick_duel_field_pipeline_lp_thresh_1499 @ 08049216 2949
     cmp r0,r1                                @ 08049218 8842
     ble LAB_08049234                         @ 0804921a 0bdd
     ldr r3,[r5,#0x0]                         @ 0804921c 2b68
@@ -267,7 +267,7 @@ LAB_08049196:
     lsrs r3,r3,#0x1f    @ 08049226 db0f
     orrs r3,r0    @ 08049228 0343
     .hword 0x4640    @ 0804922a 4046
-    ldr r1, DAT_080492c0                     @ 0804922c 2449
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_crush_cid_b @ 0804922c 2449
     movs r2,#0x2    @ 0804922e 0222
     bl enqueue_sprite_attr_type11            @ 08049230 01f028f9
 LAB_08049234:
@@ -280,7 +280,7 @@ LAB_08049234:
     beq LAB_08049268                         @ 08049242 11d0
     adds r0,r4,#0x0    @ 08049244 201c
     bl get_card_extended_stat_field3         @ 08049246 a5f045fe
-    ldr r1, DAT_080492c4                     @ 0804924a 1e49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_lp1500 @ 0804924a 1e49
     cmp r0,r1                                @ 0804924c 8842
     bgt LAB_08049268                         @ 0804924e 0bdc
     ldr r3,[r5,#0x0]                         @ 08049250 2b68
@@ -291,7 +291,7 @@ LAB_08049234:
     lsrs r3,r3,#0x1f    @ 0804925a db0f
     orrs r3,r0    @ 0804925c 0343
     .hword 0x4640    @ 0804925e 4046
-    ldr r1, DAT_080492c8                     @ 08049260 1949
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_dek_dev_cid_b @ 08049260 1949
     movs r2,#0x2    @ 08049262 0222
     bl enqueue_sprite_attr_type11            @ 08049264 01f00ef9
 LAB_08049268:
@@ -310,46 +310,46 @@ LAB_08049268:
     lsrs r3,r3,#0x1f    @ 08049282 db0f
     orrs r3,r0    @ 08049284 0343
     .hword 0x4640    @ 08049286 4046
-    ldr r1, DAT_080492cc                     @ 08049288 1049
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_hiro_scout_cid_b @ 08049288 1049
     movs r2,#0x2    @ 0804928a 0222
     bl enqueue_sprite_attr_type11            @ 0804928c 01f0faf8
 LAB_08049290:
     ldr r1,[r5,#0x0]                         @ 08049290 2968
     lsls r0,r1,#0x13    @ 08049292 c804
     lsrs r4,r0,#0x13    @ 08049294 c40c
-    ldr r0, DAT_080492d0                     @ 08049296 0e48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_parasite_cid @ 08049296 0e48
     cmp r4,r0                                @ 08049298 8442
     beq LAB_080492d8                         @ 0804929a 1dd0
-    ldr r0, DAT_080492d4                     @ 0804929c 0d48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_watapon_cid @ 0804929c 0d48
     cmp r4,r0                                @ 0804929e 8442
     beq LAB_08049334                         @ 080492a0 48d0
     b LAB_08049352                           @ 080492a2 56e0
-DAT_080492a4:
-    .word  0x00000868                     @ 080492a4 68080000
-DAT_080492a8:
-    .word  0x0201c740                     @ 080492a8 40c70102
-DAT_080492ac:
-    .word  0x00008054                     @ 080492ac 54800000
-DAT_080492b0:
-    .word  0xfffffdff                     @ 080492b0 fffdffff
-DAT_080492b4:
-    .word  0xfffffbff                     @ 080492b4 fffbffff
-DAT_080492b8:
-    .word  0xfffffe00                     @ 080492b8 00feffff
-DAT_080492bc:
-    .word  0x000005db                     @ 080492bc db050000
-DAT_080492c0:
-    .word  0x0000123b                     @ 080492c0 3b120000
-DAT_080492c4:
-    .word  0x000005dc                     @ 080492c4 dc050000
-DAT_080492c8:
-    .word  0x0000188c                     @ 080492c8 8c180000
-DAT_080492cc:
-    .word  0x00001209                     @ 080492cc 09120000
-DAT_080492d0:
-    .word  0x000012a1                     @ 080492d0 a1120000
-DAT_080492d4:
-    .word  0x000017cc                     @ 080492d4 cc170000
+tick_duel_field_zone_sprite_update_pipeline_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080492a4 68080000
+tick_duel_field_zone_sprite_update_pipeline_slot_code_arr:
+    .word  gP1SlotSetCodeArray            @ 080492a8 40c70102
+tick_duel_field_zone_sprite_update_pipeline_oam_p1:
+    .word  OAM_ZONE_UPDATE_SPRITE_P1      @ 080492ac 54800000
+tick_duel_field_zone_sprite_update_pipeline_clr_bit9:
+    .word  0xfffffdff                     @ 080492b0 fffdffff  OAM_SPRITE_ATTR_CLR_BIT9: clears bit9 (player_side)
+tick_duel_field_zone_sprite_update_pipeline_clr_bit10:
+    .word  0xfffffbff                     @ 080492b4 fffbffff  OAM_SPRITE_ATTR_CLR_BIT10: clears bit10
+tick_duel_field_zone_sprite_update_pipeline_clr_x9:
+    .word  0xfffffe00                     @ 080492b8 00feffff  OAM_ATTR1_X_CLEAR: clears attr1 bits[8:0] (x-pos field)
+tick_duel_field_pipeline_lp_thresh_1499:
+    .word  0x000005db                     @ 080492bc db050000  0x5db=1499; ble => field3<=1499 (i.e. less than LP_COST_1500=0x5dc); Crush Card LP gate
+tick_duel_field_zone_sprite_update_pipeline_crush_cid_b:
+    .word  CRUSH_CARD_CID                 @ 080492c0 3b120000
+tick_duel_field_zone_sprite_update_pipeline_lp1500:
+    .word  LP_COST_1500                   @ 080492c4 dc050000
+tick_duel_field_zone_sprite_update_pipeline_dek_dev_cid_b:
+    .word  DECK_DEVASTATION_VIRUS_CID     @ 080492c8 8c180000
+tick_duel_field_zone_sprite_update_pipeline_hiro_scout_cid_b:
+    .word  HIROS_SHADOW_SCOUT_CID         @ 080492cc 09120000
+tick_duel_field_zone_sprite_update_pipeline_parasite_cid:
+    .word  PARASITE_PARACIDE_CID          @ 080492d0 a1120000
+tick_duel_field_zone_sprite_update_pipeline_watapon_cid:
+    .word  WATAPON_CID                    @ 080492d4 cc170000
 LAB_080492d8:
     lsls r3,r1,#0x2    @ 080492d8 8b00
     lsrs r3,r3,#0x18    @ 080492da 1b0e
@@ -366,7 +366,7 @@ LAB_080492d8:
     ldr r1,[r5,#0x0]                         @ 080492f2 2968
     lsls r0,r1,#0x13    @ 080492f4 c804
     lsrs r0,r0,#0x13    @ 080492f6 c00c
-    ldr r2, DAT_08049330                     @ 080492f8 0d4a
+    ldr r2, tick_duel_field_pipeline_oam_attr2_or_3250 @ 080492f8 0d4a
     orrs r0,r2    @ 080492fa 1043
     ldr r2,[sp,#0x20]                        @ 080492fc 089a
     orrs r0,r2    @ 080492fe 1043
@@ -392,8 +392,8 @@ LAB_080492d8:
     adds r2,r4,#0x0    @ 08049328 221c
     bl enqueue_sprite_attr_for_chain_node_match @ 0804932a f9f789ff
     b LAB_08049352                           @ 0804932e 10e0
-DAT_08049330:
-    .word  0x32500000                     @ 08049330 00005032
+tick_duel_field_pipeline_oam_attr2_or_3250:
+    .word  0x32500000                     @ 08049330 00005032  OAM_ATTR2_OR_0X3250: hi16=0x3250 attr2 OR mask; lo16=0 -- med-conf bit pattern
 LAB_08049334:
     ldr r0,[sp,#0x8]                         @ 08049334 0298
     cmp r0,#0x0                              @ 08049336 0028
@@ -405,7 +405,7 @@ LAB_08049334:
     lsrs r1,r1,#0x1f    @ 08049342 c90f
     orrs r1,r0    @ 08049344 0143
     ldr r0,[sp,#0x20]                        @ 08049346 0898
-    ldr r2, DAT_08049598                     @ 08049348 934a
+    ldr r2, tick_duel_field_pipeline_packed_watapon @ 08049348 934a
     orrs r0,r2    @ 0804934a 1043
     adds r2,r6,#0x0    @ 0804934c 321c
     bl apply_equip_activation_with_id_lookup @ 0804934e 03f0dffa
@@ -435,11 +435,11 @@ LAB_0804935c:
 LAB_08049380:
     adds r0,r5,#0x0    @ 08049380 281c
     adds r1,r7,#0x0    @ 08049382 391c
-    ldr r2, DAT_0804959c                     @ 08049384 854a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_appropriate_cid @ 08049384 854a
     bl test_slot_has_active_card             @ 08049386 e9f7dff8
     cmp r0,#0x0                              @ 0804938a 0028
     beq LAB_080493dc                         @ 0804938c 26d0
-    ldr r0, DAT_080495a0                     @ 0804938e 8448
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_clr_bit9_b @ 0804938e 8448
     .hword 0x4649    @ 08049390 4946
     ands r1,r0    @ 08049392 0140
     ldr r2,[sp,#0x24]                        @ 08049394 099a
@@ -449,21 +449,21 @@ LAB_08049380:
     lsls r1,r1,#0x3    @ 0804939c c900
     .hword 0x4648    @ 0804939e 4846
     orrs r1,r0    @ 080493a0 0143
-    ldr r0, DAT_080495a4                     @ 080493a2 8048
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_clr_x9_b @ 080493a2 8048
     ands r0,r1    @ 080493a4 0840
     .hword 0x4681    @ 080493a6 8146
     lsls r0,r7,#0x10    @ 080493a8 3804
     movs r1,#0xf8    @ 080493aa f821
     lsls r1,r1,#0xd    @ 080493ac 4903
     ands r0,r1    @ 080493ae 0840
-    ldr r1, DAT_080495a8                     @ 080493b0 7d49
+    ldr r1, tick_duel_field_pipeline_oam_attr2_or_3220 @ 080493b0 7d49
     orrs r0,r1    @ 080493b2 0843
     .hword 0x4651    @ 080493b4 5146
     orrs r0,r1    @ 080493b6 0843
-    ldr r1, DAT_080495ac                     @ 080493b8 7c49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_player_stride_b @ 080493b8 7c49
     muls r1,r4    @ 080493ba 6143
     adds r1,r6,r1    @ 080493bc 7118
-    ldr r2, DAT_080495b0                     @ 080493be 7c4a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_duel_slots @ 080493be 7c4a
     adds r1,r1,r2    @ 080493c0 8918
     ldr r1,[r1,#0x0]                         @ 080493c2 0968
     lsls r2,r1,#0x13    @ 080493c4 ca04
@@ -488,16 +488,16 @@ LAB_080493dc:
     movs r7,#0x0    @ 080493ea 0027
     movs r0,#0x1    @ 080493ec 0120
     .hword 0x4681    @ 080493ee 8146
-    ldr r1, DAT_080495b0                     @ 080493f0 6f49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_duel_slots @ 080493f0 6f49
     .hword 0x468a    @ 080493f2 8a46
 LAB_080493f4:
     movs r6,#0x5    @ 080493f4 0526
     adds r0,r7,#0x0    @ 080493f6 381c
     .hword 0x464a    @ 080493f8 4a46
     ands r0,r2    @ 080493fa 1040
-    ldr r1, DAT_080495ac                     @ 080493fc 6b49
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_player_stride_b @ 080493fc 6b49
     muls r1,r0    @ 080493fe 4143
-    ldr r2, DAT_080495b4                     @ 08049400 6c4a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_slot_state @ 08049400 6c4a
     adds r0,r1,r2    @ 08049402 8818
     adds r5,r0,#0x0    @ 08049404 051c
     adds r5,#0x64    @ 08049406 6435
@@ -508,7 +508,7 @@ LAB_0804940e:
     ldr r0,[r4,#0x0]                         @ 0804940e 2068
     lsls r0,r0,#0x13    @ 08049410 c004
     lsrs r2,r0,#0x13    @ 08049412 c20c
-    ldr r0, DAT_080495b8                     @ 08049414 6848
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_greed_cid @ 08049414 6848
     cmp r2,r0                                @ 08049416 8242
     bne LAB_08049444                         @ 08049418 14d1
     ldrh r0,[r4,#0x8]                        @ 0804941a 2089
@@ -544,7 +544,7 @@ LAB_08049444:
     cmp r1,#0x0                              @ 08049456 0029
     bne LAB_080494c2                         @ 08049458 33d1
 LAB_0804945a:
-    ldr r4, DAT_080495bc                     @ 0804945a 584c
+    ldr r4, tick_duel_field_zone_sprite_update_pipeline_cyber_archfiend_cid @ 0804945a 584c
     .hword 0x4640    @ 0804945c 4046
     movs r1,#0xb    @ 0804945e 0b21
     adds r2,r4,#0x0    @ 08049460 221c
@@ -571,15 +571,15 @@ LAB_0804947c:
     movs r1,#0xf8    @ 0804948c f821
     lsls r1,r1,#0xd    @ 0804948e 4903
     ands r0,r1    @ 08049490 0840
-    ldr r1, DAT_080495a8                     @ 08049492 4549
+    ldr r1, tick_duel_field_pipeline_oam_attr2_or_3220 @ 08049492 4549
     orrs r0,r1    @ 08049494 0843
     .hword 0x4649    @ 08049496 4946
     orrs r0,r1    @ 08049498 0843
     orrs r0,r6    @ 0804949a 3043
-    ldr r1, DAT_080495ac                     @ 0804949c 4349
+    ldr r1, tick_duel_field_zone_sprite_update_pipeline_player_stride_b @ 0804949c 4349
     muls r1,r5    @ 0804949e 6943
     adds r1,r4,r1    @ 080494a0 6118
-    ldr r2, DAT_080495b0                     @ 080494a2 434a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_duel_slots @ 080494a2 434a
     adds r1,r1,r2    @ 080494a4 8918
     ldr r1,[r1,#0x0]                         @ 080494a6 0968
     lsls r2,r1,#0x2    @ 080494a8 8a00
@@ -597,7 +597,7 @@ LAB_080494ba:
     ble LAB_0804947c                         @ 080494c0 dcdd
 LAB_080494c2:
     ldr r1, PTR_gP1LifePoints_080495c0       @ 080494c2 3f49
-    ldr r2, DAT_080495c4                     @ 080494c4 3f4a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_field_state_off_b @ 080494c4 3f4a
     adds r0,r1,r2    @ 080494c6 8818
     ldr r0,[r0,#0x0]                         @ 080494c8 0068
     cmp r0,#0x0                              @ 080494ca 0028
@@ -608,7 +608,7 @@ LAB_080494c2:
     cmp r0,r8                                @ 080494d4 4045
     bne LAB_0804955a                         @ 080494d6 40d1
     movs r7,#0x5    @ 080494d8 0527
-    ldr r6, DAT_080495c8                     @ 080494da 3b4e
+    ldr r6, tick_duel_field_zone_sprite_update_pipeline_underdog_cid @ 080494da 3b4e
     movs r0,#0x1    @ 080494dc 0120
     .hword 0x4681    @ 080494de 8146
     movs r5,#0x64    @ 080494e0 6425
@@ -625,7 +625,7 @@ LAB_080494ec:
     cmp r0,#0x0                              @ 080494f6 0028
     beq LAB_08049552                         @ 080494f8 2bd0
     ldr r3, PTR_gP1LifePoints_080495c0       @ 080494fa 314b
-    ldr r0, DAT_080495ac                     @ 080494fc 2b48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_player_stride_b @ 080494fc 2b48
     muls r0,r4    @ 080494fe 6043
     adds r2,r5,r0    @ 08049500 2a18
     adds r0,r3,#0x0    @ 08049502 181c
@@ -679,7 +679,7 @@ LAB_0804955a:
 LAB_08049562:
     adds r0,r4,#0x0    @ 08049562 201c
     adds r1,r7,#0x0    @ 08049564 391c
-    ldr r2, DAT_080495cc                     @ 08049566 194a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_silent_mag_cid @ 08049566 194a
     bl test_slot_has_active_card             @ 08049568 e8f7eeff
     cmp r0,#0x0                              @ 0804956c 0028
     beq LAB_08049580                         @ 0804956e 07d0
@@ -687,7 +687,7 @@ LAB_08049562:
     str r0,[sp,#0x0]                         @ 08049572 0090
     adds r0,r4,#0x0    @ 08049574 201c
     adds r1,r7,#0x0    @ 08049576 391c
-    ldr r2, DAT_080495cc                     @ 08049578 144a
+    ldr r2, tick_duel_field_zone_sprite_update_pipeline_silent_mag_cid @ 08049578 144a
     movs r3,#0x3    @ 0804957a 0323
     bl enqueue_sprite_attr_with_mode         @ 0804957c f9f76afd
 LAB_08049580:
@@ -704,34 +704,34 @@ LAB_08049588:
     pop {r4,r5,r6,r7}                        @ 08049592 f0bc
     pop {r1}                                 @ 08049594 02bc
     bx r1                                    @ 08049596 0847
-DAT_08049598:
-    .word  0x325017cc                     @ 08049598 cc175032
-DAT_0804959c:
-    .word  0x00001353                     @ 0804959c 53130000
-DAT_080495a0:
-    .word  0xfffffdff                     @ 080495a0 fffdffff
-DAT_080495a4:
-    .word  0xfffffe00                     @ 080495a4 00feffff
-DAT_080495a8:
-    .word  0x32200000                     @ 080495a8 00002032
-DAT_080495ac:
-    .word  0x00000868                     @ 080495ac 68080000
-DAT_080495b0:
-    .word  0x0201c510                     @ 080495b0 10c50102
-DAT_080495b4:
-    .word  0x0201c520                     @ 080495b4 20c50102
-DAT_080495b8:
-    .word  0x00001802                     @ 080495b8 02180000
-DAT_080495bc:
-    .word  0x00001911                     @ 080495bc 11190000
+tick_duel_field_pipeline_packed_watapon:
+    .word  0x325017cc                     @ 08049598 cc175032  hi16=0x3250(OAM_ATTR2_OR_0X3250) lo16=0x17cc(WATAPON_CID); packed r2 arg -- med-conf
+tick_duel_field_zone_sprite_update_pipeline_appropriate_cid:
+    .word  APPROPRIATE_CID                @ 0804959c 53130000
+tick_duel_field_zone_sprite_update_pipeline_clr_bit9_b:
+    .word  0xfffffdff                     @ 080495a0 fffdffff  OAM_SPRITE_ATTR_CLR_BIT9 (2nd ref in function)
+tick_duel_field_zone_sprite_update_pipeline_clr_x9_b:
+    .word  0xfffffe00                     @ 080495a4 00feffff  OAM_ATTR1_X_CLEAR (2nd ref in function)
+tick_duel_field_pipeline_oam_attr2_or_3220:
+    .word  0x32200000                     @ 080495a8 00002032  OAM_ATTR2_OR_0X3220: hi16=0x3220 attr2 OR mask; lo16=0 -- med-conf bit pattern
+tick_duel_field_zone_sprite_update_pipeline_player_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080495ac 68080000
+tick_duel_field_zone_sprite_update_pipeline_duel_slots:
+    .word  gDuelFieldSlots                @ 080495b0 10c50102
+tick_duel_field_zone_sprite_update_pipeline_slot_state:
+    .word  gDuelFieldSlotState            @ 080495b4 20c50102
+tick_duel_field_zone_sprite_update_pipeline_greed_cid:
+    .word  GREED_CID                      @ 080495b8 02180000
+tick_duel_field_zone_sprite_update_pipeline_cyber_archfiend_cid:
+    .word  CYBER_ARCHFIEND_CID            @ 080495bc 11190000
 PTR_gP1LifePoints_080495c0:
     .word  gP1LifePoints                  @ 080495c0 e0c40102
-DAT_080495c4:
-    .word  0x00001cf4                     @ 080495c4 f41c0000
-DAT_080495c8:
-    .word  0x000016cd                     @ 080495c8 cd160000
-DAT_080495cc:
-    .word  0x00001817                     @ 080495cc 17180000
+tick_duel_field_zone_sprite_update_pipeline_field_state_off_b:
+    .word  FIELD_STATE_OFF                @ 080495c4 f41c0000
+tick_duel_field_zone_sprite_update_pipeline_underdog_cid:
+    .word  HEART_OF_THE_UNDERDOG_CID      @ 080495c8 cd160000
+tick_duel_field_zone_sprite_update_pipeline_silent_mag_cid:
+    .word  SILENT_MAGICIAN_LV4_CID        @ 080495cc 17180000
 
 @ Zone sprite update pipeline wrapper that injects update flag r2=1. r0=player_id, r1=slot_idx. Injects r2=0x1 (UPDATE_FLAG), forwards to tick_duel_field_zone_sprite_update_pipeline. Exit: pop {r1}; bx r1 void return. Adjacent to enqueue_slot_sprite_attr_by_player (0x080495dc); serves duel_field zone sprite frame loop. Side effects: OAM sprite attr buffer via tick_duel_field_zone_sprite_update_pipeline. Constants: UPDATE_FLAG=0x1.
 tick_zone_sprite_pipeline_with_update_flag:
@@ -741,13 +741,13 @@ tick_zone_sprite_pipeline_with_update_flag:
     pop {r1}                                 @ 080495d8 02bc
     bx r1                                    @ 080495da 0847
 
-@ Enqueues OAM sprite attr record for a player slot. r0=player_side [0..1]; r1=attr_halfword. If r0==0: uses default tile_id 0x55; else loads DAT_080495f8=0x8055 (alt tile_id). Truncates r1 to 16 bits (lsls/lsrs #0x10). Calls enqueue_sprite_attr_record(tile_id, attr_halfword, mode=1, flags=0). Exit via pop {r0}; bx r0 (non-standard return -- r0 overwritten, void). Called by FUN_080495fc (indeg=2). Params: r0=u32 player_side [0..1] (0=P1 tile 0x55, 1=P2 tile 0x8055); r1=u16 attr_halfword (OAM sprite attr word, truncated to 16 bits). Returns r0=void (pop {r0}; bx r0). Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record (1 record).
+@ Enqueues OAM sprite attr record for a player slot. r0=player_side [0..1]; r1=attr_halfword. If r0==0: uses default tile_id 0x55; else loads DAT_080495f8=0x8055 (alt tile_id). Truncates r1 to 16 bits (lsls/lsrs #0x10). Calls enqueue_sprite_attr_record(tile_id, attr_halfword, mode=1, flags=0). Exit via pop {r0}; bx r0 (non-standard return -- r0 overwritten, void). Called by enqueue_equip_zone_sprite_attr_full (indeg=2). Params: r0=u32 player_side [0..1] (0=P1 tile 0x55, 1=P2 tile 0x8055); r1=u16 attr_halfword (OAM sprite attr word, truncated to 16 bits). Returns r0=void (pop {r0}; bx r0). Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record (1 record).
 enqueue_slot_sprite_attr_by_player:
     push {lr}                                @ 080495dc 00b5
     movs r2,#0x55    @ 080495de 5522
     cmp r0,#0x0                              @ 080495e0 0028
     beq LAB_080495e6                         @ 080495e2 00d0
-    ldr r2, DAT_080495f8                     @ 080495e4 044a
+    ldr r2, enqueue_slot_sprite_attr_by_player_oam_p1 @ 080495e4 044a
 LAB_080495e6:
     lsls r1,r1,#0x10    @ 080495e6 0904
     lsrs r1,r1,#0x10    @ 080495e8 090c
@@ -757,10 +757,10 @@ LAB_080495e6:
     bl enqueue_sprite_attr_record            @ 080495f0 f2f79cfb
     pop {r0}                                 @ 080495f4 01bc
     bx r0                                    @ 080495f6 0047
-DAT_080495f8:
-    .word  0x00008055                     @ 080495f8 55800000
+enqueue_slot_sprite_attr_by_player_oam_p1:
+    .word  OAM_EQUIP_SLOT_TILE_P1         @ 080495f8 55800000
 
-@ Assembles and enqueues full OAM sprite attrs for equip zone area. r0=player_key (bit0=player_id [0..1]); r1=count_limit; r2=base_attr (stored on stack). Extracts player_id=r6&1, computes player_stride=player_id*0x868. Reads [gP1LifePoints+player_stride+0x10]; if exceeds r9 upper bound, clips. Calls count_field_copies_of_card(card_id=0x1332 Banisher of the Light): if copy present, calls enqueue_slot_sprite_attr_by_player (simplified 0x55/0x8055 tile path); else enters full OAM attr assembly path (bit-field pack + card_id switch dispatch) + enqueue_sprite_attr_record + increment_lp_bar_display_counter. 14 callers including FUN_0806abec, FUN_080750c0 (duel_field). Params: r0=u32 player_key (bit0=player_id [0..1]); r1=u32 count_limit; r2=u16 base_attr. Returns r0=void. Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record or enqueue_slot_sprite_attr_by_player. Constants: CARD_ID=0x1332 (Banisher of the Light).
+@ Assembles and enqueues full OAM sprite attrs for equip zone area. r0=player_key (bit0=player_id [0..1]); r1=count_limit; r2=base_attr (stored on stack). Extracts player_id=r6&1, computes player_stride=player_id*0x868. Reads [gP1LifePoints+player_stride+0x10]; if exceeds r9 upper bound, clips. Calls count_field_copies_of_card(card_id=0x1332 Banisher of the Light): if copy present, calls enqueue_slot_sprite_attr_by_player (simplified 0x55/0x8055 tile path); else enters full OAM attr assembly path (bit-field pack + card_id switch dispatch) + enqueue_sprite_attr_record + increment_lp_bar_display_counter. 14 callers including dispatch_equip_effect_slot_display_by_state_and_card, dispatch_equip_node_display_by_type_code (duel_field). Params: r0=u32 player_key (bit0=player_id [0..1]); r1=u32 count_limit; r2=u16 base_attr. Returns r0=void. Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record or enqueue_slot_sprite_attr_by_player. Constants: CARD_ID=0x1332 (Banisher of the Light).
 enqueue_equip_zone_sprite_attr_full:
     push {r4,r5,r6,r7,lr}                    @ 080495fc f0b5
     .hword 0x4657    @ 080495fe 5746
@@ -777,7 +777,7 @@ enqueue_equip_zone_sprite_attr_full:
     .hword 0x468a    @ 08049614 8a46
     movs r5,#0x1    @ 08049616 0125
     ands r5,r6    @ 08049618 3540
-    ldr r0, DAT_08049648                     @ 0804961a 0b48
+    ldr r0, enqueue_equip_zone_sprite_attr_full_player_stride @ 0804961a 0b48
     adds r7,r5,#0x0    @ 0804961c 2f1c
     muls r7,r0    @ 0804961e 4743
     .hword 0x4650    @ 08049620 5046
@@ -789,7 +789,7 @@ enqueue_equip_zone_sprite_attr_full:
     .hword 0x4648    @ 0804962c 4846
 LAB_0804962e:
     .hword 0x4681    @ 0804962e 8146
-    ldr r0, DAT_0804964c                     @ 08049630 0648
+    ldr r0, enqueue_equip_zone_sprite_attr_full_banisher_cid @ 08049630 0648
     bl count_field_copies_of_card            @ 08049632 e9f7b3f8
     cmp r0,#0x0                              @ 08049636 0028
     beq LAB_08049650                         @ 08049638 0ad0
@@ -799,15 +799,15 @@ LAB_0804962e:
     b LAB_08049818                           @ 08049642 e9e0
 PTR_gP1LifePoints_08049644:
     .word  gP1LifePoints                  @ 08049644 e0c40102
-DAT_08049648:
-    .word  0x00000868                     @ 08049648 68080000
-DAT_0804964c:
-    .word  0x00001332                     @ 0804964c 32130000
+enqueue_equip_zone_sprite_attr_full_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08049648 68080000
+enqueue_equip_zone_sprite_attr_full_banisher_cid:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 0804964c 32130000
 LAB_08049650:
     movs r0,#0x55    @ 08049650 5520
     cmp r6,#0x0                              @ 08049652 002e
     beq LAB_08049658                         @ 08049654 00d0
-    ldr r0, DAT_080496fc                     @ 08049656 2948
+    ldr r0, enqueue_equip_zone_sprite_attr_full_oam_p1 @ 08049656 2948
 LAB_08049658:
     .hword 0x464a    @ 08049658 4a46
     lsls r1,r2,#0x10    @ 0804965a 1104
@@ -831,11 +831,11 @@ LAB_08049676:
     movs r2,#0x0    @ 08049680 0022
     str r2,[sp,#0x10]                        @ 08049682 0492
     .hword 0x46ca    @ 08049684 ca46
-    ldr r7, DAT_08049700                     @ 08049686 1e4f
+    ldr r7, enqueue_equip_zone_sprite_attr_full_slot_code_arr @ 08049686 1e4f
     add r7,r8                                @ 08049688 4744
 LAB_0804968a:
     ldr r1,[sp,#0x8]                         @ 0804968a 0299
-    ldr r2, DAT_08049700                     @ 0804968c 1c4a
+    ldr r2, enqueue_equip_zone_sprite_attr_full_slot_code_arr @ 0804968c 1c4a
     adds r0,r1,r2    @ 0804968e 8818
     ldr r1,[sp,#0x10]                        @ 08049690 0499
     adds r5,r0,r1    @ 08049692 4518
@@ -845,14 +845,14 @@ LAB_0804968a:
     movs r1,#0x1    @ 0804969a 0121
     ands r0,r1    @ 0804969c 0840
     lsls r0,r0,#0xb    @ 0804969e c002
-    ldr r1, DAT_08049704                     @ 080496a0 1849
+    ldr r1, enqueue_equip_zone_sprite_attr_full_clr_bit11 @ 080496a0 1849
     ands r4,r1    @ 080496a2 0c40
     orrs r4,r0    @ 080496a4 0443
-    ldr r0, DAT_08049708                     @ 080496a6 1848
+    ldr r0, enqueue_equip_zone_sprite_attr_full_clr_bit9 @ 080496a6 1848
     ands r4,r0    @ 080496a8 0440
     ldr r2,[sp,#0xc]                         @ 080496aa 039a
     orrs r4,r2    @ 080496ac 1443
-    ldr r0, DAT_0804970c                     @ 080496ae 1748
+    ldr r0, enqueue_equip_zone_sprite_attr_full_clr_pal @ 080496ae 1748
     ands r4,r0    @ 080496b0 0440
     movs r0,#0xe0    @ 080496b2 e020
     lsls r0,r0,#0x8    @ 080496b4 0002
@@ -864,10 +864,10 @@ LAB_0804968a:
     lsls r2,r2,#0x12    @ 080496c0 9204
     lsrs r2,r2,#0x1f    @ 080496c2 d20f
     orrs r0,r2    @ 080496c4 1043
-    ldr r1, DAT_08049710                     @ 080496c6 1249
+    ldr r1, enqueue_equip_zone_sprite_attr_full_clr_x9 @ 080496c6 1249
     ands r4,r1    @ 080496c8 0c40
     orrs r4,r0    @ 080496ca 0443
-    ldr r0, DAT_08049714                     @ 080496cc 1148
+    ldr r0, enqueue_equip_zone_sprite_attr_full_clr_bit10 @ 080496cc 1148
     ands r4,r0    @ 080496ce 0440
     eors r2,r6    @ 080496d0 7240
     ldr r0,[sp,#0x4]                         @ 080496d2 0198
@@ -876,45 +876,45 @@ LAB_0804968a:
     ldr r0,[r7,#0x0]                         @ 080496d8 3868
     lsls r0,r0,#0x13    @ 080496da c004
     lsrs r1,r0,#0x13    @ 080496dc c10c
-    ldr r0, DAT_08049718                     @ 080496de 0e48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_despair_cid_a @ 080496de 0e48
     cmp r1,r0                                @ 080496e0 8142
     beq LAB_080497b0                         @ 080496e2 65d0
     cmp r1,r0                                @ 080496e4 8142
     bgt LAB_08049744                         @ 080496e6 2ddc
-    ldr r0, DAT_0804971c                     @ 080496e8 0c48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_skull_ladybug_cid_a @ 080496e8 0c48
     cmp r1,r0                                @ 080496ea 8142
     beq LAB_080497b6                         @ 080496ec 63d0
     cmp r1,r0                                @ 080496ee 8142
     bgt LAB_08049728                         @ 080496f0 1adc
-    ldr r0, DAT_08049720                     @ 080496f2 0b48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_penguin_cid_a @ 080496f2 0b48
     cmp r1,r0                                @ 080496f4 8142
     beq LAB_080497b0                         @ 080496f6 5bd0
-    ldr r0, DAT_08049724                     @ 080496f8 0a48
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_cockroach_cid_a @ 080496f8 0a48
     b LAB_08049776                           @ 080496fa 3ce0
-DAT_080496fc:
-    .word  0x00008055                     @ 080496fc 55800000
-DAT_08049700:
-    .word  0x0201c740                     @ 08049700 40c70102
-DAT_08049704:
-    .word  0xfffff7ff                     @ 08049704 fff7ffff
-DAT_08049708:
-    .word  0xfffffdff                     @ 08049708 fffdffff
-DAT_0804970c:
-    .word  0xffff0fff                     @ 0804970c ff0fffff
-DAT_08049710:
-    .word  0xfffffe00                     @ 08049710 00feffff
-DAT_08049714:
-    .word  0xfffffbff                     @ 08049714 fffbffff
-DAT_08049718:
-    .word  0x00001653                     @ 08049718 53160000
-DAT_0804971c:
-    .word  0x000012a2                     @ 0804971c a2120000
-DAT_08049720:
-    .word  0x0000106d                     @ 08049720 6d100000
-DAT_08049724:
-    .word  0x00001185                     @ 08049724 85110000
+enqueue_equip_zone_sprite_attr_full_oam_p1:
+    .word  OAM_EQUIP_SLOT_TILE_P1         @ 080496fc 55800000
+enqueue_equip_zone_sprite_attr_full_slot_code_arr:
+    .word  gP1SlotSetCodeArray            @ 08049700 40c70102
+enqueue_equip_zone_sprite_attr_full_clr_bit11:
+    .word  0xfffff7ff                     @ 08049704 fff7ffff  OAM_SPRITE_ATTR_CLR_BIT11: clears bit11
+enqueue_equip_zone_sprite_attr_full_clr_bit9:
+    .word  0xfffffdff                     @ 08049708 fffdffff  OAM_SPRITE_ATTR_CLR_BIT9
+enqueue_equip_zone_sprite_attr_full_clr_pal:
+    .word  0xffff0fff                     @ 0804970c ff0fffff  OAM_ATTR2_PAL_CLEAR: clears attr2 bits[15:12] (palette field)
+enqueue_equip_zone_sprite_attr_full_clr_x9:
+    .word  0xfffffe00                     @ 08049710 00feffff  OAM_ATTR1_X_CLEAR
+enqueue_equip_zone_sprite_attr_full_clr_bit10:
+    .word  0xfffffbff                     @ 08049714 fffbffff  OAM_SPRITE_ATTR_CLR_BIT10
+tick_duel_field_zone_sprite_update_pipeline_despair_cid_a:
+    .word  DESPAIR_FROM_THE_DARK_CID      @ 08049718 53160000
+tick_duel_field_zone_sprite_update_pipeline_skull_ladybug_cid_a:
+    .word  SKULL_MARK_LADYBUG_CID         @ 0804971c a2120000
+tick_duel_field_zone_sprite_update_pipeline_penguin_cid_a:
+    .word  PENGUIN_KNIGHT_CID             @ 08049720 6d100000
+tick_duel_field_zone_sprite_update_pipeline_cockroach_cid_a:
+    .word  COCKROACH_KNIGHT_CID           @ 08049724 85110000
 LAB_08049728:
-    ldr r0, DAT_08049738                     @ 08049728 0348
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_archfiend_cid_a @ 08049728 0348
     cmp r1,r0                                @ 0804972a 8142
     beq LAB_080497b6                         @ 0804972c 43d0
     cmp r1,r0                                @ 0804972e 8142
@@ -922,15 +922,15 @@ LAB_08049728:
     subs r0,#0xda    @ 08049732 da38
     b LAB_08049776                           @ 08049734 1fe0
     .zero  0x2
-DAT_08049738:
-    .word  0x000013e3                     @ 08049738 e3130000
+tick_duel_field_zone_sprite_update_pipeline_archfiend_cid_a:
+    .word  ARCHFIEND_OF_GILFER_CID        @ 08049738 e3130000
 LAB_0804973c:
-    ldr r0, DAT_08049740                     @ 0804973c 0048
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_makyura_cid_a @ 0804973c 0048
     b LAB_08049768                           @ 0804973e 13e0
-DAT_08049740:
-    .word  0x000014a5                     @ 08049740 a5140000
+tick_duel_field_zone_sprite_update_pipeline_makyura_cid_a:
+    .word  MAKYURA_THE_DESTRUCTOR_CID     @ 08049740 a5140000
 LAB_08049744:
-    ldr r0, DAT_08049758                     @ 08049744 0448
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_burning_algae_cid_a @ 08049744 0448
     cmp r1,r0                                @ 08049746 8142
     beq LAB_080497b6                         @ 08049748 35d0
     cmp r1,r0                                @ 0804974a 8142
@@ -940,10 +940,10 @@ LAB_08049744:
     beq LAB_080497b0                         @ 08049752 2dd0
     adds r0,#0x32    @ 08049754 3230
     b LAB_08049776                           @ 08049756 0ee0
-DAT_08049758:
-    .word  0x000016f5                     @ 08049758 f5160000
+tick_duel_field_zone_sprite_update_pipeline_burning_algae_cid_a:
+    .word  BURNING_ALGAE_CID              @ 08049758 f5160000
 LAB_0804975c:
-    ldr r0, DAT_08049770                     @ 0804975c 0448
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_peten_cid_a @ 0804975c 0448
     cmp r1,r0                                @ 0804975e 8142
     beq LAB_080497b6                         @ 08049760 29d0
     cmp r1,r0                                @ 08049762 8142
@@ -954,16 +954,16 @@ LAB_08049768:
     beq LAB_08049780                         @ 0804976a 09d0
     b LAB_080497dc                           @ 0804976c 36e0
     .zero  0x2
-DAT_08049770:
-    .word  0x000017c5                     @ 08049770 c5170000
+tick_duel_field_zone_sprite_update_pipeline_peten_cid_a:
+    .word  PETEN_THE_DARK_CLOWN_CID       @ 08049770 c5170000
 LAB_08049774:
-    ldr r0, DAT_0804977c                     @ 08049774 0148
+    ldr r0, tick_duel_field_zone_sprite_update_pipeline_dandylion_cid_a @ 08049774 0148
 LAB_08049776:
     cmp r1,r0                                @ 08049776 8142
     beq LAB_080497b6                         @ 08049778 1dd0
     b LAB_080497dc                           @ 0804977a 2fe0
-DAT_0804977c:
-    .word  0x000019fe                     @ 0804977c fe190000
+tick_duel_field_zone_sprite_update_pipeline_dandylion_cid_a:
+    .word  DANDYLION_CID                  @ 0804977c fe190000
 LAB_08049780:
     ldr r2,[r5,#0x0]                         @ 08049780 2a68
     lsls r0,r2,#0x12    @ 08049782 9004
@@ -993,12 +993,12 @@ LAB_080497b0:
     beq LAB_080497dc                         @ 080497b4 12d0
 LAB_080497b6:
     lsls r0,r6,#0x1f    @ 080497b6 f007
-    ldr r1, DAT_08049828                     @ 080497b8 1b49
+    ldr r1, enqueue_equip_zone_sprite_attr_full_slot_code_arr_b @ 080497b8 1b49
     add r1,r8                                @ 080497ba 4144
     ldr r1,[r1,#0x0]                         @ 080497bc 0968
     lsls r1,r1,#0x13    @ 080497be c904
     lsrs r1,r1,#0x13    @ 080497c0 c90c
-    ldr r2, DAT_0804982c                     @ 080497c2 1a4a
+    ldr r2, enqueue_equip_zone_sprite_attr_full_oam_attr2_or_384e @ 080497c2 1a4a
     orrs r1,r2    @ 080497c4 1143
     orrs r0,r1    @ 080497c6 0843
     ldr r1,[r5,#0x0]                         @ 080497c8 2968
@@ -1047,10 +1047,10 @@ LAB_08049818:
     pop {r4,r5,r6,r7}                        @ 08049822 f0bc
     pop {r0}                                 @ 08049824 01bc
     bx r0                                    @ 08049826 0047
-DAT_08049828:
-    .word  0x0201c740                     @ 08049828 40c70102
-DAT_0804982c:
-    .word  0x384e0000                     @ 0804982c 00004e38
+enqueue_equip_zone_sprite_attr_full_slot_code_arr_b:
+    .word  gP1SlotSetCodeArray            @ 08049828 40c70102
+enqueue_equip_zone_sprite_attr_full_oam_attr2_or_384e:
+    .word  0x384e0000                     @ 0804982c 00004e38  OAM_ATTR2_OR_0X384E: hi16=0x384e attr2 OR mask; lo16=0 -- med-conf bit pattern
 
 @ Spell/trap zone slot OAM sprite render with 9-node card_id binary search tree dispatch. Reads gP1LifePoints+player_id*4+0x10E0 halfword bits[12:0] for card_id; calls check_card_type_is_spell to select zone=0xc/0xd; builds OAM attr_word and calls enqueue_sprite_attr_record. Binary tree matches card_id (Peten 0x17c5 and 8 others); Peten hit calls enqueue_sprite_attr_type11; others call apply_equip_activation_with_id_lookup; always calls submit_lp_bar_sprite_row_by_type. Called from 0x080499c4 and 0x08049b44 (duel_field). Side effects: OAM attr buffer. Constants: ZONE_OFFSET=0x10E0, SPELL_ZONE=0xc, TRAP_ZONE=0xd.
 render_spell_zone_card_sprite_with_id_tree:
@@ -1089,27 +1089,27 @@ LAB_0804986c:
     eors r0,r1    @ 08049870 4840
     ands r0,r4    @ 08049872 2040
     lsls r0,r0,#0xb    @ 08049874 c002
-    ldr r1, DAT_080498f0                     @ 08049876 1e49
+    ldr r1, render_spell_zone_card_sprite_with_id_tree_clr_bit11 @ 08049876 1e49
     ands r6,r1    @ 08049878 0e40
     orrs r6,r0    @ 0804987a 0643
     adds r0,r7,#0x0    @ 0804987c 381c
     ands r0,r4    @ 0804987e 2040
     lsls r0,r0,#0x9    @ 08049880 4002
-    ldr r1, DAT_080498f4                     @ 08049882 1c49
+    ldr r1, render_spell_zone_card_sprite_with_id_tree_clr_bit9 @ 08049882 1c49
     ands r6,r1    @ 08049884 0e40
     orrs r6,r0    @ 08049886 0643
-    ldr r0, DAT_080498f8                     @ 08049888 1b48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_clr_pal @ 08049888 1b48
     ands r6,r0    @ 0804988a 0640
     movs r0,#0xe0    @ 0804988c e020
     lsls r0,r0,#0x8    @ 0804988e 0002
     orrs r6,r0    @ 08049890 0643
-    ldr r0, DAT_080498fc                     @ 08049892 1a48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_x9mask @ 08049892 1a48
     .hword 0x4641    @ 08049894 4146
     ands r0,r1    @ 08049896 0840
-    ldr r1, DAT_08049900                     @ 08049898 1949
+    ldr r1, render_spell_zone_card_sprite_with_id_tree_clr_x9 @ 08049898 1949
     ands r6,r1    @ 0804989a 0e40
     orrs r6,r0    @ 0804989c 0643
-    ldr r0, DAT_08049904                     @ 0804989e 1948
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_clr_bit10 @ 0804989e 1948
     ands r6,r0    @ 080498a0 0640
     .hword 0x4648    @ 080498a2 4846
     rsbs r3,r0,#0    @ 080498a4 4342
@@ -1132,45 +1132,45 @@ LAB_0804986c:
     lsrs r3,r3,#0x1f    @ 080498c6 db0f
     movs r0,#0x3f    @ 080498c8 3f20
     bl enqueue_sprite_attr_record            @ 080498ca f2f72ffa
-    ldr r0, DAT_08049908                     @ 080498ce 0e48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_despair_cid @ 080498ce 0e48
     cmp r5,r0                                @ 080498d0 8542
     beq LAB_0804998c                         @ 080498d2 5bd0
     cmp r5,r0                                @ 080498d4 8542
     bgt LAB_08049934                         @ 080498d6 2ddc
-    ldr r0, DAT_0804990c                     @ 080498d8 0c48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_skull_ladybug_cid @ 080498d8 0c48
     cmp r5,r0                                @ 080498da 8542
     beq LAB_08049992                         @ 080498dc 59d0
     cmp r5,r0                                @ 080498de 8542
     bgt LAB_08049918                         @ 080498e0 1adc
-    ldr r0, DAT_08049910                     @ 080498e2 0b48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_penguin_cid @ 080498e2 0b48
     cmp r5,r0                                @ 080498e4 8542
     beq LAB_0804998c                         @ 080498e6 51d0
-    ldr r0, DAT_08049914                     @ 080498e8 0a48
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_cockroach_cid @ 080498e8 0a48
     b LAB_08049966                           @ 080498ea 3ce0
 PTR_gP1LifePoints_080498ec:
     .word  gP1LifePoints                  @ 080498ec e0c40102
-DAT_080498f0:
-    .word  0xfffff7ff                     @ 080498f0 fff7ffff
-DAT_080498f4:
-    .word  0xfffffdff                     @ 080498f4 fffdffff
-DAT_080498f8:
-    .word  0xffff0fff                     @ 080498f8 ff0fffff
-DAT_080498fc:
-    .word  0x000001ff                     @ 080498fc ff010000
-DAT_08049900:
-    .word  0xfffffe00                     @ 08049900 00feffff
-DAT_08049904:
-    .word  0xfffffbff                     @ 08049904 fffbffff
-DAT_08049908:
-    .word  0x00001653                     @ 08049908 53160000
-DAT_0804990c:
-    .word  0x000012a2                     @ 0804990c a2120000
-DAT_08049910:
-    .word  0x0000106d                     @ 08049910 6d100000
-DAT_08049914:
-    .word  0x00001185                     @ 08049914 85110000
+render_spell_zone_card_sprite_with_id_tree_clr_bit11:
+    .word  0xfffff7ff                     @ 080498f0 fff7ffff  OAM_SPRITE_ATTR_CLR_BIT11
+render_spell_zone_card_sprite_with_id_tree_clr_bit9:
+    .word  0xfffffdff                     @ 080498f4 fffdffff  OAM_SPRITE_ATTR_CLR_BIT9
+render_spell_zone_card_sprite_with_id_tree_clr_pal:
+    .word  0xffff0fff                     @ 080498f8 ff0fffff  OAM_ATTR2_PAL_CLEAR: clears attr2 bits[15:12]
+render_spell_zone_card_sprite_with_id_tree_x9mask:
+    .word  0x000001ff                     @ 080498fc ff010000  OAM_ATTR1_X_MASK=0x1ff: mask for attr1 x-pos bits[8:0]
+render_spell_zone_card_sprite_with_id_tree_clr_x9:
+    .word  0xfffffe00                     @ 08049900 00feffff  OAM_ATTR1_X_CLEAR
+render_spell_zone_card_sprite_with_id_tree_clr_bit10:
+    .word  0xfffffbff                     @ 08049904 fffbffff  OAM_SPRITE_ATTR_CLR_BIT10
+render_spell_zone_card_sprite_with_id_tree_despair_cid:
+    .word  DESPAIR_FROM_THE_DARK_CID      @ 08049908 53160000
+render_spell_zone_card_sprite_with_id_tree_skull_ladybug_cid:
+    .word  SKULL_MARK_LADYBUG_CID         @ 0804990c a2120000
+render_spell_zone_card_sprite_with_id_tree_penguin_cid:
+    .word  PENGUIN_KNIGHT_CID             @ 08049910 6d100000
+render_spell_zone_card_sprite_with_id_tree_cockroach_cid:
+    .word  COCKROACH_KNIGHT_CID           @ 08049914 85110000
 LAB_08049918:
-    ldr r0, DAT_08049928                     @ 08049918 0348
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_archfiend_cid @ 08049918 0348
     cmp r5,r0                                @ 0804991a 8542
     beq LAB_08049992                         @ 0804991c 39d0
     cmp r5,r0                                @ 0804991e 8542
@@ -1178,15 +1178,15 @@ LAB_08049918:
     subs r0,#0xda    @ 08049922 da38
     b LAB_08049966                           @ 08049924 1fe0
     .zero  0x2
-DAT_08049928:
-    .word  0x000013e3                     @ 08049928 e3130000
+render_spell_zone_card_sprite_with_id_tree_archfiend_cid:
+    .word  ARCHFIEND_OF_GILFER_CID        @ 08049928 e3130000
 LAB_0804992c:
-    ldr r0, DAT_08049930                     @ 0804992c 0048
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_makyura_cid @ 0804992c 0048
     b LAB_08049958                           @ 0804992e 13e0
-DAT_08049930:
-    .word  0x000014a5                     @ 08049930 a5140000
+render_spell_zone_card_sprite_with_id_tree_makyura_cid:
+    .word  MAKYURA_THE_DESTRUCTOR_CID     @ 08049930 a5140000
 LAB_08049934:
-    ldr r0, DAT_08049948                     @ 08049934 0448
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_burning_algae_cid @ 08049934 0448
     cmp r5,r0                                @ 08049936 8542
     beq LAB_08049992                         @ 08049938 2bd0
     cmp r5,r0                                @ 0804993a 8542
@@ -1196,10 +1196,10 @@ LAB_08049934:
     beq LAB_0804998c                         @ 08049942 23d0
     adds r0,#0x32    @ 08049944 3230
     b LAB_08049966                           @ 08049946 0ee0
-DAT_08049948:
-    .word  0x000016f5                     @ 08049948 f5160000
+render_spell_zone_card_sprite_with_id_tree_burning_algae_cid:
+    .word  BURNING_ALGAE_CID              @ 08049948 f5160000
 LAB_0804994c:
-    ldr r0, DAT_08049960                     @ 0804994c 0448
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_peten_cid @ 0804994c 0448
     cmp r5,r0                                @ 0804994e 8542
     beq LAB_08049992                         @ 08049950 1fd0
     cmp r5,r0                                @ 08049952 8542
@@ -1210,16 +1210,16 @@ LAB_08049958:
     beq LAB_08049970                         @ 0804995a 09d0
     b LAB_080499a8                           @ 0804995c 24e0
     .zero  0x2
-DAT_08049960:
-    .word  0x000017c5                     @ 08049960 c5170000
+render_spell_zone_card_sprite_with_id_tree_peten_cid:
+    .word  PETEN_THE_DARK_CLOWN_CID       @ 08049960 c5170000
 LAB_08049964:
-    ldr r0, DAT_0804996c                     @ 08049964 0148
+    ldr r0, render_spell_zone_card_sprite_with_id_tree_dandylion_cid @ 08049964 0148
 LAB_08049966:
     cmp r5,r0                                @ 08049966 8542
     beq LAB_08049992                         @ 08049968 13d0
     b LAB_080499a8                           @ 0804996a 1de0
-DAT_0804996c:
-    .word  0x000019fe                     @ 0804996c fe190000
+render_spell_zone_card_sprite_with_id_tree_dandylion_cid:
+    .word  DANDYLION_CID                  @ 0804996c fe190000
 LAB_08049970:
     .hword 0x4650    @ 08049970 5046
     movs r1,#0xe    @ 08049972 0e21
@@ -1240,7 +1240,7 @@ LAB_0804998c:
 LAB_08049992:
     .hword 0x4651    @ 08049992 5146
     lsls r0,r1,#0x1f    @ 08049994 c807
-    ldr r1, DAT_080499c0                     @ 08049996 0a49
+    ldr r1, render_spell_zone_card_sprite_with_id_tree_oam_attr2_or_384e @ 08049996 0a49
     orrs r5,r1    @ 08049998 0d43
     orrs r0,r5    @ 0804999a 2843
     .hword 0x4642    @ 0804999c 4246
@@ -1260,10 +1260,10 @@ LAB_080499a8:
     pop {r0}                                 @ 080499ba 01bc
     bx r0                                    @ 080499bc 0047
     .zero  0x2
-DAT_080499c0:
-    .word  0x384e0000                     @ 080499c0 00004e38
+render_spell_zone_card_sprite_with_id_tree_oam_attr2_or_384e:
+    .word  0x384e0000                     @ 080499c0 00004e38  OAM_ATTR2_OR_0X384E (2nd site) -- med-conf bit pattern
 
-@ Query field copy count for icid 0x1332 (Banisher of the Light); if > 0 directly call render_matched_pair_zone_sprites and return; otherwise enter detailed pair-check loop: traverse P1/P2 hand and field zones, test pair eligibility per slot via check_card_pair_allowed, on match call render_spell_zone_card_sprite_with_id_tree to render corresponding zone sprite. On first pair found call increment_lp_bar_display_counter; at end call decrement_lp_bar_display_counter + scan_field_slots_for_equip_sprite. pop{r0};bx r0 void exit. Called by duel_field rendering functions and FUN_0806d960 / FUN_0807f0a4. Function: fast-path render if field copy present; else full pair scan+render. Constants: icid=0x1332 (Banisher of the Light), PLAYER_STRIDE=0x868, ZONE_A=0x0201c4f0, ZONE_B=0x0201c4f8.
+@ Query field copy count for icid 0x1332 (Banisher of the Light); if > 0 directly call render_matched_pair_zone_sprites and return; otherwise enter detailed pair-check loop: traverse P1/P2 hand and field zones, test pair eligibility per slot via check_card_pair_allowed, on match call render_spell_zone_card_sprite_with_id_tree to render corresponding zone sprite. On first pair found call increment_lp_bar_display_counter; at end call decrement_lp_bar_display_counter + scan_field_slots_for_equip_sprite. pop{r0};bx r0 void exit. Called by duel_field rendering functions and dispatch_field_spell_placement_display_by_state / tick_prng_pair_zone_sprite_by_field_card. Function: fast-path render if field copy present; else full pair scan+render. Constants: icid=0x1332 (Banisher of the Light), PLAYER_STRIDE=0x868, ZONE_A=0x0201c4f0, ZONE_B=0x0201c4f8.
 render_pair_zone_sprites_if_field_card_present:
     push {r4,r5,r6,r7,lr}                    @ 080499c4 f0b5
     .hword 0x4657    @ 080499c6 5746
@@ -1277,7 +1277,7 @@ render_pair_zone_sprites_if_field_card_present:
     str r3,[sp,#0x8]                         @ 080499d6 0293
     movs r0,#0x0    @ 080499d8 0020
     .hword 0x4681    @ 080499da 8146
-    ldr r0, DAT_080499f4                     @ 080499dc 0548
+    ldr r0, render_pair_zone_sprites_if_field_card_present_banisher_cid @ 080499dc 0548
     bl count_field_copies_of_card            @ 080499de e8f7ddfe
     cmp r0,#0x0                              @ 080499e2 0028
     beq LAB_080499f8                         @ 080499e4 08d0
@@ -1287,8 +1287,8 @@ render_pair_zone_sprites_if_field_card_present:
     ldr r3,[sp,#0x8]                         @ 080499ec 029b
     bl render_matched_pair_zone_sprites      @ 080499ee 00f0e5f8
     b LAB_08049b22                           @ 080499f2 96e0
-DAT_080499f4:
-    .word  0x00001332                     @ 080499f4 32130000
+render_pair_zone_sprites_if_field_card_present_banisher_cid:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 080499f4 32130000
 LAB_080499f8:
     ldr r1,[sp,#0x0]                         @ 080499f8 0099
     lsls r4,r1,#0x10    @ 080499fa 0c04
@@ -1309,7 +1309,7 @@ LAB_08049a16:
     ldr r3, PTR_gP1LifePoints_08049b34       @ 08049a1c 454b
     movs r1,#0x1    @ 08049a1e 0121
     ands r1,r7    @ 08049a20 3940
-    ldr r2, DAT_08049b38                     @ 08049a22 454a
+    ldr r2, render_pair_zone_sprites_if_field_card_present_player_stride @ 08049a22 454a
     adds r0,r1,#0x0    @ 08049a24 081c
     muls r0,r2    @ 08049a26 5043
     adds r4,r3,#0x0    @ 08049a28 1c1c
@@ -1362,10 +1362,10 @@ LAB_08049a74:
     bl render_spell_zone_card_sprite_with_id_tree @ 08049a84 fff7d4fe
 LAB_08049a88:
     adds r6,#0x1    @ 08049a88 0136
-    ldr r2, DAT_08049b38                     @ 08049a8a 2b4a
+    ldr r2, render_pair_zone_sprites_if_field_card_present_player_stride @ 08049a8a 2b4a
     .hword 0x4640    @ 08049a8c 4046
     muls r0,r2    @ 08049a8e 5043
-    ldr r1, DAT_08049b3c                     @ 08049a90 2a49
+    ldr r1, render_pair_zone_sprites_if_field_card_present_slot_count_base @ 08049a90 2a49
     adds r0,r0,r1    @ 08049a92 4018
     ldr r0,[r0,#0x0]                         @ 08049a94 0068
     cmp r6,r0                                @ 08049a96 8642
@@ -1375,7 +1375,7 @@ LAB_08049a9a:
     ldr r3, PTR_gP1LifePoints_08049b34       @ 08049a9c 254b
     movs r1,#0x1    @ 08049a9e 0121
     ands r1,r7    @ 08049aa0 3940
-    ldr r2, DAT_08049b38                     @ 08049aa2 254a
+    ldr r2, render_pair_zone_sprites_if_field_card_present_player_stride @ 08049aa2 254a
     adds r0,r1,#0x0    @ 08049aa4 081c
     muls r0,r2    @ 08049aa6 5043
     adds r4,r3,#0x0    @ 08049aa8 1c1c
@@ -1426,10 +1426,10 @@ LAB_08049aea:
     bl render_spell_zone_card_sprite_with_id_tree @ 08049b00 fff796fe
 LAB_08049b04:
     adds r6,#0x1    @ 08049b04 0136
-    ldr r2, DAT_08049b38                     @ 08049b06 0c4a
+    ldr r2, render_pair_zone_sprites_if_field_card_present_player_stride @ 08049b06 0c4a
     .hword 0x4640    @ 08049b08 4046
     muls r0,r2    @ 08049b0a 5043
-    ldr r1, DAT_08049b40                     @ 08049b0c 0c49
+    ldr r1, render_pair_zone_sprites_if_field_card_present_chain_count @ 08049b0c 0c49
     adds r0,r0,r1    @ 08049b0e 4018
     ldr r0,[r0,#0x0]                         @ 08049b10 0068
     cmp r6,r0                                @ 08049b12 8642
@@ -1451,12 +1451,12 @@ LAB_08049b22:
     .zero  0x2
 PTR_gP1LifePoints_08049b34:
     .word  gP1LifePoints                  @ 08049b34 e0c40102
-DAT_08049b38:
-    .word  0x00000868                     @ 08049b38 68080000
-DAT_08049b3c:
-    .word  0x0201c4f0                     @ 08049b3c f0c40102
-DAT_08049b40:
-    .word  0x0201c4f8                     @ 08049b40 f8c40102
+render_pair_zone_sprites_if_field_card_present_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08049b38 68080000
+render_pair_zone_sprites_if_field_card_present_slot_count_base:
+    .word  gP1SlotCountBase               @ 08049b3c f0c40102
+render_pair_zone_sprites_if_field_card_present_chain_count:
+    .word  gP1ChainZoneCountBase          @ 08049b40 f8c40102
 
 @ Before rendering spell zone sprite, check field copy count (icid=0x1332=Banisher of the Light). If count_field_copies_of_card > 0: read slot halfword from gP1LP+player_id*0x868+0x10e0+r1*4, extract low 13 bits as card_id, call check_card_type_is_spell to decide zone_row (0xd=non-spell / 0xc=spell), select attr0 (P1=0x33 / P2=0x8033), construct attr and enqueue_sprite_attr_record, then call submit_lp_bar_sprite_row_by_type(0x23, 0). If count==0: call render_spell_zone_card_sprite_with_id_tree to render; then scan_field_slots_for_equip_sprite(player_id, 1). pop{r0};bx r0 void exit. Called by 5 duel_field functions. Constants: icid=0x1332 (Banisher of the Light), ZONE_OFFSET=0x10e0 (=0x87<<5), P1_ATTR0=0x33, P2_ATTR0=0x8033, SPELL_ROW=0xc, NON_SPELL_ROW=0xd, LP_ROW=0x23.
 render_spell_zone_sprite_with_field_copy_check:
@@ -1464,7 +1464,7 @@ render_spell_zone_sprite_with_field_copy_check:
     adds r6,r0,#0x0    @ 08049b46 061c
     adds r4,r1,#0x0    @ 08049b48 0c1c
     adds r5,r2,#0x0    @ 08049b4a 151c
-    ldr r0, DAT_08049b94                     @ 08049b4c 1148
+    ldr r0, render_spell_zone_sprite_with_field_copy_check_banisher_cid @ 08049b4c 1148
     bl count_field_copies_of_card            @ 08049b4e e8f725fe
     cmp r0,#0x0                              @ 08049b52 0028
     beq LAB_08049ba0                         @ 08049b54 24d0
@@ -1486,7 +1486,7 @@ LAB_08049b74:
     movs r0,#0x33    @ 08049b74 3320
     cmp r6,#0x0                              @ 08049b76 002e
     beq LAB_08049b7c                         @ 08049b78 00d0
-    ldr r0, DAT_08049b9c                     @ 08049b7a 0848
+    ldr r0, render_spell_zone_sprite_with_field_copy_check_oam_p1 @ 08049b7a 0848
 LAB_08049b7c:
     rsbs r2,r5,#0    @ 08049b7c 6a42
     orrs r2,r5    @ 08049b7e 2a43
@@ -1498,12 +1498,12 @@ LAB_08049b7c:
     movs r1,#0x0    @ 08049b8c 0021
     bl submit_lp_bar_sprite_row_by_type      @ 08049b8e 3bf0c7fb
     b LAB_08049bb4                           @ 08049b92 0fe0
-DAT_08049b94:
-    .word  0x00001332                     @ 08049b94 32130000
+render_spell_zone_sprite_with_field_copy_check_banisher_cid:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08049b94 32130000
 PTR_gP1LifePoints_08049b98:
     .word  gP1LifePoints                  @ 08049b98 e0c40102
-DAT_08049b9c:
-    .word  0x00008033                     @ 08049b9c 33800000
+render_spell_zone_sprite_with_field_copy_check_oam_p1:
+    .word  OAM_EQUIP_ZONE_SPRITE_P1       @ 08049b9c 33800000
 LAB_08049ba0:
     adds r0,r6,#0x0    @ 08049ba0 301c
     adds r1,r4,#0x0    @ 08049ba2 211c
@@ -1538,7 +1538,7 @@ render_matched_pair_zone_sprites:
     movs r1,#0x1    @ 08049bd8 0121
     ldr r2,[sp,#0x0]                         @ 08049bda 009a
     ands r1,r2    @ 08049bdc 1140
-    ldr r2, DAT_08049d0c                     @ 08049bde 4b4a
+    ldr r2, render_matched_pair_zone_sprites_player_stride @ 08049bde 4b4a
     adds r0,r1,#0x0    @ 08049be0 081c
     muls r0,r2    @ 08049be2 5043
     adds r4,r3,#0x0    @ 08049be4 1c1c
@@ -1556,7 +1556,7 @@ LAB_08049bf8:
     .hword 0x4644    @ 08049bfa 4446
     muls r4,r2    @ 08049bfc 5443
     adds r0,r5,r4    @ 08049bfe 2819
-    ldr r1, DAT_08049d10                     @ 08049c00 4349
+    ldr r1, render_matched_pair_zone_sprites_slot_code_arr @ 08049c00 4349
     adds r0,r0,r1    @ 08049c02 4018
     ldr r0,[r0,#0x0]                         @ 08049c04 0068
     lsls r0,r0,#0x13    @ 08049c06 c004
@@ -1565,7 +1565,7 @@ LAB_08049bf8:
     bl check_card_pair_allowed               @ 08049c0c 00f09eff
     cmp r0,#0x0                              @ 08049c10 0028
     beq LAB_08049c4c                         @ 08049c12 1bd0
-    ldr r2, DAT_08049d10                     @ 08049c14 3e4a
+    ldr r2, render_matched_pair_zone_sprites_slot_code_arr @ 08049c14 3e4a
     adds r0,r4,r2    @ 08049c16 a018
     adds r0,r0,r5    @ 08049c18 4019
     ldr r1,[sp,#0x8]                         @ 08049c1a 0299
@@ -1581,7 +1581,7 @@ LAB_08049c26:
     ldr r2,[sp,#0x0]                         @ 08049c2c 009a
     cmp r2,#0x0                              @ 08049c2e 002a
     beq LAB_08049c34                         @ 08049c30 00d0
-    ldr r1, DAT_08049d14                     @ 08049c32 3849
+    ldr r1, render_matched_pair_zone_sprites_oam_p1 @ 08049c32 3849
 LAB_08049c34:
     ldr r3,[r0,#0x0]                         @ 08049c34 0368
     lsls r0,r3,#0x2    @ 08049c36 9800
@@ -1596,10 +1596,10 @@ LAB_08049c34:
     bl enqueue_sprite_attr_record            @ 08049c48 f2f770f8
 LAB_08049c4c:
     adds r6,#0x1    @ 08049c4c 0136
-    ldr r2, DAT_08049d0c                     @ 08049c4e 2f4a
+    ldr r2, render_matched_pair_zone_sprites_player_stride @ 08049c4e 2f4a
     .hword 0x4640    @ 08049c50 4046
     muls r0,r2    @ 08049c52 5043
-    ldr r1, DAT_08049d18                     @ 08049c54 3049
+    ldr r1, render_matched_pair_zone_sprites_slot_count_base @ 08049c54 3049
     adds r0,r0,r1    @ 08049c56 4018
     ldr r0,[r0,#0x0]                         @ 08049c58 0068
     cmp r6,r0                                @ 08049c5a 8642
@@ -1610,7 +1610,7 @@ LAB_08049c5e:
     movs r1,#0x1    @ 08049c62 0121
     ldr r2,[sp,#0x0]                         @ 08049c64 009a
     ands r1,r2    @ 08049c66 1140
-    ldr r2, DAT_08049d0c                     @ 08049c68 284a
+    ldr r2, render_matched_pair_zone_sprites_player_stride @ 08049c68 284a
     adds r0,r1,#0x0    @ 08049c6a 081c
     muls r0,r2    @ 08049c6c 5043
     adds r4,r3,#0x0    @ 08049c6e 1c1c
@@ -1629,7 +1629,7 @@ LAB_08049c84:
     .hword 0x4644    @ 08049c86 4446
     muls r4,r2    @ 08049c88 5443
     adds r0,r5,r4    @ 08049c8a 2819
-    ldr r1, DAT_08049d1c                     @ 08049c8c 2349
+    ldr r1, render_matched_pair_zone_sprites_chain_zone_arr @ 08049c8c 2349
     adds r0,r0,r1    @ 08049c8e 4018
     ldr r0,[r0,#0x0]                         @ 08049c90 0068
     lsls r0,r0,#0x13    @ 08049c92 c004
@@ -1638,7 +1638,7 @@ LAB_08049c84:
     bl check_card_pair_allowed               @ 08049c98 00f058ff
     cmp r0,#0x0                              @ 08049c9c 0028
     beq LAB_08049cd8                         @ 08049c9e 1bd0
-    ldr r2, DAT_08049d1c                     @ 08049ca0 1e4a
+    ldr r2, render_matched_pair_zone_sprites_chain_zone_arr @ 08049ca0 1e4a
     adds r0,r4,r2    @ 08049ca2 a018
     adds r0,r0,r5    @ 08049ca4 4019
     ldr r1,[sp,#0x8]                         @ 08049ca6 0299
@@ -1654,7 +1654,7 @@ LAB_08049cb2:
     ldr r2,[sp,#0x0]                         @ 08049cb8 009a
     cmp r2,#0x0                              @ 08049cba 002a
     beq LAB_08049cc0                         @ 08049cbc 00d0
-    ldr r1, DAT_08049d14                     @ 08049cbe 1549
+    ldr r1, render_matched_pair_zone_sprites_oam_p1 @ 08049cbe 1549
 LAB_08049cc0:
     ldr r3,[r0,#0x0]                         @ 08049cc0 0368
     lsls r0,r3,#0x2    @ 08049cc2 9800
@@ -1669,7 +1669,7 @@ LAB_08049cc0:
     bl enqueue_sprite_attr_record            @ 08049cd4 f2f72af8
 LAB_08049cd8:
     adds r6,#0x1    @ 08049cd8 0136
-    ldr r2, DAT_08049d0c                     @ 08049cda 0c4a
+    ldr r2, render_matched_pair_zone_sprites_player_stride @ 08049cda 0c4a
     .hword 0x4640    @ 08049cdc 4046
     muls r0,r2    @ 08049cde 5043
     add r0,r10                               @ 08049ce0 5044
@@ -1696,16 +1696,16 @@ LAB_08049cf6:
     .zero  0x2
 PTR_gP1LifePoints_08049d08:
     .word  gP1LifePoints                  @ 08049d08 e0c40102
-DAT_08049d0c:
-    .word  0x00000868                     @ 08049d0c 68080000
-DAT_08049d10:
-    .word  0x0201c740                     @ 08049d10 40c70102
-DAT_08049d14:
-    .word  0x00008033                     @ 08049d14 33800000
-DAT_08049d18:
-    .word  0x0201c4f0                     @ 08049d18 f0c40102
-DAT_08049d1c:
-    .word  0x0201c880                     @ 08049d1c 80c80102
+render_matched_pair_zone_sprites_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08049d0c 68080000
+render_matched_pair_zone_sprites_slot_code_arr:
+    .word  gP1SlotSetCodeArray            @ 08049d10 40c70102
+render_matched_pair_zone_sprites_oam_p1:
+    .word  OAM_EQUIP_ZONE_SPRITE_P1       @ 08049d14 33800000
+render_matched_pair_zone_sprites_slot_count_base:
+    .word  gP1SlotCountBase               @ 08049d18 f0c40102
+render_matched_pair_zone_sprites_chain_zone_arr:
+    .word  gP1ChainZoneArray              @ 08049d1c 80c80102
 
 @ Function: Based on r0 mode_flag, selects sprite base address (0=DAT_08049d18=0x0201c4f0
 @ gMonsterSlotSpriteBase, nonzero=DWORD_08049d40=0x00008033), then submits r2 (x_coord,
@@ -1725,7 +1725,7 @@ enqueue_equip_zone_sprite_with_mode:
     movs r4,#0x33    @ 08049d22 3324
     cmp r0,#0x0                              @ 08049d24 0028
     beq LAB_08049d2a                         @ 08049d26 00d0
-    ldr r4, DWORD_08049d40                   @ 08049d28 054c
+    ldr r4, enqueue_equip_zone_sprite_with_mode_oam_p1 @ 08049d28 054c
 LAB_08049d2a:
     lsls r2,r2,#0x10    @ 08049d2a 1204
     lsrs r2,r2,#0x10    @ 08049d2c 120c
@@ -1737,8 +1737,8 @@ LAB_08049d2a:
     pop {r4}                                 @ 08049d3a 10bc
     pop {r0}                                 @ 08049d3c 01bc
     bx r0                                    @ 08049d3e 0047
-DWORD_08049d40:
-    .word  0x00008033                     @ 08049d40 33800000
+enqueue_equip_zone_sprite_with_mode_oam_p1:
+    .word  OAM_EQUIP_ZONE_SPRITE_P1       @ 08049d40 33800000
 
 @ Function: Iterates the current player side (r8=r0=player_side) equip pair slot list
 @ (base gP1LifePoints+0x1ce8*player_side+0x10, stride=0x868). For each slot, calls
@@ -1772,7 +1772,7 @@ enqueue_pair_zone_sprite_attr_by_card_id:
     movs r0,#0x1    @ 08049d5e 0120
     .hword 0x4641    @ 08049d60 4146
     ands r0,r1    @ 08049d62 0840
-    ldr r1, DWORD_08049dc8                   @ 08049d64 1849
+    ldr r1, enqueue_pair_zone_sprite_attr_by_card_id_player_stride @ 08049d64 1849
     adds r2,r0,#0x0    @ 08049d66 021c
     muls r2,r1    @ 08049d68 4a43
     adds r0,r3,#0x0    @ 08049d6a 181c
@@ -1821,8 +1821,8 @@ LAB_08049d84:
     b LAB_08049dda                           @ 08049dc2 0ae0
 DWORD_08049dc4:
     .word  gP1LifePoints                  @ 08049dc4 e0c40102
-DWORD_08049dc8:
-    .word  0x00000868                     @ 08049dc8 68080000
+enqueue_pair_zone_sprite_attr_by_card_id_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08049dc8 68080000
 LAB_08049dcc:
     adds r4,#0x4    @ 08049dcc 0434
     adds r6,#0x1    @ 08049dce 0136
@@ -1848,7 +1848,7 @@ LAB_08049dda:
 @ get_effect_slot_entry_ptr_by_palette_id twice per slot to get current and next
 @ entry ptrs, extracts bits[21:14]x2+bit14 as sprite pair_code, selects x_base
 @ (display_mode==0: 0x56, else DAT_08049e40), then calls enqueue_sprite_attr_record(type=0xd).
-@ Called by FUN_080665d4 (field spell/pair display chain) and FUN_0806abec (card_frame chain).
+@ Called by dispatch_zone_state_for_reserved_icid_slot (field spell/pair display chain) and dispatch_equip_effect_slot_display_by_state_and_card (card_frame chain).
 @ No external memory writes; only appends to sprite queue.
 @ 
 @ Constants:
@@ -1888,7 +1888,7 @@ LAB_08049e00:
     movs r0,#0x56    @ 08049e20 5620
     cmp r7,#0x0                              @ 08049e22 002f
     beq LAB_08049e28                         @ 08049e24 00d0
-    ldr r0, DAT_08049e40                     @ 08049e26 0648
+    ldr r0, enqueue_effect_slot_sprites_descending_oam_p1 @ 08049e26 0648
 LAB_08049e28:
     movs r1,#0xd    @ 08049e28 0d21
     movs r3,#0x0    @ 08049e2a 0023
@@ -1902,10 +1902,10 @@ LAB_08049e36:
     bx r0                                    @ 08049e3a 0047
 PTR_gP1LifePoints_08049e3c:
     .word  gP1LifePoints                  @ 08049e3c e0c40102
-DAT_08049e40:
-    .word  0x00008056                     @ 08049e40 56800000
+enqueue_effect_slot_sprites_descending_oam_p1:
+    .word  OAM_EFFECT_SLOT_TILE_P1        @ 08049e40 56800000
 
-@ Called by 3 duel_field callers (FUN_0804a2c8, FUN_0804a2e4, FUN_0804a30c). Receives equip zone slot ref ptr (r3), extracts card_id bits[12:0], calls count_field_copies_of_card to check same-name count on field; sets field_copy_flag if >0. Then calls check_card_field8_is_9 (r0=card_id). Combines both check results to build OAM attr fields (palette/flip/coord), calls enqueue_sprite_attr_record to write to sprite buffer. Conditionally calls scan_field_slots_for_equip_sprite for further slot scan. r0=u8 player_id [0..1], r1=u8 slot_col [0..9], r2=u16 card_id [0..0x1fff], r3=ptr slot_entry. Returns u32 oam_attr_or_zero (0=not written). Prologue: .hword 0x4680=mov r8,r0, .hword 0x4689=mov r9,r1 (callee-save). Callers: FUN_0804a2c8, FUN_0804a2e4, FUN_0804a30c.
+@ Called by 3 duel_field callers (submit_equip_slot_sprite_zone11, enqueue_equip_slot_sprite_zone13, enqueue_equip_slot_sprite_zone12). Receives equip zone slot ref ptr (r3), extracts card_id bits[12:0], calls count_field_copies_of_card to check same-name count on field; sets field_copy_flag if >0. Then calls check_card_field8_is_9 (r0=card_id). Combines both check results to build OAM attr fields (palette/flip/coord), calls enqueue_sprite_attr_record to write to sprite buffer. Conditionally calls scan_field_slots_for_equip_sprite for further slot scan. r0=u8 player_id [0..1], r1=u8 slot_col [0..9], r2=u16 card_id [0..0x1fff], r3=ptr slot_entry. Returns u32 oam_attr_or_zero (0=not written). Prologue: .hword 0x4680=mov r8,r0, .hword 0x4689=mov r9,r1 (callee-save). Callers: submit_equip_slot_sprite_zone11, enqueue_equip_slot_sprite_zone13, enqueue_equip_slot_sprite_zone12.
 enqueue_equip_slot_sprite_with_card_check:
     push {r4,r5,r6,r7,lr}                    @ 08049e44 f0b5
     .hword 0x4657    @ 08049e46 5746
@@ -1919,7 +1919,7 @@ enqueue_equip_slot_sprite_with_card_check:
     ldr r0,[r7,#0x0]                         @ 08049e56 3868
     lsls r0,r0,#0x13    @ 08049e58 c004
     lsrs r5,r0,#0x13    @ 08049e5a c50c
-    ldr r0, DAT_08049f28                     @ 08049e5c 3248
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_banisher_cid @ 08049e5c 3248
     bl count_field_copies_of_card            @ 08049e5e e8f79dfc
     movs r4,#0x0    @ 08049e62 0024
     cmp r0,#0x0                              @ 08049e64 0028
@@ -1966,7 +1966,7 @@ LAB_08049e80:
     movs r1,#0xf    @ 08049eb4 0f21
 LAB_08049eb6:
     lsls r1,r1,#0xc    @ 08049eb6 0903
-    ldr r0, DAT_08049f2c                     @ 08049eb8 1c48
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_clr_pal @ 08049eb8 1c48
     ands r6,r0    @ 08049eba 0640
     orrs r6,r1    @ 08049ebc 0e43
     movs r0,#0x31    @ 08049ebe 3120
@@ -1974,7 +1974,7 @@ LAB_08049eb6:
     .hword 0x4641    @ 08049ec2 4146
     cmp r1,#0x0                              @ 08049ec4 0029
     beq LAB_08049ecc                         @ 08049ec6 01d0
-    ldr r2, DAT_08049f30                     @ 08049ec8 194a
+    ldr r2, enqueue_equip_slot_sprite_with_card_check_effect_zone_p1 @ 08049ec8 194a
     .hword 0x4694    @ 08049eca 9446
 LAB_08049ecc:
     .hword 0x464b    @ 08049ecc 4b46
@@ -2000,69 +2000,69 @@ LAB_08049ecc:
     movs r1,#0x1    @ 08049ef6 0121
     bl scan_field_slots_for_equip_sprite     @ 08049ef8 44f0b0fc
 LAB_08049efc:
-    ldr r0, DAT_08049f34                     @ 08049efc 0d48
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_marron_cid @ 08049efc 0d48
     cmp r5,r0                                @ 08049efe 8542
     bne LAB_08049f04                         @ 08049f00 00d1
     b LAB_0804a022                           @ 08049f02 8ee0
 LAB_08049f04:
     cmp r5,r0                                @ 08049f04 8542
     bgt LAB_08049f80                         @ 08049f06 3bdc
-    ldr r0, DAT_08049f38                     @ 08049f08 0b48
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_archfiend_cid @ 08049f08 0b48
     cmp r5,r0                                @ 08049f0a 8542
     bne LAB_08049f10                         @ 08049f0c 00d1
     b LAB_0804a022                           @ 08049f0e 88e0
 LAB_08049f10:
     cmp r5,r0                                @ 08049f10 8542
     bgt LAB_08049f54                         @ 08049f12 1fdc
-    ldr r0, DAT_08049f3c                     @ 08049f14 0948
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_cockroach_cid @ 08049f14 0948
     cmp r5,r0                                @ 08049f16 8542
     bne LAB_08049f1c                         @ 08049f18 00d1
     b LAB_0804a022                           @ 08049f1a 82e0
 LAB_08049f1c:
     cmp r5,r0                                @ 08049f1c 8542
     bgt LAB_08049f44                         @ 08049f1e 11dc
-    ldr r0, DAT_08049f40                     @ 08049f20 0748
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_penguin_cid @ 08049f20 0748
     cmp r5,r0                                @ 08049f22 8542
     beq LAB_08049fd4                         @ 08049f24 56d0
     b LAB_0804a02a                           @ 08049f26 80e0
-DAT_08049f28:
-    .word  0x00001332                     @ 08049f28 32130000
-DAT_08049f2c:
-    .word  0xffff0fff                     @ 08049f2c ff0fffff
-DAT_08049f30:
-    .word  0x00008031                     @ 08049f30 31800000
-DAT_08049f34:
-    .word  0x00001687                     @ 08049f34 87160000
-DAT_08049f38:
-    .word  0x000013e3                     @ 08049f38 e3130000
-DAT_08049f3c:
-    .word  0x00001185                     @ 08049f3c 85110000
-DAT_08049f40:
-    .word  0x0000106d                     @ 08049f40 6d100000
+enqueue_equip_slot_sprite_with_card_check_banisher_cid:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08049f28 32130000
+enqueue_equip_slot_sprite_with_card_check_clr_pal:
+    .word  0xffff0fff                     @ 08049f2c ff0fffff  OAM_ATTR2_PAL_CLEAR
+enqueue_equip_slot_sprite_with_card_check_effect_zone_p1:
+    .word  OAM_EFFECT_ZONE_SPRITE_P1      @ 08049f30 31800000
+enqueue_equip_slot_sprite_with_card_check_marron_cid:
+    .word  OUTSTANDING_DOG_MARRON_CID     @ 08049f34 87160000
+enqueue_equip_slot_sprite_with_card_check_archfiend_cid:
+    .word  ARCHFIEND_OF_GILFER_CID        @ 08049f38 e3130000
+enqueue_equip_slot_sprite_with_card_check_cockroach_cid:
+    .word  COCKROACH_KNIGHT_CID           @ 08049f3c 85110000
+enqueue_equip_slot_sprite_with_card_check_penguin_cid:
+    .word  PENGUIN_KNIGHT_CID             @ 08049f40 6d100000
 LAB_08049f44:
-    ldr r0, DAT_08049f50                     @ 08049f44 0248
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_skull_ladybug_cid @ 08049f44 0248
     cmp r5,r0                                @ 08049f46 8542
     beq LAB_0804a022                         @ 08049f48 6bd0
     adds r0,#0x67    @ 08049f4a 6730
     b LAB_08049fc8                           @ 08049f4c 3ce0
     .zero  0x2
-DAT_08049f50:
-    .word  0x000012a2                     @ 08049f50 a2120000
+enqueue_equip_slot_sprite_with_card_check_skull_ladybug_cid:
+    .word  SKULL_MARK_LADYBUG_CID         @ 08049f50 a2120000
 LAB_08049f54:
-    ldr r0, DAT_08049f64                     @ 08049f54 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_granadora_cid @ 08049f54 0348
     cmp r5,r0                                @ 08049f56 8542
     beq LAB_0804a022                         @ 08049f58 63d0
     cmp r5,r0                                @ 08049f5a 8542
     bgt LAB_08049f6c                         @ 08049f5c 06dc
-    ldr r0, DAT_08049f68                     @ 08049f5e 0248
+    ldr r0, enqueue_equip_slot_sprite_kaiser_glider_cid @ 08049f5e 0248
     b LAB_08049fc8                           @ 08049f60 32e0
     .zero  0x2
-DAT_08049f64:
-    .word  0x0000163f                     @ 08049f64 3f160000
-DAT_08049f68:
-    .word  0x000014e9                     @ 08049f68 e9140000
+enqueue_equip_slot_sprite_with_card_check_granadora_cid:
+    .word  GRANADORA_CID                  @ 08049f64 3f160000
+enqueue_equip_slot_sprite_kaiser_glider_cid:
+    .word  0x000014e9                     @ 08049f68 e9140000  0x14e9=KAISER_GLIDER_CID (pw=52824910); direct CID slot -- high-conf
 LAB_08049f6c:
-    ldr r0, DAT_08049f7c                     @ 08049f6c 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_despair_cid @ 08049f6c 0348
     cmp r5,r0                                @ 08049f6e 8542
     beq LAB_0804a008                         @ 08049f70 4ad0
     adds r0,#0x2    @ 08049f72 0230
@@ -2070,10 +2070,10 @@ LAB_08049f6c:
     beq LAB_0804a008                         @ 08049f76 47d0
     b LAB_0804a02a                           @ 08049f78 57e0
     .zero  0x2
-DAT_08049f7c:
-    .word  0x00001653                     @ 08049f7c 53160000
+enqueue_equip_slot_sprite_with_card_check_despair_cid:
+    .word  DESPAIR_FROM_THE_DARK_CID      @ 08049f7c 53160000
 LAB_08049f80:
-    ldr r0, DAT_08049f9c                     @ 08049f80 0648
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_night_assailant_cid @ 08049f80 0648
     cmp r5,r0                                @ 08049f82 8542
     beq LAB_08049ff8                         @ 08049f84 38d0
     cmp r5,r0                                @ 08049f86 8542
@@ -2087,17 +2087,17 @@ LAB_08049f80:
     subs r0,#0x9e    @ 08049f96 9e38
     b LAB_08049fc8                           @ 08049f98 16e0
     .zero  0x2
-DAT_08049f9c:
-    .word  0x0000179a                     @ 08049f9c 9a170000
+enqueue_equip_slot_sprite_with_card_check_night_assailant_cid:
+    .word  NIGHT_ASSAILANT_CID            @ 08049f9c 9a170000
 LAB_08049fa0:
-    ldr r0, DAT_08049fa8                     @ 08049fa0 0148
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_regen_mummy_cid @ 08049fa0 0148
     cmp r5,r0                                @ 08049fa2 8542
     beq LAB_08049fe6                         @ 08049fa4 1fd0
     b LAB_0804a02a                           @ 08049fa6 40e0
-DAT_08049fa8:
-    .word  0x00001799                     @ 08049fa8 99170000
+enqueue_equip_slot_sprite_with_card_check_regen_mummy_cid:
+    .word  REGENERATING_MUMMY_CID         @ 08049fa8 99170000
 LAB_08049fac:
-    ldr r0, DAT_08049fbc                     @ 08049fac 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_roc_cid @ 08049fac 0348
     cmp r5,r0                                @ 08049fae 8542
     beq LAB_08049ff8                         @ 08049fb0 22d0
     cmp r5,r0                                @ 08049fb2 8542
@@ -2105,10 +2105,10 @@ LAB_08049fac:
     subs r0,#0x63    @ 08049fb6 6338
     b LAB_08049fc8                           @ 08049fb8 06e0
     .zero  0x2
-DAT_08049fbc:
-    .word  0x00001828                     @ 08049fbc 28180000
+enqueue_equip_slot_sprite_with_card_check_roc_cid:
+    .word  ROC_FROM_THE_VALLEY_OF_HAZE_CID @ 08049fbc 28180000
 LAB_08049fc0:
-    ldr r0, DAT_08049fd0                     @ 08049fc0 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_ojamagic_cid @ 08049fc0 0348
     cmp r5,r0                                @ 08049fc2 8542
     beq LAB_08049ff8                         @ 08049fc4 18d0
     adds r0,#0xb8    @ 08049fc6 b830
@@ -2117,8 +2117,8 @@ LAB_08049fc8:
     beq LAB_0804a022                         @ 08049fca 2ad0
     b LAB_0804a02a                           @ 08049fcc 2de0
     .zero  0x2
-DAT_08049fd0:
-    .word  0x00001946                     @ 08049fd0 46190000
+enqueue_equip_slot_sprite_with_card_check_ojamagic_cid:
+    .word  OJAMAGIC_CID                   @ 08049fd0 46190000
 LAB_08049fd4:
     cmp r4,#0x0                              @ 08049fd4 002c
     bne LAB_0804a02a                         @ 08049fd6 28d1
@@ -2185,7 +2185,7 @@ LAB_0804a02a:
 LAB_0804a046:
     adds r0,r4,#0x0    @ 0804a046 201c
     movs r1,#0xa    @ 0804a048 0a21
-    ldr r2, DAT_0804a06c                     @ 0804a04a 084a
+    ldr r2, enqueue_equip_slot_sprite_with_card_check_pandemonium_cid_a @ 0804a04a 084a
     bl test_slot_has_active_card             @ 0804a04c e8f77cfa
     cmp r0,#0x0                              @ 0804a050 0028
     beq LAB_0804a09a                         @ 0804a052 22d0
@@ -2198,22 +2198,22 @@ LAB_0804a046:
     lsrs r0,r0,#0x1f    @ 0804a060 c00f
     cmp r0,r4                                @ 0804a062 a042
     beq LAB_0804a074                         @ 0804a064 06d0
-    ldr r2, DAT_0804a070                     @ 0804a066 024a
+    ldr r2, enqueue_equip_slot_sprite_packed_pandemonium_p1 @ 0804a066 024a
     b LAB_0804a076                           @ 0804a068 05e0
     .zero  0x2
-DAT_0804a06c:
-    .word  0x0000169f                     @ 0804a06c 9f160000
-DAT_0804a070:
-    .word  0x012a169f                     @ 0804a070 9f162a01
+enqueue_equip_slot_sprite_with_card_check_pandemonium_cid_a:
+    .word  PANDEMONIUM_CID                @ 0804a06c 9f160000
+enqueue_equip_slot_sprite_packed_pandemonium_p1:
+    .word  0x012a169f                     @ 0804a070 9f162a01  hi16=0x012a(r_attr bits) lo16=0x169f(PANDEMONIUM_CID); P1 path packed r2 -- med-conf
 LAB_0804a074:
-    ldr r2, DAT_0804a0d8                     @ 0804a074 184a
+    ldr r2, enqueue_equip_slot_sprite_packed_pandemonium_p2 @ 0804a074 184a
 LAB_0804a076:
     orrs r2,r1    @ 0804a076 0a43
     movs r0,#0x1    @ 0804a078 0120
     ands r0,r4    @ 0804a07a 2040
-    ldr r1, DAT_0804a0dc                     @ 0804a07c 1749
+    ldr r1, enqueue_equip_slot_sprite_with_card_check_player_stride @ 0804a07c 1749
     muls r0,r1    @ 0804a07e 4843
-    ldr r1, DAT_0804a0e0                     @ 0804a080 1749
+    ldr r1, enqueue_equip_slot_sprite_with_card_check_p2_slots @ 0804a080 1749
     adds r0,r0,r1    @ 0804a082 4018
     ldr r1,[r0,#0x0]                         @ 0804a084 0168
     lsls r0,r1,#0x2    @ 0804a086 8800
@@ -2241,7 +2241,7 @@ LAB_0804a0a0:
 LAB_0804a0b2:
     adds r0,r4,#0x0    @ 0804a0b2 201c
     movs r1,#0xa    @ 0804a0b4 0a21
-    ldr r2, DAT_0804a0e4                     @ 0804a0b6 0b4a
+    ldr r2, enqueue_equip_slot_sprite_with_card_check_centrifugal_cid_a @ 0804a0b6 0b4a
     bl test_slot_has_active_card             @ 0804a0b8 e8f746fa
     cmp r0,#0x0                              @ 0804a0bc 0028
     beq LAB_0804a112                         @ 0804a0be 28d0
@@ -2254,28 +2254,28 @@ LAB_0804a0b2:
     lsrs r0,r0,#0x1f    @ 0804a0cc c00f
     cmp r0,r4                                @ 0804a0ce a042
     beq LAB_0804a0ec                         @ 0804a0d0 0cd0
-    ldr r2, DAT_0804a0e8                     @ 0804a0d2 054a
+    ldr r2, enqueue_equip_slot_sprite_packed_centrifugal_p1 @ 0804a0d2 054a
     b LAB_0804a0ee                           @ 0804a0d4 0be0
     .zero  0x2
-DAT_0804a0d8:
-    .word  0x002a169f                     @ 0804a0d8 9f162a00
-DAT_0804a0dc:
-    .word  0x00000868                     @ 0804a0dc 68080000
-DAT_0804a0e0:
-    .word  0x0201c5d8                     @ 0804a0e0 d8c50102
-DAT_0804a0e4:
-    .word  0x0000187f                     @ 0804a0e4 7f180000
-DAT_0804a0e8:
-    .word  0x012a187f                     @ 0804a0e8 7f182a01
+enqueue_equip_slot_sprite_packed_pandemonium_p2:
+    .word  0x002a169f                     @ 0804a0d8 9f162a00  hi16=0x002a(r_attr bits) lo16=0x169f(PANDEMONIUM_CID); P2 path packed r2 -- med-conf
+enqueue_equip_slot_sprite_with_card_check_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0804a0dc 68080000
+enqueue_equip_slot_sprite_with_card_check_p2_slots:
+    .word  gDuelFieldSlots_p2_base        @ 0804a0e0 d8c50102
+enqueue_equip_slot_sprite_with_card_check_centrifugal_cid_a:
+    .word  CENTRIFUGAL_FIELD_CID          @ 0804a0e4 7f180000
+enqueue_equip_slot_sprite_packed_centrifugal_p1:
+    .word  0x012a187f                     @ 0804a0e8 7f182a01  hi16=0x012a(r_attr bits) lo16=0x187f(CENTRIFUGAL_FIELD_CID); P1 path packed r2 -- med-conf
 LAB_0804a0ec:
-    ldr r2, DAT_0804a14c                     @ 0804a0ec 174a
+    ldr r2, enqueue_equip_slot_sprite_packed_centrifugal_p2 @ 0804a0ec 174a
 LAB_0804a0ee:
     orrs r2,r1    @ 0804a0ee 0a43
     movs r0,#0x1    @ 0804a0f0 0120
     ands r0,r4    @ 0804a0f2 2040
-    ldr r1, DAT_0804a150                     @ 0804a0f4 1649
+    ldr r1, enqueue_equip_slot_sprite_with_card_check_player_stride_b @ 0804a0f4 1649
     muls r0,r1    @ 0804a0f6 4843
-    ldr r1, DAT_0804a154                     @ 0804a0f8 1649
+    ldr r1, enqueue_equip_slot_sprite_with_card_check_p2_slots_b @ 0804a0f8 1649
     adds r0,r0,r1    @ 0804a0fa 4018
     ldr r1,[r0,#0x0]                         @ 0804a0fc 0168
     lsls r0,r1,#0x2    @ 0804a0fe 8800
@@ -2306,7 +2306,7 @@ LAB_0804a118:
     bne LAB_0804a134                         @ 0804a130 00d1
     movs r1,#0x1    @ 0804a132 0121
 LAB_0804a134:
-    ldr r0, DAT_0804a158                     @ 0804a134 0848
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_vampire_cid @ 0804a134 0848
     cmp r5,r0                                @ 0804a136 8542
     beq LAB_0804a1da                         @ 0804a138 4fd0
     cmp r5,r0                                @ 0804a13a 8542
@@ -2318,27 +2318,27 @@ LAB_0804a134:
     cmp r5,r0                                @ 0804a146 8542
     beq LAB_0804a174                         @ 0804a148 14d0
     b LAB_0804a28a                           @ 0804a14a 9ee0
-DAT_0804a14c:
-    .word  0x002a187f                     @ 0804a14c 7f182a00
-DAT_0804a150:
-    .word  0x00000868                     @ 0804a150 68080000
-DAT_0804a154:
-    .word  0x0201c5d8                     @ 0804a154 d8c50102
-DAT_0804a158:
-    .word  0x00001522                     @ 0804a158 22150000
+enqueue_equip_slot_sprite_packed_centrifugal_p2:
+    .word  0x002a187f                     @ 0804a14c 7f182a00  hi16=0x002a(r_attr bits) lo16=0x187f(CENTRIFUGAL_FIELD_CID); P2 path packed r2 -- med-conf
+enqueue_equip_slot_sprite_with_card_check_player_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0804a150 68080000
+enqueue_equip_slot_sprite_with_card_check_p2_slots_b:
+    .word  gDuelFieldSlots_p2_base        @ 0804a154 d8c50102
+enqueue_equip_slot_sprite_with_card_check_vampire_cid:
+    .word  VAMPIRE_LORD_CID               @ 0804a158 22150000
 LAB_0804a15c:
-    ldr r0, DAT_0804a16c                     @ 0804a15c 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_manticore_cid @ 0804a15c 0348
     cmp r5,r0                                @ 0804a15e 8542
     beq LAB_0804a174                         @ 0804a160 08d0
-    ldr r0, DAT_0804a170                     @ 0804a162 0348
+    ldr r0, enqueue_equip_slot_sprite_with_card_check_phoenix_cid @ 0804a162 0348
     cmp r5,r0                                @ 0804a164 8542
     beq LAB_0804a236                         @ 0804a166 66d0
     b LAB_0804a28a                           @ 0804a168 8fe0
     .zero  0x2
-DAT_0804a16c:
-    .word  0x000016f9                     @ 0804a16c f9160000
-DAT_0804a170:
-    .word  0x0000185c                     @ 0804a170 5c180000
+enqueue_equip_slot_sprite_with_card_check_manticore_cid:
+    .word  MANTICORE_OF_DARKNESS_CID      @ 0804a16c f9160000
+enqueue_equip_slot_sprite_with_card_check_phoenix_cid:
+    .word  SACRED_PHOENIX_CID             @ 0804a170 5c180000
 LAB_0804a174:
     cmp r1,#0x0                              @ 0804a174 0029
     bne LAB_0804a17a                         @ 0804a176 00d1
@@ -2407,7 +2407,7 @@ LAB_0804a1da:
     cmp r1,#0x0                              @ 0804a1ee 0029
     beq LAB_0804a28a                         @ 0804a1f0 4bd0
     ldr r1, PTR_gP1LifePoints_0804a210       @ 0804a1f2 0749
-    ldr r2, DAT_0804a214                     @ 0804a1f4 074a
+    ldr r2, enqueue_equip_slot_sprite_with_card_check_lp_block2_off @ 0804a1f4 074a
     adds r0,r1,r2    @ 0804a1f6 8818
     ldr r0,[r0,#0x0]                         @ 0804a1f8 0068
     cmp r8,r0                                @ 0804a1fa 8045
@@ -2423,8 +2423,8 @@ LAB_0804a1da:
     b LAB_0804a21a                           @ 0804a20e 04e0
 PTR_gP1LifePoints_0804a210:
     .word  gP1LifePoints                  @ 0804a210 e0c40102
-DAT_0804a214:
-    .word  0x00001ce8                     @ 0804a214 e81c0000
+enqueue_equip_slot_sprite_with_card_check_lp_block2_off:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0804a214 e81c0000
 LAB_0804a218:
     movs r2,#0x1    @ 0804a218 0122
 LAB_0804a21a:
@@ -2449,13 +2449,13 @@ LAB_0804a236:
     lsls r1,r2,#0x12    @ 0804a23e 9104
     lsrs r1,r1,#0x1f    @ 0804a240 c90f
     ldr r4, PTR_gP1LifePoints_0804a264       @ 0804a242 084c
-    ldr r3, DAT_0804a268                     @ 0804a244 084b
+    ldr r3, enqueue_equip_slot_sprite_with_card_check_lp_block2_off_b @ 0804a244 084b
     adds r0,r4,r3    @ 0804a246 e018
     ldr r0,[r0,#0x0]                         @ 0804a248 0068
     adds r3,r2,#0x0    @ 0804a24a 131c
     cmp r1,r0                                @ 0804a24c 8142
     bne LAB_0804a270                         @ 0804a24e 0fd1
-    ldr r1, DAT_0804a26c                     @ 0804a250 0649
+    ldr r1, enqueue_equip_slot_sprite_with_card_check_field_state_off @ 0804a250 0649
     adds r0,r4,r1    @ 0804a252 6018
     ldr r1,[r0,#0x0]                         @ 0804a254 0168
     rsbs r0,r1,#0    @ 0804a256 4842
@@ -2467,10 +2467,10 @@ LAB_0804a236:
     .zero  0x2
 PTR_gP1LifePoints_0804a264:
     .word  gP1LifePoints                  @ 0804a264 e0c40102
-DAT_0804a268:
-    .word  0x00001ce8                     @ 0804a268 e81c0000
-DAT_0804a26c:
-    .word  0x00001cf4                     @ 0804a26c f41c0000
+enqueue_equip_slot_sprite_with_card_check_lp_block2_off_b:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0804a268 e81c0000
+enqueue_equip_slot_sprite_with_card_check_field_state_off:
+    .word  FIELD_STATE_OFF                @ 0804a26c f41c0000
 LAB_0804a270:
     movs r2,#0x1    @ 0804a270 0122
 LAB_0804a272:
@@ -2493,7 +2493,7 @@ LAB_0804a28a:
     lsls r1,r2,#0x12    @ 0804a292 9104
     lsrs r1,r1,#0x1f    @ 0804a294 c90f
     lsls r0,r1,#0x1f    @ 0804a296 c807
-    ldr r3, DAT_0804a2c4                     @ 0804a298 0a4b
+    ldr r3, submit_equip_slot_sprite_zone11_oam_attr2_or_3c4e @ 0804a298 0a4b
     orrs r5,r3    @ 0804a29a 1d43
     orrs r0,r5    @ 0804a29c 2843
     lsls r2,r2,#0x2    @ 0804a29e 9200
@@ -2514,10 +2514,10 @@ LAB_0804a2ac:
     pop {r4,r5,r6,r7}                        @ 0804a2be f0bc
     pop {r0}                                 @ 0804a2c0 01bc
     bx r0                                    @ 0804a2c2 0047
-DAT_0804a2c4:
-    .word  0x3c4e0000                     @ 0804a2c4 00004e3c
+submit_equip_slot_sprite_zone11_oam_attr2_or_3c4e:
+    .word  0x3c4e0000                     @ 0804a2c4 00004e3c  OAM_ATTR2_OR_0X3C4E: hi16=0x3c4e attr2 OR mask; lo16=0 -- med-conf bit pattern
 
-@ Called by 6 callers (indeg=6) including duel_field. Thin wrapper for enqueue_equip_slot_sprite_with_card_check (FUN_08049e44): hard-codes r1=0xb (zone 11, special equip zone slot index), passes through caller r0(player_id), r2(slot_col), r3(zone_ptr), plus stack 5th arg. Returns void; callee return value discarded by epilogue pop+bx. r0=u8 player_id [0..1], r1=u16 slot_col (overwritten to 0xb internally), r2=u16 card_id [0..0x1fff], r3=ptr zone_ptr. Constants: zone11_idx=0xb. Callers: FUN_08067c0c, FUN_08068990, FUN_08069260, FUN_0807b0c8, FUN_0808f608.
+@ Called by 6 callers (indeg=6) including duel_field. Thin wrapper for enqueue_equip_slot_sprite_with_card_check (FUN_08049e44): hard-codes r1=0xb (zone 11, special equip zone slot index), passes through caller r0(player_id), r2(slot_col), r3(zone_ptr), plus stack 5th arg. Returns void; callee return value discarded by epilogue pop+bx. r0=u8 player_id [0..1], r1=u16 slot_col (overwritten to 0xb internally), r2=u16 card_id [0..0x1fff], r3=ptr zone_ptr. Constants: zone11_idx=0xb. Callers: tick_equip_head_slot_sprite_state_machine, dispatch_equip_slot_sprite_by_state_and_zone, dispatch_equip_zone_sprite_multi_zone_by_lp_state, update_zone_entry_sprite_by_descriptor, scan_chain_nodes_for_equip_zone_sprite.
 submit_equip_slot_sprite_zone11:
     push {r4,r5,lr}                          @ 0804a2c8 30b5
     sub sp,#0x4                              @ 0804a2ca 81b0
@@ -2575,7 +2575,7 @@ enqueue_equip_slot_sprite_zone12:
     pop {r0}                                 @ 0804a330 01bc
     bx r0                                    @ 0804a332 0047
 
-@ Full display sequence for the card on the first available monster slot for a player: (1) reads field6/field9; if field6==0x16 and field9==2, calls enqueue_equip_slot_bitmap_update (slot=0xa, r2=0); (2) calls render_field_card_copy_count; (3) if slot has card, calls enqueue_sprite_attr_type11 (r1=0x198a); (4) calls submit_lp_bar_sprite_row_by_type (slot_key=0xa). r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; r2=u8 player_flag [0..1]. Returns void. Callers: FUN_0806c828, FUN_08095d84 (duel_field). Constants: player_stride=0x868, gDuelFieldSlots_offset=0x0201c600, FIELD6_EQUIP=0x16, FIELD9_TYPE2=0x2, slot_key=0xa, sprite_tile=0x198a.
+@ Full display sequence for the card on the first available monster slot for a player: (1) reads field6/field9; if field6==0x16 and field9==2, calls enqueue_equip_slot_bitmap_update (slot=0xa, r2=0); (2) calls render_field_card_copy_count; (3) if slot has card, calls enqueue_sprite_attr_type11 (r1=0x198a); (4) calls submit_lp_bar_sprite_row_by_type (slot_key=0xa). r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; r2=u8 player_flag [0..1]. Returns void. Callers: tick_equip_effect_node_display_state_machine, dispatch_lp_bar_animation_step (duel_field). Constants: player_stride=0x868, gDuelFieldSlots_offset=0x0201c600, FIELD6_EQUIP=0x16, FIELD9_TYPE2=0x2, slot_key=0xa, sprite_tile=0x198a.
 render_monster_slot_card_with_lp_bar:
     push {r4,r5,r6,r7,lr}                    @ 0804a334 f0b5
     .hword 0x4657    @ 0804a336 5746
@@ -2592,11 +2592,11 @@ render_monster_slot_card_with_lp_bar:
     ands r0,r5    @ 0804a34e 2840
     .hword 0x464a    @ 0804a350 4a46
     lsls r1,r2,#0x2    @ 0804a352 9100
-    ldr r2, DAT_0804a404                     @ 0804a354 2b4a
+    ldr r2, render_monster_slot_card_with_lp_bar_player_stride @ 0804a354 2b4a
     adds r6,r0,#0x0    @ 0804a356 061c
     muls r6,r2    @ 0804a358 5643
     adds r1,r1,r6    @ 0804a35a 8919
-    ldr r7, DAT_0804a408                     @ 0804a35c 2a4f
+    ldr r7, render_monster_slot_card_with_lp_bar_field_arr @ 0804a35c 2a4f
     adds r1,r1,r7    @ 0804a35e c919
     ldr r0,[r1,#0x0]                         @ 0804a360 0868
     lsls r0,r0,#0x13    @ 0804a362 c004
@@ -2631,7 +2631,7 @@ LAB_0804a398:
     .hword 0x468c    @ 0804a3a0 8c46
     cmp r5,#0x0                              @ 0804a3a2 002d
     beq LAB_0804a3aa                         @ 0804a3a4 01d0
-    ldr r2, DAT_0804a40c                     @ 0804a3a6 194a
+    ldr r2, render_monster_slot_card_with_lp_bar_oam_p1 @ 0804a3a6 194a
     .hword 0x4694    @ 0804a3a8 9446
 LAB_0804a3aa:
     .hword 0x4641    @ 0804a3aa 4146
@@ -2649,10 +2649,10 @@ LAB_0804a3aa:
     orrs r2,r0    @ 0804a3c2 0243
     .hword 0x4648    @ 0804a3c4 4846
     lsls r3,r0,#0x2    @ 0804a3c6 8300
-    ldr r0, DAT_0804a404                     @ 0804a3c8 0e48
+    ldr r0, render_monster_slot_card_with_lp_bar_player_stride @ 0804a3c8 0e48
     muls r0,r6    @ 0804a3ca 7043
     adds r3,r3,r0    @ 0804a3cc 1b18
-    ldr r0, DAT_0804a408                     @ 0804a3ce 0e48
+    ldr r0, render_monster_slot_card_with_lp_bar_field_arr @ 0804a3ce 0e48
     adds r7,r3,r0    @ 0804a3d0 1f18
     ldr r3,[r7,#0x0]                         @ 0804a3d2 3b68
     lsls r0,r3,#0x2    @ 0804a3d4 9800
@@ -2670,20 +2670,20 @@ LAB_0804a3aa:
     bl get_card_extended_stat_field6         @ 0804a3ee a4f003fd
     cmp r0,#0x17                             @ 0804a3f2 1728
     bne LAB_0804a456                         @ 0804a3f4 2fd1
-    ldr r1, DAT_0804a410                     @ 0804a3f6 0649
+    ldr r1, render_monster_slot_card_with_lp_bar_bubble_illusion_cid @ 0804a3f6 0649
     adds r0,r5,#0x0    @ 0804a3f8 281c
     movs r2,#0x1    @ 0804a3fa 0122
     movs r3,#0x1    @ 0804a3fc 0123
     bl enqueue_sprite_attr_type11            @ 0804a3fe 00f041f8
     b LAB_0804a456                           @ 0804a402 28e0
-DAT_0804a404:
-    .word  0x00000868                     @ 0804a404 68080000
-DAT_0804a408:
-    .word  0x0201c600                     @ 0804a408 00c60102
-DAT_0804a40c:
-    .word  0x0000804f                     @ 0804a40c 4f800000
-DAT_0804a410:
-    .word  0x0000198a                     @ 0804a410 8a190000
+render_monster_slot_card_with_lp_bar_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0804a404 68080000
+render_monster_slot_card_with_lp_bar_field_arr:
+    .word  gP1FieldArrayCBase             @ 0804a408 00c60102
+render_monster_slot_card_with_lp_bar_oam_p1:
+    .word  OAM_SLOT_SPRITE_BY_PLAYER_P1   @ 0804a40c 4f800000
+render_monster_slot_card_with_lp_bar_bubble_illusion_cid:
+    .word  BUBBLE_ILLUSION_CID            @ 0804a410 8a190000
 LAB_0804a414:
     ldr r1,[r7,#0x0]                         @ 0804a414 3968
     lsls r0,r1,#0x2    @ 0804a416 8800
@@ -2692,27 +2692,27 @@ LAB_0804a414:
     lsls r1,r1,#0x12    @ 0804a41c 8904
     lsrs r1,r1,#0x1f    @ 0804a41e c90f
     orrs r0,r1    @ 0804a420 0843
-    ldr r1, DAT_0804a468                     @ 0804a422 1149
+    ldr r1, render_monster_slot_card_with_lp_bar_clr_x9 @ 0804a422 1149
     ands r4,r1    @ 0804a424 0c40
     orrs r4,r0    @ 0804a426 0443
     lsls r1,r6,#0x9    @ 0804a428 7102
-    ldr r0, DAT_0804a46c                     @ 0804a42a 1048
+    ldr r0, render_monster_slot_card_with_lp_bar_clr_bit9 @ 0804a42a 1048
     ands r4,r0    @ 0804a42c 0440
     orrs r4,r1    @ 0804a42e 0c43
     movs r0,#0xf    @ 0804a430 0f20
     .hword 0x464a    @ 0804a432 4a46
     ands r0,r2    @ 0804a434 1040
     lsls r0,r0,#0xa    @ 0804a436 8002
-    ldr r1, DAT_0804a470                     @ 0804a438 0d49
+    ldr r1, render_monster_slot_card_with_lp_bar_clr_bits13_10 @ 0804a438 0d49
     ands r4,r1    @ 0804a43a 0c40
     orrs r4,r0    @ 0804a43c 0443
-    ldr r0, DAT_0804a474                     @ 0804a43e 0d48
+    ldr r0, render_monster_slot_card_with_lp_bar_clr_bit14 @ 0804a43e 0d48
     ands r4,r0    @ 0804a440 0440
-    ldr r0, DAT_0804a478                     @ 0804a442 0d48
+    ldr r0, render_monster_slot_card_with_lp_bar_clr_bit15 @ 0804a442 0d48
     ands r4,r0    @ 0804a444 0440
-    ldr r0, DAT_0804a47c                     @ 0804a446 0d48
+    ldr r0, render_monster_slot_card_with_lp_bar_clr_bit16 @ 0804a446 0d48
     ands r4,r0    @ 0804a448 0440
-    ldr r0, DAT_0804a480                     @ 0804a44a 0d48
+    ldr r0, render_monster_slot_card_with_lp_bar_clr_bit17 @ 0804a44a 0d48
     ands r4,r0    @ 0804a44c 0440
     movs r0,#0xa    @ 0804a44e 0a20
     adds r1,r4,#0x0    @ 0804a450 211c
@@ -2727,20 +2727,20 @@ LAB_0804a456:
     pop {r4,r5,r6,r7}                        @ 0804a462 f0bc
     pop {r1}                                 @ 0804a464 02bc
     bx r1                                    @ 0804a466 0847
-DAT_0804a468:
-    .word  0xfffffe00                     @ 0804a468 00feffff
-DAT_0804a46c:
-    .word  0xfffffdff                     @ 0804a46c fffdffff
-DAT_0804a470:
-    .word  0xffffc3ff                     @ 0804a470 ffc3ffff
-DAT_0804a474:
-    .word  0xffffbfff                     @ 0804a474 ffbfffff
-DAT_0804a478:
-    .word  0xffff7fff                     @ 0804a478 ff7fffff
-DAT_0804a47c:
-    .word  0xfffeffff                     @ 0804a47c fffffeff
-DAT_0804a480:
-    .word  0xfffdffff                     @ 0804a480 fffffdff
+render_monster_slot_card_with_lp_bar_clr_x9:
+    .word  0xfffffe00                     @ 0804a468 00feffff  OAM_ATTR1_X_CLEAR
+render_monster_slot_card_with_lp_bar_clr_bit9:
+    .word  0xfffffdff                     @ 0804a46c fffdffff  OAM_SPRITE_ATTR_CLR_BIT9
+render_monster_slot_card_with_lp_bar_clr_bits13_10:
+    .word  0xffffc3ff                     @ 0804a470 ffc3ffff  OAM_SPRITE_ATTR_CLR_BITS13_10
+render_monster_slot_card_with_lp_bar_clr_bit14:
+    .word  0xffffbfff                     @ 0804a474 ffbfffff  SLOT_ACTIVE_BIT14_CLR: clears bit14
+render_monster_slot_card_with_lp_bar_clr_bit15:
+    .word  0xffff7fff                     @ 0804a478 ff7fffff  SLOT_ACTIVE_BIT15_CLR: clears bit15
+render_monster_slot_card_with_lp_bar_clr_bit16:
+    .word  0xfffeffff                     @ 0804a47c fffffeff  OAM_SPRITE_ATTR_CLR_BIT16
+render_monster_slot_card_with_lp_bar_clr_bit17:
+    .word  0xfffdffff                     @ 0804a480 fffffdff  OAM_SPRITE_ATTR_CLR_BIT17
 
 @ Wrapper around enqueue_sprite_attr_with_mode with sprite_type fixed at 0xb (11), indeg=81. r0=u32 palette_mode (forwarded); r1=u16 x_pos [0..0x3ff]; r2=u16 y_pos [0..0x1ff]; r3=u16 extra_attr [0..0xffff]. Truncates r1/r2/r3 to u16, pushes r3 onto sp[0x0] (callee 5th arg sp[0x10]), injects r1=0xb (SPRITE_TYPE_CARD), then bl enqueue_sprite_attr_with_mode. Returns void (bx r0 transparent). 81 callers (superset of 74-caller core) cover most card position sprites in duel_field; type=0xb corresponds to standard field card sprite layer. Constants: SPRITE_TYPE_CARD=0xb.
 enqueue_sprite_attr_type11:
@@ -2764,14 +2764,14 @@ enqueue_sprite_attr_type11:
     pop {r0}                                 @ 0804a4a8 01bc
     bx r0                                    @ 0804a4aa 0047
 
-@ Called by 13 callers (indeg=13, D_shared_mid), including FUN_08044674/FUN_08044714/FUN_080447d4/FUN_080448a0/FUN_08044a34 and others. r0=u8 flag (0=use default attr_type 0x50; nonzero=use DAT_0804a4c8=0x8050); r1=u16 sprite_attr (16-bit, upper bits truncated by lsls/lsrs). Body: push lr; if r0==0 then r2=0x50 (movs r2,#0x50), else r2=0x8050 (ldr r2, DAT_0804a4c8); truncates r1 to 16-bit via lsls/lsrs #0x10; calls enqueue_sprite_attr_record(r2, r1_16bit, 0, 0). Exit: pop {r0}; bx r0 (void return, r0 restored to lr).
+@ Called by 13 callers (indeg=13, D_shared_mid), including enqueue_graveyard_spell_sprite_and_lp/enqueue_graveyard_spell_sprite_with_zone_ref/enqueue_hand_card_sprite_alt_by_zone_slot/enqueue_graveyard_spell_sprite_with_player_xor/enqueue_hand_sprite_by_zone_set_code and others. r0=u8 flag (0=use default attr_type 0x50; nonzero=use DAT_0804a4c8=0x8050); r1=u16 sprite_attr (16-bit, upper bits truncated by lsls/lsrs). Body: push lr; if r0==0 then r2=0x50 (movs r2,#0x50), else r2=0x8050 (ldr r2, DAT_0804a4c8); truncates r1 to 16-bit via lsls/lsrs #0x10; calls enqueue_sprite_attr_record(r2, r1_16bit, 0, 0). Exit: pop {r0}; bx r0 (void return, r0 restored to lr).
 @ Constants: ATTR_TYPE_A=0x50 (default sprite attr type), ATTR_TYPE_B=0x8050 (alternate type, DAT_0804a4c8).
 enqueue_sprite_attr_with_type_select:
     push {lr}                                @ 0804a4ac 00b5
     movs r2,#0x50    @ 0804a4ae 5022
     cmp r0,#0x0                              @ 0804a4b0 0028
     beq LAB_0804a4b6                         @ 0804a4b2 00d0
-    ldr r2, DAT_0804a4c8                     @ 0804a4b4 044a
+    ldr r2, enqueue_sprite_attr_with_type_select_oam_p1 @ 0804a4b4 044a
 LAB_0804a4b6:
     lsls r1,r1,#0x10    @ 0804a4b6 0904
     lsrs r1,r1,#0x10    @ 0804a4b8 090c
@@ -2781,8 +2781,8 @@ LAB_0804a4b6:
     bl enqueue_sprite_attr_record            @ 0804a4c0 f1f734fc
     pop {r0}                                 @ 0804a4c4 01bc
     bx r0                                    @ 0804a4c6 0047
-DAT_0804a4c8:
-    .word  0x00008050                     @ 0804a4c8 50800000
+enqueue_sprite_attr_with_type_select_oam_p1:
+    .word  OAM_SPRITE_TYPE_SEL_P1         @ 0804a4c8 50800000
 
 @ Called by 8 duel_field callers in activation eligibility chains. If r1==0: calls check_field_effect_zone_activation_eligible(r0) -> r4; else r4=r1 directly. Then calls get_player_deck_flag_bit1(r0). If deck_flag==r4: no update (return). Else enqueues sprite attr record with attr0=0x51 (player 0) or 0x8051 (player 1), attr1=r4[15:0], attr2=0. Combines zone eligibility check with sprite update trigger. Params: r0=u32 player_side [0..1], r1=u32 secondary_check (0=use default, else compare direct). Constants: OAM_ATTR0_P0=0x51, OAM_ATTR0_P1=0x8051 (DAT_0804a500).
 check_zone_eligible_with_deck_flag:
@@ -2801,7 +2801,7 @@ LAB_0804a4dc:
     movs r0,#0x51    @ 0804a4e6 5120
     cmp r5,#0x0                              @ 0804a4e8 002d
     beq LAB_0804a4ee                         @ 0804a4ea 00d0
-    ldr r0, DAT_0804a500                     @ 0804a4ec 0448
+    ldr r0, check_zone_eligible_with_deck_flag_oam_p1 @ 0804a4ec 0448
 LAB_0804a4ee:
     lsls r1,r4,#0x10    @ 0804a4ee 2104
     lsrs r1,r1,#0x10    @ 0804a4f0 090c
@@ -2812,8 +2812,8 @@ LAB_0804a4fa:
     pop {r4,r5}                              @ 0804a4fa 30bc
     pop {r0}                                 @ 0804a4fc 01bc
     bx r0                                    @ 0804a4fe 0047
-DAT_0804a500:
-    .word  0x00008051                     @ 0804a500 51800000
+check_zone_eligible_with_deck_flag_oam_p1:
+    .word  OAM_ZONE_ELIGIBLE_P1           @ 0804a500 51800000
 
 @ Enqueue LP field state sprite selected by player_id. Reads gP1LifePoints+player_id*0x868+0x10; if nonzero enqueues with attr0=0x57 (P1) or 0x8057 (P2), attr1=0xd, attr2/3=0 via enqueue_sprite_attr_record; zero -> skip. Exit: pop {r0}; bx r0 void return. Member of duel_field LP display sprite enqueue cluster alongside enqueue_lp_counter_sprite_by_player (0x0804a540). Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record (1 record, conditional). Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, LP_STATE_OFFSET=0x10, ATTR_P1=0x57, ATTR_P2=0x8057, ATTR1=0xd.
 enqueue_lp_field_state_sprite_by_player:
@@ -2822,7 +2822,7 @@ enqueue_lp_field_state_sprite_by_player:
     ldr r2, PTR_gP1LifePoints_0804a534       @ 0804a508 0a4a
     movs r0,#0x1    @ 0804a50a 0120
     ands r0,r3    @ 0804a50c 1840
-    ldr r1, DAT_0804a538                     @ 0804a50e 0a49
+    ldr r1, enqueue_lp_field_state_sprite_by_player_player_stride @ 0804a50e 0a49
     muls r0,r1    @ 0804a510 4843
     adds r2,#0x10    @ 0804a512 1032
     adds r0,r0,r2    @ 0804a514 8018
@@ -2832,7 +2832,7 @@ enqueue_lp_field_state_sprite_by_player:
     movs r0,#0x57    @ 0804a51c 5720
     cmp r3,#0x0                              @ 0804a51e 002b
     beq LAB_0804a524                         @ 0804a520 00d0
-    ldr r0, DAT_0804a53c                     @ 0804a522 0648
+    ldr r0, enqueue_lp_field_state_sprite_by_player_oam_p1 @ 0804a522 0648
 LAB_0804a524:
     movs r1,#0xd    @ 0804a524 0d21
     movs r2,#0x0    @ 0804a526 0022
@@ -2844,10 +2844,10 @@ LAB_0804a52e:
     .zero  0x2
 PTR_gP1LifePoints_0804a534:
     .word  gP1LifePoints                  @ 0804a534 e0c40102
-DAT_0804a538:
-    .word  0x00000868                     @ 0804a538 68080000
-DAT_0804a53c:
-    .word  0x00008057                     @ 0804a53c 57800000
+enqueue_lp_field_state_sprite_by_player_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0804a538 68080000
+enqueue_lp_field_state_sprite_by_player_oam_p1:
+    .word  OAM_LP_FIELD_STATE_P1          @ 0804a53c 57800000
 
 @ LP counter sprite enqueue function, high-frequency utility (indeg=42), called by
 @ equip/duel_field display functions. r0 = player_side [0..1] (extracted by caller
@@ -2869,7 +2869,7 @@ enqueue_lp_counter_sprite_by_player:
     movs r3,#0x53    @ 0804a54c 5323
     cmp r0,#0x0                              @ 0804a54e 0028
     beq LAB_0804a554                         @ 0804a550 00d0
-    ldr r3, DAT_0804a56c                     @ 0804a552 064b
+    ldr r3, enqueue_lp_counter_sprite_by_player_oam_p1 @ 0804a552 064b
 LAB_0804a554:
     lsls r1,r2,#0x10    @ 0804a554 1104
     lsrs r1,r1,#0x10    @ 0804a556 090c
@@ -2882,10 +2882,10 @@ LAB_0804a554:
     .zero  0x2
 PTR_gP1LifePoints_0804a568:
     .word  gP1LifePoints                  @ 0804a568 e0c40102
-DAT_0804a56c:
-    .word  0x00008053                     @ 0804a56c 53800000
+enqueue_lp_counter_sprite_by_player_oam_p1:
+    .word  OAM_LP_COUNTER_P1              @ 0804a56c 53800000
 
-@ Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). Symmetric to enqueue_sprite_attr_for_card_slot (0x0804a5a0). Reads gP1LifePoints (0x0201c4e0) + 0x1ce0 offset (slot state dword); selects OAM attr0: 0x4d (P1) if r0==0, else 0x804d (P2). Splits dword into lo/hi halfwords as attr1/attr2, calls enqueue_sprite_attr_record(attr0,lo,hi,0). Params: r0=u32 player_side [0..1]. Returns void. Constants: gP1LifePoints=0x0201c4e0, slot_state_offset=0x1ce0, OAM_P1=0x4d, OAM_P2=0x804d.
+@ Called exclusively by dispatch_equip_field_scan_sequence (duel_field main controller, indeg=1). Symmetric to enqueue_sprite_attr_for_card_slot (0x0804a5a0). Reads gP1LifePoints (0x0201c4e0) + 0x1ce0 offset (slot state dword); selects OAM attr0: 0x4d (P1) if r0==0, else 0x804d (P2). Splits dword into lo/hi halfwords as attr1/attr2, calls enqueue_sprite_attr_record(attr0,lo,hi,0). Params: r0=u32 player_side [0..1]. Returns void. Constants: gP1LifePoints=0x0201c4e0, slot_state_offset=0x1ce0, OAM_P1=0x4d, OAM_P2=0x804d.
 enqueue_duel_field_card_slot_sprite:
     push {lr}                                @ 0804a570 00b5
     ldr r1, PTR_gP1LifePoints_0804a598       @ 0804a572 0949
@@ -2896,7 +2896,7 @@ enqueue_duel_field_card_slot_sprite:
     movs r3,#0x4d    @ 0804a57c 4d23
     cmp r0,#0x0                              @ 0804a57e 0028
     beq LAB_0804a584                         @ 0804a580 00d0
-    ldr r3, DAT_0804a59c                     @ 0804a582 064b
+    ldr r3, enqueue_duel_field_card_slot_sprite_oam_p1 @ 0804a582 064b
 LAB_0804a584:
     lsls r1,r2,#0x10    @ 0804a584 1104
     lsrs r1,r1,#0x10    @ 0804a586 090c
@@ -2909,10 +2909,10 @@ LAB_0804a584:
     .zero  0x2
 PTR_gP1LifePoints_0804a598:
     .word  gP1LifePoints                  @ 0804a598 e0c40102
-DAT_0804a59c:
-    .word  0x0000804d                     @ 0804a59c 4d800000
+enqueue_duel_field_card_slot_sprite_oam_p1:
+    .word  OAM_DUEL_CARD_SLOT_P1          @ 0804a59c 4d800000
 
-@ Called by enqueue_sprite_by_field_copy_count (FUN_0808f7c0). Extracts low 16 bits of r0 as tile_idx (lsls/lsrs #0x10). Calls enqueue_sprite_attr_record with fixed attr0=0x58, attr1=tile_idx, attr2=0, shape=0. Used to enqueue sprite attr for a duel field card slot display. Params: r0=u16 card_slot_value (low 16 bits = sprite tile_idx [0..0xffff]). Returns void. Constants: OAM_ATTR0=0x58 (Y=88, square, normal mode, 4bpp).
+@ Called by enqueue_sprite_by_field_copy_count (enqueue_sprite_by_field_copy_count). Extracts low 16 bits of r0 as tile_idx (lsls/lsrs #0x10). Calls enqueue_sprite_attr_record with fixed attr0=0x58, attr1=tile_idx, attr2=0, shape=0. Used to enqueue sprite attr for a duel field card slot display. Params: r0=u16 card_slot_value (low 16 bits = sprite tile_idx [0..0xffff]). Returns void. Constants: OAM_ATTR0=0x58 (Y=88, square, normal mode, 4bpp).
 enqueue_sprite_attr_for_card_slot:
     push {lr}                                @ 0804a5a0 00b5
     adds r1,r0,#0x0    @ 0804a5a2 011c
