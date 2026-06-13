@@ -416,3 +416,18 @@
 .equ ELIGIB_ACT_TYPE_OFF,        0x00001d5c  @ [gP1LifePoints+0x1d5c] activation type flag; cmp r0,#3 in caseD_b determines branch; 17 ROM refs
 .equ ELIGIB_SPRITE_CTRL_OFF,     0x00001d68  @ [gP1LifePoints+0x1d68] sprite display control; 0=display 0x61 attr, non-0=use 0x8061 hidden attr for enqueue_sprite_attr_record; 105 ROM refs
 .equ ELIGIB_ANIM_STATE_OFF,      0x00001d6c  @ [gP1LifePoints+0x1d6c] animation state index; range check [0..0xf] in caseD_1f with thresholds 0xb/0xf; 56 ROM refs
+
+@ =============================================================================
+@ file 05 Seg-6 additions: sprite row queue/anim subsystem offsets + equip zone rank state
+@ Relative to gDuelPhaseFlags (base=0x0201b290):
+@ =============================================================================
+.equ SPRITE_ROW_WRITE_PTR_OFF,   0x00000480  @ [gDuelPhaseFlags+0x480] write ptr into row buffer (strh); flush_sprite_row_queue_partial; 2 ROM refs Seg-6a
+.equ SPRITE_ROW_COUNT_OFF,       0x00000488  @ [gDuelPhaseFlags+0x488] row entry count (halfword); flush_sprite_row_queue_partial count at +0x488; 2 ROM refs Seg-6a
+.equ SPRITE_ROW_ANIM_STATE_OFF,  0x0000048c  @ [gDuelPhaseFlags+0x48c] anim-active state flag (str); dispatch_equip_field_update_by_anim_state anim_state_offset=0x48c; 12 ROM refs Seg-6a
+.equ SPRITE_ROW_QUEUE_STATE_A_OFF, 0x00000490  @ [gDuelPhaseFlags+0x490] queue phase-A state (cleared by flush); flush_sprite_row_queue_partial clears +0x490; 4 ROM refs Seg-6a
+.equ SPRITE_ROW_ANIM_CTL_OFF,   0x00000494  @ [gDuelPhaseFlags+0x494] anim state code (0..0xe); dispatch_sprite_row_anim_by_state reads [base+0x494] as state code; 6 ROM refs Seg-6a
+.equ SPRITE_ROW_QUEUE_ACTIVE_OFF, 0x00000498  @ [gDuelPhaseFlags+0x498] queue active flag (str); dispatch_equip_field_update_by_anim_state queue_state_offset=0x498; 4 ROM refs Seg-6a
+.equ SPRITE_ROW_QUEUE_STATE_OFF, 0x0000049c  @ [gDuelPhaseFlags+0x49c] queue state code (0..0x67); dispatch_sprite_row_queue_by_state uses [base+0x49c] for index; 5 ROM refs Seg-6a
+
+@ New global: equip zone rank state struct (EWRAM)
+.equ gEquipZoneRankState,   0x0201e4d0  @ EWRAM base for equip zone rank state machine; advance_equip_zone_rank_state reads halfword [+0x14]; 1 ROM ref Seg-6a (DAT_0804f368)

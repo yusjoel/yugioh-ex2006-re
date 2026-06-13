@@ -99,7 +99,7 @@
 | 4a | 0x4b4f4..0x4be38 | 10 | 101 | — | ✅ | — |
 | 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | 8a924b3 |
 | 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | 20cbc8b |
-| 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
+| 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | pending |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ⬜ | — |
@@ -315,6 +315,70 @@ Note: switchdataD_0804c6e8 (6-entry jump table for classify_card_id_summon_categ
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 20cbc8b
+
+---
+
+### 4.06 Seg-6 完成记录 (0x0804d124..0x0804ffba, 24 fn + secondary stubs, 128 slots)
+
+**函数列表 (24)**:
+switchD_0804ce98__caseD_1e / switchD_0804ce98__caseD_1f / switchD_0804ce98__caseD_3 /
+dispatch_sprite_row_anim_by_state / reset_sprite_row_queue_tail /
+dispatch_sprite_row_queue_by_state / clear_sprite_row_queue_overflow_flag /
+flush_sprite_row_queue_partial / compact_equip_zone_rank3_entries /
+dispatch_equip_field_update_by_anim_state / advance_equip_zone_rank_state /
+check_equip_slot_eligibility_with_whitelist / check_equip_slot_eligible_with_owner_and_type /
+check_equip_slot_eligible_triple_predicate / check_equip_slot_eligible_by_owner_and_prereqs /
+check_equip_slot_eligible_with_whitelist_and_type / check_equip_target_matches_card_owner /
+check_slot_card_eligible_by_card_id / return_zero_unconditional /
+check_card_state_code_eq_15 / check_card_state_code_eq_16 / check_card_state_code_eq_13 /
+check_card_state_code_eq_11 / check_card_state_code_eq_3
+
+**Secondary stubs from 5 disasm regions**:
+- Block 1 (0x4d294..0x4daf5, 13 THUMB stubs): dispatch_sprite_row_anim_case_0..12
+- Block 2 (0x4dd58..0x4f0c1, 12 THUMB stubs): dispatch_sprite_row_queue_case_0..11
+- Region A (0x4cca2..0x4cd8b, 3 helpers): SUB_0804cca4 / SUB_0804cd00 / SUB_0804cd74
+- Region C (0x4cdac..0x4cdd7, 4 orphan handlers): orphan_slot_card_eligible_handler_0/1/2 + LAB_0804cdd2
+- Region D (0x4f098..0x4f0c1, 2 helpers): SUB_0804f098 / SUB_0804f0b8
+
+**符号化统计**: EQ=129 (Seg-6a ~68 + Seg-6b ~61) / REF=2 / RENAME=2 / PLATE=13 occurrences (9 unique FUN_ replaced)
+
+**新建 constants**:
+- ewram.inc +8: SPRITE_ROW_WRITE_PTR_OFF / SPRITE_ROW_COUNT_OFF / SPRITE_ROW_ANIM_STATE_OFF / SPRITE_ROW_QUEUE_STATE_A_OFF / SPRITE_ROW_ANIM_CTL_OFF / SPRITE_ROW_QUEUE_ACTIVE_OFF / SPRITE_ROW_QUEUE_STATE_OFF / gEquipZoneRankState
+- card_info.inc +25 named CID: PETIT_MOTH / LABYRINTH_WALL / CYCLON_LASER / BUSTER_RANCHER / Y_DRAGON_HEAD / Z_METAL_TANK / DARK_BLADE / DECAYED_COMMANDER / GIANT_ORC / SECOND_GOBLIN / VAMPIRE_ORCHIS / DES_DENDLE / BURNING_BEAST / AITSU / WHITE_MAGICIAN_PIKERU / RITUAL_WEAPON / CHU_SKE_MOUSE_FIGHTER / EHERO_SPARKMAN / LEGENDARY_BLACK_BELT / SOITSU / INDOMITABLE_FIGHTER_LEI_LEI / EBON_MAGICIAN_CURRAN / DIVINE_SWORD_PHOENIX_BLADE / V_TIGER_JET / ADHESIVE_EXPLOSIVE
+- card_info.inc +10 unallocated: cid_10d4 / cid_10da / cid_10e2 / cid_10e5 / cid_10ea / cid_10eb / cid_10ed / cid_10ee / cid_12c6 / cid_12ef
+- card_info.inc +1 threshold: FIELD5_SCORE_THRESHOLD_1299 (0x513)
+
+**carve**: 0 (no inter-function ROM_INCBIN; all 5 disasm regions resolved by R4)
+
+**R4 disasm** (5 regions):
+- Block 1: jump table PTR_DAT_0804d258 (15 entries, raw ptrs); 13 case stubs; 128 literal pool DWORDs forced via RefineF05Seg6PoolLabels.py
+- Block 2: jump table PTR_DAT_0804dbb8 (104 entries, 12 unique + default); 12 case stubs; 4 additional pool DWORDs at 0x4e41c/4e4d0/4e604/4e77c (0x0201c520, gDuelFieldSlots+0x10) forced to DWORD
+- Region A: 3 helpers called from Block 1; discovered only after Block 1/2 disasm revealed bl targets; 6 literal pool DWORDs forced
+- Region C: 4 orphan handlers (jump table dispatch from SUB_0804cd74); LAB_0804cdd2 = bhi target from SUB_0804cd74
+- Region D: 2 helpers called from Block 2 SUB_0804e7f0
+
+**Ghidra scripts**:
+- RefineF05Seg6Apply.py: EQ=129 / REF=2 / RENAME=2 / PLATE=12 subs
+- DisassembleF05Seg6Blocks.py: Block1 13 stubs (901 inst) + Block2 12 stubs (2032 inst)
+- DisassembleF05Seg6Secondary.py: Region A 3 stubs + Region B 2 stubs
+- DisassembleF05Seg6Tertiary.py: Region C 4 stubs (21 inst) + Region D 2 stubs (18 inst)
+- RefineF05Seg6PoolLabels.py: 138 total clearListing+DWord+label (128 original + 6 Region A + 4 Block2 decoded-as-instruction fixes)
+
+**踩坑**:
+- Literal pool words decoded as THUMB by disassembler (NOT separate DWORD): must use clearListing+createData(DWordDataType) NOT createLabel alone; total 138 pool fixes
+- Block 1/2 disasm revealed secondary helper functions (SUB_0804cca4/cd00/cd74 in ROM_INCBIN 0x4cca2; SUB_0804e7f0/e888 in ROM_INCBIN 0x4e7ec) that were misclassified as 0-ref orphans in Seg-5 - these were only revealed as needed after Block 1/2 disasm
+- Region C (0x4cdac) misclassified as "7 internal refs only, orphan" in Seg-5; becomes needed because bhi from SUB_0804cd74 targets LAB_0804cdd2 inside
+- Region D (0x4f098): SUB_0804f0b8 called from Region B SUB_0804e7f0 in cascading discovery chain
+- 4 literal pool words at 0x4e41c/4e4d0/4e604/4e77c each = 0x0201c520 (gDuelFieldSlots+0x10); after clearListing+setTMode across Block 2, disassembler decoded them as stmia+lsls; fixed by adding to pool labels script
+- fn-ptr periodic fix (post re-export): asm/03 x4 + asm/04 x3 (same slots as Seg-5 and prior segs)
+
+**plate FUN_ in Seg-6 range**: 0 stale FUN_ in code positions (all in `@` comments = cross-file references deferred)
+
+**CJK in new EOL/plate**: 0 (all Ghidra-set text is pure ASCII)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: pending
 
 ---
 

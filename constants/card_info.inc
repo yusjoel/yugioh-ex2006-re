@@ -843,3 +843,46 @@
 .equ COCOON_OF_EVOLUTION_CID,              0x00000fee  @ Cocoon of Evolution (pw=40240595; card_0079 slot=0x0FEE); check_card_slot_activation_eligible BST lower bound
 .equ SWORDS_OF_REVEALING_LIGHT_CID,        0x00001102  @ Swords of Revealing Light (pw=72302403; card_0308 slot=0x1102); check_card_slot_activation_eligible BST
 .equ METALMORPH_CID,                       0x00001238  @ Metalmorph (pw=68540058; card_0539 slot=0x1238); check_card_slot_activation_eligible BST pivot
+
+@ =============================================================================
+@ file 05 Seg-6b additions: check_slot_card_eligible_by_card_id BST equip-target CIDs
+@ Named cards (confirmed via data/card-stats.s slot_id match):
+@ =============================================================================
+.equ PETIT_MOTH_CID,              0x000010bc  @ Petit Moth (slot=0x10BC); BST node in check_slot_card_eligible_by_card_id
+.equ LABYRINTH_WALL_CID,          0x00001114  @ Labyrinth Wall (pw=67284908; slot=0x1114); BST node
+.equ CYCLON_LASER_CID,            0x00001496  @ Cyclon Laser (pw=05870978; slot=0x1496); BST node
+.equ BUSTER_RANCHER_CID,          0x0000159e  @ Buster Rancher (slot=0x159E); BST node
+.equ Y_DRAGON_HEAD_CID,           0x000015b0  @ Y-Dragon Head (pw=68514277; slot=0x15B0); BST node
+.equ Z_METAL_TANK_CID,            0x000015b3  @ Z-Metal Tank (pw=64500000; slot=0x15B3); BST node
+.equ DARK_BLADE_CID,              0x000015cd  @ Dark Blade (slot=0x15CD); BST node
+.equ DECAYED_COMMANDER_CID,       0x000015d0  @ Decayed Commander (slot=0x15D0); BST node
+.equ GIANT_ORC_CID,               0x000015d2  @ Giant Orc (slot=0x15D2); BST node
+.equ SECOND_GOBLIN_CID,           0x000015d3  @ Second Goblin (slot=0x15D3); BST node
+.equ VAMPIRE_ORCHIS_CID,          0x000015d4  @ Vampire Orchis (slot=0x15D4); BST node
+.equ DES_DENDLE_CID,              0x000015d5  @ Des Dendle (slot=0x15D5); BST node
+.equ BURNING_BEAST_CID,           0x000015d6  @ Burning Beast (slot=0x15D6); BST node
+.equ AITSU_CID,                   0x0000160a  @ Aitsu (slot=0x160A); BST node
+.equ WHITE_MAGICIAN_PIKERU_CID,   0x00001757  @ White Magician Pikeru (slot=0x1757); BST node
+.equ RITUAL_WEAPON_CID,           0x000017fb  @ Ritual Weapon (slot=0x17FB); BST node
+.equ CHU_SKE_MOUSE_FIGHTER_CID,   0x0000185a  @ Chu-Ske the Mouse Fighter (slot=0x185A); BST node
+.equ EHERO_SPARKMAN_CID,          0x000018a9  @ Elemental Hero Sparkman (pw=20721928; slot=0x18A9); BST node
+.equ LEGENDARY_BLACK_BELT_CID,    0x000018d0  @ Legendary Black Belt (slot=0x18D0); BST node
+.equ SOITSU_CID,                  0x0000190b  @ Soitsu (slot=0x190B); BST node
+.equ INDOMITABLE_FIGHTER_LEI_LEI_CID, 0x00001915 @ Indomitable Fighter Lei Lei (slot=0x1915); BST node
+.equ EBON_MAGICIAN_CURRAN_CID,    0x0000191d  @ Ebon Magician Curran (pw=46128076; slot=0x191D); BST node
+.equ DIVINE_SWORD_PHOENIX_BLADE_CID, 0x0000193a @ Divine Sword - Phoenix Blade (slot=0x193A); BST node
+.equ V_TIGER_JET_CID,             0x00001947  @ V-Tiger Jet (pw=51638941; slot=0x1947); BST node
+.equ ADHESIVE_EXPLOSIVE_CID,      0x000019bd  @ Adhesive Explosive (slot=0x19BD); BST node
+@ Unallocated slot IDs used in BST (no card in card-stats.s with these slot_ids):
+.equ cid_10d4,  0x000010d4  @ unallocated; BST node in check_slot_card_eligible_by_card_id
+.equ cid_10da,  0x000010da  @ unallocated; BST node
+.equ cid_10e2,  0x000010e2  @ unallocated; BST node
+.equ cid_10e5,  0x000010e5  @ unallocated; BST node
+.equ cid_10ea,  0x000010ea  @ unallocated; BST node
+.equ cid_10eb,  0x000010eb  @ unallocated; BST node
+.equ cid_10ed,  0x000010ed  @ unallocated; BST node
+.equ cid_10ee,  0x000010ee  @ unallocated; BST node
+.equ cid_12c6,  0x000012c6  @ unallocated; BST node
+.equ cid_12ef,  0x000012ef  @ unallocated; BST node
+@ Score threshold (not a CID):
+.equ FIELD5_SCORE_THRESHOLD_1299,  0x00000513  @ field5 score upper bound; check_slot_card_eligible_by_card_id after get_slot_field5_score comparison; value 1299 is a score bound not a slot_id
