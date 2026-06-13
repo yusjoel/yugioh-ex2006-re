@@ -17915,7 +17915,7 @@ LAB_08050fd8:
 LAB_08050ff2:
     b LAB_08051118                           @ 08050ff2 91e0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_a:
-    .word  0x080502b1                     @ 08050ff4 b1020508
+    .word  eval_equip_slot_score_by_card_state+1 @ 08050ff4 b1020508
 LAB_08050ff8:
     ldr r0,[sp,#0x4]                         @ 08050ff8 0198
     cmp r0,#0x1                              @ 08050ffa 0128
@@ -17939,7 +17939,7 @@ LAB_08051000:
 LAB_0805101e:
     b LAB_08051118                           @ 0805101e 7be0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_b:
-    .word  0x08050a55                     @ 08051020 550a0508
+    .word  check_equip_slot_eligible_by_card_id_bst+1 @ 08051020 550a0508
 LAB_08051024:
     ldr r0,[sp,#0x0]                         @ 08051024 0098
     bl check_card_field8_is_9                @ 08051026 f9f7e3fe
@@ -17967,7 +17967,7 @@ LAB_0805103e:
     ble LAB_0805111a                         @ 08051054 61dd
     b LAB_08051118                           @ 08051056 5fe0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_c:
-    .word  0x08052aa9                     @ 08051058 a92a0508
+    .word  check_equip_slot_eligible_by_card_id_dispatch_b+1 @ 08051058 a92a0508
 LAB_0805105c:
     ldr r1,[sp,#0x0]                         @ 0805105c 0099
     ldr r0, check_equip_slot_eligible_by_card_id_tree_cid_1706 @ 0805105e 0848
@@ -17989,7 +17989,7 @@ LAB_0805105c:
 check_equip_slot_eligible_by_card_id_tree_cid_1706:
     .word  TORPEDO_FISH_CID               @ 08051080 06170000
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_d:
-    .word  0x08050995                     @ 08051084 95090508
+    .word  check_equip_slot_eligible_by_type_then_prereqs+1 @ 08051084 95090508
 LAB_08051088:
     ldr r0, check_equip_slot_eligible_by_card_id_tree_cid_1709 @ 08051088 0548
     cmp r1,r0                                @ 0805108a 8142
@@ -18006,7 +18006,7 @@ LAB_08051090:
 check_equip_slot_eligible_by_card_id_tree_cid_1709:
     .word  CANNONBALL_SPEAR_SHELLFISH_CID @ 080510a0 09170000
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_e:
-    .word  0x08051b21                     @ 080510a4 211b0508
+    .word  check_equip_slot_eligible_by_setcode_and_prereqs+1 @ 080510a4 211b0508
 LAB_080510a8:
     ldr r0,[sp,#0x4]                         @ 080510a8 0198
     cmp r0,#0xd                              @ 080510aa 0d28
@@ -18027,7 +18027,7 @@ LAB_080510b0:
     b LAB_08051118                           @ 080510c8 26e0
     .zero  0x2
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_f:
-    .word  0x08051b21                     @ 080510cc 211b0508
+    .word  check_equip_slot_eligible_by_setcode_and_prereqs+1 @ 080510cc 211b0508
 LAB_080510d0:
     movs r2,#0x1    @ 080510d0 0122
     ands r2,r4    @ 080510d2 2240

@@ -77,7 +77,7 @@
 |-----|------|-----|--------|------------------------|------|--------|
 | 1 | 0x537c0..0x541cc | 22 | 47 | — | ✅ | f3bb6a9 |
 | 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ✅ | 6c90482 |
-| 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ⬜ | — |
+| 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ✅ | pending |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ⬜ | — |
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ⬜ | — |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ⬜ | — |
@@ -125,6 +125,22 @@
 - **验收**: FUN_残留=0; CJK=0; ROM_INCBIN 0x54614 无残留; disasm fn check_equip_slot_eligible_by_side_and_zone_for_desert_sunlight @ line 2140 出现
 - **commit**: 6c90482
 
+### 4.03 Seg-3 完成记录 (2026-06-14, commit pending)
+
+- **段范围**: 0x08054ba0..0x08055440, 22 fn + 1 disasm'd (check_zone_slot_occupied_with_clear_equip_flag)
+- **disasm=1**: ROM_INCBIN 0x08055188/0x34 -> check_zone_slot_occupied_with_clear_equip_flag (R4 disasm; fn-ptr2 @ dispatch_table 0x09e4365c CID 0x130f + 0x09e43b84 CID 0x14b4 Byser Shock; leaf fn bx lr; THUMB decode verified; clearListing->setTMode->DisassembleCommand->createFunction+setName+plate; lit pool 0x080551b0/0x080551b4 createDWord'd)
+- **EQ=44**: 21x PLAYER_BLOCK_STRIDE + 21x gDuelFieldSlots (ewram.inc 复用) + 2x pool slots in disasm'd fn (check_zone_slot_clear_equip_stride / check_zone_slot_clear_equip_slots)
+- **REF=1**: 0x08054c44 -> gEquipChainSlotRefs=0x0201bb90 (ewram.inc 复用; slot_label=check_equip_slot_eligible_by_prereqs_and_effect_ctx_ctx)
+- **PLATE=1**: disasm'd fn plate (ASCII; 669 chars; dispatch table + predicate semantics)
+- **FUNC_RENAME=0, PLATE_SUBS=0** (Seg-3 内所有 22 现有函数 plate 已 ASCII 无 stale FUN_)
+- **carve=0, §5.1=0**
+- **新建 constants/全局**: none (全复用 ewram.inc)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x2 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc) + asm/04 x1 (gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0) + asm/05 Seg-8 x6 (eval_equip_slot_score_by_card_state/check_equip_slot_eligible_by_card_id_bst/check_equip_slot_eligible_by_card_id_dispatch_b/check_equip_slot_eligible_by_type_then_prereqs/check_equip_slot_eligible_by_setcode_and_prereqs x2) + asm/06 x1 (check_equip_slot_eligible_triple_predicate+1 @ 0x53e08)
+- **CSV sync**: naming-proposals.csv +1 行 (0x08055188 check_zone_slot_occupied_with_clear_equip_flag)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **验收**: FUN_残留=0; CJK=0; ROM_INCBIN 0x55188 无残留; disasm fn @ asm/06 line 3971
+- **commit**: pending
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -136,7 +152,7 @@
 |---|---|---|---|---|---|
 | Seg-1 | 0x537c0..0x541cc | 22 | 47 | — | equip eligibility by slot equip flag dispatch + side/setcode/type 资格检查簇头 |
 | Seg-2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | side+setcode+prereqs+type 资格检查簇 |
-| Seg-3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | equip_type+occupied 资格检查簇 |
+| Seg-3 | 0x54ba0..0x55440 | 22+1 | 43 | ROM_INCBIN 0x55188/0x34 | equip_type+occupied 资格检查簇 ✅ |
 | Seg-4 | 0x55440..0x565e8 | 22 | 149 | — | 重: same_player_type_mismatch + card_id BST/pairs 大型分发簇 |
 | Seg-5 | 0x565e8..0x57458 | 22 | 101 | — | tick_equip_activation_with_lp_cost_sprite + LP cost display 簇头 |
 | Seg-6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | set_lp_row_type2 + equip activation LP display seq |

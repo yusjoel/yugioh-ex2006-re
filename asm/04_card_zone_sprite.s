@@ -1357,7 +1357,7 @@ tick_equip_scan_state_base:
 tick_equip_scan_field_slots_base:
     .word  gDuelFieldSlots                @ 08040ab0 10c50102  gDuelFieldSlots
 tick_equip_scan_destiny_chain_table:
-    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  +7*16=+0x70: Destiny Board + Spirit Message I/N/A/L card_ids
+    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  zone_monster_field_bonus_table+7*16: Destiny Board + Spirit Message I/N/A/L card_ids
 tick_equip_scan_player_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08040ab8 68080000  PLAYER_BLOCK_STRIDE (0x868)
 LAB_08040abc:
@@ -13237,7 +13237,7 @@ dat_08045ef4_ptr:
 dat_08045ef8_cid:
     .word  NITRO_UNIT_CID                 @ 08045ef8 d1180000
 dat_08045efc_fnptr:
-    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408  THUMB fn-ptr +1
+    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408
 dat_08045f00_cid:
     .word  upd_cid_1672                   @ 08045f00 72160000  card gap; no card-stats entry
 dat_08045f04_cid:
@@ -16764,7 +16764,7 @@ LAB_080478d4:
     pop {r1}                                 @ 080478ec 02bc
     bx r1                                    @ 080478ee 0847
 upd_equip_bitmap_effect_zone:
-    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102  gDuelFieldSlots+0x10a4=0x0201d5b4
+    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102
 PTR_gP1LifePoints_080478f4:
     .word  gP1LifePoints                  @ 080478f4 e0c40102
 upd_equip_bitmap_ctrl_off_b:

@@ -1264,6 +1264,7 @@ address,name,proposed_name,score,tags
 0x08055078,check_equip_slot_eligible_by_prereqs_and_type_code_mismatch,,,
 0x080550e4,check_equip_slot_eligible_by_prereqs_and_type,,,
 0x08055138,check_equip_slot_cross_player_type_eligible,,,
+0x08055188,check_zone_slot_occupied_with_clear_equip_flag,,,
 0x080551bc,check_equip_slot_eligible_by_setcode_g_and_field5,,,
 0x08055248,check_slot_effect_value_beats_card_category,,,
 0x080552a0,check_equip_slot_eligible_by_effect_value_and_category,,,
