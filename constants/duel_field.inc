@@ -302,3 +302,38 @@
 @ Source: asm/06_equip_eligibility_b.s, Seg-2 (check_equip_slot_eligible_by_card_specific_activation)
 @ =============================================================================
 .equ EQUIP_FLAG_TARGET_ICID_TABLE_OFF, 0x000010b0  @ gDuelFieldSlots+0x10b0: u16[] indexed by equip_slot[+0xa] (equip_flag); Roll Out! (0x1979) uses to resolve target card ICID; distinct from SLOT_FACE_STATUS_ARRAY_OFF=0x10b1 (byte array) by 1 byte; med-conf; 1 Seg-2 slot
+
+@ =============================================================================
+@ file 06 Seg-4 additions: equip activation step / trigger param / LP cost 5000 / equip zone sprite attr
+@ Source: asm/06_equip_eligibility_b.s, Seg-4 (0x08055440..0x080565e8)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_STEP_OFF, 0x000004ac  @ [gDuelPhaseFlags+0x4ac] equip activation state machine step counter; values 0/1/2 in tick_equip_activation_state_machine; 0xa/0xb in type8_entry wrapper; 4 Seg-4 slots; conf: high
+.equ TRIGGER_OP_PARAM_107,      0x00000107  @ trigger_card_display_op31_if_not_active second arg; asm/06 line 6925; 1 Seg-4 slot; conf: med
+.equ LP_COST_5000,              0x00001388  @ get_card_lp_cost_by_id return 5000 LP; asm/06 line 5697; distinct from EQUIP_SLOT_CARD_ID_RANGE_MAX=0x1388 (card_id domain) and gap CID 0x1388 (score BST node); conf: high
+.equ EQUIP_ZONE_SPRITE_ATTR,    0x00000fb6  @ enqueue_equip_zone_sprite_at_slot r2 arg to enqueue_sprite_attr_with_mode; 4022=0xfb6 sprite attr code; asm/06 line 6873; conf: high
+
+@ Equip score literals (lookup_equip_card_score_by_card_id_and_player BST branch return values)
+@ Mooyan Curry player 0/1 and A Rival Appears! player 1 scores:
+.equ lookup_equip_score_mooyan_p0,        0x00000197  @ Mooyan Curry player 0 equip score; 1 Seg-4 slot
+.equ lookup_equip_score_a_rival_appears_p1, 0x000001c7 @ A Rival Appears! player 1 equip score; 1 Seg-4 slot
+.equ lookup_equip_score_mooyan_p1,        0x00000199  @ Mooyan Curry player 1 equip score; 1 Seg-4 slot
+@ 22 neutral BST-branch score labels (0x1a5..0x1cf range):
+.equ lookup_equip_score_b_0x1a5,          0x000001a5  @ BST branch score 0x1a5; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1a7,          0x000001a7  @ BST branch score 0x1a7; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1a9,          0x000001a9  @ BST branch score 0x1a9; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1ab,          0x000001ab  @ BST branch score 0x1ab; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1ad,          0x000001ad  @ BST branch score 0x1ad; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1af,          0x000001af  @ BST branch score 0x1af; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1b1,          0x000001b1  @ BST branch score 0x1b1; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1b3,          0x000001b3  @ BST branch score 0x1b3; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1b5,          0x000001b5  @ BST branch score 0x1b5; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1b7,          0x000001b7  @ BST branch score 0x1b7; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1b9,          0x000001b9  @ BST branch score 0x1b9; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1bf,          0x000001bf  @ BST branch score 0x1bf; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1c1,          0x000001c1  @ BST branch score 0x1c1; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1c3,          0x000001c3  @ BST branch score 0x1c3; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1c5,          0x000001c5  @ BST branch score 0x1c5; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1c9,          0x000001c9  @ BST branch score 0x1c9; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1cb,          0x000001cb  @ BST branch score 0x1cb; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1cd,          0x000001cd  @ BST branch score 0x1cd; 1 Seg-4 slot
+.equ lookup_equip_score_b_0x1cf,          0x000001cf  @ BST branch score 0x1cf; 1 Seg-4 slot

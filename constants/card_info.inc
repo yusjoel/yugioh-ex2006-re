@@ -988,3 +988,68 @@
 .equ GILFORD_THE_LEGEND_CID,         0x00001938  @ Gilford the Legend (pw=69933858; card-stats.s card_2073 slot=0x1938); equip BST dispatch literal pool 0x0805495c; high-conf
 .equ SERIAL_SPELL_CID,               0x0000183e  @ Serial Spell (pw=49398568; card-stats.s card_1980 slot=0x183E); invoke_serial_spell_effect_node_handler literal pool 0x08054b9c; high-conf
 .equ THE_TRICKY_TARGET_SLOT_PATTERN, 0xc0300000  @ THE_TRICKY_CID(0x1806)<<19 == 0xc0300000; Tricky's Magic 4 target check: (slot_word<<19)==pattern iff slot_word bits[12:0]==THE_TRICKY_CID; python verified; high-conf
+
+@ =============================================================================
+@ file 06 Seg-4 additions: equip activation BST card IDs
+@ Source: asm/06_equip_eligibility_b.s, Seg-4 (0x08055440..0x080565e8)
+@ All values verified against data/card-stats.s slot= fields.
+@ 55 new CIDs: 50 named (high-conf) + 5 gap CIDs (low-conf neutral names; no card in card-stats.s).
+@ Passcodes verified against data/card-stats.s.
+@ =============================================================================
+@ Named CIDs (sorted by CID value):
+.equ MALEVOLENT_NUZZLER_CID,         0x000010e7  @ Malevolent Nuzzler (pw=99597615); tick_equip_activation BST dispatch
+.equ MOOYAN_CURRY_CID,               0x000010f8  @ Mooyan Curry (pw=58074572); lookup_equip_card_score BST
+.equ CHIMERA_FLYING_MYTHICAL_BEAST_CID, 0x00001294 @ Chimera the Flying Mythical Beast (pw=4796100); tick_equip_activation BST
+.equ BRAIN_CONTROL_CID,              0x000012c3  @ Brain Control (pw=87910978); get_card_lp_cost_by_id BST
+.equ DARK_MAGIC_CURTAIN_CID,         0x000012de  @ Dark Magic Curtain (pw=99789342); get_card_lp_cost_by_id BST
+.equ SOLEMN_JUDGMENT_CID,            0x000012fd  @ Solemn Judgment (pw=41420027); get_card_lp_cost_by_id BST
+.equ SEVEN_TOOLS_OF_THE_BANDIT_CID,  0x000012ff  @ Seven Tools of the Bandit (pw=3819470); get_card_lp_cost_by_id BST
+.equ FINAL_DESTINY_CID,              0x00001321  @ Final Destiny (pw=18591904); classify_equip_tier_abce BST
+.equ JUDGMENT_OF_ANUBIS_CID,         0x00001470  @ Judgment of Anubis (pw=55256016); classify_equip_tier_abce BST
+.equ ROPE_OF_LIFE_CID,               0x000014a7  @ Rope of Life (pw=93382620); classify_equip_tier_abce BST
+.equ DARK_BALTER_THE_TERRIBLE_CID,   0x000014b6  @ Dark Balter the Terrible (pw=80071763); get_card_lp_cost_by_id BST
+.equ BARK_OF_DARK_RULER_CID,         0x000014be  @ Bark of Dark Ruler (pw=41925941); get_card_lp_cost_by_id BST
+.equ SPELL_REPRODUCTION_CID,         0x000014ea  @ Spell Reproduction (pw=29228529); classify_equip_tier_abc_short BST
+.equ MAHARAGHI_CID,                  0x000014fd  @ Maharaghi (pw=40695128); lookup_equip_card_score BST
+.equ OMINOUS_FORTUNETELLING_CID,     0x00001519  @ Ominous Fortunetelling (pw=56995655); lookup_equip_card_score BST
+.equ ORDEAL_OF_A_TRAVELER_CID,       0x0000153f  @ Ordeal of a Traveler (pw=39537362); lookup_equip_card_score BST
+.equ PUPPET_MASTER_CID,              0x0000156a  @ Puppet Master (pw=41442341); get_card_lp_cost_by_id BST
+.equ CARD_SHUFFLE_CID,               0x00001599  @ Card Shuffle (pw=12183332); get_card_lp_cost_by_id + lookup_equip_card_score BST
+.equ REVERSAL_QUIZ_CID,              0x000015a5  @ Reversal Quiz (pw=5990062); lookup_equip_card_score BST
+.equ ROPE_OF_SPIRIT_CID,             0x000015b5  @ Rope of Spirit (pw=37383714); get_card_lp_cost_by_id BST
+.equ SPELL_SHIELD_TYPE8_CID,         0x000015f1  @ Spell Shield Type-8 (pw=38275183); lookup_equip_card_score BST
+.equ BREAKER_MAGICAL_WARRIOR_CID,    0x00001617  @ Breaker the Magical Warrior (pw=71413901); classify_equip_tier_abcx BST
+.equ ANTI_SPELL_CID,                 0x00001634  @ Anti-Spell (pw=53112492); classify_equip_tier_abcx BST
+.equ SKILL_DRAIN_CID,                0x0000166c  @ Skill Drain (pw=82732705); get_card_lp_cost_by_id BST
+.equ DARK_SCORPION_GORG_THE_STRONG_CID, 0x00001685 @ Dark Scorpion - Gorg the Strong (pw=48768179); lookup_equip_card_score BST
+.equ SPELL_VANISHING_CID,            0x000016a6  @ Spell Vanishing (pw=29735721); classify_equip_tier_abce BST
+.equ DIMENSION_FUSION_CID,           0x00001712  @ Dimension Fusion (pw=23557835); get_card_lp_cost_by_id BST
+.equ AGENT_OF_CREATION_VENUS_CID,    0x00001741  @ The Agent of Creation - Venus (pw=64734921); get_card_lp_cost_by_id BST
+.equ MYSTIK_WOK_CID,                 0x0000175a  @ Mystik Wok (pw=80161395); lookup_equip_card_score BST
+.equ RETURN_ZOMBIE_CID,              0x00001775  @ Return Zombie (pw=3072077); get_card_lp_cost_by_id BST
+.equ SPECIAL_HURRICANE_CID,          0x0000179e  @ Special Hurricane (pw=42598242); classify_equip_tier_abce BST
+.equ SPELL_ECONOMICS_CID,            0x000017a3  @ Spell Economics (pw=4259068); get_card_lp_cost_by_id field6==0x16 gate
+.equ ENCHANTING_FITTING_ROOM_CID,    0x000017a7  @ Enchanting Fitting Room (pw=30531525); get_card_lp_cost_by_id BST
+.equ CRUSH_D_GANDRA_CID,             0x000017bc  @ Crush D. Gandra (pw=64681432); get_card_lp_cost_by_id BST
+.equ ABYSSAL_DESIGNATOR_CID,         0x000017f4  @ Abyssal Designator (pw=89801755); get_card_lp_cost_by_id BST
+.equ BACK_TO_SQUARE_ONE_CID,         0x00001844  @ Back to Square One (pw=47453433); classify_equip_tier_abce BST
+.equ FUH_RIN_KA_ZAN_CID,             0x0000184e  @ Fuh-Rin-Ka-Zan (pw=1781310); lookup_equip_card_score BST
+.equ SPELL_PURIFICATION_CID,         0x00001851  @ Spell Purification (pw=1669772); classify_equip_tier_abce BST
+.equ FORCED_CEASEFIRE_CID,           0x0000188e  @ Forced Ceasefire (pw=97806240); classify_equip_tier_abce BST
+.equ BATTERY_CHARGER_CID,            0x000018cc  @ Battery Charger (pw=61181383); get_card_lp_cost_by_id BST
+.equ BUBBLE_SHUFFLE_CID,             0x00001908  @ Bubble Shuffle (pw=61968753); check_equip_slot_eligible_by_card_id_bst_special_cases
+.equ CYBERNETIC_MAGICIAN_CID,        0x0000190e  @ Cybernetic Magician (pw=59023523); classify_equip_tier_abce BST
+.equ PROTECTIVE_SOUL_AILIN_CID,      0x00001916  @ Protective Soul Ailin (pw=11678191); lookup_equip_card_score BST
+.equ A_RIVAL_APPEARS_CID,            0x0000192b  @ A Rival Appears! (pw=5728014); check_equip_slot_eligible_by_rival_appears_effect
+.equ TRIAGE_CID,                     0x00001932  @ Triage (pw=30888983); get_card_lp_cost_by_id BST
+.equ DARK_DEAL_CID,                  0x00001975  @ Dark Deal (pw=65824822); get_card_lp_cost_by_id BST
+.equ PHANTASMAL_MARTYRS_CID,         0x000019af  @ Phantasmal Martyrs (pw=93224848); classify_equip_tier_abc_short BST
+.equ DAMAGE_CONDENSER_CID,           0x000019b6  @ Damage Condenser (pw=28378427); classify_equip_tier_abce BST
+.equ DEMISE_KING_OF_ARMAGEDDON_CID,  0x000019d5  @ Demise, King of Armageddon (pw=72426662); get_card_lp_cost_by_id BST
+.equ MALFUNCTION_CID,                0x000019e2  @ Malfunction (pw=6137095); get_card_lp_cost_by_id BST
+@ Gap CIDs (5 new, low-conf neutral names; no slot= in card-stats.s for these values):
+.equ get_card_lp_cost_by_id_cid_1190, 0x00001190 @ unallocated slot_id; BST node in get_card_lp_cost_by_id
+.equ get_card_lp_cost_by_id_cid_11cf, 0x000011cf @ unallocated slot_id; BST node in get_card_lp_cost_by_id
+.equ get_card_lp_cost_by_id_cid_1393, 0x00001393 @ unallocated slot_id; BST node in get_card_lp_cost_by_id
+.equ get_card_lp_cost_by_id_cid_169d, 0x0000169d @ unallocated slot_id; BST node in get_card_lp_cost_by_id
+.equ lookup_equip_card_score_cid_1388, 0x00001388 @ unallocated slot_id; BST node in lookup_equip_card_score; same value as LP_COST_5000/EQUIP_SLOT_CARD_ID_RANGE_MAX -- different domain
