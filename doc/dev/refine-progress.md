@@ -85,7 +85,7 @@
 | 5 | 0x565e8..0x57458 (22 fn, 101 槽) | ⬜ | — |
 | 6 | 0x57458..0x58550 (22 fn, 99 槽, ROM_INCBIN x2) | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec (22 fn, 58 槽) | ✅ | 8fd1210 |
-| 8 | 0x58cec..0x59de0 (22 fn+13 new, 107 槽, ROM_INCBIN x2 + switchD) | ✅ | TBD |
+| 8 | 0x58cec..0x59de0 (22 fn+13 new, 107 槽, ROM_INCBIN x2 + switchD) | ✅ | 11c409d |
 | 9 | 0x59de0..0x5b480 (22 fn, 146 槽, ROM_INCBIN x2) | ⬜ | — |
 | 10 | 0x5b480..0x5c2f0 (15 fn, 69 槽, switchD x2) | ⬜ | — |
 

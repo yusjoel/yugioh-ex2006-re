@@ -82,7 +82,7 @@
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ✅ | 3177750 |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | 8fd1210 |
-| 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ✅ | TBD |
+| 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ✅ | 11c409d |
 | 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
 | 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ⬜ | — |
 
@@ -205,7 +205,7 @@
 - **§5.1**: 0 (all ROM_INCBIN blocks have references; disasm'd)
 - **验收**: FUN_ 残留=0 in Seg-8 range; CJK=0 in Seg-8 comments; 4 ROM_INCBIN blocks replaced; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- **commit**: TBD
+- **commit**: 11c409d
 
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
