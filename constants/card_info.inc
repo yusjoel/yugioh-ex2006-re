@@ -640,3 +640,65 @@
 .equ HARPIE_LADY_1_CID,        0x0000182a  @ Harpie Lady 1 (pw=91932350; card_1710 slot=0x182A); Harpie pair whitelist target (equivalent group with HARPIE_LADY_CID + CYBER_HARPIE_LADY_CID); 7 raw ROM refs
 .equ HARPIE_LADY_3_CID,        0x0000182c  @ Harpie Lady 3 (pw=54415063; card_1712 slot=0x182C); Harpie pair whitelist target; 12 raw ROM refs
 .equ BEWD_RANGE_CHECK_BIAS,    0xfffff05a  @ range-check bias -0xfa6: adds r0,r1,bias; cmp r0,#1; bhi -> tests if r1 in {0xfa6,0xfa7} (BEWD/gap range); check_card_pair_allowed + check_card_ids_banlist_compatible; 2 raw ROM refs
+
+@ =============================================================================
+@ file 05 Seg-3 additions: card field/type queries + summon restriction + evolution IDs
+@ Source: asm/05_equip_eligibility_a.s, Seg-3 (0x0804ad48..0x0804b4f4)
+@ check_card_is_archfiend/gravekeeper/amazoness/ninja/guardian/dark_scorpion/batteryman/
+@   dark_world_range_type + effect_monster_b/c/bes/special_summon types +
+@   fusion_target_range + get_card_evolution_target_ids
+@ =============================================================================
+@ -- main-segment EQ (40 new CIDs) --
+.equ B_SKULL_DRAGON_CID,               0x0000107f  @ B. Skull Dragon (pw=11901678; card_0205)
+.equ WICKED_MIRROR_CID,                0x000010ab  @ Wicked Mirror (pw=15150371; card_0246)
+.equ AXE_OF_DESPAIR_CID,               0x000010d6  @ Axe of Despair (pw=40619825; card_0283)
+.equ ARMED_NINJA_CID,                  0x0000117b  @ Armed Ninja (pw=09076207; card_0395)
+.equ TOON_SUMMONED_SKULL_CID,          0x0000127f  @ Toon Summoned Skull (pw=91842653; card_0591)
+.equ BEAST_OF_TALWAR_CID,              0x000012b5  @ Beast of Talwar (pw=11761845; card_0638)
+.equ GRAVEKEEPERS_SERVANT_CID,         0x0000131d  @ Gravekeeper's Servant (pw=16762927; card_0710)
+.equ AMAZONESS_ARCHERS_CID,            0x000014a6  @ Amazoness Archers (pw=67987611; card_0992)
+.equ AMAZONESS_FIGHTER_CID,            0x000014af  @ Amazoness Fighter (pw=55821894; card_0998)
+.equ LESSER_FIEND_CID,                 0x000014b7  @ Lesser Fiend (pw=16475472; card_1003)
+.equ GUARDIAN_SPHINX_CID,              0x0000152e  @ Guardian Sphinx (pw=40659562; card_1107)
+.equ GRAVEKEEPERS_ASSAILANT_CID,       0x0000158d  @ Gravekeeper's Assailant (pw=25262697; card_1169)
+.equ OJAMA_GREEN_CID,                  0x00001681  @ Ojama Green (pw=12482652; card_1358)
+.equ SKULL_ARCHFIEND_OF_LIGHTNING_CID, 0x00001692  @ Skull Archfiend of Lightning (pw=61370518; card_1374)
+.equ OJAMA_BLACK_CID,                  0x000016b4  @ Ojama Black (pw=79335209; card_1400)
+.equ STRIKE_NINJA_CID,                 0x000016b9  @ Strike Ninja (pw=41006930; card_1405)
+.equ OJAMA_DELTA_HURRICANE_CID,        0x000016cf  @ Ojama Delta Hurricane!! (pw=08251996; card_1425)
+.equ THEINEN_THE_GREAT_SPHINX_CID,     0x000017c9  @ Theinen the Great Sphinx (pw=87997872; card_1624)
+.equ ULTIMATE_INSECT_LV1_CID,          0x000017d1  @ Ultimate Insect LV1 (pw=49441499; card_1631)
+.equ HORUS_LV4_CID,                    0x000017d2  @ Horus the Black Flame Dragon LV4 (pw=75830094; card_1632)
+.equ DARK_MIMIC_LV3_CID,               0x000017d6  @ Dark Mimic LV3 (pw=01102515; card_1636)
+.equ MYSTIC_SWORDSMAN_LV2_CID,         0x000017d7  @ Mystic Swordsman LV2 (pw=47507260; card_1637)
+.equ MYSTIC_SWORDSMAN_LV4_CID,         0x000017d8  @ Mystic Swordsman LV4 (pw=74591968; card_1638)
+.equ ARMED_DRAGON_LV5_CID,             0x000017da  @ Armed Dragon LV5 (pw=46384672; card_1640)
+.equ ARMED_DRAGON_LV7_CID,             0x000017db  @ Armed Dragon LV7 (pw=73879377; card_1641)
+.equ NINJA_GRANDMASTER_SASUKE_CID,     0x000017df  @ Ninja Grandmaster Sasuke (pw=04041838; card_1644)
+.equ SILENT_SWORDSMAN_LV3_CID,         0x00001812  @ Silent Swordsman LV3 (pw=01995985; card_1690)
+.equ SILENT_SWORDSMAN_LV7_CID,         0x00001816  @ Silent Swordsman LV7 (pw=37267041; card_1692)
+.equ MYSTIC_SWORDSMAN_LV6_CID,         0x00001823  @ Mystic Swordsman LV6 (pw=60482781; card_1704)
+.equ ANCIENT_GEAR_GOLEM_CID,           0x000018ab  @ Ancient Gear Golem (pw=83104731; card_1819)
+.equ ULTIMATE_INSECT_LV7_CID,          0x000018af  @ Ultimate Insect LV7 (pw=19877898; card_1823)
+.equ WHITE_NINJA_CID,                  0x000018be  @ White Ninja (pw=01571945; card_1838)
+.equ EHERO_BUBBLEMAN_CID,              0x000018f9  @ Elemental Hero Bubbleman (pw=79979666; card_1882)
+.equ WINGED_KURIBOH_LV10_CID,          0x00001906  @ Winged Kuriboh LV10 (pw=98585345; card_1891)
+.equ BES_CRYSTAL_CORE_CID,             0x00001913  @ B.E.S. Crystal Core (pw=22790789; card_1904)
+.equ BES_TETRAN_CID,                   0x00001962  @ B.E.S. Tetran (pw=44954628; card_1968)
+.equ EHERO_MADBALLMAN_CID,             0x00001981  @ Elemental Hero Madballman (pw=52031567; card_1996)
+.equ ARMED_DRAGON_LV10_CID,            0x0000198c  @ Armed Dragon LV10 (pw=59464593; card_2005)
+.equ EHERO_NEO_BUBBLEMAN_CID,          0x000019a6  @ Elemental Hero Neo Bubbleman (pw=05285665; card_2015)
+.equ ANCIENT_GEAR_DRILL_CID,           0x000019ae  @ Ancient Gear Drill (pw=67829249; card_2022)
+@ -- disasm-block EQ (11 new CIDs; 4 existing reused) --
+.equ TOON_ALLIGATOR_CID,               0x00001123  @ Toon Alligator (pw=59383041; card_0316)
+.equ METAL_GUARDIAN_CID,               0x00000ffe  @ Metal Guardian (pw=68339286; card_0191)
+.equ GATE_GUARDIAN_CID,                0x0000111c  @ Gate Guardian (pw=25833572; card_0218)
+.equ GUARDIAN_OF_THRONE_ROOM_CID,      0x000011a7  @ Guardian of the Throne Room (pw=47879985; card_0339)
+.equ SKULL_GUARDIAN_CID,               0x00001266  @ Skull Guardian (pw=03627449; card_0584)
+.equ GUARDIAN_ANGEL_JOAN_CID,          0x0000170b  @ Guardian Angel Joan (pw=68007326; card_1564)
+.equ LOST_GUARDIAN_CID,                0x000018b0  @ Lost Guardian (pw=45871897; card_1828)
+.equ DARK_SCORPION_CHICK_CID,          0x00001656  @ Dark Scorpion - Chick the Yellow (pw=61587183; card_1320)
+.equ DARK_SCORPION_MEANAE_CID,         0x00001686  @ Dark Scorpion - Meanae the Thorn (pw=74153887; card_1356)
+.equ MUSTERING_DARK_SCORPIONS_CID,     0x0000169e  @ Mustering of the Dark Scorpions (pw=68191243; card_1370)
+@ NOTE: BATTERYMAN_AA_CID=0x18c3 and BATTERYMAN_C_CID=0x191c already in card_info.inc (reuse)
+@ NOTE: BLUE_EYES_TOON_DRAGON_CID/TOON_DARK_MAGICIAN_GIRL_CID/TOON_WORLD_CARD_ID/TOON_GOBLIN_AF_CID already defined (reuse)

@@ -95,7 +95,7 @@
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | 68c1e28 |
-| 3 | 0x4ad48..0x4b4f4 | 24 | 73 | — | ⬜ | — |
+| 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | (pending) |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
@@ -185,6 +185,82 @@ check_card_ids_banlist_compatible
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 68c1e28
+
+### 4.03 Seg-3 完成记录 (0x0804ad48..0x0804b4f4, 24+5 fn, 73+20 slots, 3 disasm blocks)
+
+**函数列表 (24 original)**:
+check_card_has_stat_with_bit_13 / check_card_has_spell_counter /
+check_card_field5_high_byte_match / check_card_field5_word_match /
+check_card_is_union_type / check_card_is_amazon_type /
+check_card_is_sea_serpent_type / check_card_is_fairy_type /
+check_card_is_insect_type / check_card_is_rock_type /
+check_card_is_plant_type / check_card_is_machine_type /
+check_card_is_thunder_type / check_card_is_beast_type /
+check_card_is_beast_warrior_type / check_card_is_dinosaur_type /
+check_card_is_reptile_type / check_card_is_aqua_type /
+check_card_is_pyro_type / check_card_is_wind_type /
+check_card_is_earth_type / check_card_is_water_type /
+check_card_is_fire_type / check_card_is_ninja_type (FUNC_RENAME from check_card_id_in_special_set)
+
+**函数列表 (5 new from R4 disasm)**:
+check_card_is_toon_type (0x0804ae40) /
+check_card_is_guardian_type (0x0804af88) /
+check_card_is_dark_scorpion_type (0x0804b004) /
+check_card_is_batteryman_type (0x0804b250) /
+check_card_is_dark_world_range_type (0x0804b26c)
+
+**符号化统计**: EQ=87 (70 main-segment + 17 disasm literal pool)
+/ REF=2 / RENAME=3 / FUNC_RENAME=1 (check_card_id_in_special_set->check_card_is_ninja_type)
+/ PLATE=7 (6 FUN_ subs + 1 ASCII rewrite for ninja_type)
+
+**新建 constants**:
+- card_info.inc +50 CID:
+  main-segment (40): B_SKULL_DRAGON_CID / SERPENTINE_PRINCESS_CID / PARASITE_PARACIDE_CID /
+  DREAM_CLOWN_CID / THOUSAND_EYES_RESTRICT_CID / RELINQUISHED_CID / THOUSAND_EYES_IDOL_CID /
+  AMAZONESS_ARCHER_CID / AMAZONESS_CHAIN_MASTER_CID / AMAZONESS_FIGHTER_CID /
+  AMAZONESS_PALADIN_CID / AMAZONESS_SWORDSWOMAN_CID / AMAZONESS_TIGER_CID /
+  AMAZONESS_BLOWPIPER_CID / AMAZONESS_SPELLCASTER_CID / AMAZONESS_TRAINEE_CID /
+  PRINCESS_OF_TSURUGI_CID / INJECT_FAIRY_LEN_CID / CELTIC_GUARDIAN_CID /
+  BREAKER_THE_MAGICAL_WARRIOR_CID / DARK_MAGICIAN_GIRL_CID / MAGICAL_MARIONETTE_CID /
+  COPYCAT_CID / SKILLED_WHITE_MAGICIAN_CID / SKILLED_DARK_MAGICIAN_CID /
+  APPRENTICE_MAGICIAN_CID / DARK_RED_ENCHANTER_CID / MYTHICAL_BEAST_CERBERUS_CID /
+  ENDYMION_THE_MASTER_MAGIC_SWORDSMAN_CID / MAGICIAN_OF_FAITH_CID /
+  NINJA_GRANDMASTER_SASUKE_CID / NINJA_SHADOW_SASUKE_CID / NINJA_YOSENJU_SASUKE_CID /
+  ARMED_SAMURAI_BEN_KEI_CID / DISCIPLE_OF_THE_FORBIDDEN_SPELL_CID /
+  WATER_DRAGON_CID / HYDROGEDDON_CID / OXYGEDDON_CID /
+  ANCIENT_GEAR_GOLEM_CID / ANCIENT_GEAR_DRILL_CID
+  disasm blocks (10): TOON_ALLIGATOR_CID / METAL_GUARDIAN_CID / GATE_GUARDIAN_CID /
+  GUARDIAN_OF_THRONE_ROOM_CID / SKULL_GUARDIAN_CID / GUARDIAN_ANGEL_JOAN_CID /
+  LOST_GUARDIAN_CID / DARK_SCORPION_CHICK_CID / DARK_SCORPION_MEANAE_CID /
+  MUSTERING_DARK_SCORPIONS_CID
+
+**R4 disasm**: 3 ROM_INCBIN blocks disassembled into 5 THUMB functions
+- Block A (0x0804ae40..0x0804b003, 6 CID toon check): check_card_is_toon_type; literal pool 6 x 4B forced DWORD via FixF05Seg3SplitLiteralPools.py
+- Block B (0x0804b004..0x0804b24f, 8 CID guardian + 3 CID dark_scorpion + 1 CID batteryman):
+  check_card_is_guardian_type / check_card_is_dark_scorpion_type / check_card_is_batteryman_type;
+  literal pool 12 x 4B forced DWORD
+- Block C (0x0804b26c..0x0804b287, 2 CID dark_world_range check; switch table 0x0804b288..0x0804b2d3 19xDWORD; inline stub 0x0804b2d4..0x0804b2db):
+  check_card_is_dark_world_range_type; FixF05Seg3BlockCStubTable.py split switch table DWORDs
+  + disasm inline stub; dark_world_range_case1_ret @ 0x0804b2d4 / dark_world_range_ret0 @ 0x0804b2d8
+
+**carve**: 0 (no inter-function ROM_INCBIN; 3 intra-function disasm blocks resolved by R4)
+
+**Ghidra 脚本**:
+- RefineF05Seg3Slots.py: A=70 EQ / B=1 REF / C=1 RENAME / D=1 FUNC_RENAME / E=8 PLATE_SUBS / E2=1 PLATE_REWRITE
+- DisassembleF05Seg3Blocks.py: 3 blocks clearListing+setTMode+disasm; 5 createFunction; RENAME2+REF1+PLATE5
+- FixF05Seg3SplitLiteralPools.py: 20 slots clearListing+createDWord+label+equate (forced DWORD split)
+- FixF05Seg3BlockCStubTable.py: 19 switch table DWORDs + 8B inline stub disasm + 2 labels
+
+**踩坑**:
+- EQ FAIL "no 4B data": disasm 后 literal pool 被 Ghidra 当 code/raw bytes; 必须
+  clearListing+createData(DWordDataType) 强制转 DWORD 才能单独 export label
+- Block C switch table 0x0804b288..0x0804b2d3 + inline stub 0x0804b2d4..0x0804b2db 须分开处理;
+  bhi LAB_0804b2d8 在链接时无定义 -> FixF05Seg3BlockCStubTable.py 补 disasm stub + label
+- fn-ptr +1 periodic fix: asm/04 x3 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF) after re-export
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

@@ -16764,7 +16764,7 @@ LAB_080478d4:
     pop {r1}                                 @ 080478ec 02bc
     bx r1                                    @ 080478ee 0847
 upd_equip_bitmap_effect_zone:
-    .word  gP1LifePoints+EQUIP_BITMAP_CTRL_OFF @ 080478f0 b4d50102
+    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102
 PTR_gP1LifePoints_080478f4:
     .word  gP1LifePoints                  @ 080478f4 e0c40102
 upd_equip_bitmap_ctrl_off_b:
