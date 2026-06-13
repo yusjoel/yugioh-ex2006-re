@@ -935,3 +935,36 @@
 .equ OXYGEDDON_CID,                         0x00001950  @ Oxygeddon (pw=58071123; card-stats.s card_1951 slot=0x1950); check_equip_slot_eligible_by_card_id_tree BST
 @ Score threshold (not a CID; distinct from FIELD5_SCORE_THRESHOLD_1299=0x513 in this file):
 .equ FIELD5_SCORE_THRESHOLD_1999,           0x000007cf  @ field5 score <= 1999 (0x7cf) path; check_equip_slot_eligible_by_card_id_tree Hydrogeddon/Oxygeddon path; value 1999 is score bound not slot_id
+
+@ =============================================================================
+@ file 05 Seg-9 additions: equip slot eligibility by_card_id_dispatch / by_type_and_card_id_pair CIDs
+@ Source: asm/05_equip_eligibility_a.s, Seg-9 (0x08051cc4..0x08052df8)
+@ 27 new CIDs; passcodes verified against data/card-stats.s.
+@ =============================================================================
+.equ SUMMONED_SKULL_CID,             0x00000fbc  @ Summoned Skull (pw=70781052, card_0022)
+.equ RED_EYES_B_DRAGON_CID,          0x00000ff8  @ Red-Eyes B. Dragon (pw=74677422, card_0082)
+.equ MULTIPLY_CID,                   0x000012c5  @ Multiply (pw=40703222); Multiply frog tokens
+.equ GRACEFUL_DICE_CID,              0x000012cf  @ Graceful Dice (pw=74137509)
+.equ SHADOW_TAMER_CID,               0x000014cd  @ Shadow Tamer (pw=37620434)
+.equ DRAGON_MANIPULATOR_CID,         0x000014ce  @ Dragon Manipulator (pw=74701381)
+.equ WINGBEAT_GIANT_DRAGON_CID,      0x000014df  @ A Wingbeat of Giant Dragon (pw=28596933)
+.equ INSECT_IMITATION_CID,           0x0000140b  @ Insect Imitation (pw=96965364)
+.equ LIMITER_REMOVAL_CID,            0x00001409  @ Limiter Removal (pw=23171610)
+.equ CATHEDRAL_OF_NOBLES_CID,        0x0000146f  @ Cathedral of Nobles (pw=29732298)
+.equ PYRAMID_ENERGY_CID,             0x0000153d  @ Pyramid Energy (pw=76826042)
+.equ METAMORPHOSIS_CID,              0x000015a3  @ Metamorphosis (pw=46411259)
+.equ FORMATION_UNION_CID,            0x000015f7  @ Formation Union (pw=26708437)
+.equ KNIGHTS_TITLE_CID,              0x0000167d  @ Knight's Title (pw=87210505)
+.equ TERRORKING_ARCHFIEND_CID,       0x00001691  @ Terrorking Archfiend (pw=55321970)
+.equ ULTRA_EVOLUTION_PILL_CID,       0x00001715  @ Ultra Evolution Pill (pw=78418106)
+.equ ORDER_TO_CHARGE_CID,            0x0000179f  @ Order to Charge (pw=78986941)
+.equ ORDER_TO_SMASH_CID,             0x000017b8  @ Order to Smash (pw=39019325)
+.equ BIG_WAVE_SMALL_WAVE_CID,        0x000017f9  @ Big Wave Small Wave (pw=51562916)
+.equ DOUBLE_ATTACK_CID,              0x000018cb  @ Double Attack (pw=34187685)
+.equ KAMINOTE_BLOW_CID,              0x000018cd  @ Kaminote Blow (pw=97570038)
+.equ MINEFIELD_ERUPTION_CID,         0x000018d6  @ Minefield Eruption (pw=85519211)
+.equ TRANSCENDENT_WINGS_CID,         0x00001907  @ Transcendent Wings (pw=25573054)
+.equ SPIRITUAL_EARTH_ART_CID,        0x00001927  @ Spiritual Earth Art - Kurogane (pw=70156997)
+.equ ELEMENTAL_HERO_TEMPEST_CID,     0x00001957  @ Elemental Hero Tempest (pw=card_2150+)
+.equ HERO_HEART_CID,                 0x000019ab  @ Hero Heart (pw=67951831)
+.equ PHOTON_GENERATOR_UNIT_CID,      0x000019b1  @ Photon Generator Unit (pw=card_2205+)

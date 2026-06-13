@@ -102,7 +102,7 @@
 | 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | 5d95bfc |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ✅ | 6c92afe |
-| 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ⬜ | — |
+| 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ✅ | pending |
 | 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -550,6 +550,72 @@ check_equip_slot_eligible_by_cid_pair_c
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 6c92afe
+
+---
+
+### 4.09 Seg-9 完成记录 (0x08051cc4..0x08052df8, 24 fn, 117 slots)
+
+**函数列表 (24)**:
+check_equip_slot_eligible_by_card_id_bst_and_pairs /
+check_equip_slot_eligible_by_side_and_slot_vacant /
+check_equip_slot_eligible_by_field8_and_chain /
+check_equip_slot_eligible_by_side_mismatch_and_prereqs /
+check_equip_slot_eligible_by_side_and_type_query /
+check_equip_slot_eligible_by_type_query_prereqs_and_eligible /
+check_equip_slot_eligible_by_prereqs_and_slot8_flag /
+check_equip_slot_eligible_by_chain_node_and_activation /
+check_equip_slot_eligible_by_whitelist_type_and_state /
+check_equip_slot_eligible_by_slot_chain_node /
+check_equip_slot_eligible_by_setcode_global_and_chain /
+check_equip_slot_eligible_by_card_id_dispatch /
+check_equip_slot_eligible_by_card_id_dispatch_alt /
+check_equip_slot_eligible_by_type_and_card_id_pair /
+check_equip_slot_eligible_by_prereqs_and_duel_ctx /
+check_equip_slot_eligible_by_setcode_not_field6_17 /
+check_equip_slot_eligible_by_prereqs_and_spell_type /
+check_equip_slot_eligible_by_revival_jam_and_duel_ctx /
+check_equip_slot_eligible_by_owner_bit_and_chain_field /
+check_equip_slot_eligible_by_chain_list_entry /
+check_equip_slot_eligible_by_field6_present_no_field8 /
+check_equip_slot_eligible_by_type_and_chain_score4 /
+check_equip_slot_eligible_by_paired_card_zone_match /
+check_equip_slot_eligible_by_card_id_dispatch_b
+
+**符号化统计**: EQ=112 (30 PLAYER_BLOCK_STRIDE + 30 gDuelFieldSlots + 2 gEquipChainSlotRefs + 1 gDuelPhaseFlags + 1 LP_BAR_ANIM_STATE_OFF + 1 SPRITE_ROW_ENTRY_DATA_OFF + 1 CHAIN_NODE_CARD_ARR_OFF + 19 CID-reuse + 27 CID-new) / REF=0 / RENAME=5 (4 packed zone masks + 1 cid_13b0) / FUNC_RENAME=0 / PLATE=2 subs (FUN_0809077c->invoke_count_zone_pair_hits_full_range; FUN_080556f0->check_equip_slot_eligible_by_setcode_activation_and_zone_pair)
+
+**新建 constants** (card_info.inc +27 CID):
+SUMMONED_SKULL_CID (0x0fbc) / RED_EYES_B_DRAGON_CID (0x0ff8) / MULTIPLY_CID (0x12c5) /
+GRACEFUL_DICE_CID (0x12cf) / SHADOW_TAMER_CID (0x14cd) / DRAGON_MANIPULATOR_CID (0x14ce) /
+WINGBEAT_GIANT_DRAGON_CID (0x14df) / INSECT_IMITATION_CID (0x140b) / LIMITER_REMOVAL_CID (0x1409) /
+CATHEDRAL_OF_NOBLES_CID (0x146f) / PYRAMID_ENERGY_CID (0x153d) / METAMORPHOSIS_CID (0x15a3) /
+FORMATION_UNION_CID (0x15f7) / KNIGHTS_TITLE_CID (0x167d) / TERRORKING_ARCHFIEND_CID (0x1691) /
+ULTRA_EVOLUTION_PILL_CID (0x1715) / ORDER_TO_CHARGE_CID (0x179f) / ORDER_TO_SMASH_CID (0x17b8) /
+BIG_WAVE_SMALL_WAVE_CID (0x17f9) / DOUBLE_ATTACK_CID (0x18cb) / KAMINOTE_BLOW_CID (0x18cd) /
+MINEFIELD_ERUPTION_CID (0x18d6) / TRANSCENDENT_WINGS_CID (0x1907) / SPIRITUAL_EARTH_ART_CID (0x1927) /
+ELEMENTAL_HERO_TEMPEST_CID (0x1957) / HERO_HEART_CID (0x19ab) / PHOTON_GENERATOR_UNIT_CID (0x19b1)
+
+**RENAME (5)**:
+- revival_jam_zone_mask (0x9e380000) @ 0x080527f0: Revival Jam (0x13c7) << 19
+- cathedral_of_nobles_zone_mask (0xa3d00000) @ 0x08052a70: Mystical Beast Serket (0x147a) << 19
+- transcendent_wings_zone_mask (0xc5500000) @ 0x08052aa4: Winged Kuriboh (0x18aa) << 19
+- mine_golem_zone_mask (0xc5b80000) @ 0x080525bc: Mine Golem (0x18b7) << 19
+- cid_13b0 @ 0x08052114: unallocated slot_id (not in card-stats.s)
+
+**carve**: 0 (no ROM_INCBIN in Seg-9; all inter-function bytes are literal pool or .zero alignment)
+
+**disasm**: 0
+
+**section5_1**: 0 (no 0-reference orphan blocks in range)
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn+1 / eval_amazoness_fnptr_a+1 / eval_amazoness_fnptr_b+1 / eval_equip_chain_pred_fnptr+1) + asm/04 x4 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+
+**plate FUN_ in Seg-9 range**: 0 stale FUN_ (grep confirmed; python check FUN_=0 / non-ASCII=0)
+
+**CJK in new EOL/plate**: 0 (all Ghidra-set text is pure ASCII; EOL comments verified ASCII-only)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: pending
 
 ---
 

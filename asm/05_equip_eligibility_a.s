@@ -17915,7 +17915,7 @@ LAB_08050fd8:
 LAB_08050ff2:
     b LAB_08051118                           @ 08050ff2 91e0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_a:
-    .word  eval_equip_slot_score_by_card_state+1  @ 08050ff4 b1020508
+    .word  0x080502b1                     @ 08050ff4 b1020508
 LAB_08050ff8:
     ldr r0,[sp,#0x4]                         @ 08050ff8 0198
     cmp r0,#0x1                              @ 08050ffa 0128
@@ -17939,7 +17939,7 @@ LAB_08051000:
 LAB_0805101e:
     b LAB_08051118                           @ 0805101e 7be0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_b:
-    .word  check_equip_slot_eligible_by_card_id_bst+1  @ 08051020 550a0508
+    .word  0x08050a55                     @ 08051020 550a0508
 LAB_08051024:
     ldr r0,[sp,#0x0]                         @ 08051024 0098
     bl check_card_field8_is_9                @ 08051026 f9f7e3fe
@@ -17967,7 +17967,7 @@ LAB_0805103e:
     ble LAB_0805111a                         @ 08051054 61dd
     b LAB_08051118                           @ 08051056 5fe0
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_c:
-    .word  check_equip_slot_eligible_by_card_id_dispatch_b+1  @ 08051058 a92a0508
+    .word  0x08052aa9                     @ 08051058 a92a0508
 LAB_0805105c:
     ldr r1,[sp,#0x0]                         @ 0805105c 0099
     ldr r0, check_equip_slot_eligible_by_card_id_tree_cid_1706 @ 0805105e 0848
@@ -17989,7 +17989,7 @@ LAB_0805105c:
 check_equip_slot_eligible_by_card_id_tree_cid_1706:
     .word  TORPEDO_FISH_CID               @ 08051080 06170000
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_d:
-    .word  check_equip_slot_eligible_by_type_then_prereqs+1  @ 08051084 95090508
+    .word  0x08050995                     @ 08051084 95090508
 LAB_08051088:
     ldr r0, check_equip_slot_eligible_by_card_id_tree_cid_1709 @ 08051088 0548
     cmp r1,r0                                @ 0805108a 8142
@@ -18006,7 +18006,7 @@ LAB_08051090:
 check_equip_slot_eligible_by_card_id_tree_cid_1709:
     .word  CANNONBALL_SPEAR_SHELLFISH_CID @ 080510a0 09170000
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_e:
-    .word  check_equip_slot_eligible_by_setcode_and_prereqs+1  @ 080510a4 211b0508
+    .word  0x08051b21                     @ 080510a4 211b0508
 LAB_080510a8:
     ldr r0,[sp,#0x4]                         @ 080510a8 0198
     cmp r0,#0xd                              @ 080510aa 0d28
@@ -18027,7 +18027,7 @@ LAB_080510b0:
     b LAB_08051118                           @ 080510c8 26e0
     .zero  0x2
 check_equip_slot_eligible_by_card_id_tree_fn_ptr_f:
-    .word  check_equip_slot_eligible_by_setcode_and_prereqs+1  @ 080510cc 211b0508
+    .word  0x08051b21                     @ 080510cc 211b0508
 LAB_080510d0:
     movs r2,#0x1    @ 080510d0 0122
     ands r2,r4    @ 080510d2 2240
@@ -19872,10 +19872,10 @@ check_equip_slot_eligible_by_card_id_bst_and_pairs:
     lsls r3,r5,#0x2    @ 08051ce0 ab00
     adds r0,r3,r5    @ 08051ce2 5819
     lsls r0,r0,#0x2    @ 08051ce4 8000
-    ldr r1, DWORD_08051d20                   @ 08051ce6 0e49
+    ldr r1, check_equip_slot_eligible_by_card_id_bst_and_pairs_stride @ 08051ce6 0e49
     muls r1,r2    @ 08051ce8 5143
     adds r0,r0,r1    @ 08051cea 4018
-    ldr r1, DWORD_08051d24                   @ 08051cec 0d49
+    ldr r1, check_equip_slot_eligible_by_card_id_bst_and_pairs_dfs @ 08051cec 0d49
     adds r0,r0,r1    @ 08051cee 4018
     ldrh r0,[r0,#0x8]                        @ 08051cf0 0089
     adds r7,r3,#0x0    @ 08051cf2 1f1c
@@ -19900,41 +19900,41 @@ check_equip_slot_eligible_by_card_id_bst_and_pairs:
 LAB_08051d1c:
     movs r0,#0x0    @ 08051d1c 0020
     b LAB_08051dd2                           @ 08051d1e 58e0
-DWORD_08051d20:
-    .word  0x00000868                     @ 08051d20 68080000
-DWORD_08051d24:
-    .word  0x0201c510                     @ 08051d24 10c50102
+check_equip_slot_eligible_by_card_id_bst_and_pairs_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051d20 68080000
+check_equip_slot_eligible_by_card_id_bst_and_pairs_dfs:
+    .word  gDuelFieldSlots                @ 08051d24 10c50102
 LAB_08051d28:
     ldrh r1,[r6,#0x0]                        @ 08051d28 3188
-    ldr r0, DWORD_08051d3c                   @ 08051d2a 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_bst_and_pairs_kt_cid @ 08051d2a 0448
     cmp r1,r0                                @ 08051d2c 8142
     beq LAB_08051d7c                         @ 08051d2e 25d0
     cmp r1,r0                                @ 08051d30 8142
     bgt LAB_08051d44                         @ 08051d32 07dc
-    ldr r0, DWORD_08051d40                   @ 08051d34 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_bst_and_pairs_mul_cid @ 08051d34 0248
     cmp r1,r0                                @ 08051d36 8142
     beq LAB_08051d50                         @ 08051d38 0ad0
     b LAB_08051dd0                           @ 08051d3a 49e0
-DWORD_08051d3c:
-    .word  0x0000167d                     @ 08051d3c 7d160000
-DWORD_08051d40:
-    .word  0x000012c5                     @ 08051d40 c5120000
+check_equip_slot_eligible_by_card_id_bst_and_pairs_kt_cid:
+    .word  KNIGHTS_TITLE_CID              @ 08051d3c 7d160000
+check_equip_slot_eligible_by_card_id_bst_and_pairs_mul_cid:
+    .word  MULTIPLY_CID                   @ 08051d40 c5120000
 LAB_08051d44:
-    ldr r0, DWORD_08051d4c                   @ 08051d44 0148
+    ldr r0, check_equip_slot_eligible_by_card_id_bst_and_pairs_nat_cid @ 08051d44 0148
     cmp r1,r0                                @ 08051d46 8142
     beq LAB_08051da8                         @ 08051d48 2ed0
     b LAB_08051dd0                           @ 08051d4a 41e0
-DWORD_08051d4c:
-    .word  0x00001768                     @ 08051d4c 68170000
+check_equip_slot_eligible_by_card_id_bst_and_pairs_nat_cid:
+    .word  NINJITSU_ART_OF_TRANSFORMATION_CID @ 08051d4c 68170000
 LAB_08051d50:
     movs r2,#0x1    @ 08051d50 0122
     ands r2,r4    @ 08051d52 2240
     adds r0,r7,r5    @ 08051d54 7819
     lsls r0,r0,#0x2    @ 08051d56 8000
-    ldr r1, DWORD_08051d74                   @ 08051d58 0649
+    ldr r1, check_equip_slot_eligible_by_card_id_bst_and_pairs_stride_b @ 08051d58 0649
     muls r1,r2    @ 08051d5a 5143
     adds r0,r0,r1    @ 08051d5c 4018
-    ldr r1, DWORD_08051d78                   @ 08051d5e 0649
+    ldr r1, check_equip_slot_eligible_by_card_id_bst_and_pairs_dfs_b @ 08051d5e 0649
     adds r0,r0,r1    @ 08051d60 4018
     ldr r0,[r0,#0x0]                         @ 08051d62 0068
     lsls r0,r0,#0x13    @ 08051d64 c004
@@ -19944,41 +19944,41 @@ LAB_08051d50:
     bl check_card_pair_allowed               @ 08051d6c f8f7eefe
     b LAB_08051dd2                           @ 08051d70 2fe0
     .zero  0x2
-DWORD_08051d74:
-    .word  0x00000868                     @ 08051d74 68080000
-DWORD_08051d78:
-    .word  0x0201c510                     @ 08051d78 10c50102
+check_equip_slot_eligible_by_card_id_bst_and_pairs_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051d74 68080000
+check_equip_slot_eligible_by_card_id_bst_and_pairs_dfs_b:
+    .word  gDuelFieldSlots                @ 08051d78 10c50102
 LAB_08051d7c:
     movs r2,#0x1    @ 08051d7c 0122
     ands r2,r4    @ 08051d7e 2240
     adds r0,r7,r5    @ 08051d80 7819
     lsls r0,r0,#0x2    @ 08051d82 8000
-    ldr r1, DWORD_08051d9c                   @ 08051d84 0549
+    ldr r1, check_equip_slot_eligible_by_side_and_slot_vacant_stride @ 08051d84 0549
     muls r1,r2    @ 08051d86 5143
     adds r0,r0,r1    @ 08051d88 4018
-    ldr r1, DWORD_08051da0                   @ 08051d8a 0549
+    ldr r1, check_equip_slot_eligible_by_side_and_slot_vacant_dfs @ 08051d8a 0549
     adds r0,r0,r1    @ 08051d8c 4018
     ldr r0,[r0,#0x0]                         @ 08051d8e 0068
     lsls r0,r0,#0x13    @ 08051d90 c004
     lsrs r0,r0,#0x13    @ 08051d92 c00c
-    ldr r1, DWORD_08051da4                   @ 08051d94 0349
+    ldr r1, check_equip_slot_eligible_by_card_id_bst_and_pairs_dm_cid @ 08051d94 0349
     bl check_card_pair_allowed               @ 08051d96 f8f7d9fe
     b LAB_08051dd2                           @ 08051d9a 1ae0
-DWORD_08051d9c:
-    .word  0x00000868                     @ 08051d9c 68080000
-DWORD_08051da0:
-    .word  0x0201c510                     @ 08051da0 10c50102
-DWORD_08051da4:
-    .word  0x00000fc9                     @ 08051da4 c90f0000
+check_equip_slot_eligible_by_side_and_slot_vacant_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051d9c 68080000
+check_equip_slot_eligible_by_side_and_slot_vacant_dfs:
+    .word  gDuelFieldSlots                @ 08051da0 10c50102
+check_equip_slot_eligible_by_card_id_bst_and_pairs_dm_cid:
+    .word  DARK_MAGICIAN_CID_0FC9         @ 08051da4 c90f0000
 LAB_08051da8:
     movs r2,#0x1    @ 08051da8 0122
     ands r2,r4    @ 08051daa 2240
     adds r0,r7,r5    @ 08051dac 7819
     lsls r0,r0,#0x2    @ 08051dae 8000
-    ldr r1, DWORD_08051dc8                   @ 08051db0 0549
+    ldr r1, check_equip_slot_eligible_by_field8_and_chain_stride_a @ 08051db0 0549
     muls r1,r2    @ 08051db2 5143
     adds r0,r0,r1    @ 08051db4 4018
-    ldr r1, DWORD_08051dcc                   @ 08051db6 0549
+    ldr r1, check_equip_slot_eligible_by_field8_and_chain_dfs_a @ 08051db6 0549
     adds r0,r0,r1    @ 08051db8 4018
     ldr r0,[r0,#0x0]                         @ 08051dba 0068
     lsls r0,r0,#0x13    @ 08051dbc c004
@@ -19986,10 +19986,10 @@ LAB_08051da8:
     bl check_card_is_ninja_type              @ 08051dc0 f9f76cf9
     b LAB_08051dd2                           @ 08051dc4 05e0
     .zero  0x2
-DWORD_08051dc8:
-    .word  0x00000868                     @ 08051dc8 68080000
-DWORD_08051dcc:
-    .word  0x0201c510                     @ 08051dcc 10c50102
+check_equip_slot_eligible_by_field8_and_chain_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051dc8 68080000
+check_equip_slot_eligible_by_field8_and_chain_dfs_a:
+    .word  gDuelFieldSlots                @ 08051dcc 10c50102
 LAB_08051dd0:
     movs r0,#0x1    @ 08051dd0 0120
 LAB_08051dd2:
@@ -20017,10 +20017,10 @@ check_equip_slot_eligible_by_side_and_slot_vacant:
     lsls r0,r1,#0x2    @ 08051de8 8800
     adds r0,r0,r1    @ 08051dea 4018
     lsls r0,r0,#0x2    @ 08051dec 8000
-    ldr r1, DWORD_08051e14                   @ 08051dee 0949
+    ldr r1, check_equip_slot_eligible_by_field8_and_chain_stride_b @ 08051dee 0949
     muls r1,r2    @ 08051df0 5143
     adds r0,r0,r1    @ 08051df2 4018
-    ldr r1, DWORD_08051e18                   @ 08051df4 0849
+    ldr r1, check_equip_slot_eligible_by_field8_and_chain_dfs_b @ 08051df4 0849
     adds r2,r0,r1    @ 08051df6 4218
     ldr r0,[r2,#0x0]                         @ 08051df8 1068
     lsls r0,r0,#0x13    @ 08051dfa c004
@@ -20036,10 +20036,10 @@ check_equip_slot_eligible_by_side_and_slot_vacant:
     bne LAB_08051e1c                         @ 08051e0e 05d1
     movs r0,#0x1    @ 08051e10 0120
     b LAB_08051e1e                           @ 08051e12 04e0
-DWORD_08051e14:
-    .word  0x00000868                     @ 08051e14 68080000
-DWORD_08051e18:
-    .word  0x0201c510                     @ 08051e18 10c50102
+check_equip_slot_eligible_by_field8_and_chain_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051e14 68080000
+check_equip_slot_eligible_by_field8_and_chain_dfs_b:
+    .word  gDuelFieldSlots                @ 08051e18 10c50102
 LAB_08051e1c:
     movs r0,#0x0    @ 08051e1c 0020
 LAB_08051e1e:
@@ -20065,10 +20065,10 @@ check_equip_slot_eligible_by_field8_and_chain:
     lsls r0,r4,#0x2    @ 08051e30 a000
     adds r0,r0,r4    @ 08051e32 0019
     lsls r0,r0,#0x2    @ 08051e34 8000
-    ldr r1, DWORD_08051e84                   @ 08051e36 1349
+    ldr r1, check_equip_slot_eligible_by_side_mismatch_and_prereqs_stride @ 08051e36 1349
     muls r1,r2    @ 08051e38 5143
     adds r0,r0,r1    @ 08051e3a 4018
-    ldr r1, DWORD_08051e88                   @ 08051e3c 1249
+    ldr r1, check_equip_slot_eligible_by_side_mismatch_and_prereqs_dfs @ 08051e3c 1249
     adds r0,r0,r1    @ 08051e3e 4018
     ldr r0,[r0,#0x0]                         @ 08051e40 0068
     lsls r0,r0,#0x13    @ 08051e42 c004
@@ -20101,10 +20101,10 @@ check_equip_slot_eligible_by_field8_and_chain:
     movs r0,#0x1    @ 08051e7e 0120
     b LAB_08051e8e                           @ 08051e80 05e0
     .zero  0x2
-DWORD_08051e84:
-    .word  0x00000868                     @ 08051e84 68080000
-DWORD_08051e88:
-    .word  0x0201c510                     @ 08051e88 10c50102
+check_equip_slot_eligible_by_side_mismatch_and_prereqs_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051e84 68080000
+check_equip_slot_eligible_by_side_mismatch_and_prereqs_dfs:
+    .word  gDuelFieldSlots                @ 08051e88 10c50102
 LAB_08051e8c:
     movs r0,#0x0    @ 08051e8c 0020
 LAB_08051e8e:
@@ -20112,7 +20112,7 @@ LAB_08051e8e:
     pop {r1}                                 @ 08051e90 02bc
     bx r1                                    @ 08051e92 0847
 
-@ Equip slot eligibility predicate, called via function pointer table at 0x08061eb0, passed to FUN_0809077c as callback. Sequence: (1) Read [r6+2] bit0 (equipping card side) vs r5 (player_id); reject if equal (beq fail = same side). (2) cmp r4,#4; bgt skips whitelist -> if <=4, check_slot_card_is_equip_whitelist(r5,r4); reject on failure. (3) Compute target slot addr, read full word bit19 check (0 -> reject). (4) check_zone_slot_equip_prerequisites(r6,r5,r4). (5) check_card_equip_eligible_for_slot(r6,r5,r4,r3=1). Return 1 on pass. Opposite-side variant: equipping card side must differ from player_id.
+@ Equip slot eligibility predicate, called via function pointer table at 0x08061eb0, passed to invoke_count_zone_pair_hits_full_range as callback. Sequence: (1) Read [r6+2] bit0 (equipping card side) vs r5 (player_id); reject if equal (beq fail = same side). (2) cmp r4,#4; bgt skips whitelist -> if <=4, check_slot_card_is_equip_whitelist(r5,r4); reject on failure. (3) Compute target slot addr, read full word bit19 check (0 -> reject). (4) check_zone_slot_equip_prerequisites(r6,r5,r4). (5) check_card_equip_eligible_for_slot(r6,r5,r4,r3=1). Return 1 on pass. Opposite-side variant: equipping card side must differ from player_id.
 @ 
 @ Constants:
 @ - gDuelFieldSlots = 0x0201c510
@@ -20142,10 +20142,10 @@ LAB_08051eb6:
     lsls r0,r4,#0x2    @ 08051eba a000
     adds r0,r0,r4    @ 08051ebc 0019
     lsls r0,r0,#0x2    @ 08051ebe 8000
-    ldr r1, DAT_08051ef4                     @ 08051ec0 0c49
+    ldr r1, check_equip_slot_eligible_by_side_and_type_query_stride @ 08051ec0 0c49
     muls r1,r2    @ 08051ec2 5143
     adds r0,r0,r1    @ 08051ec4 4018
-    ldr r1, DAT_08051ef8                     @ 08051ec6 0c49
+    ldr r1, check_equip_slot_eligible_by_side_and_type_query_dfs @ 08051ec6 0c49
     adds r0,r0,r1    @ 08051ec8 4018
     ldr r0,[r0,#0x0]                         @ 08051eca 0068
     lsls r0,r0,#0x13    @ 08051ecc c004
@@ -20166,10 +20166,10 @@ LAB_08051eb6:
     beq LAB_08051efc                         @ 08051eee 05d0
     movs r0,#0x1    @ 08051ef0 0120
     b LAB_08051efe                           @ 08051ef2 04e0
-DAT_08051ef4:
-    .word  0x00000868                     @ 08051ef4 68080000
-DAT_08051ef8:
-    .word  0x0201c510                     @ 08051ef8 10c50102
+check_equip_slot_eligible_by_side_and_type_query_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051ef4 68080000
+check_equip_slot_eligible_by_side_and_type_query_dfs:
+    .word  gDuelFieldSlots                @ 08051ef8 10c50102
 LAB_08051efc:
     movs r0,#0x0    @ 08051efc 0020
 LAB_08051efe:
@@ -20199,10 +20199,10 @@ check_equip_slot_eligible_by_side_and_type_query:
     lsls r0,r3,#0x2    @ 08051f1e 9800
     adds r0,r0,r3    @ 08051f20 c018
     lsls r0,r0,#0x2    @ 08051f22 8000
-    ldr r1, DAT_08051f50                     @ 08051f24 0a49
+    ldr r1, check_equip_slot_eligible_by_type_query_prereqs_and_eligible_stride @ 08051f24 0a49
     muls r1,r2    @ 08051f26 5143
     adds r0,r0,r1    @ 08051f28 4018
-    ldr r1, DAT_08051f54                     @ 08051f2a 0a49
+    ldr r1, check_equip_slot_eligible_by_type_query_prereqs_and_eligible_dfs @ 08051f2a 0a49
     adds r1,r0,r1    @ 08051f2c 4118
     ldr r0,[r1,#0x0]                         @ 08051f2e 0868
     lsls r0,r0,#0x13    @ 08051f30 c004
@@ -20220,10 +20220,10 @@ check_equip_slot_eligible_by_side_and_type_query:
     movs r0,#0x1    @ 08051f4a 0120
     b LAB_08051f5a                           @ 08051f4c 05e0
     .zero  0x2
-DAT_08051f50:
-    .word  0x00000868                     @ 08051f50 68080000
-DAT_08051f54:
-    .word  0x0201c510                     @ 08051f54 10c50102
+check_equip_slot_eligible_by_type_query_prereqs_and_eligible_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051f50 68080000
+check_equip_slot_eligible_by_type_query_prereqs_and_eligible_dfs:
+    .word  gDuelFieldSlots                @ 08051f54 10c50102
 LAB_08051f58:
     movs r0,#0x0    @ 08051f58 0020
 LAB_08051f5a:
@@ -20250,10 +20250,10 @@ check_equip_slot_eligible_by_type_query_prereqs_and_eligible:
     lsls r0,r4,#0x2    @ 08051f70 a000
     adds r0,r0,r4    @ 08051f72 0019
     lsls r0,r0,#0x2    @ 08051f74 8000
-    ldr r1, DAT_08051fc0                     @ 08051f76 1249
+    ldr r1, check_equip_slot_eligible_by_prereqs_and_slot8_flag_stride @ 08051f76 1249
     muls r1,r2    @ 08051f78 5143
     adds r0,r0,r1    @ 08051f7a 4018
-    ldr r1, DAT_08051fc4                     @ 08051f7c 1149
+    ldr r1, check_equip_slot_eligible_by_prereqs_and_slot8_flag_dfs @ 08051f7c 1149
     adds r1,r0,r1    @ 08051f7e 4118
     ldr r0,[r1,#0x0]                         @ 08051f80 0868
     lsls r0,r0,#0x13    @ 08051f82 c004
@@ -20284,10 +20284,10 @@ check_equip_slot_eligible_by_type_query_prereqs_and_eligible:
     movs r0,#0x1    @ 08051fba 0120
     b LAB_08051fca                           @ 08051fbc 05e0
     .zero  0x2
-DAT_08051fc0:
-    .word  0x00000868                     @ 08051fc0 68080000
-DAT_08051fc4:
-    .word  0x0201c510                     @ 08051fc4 10c50102
+check_equip_slot_eligible_by_prereqs_and_slot8_flag_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08051fc0 68080000
+check_equip_slot_eligible_by_prereqs_and_slot8_flag_dfs:
+    .word  gDuelFieldSlots                @ 08051fc4 10c50102
 LAB_08051fc8:
     movs r0,#0x0    @ 08051fc8 0020
 LAB_08051fca:
@@ -20315,10 +20315,10 @@ check_equip_slot_eligible_by_prereqs_and_slot8_flag:
     lsls r0,r3,#0x2    @ 08051fe0 9800
     adds r0,r0,r3    @ 08051fe2 c018
     lsls r0,r0,#0x2    @ 08051fe4 8000
-    ldr r1, DAT_08052010                     @ 08051fe6 0a49
+    ldr r1, check_equip_slot_eligible_by_chain_node_and_activation_stride @ 08051fe6 0a49
     muls r1,r2    @ 08051fe8 5143
     adds r0,r0,r1    @ 08051fea 4018
-    ldr r1, DAT_08052014                     @ 08051fec 0949
+    ldr r1, check_equip_slot_eligible_by_chain_node_and_activation_dfs @ 08051fec 0949
     adds r4,r0,r1    @ 08051fee 4418
     ldr r0,[r4,#0x0]                         @ 08051ff0 2068
     lsls r0,r0,#0x13    @ 08051ff2 c004
@@ -20335,10 +20335,10 @@ check_equip_slot_eligible_by_prereqs_and_slot8_flag:
     orrs r0,r1    @ 0805200a 0843
     lsrs r0,r0,#0x1f    @ 0805200c c00f
     b LAB_0805201a                           @ 0805200e 04e0
-DAT_08052010:
-    .word  0x00000868                     @ 08052010 68080000
-DAT_08052014:
-    .word  0x0201c510                     @ 08052014 10c50102
+check_equip_slot_eligible_by_chain_node_and_activation_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052010 68080000
+check_equip_slot_eligible_by_chain_node_and_activation_dfs:
+    .word  gDuelFieldSlots                @ 08052014 10c50102
 LAB_08052018:
     movs r0,#0x0    @ 08052018 0020
 LAB_0805201a:
@@ -20365,10 +20365,10 @@ check_equip_slot_eligible_by_chain_node_and_activation:
     lsls r0,r4,#0x2    @ 08052030 a000
     adds r0,r0,r4    @ 08052032 0019
     lsls r0,r0,#0x2    @ 08052034 8000
-    ldr r1, DAT_08052070                     @ 08052036 0e49
+    ldr r1, check_equip_slot_eligible_by_whitelist_type_and_state_stride @ 08052036 0e49
     muls r1,r2    @ 08052038 5143
     adds r0,r0,r1    @ 0805203a 4018
-    ldr r1, DAT_08052074                     @ 0805203c 0d49
+    ldr r1, check_equip_slot_eligible_by_whitelist_type_and_state_dfs @ 0805203c 0d49
     adds r0,r0,r1    @ 0805203e 4018
     ldr r0,[r0,#0x0]                         @ 08052040 0068
     lsls r0,r0,#0x13    @ 08052042 c004
@@ -20392,10 +20392,10 @@ check_equip_slot_eligible_by_chain_node_and_activation:
     movs r0,#0x1    @ 0805206a 0120
     b LAB_0805207a                           @ 0805206c 05e0
     .zero  0x2
-DAT_08052070:
-    .word  0x00000868                     @ 08052070 68080000
-DAT_08052074:
-    .word  0x0201c510                     @ 08052074 10c50102
+check_equip_slot_eligible_by_whitelist_type_and_state_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052070 68080000
+check_equip_slot_eligible_by_whitelist_type_and_state_dfs:
+    .word  gDuelFieldSlots                @ 08052074 10c50102
 LAB_08052078:
     movs r0,#0x0    @ 08052078 0020
 LAB_0805207a:
@@ -20428,10 +20428,10 @@ check_equip_slot_eligible_by_whitelist_type_and_state:
     lsls r0,r4,#0x2    @ 08052090 a000
     adds r0,r0,r4    @ 08052092 0019
     lsls r0,r0,#0x2    @ 08052094 8000
-    ldr r1, DAT_080520e8                     @ 08052096 1449
+    ldr r1, check_equip_slot_eligible_by_slot_chain_node_stride @ 08052096 1449
     muls r1,r2    @ 08052098 5143
     adds r0,r0,r1    @ 0805209a 4018
-    ldr r1, DAT_080520ec                     @ 0805209c 1349
+    ldr r1, check_equip_slot_eligible_by_slot_chain_node_dfs @ 0805209c 1349
     adds r1,r0,r1    @ 0805209e 4118
     ldr r0,[r1,#0x0]                         @ 080520a0 0868
     lsls r0,r0,#0x13    @ 080520a2 c004
@@ -20467,10 +20467,10 @@ LAB_080520e2:
     movs r0,#0x0    @ 080520e2 0020
     b LAB_08052144                           @ 080520e4 2ee0
     .zero  0x2
-DAT_080520e8:
-    .word  0x00000868                     @ 080520e8 68080000
-DAT_080520ec:
-    .word  0x0201c510                     @ 080520ec 10c50102
+check_equip_slot_eligible_by_slot_chain_node_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080520e8 68080000
+check_equip_slot_eligible_by_slot_chain_node_dfs:
+    .word  gDuelFieldSlots                @ 080520ec 10c50102
 LAB_080520f0:
     adds r0,r5,#0x0    @ 080520f0 281c
     adds r1,r4,#0x0    @ 080520f2 211c
@@ -20478,26 +20478,26 @@ LAB_080520f0:
     lsls r0,r0,#0x10    @ 080520f8 0004
     lsrs r2,r0,#0x10    @ 080520fa 020c
     ldrh r1,[r6,#0x0]                        @ 080520fc 3188
-    ldr r0, DAT_08052110                     @ 080520fe 0448
+    ldr r0, check_equip_slot_eligible_by_slot_chain_node_st_cid @ 080520fe 0448
     cmp r1,r0                                @ 08052100 8142
     beq LAB_0805212e                         @ 08052102 14d0
     cmp r1,r0                                @ 08052104 8142
     bgt LAB_08052118                         @ 08052106 07dc
-    ldr r0, DAT_08052114                     @ 08052108 0248
+    ldr r0, cid_13b0                         @ 08052108 0248
     cmp r1,r0                                @ 0805210a 8142
     beq LAB_08052124                         @ 0805210c 0ad0
     b LAB_08052142                           @ 0805210e 18e0
-DAT_08052110:
-    .word  0x000014cd                     @ 08052110 cd140000
-DAT_08052114:
-    .word  0x000013b0                     @ 08052114 b0130000
+check_equip_slot_eligible_by_slot_chain_node_st_cid:
+    .word  SHADOW_TAMER_CID               @ 08052110 cd140000
+cid_13b0:
+    .word  0x000013b0                     @ 08052114 b0130000  unallocated slot_id; not found in card-stats.s
 LAB_08052118:
-    ldr r0, DAT_08052120                     @ 08052118 0148
+    ldr r0, check_equip_slot_eligible_by_slot_chain_node_dm_cid @ 08052118 0148
     cmp r1,r0                                @ 0805211a 8142
     beq LAB_08052138                         @ 0805211c 0cd0
     b LAB_08052142                           @ 0805211e 10e0
-DAT_08052120:
-    .word  0x000014ce                     @ 08052120 ce140000
+check_equip_slot_eligible_by_slot_chain_node_dm_cid:
+    .word  DRAGON_MANIPULATOR_CID         @ 08052120 ce140000
 LAB_08052124:
     movs r0,#0x0    @ 08052124 0020
     cmp r2,#0x7                              @ 08052126 072a
@@ -20544,10 +20544,10 @@ check_equip_slot_eligible_by_slot_chain_node:
     lsls r0,r3,#0x2    @ 0805215c 9800
     adds r0,r0,r3    @ 0805215e c018
     lsls r0,r0,#0x2    @ 08052160 8000
-    ldr r1, DWORD_08052190                   @ 08052162 0b49
+    ldr r1, check_equip_slot_eligible_by_setcode_global_and_chain_stride @ 08052162 0b49
     muls r1,r2    @ 08052164 5143
     adds r0,r0,r1    @ 08052166 4018
-    ldr r1, DWORD_08052194                   @ 08052168 0a49
+    ldr r1, check_equip_slot_eligible_by_setcode_global_and_chain_dfs @ 08052168 0a49
     adds r1,r0,r1    @ 0805216a 4118
     ldr r0,[r1,#0x0]                         @ 0805216c 0868
     lsls r0,r0,#0x13    @ 0805216e c004
@@ -20566,10 +20566,10 @@ check_equip_slot_eligible_by_slot_chain_node:
     movs r0,#0x1    @ 0805218a 0120
     b LAB_0805219a                           @ 0805218c 05e0
     .zero  0x2
-DWORD_08052190:
-    .word  0x00000868                     @ 08052190 68080000
-DWORD_08052194:
-    .word  0x0201c510                     @ 08052194 10c50102
+check_equip_slot_eligible_by_setcode_global_and_chain_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052190 68080000
+check_equip_slot_eligible_by_setcode_global_and_chain_dfs:
+    .word  gDuelFieldSlots                @ 08052194 10c50102
 LAB_08052198:
     movs r0,#0x0    @ 08052198 0020
 LAB_0805219a:
@@ -20595,10 +20595,10 @@ check_equip_slot_eligible_by_setcode_global_and_chain:
     lsls r0,r4,#0x2    @ 080521ac a000
     adds r0,r0,r4    @ 080521ae 0019
     lsls r0,r0,#0x2    @ 080521b0 8000
-    ldr r1, DWORD_08052214                   @ 080521b2 1849
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_stride @ 080521b2 1849
     muls r1,r2    @ 080521b4 5143
     adds r0,r0,r1    @ 080521b6 4018
-    ldr r1, DWORD_08052218                   @ 080521b8 1749
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_dfs @ 080521b8 1749
     adds r1,r0,r1    @ 080521ba 4118
     ldr r0,[r1,#0x0]                         @ 080521bc 0868
     lsls r0,r0,#0x13    @ 080521be c004
@@ -20641,10 +20641,10 @@ check_equip_slot_eligible_by_setcode_global_and_chain:
     beq LAB_0805221c                         @ 0805220e 05d0
     movs r0,#0x1    @ 08052210 0120
     b LAB_0805221e                           @ 08052212 04e0
-DWORD_08052214:
-    .word  0x00000868                     @ 08052214 68080000
-DWORD_08052218:
-    .word  0x0201c510                     @ 08052218 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052214 68080000
+check_equip_slot_eligible_by_card_id_dispatch_dfs:
+    .word  gDuelFieldSlots                @ 08052218 10c50102
 LAB_0805221c:
     movs r0,#0x0    @ 0805221c 0020
 LAB_0805221e:
@@ -20669,10 +20669,10 @@ check_equip_slot_eligible_by_card_id_dispatch:
     lsls r0,r5,#0x2    @ 08052234 a800
     adds r0,r0,r5    @ 08052236 4019
     lsls r0,r0,#0x2    @ 08052238 8000
-    ldr r1, DAT_080522b4                     @ 0805223a 1e49
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_stride_b @ 0805223a 1e49
     muls r1,r2    @ 0805223c 5143
     adds r0,r0,r1    @ 0805223e 4018
-    ldr r1, DAT_080522b8                     @ 08052240 1d49
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_dfs_b @ 08052240 1d49
     adds r7,r0,r1    @ 08052242 4718
     ldr r0,[r7,#0x0]                         @ 08052244 3868
     lsls r0,r0,#0x13    @ 08052246 c004
@@ -20714,12 +20714,12 @@ LAB_08052272:
     beq LAB_0805233a                         @ 08052292 52d0
 LAB_08052294:
     ldrh r1,[r6,#0x0]                        @ 08052294 3188
-    ldr r0, DAT_080522bc                     @ 08052296 0948
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_uep_cid @ 08052296 0948
     cmp r1,r0                                @ 08052298 8142
     beq LAB_08052348                         @ 0805229a 55d0
     cmp r1,r0                                @ 0805229c 8142
     bgt LAB_080522dc                         @ 0805229e 1ddc
-    ldr r0, DAT_080522c0                     @ 080522a0 0748
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_ii_cid @ 080522a0 0748
     cmp r1,r0                                @ 080522a2 8142
     beq LAB_0805231c                         @ 080522a4 3ad0
     cmp r1,r0                                @ 080522a6 8142
@@ -20729,29 +20729,29 @@ LAB_08052294:
     beq LAB_08052308                         @ 080522ae 2bd0
     b LAB_0805238c                           @ 080522b0 6ce0
     .zero  0x2
-DAT_080522b4:
-    .word  0x00000868                     @ 080522b4 68080000
-DAT_080522b8:
-    .word  0x0201c510                     @ 080522b8 10c50102
-DAT_080522bc:
-    .word  0x00001715                     @ 080522bc 15170000
-DAT_080522c0:
-    .word  0x0000140b                     @ 080522c0 0b140000
+check_equip_slot_eligible_by_card_id_dispatch_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080522b4 68080000
+check_equip_slot_eligible_by_card_id_dispatch_dfs_b:
+    .word  gDuelFieldSlots                @ 080522b8 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_uep_cid:
+    .word  ULTRA_EVOLUTION_PILL_CID       @ 080522bc 15170000
+check_equip_slot_eligible_by_card_id_dispatch_ii_cid:
+    .word  INSECT_IMITATION_CID           @ 080522c0 0b140000
 LAB_080522c4:
-    ldr r0, DAT_080522d4                     @ 080522c4 0348
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_meta_cid @ 080522c4 0348
     cmp r1,r0                                @ 080522c6 8142
     beq LAB_0805231c                         @ 080522c8 28d0
-    ldr r0, DAT_080522d8                     @ 080522ca 0348
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_dedtld_cid @ 080522ca 0348
     cmp r1,r0                                @ 080522cc 8142
     beq LAB_0805233e                         @ 080522ce 36d0
     b LAB_0805238c                           @ 080522d0 5ce0
     .zero  0x2
-DAT_080522d4:
-    .word  0x000015a3                     @ 080522d4 a3150000
-DAT_080522d8:
-    .word  0x00001713                     @ 080522d8 13170000
+check_equip_slot_eligible_by_card_id_dispatch_meta_cid:
+    .word  METAMORPHOSIS_CID              @ 080522d4 a3150000
+check_equip_slot_eligible_by_card_id_dispatch_dedtld_cid:
+    .word  DEDICATION_THROUGH_LIGHT_DARK_CID @ 080522d8 13170000
 LAB_080522dc:
-    ldr r0, DAT_080522f0                     @ 080522dc 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_sea_cid @ 080522dc 0448
     cmp r1,r0                                @ 080522de 8142
     beq LAB_08052370                         @ 080522e0 46d0
     cmp r1,r0                                @ 080522e2 8142
@@ -20761,10 +20761,10 @@ LAB_080522dc:
     beq LAB_08052360                         @ 080522ea 39d0
     b LAB_0805238c                           @ 080522ec 4ee0
     .zero  0x2
-DAT_080522f0:
-    .word  0x00001927                     @ 080522f0 27190000
+check_equip_slot_eligible_by_card_id_dispatch_sea_cid:
+    .word  SPIRITUAL_EARTH_ART_CID        @ 080522f0 27190000
 LAB_080522f4:
-    ldr r0, DAT_08052304                     @ 080522f4 0348
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_pgu_cid @ 080522f4 0348
     cmp r1,r0                                @ 080522f6 8142
     beq LAB_0805237c                         @ 080522f8 40d0
     adds r0,#0x4    @ 080522fa 0430
@@ -20772,8 +20772,8 @@ LAB_080522f4:
     beq LAB_0805237c                         @ 080522fe 3dd0
     b LAB_0805238c                           @ 08052300 44e0
     .zero  0x2
-DAT_08052304:
-    .word  0x000019b1                     @ 08052304 b1190000
+check_equip_slot_eligible_by_card_id_dispatch_pgu_cid:
+    .word  PHOTON_GENERATOR_UNIT_CID      @ 08052304 b1190000
 LAB_08052308:
     adds r0,r4,#0x0    @ 08052308 201c
     adds r1,r5,#0x0    @ 0805230a 291c
@@ -20802,11 +20802,11 @@ LAB_0805233a:
     movs r0,#0x0    @ 0805233a 0020
     b LAB_0805238e                           @ 0805233c 27e0
 LAB_0805233e:
-    ldr r1, DAT_08052344                     @ 0805233e 0149
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_alt_dm_cid @ 0805233e 0149
     b LAB_08052362                           @ 08052340 0fe0
     .zero  0x2
-DAT_08052344:
-    .word  0x00000fc9                     @ 08052344 c90f0000
+check_equip_slot_eligible_by_card_id_dispatch_alt_dm_cid:
+    .word  DARK_MAGICIAN_CID_0FC9         @ 08052344 c90f0000
 LAB_08052348:
     adds r0,r4,#0x0    @ 08052348 201c
     adds r1,r5,#0x0    @ 0805234a 291c
@@ -20822,14 +20822,14 @@ LAB_0805235c:
     adds r0,r1,#0x0    @ 0805235c 081c
     b LAB_0805238e                           @ 0805235e 16e0
 LAB_08052360:
-    ldr r1, DAT_0805236c                     @ 08052360 0249
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_alt_gik_cid @ 08052360 0249
 LAB_08052362:
     .hword 0x4640    @ 08052362 4046
     bl check_card_pair_allowed               @ 08052364 f8f7f2fb
     b LAB_0805238e                           @ 08052368 11e0
     .zero  0x2
-DAT_0805236c:
-    .word  0x000013c3                     @ 0805236c c3130000
+check_equip_slot_eligible_by_card_id_dispatch_alt_gik_cid:
+    .word  GEARFRIED_IRON_KNIGHT_CID      @ 0805236c c3130000
 LAB_08052370:
     adds r0,r4,#0x0    @ 08052370 201c
     adds r1,r5,#0x0    @ 08052372 291c
@@ -20837,13 +20837,13 @@ LAB_08052370:
     bl check_slot_zone_bit_eligible          @ 08052376 e8f75bff
     b LAB_0805238e                           @ 0805237a 08e0
 LAB_0805237c:
-    ldr r2, DAT_08052388                     @ 0805237c 024a
+    ldr r2, check_equip_slot_eligible_by_card_id_dispatch_alt_cd_cid @ 0805237c 024a
     adds r0,r4,#0x0    @ 0805237e 201c
     adds r1,r5,#0x0    @ 08052380 291c
     bl check_slot_card_pair_allowed          @ 08052382 dff7eff8
     b LAB_0805238e                           @ 08052386 02e0
-DAT_08052388:
-    .word  0x000018f6                     @ 08052388 f6180000
+check_equip_slot_eligible_by_card_id_dispatch_alt_cd_cid:
+    .word  CYBER_DRAGON_CID               @ 08052388 f6180000
 LAB_0805238c:
     movs r0,#0x1    @ 0805238c 0120
 LAB_0805238e:
@@ -20884,12 +20884,12 @@ LAB_080523ba:
     adds r0,r0,r5    @ 080523c0 4019
     lsls r0,r0,#0x2    @ 080523c2 8000
     .hword 0x4680    @ 080523c4 8046
-    ldr r0, DAT_08052420                     @ 080523c6 1648
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_stride_c @ 080523c6 1648
     .hword 0x4682    @ 080523c8 8246
     .hword 0x4650    @ 080523ca 5046
     muls r0,r1    @ 080523cc 4843
     add r0,r8                                @ 080523ce 4044
-    ldr r1, DAT_08052424                     @ 080523d0 1449
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_dfs_c @ 080523d0 1449
     .hword 0x4689    @ 080523d2 8946
     adds r6,r0,r1    @ 080523d4 4618
     ldr r0,[r6,#0x0]                         @ 080523d6 3068
@@ -20912,40 +20912,40 @@ LAB_080523e8:
     b LAB_080525c0                           @ 080523f6 e3e0
 LAB_080523f8:
     ldrh r1,[r7,#0x0]                        @ 080523f8 3988
-    ldr r0, DAT_08052428                     @ 080523fa 0b48
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_dsc_cid @ 080523fa 0b48
     cmp r1,r0                                @ 080523fc 8142
     beq LAB_080524d0                         @ 080523fe 67d0
     cmp r1,r0                                @ 08052400 8142
     bgt LAB_08052450                         @ 08052402 25dc
-    ldr r0, DAT_0805242c                     @ 08052404 0948
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_wgd_cid @ 08052404 0948
     cmp r1,r0                                @ 08052406 8142
     beq LAB_080524ac                         @ 08052408 50d0
     cmp r1,r0                                @ 0805240a 8142
     bgt LAB_08052438                         @ 0805240c 14dc
-    ldr r0, DAT_08052430                     @ 0805240e 0848
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_gd_cid @ 0805240e 0848
     cmp r1,r0                                @ 08052410 8142
     bne LAB_08052416                         @ 08052412 00d1
     b LAB_08052594                           @ 08052414 bee0
 LAB_08052416:
-    ldr r0, DAT_08052434                     @ 08052416 0748
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_lr_cid @ 08052416 0748
     cmp r1,r0                                @ 08052418 8142
     beq LAB_08052498                         @ 0805241a 3dd0
     b LAB_080525c0                           @ 0805241c d0e0
     .zero  0x2
-DAT_08052420:
-    .word  0x00000868                     @ 08052420 68080000
-DAT_08052424:
-    .word  0x0201c510                     @ 08052424 10c50102
-DAT_08052428:
-    .word  0x000016a3                     @ 08052428 a3160000
-DAT_0805242c:
-    .word  0x000014df                     @ 0805242c df140000
-DAT_08052430:
-    .word  0x000012cf                     @ 08052430 cf120000
-DAT_08052434:
-    .word  0x00001409                     @ 08052434 09140000
+check_equip_slot_eligible_by_card_id_dispatch_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052420 68080000
+check_equip_slot_eligible_by_card_id_dispatch_dfs_c:
+    .word  gDuelFieldSlots                @ 08052424 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_dsc_cid:
+    .word  DARK_SCORPION_COMBO_CID        @ 08052428 a3160000
+check_equip_slot_eligible_by_card_id_dispatch_wgd_cid:
+    .word  WINGBEAT_GIANT_DRAGON_CID      @ 0805242c df140000
+check_equip_slot_eligible_by_card_id_dispatch_gd_cid:
+    .word  GRACEFUL_DICE_CID              @ 08052430 cf120000
+check_equip_slot_eligible_by_card_id_dispatch_lr_cid:
+    .word  LIMITER_REMOVAL_CID            @ 08052434 09140000
 LAB_08052438:
-    ldr r0, DAT_0805244c                     @ 08052438 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_pe_cid @ 08052438 0448
     cmp r1,r0                                @ 0805243a 8142
     bne LAB_08052440                         @ 0805243c 00d1
     b LAB_08052594                           @ 0805243e a9e0
@@ -20958,10 +20958,10 @@ LAB_08052442:
 LAB_08052448:
     b LAB_080525c0                           @ 08052448 bae0
     .zero  0x2
-DAT_0805244c:
-    .word  0x0000153d                     @ 0805244c 3d150000
+check_equip_slot_eligible_by_card_id_dispatch_pe_cid:
+    .word  PYRAMID_ENERGY_CID             @ 0805244c 3d150000
 LAB_08052450:
-    ldr r0, DAT_0805246c                     @ 08052450 0648
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_bwsw_cid @ 08052450 0648
     cmp r1,r0                                @ 08052452 8142
     bne LAB_08052458                         @ 08052454 00d1
     b LAB_08052554                           @ 08052456 7de0
@@ -20976,10 +20976,10 @@ LAB_08052458:
     beq LAB_08052526                         @ 08052466 5ed0
     b LAB_080525c0                           @ 08052468 aae0
     .zero  0x2
-DAT_0805246c:
-    .word  0x000017f9                     @ 0805246c f9170000
+check_equip_slot_eligible_by_card_id_dispatch_bwsw_cid:
+    .word  BIG_WAVE_SMALL_WAVE_CID        @ 0805246c f9170000
 LAB_08052470:
-    ldr r0, DAT_08052484                     @ 08052470 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_kb_cid @ 08052470 0448
     cmp r1,r0                                @ 08052472 8142
     bne LAB_08052478                         @ 08052474 00d1
     b LAB_08052578                           @ 08052476 7fe0
@@ -20990,18 +20990,18 @@ LAB_08052478:
     cmp r1,r0                                @ 0805247e 8142
     beq LAB_08052560                         @ 08052480 6ed0
     b LAB_080525c0                           @ 08052482 9de0
-DAT_08052484:
-    .word  0x000018cd                     @ 08052484 cd180000
+check_equip_slot_eligible_by_card_id_dispatch_kb_cid:
+    .word  KAMINOTE_BLOW_CID              @ 08052484 cd180000
 LAB_08052488:
-    ldr r0, DAT_08052494                     @ 08052488 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_me_cid @ 08052488 0248
     cmp r1,r0                                @ 0805248a 8142
     bne LAB_08052490                         @ 0805248c 00d1
     b LAB_0805259c                           @ 0805248e 85e0
 LAB_08052490:
     b LAB_080525c0                           @ 08052490 96e0
     .zero  0x2
-DAT_08052494:
-    .word  0x000018d6                     @ 08052494 d6180000
+check_equip_slot_eligible_by_card_id_dispatch_me_cid:
+    .word  MINEFIELD_ERUPTION_CID         @ 08052494 d6180000
 LAB_08052498:
     adds r0,r4,#0x0    @ 08052498 201c
     adds r1,r5,#0x0    @ 0805249a 291c
@@ -21034,26 +21034,26 @@ LAB_080524d0:
     ldr r0,[r6,#0x0]                         @ 080524d0 3068
     lsls r0,r0,#0x13    @ 080524d2 c004
     lsrs r1,r0,#0x13    @ 080524d4 c10c
-    ldr r0, DAT_080524ec                     @ 080524d6 0548
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_alt_dschick_cid @ 080524d6 0548
     cmp r1,r0                                @ 080524d8 8142
     beq LAB_08052594                         @ 080524da 5bd0
     cmp r1,r0                                @ 080524dc 8142
     bgt LAB_080524f4                         @ 080524de 09dc
-    ldr r0, DAT_080524f0                     @ 080524e0 0348
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_alt_dz_cid @ 080524e0 0348
     cmp r1,r0                                @ 080524e2 8142
     beq LAB_08052594                         @ 080524e4 56d0
     adds r0,#0xec    @ 080524e6 ec30
     b LAB_08052442                           @ 080524e8 abe7
     .zero  0x2
-DAT_080524ec:
-    .word  0x00001656                     @ 080524ec 56160000
-DAT_080524f0:
-    .word  0x00001532                     @ 080524f0 32150000
+check_equip_slot_eligible_by_card_id_dispatch_alt_dschick_cid:
+    .word  DARK_SCORPION_CHICK_CID        @ 080524ec 56160000
+check_equip_slot_eligible_by_card_id_dispatch_alt_dz_cid:
+    .word  DON_ZALOOG_CID                 @ 080524f0 32150000
 LAB_080524f4:
-    ldr r0, DAT_080524f8                     @ 080524f4 0048
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_alt_dsmeanae_cid @ 080524f4 0048
     b LAB_0805258a                           @ 080524f6 48e0
-DAT_080524f8:
-    .word  0x00001686                     @ 080524f8 86160000
+check_equip_slot_eligible_by_card_id_dispatch_alt_dsmeanae_cid:
+    .word  DARK_SCORPION_MEANAE_CID       @ 080524f8 86160000
 LAB_080524fc:
     movs r7,#0x0    @ 080524fc 0027
     adds r0,r4,#0x0    @ 080524fe 201c
@@ -21120,7 +21120,7 @@ LAB_08052578:
     ldr r0,[r6,#0x0]                         @ 08052578 3068
     lsls r0,r0,#0x13    @ 0805257a c004
     lsrs r1,r0,#0x13    @ 0805257c c10c
-    ldr r0, DAT_08052598                     @ 0805257e 0648
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_alt_chuske_cid @ 0805257e 0648
     cmp r1,r0                                @ 08052580 8142
     beq LAB_08052594                         @ 08052582 07d0
     cmp r1,r0                                @ 08052584 8142
@@ -21135,8 +21135,8 @@ LAB_0805258a:
 LAB_08052594:
     movs r0,#0x1    @ 08052594 0120
     b LAB_080525c2                           @ 08052596 14e0
-DAT_08052598:
-    .word  0x0000185a                     @ 08052598 5a180000
+check_equip_slot_eligible_by_card_id_dispatch_alt_chuske_cid:
+    .word  CHU_SKE_MOUSE_FIGHTER_CID      @ 08052598 5a180000
 LAB_0805259c:
     movs r2,#0x0    @ 0805259c 0022
     movs r0,#0x1    @ 0805259e 0120
@@ -21147,7 +21147,7 @@ LAB_0805259c:
     add r0,r9                                @ 080525a8 4844
     ldr r0,[r0,#0x0]                         @ 080525aa 0068
     lsls r0,r0,#0x13    @ 080525ac c004
-    ldr r1, DAT_080525bc                     @ 080525ae 0349
+    ldr r1, mine_golem_zone_mask             @ 080525ae 0349
     cmp r0,r1                                @ 080525b0 8842
     bne LAB_080525b6                         @ 080525b2 00d1
     movs r2,#0x1    @ 080525b4 0122
@@ -21155,8 +21155,8 @@ LAB_080525b6:
     adds r0,r2,#0x0    @ 080525b6 101c
     b LAB_080525c2                           @ 080525b8 03e0
     .zero  0x2
-DAT_080525bc:
-    .word  0xc5b80000                     @ 080525bc 0000b8c5
+mine_golem_zone_mask:
+    .word  0xc5b80000                     @ 080525bc 0000b8c5  Mine Golem (0x18b7) << 19; dispatch_alt Chu-Ske range end
 LAB_080525c0:
     movs r0,#0x0    @ 080525c0 0020
 LAB_080525c2:
@@ -21168,7 +21168,7 @@ LAB_080525c2:
     pop {r1}                                 @ 080525cc 02bc
     bx r1                                    @ 080525ce 0847
 
-@ Equip slot eligibility predicate, called by FUN_080556f0 (indeg=1). Sequence: (1) Compute gDuelFieldSlots[r6&1][r5] slot addr, read full word bits[18:0] (r1=slot_card_id); read [r4+2] bit0 (equipping card side) vs r6 -- reject if not equal (bne fail = opposite side rejected; requires same side). (2) cmp r5,#4; bgt reject (SLOT_IDX_MAX=4). (3) r1==0 reject (slot empty). (4) check_zone_slot_equip_prerequisites(r4,r6,r5). (5) query_slot_card_type_eligibility(r4,r6,r5) -- nonzero reject. (6) BST on [r4+0] halfword (equipping card_id): 0x1420 (Monster Recovery) -> check [slot+0] bit[14] vs equipping card [+2] bit0 (same side -> reject); 0x1957 (Elemental Hero Tempest) -> find_equip_chain_node_by_slot_pair, nonzero -> reject. Default -> return 1. Exit: pop{r1};bx r1 (Sub-case E).
+@ Equip slot eligibility predicate, called by check_equip_slot_eligible_by_setcode_activation_and_zone_pair (indeg=1). Sequence: (1) Compute gDuelFieldSlots[r6&1][r5] slot addr, read full word bits[18:0] (r1=slot_card_id); read [r4+2] bit0 (equipping card side) vs r6 -- reject if not equal (bne fail = opposite side rejected; requires same side). (2) cmp r5,#4; bgt reject (SLOT_IDX_MAX=4). (3) r1==0 reject (slot empty). (4) check_zone_slot_equip_prerequisites(r4,r6,r5). (5) query_slot_card_type_eligibility(r4,r6,r5) -- nonzero reject. (6) BST on [r4+0] halfword (equipping card_id): 0x1420 (Monster Recovery) -> check [slot+0] bit[14] vs equipping card [+2] bit0 (same side -> reject); 0x1957 (Elemental Hero Tempest) -> find_equip_chain_node_by_slot_pair, nonzero -> reject. Default -> return 1. Exit: pop{r1};bx r1 (Sub-case E).
 @ 
 @ Constants:
 @ - gDuelFieldSlots = 0x0201c510
@@ -21187,10 +21187,10 @@ check_equip_slot_eligible_by_type_and_card_id_pair:
     lsls r0,r5,#0x2    @ 080525dc a800
     adds r0,r0,r5    @ 080525de 4019
     lsls r0,r0,#0x2    @ 080525e0 8000
-    ldr r1, DAT_08052634                     @ 080525e2 1449
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_alt_stride @ 080525e2 1449
     muls r1,r2    @ 080525e4 5143
     adds r0,r0,r1    @ 080525e6 4018
-    ldr r1, DAT_08052638                     @ 080525e8 1349
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_alt_dfs @ 080525e8 1349
     adds r7,r0,r1    @ 080525ea 4718
     ldr r0,[r7,#0x0]                         @ 080525ec 3868
     lsls r0,r0,#0x13    @ 080525ee c004
@@ -21221,17 +21221,17 @@ check_equip_slot_eligible_by_type_and_card_id_pair:
     lsls r0,r0,#0x5    @ 08052624 4001
     cmp r1,r0                                @ 08052626 8142
     beq LAB_08052640                         @ 08052628 0ad0
-    ldr r0, DAT_0805263c                     @ 0805262a 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_alt_eht_cid @ 0805262a 0448
     cmp r1,r0                                @ 0805262c 8142
     beq LAB_08052654                         @ 0805262e 11d0
     b LAB_0805266a                           @ 08052630 1be0
     .zero  0x2
-DAT_08052634:
-    .word  0x00000868                     @ 08052634 68080000
-DAT_08052638:
-    .word  0x0201c510                     @ 08052638 10c50102
-DAT_0805263c:
-    .word  0x00001957                     @ 0805263c 57190000
+check_equip_slot_eligible_by_card_id_dispatch_alt_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052634 68080000
+check_equip_slot_eligible_by_card_id_dispatch_alt_dfs:
+    .word  gDuelFieldSlots                @ 08052638 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_alt_eht_cid:
+    .word  ELEMENTAL_HERO_TEMPEST_CID     @ 0805263c 57190000
 LAB_08052640:
     ldr r1,[r7,#0x0]                         @ 08052640 3968
     lsls r1,r1,#0x12    @ 08052642 8904
@@ -21290,7 +21290,7 @@ check_equip_slot_eligible_by_prereqs_and_duel_ctx:
     bl check_zone_slot_equip_prerequisites   @ 08052692 e4f76df8
     cmp r0,#0x0                              @ 08052696 0028
     beq LAB_080526aa                         @ 08052698 07d0
-    ldr r0, DWORD_080526b0                   @ 0805269a 0548
+    ldr r0, check_equip_slot_eligible_by_prereqs_and_duel_ctx_ecsr @ 0805269a 0548
     ldr r1,[r0,#0x4]                         @ 0805269c 4168
     adds r2,r0,#0x0    @ 0805269e 021c
     cmp r1,r4                                @ 080526a0 a142
@@ -21302,8 +21302,8 @@ LAB_080526aa:
     movs r0,#0x0    @ 080526aa 0020
     b LAB_080526c4                           @ 080526ac 0ae0
     .zero  0x2
-DWORD_080526b0:
-    .word  0x0201bb90                     @ 080526b0 90bb0102
+check_equip_slot_eligible_by_prereqs_and_duel_ctx_ecsr:
+    .word  gEquipChainSlotRefs            @ 080526b0 90bb0102
 LAB_080526b4:
     ldr r0,[r2,#0x0]                         @ 080526b4 1068
     ldr r1,[r2,#0x1c]                        @ 080526b6 d169
@@ -21340,10 +21340,10 @@ check_equip_slot_eligible_by_setcode_not_field6_17:
     lsls r0,r3,#0x2    @ 080526dc 9800
     adds r0,r0,r3    @ 080526de c018
     lsls r0,r0,#0x2    @ 080526e0 8000
-    ldr r1, DWORD_08052724                   @ 080526e2 1049
+    ldr r1, check_equip_slot_eligible_by_type_and_card_id_pair_stride @ 080526e2 1049
     muls r1,r2    @ 080526e4 5143
     adds r0,r0,r1    @ 080526e6 4018
-    ldr r1, DWORD_08052728                   @ 080526e8 0f49
+    ldr r1, check_equip_slot_eligible_by_type_and_card_id_pair_dfs @ 080526e8 0f49
     adds r4,r0,r1    @ 080526ea 4418
     ldr r0,[r4,#0x0]                         @ 080526ec 2068
     lsls r0,r0,#0x13    @ 080526ee c004
@@ -21372,10 +21372,10 @@ check_equip_slot_eligible_by_setcode_not_field6_17:
     movs r0,#0x1    @ 0805271e 0120
     b LAB_0805272e                           @ 08052720 05e0
     .zero  0x2
-DWORD_08052724:
-    .word  0x00000868                     @ 08052724 68080000
-DWORD_08052728:
-    .word  0x0201c510                     @ 08052728 10c50102
+check_equip_slot_eligible_by_type_and_card_id_pair_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052724 68080000
+check_equip_slot_eligible_by_type_and_card_id_pair_dfs:
+    .word  gDuelFieldSlots                @ 08052728 10c50102
 LAB_0805272c:
     movs r0,#0x0    @ 0805272c 0020
 LAB_0805272e:
@@ -21400,10 +21400,10 @@ check_equip_slot_eligible_by_prereqs_and_spell_type:
     lsls r0,r3,#0x2    @ 08052740 9800
     adds r0,r0,r3    @ 08052742 c018
     lsls r0,r0,#0x2    @ 08052744 8000
-    ldr r1, DWORD_08052780                   @ 08052746 0e49
+    ldr r1, check_equip_slot_eligible_by_prereqs_and_duel_ctx_stride @ 08052746 0e49
     muls r1,r2    @ 08052748 5143
     adds r0,r0,r1    @ 0805274a 4018
-    ldr r1, DWORD_08052784                   @ 0805274c 0d49
+    ldr r1, check_equip_slot_eligible_by_prereqs_and_duel_ctx_dfs @ 0805274c 0d49
     adds r1,r0,r1    @ 0805274e 4118
     ldr r0,[r1,#0x0]                         @ 08052750 0868
     lsls r0,r0,#0x13    @ 08052752 c004
@@ -21427,10 +21427,10 @@ check_equip_slot_eligible_by_prereqs_and_spell_type:
     beq LAB_08052788                         @ 0805277a 05d0
     movs r0,#0x1    @ 0805277c 0120
     b LAB_0805278a                           @ 0805277e 04e0
-DWORD_08052780:
-    .word  0x00000868                     @ 08052780 68080000
-DWORD_08052784:
-    .word  0x0201c510                     @ 08052784 10c50102
+check_equip_slot_eligible_by_prereqs_and_duel_ctx_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052780 68080000
+check_equip_slot_eligible_by_prereqs_and_duel_ctx_dfs:
+    .word  gDuelFieldSlots                @ 08052784 10c50102
 LAB_08052788:
     movs r0,#0x0    @ 08052788 0020
 LAB_0805278a:
@@ -21467,14 +21467,14 @@ check_equip_slot_eligible_by_revival_jam_and_duel_ctx:
     lsls r3,r4,#0x2    @ 080527aa a300
     adds r0,r3,r4    @ 080527ac 1819
     lsls r0,r0,#0x2    @ 080527ae 8000
-    ldr r1, DWORD_080527e8                   @ 080527b0 0d49
+    ldr r1, check_equip_slot_eligible_by_setcode_not_field6_17_stride @ 080527b0 0d49
     muls r1,r2    @ 080527b2 5143
     adds r0,r0,r1    @ 080527b4 4018
-    ldr r1, DWORD_080527ec                   @ 080527b6 0d49
+    ldr r1, check_equip_slot_eligible_by_setcode_not_field6_17_dfs @ 080527b6 0d49
     adds r0,r0,r1    @ 080527b8 4018
     ldr r0,[r0,#0x0]                         @ 080527ba 0068
     lsls r0,r0,#0x13    @ 080527bc c004
-    ldr r1, DWORD_080527f0                   @ 080527be 0c49
+    ldr r1, revival_jam_zone_mask            @ 080527be 0c49
     adds r7,r3,#0x0    @ 080527c0 1f1c
     cmp r0,r1                                @ 080527c2 8842
     bne LAB_080527e2                         @ 080527c4 0dd1
@@ -21484,7 +21484,7 @@ check_equip_slot_eligible_by_revival_jam_and_duel_ctx:
     bl check_zone_slot_equip_prerequisites   @ 080527cc e3f7d0ff
     cmp r0,#0x0                              @ 080527d0 0028
     beq LAB_080527e2                         @ 080527d2 06d0
-    ldr r1, DWORD_080527f4                   @ 080527d4 0749
+    ldr r1, check_equip_slot_eligible_by_revival_jam_and_duel_ctx_ecsr @ 080527d4 0749
     ldr r0,[r1,#0x4]                         @ 080527d6 4868
     cmp r0,r5                                @ 080527d8 a842
     bne LAB_080527f8                         @ 080527da 0dd1
@@ -21495,23 +21495,23 @@ LAB_080527e2:
     movs r0,#0x0    @ 080527e2 0020
     b LAB_08052812                           @ 080527e4 15e0
     .zero  0x2
-DWORD_080527e8:
-    .word  0x00000868                     @ 080527e8 68080000
-DWORD_080527ec:
-    .word  0x0201c510                     @ 080527ec 10c50102
-DWORD_080527f0:
-    .word  0x9e380000                     @ 080527f0 0000389e
-DWORD_080527f4:
-    .word  0x0201bb90                     @ 080527f4 90bb0102
+check_equip_slot_eligible_by_setcode_not_field6_17_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080527e8 68080000
+check_equip_slot_eligible_by_setcode_not_field6_17_dfs:
+    .word  gDuelFieldSlots                @ 080527ec 10c50102
+revival_jam_zone_mask:
+    .word  0x9e380000                     @ 080527f0 0000389e  Revival Jam (0x13c7) << 19
+check_equip_slot_eligible_by_revival_jam_and_duel_ctx_ecsr:
+    .word  gEquipChainSlotRefs            @ 080527f4 90bb0102
 LAB_080527f8:
     movs r2,#0x1    @ 080527f8 0122
     ands r2,r5    @ 080527fa 2a40
     adds r1,r7,r4    @ 080527fc 3919
     lsls r1,r1,#0x2    @ 080527fe 8900
-    ldr r0, DWORD_08052818                   @ 08052800 0548
+    ldr r0, check_equip_slot_eligible_by_prereqs_and_spell_type_stride @ 08052800 0548
     muls r0,r2    @ 08052802 5043
     adds r1,r1,r0    @ 08052804 0918
-    ldr r0, DWORD_0805281c                   @ 08052806 0548
+    ldr r0, check_equip_slot_eligible_by_prereqs_and_spell_type_dfs @ 08052806 0548
     adds r1,r1,r0    @ 08052808 0918
     ldrh r2,[r1,#0x8]                        @ 0805280a 0a89
     rsbs r0,r2,#0    @ 0805280c 5042
@@ -21521,10 +21521,10 @@ LAB_08052812:
     pop {r4,r5,r6,r7}                        @ 08052812 f0bc
     pop {r1}                                 @ 08052814 02bc
     bx r1                                    @ 08052816 0847
-DWORD_08052818:
-    .word  0x00000868                     @ 08052818 68080000
-DWORD_0805281c:
-    .word  0x0201c510                     @ 0805281c 10c50102
+check_equip_slot_eligible_by_prereqs_and_spell_type_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052818 68080000
+check_equip_slot_eligible_by_prereqs_and_spell_type_dfs:
+    .word  gDuelFieldSlots                @ 0805281c 10c50102
 
 @ Function: Composite equip slot eligibility check. Verifies in order: (1) owner_bit equals equip_card.side[bit0]; (2) slot_idx [0..4] in range; (3) zone chain_field (bits[12:0] of zone word) is nonzero; (4) check_zone_slot_equip_prerequisites returns nonzero; (5) query_slot_card_type_eligibility returns 0 (card type eligible). Returns 1 if all pass, 0 on any failure. Pure query, no external writes.
 @ 
@@ -21542,10 +21542,10 @@ check_equip_slot_eligible_by_owner_bit_and_chain_field:
     lsls r0,r4,#0x2    @ 0805282c a000
     adds r0,r0,r4    @ 0805282e 0019
     lsls r0,r0,#0x2    @ 08052830 8000
-    ldr r1, DWORD_08052874                   @ 08052832 1049
+    ldr r1, check_equip_slot_eligible_by_revival_jam_and_duel_ctx_stride @ 08052832 1049
     muls r1,r2    @ 08052834 5143
     adds r0,r0,r1    @ 08052836 4018
-    ldr r1, DWORD_08052878                   @ 08052838 0f49
+    ldr r1, check_equip_slot_eligible_by_revival_jam_and_duel_ctx_dfs @ 08052838 0f49
     adds r0,r0,r1    @ 0805283a 4018
     ldr r0,[r0,#0x0]                         @ 0805283c 0068
     lsls r0,r0,#0x13    @ 0805283e c004
@@ -21573,10 +21573,10 @@ check_equip_slot_eligible_by_owner_bit_and_chain_field:
     beq LAB_0805287c                         @ 0805286e 05d0
     movs r0,#0x1    @ 08052870 0120
     b LAB_0805287e                           @ 08052872 04e0
-DWORD_08052874:
-    .word  0x00000868                     @ 08052874 68080000
-DWORD_08052878:
-    .word  0x0201c510                     @ 08052878 10c50102
+check_equip_slot_eligible_by_revival_jam_and_duel_ctx_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052874 68080000
+check_equip_slot_eligible_by_revival_jam_and_duel_ctx_dfs:
+    .word  gDuelFieldSlots                @ 08052878 10c50102
 LAB_0805287c:
     movs r0,#0x0    @ 0805287c 0020
 LAB_0805287e:
@@ -21602,10 +21602,10 @@ check_equip_slot_eligible_by_chain_list_entry:
     lsls r0,r4,#0x2    @ 08052894 a000
     adds r0,r0,r4    @ 08052896 0019
     lsls r0,r0,#0x2    @ 08052898 8000
-    ldr r1, DWORD_080528d8                   @ 0805289a 0f49
+    ldr r1, check_equip_slot_eligible_by_owner_bit_and_chain_field_stride @ 0805289a 0f49
     muls r1,r2    @ 0805289c 5143
     adds r0,r0,r1    @ 0805289e 4018
-    ldr r1, DWORD_080528dc                   @ 080528a0 0e49
+    ldr r1, check_equip_slot_eligible_by_owner_bit_and_chain_field_dfs @ 080528a0 0e49
     adds r1,r0,r1    @ 080528a2 4118
     ldr r0,[r1,#0x0]                         @ 080528a4 0868
     lsls r0,r0,#0x13    @ 080528a6 c004
@@ -21632,23 +21632,23 @@ check_equip_slot_eligible_by_chain_list_entry:
     bne LAB_080528e4                         @ 080528d2 07d1
     b LAB_08052938                           @ 080528d4 30e0
     .zero  0x2
-DWORD_080528d8:
-    .word  0x00000868                     @ 080528d8 68080000
-DWORD_080528dc:
-    .word  0x0201c510                     @ 080528dc 10c50102
+check_equip_slot_eligible_by_owner_bit_and_chain_field_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080528d8 68080000
+check_equip_slot_eligible_by_owner_bit_and_chain_field_dfs:
+    .word  gDuelFieldSlots                @ 080528dc 10c50102
 LAB_080528e0:
     movs r0,#0x1    @ 080528e0 0120
     b LAB_0805293a                           @ 080528e2 2ae0
 LAB_080528e4:
     movs r3,#0x0    @ 080528e4 0023
-    ldr r2, DWORD_08052944                   @ 080528e6 174a
-    ldr r7, DWORD_08052948                   @ 080528e8 174f
+    ldr r2, check_equip_slot_eligible_by_chain_list_entry_dpf @ 080528e6 174a
+    ldr r7, check_equip_slot_eligible_by_chain_list_entry_chain_cnt_off @ 080528e8 174f
     adds r0,r2,r7    @ 080528ea d019
     ldr r0,[r0,#0x0]                         @ 080528ec 0068
     .hword 0x4694    @ 080528ee 9446
     cmp r3,r0                                @ 080528f0 8342
     bcs LAB_08052938                         @ 080528f2 21d2
-    ldr r1, DWORD_0805294c                   @ 080528f4 1549
+    ldr r1, check_equip_slot_eligible_by_chain_list_entry_chain_arr_off @ 080528f4 1549
     adds r1,r1,r2    @ 080528f6 8918
     .hword 0x4688    @ 080528f8 8846
     adds r6,r0,#0x0    @ 080528fa 061c
@@ -21662,7 +21662,7 @@ LAB_080528fc:
     cmp r0,#0x1                              @ 08052908 0128
     bhi LAB_08052930                         @ 0805290a 11d8
     lsls r1,r3,#0x2    @ 0805290c 9900
-    ldr r7, DWORD_08052950                   @ 0805290e 104f
+    ldr r7, check_equip_slot_eligible_by_chain_list_entry_card_arr_off @ 0805290e 104f
     adds r0,r2,r7    @ 08052910 d019
     adds r1,r1,r0    @ 08052912 0918
     ldr r2,[r1,#0x0]                         @ 08052914 0a68
@@ -21692,14 +21692,14 @@ LAB_0805293a:
     pop {r4,r5,r6,r7}                        @ 0805293e f0bc
     pop {r1}                                 @ 08052940 02bc
     bx r1                                    @ 08052942 0847
-DWORD_08052944:
-    .word  0x0201b290                     @ 08052944 90b20102
-DWORD_08052948:
-    .word  0x000004cc                     @ 08052948 cc040000
-DWORD_0805294c:
-    .word  0x000004d4                     @ 0805294c d4040000
-DWORD_08052950:
-    .word  0x000004f4                     @ 08052950 f4040000
+check_equip_slot_eligible_by_chain_list_entry_dpf:
+    .word  gDuelPhaseFlags                @ 08052944 90b20102
+check_equip_slot_eligible_by_chain_list_entry_chain_cnt_off:
+    .word  LP_BAR_ANIM_STATE_OFF          @ 08052948 cc040000
+check_equip_slot_eligible_by_chain_list_entry_chain_arr_off:
+    .word  SPRITE_ROW_ENTRY_DATA_OFF      @ 0805294c d4040000
+check_equip_slot_eligible_by_chain_list_entry_card_arr_off:
+    .word  CHAIN_NODE_CARD_ARR_OFF        @ 08052950 f4040000
 
 @ Function: Lightweight equip slot eligibility check (no external prerequisite calls). Verifies: (1) owner_bit != equip_card.side[bit0] (subs r5,1,card.side; cmp r1,r5; bne fail -- requires owner opposite side from equip card); (2) slot_idx [0..4] in range; (3) chain_field (bits[12:0]) nonzero; (4) field8 ([+0x8]) == 0; (5) field6 ([+0x6]) != 0. Returns 1 if all pass.
 @ 
@@ -21716,10 +21716,10 @@ check_equip_slot_eligible_by_field6_present_no_field8:
     lsls r2,r6,#0x2    @ 0805295e b200
     adds r2,r2,r6    @ 08052960 9219
     lsls r2,r2,#0x2    @ 08052962 9200
-    ldr r3, DWORD_08052998                   @ 08052964 0c4b
+    ldr r3, check_equip_slot_eligible_by_chain_list_entry_stride @ 08052964 0c4b
     muls r3,r4    @ 08052966 6343
     adds r2,r2,r3    @ 08052968 d218
-    ldr r3, DWORD_0805299c                   @ 0805296a 0c4b
+    ldr r3, check_equip_slot_eligible_by_chain_list_entry_dfs @ 0805296a 0c4b
     adds r3,r2,r3    @ 0805296c d318
     ldr r2,[r3,#0x0]                         @ 0805296e 1a68
     lsls r2,r2,#0x13    @ 08052970 d204
@@ -21742,10 +21742,10 @@ check_equip_slot_eligible_by_field6_present_no_field8:
     beq LAB_080529a0                         @ 08052992 05d0
     movs r0,#0x1    @ 08052994 0120
     b LAB_080529a2                           @ 08052996 04e0
-DWORD_08052998:
-    .word  0x00000868                     @ 08052998 68080000
-DWORD_0805299c:
-    .word  0x0201c510                     @ 0805299c 10c50102
+check_equip_slot_eligible_by_chain_list_entry_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052998 68080000
+check_equip_slot_eligible_by_chain_list_entry_dfs:
+    .word  gDuelFieldSlots                @ 0805299c 10c50102
 LAB_080529a0:
     movs r0,#0x0    @ 080529a0 0020
 LAB_080529a2:
@@ -21773,10 +21773,10 @@ check_equip_slot_eligible_by_type_and_chain_score4:
     lsls r0,r4,#0x2    @ 080529bc a000
     adds r0,r0,r4    @ 080529be 0019
     lsls r0,r0,#0x2    @ 080529c0 8000
-    ldr r1, DWORD_08052a0c                   @ 080529c2 1249
+    ldr r1, check_equip_slot_eligible_by_field6_present_no_field8_stride @ 080529c2 1249
     muls r1,r2    @ 080529c4 5143
     adds r0,r0,r1    @ 080529c6 4018
-    ldr r1, DWORD_08052a10                   @ 080529c8 1149
+    ldr r1, check_equip_slot_eligible_by_field6_present_no_field8_dfs @ 080529c8 1149
     adds r6,r0,r1    @ 080529ca 4618
     ldr r0,[r6,#0x0]                         @ 080529cc 3068
     lsls r0,r0,#0x13    @ 080529ce c004
@@ -21808,10 +21808,10 @@ check_equip_slot_eligible_by_type_and_chain_score4:
     bne LAB_08052a14                         @ 08052a06 05d1
     movs r0,#0x1    @ 08052a08 0120
     b LAB_08052a16                           @ 08052a0a 04e0
-DWORD_08052a0c:
-    .word  0x00000868                     @ 08052a0c 68080000
-DWORD_08052a10:
-    .word  0x0201c510                     @ 08052a10 10c50102
+check_equip_slot_eligible_by_field6_present_no_field8_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052a0c 68080000
+check_equip_slot_eligible_by_field6_present_no_field8_dfs:
+    .word  gDuelFieldSlots                @ 08052a10 10c50102
 LAB_08052a14:
     movs r0,#0x0    @ 08052a14 0020
 LAB_08052a16:
@@ -21838,53 +21838,53 @@ check_equip_slot_eligible_by_paired_card_zone_match:
     cmp r2,#0x4                              @ 08052a2e 042a
     bgt LAB_08052a40                         @ 08052a30 06dc
     ldrh r1,[r4,#0x0]                        @ 08052a32 2188
-    ldr r0, DWORD_08052a44                   @ 08052a34 0348
+    ldr r0, check_equip_slot_eligible_by_type_and_chain_score4_con_cid @ 08052a34 0348
     cmp r1,r0                                @ 08052a36 8142
     beq LAB_08052a4c                         @ 08052a38 08d0
-    ldr r0, DWORD_08052a48                   @ 08052a3a 0348
+    ldr r0, check_equip_slot_eligible_by_type_and_chain_score4_tw_cid @ 08052a3a 0348
     cmp r1,r0                                @ 08052a3c 8142
     beq LAB_08052a74                         @ 08052a3e 19d0
 LAB_08052a40:
     movs r0,#0x0    @ 08052a40 0020
     b LAB_08052a94                           @ 08052a42 27e0
-DWORD_08052a44:
-    .word  0x0000146f                     @ 08052a44 6f140000
-DWORD_08052a48:
-    .word  0x00001907                     @ 08052a48 07190000
+check_equip_slot_eligible_by_type_and_chain_score4_con_cid:
+    .word  CATHEDRAL_OF_NOBLES_CID        @ 08052a44 6f140000
+check_equip_slot_eligible_by_type_and_chain_score4_tw_cid:
+    .word  TRANSCENDENT_WINGS_CID         @ 08052a48 07190000
 LAB_08052a4c:
     movs r4,#0x0    @ 08052a4c 0024
     lsls r0,r2,#0x2    @ 08052a4e 9000
     adds r0,r0,r2    @ 08052a50 8018
     lsls r0,r0,#0x2    @ 08052a52 8000
-    ldr r1, DWORD_08052a68                   @ 08052a54 0449
+    ldr r1, check_equip_slot_eligible_by_type_and_chain_score4_stride @ 08052a54 0449
     muls r1,r3    @ 08052a56 5943
     adds r0,r0,r1    @ 08052a58 4018
-    ldr r1, DWORD_08052a6c                   @ 08052a5a 0449
+    ldr r1, check_equip_slot_eligible_by_type_and_chain_score4_dfs @ 08052a5a 0449
     adds r0,r0,r1    @ 08052a5c 4018
     ldr r0,[r0,#0x0]                         @ 08052a5e 0068
     lsls r0,r0,#0x13    @ 08052a60 c004
-    ldr r1, DWORD_08052a70                   @ 08052a62 0349
+    ldr r1, cathedral_of_nobles_zone_mask    @ 08052a62 0349
     b LAB_08052a8c                           @ 08052a64 12e0
     .zero  0x2
-DWORD_08052a68:
-    .word  0x00000868                     @ 08052a68 68080000
-DWORD_08052a6c:
-    .word  0x0201c510                     @ 08052a6c 10c50102
-DWORD_08052a70:
-    .word  0xa3d00000                     @ 08052a70 0000d0a3
+check_equip_slot_eligible_by_type_and_chain_score4_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052a68 68080000
+check_equip_slot_eligible_by_type_and_chain_score4_dfs:
+    .word  gDuelFieldSlots                @ 08052a6c 10c50102
+cathedral_of_nobles_zone_mask:
+    .word  0xa3d00000                     @ 08052a70 0000d0a3  Mystical Beast Serket (0x147a) << 19; Cathedral of Nobles path
 LAB_08052a74:
     movs r4,#0x0    @ 08052a74 0024
     lsls r0,r2,#0x2    @ 08052a76 9000
     adds r0,r0,r2    @ 08052a78 8018
     lsls r0,r0,#0x2    @ 08052a7a 8000
-    ldr r1, DWORD_08052a9c                   @ 08052a7c 0749
+    ldr r1, check_equip_slot_eligible_by_paired_card_zone_match_stride @ 08052a7c 0749
     muls r1,r3    @ 08052a7e 5943
     adds r0,r0,r1    @ 08052a80 4018
-    ldr r1, DWORD_08052aa0                   @ 08052a82 0749
+    ldr r1, check_equip_slot_eligible_by_paired_card_zone_match_dfs @ 08052a82 0749
     adds r0,r0,r1    @ 08052a84 4018
     ldr r0,[r0,#0x0]                         @ 08052a86 0068
     lsls r0,r0,#0x13    @ 08052a88 c004
-    ldr r1, DWORD_08052aa4                   @ 08052a8a 0649
+    ldr r1, transcendent_wings_zone_mask     @ 08052a8a 0649
 LAB_08052a8c:
     cmp r0,r1                                @ 08052a8c 8842
     bne LAB_08052a92                         @ 08052a8e 00d1
@@ -21896,12 +21896,12 @@ LAB_08052a94:
     pop {r1}                                 @ 08052a96 02bc
     bx r1                                    @ 08052a98 0847
     .zero  0x2
-DWORD_08052a9c:
-    .word  0x00000868                     @ 08052a9c 68080000
-DWORD_08052aa0:
-    .word  0x0201c510                     @ 08052aa0 10c50102
-DWORD_08052aa4:
-    .word  0xc5500000                     @ 08052aa4 000050c5
+check_equip_slot_eligible_by_paired_card_zone_match_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052a9c 68080000
+check_equip_slot_eligible_by_paired_card_zone_match_dfs:
+    .word  gDuelFieldSlots                @ 08052aa0 10c50102
+transcendent_wings_zone_mask:
+    .word  0xc5500000                     @ 08052aa4 000050c5  Winged Kuriboh (0x18aa) << 19; Transcendent Wings path
 
 @ Function: Second large card_id dispatch hub for equip slot eligibility; called by 0x08053704 and 0x080538e8 (duel_field module). First verifies owner_bit equal, slot_idx [0..4] in range, field8 != 0, chain_field != 0, check_zone_slot_equip_prerequisites passes, query_slot_card_type_eligibility returns 0. Then dispatches on card_id (ldrh from [r7+0x0]) via BST-style comparison covering 20+ card_id constants; each ID has independent eligibility logic (card_field8 check / chain score / state code / special_set query etc.). Returns 0 if no ID matched.
 @ 
@@ -21919,10 +21919,10 @@ check_equip_slot_eligible_by_card_id_dispatch_b:
     lsls r0,r5,#0x2    @ 08052ab4 a800
     adds r0,r0,r5    @ 08052ab6 4019
     lsls r0,r0,#0x2    @ 08052ab8 8000
-    ldr r1, DAT_08052b38                     @ 08052aba 1f49
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_b_stride @ 08052aba 1f49
     muls r1,r2    @ 08052abc 5143
     adds r0,r0,r1    @ 08052abe 4018
-    ldr r1, DAT_08052b3c                     @ 08052ac0 1e49
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_b_dfs @ 08052ac0 1e49
     adds r1,r0,r1    @ 08052ac2 4118
     ldr r0,[r1,#0x0]                         @ 08052ac4 0868
     lsls r0,r0,#0x13    @ 08052ac6 c004
@@ -21964,21 +21964,21 @@ LAB_08052afa:
     b LAB_08052dee                           @ 08052b08 71e1
 LAB_08052b0a:
     ldrh r1,[r7,#0x0]                        @ 08052b0a 3988
-    ldr r0, DAT_08052b40                     @ 08052b0c 0c48
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_nad_cid @ 08052b0c 0c48
     cmp r1,r0                                @ 08052b0e 8142
     bne LAB_08052b14                         @ 08052b10 00d1
     b LAB_08052ce0                           @ 08052b12 e5e0
 LAB_08052b14:
     cmp r1,r0                                @ 08052b14 8142
     bgt LAB_08052b94                         @ 08052b16 3ddc
-    ldr r0, DAT_08052b44                     @ 08052b18 0a48
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_cm_cid @ 08052b18 0a48
     cmp r1,r0                                @ 08052b1a 8142
     bne LAB_08052b20                         @ 08052b1c 00d1
     b LAB_08052c6e                           @ 08052b1e a6e0
 LAB_08052b20:
     cmp r1,r0                                @ 08052b20 8142
     bgt LAB_08052b60                         @ 08052b22 1ddc
-    ldr r0, DAT_08052b48                     @ 08052b24 0848
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_go_cid @ 08052b24 0848
     cmp r1,r0                                @ 08052b26 8142
     bne LAB_08052b2c                         @ 08052b28 00d1
     b LAB_08052c28                           @ 08052b2a 7de0
@@ -21989,18 +21989,18 @@ LAB_08052b2c:
     cmp r1,r0                                @ 08052b32 8142
     beq LAB_08052c08                         @ 08052b34 68d0
     b LAB_08052dee                           @ 08052b36 5ae1
-DAT_08052b38:
-    .word  0x00000868                     @ 08052b38 68080000
-DAT_08052b3c:
-    .word  0x0201c510                     @ 08052b3c 10c50102
-DAT_08052b40:
-    .word  0x000017ff                     @ 08052b40 ff170000
-DAT_08052b44:
-    .word  0x0000169b                     @ 08052b44 9b160000
-DAT_08052b48:
-    .word  0x000014fc                     @ 08052b48 fc140000
+check_equip_slot_eligible_by_card_id_dispatch_b_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052b38 68080000
+check_equip_slot_eligible_by_card_id_dispatch_b_dfs:
+    .word  gDuelFieldSlots                @ 08052b3c 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_b_nad_cid:
+    .word  NINJITSU_ART_OF_DECOY_CID      @ 08052b40 ff170000
+check_equip_slot_eligible_by_card_id_dispatch_b_cm_cid:
+    .word  CHECKMATE_CID                  @ 08052b44 9b160000
+check_equip_slot_eligible_by_card_id_dispatch_b_go_cid:
+    .word  GRADIUS_OPTION_CID             @ 08052b48 fc140000
 LAB_08052b4c:
-    ldr r0, DAT_08052b5c                     @ 08052b4c 0348
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_fu_cid @ 08052b4c 0348
     cmp r1,r0                                @ 08052b4e 8142
     beq LAB_08052c38                         @ 08052b50 72d0
     adds r0,#0x8    @ 08052b52 0830
@@ -22008,10 +22008,10 @@ LAB_08052b4c:
     beq LAB_08052c40                         @ 08052b56 73d0
     b LAB_08052dee                           @ 08052b58 49e1
     .zero  0x2
-DAT_08052b5c:
-    .word  0x000015f7                     @ 08052b5c f7150000
+check_equip_slot_eligible_by_card_id_dispatch_b_fu_cid:
+    .word  FORMATION_UNION_CID            @ 08052b5c f7150000
 LAB_08052b60:
-    ldr r0, DAT_08052b78                     @ 08052b60 0548
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_otc_cid @ 08052b60 0548
     cmp r1,r0                                @ 08052b62 8142
     bne LAB_08052b68                         @ 08052b64 00d1
     b LAB_08052c88                           @ 08052b66 8fe0
@@ -22025,10 +22025,10 @@ LAB_08052b68:
 LAB_08052b74:
     b LAB_08052dee                           @ 08052b74 3be1
     .zero  0x2
-DAT_08052b78:
-    .word  0x0000179f                     @ 08052b78 9f170000
+check_equip_slot_eligible_by_card_id_dispatch_b_otc_cid:
+    .word  ORDER_TO_CHARGE_CID            @ 08052b78 9f170000
 LAB_08052b7c:
-    ldr r0, DAT_08052b90                     @ 08052b7c 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ots_cid @ 08052b7c 0448
     cmp r1,r0                                @ 08052b7e 8142
     bne LAB_08052b84                         @ 08052b80 00d1
     b LAB_08052c98                           @ 08052b82 89e0
@@ -22040,10 +22040,10 @@ LAB_08052b84:
 LAB_08052b8c:
     b LAB_08052dee                           @ 08052b8c 2fe1
     .zero  0x2
-DAT_08052b90:
-    .word  0x000017b8                     @ 08052b90 b8170000
+check_equip_slot_eligible_by_card_id_dispatch_b_ots_cid:
+    .word  ORDER_TO_SMASH_CID             @ 08052b90 b8170000
 LAB_08052b94:
-    ldr r0, DAT_08052bb8                     @ 08052b94 0848
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_da_cid @ 08052b94 0848
     cmp r1,r0                                @ 08052b96 8142
     bne LAB_08052b9c                         @ 08052b98 00d1
     b LAB_08052da0                           @ 08052b9a 01e1
@@ -22064,10 +22064,10 @@ LAB_08052ba8:
 LAB_08052bb4:
     b LAB_08052dee                           @ 08052bb4 1be1
     .zero  0x2
-DAT_08052bb8:
-    .word  0x000018cb                     @ 08052bb8 cb180000
+check_equip_slot_eligible_by_card_id_dispatch_b_da_cid:
+    .word  DOUBLE_ATTACK_CID              @ 08052bb8 cb180000
 LAB_08052bbc:
-    ldr r0, DAT_08052bd0                     @ 08052bbc 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ua_cid @ 08052bbc 0448
     cmp r1,r0                                @ 08052bbe 8142
     bne LAB_08052bc4                         @ 08052bc0 00d1
     b LAB_08052d34                           @ 08052bc2 b7e0
@@ -22079,10 +22079,10 @@ LAB_08052bc4:
 LAB_08052bcc:
     b LAB_08052dee                           @ 08052bcc 0fe1
     .zero  0x2
-DAT_08052bd0:
-    .word  0x00001890                     @ 08052bd0 90180000
+check_equip_slot_eligible_by_card_id_dispatch_b_ua_cid:
+    .word  UNION_ATTACK_CID               @ 08052bd0 90180000
 LAB_08052bd4:
-    ldr r0, DAT_08052bec                     @ 08052bd4 0548
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_fs_cid @ 08052bd4 0548
     cmp r1,r0                                @ 08052bd6 8142
     bne LAB_08052bdc                         @ 08052bd8 00d1
     b LAB_08052dc0                           @ 08052bda f1e0
@@ -22096,10 +22096,10 @@ LAB_08052bdc:
 LAB_08052be8:
     b LAB_08052dee                           @ 08052be8 01e1
     .zero  0x2
-DAT_08052bec:
-    .word  0x0000195b                     @ 08052bec 5b190000
+check_equip_slot_eligible_by_card_id_dispatch_b_fs_cid:
+    .word  FEATHER_SHOT_CID               @ 08052bec 5b190000
 LAB_08052bf0:
-    ldr r0, DAT_08052c04                     @ 08052bf0 0448
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_hh_cid @ 08052bf0 0448
     cmp r1,r0                                @ 08052bf2 8142
     bne LAB_08052bf8                         @ 08052bf4 00d1
     b LAB_08052dd0                           @ 08052bf6 ebe0
@@ -22111,10 +22111,10 @@ LAB_08052bf8:
 LAB_08052c00:
     b LAB_08052dee                           @ 08052c00 f5e0
     .zero  0x2
-DAT_08052c04:
-    .word  0x000019ab                     @ 08052c04 ab190000
+check_equip_slot_eligible_by_card_id_dispatch_b_hh_cid:
+    .word  HERO_HEART_CID                 @ 08052c04 ab190000
 LAB_08052c08:
-    ldr r0, DAT_08052c24                     @ 08052c08 0648
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ss_cid @ 08052c08 0648
     cmp r6,r0                                @ 08052c0a 8642
     bne LAB_08052c10                         @ 08052c0c 00d1
     b LAB_08052dea                           @ 08052c0e ece0
@@ -22129,18 +22129,18 @@ LAB_08052c10:
     b LAB_08052dee                           @ 08052c20 e5e0
 LAB_08052c22:
     b LAB_08052dea                           @ 08052c22 e2e0
-DAT_08052c24:
-    .word  0x00000fbc                     @ 08052c24 bc0f0000
+check_equip_slot_eligible_by_card_id_dispatch_b_ss_cid:
+    .word  SUMMONED_SKULL_CID             @ 08052c24 bc0f0000
 LAB_08052c28:
     movs r1,#0x0    @ 08052c28 0021
-    ldr r0, DAT_08052c34                     @ 08052c2a 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_gradius_cid @ 08052c2a 0248
     cmp r6,r0                                @ 08052c2c 8642
     beq LAB_08052c32                         @ 08052c2e 00d0
     b LAB_08052de6                           @ 08052c30 d9e0
 LAB_08052c32:
     b LAB_08052de4                           @ 08052c32 d7e0
-DAT_08052c34:
-    .word  0x00001414                     @ 08052c34 14140000
+check_equip_slot_eligible_by_card_id_dispatch_b_gradius_cid:
+    .word  GRADIUS_CID                    @ 08052c34 14140000
 LAB_08052c38:
     adds r0,r6,#0x0    @ 08052c38 301c
     bl check_card_stat_field8_is_8           @ 08052c3a f8f7f7f8
@@ -22170,15 +22170,15 @@ LAB_08052c62:
     b LAB_08052d96                           @ 08052c6c 93e0
 LAB_08052c6e:
     movs r1,#0x0    @ 08052c6e 0021
-    ldr r0, DAT_08052c7c                     @ 08052c70 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ta_cid @ 08052c70 0248
     cmp r6,r0                                @ 08052c72 8642
     beq LAB_08052c78                         @ 08052c74 00d0
     b LAB_08052de6                           @ 08052c76 b6e0
 LAB_08052c78:
     b LAB_08052de4                           @ 08052c78 b4e0
     .zero  0x2
-DAT_08052c7c:
-    .word  0x00001691                     @ 08052c7c 91160000
+check_equip_slot_eligible_by_card_id_dispatch_b_ta_cid:
+    .word  TERRORKING_ARCHFIEND_CID       @ 08052c7c 91160000
 LAB_08052c80:
     adds r0,r6,#0x0    @ 08052c80 301c
     bl check_card_is_archfiend_type          @ 08052c82 f8f70df9
@@ -22220,14 +22220,14 @@ LAB_08052ccc:
     b LAB_08052df0                           @ 08052cce 8fe0
 LAB_08052cd0:
     movs r1,#0x0    @ 08052cd0 0021
-    ldr r0, DAT_08052cdc                     @ 08052cd2 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_rebd_cid @ 08052cd2 0248
     cmp r6,r0                                @ 08052cd4 8642
     beq LAB_08052cda                         @ 08052cd6 00d0
     b LAB_08052de6                           @ 08052cd8 85e0
 LAB_08052cda:
     b LAB_08052de4                           @ 08052cda 83e0
-DAT_08052cdc:
-    .word  0x00000ff8                     @ 08052cdc f80f0000
+check_equip_slot_eligible_by_card_id_dispatch_b_rebd_cid:
+    .word  RED_EYES_B_DRAGON_CID          @ 08052cdc f80f0000
 LAB_08052ce0:
     adds r0,r6,#0x0    @ 08052ce0 301c
     bl check_card_is_ninja_type              @ 08052ce2 f8f7dbf9
@@ -22238,10 +22238,10 @@ LAB_08052ce8:
     lsls r0,r5,#0x2    @ 08052cec a800
     adds r0,r0,r5    @ 08052cee 4019
     lsls r0,r0,#0x2    @ 08052cf0 8000
-    ldr r1, DAT_08052d18                     @ 08052cf2 0949
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_b_stride_b @ 08052cf2 0949
     muls r1,r2    @ 08052cf4 5143
     adds r0,r0,r1    @ 08052cf6 4018
-    ldr r1, DAT_08052d1c                     @ 08052cf8 0849
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_b_dfs_b @ 08052cf8 0849
     adds r0,r0,r1    @ 08052cfa 4018
     ldrh r0,[r0,#0x6]                        @ 08052cfc c088
     cmp r0,#0x0                              @ 08052cfe 0028
@@ -22256,10 +22256,10 @@ LAB_08052ce8:
     bne LAB_08052de6                         @ 08052d12 68d1
     b LAB_08052de4                           @ 08052d14 66e0
     .zero  0x2
-DAT_08052d18:
-    .word  0x00000868                     @ 08052d18 68080000
-DAT_08052d1c:
-    .word  0x0201c510                     @ 08052d1c 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_b_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052d18 68080000
+check_equip_slot_eligible_by_card_id_dispatch_b_dfs_b:
+    .word  gDuelFieldSlots                @ 08052d1c 10c50102
 LAB_08052d20:
     adds r0,r4,#0x0    @ 08052d20 201c
     adds r1,r5,#0x0    @ 08052d22 291c
@@ -22274,9 +22274,9 @@ LAB_08052d34:
     movs r2,#0x0    @ 08052d34 0022
     movs r0,#0x1    @ 08052d36 0120
     ands r0,r4    @ 08052d38 2040
-    ldr r1, DAT_08052d64                     @ 08052d3a 0a49
+    ldr r1, check_equip_slot_eligible_by_card_id_dispatch_b_stride_c @ 08052d3a 0a49
     muls r1,r0    @ 08052d3c 4143
-    ldr r0, DAT_08052d68                     @ 08052d3e 0a48
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_dfs_c @ 08052d3e 0a48
     adds r1,r1,r0    @ 08052d40 0918
 LAB_08052d42:
     cmp r2,r5                                @ 08052d42 aa42
@@ -22297,10 +22297,10 @@ LAB_08052d5a:
     cmp r2,#0x4                              @ 08052d5e 042a
     ble LAB_08052d42                         @ 08052d60 efdd
     b LAB_08052dee                           @ 08052d62 44e0
-DAT_08052d64:
-    .word  0x00000868                     @ 08052d64 68080000
-DAT_08052d68:
-    .word  0x0201c510                     @ 08052d68 10c50102
+check_equip_slot_eligible_by_card_id_dispatch_b_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08052d64 68080000
+check_equip_slot_eligible_by_card_id_dispatch_b_dfs_c:
+    .word  gDuelFieldSlots                @ 08052d68 10c50102
 LAB_08052d6c:
     movs r6,#0x0    @ 08052d6c 0026
     adds r0,r4,#0x0    @ 08052d6e 201c
@@ -22338,21 +22338,21 @@ LAB_08052da0:
     b LAB_08052de4                           @ 08052db0 18e0
 LAB_08052db2:
     movs r1,#0x0    @ 08052db2 0021
-    ldr r0, DAT_08052dbc                     @ 08052db4 0148
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ok_cid @ 08052db4 0148
     cmp r6,r0                                @ 08052db6 8642
     bne LAB_08052de6                         @ 08052db8 15d1
     b LAB_08052de4                           @ 08052dba 13e0
-DAT_08052dbc:
-    .word  0x000017ee                     @ 08052dbc ee170000
+check_equip_slot_eligible_by_card_id_dispatch_b_ok_cid:
+    .word  OJAMA_KING_CARD_ID             @ 08052dbc ee170000
 LAB_08052dc0:
     movs r1,#0x0    @ 08052dc0 0021
-    ldr r0, DAT_08052dcc                     @ 08052dc2 0248
+    ldr r0, check_equip_slot_eligible_by_card_id_dispatch_b_ea_cid @ 08052dc2 0248
     cmp r6,r0                                @ 08052dc4 8642
     bne LAB_08052de6                         @ 08052dc6 0ed1
     b LAB_08052de4                           @ 08052dc8 0ce0
     .zero  0x2
-DAT_08052dcc:
-    .word  0x000018a6                     @ 08052dcc a6180000
+check_equip_slot_eligible_by_card_id_dispatch_b_ea_cid:
+    .word  EHERO_AVIAN_CID                @ 08052dcc a6180000
 LAB_08052dd0:
     adds r0,r6,#0x0    @ 08052dd0 301c
     bl check_card_id_is_normal_summon_type   @ 08052dd2 f8f7c7f9
