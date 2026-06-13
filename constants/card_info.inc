@@ -740,6 +740,7 @@
 .equ MAGICAL_MERCHANT_CID,                 0x0000161f  @ Magical Merchant (pw=32362575)
 .equ GUARDIAN_GRARL_CID,                   0x0000164c  @ Guardian Grarl (pw=47150851)
 .equ IRON_BLACKSMITH_KOTETSU_CID,          0x00001689  @ Iron Blacksmith Kotetsu (pw=73431236)
+.equ CRIMSON_NINJA_CID,                    0x000016b8  @ Crimson Ninja (pw=14618326); used in tick_equip_sprite_with_attr11_if_seq_zero as sprite param (attr11 path); F06 Seg-7 slot 0x08058824
 .equ FINAL_COUNTDOWN_CID,                  0x0000169c  @ Final Countdown (pw=95308449)
 .equ WITCH_DOCTOR_OF_CHAOS_CID,            0x000016c2  @ Witch Doctor of Chaos (pw=75946257)
 .equ CHAOS_SORCERER_CID,                   0x000016c9  @ Chaos Sorcerer (pw=09596126)

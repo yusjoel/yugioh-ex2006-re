@@ -13237,7 +13237,7 @@ dat_08045ef4_ptr:
 dat_08045ef8_cid:
     .word  NITRO_UNIT_CID                 @ 08045ef8 d1180000
 dat_08045efc_fnptr:
-    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408  THUMB fn-ptr +1
+    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408
 dat_08045f00_cid:
     .word  upd_cid_1672                   @ 08045f00 72160000  card gap; no card-stats entry
 dat_08045f04_cid:
@@ -16764,7 +16764,7 @@ LAB_080478d4:
     pop {r1}                                 @ 080478ec 02bc
     bx r1                                    @ 080478ee 0847
 upd_equip_bitmap_effect_zone:
-    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102  = 0x0201d5b4 effect zone partition ptr
+    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102
 PTR_gP1LifePoints_080478f4:
     .word  gP1LifePoints                  @ 080478f4 e0c40102
 upd_equip_bitmap_ctrl_off_b:

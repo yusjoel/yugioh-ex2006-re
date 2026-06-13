@@ -416,6 +416,7 @@
 .equ ELIGIB_ACT_TYPE_OFF,        0x00001d5c  @ [gP1LifePoints+0x1d5c] activation type flag; cmp r0,#3 in caseD_b determines branch; 17 ROM refs
 .equ ELIGIB_SPRITE_CTRL_OFF,     0x00001d68  @ [gP1LifePoints+0x1d68] sprite display control; 0=display 0x61 attr, non-0=use 0x8061 hidden attr for enqueue_sprite_attr_record; 105 ROM refs
 .equ ELIGIB_ANIM_STATE_OFF,      0x00001d6c  @ [gP1LifePoints+0x1d6c] animation state index; range check [0..0xf] in caseD_1f with thresholds 0xb/0xf; 56 ROM refs
+.equ LP_BANISHER_CTX_OFF,        0x00001d70  @ [gP1LifePoints+0x1d70] banisher zone LP context field; adjacent to ELIGIB_SPRITE_CTRL_OFF(+0x1d68) +8 and ELIGIB_ANIM_STATE_OFF(+0x1d6c) +4; 39 ROM refs; F06 Seg-7 (tick_equip_zone_target_lp_step2_off x2)
 
 @ =============================================================================
 @ file 05 Seg-6 additions: sprite row queue/anim subsystem offsets + equip zone rank state

@@ -352,3 +352,9 @@
 @ =============================================================================
 .equ EQUIP_ACTIVATION_AUX_OFF,      0x000004b4  @ [gDuelPhaseFlags+0x4b4] equip activation secondary counter; distinct from EQUIP_ACTIVATION_STEP_OFF=0x4ac; 8 Seg-6 slots in tick_equip_slot_score_fill_display_seq; conf: high
 .equ EQUIP_ZONE_SPRITE_ATTR_MODE1,  0x0000152a  @ enqueue_equip_zone_sprite_mode1 r2 arg to enqueue_sprite_attr_with_mode; mode=1 sprite attr code 0x152a; sibling of EQUIP_ZONE_SPRITE_ATTR=0x0fb6 (mode=2); distinct from Swarm of Scarabs CID=0x152a (different domain); 1 Seg-6 slot; conf: high
+
+@ =============================================================================
+@ file 06 Seg-7 additions: equip active context slot pointer offset
+@ Source: asm/06_equip_eligibility_b.s Seg-7 (0x08058550..0x08058cec)
+@ =============================================================================
+.equ EQUIP_ACTIVE_CTX_OFF,          0x00000484  @ [gDuelPhaseFlags+0x484] current equip activation context slot ptr; 46 ROM refs; asm/06 L12851 ACTIVATION_OFFSET=0x484; asm/09 L17878 ACTIVE_NODE_OFFSET=0x484; asm/10 L15465 SLOT_SNAPSHOT_OFFSET=0x484; conf: high
