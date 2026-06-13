@@ -95,7 +95,7 @@
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | 68c1e28 |
-| 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | (pending) |
+| 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | bd9ce13 |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
@@ -260,7 +260,7 @@ check_card_is_dark_world_range_type (0x0804b26c)
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: bd9ce13
 
 ---
 
