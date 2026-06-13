@@ -629,3 +629,14 @@
 .equ BUBBLE_ILLUSION_CID,             0x0000198a  @ Bubble Illusion         (pw=80075749)
 .equ DANDYLION_CID,                   0x000019fe  @ Dandylion               (pw=15341821)
 .equ KAISER_GLIDER_CID,               0x000014e9  @ Kaiser Glider           (pw=52824910)
+
+@ =============================================================================
+@ file 05 Seg-2 additions: card IDs for Harpie/Polymerization/BEWD pair checks
+@ Source: asm/05_equip_eligibility_a.s, Seg-2 (0x0804a5b8..0x0804ad48)
+@ check_card_pair_allowed / map_card_id_to_banlist_canonical / check_card_ids_banlist_compatible
+@ =============================================================================
+.equ POLYMERIZATION_CID_1303,  0x00001303  @ Polymerization 2nd print (pw=24094653; card_0689 slot=0x1303); pair/fusion whitelist check_card_pair_allowed; 13 raw ROM refs
+.equ CYBER_HARPIE_LADY_CID,    0x00001477  @ Cyber Harpie Lady (pw=80316585; card_0951 slot=0x1477); Harpie pair whitelist (interchangeable w/ HARPIE_LADY_CID 0xfe4 group); 9 raw ROM refs
+.equ HARPIE_LADY_1_CID,        0x0000182a  @ Harpie Lady 1 (pw=91932350; card_1710 slot=0x182A); Harpie pair whitelist target (equivalent group with HARPIE_LADY_CID + CYBER_HARPIE_LADY_CID); 7 raw ROM refs
+.equ HARPIE_LADY_3_CID,        0x0000182c  @ Harpie Lady 3 (pw=54415063; card_1712 slot=0x182C); Harpie pair whitelist target; 12 raw ROM refs
+.equ BEWD_RANGE_CHECK_BIAS,    0xfffff05a  @ range-check bias -0xfa6: adds r0,r1,bias; cmp r0,#1; bhi -> tests if r1 in {0xfa6,0xfa7} (BEWD/gap range); check_card_pair_allowed + check_card_ids_banlist_compatible; 2 raw ROM refs

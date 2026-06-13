@@ -279,3 +279,11 @@
 @ =============================================================================
 .equ FIELD_COPY_COUNT_FLAG,          0x00010002  @ bit0=mode2,bit16=field_copy_exists; anded with count_field_copies_of_card return to detect duplicate presence; 740 raw refs
 .equ EQUIP_ZONE_EFFECT_ATTR_OR,      0x1e501511  @ packed OR mask for find_effect_node_in_zone hit path; low16=0x1511 type; high16=0x1e50 mode; 1 pool ref; conf LOW
+
+@ =============================================================================
+@ file 05 Seg-2 additions: equip zone sprite x-position delta constants
+@ Used by enqueue_monster_zone_equip_sprites_and_lp_counters to compute
+@ sprite x-coordinates for equip zone rendering in monster zone row.
+@ =============================================================================
+.equ EQUIP_SPRITE_X_DELTA_A,   0xffffe730  @ neg x-position delta A for equip zone sprite in monster zone row; enqueue_monster_zone_equip_sprites_and_lp_counters; 3 raw ROM refs
+.equ EQUIP_SPRITE_X_DELTA_B,   0xffffe32c  @ neg x-position delta B for equip zone sprite in monster zone row (player-stride variant); enqueue_monster_zone_equip_sprites_and_lp_counters; 1 raw ROM ref

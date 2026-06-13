@@ -391,3 +391,10 @@
 @ =============================================================================
 .equ P1LP_EQUIP_BITMAP_CTR_OFF,     0x00001d3c  @ [gP1LP+player*PLAYER_BLOCK_STRIDE+0x1d3c] modulo-10 equip-slot bitmap anim frame counter; 6 ROM refs; update_duel_field_slot_sprite_state
 .equ gEquipZoneCountTable,          0x0201e1c8  @ equip zone count tracking table base (EWRAM); 55 ROM refs; apply_nitro_unit_equip_activation loop
+
+@ =============================================================================
+@ file 05 Seg-2 additions: LP bar animation counter/state offsets
+@ Relative to gDuelPhaseFlags (0x0201b290)
+@ =============================================================================
+.equ LP_BAR_DISPLAY_CTR_OFF,   0x000004c4  @ [gDuelPhaseFlags+0x4c4] LP bar animation display counter; incremented by increment_lp_bar_display_counter/increment_lp_bar_counter_no_player; decremented by decrement_lp_bar_display_counter; 18 raw ROM refs; Seg-2
+.equ LP_BAR_ANIM_STATE_OFF,    0x000004cc  @ [gDuelPhaseFlags+0x4cc] LP bar animation state reset field; cleared to 0 when display counter first reaches 1 (initial anim trigger path); 37 raw ROM refs; Seg-2

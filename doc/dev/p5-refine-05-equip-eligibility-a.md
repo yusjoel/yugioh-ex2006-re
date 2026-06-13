@@ -94,7 +94,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
-| 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ⬜ | — |
+| 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | TBD |
 | 3 | 0x4ad48..0x4b4f4 | 24 | 73 | — | ⬜ | — |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
@@ -152,6 +152,40 @@ will be resolved when those segments are refined.
 
 **commit**: 6dd6fec
 
+### 4.02 Seg-2 完成记录 (0x0804a5b8..0x0804ad48, 12 fn, 68 slots)
+
+**函数列表 (12)**:
+enqueue_monster_zone_equip_sprites_and_lp_counters /
+enqueue_sprite_attr_type10_halfword /
+increment_lp_bar_display_counter /
+increment_lp_bar_counter_no_player /
+decrement_lp_bar_display_counter /
+set_slot_occupy_bit_with_sprite_update /
+set_player_state_bit_with_sprite_update /
+set_field_slot_bit_with_sprite_update /
+map_field8_to_card_type_category (contains switchD_0804a9ee) /
+check_card_pair_allowed /
+map_card_id_to_banlist_canonical /
+check_card_ids_banlist_compatible
+
+**符号化统计**: EQ=33 / REF=1 / card_id_EQ=34 / FUNC_RENAME=0 / PLATE=4 subs (3 fn)
+
+**新建 constants**:
+- ewram.inc +2 (LP_BAR_DISPLAY_CTR_OFF=0x4c4 / LP_BAR_ANIM_STATE_OFF=0x4cc)
+- duel_field.inc +2 (EQUIP_SPRITE_X_DELTA_A=0xffffe730 / EQUIP_SPRITE_X_DELTA_B=0xffffe32c)
+- oam_attr.inc +2 (OAM_PLAYER_STATE_BIT_SPRITE_P1=0x8022 / OAM_FIELD_SLOT_BIT_SPRITE_P1=0x802a)
+- card_info.inc +5 (POLYMERIZATION_CID_1303 / CYBER_HARPIE_LADY_CID / HARPIE_LADY_1_CID / HARPIE_LADY_3_CID / BEWD_RANGE_CHECK_BIAS)
+
+**carve**: 0 (no fn-ptr ROM_INCBIN in this segment; §5.1 orphan block 0x4aa5e/0xee)
+
+**plate FUN_ residual after landing**: 0 stale FUN_ in Seg-2 range (grep confirmed)
+
+**踩坑**: fn-ptr +1 periodic fix -- asm/03 x4 (eval_equip_bonus_for_slot_pred_fn / eval_amazoness_fnptr_a / eval_amazoness_fnptr_b / eval_equip_chain_pred_fnptr) + asm/04 x3 (tick_equip_scan_destiny_chain_table now +7*16 / dat_08045efc_fnptr +1 / upd_equip_bitmap_effect_zone gP1LifePoints+EQUIP_BITMAP_CTRL_OFF fix) after re-export
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: TBD
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -181,6 +215,7 @@ will be resolved when those segments are refined.
 | 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
+| 0x0804aa5e | 0xee (238B) | Seg-2 | 孤立 THUMB 代码块 (BST 比较器形态, 与 check_card_pair_allowed 结构相似但独立); 全 ROM raw=0 fn-ptr 及 THUMB+1=0 (2B step exhaustive scan, reviewer 独立确认) | defer |
 
 ---
 

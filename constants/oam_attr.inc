@@ -125,3 +125,11 @@
 .equ OAM_ATTR2_OR_0X3220,             0x32200000  @ OAM attr2 packed OR mask hi16=0x3220
 .equ OAM_ATTR2_OR_0X384E,             0x384e0000  @ OAM attr2 packed OR mask hi16=0x384e
 .equ OAM_ATTR2_OR_0X3C4E,             0x3c4e0000  @ OAM attr2 packed OR mask hi16=0x3c4e
+
+@ =============================================================================
+@ file 05 Seg-2 additions: player-state and field-slot sprite bit P1 attr0 values
+@ bit15 set = OBJ_DIS (P1 convention); low byte = OAM Y coordinate
+@ Source: asm/05_equip_eligibility_a.s, Seg-2 (0x0804a5b8..0x0804ad48)
+@ =============================================================================
+.equ OAM_PLAYER_STATE_BIT_SPRITE_P1,  0x00008022  @ P1 OAM attr0 Y-coord for player-level state bit change sprite (bit15+0x22); set_player_state_bit_with_sprite_update; P2=0x22 inline; 29 raw ROM refs
+.equ OAM_FIELD_SLOT_BIT_SPRITE_P1,    0x0000802a  @ P1 OAM attr0 Y-coord for field slot bit change sprite (bit15+0x2a); set_field_slot_bit_with_sprite_update; P2=0x2a inline; 233 raw ROM refs
