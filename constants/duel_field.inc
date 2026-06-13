@@ -287,3 +287,12 @@
 @ =============================================================================
 .equ EQUIP_SPRITE_X_DELTA_A,   0xffffe730  @ neg x-position delta A for equip zone sprite in monster zone row; enqueue_monster_zone_equip_sprites_and_lp_counters; 3 raw ROM refs
 .equ EQUIP_SPRITE_X_DELTA_B,   0xffffe32c  @ neg x-position delta B for equip zone sprite in monster zone row (player-stride variant); enqueue_monster_zone_equip_sprites_and_lp_counters; 1 raw ROM ref
+
+@ =============================================================================
+@ file 05 Seg-8 additions: equip slot card type field masks
+@ Used in check_equip_slot_eligible_by_card_id_score (0x080517b4) type filter:
+@ bits[11:6] of card[+2] halfword; (slot_word & 0xfc0) must be 0x180 or 0x1c0
+@ =============================================================================
+.equ SLOT_CARD_TYPE_MASK,       0x00000fc0  @ bits[11:6] type field in card[+2] halfword; lsls r1,#0xfc<<4=0xfc0; check_equip_slot_eligible_by_card_id_score inner filter; med-conf; 1 Seg-8 slot
+.equ SLOT_CARD_TYPE_ELIGIBLE_A, 0x00000180  @ eligible slot type value A; lsls r0,#0xc0<<1=0x180; check_equip_slot_eligible_by_card_id_score; med-conf; 1 Seg-8 slot
+.equ SLOT_CARD_TYPE_ELIGIBLE_B, 0x000001c0  @ eligible slot type value B; ELIGIBLE_A+0x40=0x1c0; check_equip_slot_eligible_by_card_id_score; med-conf; 1 Seg-8 slot

@@ -431,3 +431,9 @@
 
 @ New global: equip zone rank state struct (EWRAM)
 .equ gEquipZoneRankState,   0x0201e4d0  @ EWRAM base for equip zone rank state machine; advance_equip_zone_rank_state reads halfword [+0x14]; 1 ROM ref Seg-6a (DAT_0804f368)
+
+@ =============================================================================
+@ file 05 Seg-8 additions: equip chain node card array offset
+@ Relative to gDuelPhaseFlags (base=0x0201b290):
+@ =============================================================================
+.equ CHAIN_NODE_CARD_ARR_OFF,  0x000004f4  @ [gDuelPhaseFlags+0x4f4] card pointer array for equip chain node list; check_equip_slot_eligible_by_card_id_pair (0x080513d0) chain node traversal; Seg-9 comment confirms OFFSET_CARD_ARR=0x4f4; 1 Seg-8 slot

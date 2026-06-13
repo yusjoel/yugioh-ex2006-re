@@ -916,3 +916,22 @@
 .equ cid_1305,  0x00001305  @ unallocated slot_id; BST node adjacent to cid_1304
 .equ cid_123d,  0x0000123d  @ unallocated slot_id; BST node in check_equip_slot_eligible_by_card_id_bst
 .equ cid_123e,  0x0000123e  @ unallocated slot_id; BST node adjacent to cid_123d
+
+@ =============================================================================
+@ file 05 Seg-8 additions: equip slot eligibility by card_id tree / pair / score CIDs
+@ Source: asm/05_equip_eligibility_a.s Seg-8 (0x08050e40..0x08051cc4)
+@ All values verified against data/card-stats.s slot= fields (confidence: high unless noted).
+@ =============================================================================
+.equ DE_SPELL_GERM_WEAPON_CID,              0x000014ee  @ De-Spell Germ Weapon (pw=54591086; card-stats.s card_1054 slot=0x14EE); check_equip_slot_eligible_by_card_id_tree BST
+.equ TORPEDO_FISH_CID,                      0x00001706  @ Torpedo Fish (pw=90337190; card-stats.s card_1470 slot=0x1706); check_equip_slot_eligible_by_card_id_tree BST
+.equ ORCA_MEGA_FORTRESS_OF_DARKNESS_CID,    0x00001708  @ Orca Mega-Fortress of Darkness (pw=63120904; card-stats.s card_1472 slot=0x1708); check_equip_slot_eligible_by_card_id_tree BST
+.equ ARCANE_ARCHER_OF_THE_FOREST_CID,       0x00001753  @ Arcane Archer of the Forest (pw=55001420; card-stats.s card_1534 slot=0x1753); check_equip_slot_eligible_by_card_id_tree BST
+.equ CHAIN_DESTRUCTION_CID,                 0x000012cd  @ Chain Destruction (pw=01248895; card-stats.s card_0654 slot=0x12CD); check_equip_slot_eligible_by_card_id_pair BST
+.equ TRAP_HOLE_CID,                         0x000012e4  @ Trap Hole (pw=04206964; card-stats.s card_0668 slot=0x12E4); check_equip_slot_eligible_by_card_id_score BST
+.equ ELEMENTAL_BURST_CID,                   0x0000188d  @ Elemental Burst (pw=61411502; card-stats.s card_1804 slot=0x188D); check_equip_slot_eligible_by_card_id_tree BST
+.equ SPIRITUAL_WATER_ART_AOI_CID,           0x00001928  @ Spiritual Water Art - Aoi (pw=06540606; card-stats.s card_1925 slot=0x1928); check_equip_slot_eligible_by_card_id_tree BST
+.equ SPIRITUAL_WIND_ART_MIYABI_CID,         0x0000192a  @ Spiritual Wind Art - Miyabi (pw=79333300; card-stats.s card_1927 slot=0x192A); check_equip_slot_eligible_by_card_id_tree BST
+.equ HYDROGEDDON_CID,                       0x0000194f  @ Hydrogeddon (pw=22587018; card-stats.s card_1950 slot=0x194F); check_equip_slot_eligible_by_card_id_tree BST
+.equ OXYGEDDON_CID,                         0x00001950  @ Oxygeddon (pw=58071123; card-stats.s card_1951 slot=0x1950); check_equip_slot_eligible_by_card_id_tree BST
+@ Score threshold (not a CID; distinct from FIELD5_SCORE_THRESHOLD_1299=0x513 in this file):
+.equ FIELD5_SCORE_THRESHOLD_1999,           0x000007cf  @ field5 score <= 1999 (0x7cf) path; check_equip_slot_eligible_by_card_id_tree Hydrogeddon/Oxygeddon path; value 1999 is score bound not slot_id

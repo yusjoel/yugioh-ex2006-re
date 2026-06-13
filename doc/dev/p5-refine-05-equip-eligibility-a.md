@@ -101,7 +101,7 @@
 | 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | 20cbc8b |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | 5d95bfc |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
-| 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
+| 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ✅ | — |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ⬜ | — |
 | 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
 
@@ -501,6 +501,58 @@ check_equip_slot_eligible_with_whitelist_prereqs_1
 
 ---
 
+### 4.08 Seg-8 完成记录 (0x08050e40..0x08051cc4, 24 fn, 83 slots)
+
+**函数列表 (24)**:
+check_equip_slot_eligible_with_whitelist_prereqs_2 / check_equip_slot_eligible_with_whitelist_prereqs_3 /
+check_equip_slot_eligible_by_opposite_side_and_prereqs /
+check_equip_slot_eligible_by_lp_zone_and_type /
+check_equip_slot_eligible_by_lp_zone_and_type_lp_base /
+check_equip_slot_eligible_by_lp_and_pair / check_equip_slot_eligible_by_lp_with_side_check /
+check_equip_slot_eligible_by_lp_threshold / check_equip_slot_eligible_by_lp_or_state /
+check_equip_slot_eligible_by_card_id_and_lp / check_equip_slot_eligible_by_field5_with_lp /
+check_equip_slot_eligible_by_card_id_and_prereqs_alt /
+check_equip_slot_eligible_by_card_id_tree (contains fn-ptr table a/b/c/d/e/f) /
+check_equip_slot_eligible_by_card_id_dispatch_a /
+check_equip_slot_eligible_by_card_id_score_cid_1250 (RENAME from DAT_08051848) /
+check_equip_slot_eligible_by_card_id_score_cid_set_f /
+check_equip_slot_eligible_by_card_id_score_2_cids /
+check_equip_slot_eligible_by_card_id_dispatch_b /
+check_equip_slot_eligible_by_prereqs_and_opponent /
+check_equip_slot_eligible_by_setcode_and_prereqs /
+check_equip_slot_eligible_by_setcode_and_cid_pair /
+check_equip_slot_eligible_by_cid_pair_a / check_equip_slot_eligible_by_cid_pair_b /
+check_equip_slot_eligible_by_cid_pair_c
+
+**符号化统计**: EQ=75 (25 PLAYER_BLOCK_STRIDE + 24 gDuelFieldSlots + 2 gEquipChainSlotRefs + 4 gDuelPhaseFlags + 1 P1LP_BLOCK2_OFF_1CE8 + 5 CID reuse + 1 SLOT_CARD_EMPTY + 1 FIELD5_SCORE_THRESHOLD_1999 + 1 LP threshold reuse + 11 new CID) / REF=1 (gP1LifePoints) / FNPTR=6 / RENAME=1 / FUNC_RENAME=0 / PLATE=4 subs (2 fn)
+
+**新建 constants**:
+- card_info.inc +11 CID + 1 threshold:
+  DE_SPELL_GERM_WEAPON_CID (0x14ee) / TORPEDO_FISH_CID (0x1706) /
+  ORCA_MEGA_FORTRESS_OF_DARKNESS_CID (0x1708) / ARCANE_ARCHER_OF_THE_FOREST_CID (0x1753) /
+  CHAIN_DESTRUCTION_CID (0x12cd) / TRAP_HOLE_CID (0x12e4) / ELEMENTAL_BURST_CID (0x188d) /
+  SPIRITUAL_WATER_ART_AOI_CID (0x1928) / SPIRITUAL_WIND_ART_MIYABI_CID (0x192a) /
+  HYDROGEDDON_CID (0x194f) / OXYGEDDON_CID (0x1950) /
+  FIELD5_SCORE_THRESHOLD_1999 (0x7cf)
+- ewram.inc +1: CHAIN_NODE_CARD_ARR_OFF (0x4f4)
+- duel_field.inc +3: SLOT_CARD_TYPE_MASK (0xfc0) / SLOT_CARD_TYPE_ELIGIBLE_A (0x180) / SLOT_CARD_TYPE_ELIGIBLE_B (0x1c0)
+
+**carve**: 0 (no inter-function ROM_INCBIN; ROM_INCBIN 0x51bfc/0x40 -> §5.1)
+
+**disasm**: 0
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn / eval_amazoness_fnptr_a / eval_amazoness_fnptr_b / eval_equip_chain_pred_fnptr) + asm/04 x3 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF) + asm/05 x6 (fn-ptr slots _a..._f in check_equip_slot_eligible_by_card_id_tree)
+
+**plate FUN_ in Seg-8 range**: 0 stale FUN_ (grep confirmed)
+
+**CJK in new EOL/plate**: 0 (all Ghidra-set text is pure ASCII)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 05 范围 `[0x08049014, 0x080537c0)` (239 named fn, 1010 DAT_/DWORD_/PTR_ 槽,
@@ -530,6 +582,7 @@ check_equip_slot_eligible_with_whitelist_prereqs_1
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
 | 0x0804aa5e | 0xee (238B) | Seg-2 | 孤立 THUMB 代码块 (BST 比较器形态, 与 check_card_pair_allowed 结构相似但独立); 全 ROM raw=0 fn-ptr 及 THUMB+1=0 (2B step exhaustive scan, reviewer 独立确认) | defer |
 | 0x0804becc | 0x54 (84B) | Seg-4b | THUMB dead code orphan (01 1c...70 47 等 opcode); no named function; 全 ROM raw=0 / THUMB+1=0 (穷举 2B-step scan [4becc,4bf20), reviewer 独立确认) | defer |
+| 0x08051bfc | 0x40 (64B) | Seg-8 | inter-function data after check_equip_slot_eligible_by_card_id_score_2_cids; 0 external refs; content = inert CID pair data or pad; §5.1 登记留待 | defer |
 
 ---
 

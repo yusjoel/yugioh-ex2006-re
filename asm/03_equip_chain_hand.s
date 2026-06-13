@@ -5867,7 +5867,7 @@ LAB_080389ce:
     b LAB_08038a06                           @ 080389d8 15e0
     .zero  0x2
 eval_amazoness_fnptr_a:
-    .word  check_card_is_amazoness_type+1 @ 080389dc 49b00408
+    .word  check_card_is_amazoness_type+1   @ 080389dc 49b00408
 LAB_080389e0:
     ldr r1, eval_amazoness_fnptr_b           @ 080389e0 0549
     ldr r0,[sp,#0x3c]                        @ 080389e2 0f98
@@ -5881,7 +5881,7 @@ LAB_080389e0:
     b apply_slot_score_bonus_by_state        @ 080389f4 13e2
     .zero  0x2
 eval_amazoness_fnptr_b:
-    .word  check_card_is_amazoness_type+1 @ 080389f8 49b00408
+    .word  check_card_is_amazoness_type+1   @ 080389f8 49b00408
 LAB_080389fc:
     ldr r0,[sp,#0x3c]                        @ 080389fc 0f98
     ldr r1,[sp,#0x40]                        @ 080389fe 1099
@@ -10512,7 +10512,7 @@ LAB_0803aa50:
     beq LAB_0803aa82                         @ 0803aa70 07d0
     b LAB_0803ab44                           @ 0803aa72 67e0
 eval_equip_chain_pred_fnptr:
-    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr
+    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308
 eval_equip_chain_node_pool_a:
     .word  gEquipNodePool                 @ 0803aa78 c0d90102
 LAB_0803aa7c:
