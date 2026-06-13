@@ -97,7 +97,7 @@
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | 68c1e28 |
 | 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | bd9ce13 |
 | 4a | 0x4b4f4..0x4be38 | 10 | 101 | — | ✅ | — |
-| 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ⬜ | — |
+| 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
@@ -231,6 +231,50 @@ CARD_FIELD6_EQUIP_RITUAL @ 0x4bca4
 
 **commit**: 3155175
 
+### 4.04b Seg-4b 完成记录 (0x0804be38..0x0804c6e8, 14 fn, 99 slots)
+
+**函数列表 (14)**:
+get_card_effect_category / check_card_id_is_equip_set_b /
+check_card_id_is_equip_set_d / check_card_is_equip_set_c /
+check_card_id_is_equip_blocker / check_card_id_is_equip_set_e /
+check_card_id_is_equip_excluded_set_f / check_card_id_is_field_zone_special /
+check_card_is_zone_pair_restricted / check_card_is_field_spell_type_b /
+get_card_effect_zone_check_sides / check_card_id_is_equip_set_g /
+classify_card_id_summon_category / get_paired_card_id_by_variant
+
+**符号化统计**: EQ=89 / RENAME=10 / FUNC_RENAME=0 / REF=0 / PLATE=1 (classify_card_id_summon_category plate rewrite FUN_0803088c -> check_effect_slot_summon_path_eligible)
+
+**新建 constants** (card_info.inc +57 new CIDs):
+BEASTKING_OF_THE_SWAMPS / VERSAGO_THE_DESTROYER / MONSTER_EYE / THUNDER_DRAGON /
+MYSTICAL_SHEEP_1 / MAGICAL_LABYRINTH / HANNIBAL_NECROMANCER / MESMERIC_CONTROL /
+MONSTER_REBORN / POT_OF_GREED / ROYAL_DECREE / RESTRUCTER_REVOLUTION /
+UPSTART_GOBLIN / DELINQUENT_DUO / THE_FORCEFUL_SENTRY / SPEAR_CRETIN /
+DE_FUSION / JAR_OF_GREED / SPIRITUALISM / SPIRIT_MESSAGE_I / FUSION_GATE /
+THE_WARRIOR_RETURNING_ALIVE / THE_DRAGONS_BEAD / GREAT_DEZARD / CARD_OF_SANCTITY /
+MYSTICAL_KNIGHT_OF_JACKAL / SKILLED_WHITE_MAGICIAN / SKILLED_DARK_MAGICIAN /
+ROYAL_MAGICAL_LIBRARY / JAR_ROBBER / MIRACLE_RESTORING / DESROOK_ARCHFIEND /
+RAY_OF_HOPE / MATAZA_THE_ZAPPER / DEDICATION_THROUGH_LIGHT_DARK / THE_KICK_MAN /
+CORPSE_OF_YATA_GARASU / ASWAN_APPARITION / NUBIAN_GUARD / KING_OF_THE_SWAMP /
+CARD_7 / THE_SECOND_SARCOPHAGUS / THE_END_OF_ANUBIS / DARK_FACTORY_MASS_PROD /
+CEMETARY_BOMB / BIG_CORE / BLAST_MAGICIAN / A_FEATHER_OF_THE_PHOENIX /
+GOOD_GOBLIN_HOUSEKEEPING / CYBER_END_DRAGON / SPARK_BLASTER / DARK_RULER_VANDALGYON /
+ALKANA_KNIGHT_JOKER / POT_OF_AVARICE / ROLL_OUT / MYTHICAL_BEAST_CERBERUS / MAGICAL_MALLET
+(3 reuses not new: EQUIP_CHAIN_PAIR_CARD_MAX / HORUS_LV4 / D3S_FROG already existed)
+
+**carve**: 0 (no inter-function ROM_INCBIN in segment)
+
+**disasm**: 0
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn / eval_amazoness_fnptr_a / eval_amazoness_fnptr_b / eval_equip_chain_pred_fnptr) + asm/04 x3 (tick_equip_scan_destiny_chain_table zone_monster_field_bonus_table+7*16 / dat_08045efc_fnptr apply_nitro_unit_equip_activation+1 / upd_equip_bitmap_effect_zone gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+
+**plate FUN_ in Seg-4b range after landing**: 0 stale FUN_ (grep confirmed)
+
+**CJK in Seg-4b range**: 0 non-ASCII bytes (grep confirmed)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**Seg-4 (4a+4b) 全完成** (4a commit 3155175 + 4b this commit)
+
 ---
 
 ### 4.03 Seg-3 完成记录 (0x0804ad48..0x0804b4f4, 24+5 fn, 73+20 slots, 3 disasm blocks)
@@ -339,6 +383,7 @@ check_card_is_dark_world_range_type (0x0804b26c)
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
 | 0x0804aa5e | 0xee (238B) | Seg-2 | 孤立 THUMB 代码块 (BST 比较器形态, 与 check_card_pair_allowed 结构相似但独立); 全 ROM raw=0 fn-ptr 及 THUMB+1=0 (2B step exhaustive scan, reviewer 独立确认) | defer |
+| 0x0804becc | 0x54 (84B) | Seg-4b | THUMB dead code orphan (01 1c...70 47 等 opcode); no named function; 全 ROM raw=0 / THUMB+1=0 (穷举 2B-step scan [4becc,4bf20), reviewer 独立确认) | defer |
 
 ---
 

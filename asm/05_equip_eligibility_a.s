@@ -6477,7 +6477,7 @@ LAB_0804be36:
 @ Classify card_id (r0) into effect category code via binary tree ID comparisons. Returns: 0=none, 1=type_B, 3=type_C, 5=type_D, 0xff=type_A. Pure read-only; no side effects. Key IDs: 0x161a, 0x128e, 0x1610-0x1617, 0x16de, 0x1624, 0x186a, 0x1817, 0x1983. Called by get_slot_effect_card_value (returns 0/non-0) and addr 0x0804513c (extracts bit0).
 get_card_effect_category:
     adds r1,r0,#0x0    @ 0804be38 011c
-    ldr r0, DAT_0804be5c                     @ 0804be3a 0848
+    ldr r0, effect_cat_royal_mag_lib_a_cid   @ 0804be3a 0848
     cmp r1,r0                                @ 0804be3c 8142
     beq LAB_0804bebc                         @ 0804be3e 3dd0
     cmp r1,r0                                @ 0804be40 8142
@@ -6487,21 +6487,21 @@ get_card_effect_category:
     beq LAB_0804bebc                         @ 0804be48 38d0
     cmp r1,r0                                @ 0804be4a 8142
     bgt LAB_0804be68                         @ 0804be4c 0cdc
-    ldr r0, DAT_0804be60                     @ 0804be4e 0448
+    ldr r0, effect_cat_hannibal_necro_cid    @ 0804be4e 0448
     cmp r1,r0                                @ 0804be50 8142
     beq LAB_0804beb8                         @ 0804be52 31d0
-    ldr r0, DAT_0804be64                     @ 0804be54 0348
+    ldr r0, effect_cat_skilled_white_mag_cid @ 0804be54 0348
     cmp r1,r0                                @ 0804be56 8142
     beq LAB_0804bebc                         @ 0804be58 30d0
     b LAB_0804bec8                           @ 0804be5a 35e0
-DAT_0804be5c:
-    .word  0x0000161a                     @ 0804be5c 1a160000
-DAT_0804be60:
-    .word  0x0000128e                     @ 0804be60 8e120000
-DAT_0804be64:
-    .word  0x00001610                     @ 0804be64 10160000
+effect_cat_royal_mag_lib_a_cid:
+    .word  ROYAL_MAGICAL_LIBRARY_CID      @ 0804be5c 1a160000
+effect_cat_hannibal_necro_cid:
+    .word  HANNIBAL_NECROMANCER_CID       @ 0804be60 8e120000
+effect_cat_skilled_white_mag_cid:
+    .word  SKILLED_WHITE_MAGICIAN_CID     @ 0804be64 10160000
 LAB_0804be68:
-    ldr r0, DAT_0804be78                     @ 0804be68 0348
+    ldr r0, effect_cat_magical_marionette_cid @ 0804be68 0348
     cmp r1,r0                                @ 0804be6a 8142
     beq LAB_0804bec4                         @ 0804be6c 2ad0
     adds r0,#0x2    @ 0804be6e 0230
@@ -6509,10 +6509,10 @@ LAB_0804be68:
     beq LAB_0804beb8                         @ 0804be72 21d0
     b LAB_0804bec8                           @ 0804be74 28e0
     .zero  0x2
-DAT_0804be78:
-    .word  0x00001615                     @ 0804be78 15160000
+effect_cat_magical_marionette_cid:
+    .word  MAGICAL_MARIONETTE_CID         @ 0804be78 15160000
 LAB_0804be7c:
-    ldr r0, DAT_0804be90                     @ 0804be7c 0448
+    ldr r0, effect_cat_tower_of_babel_cid    @ 0804be7c 0448
     cmp r1,r0                                @ 0804be7e 8142
     beq LAB_0804bec4                         @ 0804be80 20d0
     cmp r1,r0                                @ 0804be82 8142
@@ -6522,10 +6522,10 @@ LAB_0804be7c:
     beq LAB_0804bec4                         @ 0804be8a 1bd0
     adds r0,#0x71    @ 0804be8c 7130
     b LAB_0804beae                           @ 0804be8e 0ee0
-DAT_0804be90:
-    .word  0x000016de                     @ 0804be90 de160000
+effect_cat_tower_of_babel_cid:
+    .word  TOWER_OF_BABEL_CID             @ 0804be90 de160000
 LAB_0804be94:
-    ldr r0, DAT_0804bea8                     @ 0804be94 0448
+    ldr r0, effect_cat_blast_magician_cid    @ 0804be94 0448
     cmp r1,r0                                @ 0804be96 8142
     beq LAB_0804bec4                         @ 0804be98 14d0
     cmp r1,r0                                @ 0804be9a 8142
@@ -6535,16 +6535,16 @@ LAB_0804be94:
     beq LAB_0804bec0                         @ 0804bea2 0dd0
     b LAB_0804bec8                           @ 0804bea4 10e0
     .zero  0x2
-DAT_0804bea8:
-    .word  0x0000186a                     @ 0804bea8 6a180000
+effect_cat_blast_magician_cid:
+    .word  BLAST_MAGICIAN_CID             @ 0804bea8 6a180000
 LAB_0804beac:
-    ldr r0, DAT_0804beb4                     @ 0804beac 0148
+    ldr r0, effect_cat_mythical_beast_cerb_cid @ 0804beac 0148
 LAB_0804beae:
     cmp r1,r0                                @ 0804beae 8142
     beq LAB_0804bec4                         @ 0804beb0 08d0
     b LAB_0804bec8                           @ 0804beb2 09e0
-DAT_0804beb4:
-    .word  0x00001983                     @ 0804beb4 83190000
+effect_cat_mythical_beast_cerb_cid:
+    .word  MYTHICAL_BEAST_CERBERUS_CID    @ 0804beb4 83190000
 LAB_0804beb8:
     movs r0,#0x1    @ 0804beb8 0120
     b LAB_0804beca                           @ 0804beba 06e0
@@ -6566,36 +6566,36 @@ LAB_0804beca:
 @ Check if card_id (r0) belongs to equip card set B (second hardcoded ID range/list). Pure BST leaf over card IDs in set B. Returns 1=member, 0=not member. Sibling: check_card_id_is_equip_set_a (set A range). r0: card_id [0..0x19b7]. Returns u32 bool.
 check_card_id_is_equip_set_b:
     adds r1,r0,#0x0    @ 0804bf20 011c
-    ldr r0, DAT_0804bf3c                     @ 0804bf22 0648
+    ldr r0, equip_set_b_spark_blaster_cid    @ 0804bf22 0648
     cmp r1,r0                                @ 0804bf24 8142
     beq LAB_0804bf7c                         @ 0804bf26 29d0
     cmp r1,r0                                @ 0804bf28 8142
     bgt LAB_0804bf58                         @ 0804bf2a 15dc
-    ldr r0, DAT_0804bf40                     @ 0804bf2c 0448
+    ldr r0, check_equip_set_b_cid_16fe       @ 0804bf2c 0448
     cmp r1,r0                                @ 0804bf2e 8142
     beq LAB_0804bf7c                         @ 0804bf30 24d0
     cmp r1,r0                                @ 0804bf32 8142
     bgt LAB_0804bf48                         @ 0804bf34 08dc
-    ldr r0, DAT_0804bf44                     @ 0804bf36 0348
+    ldr r0, equip_set_b_great_dezard_cid     @ 0804bf36 0348
     b LAB_0804bf64                           @ 0804bf38 14e0
     .zero  0x2
-DAT_0804bf3c:
-    .word  0x00001909                     @ 0804bf3c 09190000
-DAT_0804bf40:
-    .word  0x000016fe                     @ 0804bf40 fe160000
-DAT_0804bf44:
-    .word  0x00001529                     @ 0804bf44 29150000
+equip_set_b_spark_blaster_cid:
+    .word  SPARK_BLASTER_CID              @ 0804bf3c 09190000
+check_equip_set_b_cid_16fe:
+    .word  0x000016fe                     @ 0804bf40 fe160000  gap cid 0x16fe; between Don_Turtle(0x16fd) Dark_Driceratops(0x16ff); conf low
+equip_set_b_great_dezard_cid:
+    .word  GREAT_DEZARD_CID               @ 0804bf44 29150000
 LAB_0804bf48:
-    ldr r0, DAT_0804bf54                     @ 0804bf48 0248
+    ldr r0, equip_set_b_big_core_cid         @ 0804bf48 0248
     cmp r1,r0                                @ 0804bf4a 8142
     beq LAB_0804bf7c                         @ 0804bf4c 16d0
     adds r0,#0xc1    @ 0804bf4e c130
     b LAB_0804bf64                           @ 0804bf50 08e0
     .zero  0x2
-DAT_0804bf54:
-    .word  0x00001837                     @ 0804bf54 37180000
+equip_set_b_big_core_cid:
+    .word  BIG_CORE_CID                   @ 0804bf54 37180000
 LAB_0804bf58:
-    ldr r0, DAT_0804bf6c                     @ 0804bf58 0448
+    ldr r0, equip_set_b_bes_tetran_cid       @ 0804bf58 0448
     cmp r1,r0                                @ 0804bf5a 8142
     beq LAB_0804bf7c                         @ 0804bf5c 0ed0
     cmp r1,r0                                @ 0804bf5e 8142
@@ -6606,10 +6606,10 @@ LAB_0804bf64:
     beq LAB_0804bf7c                         @ 0804bf66 09d0
     b LAB_0804bf84                           @ 0804bf68 0ce0
     .zero  0x2
-DAT_0804bf6c:
-    .word  0x00001962                     @ 0804bf6c 62190000
+equip_set_b_bes_tetran_cid:
+    .word  BES_TETRAN_CID                 @ 0804bf6c 62190000
 LAB_0804bf70:
-    ldr r0, DAT_0804bf80                     @ 0804bf70 0348
+    ldr r0, equip_set_b_anc_gear_castle_cid  @ 0804bf70 0348
     cmp r1,r0                                @ 0804bf72 8142
     beq LAB_0804bf7c                         @ 0804bf74 02d0
     adds r0,#0xd    @ 0804bf76 0d30
@@ -6618,8 +6618,8 @@ LAB_0804bf70:
 LAB_0804bf7c:
     movs r0,#0x1    @ 0804bf7c 0120
     b LAB_0804bf86                           @ 0804bf7e 02e0
-DAT_0804bf80:
-    .word  0x000019b2                     @ 0804bf80 b2190000
+equip_set_b_anc_gear_castle_cid:
+    .word  ANCIENT_GEAR_CASTLE_CID        @ 0804bf80 b2190000
 LAB_0804bf84:
     movs r0,#0x0    @ 0804bf84 0020
 LAB_0804bf86:
@@ -6633,7 +6633,7 @@ LAB_0804bf86:
 @ Constants: SET_D_ANCHOR_ROOT=0x12ec, SET_D_ANCHOR_B=0x12ce, SET_D_ID_A=0x1325, SET_D_ID_B=0x1307, SET_D_ID_C=0x132b, SET_D_ID_D=0x1804.
 check_card_id_is_equip_set_d:
     adds r1,r0,#0x0    @ 0804bf88 011c
-    ldr r0, DAT_0804bfac                     @ 0804bf8a 0848
+    ldr r0, equip_set_d_pot_of_greed_a_cid   @ 0804bf8a 0848
     cmp r1,r0                                @ 0804bf8c 8142
     beq LAB_0804c004                         @ 0804bf8e 39d0
     cmp r1,r0                                @ 0804bf90 8142
@@ -6650,10 +6650,10 @@ check_card_id_is_equip_set_d:
     subs r0,#0x8    @ 0804bfa6 0838
     b LAB_0804bfc2                           @ 0804bfa8 0be0
     .zero  0x2
-DAT_0804bfac:
-    .word  0x000012ec                     @ 0804bfac ec120000
+equip_set_d_pot_of_greed_a_cid:
+    .word  POT_OF_GREED_CID               @ 0804bfac ec120000
 LAB_0804bfb0:
-    ldr r0, DAT_0804bfc8                     @ 0804bfb0 0548
+    ldr r0, equip_set_d_mesmeric_ctrl_cid    @ 0804bfb0 0548
     cmp r1,r0                                @ 0804bfb2 8142
     beq LAB_0804c004                         @ 0804bfb4 26d0
     cmp r1,r0                                @ 0804bfb6 8142
@@ -6666,10 +6666,10 @@ LAB_0804bfc2:
     cmp r1,r0                                @ 0804bfc2 8142
     blt LAB_0804c010                         @ 0804bfc4 24db
     b LAB_0804c004                           @ 0804bfc6 1de0
-DAT_0804bfc8:
-    .word  0x000012ce                     @ 0804bfc8 ce120000
+equip_set_d_mesmeric_ctrl_cid:
+    .word  MESMERIC_CONTROL_CID           @ 0804bfc8 ce120000
 LAB_0804bfcc:
-    ldr r0, DAT_0804bfe8                     @ 0804bfcc 0648
+    ldr r0, equip_set_d_delinquent_duo_cid   @ 0804bfcc 0648
     cmp r1,r0                                @ 0804bfce 8142
     bgt LAB_0804bff8                         @ 0804bfd0 12dc
     subs r0,#0x1    @ 0804bfd2 0138
@@ -6683,30 +6683,30 @@ LAB_0804bfcc:
     subs r0,#0xa    @ 0804bfe2 0a38
     b LAB_0804bfee                           @ 0804bfe4 03e0
     .zero  0x2
-DAT_0804bfe8:
-    .word  0x00001325                     @ 0804bfe8 25130000
+equip_set_d_delinquent_duo_cid:
+    .word  DELINQUENT_DUO_CID             @ 0804bfe8 25130000
 LAB_0804bfec:
-    ldr r0, DAT_0804bff4                     @ 0804bfec 0148
+    ldr r0, equip_set_d_restructer_rev_cid   @ 0804bfec 0148
 LAB_0804bfee:
     cmp r1,r0                                @ 0804bfee 8142
     beq LAB_0804c004                         @ 0804bff0 08d0
     b LAB_0804c010                           @ 0804bff2 0de0
-DAT_0804bff4:
-    .word  0x00001307                     @ 0804bff4 07130000
+equip_set_d_restructer_rev_cid:
+    .word  RESTRUCTER_REVOLUTION_CID      @ 0804bff4 07130000
 LAB_0804bff8:
-    ldr r0, DAT_0804c008                     @ 0804bff8 0348
+    ldr r0, equip_set_d_forceful_sentry_cid  @ 0804bff8 0348
     cmp r1,r0                                @ 0804bffa 8142
     beq LAB_0804c004                         @ 0804bffc 02d0
-    ldr r0, DAT_0804c00c                     @ 0804bffe 0348
+    ldr r0, equip_set_d_cemetary_bomb_cid    @ 0804bffe 0348
     cmp r1,r0                                @ 0804c000 8142
     bne LAB_0804c010                         @ 0804c002 05d1
 LAB_0804c004:
     movs r0,#0x1    @ 0804c004 0120
     b LAB_0804c012                           @ 0804c006 04e0
-DAT_0804c008:
-    .word  0x0000132b                     @ 0804c008 2b130000
-DAT_0804c00c:
-    .word  0x00001804                     @ 0804c00c 04180000
+equip_set_d_forceful_sentry_cid:
+    .word  THE_FORCEFUL_SENTRY_CID        @ 0804c008 2b130000
+equip_set_d_cemetary_bomb_cid:
+    .word  CEMETARY_BOMB_CID              @ 0804c00c 04180000
 LAB_0804c010:
     movs r0,#0x0    @ 0804c010 0020
 LAB_0804c012:
@@ -6715,7 +6715,7 @@ LAB_0804c012:
 @ equip set C classifier: third sibling alongside check_card_id_is_equip_set_a (0x0804bd78) and check_card_id_is_equip_set_b (0x0804bf20). BST whitelist over card_id: hits 0x114f/0xfe0/0x168f/0x179c etc->return 1; else->return 0. Called by check_card_zone_activation_blocked in continuous equip (field6==0x16) path. r0=u16 card_id [0..0x1fff]. Returns u32 bool. Leaf, no side-effects. Constants: set_c_ids={0xfe0, 0x114f, 0x168f, 0x179c}.
 check_card_is_equip_set_c:
     adds r1,r0,#0x0    @ 0804c014 011c
-    ldr r0, DAT_0804c02c                     @ 0804c016 0548
+    ldr r0, equip_set_c_thunder_dragon_cid   @ 0804c016 0548
     cmp r1,r0                                @ 0804c018 8142
     beq LAB_0804c04e                         @ 0804c01a 18d0
     cmp r1,r0                                @ 0804c01c 8142
@@ -6726,10 +6726,10 @@ check_card_is_equip_set_c:
     beq LAB_0804c04e                         @ 0804c026 12d0
     adds r0,#0xe    @ 0804c028 0e30
     b LAB_0804c03c                           @ 0804c02a 07e0
-DAT_0804c02c:
-    .word  0x0000114f                     @ 0804c02c 4f110000
+equip_set_c_thunder_dragon_cid:
+    .word  THUNDER_DRAGON_CID             @ 0804c02c 4f110000
 LAB_0804c030:
-    ldr r0, DAT_0804c044                     @ 0804c030 0448
+    ldr r0, equip_set_c_desrook_archfiend_cid @ 0804c030 0448
     cmp r1,r0                                @ 0804c032 8142
     beq LAB_0804c04e                         @ 0804c034 0bd0
     cmp r1,r0                                @ 0804c036 8142
@@ -6740,18 +6740,18 @@ LAB_0804c03c:
     beq LAB_0804c04e                         @ 0804c03e 06d0
     b LAB_0804c058                           @ 0804c040 0ae0
     .zero  0x2
-DAT_0804c044:
-    .word  0x0000168f                     @ 0804c044 8f160000
+equip_set_c_desrook_archfiend_cid:
+    .word  DESROOK_ARCHFIEND_CID          @ 0804c044 8f160000
 LAB_0804c048:
-    ldr r0, DAT_0804c054                     @ 0804c048 0248
+    ldr r0, equip_set_c_king_swamp_a_cid     @ 0804c048 0248
     cmp r1,r0                                @ 0804c04a 8142
     bne LAB_0804c058                         @ 0804c04c 04d1
 LAB_0804c04e:
     movs r0,#0x1    @ 0804c04e 0120
     b LAB_0804c05a                           @ 0804c050 03e0
     .zero  0x2
-DAT_0804c054:
-    .word  0x0000179c                     @ 0804c054 9c170000
+equip_set_c_king_swamp_a_cid:
+    .word  KING_OF_THE_SWAMP_CID          @ 0804c054 9c170000
 LAB_0804c058:
     movs r0,#0x0    @ 0804c058 0020
 LAB_0804c05a:
@@ -6760,29 +6760,29 @@ LAB_0804c05a:
 @ Pure leaf: whitelist {0x149c, 0x1232, 0x1517} -> return 1; else -> return 0. r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=equip blocker, 0=not). Leaf, no side-effects. Constants: equip_blocker_a=0x149c (Beast Soul Swap), equip_blocker_b=0x1232, equip_blocker_c=0x1517.
 check_card_id_is_equip_blocker:
     adds r1,r0,#0x0    @ 0804c05c 011c
-    ldr r0, DAT_0804c070                     @ 0804c05e 0448
+    ldr r0, equip_blocker_fusion_gate_cid    @ 0804c05e 0448
     cmp r1,r0                                @ 0804c060 8142
     beq LAB_0804c07e                         @ 0804c062 0cd0
     cmp r1,r0                                @ 0804c064 8142
     bgt LAB_0804c078                         @ 0804c066 07dc
-    ldr r0, DAT_0804c074                     @ 0804c068 0248
+    ldr r0, equip_blocker_magical_lab_cid    @ 0804c068 0248
     cmp r1,r0                                @ 0804c06a 8142
     beq LAB_0804c07e                         @ 0804c06c 07d0
     b LAB_0804c088                           @ 0804c06e 0be0
-DAT_0804c070:
-    .word  0x0000149c                     @ 0804c070 9c140000
-DAT_0804c074:
-    .word  0x00001232                     @ 0804c074 32120000
+equip_blocker_fusion_gate_cid:
+    .word  FUSION_GATE_CID                @ 0804c070 9c140000
+equip_blocker_magical_lab_cid:
+    .word  MAGICAL_LABYRINTH_CID          @ 0804c074 32120000
 LAB_0804c078:
-    ldr r0, DAT_0804c084                     @ 0804c078 0248
+    ldr r0, check_equip_blocker_cid_1517     @ 0804c078 0248
     cmp r1,r0                                @ 0804c07a 8142
     bne LAB_0804c088                         @ 0804c07c 04d1
 LAB_0804c07e:
     movs r0,#0x1    @ 0804c07e 0120
     b LAB_0804c08a                           @ 0804c080 03e0
     .zero  0x2
-DAT_0804c084:
-    .word  0x00001517                     @ 0804c084 17150000
+check_equip_blocker_cid_1517:
+    .word  0x00001517                     @ 0804c084 17150000  gap cid 0x1517; between Disappear(0x1515) Bottomless_Trap_Hole(0x1518); conf low
 LAB_0804c088:
     movs r0,#0x0    @ 0804c088 0020
 LAB_0804c08a:
@@ -6796,12 +6796,12 @@ LAB_0804c08a:
 @ Constants: ANCHOR_ROOT=0x1228, ANCHOR_B=0x10a8, ANCHOR_C=0x10b3, ANCHOR_D=0x179c.
 check_card_id_is_equip_set_e:
     adds r1,r0,#0x0    @ 0804c08c 011c
-    ldr r0, DAT_0804c0a8                     @ 0804c08e 0648
+    ldr r0, equip_set_e_mystical_sheep1_cid  @ 0804c08e 0648
     cmp r1,r0                                @ 0804c090 8142
     beq LAB_0804c0d2                         @ 0804c092 1ed0
     cmp r1,r0                                @ 0804c094 8142
     bgt LAB_0804c0bc                         @ 0804c096 11dc
-    ldr r0, DAT_0804c0ac                     @ 0804c098 0448
+    ldr r0, equip_set_e_beastking_swamps_cid @ 0804c098 0448
     cmp r1,r0                                @ 0804c09a 8142
     beq LAB_0804c0d2                         @ 0804c09c 19d0
     cmp r1,r0                                @ 0804c09e 8142
@@ -6809,20 +6809,20 @@ check_card_id_is_equip_set_e:
     subs r0,#0x95    @ 0804c0a2 9538
     b LAB_0804c0b2                           @ 0804c0a4 05e0
     .zero  0x2
-DAT_0804c0a8:
-    .word  0x00001228                     @ 0804c0a8 28120000
-DAT_0804c0ac:
-    .word  0x000010a8                     @ 0804c0ac a8100000
+equip_set_e_mystical_sheep1_cid:
+    .word  MYSTICAL_SHEEP_1_CID           @ 0804c0a8 28120000
+equip_set_e_beastking_swamps_cid:
+    .word  BEASTKING_OF_THE_SWAMPS_CID    @ 0804c0ac a8100000
 LAB_0804c0b0:
-    ldr r0, DAT_0804c0b8                     @ 0804c0b0 0148
+    ldr r0, equip_set_e_versago_destroyer_cid @ 0804c0b0 0148
 LAB_0804c0b2:
     cmp r1,r0                                @ 0804c0b2 8142
     beq LAB_0804c0d2                         @ 0804c0b4 0dd0
     b LAB_0804c0dc                           @ 0804c0b6 11e0
-DAT_0804c0b8:
-    .word  0x000010b3                     @ 0804c0b8 b3100000
+equip_set_e_versago_destroyer_cid:
+    .word  VERSAGO_THE_DESTROYER_CID      @ 0804c0b8 b3100000
 LAB_0804c0bc:
-    ldr r0, DAT_0804c0d8                     @ 0804c0bc 0648
+    ldr r0, equip_set_e_king_swamp_b_cid     @ 0804c0bc 0648
     cmp r1,r0                                @ 0804c0be 8142
     beq LAB_0804c0d2                         @ 0804c0c0 07d0
     cmp r1,r0                                @ 0804c0c2 8142
@@ -6837,8 +6837,8 @@ LAB_0804c0d2:
     movs r0,#0x1    @ 0804c0d2 0120
     b LAB_0804c0de                           @ 0804c0d4 03e0
     .zero  0x2
-DAT_0804c0d8:
-    .word  0x0000179c                     @ 0804c0d8 9c170000
+equip_set_e_king_swamp_b_cid:
+    .word  KING_OF_THE_SWAMP_CID          @ 0804c0d8 9c170000
 LAB_0804c0dc:
     movs r0,#0x0    @ 0804c0dc 0020
 LAB_0804c0de:
@@ -6852,34 +6852,34 @@ LAB_0804c0de:
 @ Constants: ANCHOR_ROOT=0x18fd, ANCHOR_B=0x14c7, ANCHOR_C=0x14da, ANCHOR_D=0x1955, ANCHOR_E=0x19d6.
 check_card_id_is_equip_excluded_set_f:
     adds r1,r0,#0x0    @ 0804c0e0 011c
-    ldr r0, DAT_0804c0fc                     @ 0804c0e2 0648
+    ldr r0, equip_excl_f_cyber_end_dragon_cid @ 0804c0e2 0648
     cmp r1,r0                                @ 0804c0e4 8142
     bgt LAB_0804c114                         @ 0804c0e6 15dc
     subs r0,#0x2    @ 0804c0e8 0238
     cmp r1,r0                                @ 0804c0ea 8142
     bge LAB_0804c132                         @ 0804c0ec 21da
-    ldr r0, DAT_0804c100                     @ 0804c0ee 0448
+    ldr r0, equip_excl_f_ryu_senshi_a_cid    @ 0804c0ee 0448
     cmp r1,r0                                @ 0804c0f0 8142
     beq LAB_0804c132                         @ 0804c0f2 1ed0
     cmp r1,r0                                @ 0804c0f4 8142
     bgt LAB_0804c104                         @ 0804c0f6 05dc
     subs r0,#0x11    @ 0804c0f8 1138
     b LAB_0804c120                           @ 0804c0fa 11e0
-DAT_0804c0fc:
-    .word  0x000018fd                     @ 0804c0fc fd180000
-DAT_0804c100:
-    .word  0x000014c7                     @ 0804c100 c7140000
+equip_excl_f_cyber_end_dragon_cid:
+    .word  CYBER_END_DRAGON_CID           @ 0804c0fc fd180000
+equip_excl_f_ryu_senshi_a_cid:
+    .word  RYU_SENSHI_CID                 @ 0804c100 c7140000
 LAB_0804c104:
-    ldr r0, DAT_0804c110                     @ 0804c104 0248
+    ldr r0, equip_excl_f_fiend_skull_cid     @ 0804c104 0248
     cmp r1,r0                                @ 0804c106 8142
     beq LAB_0804c132                         @ 0804c108 13d0
     adds r0,#0xa4    @ 0804c10a a430
     b LAB_0804c120                           @ 0804c10c 08e0
     .zero  0x2
-DAT_0804c110:
-    .word  0x000014da                     @ 0804c110 da140000
+equip_excl_f_fiend_skull_cid:
+    .word  FIEND_SKULL_DRAGON_CID         @ 0804c110 da140000
 LAB_0804c114:
-    ldr r0, DAT_0804c128                     @ 0804c114 0448
+    ldr r0, equip_excl_f_cyber_blader_cid    @ 0804c114 0448
     cmp r1,r0                                @ 0804c116 8142
     beq LAB_0804c132                         @ 0804c118 0bd0
     cmp r1,r0                                @ 0804c11a 8142
@@ -6890,18 +6890,18 @@ LAB_0804c120:
     beq LAB_0804c132                         @ 0804c122 06d0
     b LAB_0804c13c                           @ 0804c124 0ae0
     .zero  0x2
-DAT_0804c128:
-    .word  0x00001955                     @ 0804c128 55190000
+equip_excl_f_cyber_blader_cid:
+    .word  CYBER_BLADER_CID               @ 0804c128 55190000
 LAB_0804c12c:
-    ldr r0, DAT_0804c138                     @ 0804c12c 0248
+    ldr r0, equip_excl_f_d3s_frog_cid        @ 0804c12c 0248
     cmp r1,r0                                @ 0804c12e 8142
     bne LAB_0804c13c                         @ 0804c130 04d1
 LAB_0804c132:
     movs r0,#0x0    @ 0804c132 0020
     b LAB_0804c13e                           @ 0804c134 03e0
     .zero  0x2
-DAT_0804c138:
-    .word  0x000019d6                     @ 0804c138 d6190000
+equip_excl_f_d3s_frog_cid:
+    .word  D3S_FROG_CID                   @ 0804c138 d6190000
 LAB_0804c13c:
     movs r0,#0x1    @ 0804c13c 0120
 LAB_0804c13e:
@@ -6910,7 +6910,7 @@ LAB_0804c13e:
 @ Leaf function. Checks if card_id (r0) matches one of three special field zone cards: 0x170a, 0x1652 (=0x170a-0xb8), or 0x17d2. Returns 1 if match, 0 otherwise. Called by check_slot_field_zone_card_eligible to filter special zone cards before equip check. Params: r0=u16 card_id [0..0x1fff]. Constants: CARD_ID_FIELD_ZONE_A=0x170a, CARD_ID_FIELD_ZONE_B=0x1652, CARD_ID_FIELD_ZONE_C=0x17d2.
 check_card_id_is_field_zone_special:
     adds r1,r0,#0x0    @ 0804c140 011c
-    ldr r0, DAT_0804c154                     @ 0804c142 0448
+    ldr r0, field_zone_spec_mataza_zapper_cid @ 0804c142 0448
     cmp r1,r0                                @ 0804c144 8142
     beq LAB_0804c15e                         @ 0804c146 0ad0
     cmp r1,r0                                @ 0804c148 8142
@@ -6919,18 +6919,18 @@ check_card_id_is_field_zone_special:
     cmp r1,r0                                @ 0804c14e 8142
     beq LAB_0804c15e                         @ 0804c150 05d0
     b LAB_0804c168                           @ 0804c152 09e0
-DAT_0804c154:
-    .word  0x0000170a                     @ 0804c154 0a170000
+field_zone_spec_mataza_zapper_cid:
+    .word  MATAZA_THE_ZAPPER_CID          @ 0804c154 0a170000
 LAB_0804c158:
-    ldr r0, DAT_0804c164                     @ 0804c158 0248
+    ldr r0, field_zone_spec_horus_lv4_cid    @ 0804c158 0248
     cmp r1,r0                                @ 0804c15a 8142
     bne LAB_0804c168                         @ 0804c15c 04d1
 LAB_0804c15e:
     movs r0,#0x1    @ 0804c15e 0120
     b LAB_0804c16a                           @ 0804c160 03e0
     .zero  0x2
-DAT_0804c164:
-    .word  0x000017d2                     @ 0804c164 d2170000
+field_zone_spec_horus_lv4_cid:
+    .word  HORUS_LV4_CID                  @ 0804c164 d2170000
 LAB_0804c168:
     movs r0,#0x0    @ 0804c168 0020
 LAB_0804c16a:
@@ -6939,20 +6939,20 @@ LAB_0804c16a:
 @ Checks whether card_id is one of two special zone-paired cards (0x12d3 or 0x147e). These cards share a paired placement restriction: when on field, the paired card blocks placement in the partner zone. Returns 1 if card_id==0x12d3 or 0x147e, 0 otherwise. 7-instruction leaf; 9 callers all use 'cmp r0,#0; bne -> special branch'. r0=u16 card_id. Returns u8 is_zone_pair_restricted (0 or 1). Constants: CARD_ID_ZONE_PAIR_A=0x12d3(4819), CARD_ID_ZONE_PAIR_B=0x147e(5246).
 check_card_is_zone_pair_restricted:
     adds r1,r0,#0x0    @ 0804c16c 011c
-    ldr r0, DAT_0804c180                     @ 0804c16e 0448
+    ldr r0, zone_pair_restr_amplifier_cid    @ 0804c16e 0448
     cmp r1,r0                                @ 0804c170 8142
     beq LAB_0804c17a                         @ 0804c172 02d0
-    ldr r0, DAT_0804c184                     @ 0804c174 0348
+    ldr r0, zone_pair_restr_spiritualism_cid @ 0804c174 0348
     cmp r1,r0                                @ 0804c176 8142
     bne LAB_0804c188                         @ 0804c178 06d1
 LAB_0804c17a:
     movs r0,#0x1    @ 0804c17a 0120
     b LAB_0804c18a                           @ 0804c17c 05e0
     .zero  0x2
-DAT_0804c180:
-    .word  0x000012d3                     @ 0804c180 d3120000
-DAT_0804c184:
-    .word  0x0000147e                     @ 0804c184 7e140000
+zone_pair_restr_amplifier_cid:
+    .word  AMPLIFIER_CID                  @ 0804c180 d3120000
+zone_pair_restr_spiritualism_cid:
+    .word  SPIRITUALISM_CID               @ 0804c184 7e140000
 LAB_0804c188:
     movs r0,#0x0    @ 0804c188 0020
 LAB_0804c18a:
@@ -6961,13 +6961,13 @@ LAB_0804c18a:
 @ Checks if card_id falls in field_spell type-B ranges: [0x1497..0x149a] or [0x17ad..0x17ae]. Returns 1 if hit, 0 otherwise. Leaf function; no callees. Called by check_field_spell_b_placeable (0x080309fc) as final eligibility gate. Sibling: get_card_effect_zone_check_sides (0x0804c1b8, returns side_mask vs this returning bool). r0=u16 card_id [0..0x1fff]. Returns u32 bool. indeg=1, class E. Constants: FIELD_SPELL_B_RANGE1=[0x1497..0x149a], FIELD_SPELL_B_RANGE2=[0x17ad..0x17ae].
 check_card_is_field_spell_type_b:
     adds r1,r0,#0x0    @ 0804c18c 011c
-    ldr r0, DAT_0804c1ac                     @ 0804c18e 0748
+    ldr r0, field_spell_b_spirit_msg_i_cid   @ 0804c18e 0748
     cmp r1,r0                                @ 0804c190 8142
     blt LAB_0804c1b4                         @ 0804c192 0fdb
     adds r0,#0x3    @ 0804c194 0330
     cmp r1,r0                                @ 0804c196 8142
     ble LAB_0804c1a6                         @ 0804c198 05dd
-    ldr r0, DAT_0804c1b0                     @ 0804c19a 0548
+    ldr r0, field_spell_b_2nd_sarcophagus_cid @ 0804c19a 0548
     cmp r1,r0                                @ 0804c19c 8142
     bgt LAB_0804c1b4                         @ 0804c19e 09dc
     subs r0,#0x1    @ 0804c1a0 0138
@@ -6977,10 +6977,10 @@ LAB_0804c1a6:
     movs r0,#0x1    @ 0804c1a6 0120
     b LAB_0804c1b6                           @ 0804c1a8 05e0
     .zero  0x2
-DAT_0804c1ac:
-    .word  0x00001497                     @ 0804c1ac 97140000
-DAT_0804c1b0:
-    .word  0x000017ae                     @ 0804c1b0 ae170000
+field_spell_b_spirit_msg_i_cid:
+    .word  SPIRIT_MESSAGE_I_CID           @ 0804c1ac 97140000
+field_spell_b_2nd_sarcophagus_cid:
+    .word  THE_SECOND_SARCOPHAGUS_CID     @ 0804c1b0 ae170000
 LAB_0804c1b4:
     movs r0,#0x0    @ 0804c1b4 0020
 LAB_0804c1b6:
@@ -6989,21 +6989,21 @@ LAB_0804c1b6:
 @ Returns 2-bit side_mask indicating which field sides need effect zone occupation check before placing card_id. bit0=1: check opponent side; bit1=2: check own side; 0=no check. Implements a hardcoded BST over restricted card IDs. Caller 0x0805a9a8 tests each bit and calls count_available_effect_zones per side. r0=u16 card_id. Returns u8 side_mask [0..3]. Constants: EFFECT_ZONE_CHECK_NONE=0, EFFECT_ZONE_CHECK_OPPONENT=1, EFFECT_ZONE_CHECK_SELF=2, EFFECT_ZONE_CHECK_BOTH=3.
 get_card_effect_zone_check_sides:
     adds r1,r0,#0x0    @ 0804c1b8 011c
-    ldr r0, DAT_0804c1f0                     @ 0804c1ba 0d48
+    ldr r0, get_card_effect_zone_sides_cid_16c1 @ 0804c1ba 0d48
     cmp r1,r0                                @ 0804c1bc 8142
     bne LAB_0804c1c2                         @ 0804c1be 00d1
     b LAB_0804c2ca                           @ 0804c1c0 83e0
 LAB_0804c1c2:
     cmp r1,r0                                @ 0804c1c2 8142
     bgt LAB_0804c24c                         @ 0804c1c4 42dc
-    ldr r0, DAT_0804c1f4                     @ 0804c1c6 0b48
+    ldr r0, zone_sides_super_rejuv_cid       @ 0804c1c6 0b48
     cmp r1,r0                                @ 0804c1c8 8142
     bne LAB_0804c1ce                         @ 0804c1ca 00d1
     b LAB_0804c2ca                           @ 0804c1cc 7de0
 LAB_0804c1ce:
     cmp r1,r0                                @ 0804c1ce 8142
     bgt LAB_0804c218                         @ 0804c1d0 22dc
-    ldr r0, DAT_0804c1f8                     @ 0804c1d2 0948
+    ldr r0, zone_sides_pot_of_greed_b_cid    @ 0804c1d2 0948
     cmp r1,r0                                @ 0804c1d4 8142
     bne LAB_0804c1da                         @ 0804c1d6 00d1
     b LAB_0804c2ca                           @ 0804c1d8 77e0
@@ -7021,12 +7021,12 @@ LAB_0804c1e6:
     b LAB_0804c2d8                           @ 0804c1ec 74e0
 LAB_0804c1ee:
     b LAB_0804c2dc                           @ 0804c1ee 75e0
-DAT_0804c1f0:
-    .word  0x000016c1                     @ 0804c1f0 c1160000
-DAT_0804c1f4:
-    .word  0x000014e2                     @ 0804c1f4 e2140000
-DAT_0804c1f8:
-    .word  0x000012ec                     @ 0804c1f8 ec120000
+get_card_effect_zone_sides_cid_16c1:
+    .word  0x000016c1                     @ 0804c1f0 c1160000  gap cid 0x16c1; between Freed_the_Brave(0x16c0) Witch_Doctor(0x16c2); conf low
+zone_sides_super_rejuv_cid:
+    .word  SUPER_REJUVENATION_CID         @ 0804c1f4 e2140000
+zone_sides_pot_of_greed_b_cid:
+    .word  POT_OF_GREED_CID               @ 0804c1f8 ec120000
 LAB_0804c1fc:
     movs r0,#0xa1    @ 0804c1fc a120
     lsls r0,r0,#0x5    @ 0804c1fe 4001
@@ -7034,17 +7034,17 @@ LAB_0804c1fc:
     beq LAB_0804c2ca                         @ 0804c202 62d0
     cmp r1,r0                                @ 0804c204 8142
     bgt LAB_0804c210                         @ 0804c206 03dc
-    ldr r0, DAT_0804c20c                     @ 0804c208 0048
+    ldr r0, zone_sides_upstart_goblin_cid    @ 0804c208 0048
     b LAB_0804c286                           @ 0804c20a 3ce0
-DAT_0804c20c:
-    .word  0x0000131f                     @ 0804c20c 1f130000
+zone_sides_upstart_goblin_cid:
+    .word  UPSTART_GOBLIN_CID             @ 0804c20c 1f130000
 LAB_0804c210:
-    ldr r0, DAT_0804c214                     @ 0804c210 0048
+    ldr r0, zone_sides_jar_of_greed_a_cid    @ 0804c210 0048
     b LAB_0804c286                           @ 0804c212 38e0
-DAT_0804c214:
-    .word  0x0000145a                     @ 0804c214 5a140000
+zone_sides_jar_of_greed_a_cid:
+    .word  JAR_OF_GREED_CID               @ 0804c214 5a140000
 LAB_0804c218:
-    ldr r0, DAT_0804c22c                     @ 0804c218 0448
+    ldr r0, zone_sides_card_of_sanctity_cid  @ 0804c218 0448
     cmp r1,r0                                @ 0804c21a 8142
     beq LAB_0804c2ca                         @ 0804c21c 55d0
     cmp r1,r0                                @ 0804c21e 8142
@@ -7054,10 +7054,10 @@ LAB_0804c218:
     beq LAB_0804c2d8                         @ 0804c226 57d0
     adds r0,#0x60    @ 0804c228 6030
     b LAB_0804c286                           @ 0804c22a 2ce0
-DAT_0804c22c:
-    .word  0x00001567                     @ 0804c22c 67150000
+zone_sides_card_of_sanctity_cid:
+    .word  CARD_OF_SANCTITY_CID           @ 0804c22c 67150000
 LAB_0804c230:
-    ldr r0, DAT_0804c240                     @ 0804c230 0348
+    ldr r0, zone_sides_royal_mag_lib_b_cid   @ 0804c230 0348
     cmp r1,r0                                @ 0804c232 8142
     beq LAB_0804c2ca                         @ 0804c234 49d0
     cmp r1,r0                                @ 0804c236 8142
@@ -7065,15 +7065,15 @@ LAB_0804c230:
     subs r0,#0x70    @ 0804c23a 7038
     b LAB_0804c2b8                           @ 0804c23c 3ce0
     .zero  0x2
-DAT_0804c240:
-    .word  0x0000161a                     @ 0804c240 1a160000
+zone_sides_royal_mag_lib_b_cid:
+    .word  ROYAL_MAGICAL_LIBRARY_CID      @ 0804c240 1a160000
 LAB_0804c244:
-    ldr r0, DAT_0804c248                     @ 0804c244 0048
+    ldr r0, zone_sides_jar_robber_cid        @ 0804c244 0048
     b LAB_0804c286                           @ 0804c246 1ee0
-DAT_0804c248:
-    .word  0x0000162a                     @ 0804c248 2a160000
+zone_sides_jar_robber_cid:
+    .word  JAR_ROBBER_CID                 @ 0804c248 2a160000
 LAB_0804c24c:
-    ldr r0, DAT_0804c26c                     @ 0804c24c 0748
+    ldr r0, zone_sides_card7_cid             @ 0804c24c 0748
     cmp r1,r0                                @ 0804c24e 8142
     beq LAB_0804c2dc                         @ 0804c250 44d0
     cmp r1,r0                                @ 0804c252 8142
@@ -7089,10 +7089,10 @@ LAB_0804c24c:
     adds r0,#0x7    @ 0804c266 0730
     b LAB_0804c286                           @ 0804c268 0de0
     .zero  0x2
-DAT_0804c26c:
-    .word  0x000017a5                     @ 0804c26c a5170000
+zone_sides_card7_cid:
+    .word  CARD_7_CID                     @ 0804c26c a5170000
 LAB_0804c270:
-    ldr r0, DAT_0804c280                     @ 0804c270 0348
+    ldr r0, zone_sides_corpse_yata_cid       @ 0804c270 0348
     cmp r1,r0                                @ 0804c272 8142
     beq LAB_0804c2ca                         @ 0804c274 29d0
     cmp r1,r0                                @ 0804c276 8142
@@ -7100,18 +7100,18 @@ LAB_0804c270:
     subs r0,#0x2    @ 0804c27a 0238
     b LAB_0804c286                           @ 0804c27c 03e0
     .zero  0x2
-DAT_0804c280:
-    .word  0x00001776                     @ 0804c280 76170000
+zone_sides_corpse_yata_cid:
+    .word  CORPSE_OF_YATA_GARASU_CID      @ 0804c280 76170000
 LAB_0804c284:
-    ldr r0, DAT_0804c28c                     @ 0804c284 0148
+    ldr r0, check_equip_set_g_cid_1790       @ 0804c284 0148
 LAB_0804c286:
     cmp r1,r0                                @ 0804c286 8142
     beq LAB_0804c2ca                         @ 0804c288 1fd0
     b LAB_0804c2dc                           @ 0804c28a 27e0
-DAT_0804c28c:
-    .word  0x00001790                     @ 0804c28c 90170000
+check_equip_set_g_cid_1790:
+    .word  0x00001790                     @ 0804c28c 90170000  gap cid 0x1790; between Sand_Gambler(0x178f) Ghost_Knight(0x1791); conf low
 LAB_0804c290:
-    ldr r0, DAT_0804c2a8                     @ 0804c290 0548
+    ldr r0, zone_sides_good_goblin_hk_cid    @ 0804c290 0548
     cmp r1,r0                                @ 0804c292 8142
     beq LAB_0804c2ca                         @ 0804c294 19d0
     cmp r1,r0                                @ 0804c296 8142
@@ -7123,10 +7123,10 @@ LAB_0804c290:
     bgt LAB_0804c2dc                         @ 0804c2a2 1bdc
     subs r0,#0xe    @ 0804c2a4 0e38
     b LAB_0804c2b8                           @ 0804c2a6 07e0
-DAT_0804c2a8:
-    .word  0x00001888                     @ 0804c2a8 88180000
+zone_sides_good_goblin_hk_cid:
+    .word  GOOD_GOBLIN_HOUSEKEEPING_CID   @ 0804c2a8 88180000
 LAB_0804c2ac:
-    ldr r0, DAT_0804c2c0                     @ 0804c2ac 0448
+    ldr r0, zone_sides_pot_of_avarice_cid    @ 0804c2ac 0448
     cmp r1,r0                                @ 0804c2ae 8142
     beq LAB_0804c2ca                         @ 0804c2b0 0bd0
     cmp r1,r0                                @ 0804c2b2 8142
@@ -7137,18 +7137,18 @@ LAB_0804c2b8:
     beq LAB_0804c2d4                         @ 0804c2ba 0bd0
     b LAB_0804c2dc                           @ 0804c2bc 0ee0
     .zero  0x2
-DAT_0804c2c0:
-    .word  0x0000196f                     @ 0804c2c0 6f190000
+zone_sides_pot_of_avarice_cid:
+    .word  POT_OF_AVARICE_CID             @ 0804c2c0 6f190000
 LAB_0804c2c4:
-    ldr r0, DAT_0804c2d0                     @ 0804c2c4 0248
+    ldr r0, zone_sides_magical_mallet_cid    @ 0804c2c4 0248
     cmp r1,r0                                @ 0804c2c6 8142
     bne LAB_0804c2dc                         @ 0804c2c8 08d1
 LAB_0804c2ca:
     movs r0,#0x1    @ 0804c2ca 0120
     b LAB_0804c2de                           @ 0804c2cc 07e0
     .zero  0x2
-DAT_0804c2d0:
-    .word  0x0000198d                     @ 0804c2d0 8d190000
+zone_sides_magical_mallet_cid:
+    .word  MAGICAL_MALLET_CID             @ 0804c2d0 8d190000
 LAB_0804c2d4:
     movs r0,#0x2    @ 0804c2d4 0220
     b LAB_0804c2de                           @ 0804c2d6 02e0
@@ -7168,7 +7168,7 @@ LAB_0804c2de:
 @ Constants: ANCHOR_ROOT=0x159d, ANCHOR_B=0x1302, ANCHOR_C=0x14c7, ANCHOR_D=0x17c2, ANCHOR_E=0x183a, ANCHOR_F=0x1936.
 check_card_id_is_equip_set_g:
     adds r1,r0,#0x0    @ 0804c2e0 011c
-    ldr r0, DAT_0804c304                     @ 0804c2e2 0848
+    ldr r0, equip_set_g_necrovalley_cid      @ 0804c2e2 0848
     cmp r1,r0                                @ 0804c2e4 8142
     beq LAB_0804c380                         @ 0804c2e6 4bd0
     cmp r1,r0                                @ 0804c2e8 8142
@@ -7178,24 +7178,24 @@ check_card_id_is_equip_set_g:
     beq LAB_0804c380                         @ 0804c2f0 46d0
     cmp r1,r0                                @ 0804c2f2 8142
     bgt LAB_0804c314                         @ 0804c2f4 0edc
-    ldr r0, DAT_0804c308                     @ 0804c2f6 0448
+    ldr r0, equip_set_g_royal_decree_cid     @ 0804c2f6 0448
     cmp r1,r0                                @ 0804c2f8 8142
     beq LAB_0804c380                         @ 0804c2fa 41d0
     cmp r1,r0                                @ 0804c2fc 8142
     bgt LAB_0804c30c                         @ 0804c2fe 05dc
     subs r0,#0x6c    @ 0804c300 6c38
     b LAB_0804c368                           @ 0804c302 31e0
-DAT_0804c304:
-    .word  0x0000159d                     @ 0804c304 9d150000
-DAT_0804c308:
-    .word  0x00001302                     @ 0804c308 02130000
+equip_set_g_necrovalley_cid:
+    .word  NECROVALLEY_CID                @ 0804c304 9d150000
+equip_set_g_royal_decree_cid:
+    .word  ROYAL_DECREE_CID               @ 0804c308 02130000
 LAB_0804c30c:
-    ldr r0, DAT_0804c310                     @ 0804c30c 0048
+    ldr r0, equip_set_g_ryu_senshi_b_cid     @ 0804c30c 0048
     b LAB_0804c368                           @ 0804c30e 2be0
-DAT_0804c310:
-    .word  0x000014c7                     @ 0804c310 c7140000
+equip_set_g_ryu_senshi_b_cid:
+    .word  RYU_SENSHI_CID                 @ 0804c310 c7140000
 LAB_0804c314:
-    ldr r0, DAT_0804c324                     @ 0804c314 0348
+    ldr r0, equip_set_g_dragons_bead_cid     @ 0804c314 0348
     cmp r1,r0                                @ 0804c316 8142
     beq LAB_0804c380                         @ 0804c318 32d0
     cmp r1,r0                                @ 0804c31a 8142
@@ -7203,19 +7203,19 @@ LAB_0804c314:
     subs r0,#0x4    @ 0804c31e 0438
     b LAB_0804c368                           @ 0804c320 22e0
     .zero  0x2
-DAT_0804c324:
-    .word  0x000014de                     @ 0804c324 de140000
+equip_set_g_dragons_bead_cid:
+    .word  THE_DRAGONS_BEAD_CID           @ 0804c324 de140000
 LAB_0804c328:
-    ldr r0, DAT_0804c334                     @ 0804c328 0248
+    ldr r0, equip_set_g_great_dezard_cid     @ 0804c328 0248
     cmp r1,r0                                @ 0804c32a 8142
     beq LAB_0804c380                         @ 0804c32c 28d0
     adds r0,#0xb    @ 0804c32e 0b30
     b LAB_0804c368                           @ 0804c330 1ae0
     .zero  0x2
-DAT_0804c334:
-    .word  0x00001529                     @ 0804c334 29150000
+equip_set_g_great_dezard_cid:
+    .word  GREAT_DEZARD_CID               @ 0804c334 29150000
 LAB_0804c338:
-    ldr r0, DAT_0804c350                     @ 0804c338 0548
+    ldr r0, equip_set_g_beshd_cid            @ 0804c338 0548
     cmp r1,r0                                @ 0804c33a 8142
     beq LAB_0804c380                         @ 0804c33c 20d0
     cmp r1,r0                                @ 0804c33e 8142
@@ -7227,15 +7227,15 @@ LAB_0804c338:
     bgt LAB_0804c354                         @ 0804c34a 03dc
     subs r0,#0x32    @ 0804c34c 3238
     b LAB_0804c368                           @ 0804c34e 0be0
-DAT_0804c350:
-    .word  0x000017c2                     @ 0804c350 c2170000
+equip_set_g_beshd_cid:
+    .word  BLUE_EYES_SHINING_DRAGON_CID   @ 0804c350 c2170000
 LAB_0804c354:
-    ldr r0, DAT_0804c358                     @ 0804c354 0048
+    ldr r0, equip_set_g_end_of_anubis_cid    @ 0804c354 0048
     b LAB_0804c368                           @ 0804c356 07e0
-DAT_0804c358:
-    .word  0x000017b9                     @ 0804c358 b9170000
+equip_set_g_end_of_anubis_cid:
+    .word  THE_END_OF_ANUBIS_CID          @ 0804c358 b9170000
 LAB_0804c35c:
-    ldr r0, DAT_0804c370                     @ 0804c35c 0448
+    ldr r0, equip_set_g_a_team_trap_cid      @ 0804c35c 0448
     cmp r1,r0                                @ 0804c35e 8142
     beq LAB_0804c380                         @ 0804c360 0ed0
     cmp r1,r0                                @ 0804c362 8142
@@ -7246,10 +7246,10 @@ LAB_0804c368:
     beq LAB_0804c380                         @ 0804c36a 09d0
     b LAB_0804c388                           @ 0804c36c 0ce0
     .zero  0x2
-DAT_0804c370:
-    .word  0x0000183a                     @ 0804c370 3a180000
+equip_set_g_a_team_trap_cid:
+    .word  A_TEAM_TRAP_DISPOSAL_UNIT_CID  @ 0804c370 3a180000
 LAB_0804c374:
-    ldr r0, DAT_0804c384                     @ 0804c374 0348
+    ldr r0, equip_set_g_alkana_joker_cid     @ 0804c374 0348
     cmp r1,r0                                @ 0804c376 8142
     beq LAB_0804c380                         @ 0804c378 02d0
     adds r0,#0x90    @ 0804c37a 9030
@@ -7258,17 +7258,17 @@ LAB_0804c374:
 LAB_0804c380:
     movs r0,#0x1    @ 0804c380 0120
     b LAB_0804c38a                           @ 0804c382 02e0
-DAT_0804c384:
-    .word  0x00001936                     @ 0804c384 36190000
+equip_set_g_alkana_joker_cid:
+    .word  ALKANA_KNIGHT_JOKER_CID        @ 0804c384 36190000
 LAB_0804c388:
     movs r0,#0x0    @ 0804c388 0020
 LAB_0804c38a:
     bx lr                                    @ 0804c38a 7047
 
-@ Large BST: classifies card_id r0 into 3 summon/effect categories. Returns 0 = no category (not in any known range), 1 = category-1 (primary range including up to 0x1631), 2 = category-2 (special subset e.g. 0x19c0/0x19d7). Used by check_effect_slot_summon_path_eligible (FUN_0803088c) to decide activation path. r0=u16 card_id [0..0x1fff]. Returns u32 category [0..2]. Constants: upper_bound=0x1631, special_card=0x1488; exit labels: LAB_0804c6be->1, LAB_0804c6c2->2, LAB_0804c6c6->0.
+@ Large BST: classifies card_id r0 into 3 summon/effect categories. Returns 0=no category, 1=category-1 (primary range up to 0x1631=MIRACLE_RESTORING_CID), 2=category-2 (special subset). Used by check_effect_slot_summon_path_eligible (0x0803088c) to decide activation path. r0=u16 card_id. Returns u32 category [0..2].
 classify_card_id_summon_category:
     adds r1,r0,#0x0    @ 0804c38c 011c
-    ldr r0, DAT_0804c3d4                     @ 0804c38e 1148
+    ldr r0, summon_cat_miracle_restoring_cid @ 0804c38e 1148
     cmp r1,r0                                @ 0804c390 8142
     ble LAB_0804c396                         @ 0804c392 00dd
     b LAB_0804c538                           @ 0804c394 d0e0
@@ -7278,14 +7278,14 @@ LAB_0804c396:
     blt LAB_0804c39e                         @ 0804c39a 00db
     b LAB_0804c6be                           @ 0804c39c 8fe1
 LAB_0804c39e:
-    ldr r0, DAT_0804c3d8                     @ 0804c39e 0e48
+    ldr r0, summon_cat_gilasaurus_cid        @ 0804c39e 0e48
     cmp r1,r0                                @ 0804c3a0 8142
     bne LAB_0804c3a6                         @ 0804c3a2 00d1
     b LAB_0804c6be                           @ 0804c3a4 8be1
 LAB_0804c3a6:
     cmp r1,r0                                @ 0804c3a6 8142
     bgt LAB_0804c474                         @ 0804c3a8 64dc
-    ldr r0, DAT_0804c3dc                     @ 0804c3aa 0c48
+    ldr r0, summon_cat_premature_burial_cid  @ 0804c3aa 0c48
     cmp r1,r0                                @ 0804c3ac 8142
     bgt LAB_0804c418                         @ 0804c3ae 33dc
     subs r0,#0x1    @ 0804c3b0 0138
@@ -7300,7 +7300,7 @@ LAB_0804c3b8:
 LAB_0804c3c0:
     cmp r1,r0                                @ 0804c3c0 8142
     bgt LAB_0804c3f4                         @ 0804c3c2 17dc
-    ldr r0, DAT_0804c3e0                     @ 0804c3c4 0648
+    ldr r0, summon_cat_penguin_knight_cid    @ 0804c3c4 0648
     cmp r1,r0                                @ 0804c3c6 8142
     bne LAB_0804c3cc                         @ 0804c3c8 00d1
     b LAB_0804c6be                           @ 0804c3ca 78e1
@@ -7309,26 +7309,26 @@ LAB_0804c3cc:
     bgt LAB_0804c3e4                         @ 0804c3ce 09dc
     subs r0,#0x61    @ 0804c3d0 6138
     b LAB_0804c6a6                           @ 0804c3d2 68e1
-DAT_0804c3d4:
-    .word  0x00001631                     @ 0804c3d4 31160000
-DAT_0804c3d8:
-    .word  0x00001488                     @ 0804c3d8 88140000
-DAT_0804c3dc:
-    .word  0x00001366                     @ 0804c3dc 66130000
-DAT_0804c3e0:
-    .word  0x0000106d                     @ 0804c3e0 6d100000
+summon_cat_miracle_restoring_cid:
+    .word  MIRACLE_RESTORING_CID          @ 0804c3d4 31160000
+summon_cat_gilasaurus_cid:
+    .word  GILASAURUS_CID                 @ 0804c3d8 88140000
+summon_cat_premature_burial_cid:
+    .word  PREMATURE_BURIAL_CID           @ 0804c3dc 66130000
+summon_cat_penguin_knight_cid:
+    .word  PENGUIN_KNIGHT_CID             @ 0804c3e0 6d100000
 LAB_0804c3e4:
-    ldr r0, DAT_0804c3f0                     @ 0804c3e4 0248
+    ldr r0, summon_cat_monster_eye_cid       @ 0804c3e4 0248
     cmp r1,r0                                @ 0804c3e6 8142
     bne LAB_0804c3ec                         @ 0804c3e8 00d1
     b LAB_0804c6be                           @ 0804c3ea 68e1
 LAB_0804c3ec:
     adds r0,#0x1a    @ 0804c3ec 1a30
     b LAB_0804c6a6                           @ 0804c3ee 5ae1
-DAT_0804c3f0:
-    .word  0x00001138                     @ 0804c3f0 38110000
+summon_cat_monster_eye_cid:
+    .word  MONSTER_EYE_CID                @ 0804c3f0 38110000
 LAB_0804c3f4:
-    ldr r0, DAT_0804c404                     @ 0804c3f4 0348
+    ldr r0, summon_cat_monster_reborn_cid    @ 0804c3f4 0348
     cmp r1,r0                                @ 0804c3f6 8142
     bne LAB_0804c3fc                         @ 0804c3f8 00d1
     b LAB_0804c6be                           @ 0804c3fa 60e1
@@ -7337,20 +7337,20 @@ LAB_0804c3fc:
     bgt LAB_0804c408                         @ 0804c3fe 03dc
     subs r0,#0x30    @ 0804c400 3038
     b LAB_0804c6a6                           @ 0804c402 50e1
-DAT_0804c404:
-    .word  0x000012ea                     @ 0804c404 ea120000
+summon_cat_monster_reborn_cid:
+    .word  MONSTER_REBORN_CID             @ 0804c404 ea120000
 LAB_0804c408:
-    ldr r0, DAT_0804c414                     @ 0804c408 0248
+    ldr r0, summon_cat_spear_cretin_cid      @ 0804c408 0248
     cmp r1,r0                                @ 0804c40a 8142
     bne LAB_0804c410                         @ 0804c40c 00d1
     b LAB_0804c6c2                           @ 0804c40e 58e1
 LAB_0804c410:
     adds r0,#0x1e    @ 0804c410 1e30
     b LAB_0804c6a6                           @ 0804c412 48e1
-DAT_0804c414:
-    .word  0x0000133b                     @ 0804c414 3b130000
+summon_cat_spear_cretin_cid:
+    .word  SPEAR_CRETIN_CID               @ 0804c414 3b130000
 LAB_0804c418:
-    ldr r0, DAT_0804c434                     @ 0804c418 0648
+    ldr r0, summon_cat_de_fusion_cid         @ 0804c418 0648
     cmp r1,r0                                @ 0804c41a 8142
     bne LAB_0804c420                         @ 0804c41c 00d1
     b LAB_0804c6c6                           @ 0804c41e 52e1
@@ -7366,20 +7366,20 @@ LAB_0804c42c:
     bgt LAB_0804c438                         @ 0804c42e 03dc
     subs r0,#0x4    @ 0804c430 0438
     b LAB_0804c6a6                           @ 0804c432 38e1
-DAT_0804c434:
-    .word  0x000013fe                     @ 0804c434 fe130000
+summon_cat_de_fusion_cid:
+    .word  DE_FUSION_CID                  @ 0804c434 fe130000
 LAB_0804c438:
-    ldr r0, DAT_0804c444                     @ 0804c438 0248
+    ldr r0, summon_cat_valkyrion_cid         @ 0804c438 0248
     cmp r1,r0                                @ 0804c43a 8142
     bne LAB_0804c440                         @ 0804c43c 00d1
     b LAB_0804c6be                           @ 0804c43e 3ee1
 LAB_0804c440:
     adds r0,#0x6b    @ 0804c440 6b30
     b LAB_0804c6a6                           @ 0804c442 30e1
-DAT_0804c444:
-    .word  0x0000138a                     @ 0804c444 8a130000
+summon_cat_valkyrion_cid:
+    .word  VALKYRION_THE_MAGNA_WARRIOR_CID @ 0804c444 8a130000
 LAB_0804c448:
-    ldr r0, DAT_0804c460                     @ 0804c448 0548
+    ldr r0, get_card_effect_zone_sides_cid_144c @ 0804c448 0548
     cmp r1,r0                                @ 0804c44a 8142
     bne LAB_0804c450                         @ 0804c44c 00d1
     b LAB_0804c6c2                           @ 0804c44e 38e1
@@ -7393,20 +7393,20 @@ LAB_0804c450:
 LAB_0804c45c:
     adds r0,#0x34    @ 0804c45c 3430
     b LAB_0804c65c                           @ 0804c45e fde0
-DAT_0804c460:
-    .word  0x0000144c                     @ 0804c460 4c140000
+get_card_effect_zone_sides_cid_144c:
+    .word  0x0000144c                     @ 0804c460 4c140000  gap cid 0x144c; between Amazon_Archer(0x144b) Fire_Princess(0x144d); conf low
 LAB_0804c464:
-    ldr r0, DAT_0804c470                     @ 0804c464 0248
+    ldr r0, get_card_effect_zone_sides_cid_1452 @ 0804c464 0248
     cmp r1,r0                                @ 0804c466 8142
     bne LAB_0804c46c                         @ 0804c468 00d1
     b LAB_0804c6c2                           @ 0804c46a 2ae1
 LAB_0804c46c:
     b LAB_0804c65a                           @ 0804c46c f5e0
     .zero  0x2
-DAT_0804c470:
-    .word  0x00001452                     @ 0804c470 52140000
+get_card_effect_zone_sides_cid_1452:
+    .word  0x00001452                     @ 0804c470 52140000  gap cid 0x1452; between Dancing_Fairy(0x1451) Empress_Mantis(0x1453); conf low
 LAB_0804c474:
-    ldr r0, DAT_0804c4a0                     @ 0804c474 0a48
+    ldr r0, classify_summon_cat_cid_1549     @ 0804c474 0a48
     cmp r1,r0                                @ 0804c476 8142
     bne LAB_0804c47c                         @ 0804c478 00d1
     b LAB_0804c6c2                           @ 0804c47a 22e1
@@ -7431,20 +7431,20 @@ LAB_0804c496:
     subs r0,#0x1c    @ 0804c49a 1c38
     b LAB_0804c6a6                           @ 0804c49c 03e1
     .zero  0x2
-DAT_0804c4a0:
-    .word  0x00001549                     @ 0804c4a0 49150000
+classify_summon_cat_cid_1549:
+    .word  0x00001549                     @ 0804c4a0 49150000  gap cid 0x1549; between Reckless_Greed(0x1548) Toon_DMG(0x154a); conf low
 LAB_0804c4a4:
-    ldr r0, DAT_0804c4b0                     @ 0804c4a4 0248
+    ldr r0, summon_cat_warrior_ret_alive_cid @ 0804c4a4 0248
     cmp r1,r0                                @ 0804c4a6 8142
     bne LAB_0804c4ac                         @ 0804c4a8 00d1
     b LAB_0804c6be                           @ 0804c4aa 08e1
 LAB_0804c4ac:
     adds r0,#0x18    @ 0804c4ac 1830
     b LAB_0804c6a6                           @ 0804c4ae fae0
-DAT_0804c4b0:
-    .word  0x000014d2                     @ 0804c4b0 d2140000
+summon_cat_warrior_ret_alive_cid:
+    .word  THE_WARRIOR_RETURNING_ALIVE_CID @ 0804c4b0 d2140000
 LAB_0804c4b4:
-    ldr r0, DAT_0804c4d4                     @ 0804c4b4 0748
+    ldr r0, summon_cat_fiber_jar_cid         @ 0804c4b4 0748
     cmp r1,r0                                @ 0804c4b6 8142
     bne LAB_0804c4bc                         @ 0804c4b8 00d1
     b LAB_0804c6be                           @ 0804c4ba 00e1
@@ -7463,15 +7463,15 @@ LAB_0804c4c8:
 LAB_0804c4d0:
     b LAB_0804c6be                           @ 0804c4d0 f5e0
     .zero  0x2
-DAT_0804c4d4:
-    .word  0x000014fb                     @ 0804c4d4 fb140000
+summon_cat_fiber_jar_cid:
+    .word  FIBER_JAR_CID                  @ 0804c4d4 fb140000
 LAB_0804c4d8:
-    ldr r0, DAT_0804c4dc                     @ 0804c4d8 0048
+    ldr r0, summon_cat_fushioh_richie_cid    @ 0804c4d8 0048
     b LAB_0804c65c                           @ 0804c4da bfe0
-DAT_0804c4dc:
-    .word  0x00001534                     @ 0804c4dc 34150000
+summon_cat_fushioh_richie_cid:
+    .word  FUSHIOH_RICHIE_CID             @ 0804c4dc 34150000
 LAB_0804c4e0:
-    ldr r0, DAT_0804c4fc                     @ 0804c4e0 0648
+    ldr r0, summon_cat_autonomous_unit_cid   @ 0804c4e0 0648
     cmp r1,r0                                @ 0804c4e2 8142
     bne LAB_0804c4e8                         @ 0804c4e4 00d1
     b LAB_0804c6be                           @ 0804c4e6 eae0
@@ -7487,20 +7487,20 @@ LAB_0804c4f4:
     bgt LAB_0804c500                         @ 0804c4f6 03dc
     subs r0,#0x3    @ 0804c4f8 0338
     b LAB_0804c6a6                           @ 0804c4fa d4e0
-DAT_0804c4fc:
-    .word  0x000015e6                     @ 0804c4fc e6150000
+summon_cat_autonomous_unit_cid:
+    .word  AUTONOMOUS_ACTION_UNIT_CID     @ 0804c4fc e6150000
 LAB_0804c500:
-    ldr r0, DAT_0804c50c                     @ 0804c500 0248
+    ldr r0, summon_cat_mystical_kof_jackal_cid @ 0804c500 0248
     cmp r1,r0                                @ 0804c502 8142
     bne LAB_0804c508                         @ 0804c504 00d1
     b LAB_0804c6c6                           @ 0804c506 dee0
 LAB_0804c508:
     adds r0,#0x3    @ 0804c508 0330
     b LAB_0804c6c6                           @ 0804c50a dce0
-DAT_0804c50c:
-    .word  0x0000158f                     @ 0804c50c 8f150000
+summon_cat_mystical_kof_jackal_cid:
+    .word  MYSTICAL_KNIGHT_OF_JACKAL_CID  @ 0804c50c 8f150000
 LAB_0804c510:
-    ldr r0, DAT_0804c524                     @ 0804c510 0448
+    ldr r0, summon_cat_skilled_dark_mag_cid  @ 0804c510 0448
     cmp r1,r0                                @ 0804c512 8142
     bgt LAB_0804c528                         @ 0804c514 08dc
     subs r0,#0x1    @ 0804c516 0138
@@ -7511,20 +7511,20 @@ LAB_0804c51e:
     subs r0,#0x13    @ 0804c51e 1338
     b LAB_0804c6a6                           @ 0804c520 c1e0
     .zero  0x2
-DAT_0804c524:
-    .word  0x00001611                     @ 0804c524 11160000
+summon_cat_skilled_dark_mag_cid:
+    .word  SKILLED_DARK_MAGICIAN_CID      @ 0804c524 11160000
 LAB_0804c528:
-    ldr r0, DAT_0804c534                     @ 0804c528 0248
+    ldr r0, classify_summon_cat_cid_1616     @ 0804c528 0248
     cmp r1,r0                                @ 0804c52a 8142
     bne LAB_0804c530                         @ 0804c52c 00d1
     b LAB_0804c6be                           @ 0804c52e c6e0
 LAB_0804c530:
     adds r0,#0x13    @ 0804c530 1330
     b LAB_0804c6c6                           @ 0804c532 c8e0
-DAT_0804c534:
-    .word  0x00001616                     @ 0804c534 16160000
+classify_summon_cat_cid_1616:
+    .word  0x00001616                     @ 0804c534 16160000  gap cid 0x1616; between Magical_Marionette(0x1615) Breaker(0x1617); conf low
 LAB_0804c538:
-    ldr r0, DAT_0804c56c                     @ 0804c538 0c48
+    ldr r0, summon_cat_night_assailant_cid   @ 0804c538 0c48
     cmp r1,r0                                @ 0804c53a 8142
     bne LAB_0804c540                         @ 0804c53c 00d1
     b LAB_0804c6c2                           @ 0804c53e c0e0
@@ -7554,20 +7554,20 @@ LAB_0804c564:
     bgt LAB_0804c570                         @ 0804c566 03dc
     subs r0,#0x12    @ 0804c568 1238
     b LAB_0804c6a6                           @ 0804c56a 9ce0
-DAT_0804c56c:
-    .word  0x0000179a                     @ 0804c56c 9a170000
+summon_cat_night_assailant_cid:
+    .word  NIGHT_ASSAILANT_CID            @ 0804c56c 9a170000
 LAB_0804c570:
-    ldr r0, DAT_0804c57c                     @ 0804c570 0248
+    ldr r0, summon_cat_equip_chain_max_cid   @ 0804c570 0248
     cmp r1,r0                                @ 0804c572 8142
     bne LAB_0804c578                         @ 0804c574 00d1
     b LAB_0804c6be                           @ 0804c576 a2e0
 LAB_0804c578:
     adds r0,#0x15    @ 0804c578 1530
     b LAB_0804c6a6                           @ 0804c57a 94e0
-DAT_0804c57c:
-    .word  0x0000164f                     @ 0804c57c 4f160000
+summon_cat_equip_chain_max_cid:
+    .word  EQUIP_CHAIN_PAIR_CARD_MAX      @ 0804c57c 4f160000
 LAB_0804c580:
-    ldr r0, DAT_0804c598                     @ 0804c580 0548
+    ldr r0, summon_cat_equip_lock_a_cid      @ 0804c580 0548
     cmp r1,r0                                @ 0804c582 8142
     bne LAB_0804c588                         @ 0804c584 00d1
     b LAB_0804c6be                           @ 0804c586 9ae0
@@ -7581,20 +7581,20 @@ LAB_0804c588:
 LAB_0804c594:
     adds r0,#0x9    @ 0804c594 0930
     b LAB_0804c6a6                           @ 0804c596 86e0
-DAT_0804c598:
-    .word  0x000016a4                     @ 0804c598 a4160000
+summon_cat_equip_lock_a_cid:
+    .word  EQUIP_LOCK_A_CID               @ 0804c598 a4160000
 LAB_0804c59c:
-    ldr r0, DAT_0804c5a8                     @ 0804c59c 0248
+    ldr r0, summon_cat_ray_of_hope_cid       @ 0804c59c 0248
     cmp r1,r0                                @ 0804c59e 8142
     bne LAB_0804c5a4                         @ 0804c5a0 00d1
     b LAB_0804c6be                           @ 0804c5a2 8ce0
 LAB_0804c5a4:
     adds r0,#0x14    @ 0804c5a4 1430
     b LAB_0804c6a6                           @ 0804c5a6 7ee0
-DAT_0804c5a8:
-    .word  0x000016a8                     @ 0804c5a8 a8160000
+summon_cat_ray_of_hope_cid:
+    .word  RAY_OF_HOPE_CID                @ 0804c5a8 a8160000
 LAB_0804c5ac:
-    ldr r0, DAT_0804c5c8                     @ 0804c5ac 0648
+    ldr r0, summon_cat_the_kick_man_cid      @ 0804c5ac 0648
     cmp r1,r0                                @ 0804c5ae 8142
     bne LAB_0804c5b4                         @ 0804c5b0 00d1
     b LAB_0804c6be                           @ 0804c5b2 84e0
@@ -7610,20 +7610,20 @@ LAB_0804c5c0:
     bgt LAB_0804c5cc                         @ 0804c5c2 03dc
     subs r0,#0x23    @ 0804c5c4 2338
     b LAB_0804c6a6                           @ 0804c5c6 6ee0
-DAT_0804c5c8:
-    .word  0x00001745                     @ 0804c5c8 45170000
+summon_cat_the_kick_man_cid:
+    .word  THE_KICK_MAN_CID               @ 0804c5c8 45170000
 LAB_0804c5cc:
-    ldr r0, DAT_0804c5d8                     @ 0804c5cc 0248
+    ldr r0, summon_cat_dedic_light_dark_cid  @ 0804c5cc 0248
     cmp r1,r0                                @ 0804c5ce 8142
     bne LAB_0804c5d4                         @ 0804c5d0 00d1
     b LAB_0804c6c6                           @ 0804c5d2 78e0
 LAB_0804c5d4:
     adds r0,#0x1    @ 0804c5d4 0130
     b LAB_0804c6a6                           @ 0804c5d6 66e0
-DAT_0804c5d8:
-    .word  0x00001713                     @ 0804c5d8 13170000
+summon_cat_dedic_light_dark_cid:
+    .word  DEDICATION_THROUGH_LIGHT_DARK_CID @ 0804c5d8 13170000
 LAB_0804c5dc:
-    ldr r0, DAT_0804c5f0                     @ 0804c5dc 0448
+    ldr r0, summon_cat_aswan_apparition_cid  @ 0804c5dc 0448
     cmp r1,r0                                @ 0804c5de 8142
     beq LAB_0804c6be                         @ 0804c5e0 6dd0
     cmp r1,r0                                @ 0804c5e2 8142
@@ -7633,19 +7633,19 @@ LAB_0804c5dc:
     beq LAB_0804c6be                         @ 0804c5ea 68d0
     adds r0,#0x1f    @ 0804c5ec 1f30
     b LAB_0804c6a6                           @ 0804c5ee 5ae0
-DAT_0804c5f0:
-    .word  0x0000178a                     @ 0804c5f0 8a170000
+summon_cat_aswan_apparition_cid:
+    .word  ASWAN_APPARITION_CID           @ 0804c5f0 8a170000
 LAB_0804c5f4:
-    ldr r0, DAT_0804c600                     @ 0804c5f4 0248
+    ldr r0, summon_cat_nubian_guard_cid      @ 0804c5f4 0248
     cmp r1,r0                                @ 0804c5f6 8142
     beq LAB_0804c6be                         @ 0804c5f8 61d0
     adds r0,#0x9    @ 0804c5fa 0930
     b LAB_0804c6a6                           @ 0804c5fc 53e0
     .zero  0x2
-DAT_0804c600:
-    .word  0x0000178c                     @ 0804c600 8c170000
+summon_cat_nubian_guard_cid:
+    .word  NUBIAN_GUARD_CID               @ 0804c600 8c170000
 LAB_0804c604:
-    ldr r0, DAT_0804c628                     @ 0804c604 0848
+    ldr r0, summon_cat_re_fusion_cid         @ 0804c604 0848
     cmp r1,r0                                @ 0804c606 8142
     bgt LAB_0804c668                         @ 0804c608 2edc
     subs r0,#0x1    @ 0804c60a 0138
@@ -7663,19 +7663,19 @@ LAB_0804c604:
     bgt LAB_0804c62c                         @ 0804c622 03dc
     subs r0,#0x15    @ 0804c624 1538
     b LAB_0804c6a6                           @ 0804c626 3ee0
-DAT_0804c628:
-    .word  0x00001881                     @ 0804c628 81180000
+summon_cat_re_fusion_cid:
+    .word  RE_FUSION_CID                  @ 0804c628 81180000
 LAB_0804c62c:
-    ldr r0, DAT_0804c638                     @ 0804c62c 0248
+    ldr r0, summon_cat_dark_factory_mprod_cid @ 0804c62c 0248
     cmp r1,r0                                @ 0804c62e 8142
     beq LAB_0804c6be                         @ 0804c630 45d0
     adds r0,#0x6    @ 0804c632 0630
     b LAB_0804c6a6                           @ 0804c634 37e0
     .zero  0x2
-DAT_0804c638:
-    .word  0x000017f1                     @ 0804c638 f1170000
+summon_cat_dark_factory_mprod_cid:
+    .word  DARK_FACTORY_MASS_PROD_CID     @ 0804c638 f1170000
 LAB_0804c63c:
-    ldr r0, DAT_0804c650                     @ 0804c63c 0448
+    ldr r0, summon_cat_behemoth_king_cid     @ 0804c63c 0448
     cmp r1,r0                                @ 0804c63e 8142
     beq LAB_0804c6be                         @ 0804c640 3dd0
     cmp r1,r0                                @ 0804c642 8142
@@ -7685,10 +7685,10 @@ LAB_0804c63c:
     beq LAB_0804c6be                         @ 0804c64a 38d0
     adds r0,#0x8    @ 0804c64c 0830
     b LAB_0804c6a6                           @ 0804c64e 2ae0
-DAT_0804c650:
-    .word  0x00001864                     @ 0804c650 64180000
+summon_cat_behemoth_king_cid:
+    .word  BEHEMOTH_KING_CID              @ 0804c650 64180000
 LAB_0804c654:
-    ldr r0, DAT_0804c664                     @ 0804c654 0348
+    ldr r0, summon_cat_feather_phoenix_cid   @ 0804c654 0348
     cmp r1,r0                                @ 0804c656 8142
     beq LAB_0804c6be                         @ 0804c658 31d0
 LAB_0804c65a:
@@ -7698,10 +7698,10 @@ LAB_0804c65c:
     beq LAB_0804c6c2                         @ 0804c65e 30d0
     b LAB_0804c6c6                           @ 0804c660 31e0
     .zero  0x2
-DAT_0804c664:
-    .word  0x0000187a                     @ 0804c664 7a180000
+summon_cat_feather_phoenix_cid:
+    .word  A_FEATHER_OF_THE_PHOENIX_CID   @ 0804c664 7a180000
 LAB_0804c668:
-    ldr r0, DAT_0804c680                     @ 0804c668 0548
+    ldr r0, summon_cat_water_dragon_cid      @ 0804c668 0548
     cmp r1,r0                                @ 0804c66a 8142
     beq LAB_0804c6be                         @ 0804c66c 27d0
     cmp r1,r0                                @ 0804c66e 8142
@@ -7713,19 +7713,19 @@ LAB_0804c668:
     bgt LAB_0804c684                         @ 0804c67a 03dc
     subs r0,#0x37    @ 0804c67c 3738
     b LAB_0804c6a6                           @ 0804c67e 12e0
-DAT_0804c680:
-    .word  0x00001951                     @ 0804c680 51190000
+summon_cat_water_dragon_cid:
+    .word  WATER_DRAGON_CID               @ 0804c680 51190000
 LAB_0804c684:
-    ldr r0, DAT_0804c690                     @ 0804c684 0248
+    ldr r0, summon_cat_dark_ruler_vand_cid   @ 0804c684 0248
     cmp r1,r0                                @ 0804c686 8142
     beq LAB_0804c6c2                         @ 0804c688 1bd0
     adds r0,#0x2e    @ 0804c68a 2e30
     b LAB_0804c6a6                           @ 0804c68c 0be0
     .zero  0x2
-DAT_0804c690:
-    .word  0x0000190a                     @ 0804c690 0a190000
+summon_cat_dark_ruler_vand_cid:
+    .word  DARK_RULER_VANDALGYON_CID      @ 0804c690 0a190000
 LAB_0804c694:
-    ldr r0, DAT_0804c6ac                     @ 0804c694 0548
+    ldr r0, summon_cat_roll_out_cid          @ 0804c694 0548
     cmp r1,r0                                @ 0804c696 8142
     beq LAB_0804c6be                         @ 0804c698 11d0
     cmp r1,r0                                @ 0804c69a 8142
@@ -7738,8 +7738,8 @@ LAB_0804c6a6:
     cmp r1,r0                                @ 0804c6a6 8142
     beq LAB_0804c6be                         @ 0804c6a8 09d0
     b LAB_0804c6c6                           @ 0804c6aa 0ce0
-DAT_0804c6ac:
-    .word  0x00001979                     @ 0804c6ac 79190000
+summon_cat_roll_out_cid:
+    .word  ROLL_OUT_CID                   @ 0804c6ac 79190000
 LAB_0804c6b0:
     movs r0,#0xce    @ 0804c6b0 ce20
     lsls r0,r0,#0x5    @ 0804c6b2 4001
@@ -7762,21 +7762,21 @@ LAB_0804c6c8:
 
 @ Maps input card_id to its paired card_id via 6-entry switch. Subtracts 0x164a from card_id to get variant_index; if outside [0..5] return 0. Switch: 0->0x165c, 1->0x165d, 2->0x165e, 3->0x165f, 4->0x1660, 5->0x1661. I.e. card_id 0x164a..0x164f each maps to associated pair ID 0x165c..0x1661. Out-of-range returns 0. r0=u16 card_id [0..0x1fff] (typically 0x164a..0x164f). Returns u16 paired_card_id (0x165c..0x1661) or 0. indeg=5, class D. Constants: variant_base=0x164a, paired_base=0x165c, variant_count=6.
 get_paired_card_id_by_variant:
-    ldr r1, DAT_0804c6e0                     @ 0804c6cc 0449
+    ldr r1, get_paired_card_id_by_variant_base_sub @ 0804c6cc 0449
     adds r0,r0,r1    @ 0804c6ce 4018
     cmp r0,#0x5                              @ 0804c6d0 0528
     bhi switchD_0804c6dc__default            @ 0804c6d2 2dd8
     lsls r0,r0,#0x2    @ 0804c6d4 8000
-    ldr r1, DAT_0804c6e4                     @ 0804c6d6 0349
+    ldr r1, get_paired_card_id_by_variant_table_ptr @ 0804c6d6 0349
     adds r0,r0,r1    @ 0804c6d8 4018
     ldr r0,[r0,#0x0]                         @ 0804c6da 0068
 switchD_0804c6dc__switchD:
     .hword 0x4687    @ 0804c6dc 8746
     .zero  0x2
-DAT_0804c6e0:
-    .word  0xffffe9b6                     @ 0804c6e0 b6e9ffff
-DAT_0804c6e4:
-    .word  0x0804c6e8                     @ 0804c6e4 e8c60408
+get_paired_card_id_by_variant_base_sub:
+    .word  0xffffe9b6                     @ 0804c6e0 b6e9ffff  = -0x164a (negate Guardian_Elma CID range base; r0 -= 0x164a to get variant index)
+get_paired_card_id_by_variant_table_ptr:
+    .word  0x0804c6e8                     @ 0804c6e4 e8c60408  = &switchD_0804c6dc__switchdataD_0804c6e8; pointer to 6-entry jump table
 switchD_0804c6dc__switchdataD_0804c6e8:
     .word  0x0804c700                     @ 0804c6e8 00c70408
     .word  0x0804c708                     @ 0804c6ec 08c70408
