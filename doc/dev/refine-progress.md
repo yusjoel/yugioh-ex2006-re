@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `05_equip_eligibility_a.s` (0x08049014..0x080537c0; 已拆 Seg-1..10 (239 named fn / 1010 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 05 Seg-5 0x4c6e8..0x4d124 (~24 fn, ~65 槽; switchdataD_0804c6e8 跳转表 + slot card sprite row packed 提交簇)。
+> **下一任务**: file 05 Seg-6 0x4d124..0x4ffba (dispatch_card_eligibility_state_machine epilogue + next cluster)。
 
-上次更新: 2026-06-13 **file 05 Seg-4b 完成** (EQ=89/RENAME=10/FUNC_RENAME=0/PLATE=1; card_info.inc +57 new CID; §5.1 +1 orphan 0x4becc/0x54; byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3; Seg-4 全完成 4a+4b). **file 05 Seg-4a 完成** (EQ=95/RENAME=6/SCALAR_EQ=5; card_info.inc +68 (63 B-class CID + 3 inline CID + 2 field6 type); byte-identical 9689337d; no carve/disasm; commit 3155175). **file 05 Seg-3 完成** (EQ=87/REF=2/RENAME=3/FUNC_RENAME=1/PLATE=7; card_info.inc +50 CID; 3 disasm blocks → 5 new THUMB fn; FixF05Seg3SplitLiteralPools (20 DWORD forced) + FixF05Seg3BlockCStubTable (switch table + inline stub); byte-identical 9689337d; fn-ptr +1 periodic fix asm/04 x3; commit bd9ce13). **file 05 Seg-2 完成** (EQ=33/REF=1/card_id_EQ=34/PLATE=4subs; ewram.inc +2 + duel_field.inc +2 + oam_attr.inc +2 + card_info.inc +5; §5.1 +1 orphan 0x4aa5e/0xee; byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3). **file 05 Seg-1 完成** (EQ=99/REF=14/RENAME=39/PLATE=33; card_info.inc +16 CID + oam_attr.inc +21; byte-identical 9689337d; fn-ptr +1 periodic fix 7 slots). file 04 全 10 段完成 ✅ (Seg-10: EQ=87/REF=25/PLATE=8fn; 新建 oam_attr x10 + card_info x26 + duel_field x2; byte-identical 9689337d, commit cb54638)。
+上次更新: 2026-06-13 **file 05 Seg-5 完成** (EQ=67/REF=0/RENAME=8/PLATE=0; card_info.inc +7 CID / oam_attr.inc +2 / ewram.inc +9; §5.1 +3 orphan blocks (0x4c734/0x38, 0x4cca2/0xea, 0x4cdac/0x2c); byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3). **file 05 Seg-4b 完成** (EQ=89/RENAME=10/FUNC_RENAME=0/PLATE=1; card_info.inc +57 new CID; §5.1 +1 orphan 0x4becc/0x54; byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3; Seg-4 全完成 4a+4b). **file 05 Seg-4a 完成** (EQ=95/RENAME=6/SCALAR_EQ=5; card_info.inc +68 (63 B-class CID + 3 inline CID + 2 field6 type); byte-identical 9689337d; no carve/disasm; commit 3155175). **file 05 Seg-3 完成** (EQ=87/REF=2/RENAME=3/FUNC_RENAME=1/PLATE=7; card_info.inc +50 CID; 3 disasm blocks → 5 new THUMB fn; FixF05Seg3SplitLiteralPools (20 DWORD forced) + FixF05Seg3BlockCStubTable (switch table + inline stub); byte-identical 9689337d; fn-ptr +1 periodic fix asm/04 x3; commit bd9ce13). **file 05 Seg-2 完成** (EQ=33/REF=1/card_id_EQ=34/PLATE=4subs; ewram.inc +2 + duel_field.inc +2 + oam_attr.inc +2 + card_info.inc +5; §5.1 +1 orphan 0x4aa5e/0xee; byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3). **file 05 Seg-1 完成** (EQ=99/REF=14/RENAME=39/PLATE=33; card_info.inc +16 CID + oam_attr.inc +21; byte-identical 9689337d; fn-ptr +1 periodic fix 7 slots). file 04 全 10 段完成 ✅ (Seg-10: EQ=87/REF=25/PLATE=8fn; 新建 oam_attr x10 + card_info x26 + duel_field x2; byte-identical 9689337d, commit cb54638)。
 
 ---
 
@@ -24,7 +24,7 @@
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-04-card-zone-sprite.md` |
-| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (4b/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
+| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (5/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |
 | 08 | equip_oam_neodaed | 0x080643e0..0x0806e76c | 未拆 | ⬜ | |
@@ -117,4 +117,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-13 (04 文件 Seg-10 完成: render_slot_card_sprite + zone sprite effect dispatch + lp indicator + setup_equip_slot_sprite_attr_by_card; EQ=87/REF=25/PLATE=8fn; 新建 oam_attr.inc x10 + card_info.inc x26 + duel_field.inc x2; plate FUN_=0/CJK=0; byte-identical 9689337d; file 04 全 10 段完成 ✅; 下一任务 file 05 活动 doc 建立)。
+**上次更新**: 2026-06-13 (file 05 Seg-5 完成: EQ=67/REF=0/RENAME=8/PLATE=0; card_info.inc +7 CID / oam_attr.inc +2 / ewram.inc +9; §5.1 +3 orphan blocks; byte-identical 9689337d; fn-ptr +1 periodic fix asm/03 x4 + asm/04 x3; Seg-5 ✅; 下一任务 Seg-6 0x4d124..0x4ffba)。

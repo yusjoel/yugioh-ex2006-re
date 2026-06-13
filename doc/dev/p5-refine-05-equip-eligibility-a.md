@@ -98,7 +98,7 @@
 | 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | bd9ce13 |
 | 4a | 0x4b4f4..0x4be38 | 10 | 101 | — | ✅ | — |
 | 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | 8a924b3 |
-| 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
+| 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | (pending) |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
@@ -274,6 +274,47 @@ ALKANA_KNIGHT_JOKER / POT_OF_AVARICE / ROLL_OUT / MYTHICAL_BEAST_CERBERUS / MAGI
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **Seg-4 (4a+4b) 全完成** (4a commit 3155175 + 4b this commit)
+
+### 4.05 Seg-5 完成记录 (0x0804c6e8..0x0804d124, 7 fn body, 75 slots)
+
+**函数列表 (7)**:
+- submit_slot_card_sprite_row_entry (0x0804c76c)
+- apply_equip_activation_with_id_lookup (0x0804c910)
+- init_card_sprite_row_entry (0x0804c958)
+- init_card_sprite_row_entry_alt (0x0804caf0)
+- submit_slot_card_sprite_row_packed (0x0804cc8c)
+- check_card_slot_activation_eligible (0x0804cdd8)
+- dispatch_card_eligibility_state_machine (0x0804ce78; body spans into Seg-6 to 0x4d1d2)
+
+Note: switchdataD_0804c6e8 (6-entry jump table for classify_card_id_summon_category caseD) + case stubs occupy 0x4c6e8..0x4c732 (segment prefix from Seg-4b function).
+
+**符号化统计**: EQ=67 / REF=0 / RENAME=8 / FUNC_RENAME=0 / PLATE=0
+
+**新建 constants**:
+- card_info.inc +7 new CID: BUTTERFLY_DAGGER_ELMA_CID (0x165c) / GRAVITY_AXE_GRARL_CID (0x165e) / WICKED_BREAKING_FLAMBERGE_BAOU_CID (0x165f) / TWIN_SWORDS_FLASHING_LIGHT_TRYCE_CID (0x1661) / COCOON_OF_EVOLUTION_CID (0xfee) / SWORDS_OF_REVEALING_LIGHT_CID (0x1102) / METALMORPH_CID (0x1238)
+- oam_attr.inc +2: OAM_ATTR2_CLR_BITS_11_6 (0xfffff03f) / SPRITE_ATTR_TYPE_HIDDEN_Y97 (0x8061)
+- ewram.inc +9: SPRITE_ROW_ENTRY_DATA_OFF (0x4d4) / ELIGIB_STATE_OFF (0x574) / ELIGIB_RESULT_OFF (0x584) / ELIGIB_CARD_ID_OFF (0x1d44) / ELIGIB_STATE_CTRL_OFF (0x1d54) / ELIGIB_ACT_COUNT_OFF (0x1d58) / ELIGIB_ACT_TYPE_OFF (0x1d5c) / ELIGIB_SPRITE_CTRL_OFF (0x1d68) / ELIGIB_ANIM_STATE_OFF (0x1d6c)
+
+**C5 碰撞处理**: ELIGIB_RESULT_OFF=0x584 与 duel_field.inc GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF=0x584 数值碰撞; 用户裁定新建独立常量 (不同 base 寄存器/不同 EWRAM 结构体的字段偏移, 良性碰撞).
+
+**carve**: 0 (无外部引用 ROM_INCBIN; 3 orphan 块全 §5.1)
+
+**disasm**: 0 (orphan THUMB code 无外部 caller, §5.1 留待)
+
+**§5.1 新增 3 孤儿块**:
+- 0x0804c734 / 0x38 (56B): gap bytes between classify tail and submit_slot_card_sprite_row_entry; 0 raw/thumb refs
+- 0x0804cca2 / 0xea (234B): orphan THUMB code (2 bx lr), loads PTR_DAT ptr; raw=1 from 0x086bb944 (compressed resource, non-code); 0 external code refs
+- 0x0804cdac / 0x2c (44B): orphan THUMB stubs (3 entry pts); raw=7 all from internal PTR_DAT_0804cd90 table (orphan island); 0 external refs
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn / eval_amazoness_fnptr_a / eval_amazoness_fnptr_b / eval_equip_chain_pred_fnptr) + asm/04 x3 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+
+**plate FUN_ in Seg-5 range**: 11 occurrences, all are caller references from Seg-6+ callers (FUN_080432bc/08043714/080439e0/08043d90/080440b8 / FUN_08095ba8/08095ca0/08095d84); deferred to Seg-6 / file-09 refinement per proposal C8 approval
+
+**CJK in new EOL/plate**: 0 (all text from this segment is pure ASCII)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

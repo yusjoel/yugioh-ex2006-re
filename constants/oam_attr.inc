@@ -133,3 +133,9 @@
 @ =============================================================================
 .equ OAM_PLAYER_STATE_BIT_SPRITE_P1,  0x00008022  @ P1 OAM attr0 Y-coord for player-level state bit change sprite (bit15+0x22); set_player_state_bit_with_sprite_update; P2=0x22 inline; 29 raw ROM refs
 .equ OAM_FIELD_SLOT_BIT_SPRITE_P1,    0x0000802a  @ P1 OAM attr0 Y-coord for field slot bit change sprite (bit15+0x2a); set_field_slot_bit_with_sprite_update; P2=0x2a inline; 233 raw ROM refs
+
+@ =============================================================================
+@ file 05 Seg-5 additions: OAM attr2 tile-field clear mask + hidden sprite attr
+@ =============================================================================
+.equ OAM_ATTR2_CLR_BITS_11_6,  0xfffff03f  @ AND mask clearing bits[11:6]; used to clear OAM char-name tile index field in sprite row packing (submit_slot_card_sprite_row_entry + init variants); 14 ROM refs
+.equ SPRITE_ATTR_TYPE_HIDDEN_Y97, 0x00008061 @ OBJ disabled (bit15=1) | Y=0x61 (97); passed to enqueue_sprite_attr_record when eligib_sprite_ctrl [gP1LP+ELIGIB_SPRITE_CTRL_OFF] != 0; contrast 0x0061 (OBJ enabled) when field==0; 81 ROM refs

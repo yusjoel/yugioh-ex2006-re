@@ -831,3 +831,15 @@
 .equ ROLL_OUT_CID,                       0x00001979  @ Roll Out! (pw=91597389); summon category BST
 .equ MYTHICAL_BEAST_CERBERUS_CID,        0x00001983  @ Mythical Beast Cerberus (pw=55424270); effect category BST
 .equ MAGICAL_MALLET_CID,                 0x0000198d  @ Magical Mallet (pw=85852291); effect zone check
+
+@ =============================================================================
+@ file 05 Seg-5 additions: Guardian weapon CIDs (classify_card_id_summon_category case pool)
+@   + BST whitelist CIDs (check_card_slot_activation_eligible)
+@ =============================================================================
+.equ BUTTERFLY_DAGGER_ELMA_CID,             0x0000165c  @ Butterfly Dagger-Elma (pw=69243953; card_1332 slot=0x165C); classify_card_id_summon_category case Guardian weapon
+.equ GRAVITY_AXE_GRARL_CID,                0x0000165e  @ Gravity Axe-Grarl (pw=32022366; card_1334 slot=0x165E); classify_card_id_summon_category case Guardian weapon
+.equ WICKED_BREAKING_FLAMBERGE_BAOU_CID,   0x0000165f  @ Wicked-Breaking Flamberge-Baou (pw=68427465; card_1335 slot=0x165F); classify_card_id_summon_category case Guardian weapon
+.equ TWIN_SWORDS_FLASHING_LIGHT_TRYCE_CID, 0x00001661  @ Twin Swords of Flashing Light-Tryce (pw=21900719; card_1337 slot=0x1661); classify_card_id_summon_category case Guardian weapon
+.equ COCOON_OF_EVOLUTION_CID,              0x00000fee  @ Cocoon of Evolution (pw=40240595; card_0079 slot=0x0FEE); check_card_slot_activation_eligible BST lower bound
+.equ SWORDS_OF_REVEALING_LIGHT_CID,        0x00001102  @ Swords of Revealing Light (pw=72302403; card_0308 slot=0x1102); check_card_slot_activation_eligible BST
+.equ METALMORPH_CID,                       0x00001238  @ Metalmorph (pw=68540058; card_0539 slot=0x1238); check_card_slot_activation_eligible BST pivot

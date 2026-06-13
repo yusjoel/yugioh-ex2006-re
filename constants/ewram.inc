@@ -398,3 +398,21 @@
 @ =============================================================================
 .equ LP_BAR_DISPLAY_CTR_OFF,   0x000004c4  @ [gDuelPhaseFlags+0x4c4] LP bar animation display counter; incremented by increment_lp_bar_display_counter/increment_lp_bar_counter_no_player; decremented by decrement_lp_bar_display_counter; 18 raw ROM refs; Seg-2
 .equ LP_BAR_ANIM_STATE_OFF,    0x000004cc  @ [gDuelPhaseFlags+0x4cc] LP bar animation state reset field; cleared to 0 when display counter first reaches 1 (initial anim trigger path); 37 raw ROM refs; Seg-2
+
+@ =============================================================================
+@ file 05 Seg-5 additions: card sprite row / equip eligibility state machine offsets
+@ gDuelPhaseFlags-relative (base=0x0201b290):
+@ =============================================================================
+.equ SPRITE_ROW_ENTRY_DATA_OFF,  0x000004d4  @ [gDuelPhaseFlags+0x4d4] byte array for card sprite row entry flag data; init_card_sprite_row_entry iterates count(LP_BAR_ANIM_STATE_OFF) entries; 25 ROM refs
+.equ ELIGIB_STATE_OFF,           0x00000574  @ [gDuelPhaseFlags+0x574] dispatch_card_eligibility_state_machine state word [0..0x1f]; indexes 32-entry switch table; 18 ROM refs
+@ NOTE: ELIGIB_RESULT_OFF=0x584 has same numeric value as GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF in duel_field.inc
+@   but they are DIFFERENT fields: ELIGIB_RESULT_OFF is gDuelPhaseFlags+0x584 (eligibility result: 0=pending,1=confirmed),
+@   while GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF is gPrng+0x1c0_deref+0x584. Benign numeric collision; independent constants.
+.equ ELIGIB_RESULT_OFF,          0x00000584  @ [gDuelPhaseFlags+0x584] eligibility result field; 0=pending, 1=confirmed; written by caseD_14/15/1f; 20 ROM refs
+@ gP1LifePoints-relative (base=0x0201c4e0):
+.equ ELIGIB_CARD_ID_OFF,         0x00001d44  @ [gP1LifePoints+0x1d44] card_id field accessed in dispatch_card_eligibility_state_machine caseD_1f; 9 ROM refs
+.equ ELIGIB_STATE_CTRL_OFF,      0x00001d54  @ [gP1LifePoints+0x1d54] eligibility state control word; written to state values (0, 0xa, 0x1e etc.) by various cases; 33 ROM refs
+.equ ELIGIB_ACT_COUNT_OFF,       0x00001d58  @ [gP1LifePoints+0x1d58] activation count field; written r0=1 in caseD_b; 16 ROM refs
+.equ ELIGIB_ACT_TYPE_OFF,        0x00001d5c  @ [gP1LifePoints+0x1d5c] activation type flag; cmp r0,#3 in caseD_b determines branch; 17 ROM refs
+.equ ELIGIB_SPRITE_CTRL_OFF,     0x00001d68  @ [gP1LifePoints+0x1d68] sprite display control; 0=display 0x61 attr, non-0=use 0x8061 hidden attr for enqueue_sprite_attr_record; 105 ROM refs
+.equ ELIGIB_ANIM_STATE_OFF,      0x00001d6c  @ [gP1LifePoints+0x1d6c] animation state index; range check [0..0xf] in caseD_1f with thresholds 0xb/0xf; 56 ROM refs
