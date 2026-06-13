@@ -24,7 +24,7 @@
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-04-card-zone-sprite.md` |
-| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (8/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
+| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 已拆 | 🟡 进行中 (9/10) | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |
 | 08 | equip_oam_neodaed | 0x080643e0..0x0806e76c | 未拆 | ⬜ | |
