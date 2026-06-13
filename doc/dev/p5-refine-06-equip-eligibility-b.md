@@ -77,7 +77,7 @@
 |-----|------|-----|--------|------------------------|------|--------|
 | 1 | 0x537c0..0x541cc | 22 | 47 | — | ✅ | f3bb6a9 |
 | 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ✅ | 6c90482 |
-| 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ✅ | pending |
+| 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ✅ | aee415f |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ⬜ | — |
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ⬜ | — |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ⬜ | — |
@@ -139,7 +139,7 @@
 - **CSV sync**: naming-proposals.csv +1 行 (0x08055188 check_zone_slot_occupied_with_clear_equip_flag)
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **验收**: FUN_残留=0; CJK=0; ROM_INCBIN 0x55188 无残留; disasm fn @ asm/06 line 3971
-- **commit**: pending
+- **commit**: aee415f
 
 ---
 
