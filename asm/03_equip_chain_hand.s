@@ -10512,7 +10512,7 @@ LAB_0803aa50:
     beq LAB_0803aa82                         @ 0803aa70 07d0
     b LAB_0803ab44                           @ 0803aa72 67e0
 eval_equip_chain_pred_fnptr:
-    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr); asm must have +1 after re-export
+    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr
 eval_equip_chain_node_pool_a:
     .word  gEquipNodePool                 @ 0803aa78 c0d90102
 LAB_0803aa7c:

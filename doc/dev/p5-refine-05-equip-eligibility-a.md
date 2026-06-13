@@ -100,7 +100,7 @@
 | 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | 8a924b3 |
 | 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | 20cbc8b |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | 5d95bfc |
-| 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
+| 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | pending |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ⬜ | — |
 | 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
@@ -457,6 +457,47 @@ check_card_is_dark_world_range_type (0x0804b26c)
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: bd9ce13
+
+---
+
+### 4.07 Seg-7 完成记录 (0x0804ffba..0x08050e40, 24 fn, 73 slots)
+
+**函数列表 (24)**:
+check_slot_zone_bit3_eligible / check_slot_zone_bit1_eligible / check_slot_zone_bit2_eligible /
+return_true_unconditional / check_equip_slot_eligible_by_card_id_and_prereqs /
+check_equip_chain_type_d_node_exists / check_card_ptr_equippable_by_owner_bit /
+check_equip_slot_eligible_with_field6_score / check_equip_slot_eligible_type_only /
+check_equip_slot_eligible_with_score_bound / check_equip_slot_eligible_with_field6_and_pair /
+eval_equip_slot_score_by_card_state / check_equip_slot_eligible_type_and_card_match /
+check_equip_slot_eligible_by_type_query / check_equip_slot_eligible_by_prereqs_and_field_match /
+check_equip_slot_eligible_by_type_query_with_occupied / check_equip_slot_eligible_by_whitelist_query /
+check_equip_slot_eligible_by_owner_path_split / check_equip_slot_eligible_by_type_then_prereqs /
+check_equip_slot_eligible_by_prereqs_then_type / check_equip_slot_eligible_by_card_id_bst /
+check_equip_slot_eligible_with_bst_filter / check_equip_slot_eligible_with_whitelist_prereqs_0 /
+check_equip_slot_eligible_with_whitelist_prereqs_1
+
+**符号化统计**: EQ=69 (21 PLAYER_BLOCK_STRIDE + 20 gDuelFieldSlots + 6 reuse + 22 new CID) / REF=0 / RENAME=3 / FUNC_RENAME=0 / PLATE=4 subs (2 fn)
+
+**新建 constants** (card_info.inc +22):
+- 18 named CID: INFERNALQUEEN_ARCHFIEND / THROWSTONE_UNIT / DRAGON_SEEKER / WINGED_MINION /
+  COMBINATION_ATTACK / WILD_NATURES_RELEASE / CYBER_LASER_DRAGON / TRIBE_INFECTING_VIRUS /
+  BURST_BREATH / NEEDLE_CEILING / OJAMUSCLE / REALLY_ETERNAL_REST / WEED_OUT /
+  CURSE_OF_ANUBIS / ROULETTE_BARREL / ZERO_GRAVITY / BURST_RETURN / EHERO_BURSTINATRIX
+- 4 unallocated: cid_1304 / cid_1305 / cid_123d / cid_123e
+
+**carve**: 0 (no inter-function ROM_INCBIN in Seg-7)
+
+**disasm**: 0
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn / eval_amazoness_fnptr_a / eval_amazoness_fnptr_b / eval_equip_chain_pred_fnptr) + asm/04 x3 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+
+**plate FUN_ in Seg-7 range**: 0 stale FUN_ (grep confirmed; FUN_ only in @ comment cross-refs to other files)
+
+**CJK in new EOL/plate**: 0 (all Ghidra-set text is pure ASCII)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: pending
 
 ---
 

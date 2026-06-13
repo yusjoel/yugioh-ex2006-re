@@ -886,3 +886,33 @@
 .equ cid_12ef,  0x000012ef  @ unallocated; BST node
 @ Score threshold (not a CID):
 .equ FIELD5_SCORE_THRESHOLD_1299,  0x00000513  @ field5 score upper bound; check_slot_card_eligible_by_card_id after get_slot_field5_score comparison; value 1299 is a score bound not a slot_id
+
+@ =============================================================================
+@ file 05 Seg-7 additions: equip slot eligibility BST card IDs
+@ Source: asm/05_equip_eligibility_a.s Seg-7 (0x0804ffba..0x08050e40)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+@ Named CIDs (18 new, high-conf from card-stats.s):
+.equ INFERNALQUEEN_ARCHFIEND_CID,  0x00001690  @ Infernalqueen Archfiend (slot=0x1690); eval_equip_slot_score_by_card_state BST
+.equ THROWSTONE_UNIT_CID,          0x000014c5  @ Throwstone Unit (slot=0x14C5); eval_equip_slot_score_by_card_state BST
+.equ DRAGON_SEEKER_CID,            0x0000119a  @ Dragon Seeker (slot=0x119A); eval_equip_slot_score_by_card_state BST
+.equ WINGED_MINION_CID,            0x000014b9  @ Winged Minion (slot=0x14B9); eval_equip_slot_score_by_card_state BST
+.equ COMBINATION_ATTACK_CID,       0x000015e4  @ Combination Attack (slot=0x15E4); eval_equip_slot_score_by_card_state BST
+.equ WILD_NATURES_RELEASE_CID,     0x000016ce  @ Wild Nature's Release (slot=0x16CE); eval_equip_slot_score_by_card_state BST
+.equ CYBER_LASER_DRAGON_CID,       0x000019a9  @ Cyber Laser Dragon (slot=0x19A9); eval_equip_slot_score_by_card_state BST
+.equ TRIBE_INFECTING_VIRUS_CID,    0x0000161c  @ Tribe-Infecting Virus (slot=0x161C); check_equip_slot_eligible_by_card_id_bst BST
+.equ BURST_BREATH_CID,             0x000014e4  @ Burst Breath (slot=0x14E4); check_equip_slot_eligible_by_card_id_bst BST
+.equ NEEDLE_CEILING_CID,           0x00001542  @ Needle Ceiling (slot=0x1542); check_equip_slot_eligible_by_card_id_bst BST
+.equ OJAMUSCLE_CID,                0x00001945  @ Ojamuscle (slot=0x1945); check_equip_slot_eligible_by_card_id_bst BST
+.equ REALLY_ETERNAL_REST_CID,      0x0000166d  @ Really Eternal Rest (slot=0x166D); check_equip_slot_eligible_by_card_id_bst BST
+.equ WEED_OUT_CID,                 0x00001977  @ Weed Out (slot=0x1977); check_equip_slot_eligible_by_card_id_bst BST
+.equ CURSE_OF_ANUBIS_CID,          0x000017b3  @ Curse of Anubis (slot=0x17B3); check_equip_slot_eligible_with_bst_filter BST
+.equ ROULETTE_BARREL_CID,          0x000015df  @ Roulette Barrel (slot=0x15DF); check_equip_slot_eligible_with_bst_filter BST
+.equ ZERO_GRAVITY_CID,             0x000016e1  @ Zero Gravity (slot=0x16E1); check_equip_slot_eligible_with_bst_filter BST
+.equ BURST_RETURN_CID,             0x00001988  @ Burst Return (slot=0x1988); check_equip_slot_eligible_with_bst_filter BST
+.equ EHERO_BURSTINATRIX_CID,       0x000018a7  @ Elemental Hero Burstinatrix (slot=0x18A7); check_equip_slot_eligible_with_bst_filter BST
+@ Unallocated slot IDs (4 new, low-conf neutral names; no card in card-stats.s with these slot_ids):
+.equ cid_1304,  0x00001304  @ unallocated slot_id; BST root in check_equip_slot_eligible_by_card_id_bst
+.equ cid_1305,  0x00001305  @ unallocated slot_id; BST node adjacent to cid_1304
+.equ cid_123d,  0x0000123d  @ unallocated slot_id; BST node in check_equip_slot_eligible_by_card_id_bst
+.equ cid_123e,  0x0000123e  @ unallocated slot_id; BST node adjacent to cid_123d
