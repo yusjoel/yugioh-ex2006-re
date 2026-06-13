@@ -103,7 +103,7 @@
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ✅ | 6c92afe |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ✅ | 0384db3 |
-| 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
+| 10 | 0x52df8..0x537c0 | 23 | 51 | — | ✅ | (pending commit) |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 重段提示: Seg-4 (200 槽, switch 派发 + check_card_is_equip_set 簇) / Seg-1 (152 槽, sprite 提交簇) /
@@ -616,6 +616,64 @@ ELEMENTAL_HERO_TEMPEST_CID (0x1957) / HERO_HEART_CID (0x19ab) / PHOTON_GENERATOR
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 0384db3
+
+---
+
+### 4.10 Seg-10 完成记录 (0x08052df8..0x080537c0, 23 fn, 51 slots) -- file 05 全 10 段完成
+
+**函数列表 (23)**:
+check_equip_slot_eligible_by_prereqs_and_active_player_match /
+check_equip_slot_eligible_by_whitelist_and_setcode_match /
+check_equip_slot_eligible_by_owner_match_and_active_ctx /
+check_equip_slot_eligible_by_chain_score_field10_exact /
+check_equip_slot_eligible_by_chain_score_capped6_match /
+check_equip_slot_eligible_by_owner_mismatch_whitelist_prereqs /
+check_equip_slot_eligible_by_type_and_zone_flag_bits /
+check_equip_slot_eligible_by_whitelist_and_setcode_no_field8 /
+check_equip_slot_eligible_by_field6_not17_owner_mismatch /
+check_equip_slot_eligible_by_monster_space_type_score3 /
+check_equip_slot_eligible_by_active_ctx_score_nonzero /
+dispatch_equip_slot_eligible_by_field6_bit /
+check_equip_slot_eligible_by_owner_mismatch_field8_no_field6 /
+check_equip_slot_eligible_by_field6_not17_owner_match /
+check_equip_slot_eligible_by_field5_score_or_chain_type /
+check_equip_slot_eligible_by_side_type_and_occupied /
+check_equip_slot_eligible_by_whitelist_and_field8 /
+check_equip_slot_eligible_with_whitelist_prereqs_and_eligible /
+check_equip_slot_eligible_with_whitelist_prereqs_and_eligible_b /
+check_equip_slot_eligible_by_prereqs_with_zone_guard /
+check_equip_slot_eligible_by_side_setcode_and_eligible /
+dispatch_equip_slot_eligible_by_card_id_tier /
+check_equip_slot_eligible_by_setcode_and_prereqs_no_whitelist
+
+**符号化统计**: EQ=51 (20 PLAYER_BLOCK_STRIDE + 20 gDuelFieldSlots + 3 gEquipChainSlotRefs + 8 unique-D) / REF=0 / RENAME=0 / FUNC_RENAME=0 / PLATE=2 rewrites (CJK mojibake -> ASCII full overwrite) / EOL=10
+
+**新建 constants**:
+- card_info.inc +2:
+  BOTTOMLESS_TRAP_HOLE_CID = 0x00001518 (Bottomless Trap Hole, pw=29401950, card-stats.s card_1088)
+  FIELD5_SCORE_THRESHOLD_1499 = 0x000005db (field5 score threshold 1499; score<=0x5db->ineligible; score>0x5db->eligible)
+
+**PLATE rewrites (2)**:
+- PLATE-1: dispatch_equip_slot_eligible_by_field6_bit (0x08053294) -- CJK mojibake replaced with ASCII plate describing field6 bits[4:3] two-path dispatch
+- PLATE-2: dispatch_equip_slot_eligible_by_card_id_tier (0x08053704) -- CJK mojibake + incorrect card names (Premature Burial/Call of the Haunted/Wicked-Breaking Flamberge) replaced with ASCII plate with corrected card names: Throwstone Unit (0x14c5) / Checkmate (0x169b) / Arcane Archer of the Forest (0x1753)
+
+**carve**: 0 (no ROM_INCBIN in Seg-10)
+
+**disasm**: 0
+
+**section5_1**: 0 (no 0-reference orphan blocks in range)
+
+**fn-ptr periodic fix** (post re-export): asm/03 x4 (eval_equip_bonus_for_slot_pred_fn+1 / eval_amazoness_fnptr_a+1 / eval_amazoness_fnptr_b+1 / eval_equip_chain_pred_fnptr+1) + asm/04 x3 (zone_monster_field_bonus_table+7*16 / apply_nitro_unit_equip_activation+1 / gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+
+**plate FUN_ in Seg-10 range**: 0 stale FUN_ (grep confirmed; python check FUN_=0 / non-ASCII=0)
+
+**CJK in new EOL/plate**: 0 (all Ghidra-set text is pure ASCII; 2 plate rewrites and 10 EOL comments verified ASCII-only)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (see below)
+
+**file 05 全 10 段完成** (Seg-1..Seg-10 全部 ✅; ROM 0x08049014..0x080537c0; 239 fn / 1010 slots fully symbolized)
 
 ---
 

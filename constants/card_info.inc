@@ -968,3 +968,11 @@
 .equ ELEMENTAL_HERO_TEMPEST_CID,     0x00001957  @ Elemental Hero Tempest (pw=card_2150+)
 .equ HERO_HEART_CID,                 0x000019ab  @ Hero Heart (pw=67951831)
 .equ PHOTON_GENERATOR_UNIT_CID,      0x000019b1  @ Photon Generator Unit (pw=card_2205+)
+
+@ =============================================================================
+@ file 05 Seg-10 additions: equip slot eligibility field5/chain dispatch CIDs
+@ Source: asm/05_equip_eligibility_a.s, Seg-10 (0x08052df8..0x080537c0)
+@ Values verified against data/card-stats.s; confidence: high.
+@ =============================================================================
+.equ BOTTOMLESS_TRAP_HOLE_CID,       0x00001518  @ Bottomless Trap Hole (pw=29401950; card-stats.s card_1088 slot=0x1518); check_equip_slot_eligible_by_field5_score_or_chain_type field5 score gate
+.equ FIELD5_SCORE_THRESHOLD_1499,    0x000005db  @ field5 score threshold (1499=0x5db); score<=0x5db -> ineligible (ble branch); score>0x5db -> eligible; distinct from THRESHOLD_1299(0x513)/1999(0x7cf)
