@@ -80,7 +80,7 @@
 | 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ✅ | aee415f |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ✅ | fd8e6b6 |
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ✅ | 3177750 |
-| 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | (pending) |
+| 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec | 22 | 54 | — | ⬜ | — |
 | 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ⬜ | — |
 | 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x59cc8/0x28 + 0x59d14/0xcc + 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
@@ -172,7 +172,7 @@
 - **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0) + asm/05 x6 (eval_equip_slot_score_by_card_state+1/check_equip_slot_eligible_by_card_id_bst+1/check_equip_slot_eligible_by_card_id_dispatch_b+1/check_equip_slot_eligible_by_type_then_prereqs+1/check_equip_slot_eligible_by_setcode_and_prereqs+1 x2)
 - **验收**: FUN_ 残留=0 (lines 9463-11807); CJK=0; ROM_INCBIN 0x57d0a/0x57d4c both replaced
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- **commit**: pending
+- **commit**: 51ebd37
 
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
