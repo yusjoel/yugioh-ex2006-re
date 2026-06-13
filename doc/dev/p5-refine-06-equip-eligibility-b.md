@@ -75,7 +75,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|------------------------|------|--------|
-| 1 | 0x537c0..0x541cc | 22 | 47 | — | ⬜ | — |
+| 1 | 0x537c0..0x541cc | 22 | 47 | — | ✅ | f3bb6a9 |
 | 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ⬜ | — |
 | 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ⬜ | — |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ⬜ | — |
@@ -95,7 +95,21 @@
 
 ## 四、逐段完成记录
 
-(各段落地后由 fixer 追加 4.0N 小节: 函数列表 / 符号化统计 / 新建 constants / carve/disasm / 踩坑 / commit)
+### 4.01 Seg-1 完成记录 (2026-06-14, commit f3bb6a9)
+
+- **段范围**: 0x080537c0..0x080541cc, 22 fn
+- **EQ=45**: 19x PLAYER_BLOCK_STRIDE + 19x gDuelFieldSlots (ewram.inc 复用)
+  + 2x SCROLLBAR_CLEAR_BITS_14_6 (gl_scrollbar.inc 复用; setcode-A bits[14:6] 清位)
+  + 1x gEquipChainSlotRefs + 1x GRAVEKEEPERS_CANNONHOLDER_CID (card_info.inc 新建 0x158c)
+  + 1x gDuelPhaseFlags + 1x LP_BAR_ANIM_STATE_OFF + 1x CHAIN_NODE_CARD_ARR_OFF
+- **REF=1**: 0x08053e08 fn-ptr -> check_equip_slot_eligible_triple_predicate+1
+- **RENAME=1**: DWORD_08054138 -> dispatch_equip_slot_eligible_by_type_prereqs_or_setcode_flag_a (equip_flag=0x1706 鉴别码; med-conf; 非 TORPEDO_FISH_CID)
+- **PLATE=3**: P1 dispatch_equip_slot_eligible_by_type_prereqs_or_setcode ASCII 全段重写 (旧 CJK mojibake); P2 FUN_08054e5c->check_equip_slot_eligible_by_setcode_prereqs_all_slots (line 1024); P3 同上 (line 1482, 跨段 0x080541cc 提前修订)
+- **新建 constants**: card_info.inc +1 (GRAVEKEEPERS_CANNONHOLDER_CID=0x158c); ewram.inc +2 (EQUIP_CTX_PLAYER_OFF=0x0, EQUIP_CTX_SLOT_REF_OFF=0x1c)
+- **carve=0, disasm=0, §5.1=0**
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 x2, check_card_is_amazoness_type+1 x2) + asm/04 x3 (zone_monster_field_bonus_table+7*16, apply_nitro_unit_equip_activation+1, gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **commit**: f3bb6a9
 
 ---
 
