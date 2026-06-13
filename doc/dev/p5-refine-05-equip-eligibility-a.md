@@ -100,7 +100,7 @@
 | 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | 8a924b3 |
 | 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | 20cbc8b |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | 5d95bfc |
-| 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | pending |
+| 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ⬜ | — |
 | 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
@@ -497,7 +497,7 @@ check_equip_slot_eligible_with_whitelist_prereqs_1
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: pending
+**commit**: 69b408a
 
 ---
 
