@@ -437,3 +437,10 @@
 @ Relative to gDuelPhaseFlags (base=0x0201b290):
 @ =============================================================================
 .equ CHAIN_NODE_CARD_ARR_OFF,  0x000004f4  @ [gDuelPhaseFlags+0x4f4] card pointer array for equip chain node list; check_equip_slot_eligible_by_card_id_pair (0x080513d0) chain node traversal; Seg-9 comment confirms OFFSET_CARD_ARR=0x4f4; 1 Seg-8 slot
+
+@ =============================================================================
+@ file 06 Seg-1 additions: equip chain slot ref struct field offsets
+@ Relative to gEquipChainSlotRefs (base=0x0201bb90):
+@ =============================================================================
+.equ EQUIP_CTX_PLAYER_OFF,    0x00000000  @ [gEquipChainSlotRefs+0x0] activation player id field; check_equip_slot_eligible_by_opposite_side_and_effect_ctx ldr/cmp vs r5(player_id); asm/02 plate confirms activation_player_offset=0; 1 F06 Seg-1 ref
+.equ EQUIP_CTX_SLOT_REF_OFF,  0x0000001c  @ [gEquipChainSlotRefs+0x1c] context zone slot reference field; check_equip_slot_eligible_by_opposite_side_and_effect_ctx ldr/cmp vs r4(zone_idx); asm/02 plate confirms context_slot_ref_offset=0x1c; 1 F06 Seg-1 ref

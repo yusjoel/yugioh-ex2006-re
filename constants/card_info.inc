@@ -660,6 +660,7 @@
 .equ AMAZONESS_FIGHTER_CID,            0x000014af  @ Amazoness Fighter (pw=55821894; card_0998)
 .equ LESSER_FIEND_CID,                 0x000014b7  @ Lesser Fiend (pw=16475472; card_1003)
 .equ GUARDIAN_SPHINX_CID,              0x0000152e  @ Guardian Sphinx (pw=40659562; card_1107)
+.equ GRAVEKEEPERS_CANNONHOLDER_CID,    0x0000158c  @ Gravekeeper's Cannonholder (pw=99877698; card_1168)
 .equ GRAVEKEEPERS_ASSAILANT_CID,       0x0000158d  @ Gravekeeper's Assailant (pw=25262697; card_1169)
 .equ OJAMA_GREEN_CID,                  0x00001681  @ Ojama Green (pw=12482652; card_1358)
 .equ SKULL_ARCHFIEND_OF_LIGHTNING_CID, 0x00001692  @ Skull Archfiend of Lightning (pw=61370518; card_1374)
