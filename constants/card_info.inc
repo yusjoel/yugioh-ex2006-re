@@ -1117,3 +1117,19 @@
 .equ cid_134f,                     0x0000134f  @ unassigned slot 0x134f (gap); populate_effect_node_snapshot; conf: low
 .equ cid_1350,                     0x00001350  @ unassigned slot 0x1350 (gap); populate_effect_node_snapshot; conf: low
 .equ cid_1351,                     0x00001351  @ unassigned slot 0x1351 (gap between 0x1350 and Numinous Healer 0x1352); populate_effect_node_snapshot; conf: low
+
+@ =============================================================================
+@ file 07 Seg-1 additions: equip effect chain / card effect handler dispatch CIDs
+@ Source: asm/07_equip_effect_chain.s Seg-1 (0x0805c2f0..0x0805cfec)
+@ =============================================================================
+.equ SANGA_OF_THUNDER_CID,       0x00001119  @ Sanga of the Thunder (pw=25955164; card-stats.s slot=0x1119); check_equip_slot_eligible_with_sanga_and_prereqs chain node check; conf: high
+.equ SCAPEGOAT_CID,              0x000012d2  @ Scapegoat (pw=73915051; card-stats.s slot=0x12d2); min_monster_slots=4 threshold in check_equip_slot_eligible_by_scapegoat_or_stray_lambs; conf: high
+.equ GRACEFUL_CHARITY_CID,       0x000012cc  @ Graceful Charity (pw=79571449; card-stats.s slot=0x12cc); tier-3 LP cost threshold in check_lp_draw_card_tier_threshold; conf: high
+.equ GREENKAPPA_CID,             0x000011f0  @ Greenkappa (pw=61831093; card-stats.s slot=0x11f0); dispatch branch boundary in check_equip_target_zone_validity_by_card_id; conf: high
+.equ REAPER_OF_CARDS_CID,        0x00000ffa  @ Reaper of the Cards (pw=33066139; card-stats.s slot=0x0ffa); direct effect slot read path in check_equip_target_zone_validity_by_card_id; conf: high
+.equ HARPIES_FEATHER_DUSTER_CID, 0x00001246  @ Harpie's Feather Duster (pw=18144506; card-stats.s slot=0x1246); direct effect slot read path; conf: high
+.equ DRIVING_SNOW_CID,           0x0000134d  @ Driving Snow (pw=00473469; card-stats.s slot=0x134d); dedicated dispatch branch in check_equip_target_zone_validity_by_card_id; conf: high
+.equ NOBLEMAN_EXTERMINATION_CID, 0x00001364  @ Nobleman of Extermination (pw=17449108; card-stats.s slot=0x1364); dedicated path in check_equip_target_zone_validity_by_card_id; conf: high
+.equ BAIT_DOLL_CID,              0x0000149b  @ Bait Doll (pw=07165085; card-stats.s slot=0x149b); dedicated path in check_equip_target_zone_validity_by_card_id; conf: high
+.equ cid_131c,                   0x0000131c  @ unassigned slot 0x131c (not in card-stats.s); dispatch upper boundary in check_equip_target_zone_validity_by_card_id; conf: low
+.equ cid_12fb,                   0x000012fb  @ unassigned slot 0x12fb (not in card-stats.s); count_field_copies_of_card arg in check_equip_slot_eligible_without_reserved_field_card; conf: low
