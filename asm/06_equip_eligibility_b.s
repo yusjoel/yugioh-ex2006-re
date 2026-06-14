@@ -18267,7 +18267,7 @@ apply_card_equip_activation:
     bl get_card_equip_zone_rank              @ 0805aedc f0f7d8fe
     cmp r4,r0                                @ 0805aee0 8442
     blt LAB_0805af4c                         @ 0805aee2 33db
-    ldr r0, special_equip_sentinel_id_18105  @ 0805aee4 1a48
+    ldr r0, uria_lord_cid_18105              @ 0805aee4 1a48
     .hword 0x464a    @ 0805aee6 4a46
     ldrh r2,[r2,#0x0]                        @ 0805aee8 1288
     cmp r2,r0                                @ 0805aeea 8242
@@ -18322,8 +18322,8 @@ LAB_0805af24:
 LAB_0805af4c:
     movs r0,#0x0    @ 0805af4c 0020
     b LAB_0805b024                           @ 0805af4e 69e0
-special_equip_sentinel_id_18105:
-    .word  SPECIAL_EQUIP_SENTINEL_ID      @ 0805af50 a3190000
+uria_lord_cid_18105:
+    .word  URIA_LORD_CID                  @ 0805af50 a3190000
 chain_energy_cid_18107:
     .word  CHAIN_ENERGY_CID               @ 0805af54 2c130000
 PTR_gP1LifePoints_0805af58:

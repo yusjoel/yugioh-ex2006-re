@@ -19025,7 +19025,31 @@ LAB_08063848:
 LAB_0806384a:
     pop {r1}                                 @ 0806384a 02bc
     bx r1                                    @ 0806384c 0847
-    ROM_INCBIN 0x6384e, 0x2a
+    .zero  0x2
+
+@ fn_eligible for CID=0x1926 (Fire Darts, pw=43061293) + CID=0x1775 (Return Zombie, pw=28205952). Reached via card effect handler dispatch table at ROM 0x09e42ad8 + 0x09e45e38. 2B alignment pad at 0x0806384e; fn entry at 0x08063850. Reads gP1LP[player_id * PLAYER_BLOCK_STRIDE + 0xc] (zone placement state field). Returns 1 if field_0xc == 0 (zone placement inactive), 0 if nonzero. player_id extracted from slot byte[+2] bit0. Lit pool @ 0x08063870: gP1LifePoints(0x0201c4e0) / PLAYER_BLOCK_STRIDE(0x868).
+check_zone_field0c_is_zero_for_player:
+    movs r3,#0x0    @ 08063850 0023
+    ldr r2, gp1lp_ptr_08063870               @ 08063852 074a
+    ldrb r0,[r0,#0x2]                        @ 08063854 8078
+    lsls r0,r0,#0x1f    @ 08063856 c007
+    lsrs r0,r0,#0x1f    @ 08063858 c00f
+    ldr r1, player_stride_08063874           @ 0806385a 0649
+    muls r0,r1    @ 0806385c 4843
+    adds r2,#0xc    @ 0806385e 0c32
+    adds r0,r0,r2    @ 08063860 8018
+    ldr r0,[r0,#0x0]                         @ 08063862 0068
+    cmp r0,#0x0                              @ 08063864 0028
+    bne LAB_0806386a                         @ 08063866 00d1
+    movs r3,#0x1    @ 08063868 0123
+LAB_0806386a:
+    adds r0,r3,#0x0    @ 0806386a 181c
+    bx lr                                    @ 0806386c 7047
+    .zero  0x2
+gp1lp_ptr_08063870:
+    .word  gP1LifePoints                  @ 08063870 e0c40102
+player_stride_08063874:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063874 68080000
 
 @ Equip slot eligibility predicate, returns 0/1. Thin wrapper: loads fixed fn-ptr 0x08050ead as the second argument, calls invoke_count_zone_pair_hits_full_range(slot, fn_ptr) to count the zone-pair hits of that predicate over the full range. If hit count > 0 returns 1, otherwise returns 0. Isomorphic to 0x08061d5c / 0x08061e98, only the predicate fn-ptr differs. Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -19034,7 +19058,7 @@ LAB_0806384a:
 @ - HIT_THRESHOLD=0 (count > 0 is eligible)
 check_equip_slot_has_zone_pair_hit_table_0ead:
     push {lr}                                @ 08063878 00b5
-    ldr r1, DAT_08063890                     @ 0806387a 0549
+    ldr r1, zone_pair_pred_0ead_ptr_08063890 @ 0806387a 0549
     bl invoke_count_zone_pair_hits_full_range @ 0806387c 2cf07eff
     movs r1,#0x0    @ 08063880 0021
     cmp r0,#0x0                              @ 08063882 0028
@@ -19045,8 +19069,8 @@ LAB_08063888:
     pop {r1}                                 @ 0806388a 02bc
     bx r1                                    @ 0806388c 0847
     .zero  0x2
-DAT_08063890:
-    .word  0x08050ead                     @ 08063890 ad0e0508
+zone_pair_pred_0ead_ptr_08063890:
+    .word  0x08050ead                     @ 08063890 ad0e0508  fn-ptr set_equip_activation_state_by_mode+1 @0x08050eac
 
 @ Called by count_hand_cards_by_field6 (0x08033e70). Validates the revival/special summon condition for the current slot: first calls count_hand_cards_by_field6 (field6=0x16) to confirm the opponent hand contains a matching card; if none, returns 0 immediately. If a matching card exists, reads gP1LifePoints + player_id*0x868 + 0x0c to check the own-player monster zone control field; returns 1 if zero (condition met), otherwise returns 0.
 @ Side effects: no external writes.
@@ -19065,11 +19089,11 @@ check_slot_revival_valid_with_zone_state:
     b LAB_080638c8                           @ 080638aa 0de0
 LAB_080638ac:
     movs r3,#0x0    @ 080638ac 0023
-    ldr r2, PTR_gP1LifePoints_080638d0       @ 080638ae 084a
+    ldr r2, gp1lp_ptr_080638d0               @ 080638ae 084a
     ldrb r4,[r4,#0x2]                        @ 080638b0 a478
     lsls r0,r4,#0x1f    @ 080638b2 e007
     lsrs r0,r0,#0x1f    @ 080638b4 c00f
-    ldr r1, DAT_080638d4                     @ 080638b6 0749
+    ldr r1, player_stride_080638d4           @ 080638b6 0749
     muls r0,r1    @ 080638b8 4843
     adds r2,#0xc    @ 080638ba 0c32
     adds r0,r0,r2    @ 080638bc 8018
@@ -19084,10 +19108,10 @@ LAB_080638c8:
     pop {r1}                                 @ 080638ca 02bc
     bx r1                                    @ 080638cc 0847
     .zero  0x2
-PTR_gP1LifePoints_080638d0:
-    .word  gP1LifePoints                  @ 080638d0 e0c40102
-DAT_080638d4:
-    .word  0x00000868                     @ 080638d4 68080000
+gp1lp_ptr_080638d0:
+    .word  gP1LifePoints                  @ 080638d0 e0c40102  gP1LifePoints ptr for check_slot_revival_valid_with_zone_state LP read
+player_stride_080638d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080638d4 68080000
 
 @ Equip slot activation eligibility predicate, returns 0/2. r0=slot. Takes zone_type from slot byte[+0x2] (ldrh) (mask 0xfc0). If zone_type == 0x240 (0x90<<2) or zone_type-0x40 == 0x200 (i.e. 0x240) continues, otherwise returns 0. Then count_effect_node_zone_activations(slot) must == 1 (cmp #1; bne -> 0); invoke_count_zone_pair_hits_full_range(slot, 0x08054899) hit (bne, nonzero; beq -> 0); all satisfied returns 2, otherwise returns 0. Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -19117,15 +19141,15 @@ LAB_080638f2:
     bl count_effect_node_zone_activations    @ 080638f4 2cf00eff
     cmp r0,#0x1                              @ 080638f8 0128
     bne LAB_08063910                         @ 080638fa 09d1
-    ldr r1, DAT_0806390c                     @ 080638fc 0349
+    ldr r1, zone_pair_pred_4899_ptr_0806390c @ 080638fc 0349
     adds r0,r4,#0x0    @ 080638fe 201c
     bl invoke_count_zone_pair_hits_full_range @ 08063900 2cf03cff
     cmp r0,#0x0                              @ 08063904 0028
     beq LAB_08063910                         @ 08063906 03d0
     movs r0,#0x2    @ 08063908 0220
     b LAB_08063912                           @ 0806390a 02e0
-DAT_0806390c:
-    .word  0x08054899                     @ 0806390c 99480508
+zone_pair_pred_4899_ptr_0806390c:
+    .word  0x08054899                     @ 0806390c 99480508  fn-ptr check_equip_slot_eligible_by_same_side_and_prereqs+1 @0x08054898
 LAB_08063910:
     movs r0,#0x0    @ 08063910 0020
 LAB_08063912:
@@ -19138,13 +19162,13 @@ LAB_08063912:
 @ Constants: player_stride=0x868, opp_zone_active_offset=0x10.
 check_field_spell_placeable_with_opp_zone:
     push {lr}                                @ 08063918 00b5
-    ldr r2, PTR_gP1LifePoints_08063944       @ 0806391a 0a4a
+    ldr r2, gp1lp_ptr_08063944               @ 0806391a 0a4a
     ldrb r0,[r0,#0x2]                        @ 0806391c 8078
     lsls r3,r0,#0x1f    @ 0806391e c307
     lsrs r0,r3,#0x1f    @ 08063920 d80f
     movs r1,#0x1    @ 08063922 0121
     eors r0,r1    @ 08063924 4840
-    ldr r1, DAT_08063948                     @ 08063926 0849
+    ldr r1, player_stride_08063948           @ 08063926 0849
     muls r0,r1    @ 08063928 4843
     adds r2,#0x10    @ 0806392a 1032
     adds r0,r0,r2    @ 0806392c 8018
@@ -19158,10 +19182,10 @@ check_field_spell_placeable_with_opp_zone:
     movs r0,#0x1    @ 0806393e 0120
     b LAB_0806394e                           @ 08063940 05e0
     .zero  0x2
-PTR_gP1LifePoints_08063944:
-    .word  gP1LifePoints                  @ 08063944 e0c40102
-DAT_08063948:
-    .word  0x00000868                     @ 08063948 68080000
+gp1lp_ptr_08063944:
+    .word  gP1LifePoints                  @ 08063944 e0c40102  gP1LifePoints ptr for check_field_spell_placeable_with_opp_zone opp LP read
+player_stride_08063948:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063948 68080000
 LAB_0806394c:
     movs r0,#0x0    @ 0806394c 0020
 LAB_0806394e:
@@ -19169,7 +19193,7 @@ LAB_0806394e:
     bx r1                                    @ 08063950 0847
     .zero  0x2
 
-@ Called by FUN_0807d014 (tags: card_frame, card_ids, card_stats, duel_field, font_jp, game_str, settings). Comprehensively validates the equip card slot target: verifies slot type field (low 3 bits of ldrh[+0x2]) equals 0x480, slot[+0x14] is nonzero; then checks gDuelFieldState (0x0201bb90) attacking_side and attacking_slot fields against slot player_id and zone_idx, and confirms no_chain_flag is 0; finally locates the corresponding slot in gDuelFieldSlots (0x0201c510) and checks ATK/DEF are both nonzero. Returns 1 if all checks pass; 0 if any fail.
+@ Called by tick_equip_target_validity_prng_lp_display (tags: card_frame, card_ids, card_stats, duel_field, font_jp, game_str, settings). Comprehensively validates the equip card slot target: verifies slot type field (low 3 bits of ldrh[+0x2]) equals 0x480, slot[+0x14] is nonzero; then checks gDuelFieldState (0x0201bb90) attacking_side and attacking_slot fields against slot player_id and zone_idx, and confirms no_chain_flag is 0; finally locates the corresponding slot in gDuelFieldSlots (0x0201c510) and checks ATK/DEF are both nonzero. Returns 1 if all checks pass; 0 if any fail.
 @ Side effects: no external writes.
 @ Constants: SPELL_ZONE_TYPE=0x480 (0x90<<3), player_stride=0x868, gDuelFieldState_base=0x0201bb90, gDuelFieldSlots_base=0x0201c510.
 check_equip_slot_target_valid_in_zone:
@@ -19186,7 +19210,7 @@ check_equip_slot_target_valid_in_zone:
     ldr r0,[r2,#0x14]                        @ 08063968 5069
     cmp r0,#0x0                              @ 0806396a 0028
     beq LAB_080639c0                         @ 0806396c 28d0
-    ldr r3, DAT_080639b4                     @ 0806396e 114b
+    ldr r3, chain_state_ptr_080639b4         @ 0806396e 114b
     ldrb r2,[r2,#0x2]                        @ 08063970 9278
     lsls r2,r2,#0x1f    @ 08063972 d207
     lsrs r0,r2,#0x1f    @ 08063974 d00f
@@ -19207,10 +19231,10 @@ check_equip_slot_target_valid_in_zone:
     lsls r0,r1,#0x2    @ 08063992 8800
     adds r0,r0,r1    @ 08063994 4018
     lsls r0,r0,#0x2    @ 08063996 8000
-    ldr r1, DAT_080639b8                     @ 08063998 0749
+    ldr r1, player_stride_080639b8           @ 08063998 0749
     muls r1,r2    @ 0806399a 5143
     adds r0,r0,r1    @ 0806399c 4018
-    ldr r1, DAT_080639bc                     @ 0806399e 0749
+    ldr r1, duel_slots_ptr_080639bc          @ 0806399e 0749
     adds r1,r0,r1    @ 080639a0 4118
     ldrh r0,[r1,#0x8]                        @ 080639a2 0889
     cmp r0,#0x0                              @ 080639a4 0028
@@ -19221,12 +19245,12 @@ check_equip_slot_target_valid_in_zone:
     movs r0,#0x1    @ 080639ae 0120
     b LAB_080639c2                           @ 080639b0 07e0
     .zero  0x2
-DAT_080639b4:
-    .word  0x0201bb90                     @ 080639b4 90bb0102
-DAT_080639b8:
-    .word  0x00000868                     @ 080639b8 68080000
-DAT_080639bc:
-    .word  0x0201c510                     @ 080639bc 10c50102
+chain_state_ptr_080639b4:
+    .word  gEquipChainSlotRefs            @ 080639b4 90bb0102
+player_stride_080639b8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080639b8 68080000
+duel_slots_ptr_080639bc:
+    .word  gDuelFieldSlots                @ 080639bc 10c50102
 LAB_080639c0:
     movs r0,#0x0    @ 080639c0 0020
 LAB_080639c2:
@@ -19257,10 +19281,10 @@ check_equip_slot_matches_monster_state:
     lsls r0,r1,#0x2    @ 080639e8 8800
     adds r0,r0,r1    @ 080639ea 4018
     lsls r0,r0,#0x2    @ 080639ec 8000
-    ldr r1, DAT_08063a24                     @ 080639ee 0d49
+    ldr r1, player_stride_08063a24           @ 080639ee 0d49
     muls r1,r2    @ 080639f0 5143
     adds r0,r0,r1    @ 080639f2 4018
-    ldr r1, DAT_08063a28                     @ 080639f4 0c49
+    ldr r1, duel_slots_ptr_08063a28          @ 080639f4 0c49
     adds r0,r0,r1    @ 080639f6 4018
     ldr r0,[r0,#0x0]                         @ 080639f8 0068
     lsls r0,r0,#0x13    @ 080639fa c004
@@ -19269,7 +19293,7 @@ check_equip_slot_matches_monster_state:
     lsls r0,r3,#0x17    @ 08063a00 d805
     lsrs r0,r0,#0x15    @ 08063a02 400d
     adds r0,r1,r0    @ 08063a04 0818
-    ldr r1, DAT_08063a2c                     @ 08063a06 0949
+    ldr r1, stat_table_off_08063a2c          @ 08063a06 0949
     adds r0,r0,r1    @ 08063a08 4018
     ldrh r0,[r0,#0x0]                        @ 08063a0a 0088
     lsls r0,r0,#0x13    @ 08063a0c c004
@@ -19283,12 +19307,12 @@ check_equip_slot_matches_monster_state:
     lsls r0,r1,#0x12    @ 08063a1e 8804
     lsrs r2,r0,#0x1c    @ 08063a20 020f
     b LAB_08063a34                           @ 08063a22 07e0
-DAT_08063a24:
-    .word  0x00000868                     @ 08063a24 68080000
-DAT_08063a28:
-    .word  0x0201c510                     @ 08063a28 10c50102
-DAT_08063a2c:
-    .word  0x000010b0                     @ 08063a2c b0100000
+player_stride_08063a24:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063a24 68080000
+duel_slots_ptr_08063a28:
+    .word  gDuelFieldSlots                @ 08063a28 10c50102
+stat_table_off_08063a2c:
+    .word  EQUIP_FLAG_TARGET_ICID_TABLE_OFF @ 08063a2c b0100000  stat_table_offset=0x10b0 for equip flag target CID table
 LAB_08063a30:
     movs r2,#0x1    @ 08063a30 0122
     rsbs r2,r2,#0    @ 08063a32 5242
@@ -19500,8 +19524,8 @@ check_equip_slot_eligible_deck_pair_with_spell_zone:
     adds r4,r0,#0x0    @ 08063ba6 041c
     cmp r1,#0x0                              @ 08063ba8 0029
     bne LAB_08063c0c                         @ 08063baa 2fd1
-    ldr r3, DWORD_08063c00                   @ 08063bac 144b
-    ldr r0, DWORD_08063c04                   @ 08063bae 1548
+    ldr r3, gp1lp_ptr_08063c00               @ 08063bac 144b
+    ldr r0, active_player_off_08063c04       @ 08063bae 1548
     adds r1,r3,r0    @ 08063bb0 1918
     ldrb r2,[r4,#0x2]                        @ 08063bb2 a278
     lsls r0,r2,#0x1f    @ 08063bb4 d007
@@ -19509,7 +19533,7 @@ check_equip_slot_eligible_deck_pair_with_spell_zone:
     ldr r1,[r1,#0x0]                         @ 08063bb8 0968
     cmp r1,r0                                @ 08063bba 8142
     bne LAB_08063c0c                         @ 08063bbc 26d1
-    ldr r1, DWORD_08063c08                   @ 08063bbe 1249
+    ldr r1, duel_phase_off_08063c08          @ 08063bbe 1249
     adds r0,r3,r1    @ 08063bc0 5818
     ldr r0,[r0,#0x0]                         @ 08063bc2 0068
     cmp r0,#0x2                              @ 08063bc4 0228
@@ -19540,12 +19564,12 @@ LAB_08063bcc:
     movs r0,#0x1    @ 08063bfa 0120
     b LAB_08063c0e                           @ 08063bfc 07e0
     .zero  0x2
-DWORD_08063c00:
+gp1lp_ptr_08063c00:
     .word  gP1LifePoints                  @ 08063c00 e0c40102
-DWORD_08063c04:
-    .word  0x00001ce8                     @ 08063c04 e81c0000
-DWORD_08063c08:
-    .word  0x00001cf4                     @ 08063c08 f41c0000
+active_player_off_08063c04:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08063c04 e81c0000
+duel_phase_off_08063c08:
+    .word  FIELD_STATE_OFF                @ 08063c08 f41c0000
 LAB_08063c0c:
     movs r0,#0x0    @ 08063c0c 0020
 LAB_08063c0e:
@@ -19564,13 +19588,13 @@ check_equip_slot_eligible_neo_daedalus_with_lp_threshold:
     push {r4,lr}                             @ 08063c14 10b5
     adds r3,r0,#0x0    @ 08063c16 031c
     adds r4,r1,#0x0    @ 08063c18 0c1c
-    ldr r2, DWORD_08063c40                   @ 08063c1a 094a
+    ldr r2, gp1lp_ptr_08063c40               @ 08063c1a 094a
     ldrb r1,[r3,#0x2]                        @ 08063c1c 9978
     lsls r0,r1,#0x1f    @ 08063c1e c807
     lsrs r0,r0,#0x1f    @ 08063c20 c00f
     movs r1,#0x1    @ 08063c22 0121
     eors r0,r1    @ 08063c24 4840
-    ldr r1, DWORD_08063c44                   @ 08063c26 0749
+    ldr r1, player_stride_08063c44           @ 08063c26 0749
     muls r0,r1    @ 08063c28 4843
     adds r2,#0x10    @ 08063c2a 1032
     adds r0,r0,r2    @ 08063c2c 8018
@@ -19582,10 +19606,10 @@ check_equip_slot_eligible_neo_daedalus_with_lp_threshold:
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 08063c38 f8f706fb
     b LAB_08063c4a                           @ 08063c3c 05e0
     .zero  0x2
-DWORD_08063c40:
+gp1lp_ptr_08063c40:
     .word  gP1LifePoints                  @ 08063c40 e0c40102
-DWORD_08063c44:
-    .word  0x00000868                     @ 08063c44 68080000
+player_stride_08063c44:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063c44 68080000
 LAB_08063c48:
     movs r0,#0x0    @ 08063c48 0020
 LAB_08063c4a:
@@ -19600,14 +19624,14 @@ LAB_08063c4a:
 @ - HIT_THRESHOLD=1 (count > 1 is eligible, cmp #1; ble fails)
 check_equip_slot_zone_pair_hit_over_one_table_0a55:
     push {lr}                                @ 08063c50 00b5
-    ldr r1, DWORD_08063c60                   @ 08063c52 0349
+    ldr r1, zone_pair_pred_0a55_ptr_08063c60 @ 08063c52 0349
     bl invoke_count_zone_pair_hits_full_range @ 08063c54 2cf092fd
     cmp r0,#0x1                              @ 08063c58 0128
     ble LAB_08063c64                         @ 08063c5a 03dd
     movs r0,#0x1    @ 08063c5c 0120
     b LAB_08063c66                           @ 08063c5e 02e0
-DWORD_08063c60:
-    .word  0x08050a55                     @ 08063c60 550a0508
+zone_pair_pred_0a55_ptr_08063c60:
+    .word  0x08050a55                     @ 08063c60 550a0508  fn-ptr check_equip_slot_eligible_by_card_id_bst+1 @0x08050a54
 LAB_08063c64:
     movs r0,#0x0    @ 08063c64 0020
 LAB_08063c66:
@@ -19647,7 +19671,7 @@ LAB_08063c8e:
     bx r1                                    @ 08063c90 0847
     .zero  0x2
 
-@ Called to check whether slot r0 satisfies the Water Dragon (0x1951, Oxygeddon/Hydrogeddon pair) equip activation conditions. Three-step check: (1) count_monster_slots_for_player(player_id) > 2; (2) check_field_spell_neo_daedalus_group_placeable(player_id) returns nonzero; (3) dispatch_effect_handler_by_card_id(player_id, card_id, table_A=0x194f/Hydrogeddon) > 1 AND dispatch_effect_handler_by_card_id(player_id, card_id, table_B=0x1950/Oxygeddon) > 0. All pass returns 1, otherwise 0. Called from FUN_08059fc4 in the card_id==0x1951 Water Dragon branch.
+@ Called to check whether slot r0 satisfies the Water Dragon (0x1951, Oxygeddon/Hydrogeddon pair) equip activation conditions. Three-step check: (1) count_monster_slots_for_player(player_id) > 2; (2) check_field_spell_neo_daedalus_group_placeable(player_id) returns nonzero; (3) dispatch_effect_handler_by_card_id(player_id, card_id, table_A=0x194f/Hydrogeddon) > 1 AND dispatch_effect_handler_by_card_id(player_id, card_id, table_B=0x1950/Oxygeddon) > 0. All pass returns 1, otherwise 0. Called from tick_equip_activation_if_pair_eligible in the card_id==0x1951 Water Dragon branch.
 @ 
 @ Constants:
 @ - CARD_ID_HYDROGEDDON=0x194f (Hydrogeddon; table A)
@@ -19678,7 +19702,7 @@ check_slot_eligible_water_dragon_pair:
     lsls r0,r1,#0x1f    @ 08063cb8 c807
     lsrs r0,r0,#0x1f    @ 08063cba c00f
     ldrh r1,[r4,#0x0]                        @ 08063cbc 2188
-    ldr r2, DAT_08063ce0                     @ 08063cbe 084a
+    ldr r2, hydrogeddon_cid_08063ce0         @ 08063cbe 084a
     bl dispatch_effect_handler_by_card_id    @ 08063cc0 29f0f6fe
     cmp r0,#0x1                              @ 08063cc4 0128
     ble LAB_08063ce8                         @ 08063cc6 0fdd
@@ -19686,24 +19710,38 @@ check_slot_eligible_water_dragon_pair:
     lsls r0,r1,#0x1f    @ 08063cca c807
     lsrs r0,r0,#0x1f    @ 08063ccc c00f
     ldrh r1,[r4,#0x0]                        @ 08063cce 2188
-    ldr r2, DAT_08063ce4                     @ 08063cd0 044a
+    ldr r2, oxygeddon_cid_08063ce4           @ 08063cd0 044a
     bl dispatch_effect_handler_by_card_id    @ 08063cd2 29f0edfe
     cmp r0,#0x0                              @ 08063cd6 0028
     ble LAB_08063ce8                         @ 08063cd8 06dd
     movs r0,#0x1    @ 08063cda 0120
     b LAB_08063cea                           @ 08063cdc 05e0
     .zero  0x2
-DAT_08063ce0:
-    .word  0x0000194f                     @ 08063ce0 4f190000
-DAT_08063ce4:
-    .word  0x00001950                     @ 08063ce4 50190000
+hydrogeddon_cid_08063ce0:
+    .word  HYDROGEDDON_CID                @ 08063ce0 4f190000
+oxygeddon_cid_08063ce4:
+    .word  OXYGEDDON_CID                  @ 08063ce4 50190000
 LAB_08063ce8:
     movs r0,#0x0    @ 08063ce8 0020
 LAB_08063cea:
     pop {r4}                                 @ 08063cea 10bc
     pop {r1}                                 @ 08063cec 02bc
     bx r1                                    @ 08063cee 0847
-    ROM_INCBIN 0x63cf0, 0x14
+
+@ fn_eligible for CID=0x1954 (VWXYZ-Dragon Catapult Cannon, pw=84243274). Reached via card effect handler dispatch table at ROM 0x09e45328. Reads [gEquipChainSlotRefs+0x8] (chain interrupt field). Returns 1 if [gEquipChainSlotRefs+8] == 0 (no chain interrupt active), 0 if nonzero. Lit pool @ 0x08063cfc: gEquipChainSlotRefs(0x0201bb90).
+check_chain_field8_is_zero:
+    ldr r0, chain_state_ptr_08063cfc         @ 08063cf0 0248
+    ldr r0,[r0,#0x8]                         @ 08063cf2 8068
+    cmp r0,#0x0                              @ 08063cf4 0028
+    bne LAB_08063d00                         @ 08063cf6 03d1
+    movs r0,#0x1    @ 08063cf8 0120
+    b LAB_08063d02                           @ 08063cfa 02e0
+chain_state_ptr_08063cfc:
+    .word  gEquipChainSlotRefs            @ 08063cfc 90bb0102
+LAB_08063d00:
+    movs r0,#0x0    @ 08063d00 0020
+LAB_08063d02:
+    bx lr                                    @ 08063d02 7047
 
 @ Checks Neo Daedalus / LP-slot effect activation eligibility via the effect_slot pointer and returns a tier code. Flow: first calls check_equip_slot_eligible_neo_daedalus_with_lp_slot_effect(slot_ptr); if not eligible returns 0. Otherwise clears slot[+0xc] then calls count_effect_node_zone_activations to count zone activations; if <=1 returns 0. Otherwise writes slot[+0xc]=2 and recounts; if result is 0 returns 0, else returns 2. Statically dispatched via fn-ptr by the 0x0806xxxx equip effect display state-machine cluster (indeg=0). Return value lets the caller decide the slot activation tier.
 @ 
@@ -19770,7 +19808,7 @@ check_slot_eligible_dark_field_equip:
     lsls r1,r1,#0x2    @ 08063d58 8900
     cmp r0,r1                                @ 08063d5a 8842
     bne LAB_08063dac                         @ 08063d5c 26d1
-    ldr r1, PTR_gP1LifePoints_08063da8       @ 08063d5e 1249
+    ldr r1, gp1lp_ptr_08063da8               @ 08063d5e 1249
     ldr r2,[r4,#0x14]                        @ 08063d60 6269
     lsls r0,r2,#0x17    @ 08063d62 d005
     lsrs r0,r0,#0x15    @ 08063d64 400d
@@ -19805,15 +19843,52 @@ check_slot_eligible_dark_field_equip:
     movs r0,#0x1    @ 08063da2 0120
     b LAB_08063dae                           @ 08063da4 03e0
     .zero  0x2
-PTR_gP1LifePoints_08063da8:
-    .word  gP1LifePoints                  @ 08063da8 e0c40102
+gp1lp_ptr_08063da8:
+    .word  gP1LifePoints                  @ 08063da8 e0c40102  gP1LifePoints ptr for check_slot_eligible_dark_field_equip slot resolve
 LAB_08063dac:
     movs r0,#0x0    @ 08063dac 0020
 LAB_08063dae:
     pop {r4,r5}                              @ 08063dae 30bc
     pop {r1}                                 @ 08063db0 02bc
     bx r1                                    @ 08063db2 0847
-    ROM_INCBIN 0x63db4, 0x40
+
+@ fn_eligible for CID=0x195e (Chthonian Blast, pw=18271561). Reached via card effect handler dispatch table at ROM 0x09e42cd0. Checks: (1) zone type bits[11:6] of slot[+2] must be 0x16 or 0x1b. (2) bit9 of slot[+0x14] must match slot.player_id (bit0 of slot[+2]). (3) lsrs r0,r2,#18 + lsrs r0,r0,#28: result always 0 for 32-bit r2 (r2>>46);     bgt(0>4)=false -> falls through. (4) ands r2,r0 [0x4002=ANDS Rd=r2,Rs=r0]: slot[+0x14] & 0x00fa8000. (5) movs r0,#0xe5; lsls r0,r0,#15 -> r0=0x00728000 (0xe5<<15). (6) cmp r2,r0: (slot[+0x14] & 0x00fa8000) must == 0x00728000. Lit pool @ 0x08063dec: 0x00fa8000 (bit-match mask).
+check_slot_zone_code_and_link_field_for_cid_195e:
+    adds r3,r0,#0x0    @ 08063db4 031c
+    ldrh r1,[r3,#0x2]                        @ 08063db6 5988
+    lsls r0,r1,#0x14    @ 08063db8 0805
+    lsrs r0,r0,#0x1a    @ 08063dba 800e
+    cmp r0,#0x16                             @ 08063dbc 1628
+    beq LAB_08063dc4                         @ 08063dbe 01d0
+    cmp r0,#0x1b                             @ 08063dc0 1b28
+    bne LAB_08063df0                         @ 08063dc2 15d1
+LAB_08063dc4:
+    ldr r2,[r3,#0x14]                        @ 08063dc4 5a69
+    lsls r1,r2,#0x16    @ 08063dc6 9105
+    lsrs r1,r1,#0x1f    @ 08063dc8 c90f
+    ldrb r3,[r3,#0x2]                        @ 08063dca 9b78
+    lsls r0,r3,#0x1f    @ 08063dcc d807
+    lsrs r0,r0,#0x1f    @ 08063dce c00f
+    cmp r1,r0                                @ 08063dd0 8142
+    bne LAB_08063df0                         @ 08063dd2 0dd1
+    lsls r0,r2,#0x12    @ 08063dd4 9004
+    lsrs r0,r0,#0x1c    @ 08063dd6 000f
+    cmp r0,#0x4                              @ 08063dd8 0428
+    bgt LAB_08063df0                         @ 08063dda 09dc
+    ldr r0, field_mask_08063dec              @ 08063ddc 0348
+    ands r2,r0    @ 08063dde 0240
+    movs r0,#0xe5    @ 08063de0 e520
+    lsls r0,r0,#0xf    @ 08063de2 c003
+    cmp r2,r0                                @ 08063de4 8242
+    bne LAB_08063df0                         @ 08063de6 03d1
+    movs r0,#0x1    @ 08063de8 0120
+    b LAB_08063df2                           @ 08063dea 02e0
+field_mask_08063dec:
+    .word  0x00fa8000                     @ 08063dec 0080fa00  slot[+0x14] bit-match mask 0x00fa8000 for Chthonian Blast fn_eligible check
+LAB_08063df0:
+    movs r0,#0x0    @ 08063df0 0020
+LAB_08063df2:
+    bx lr                                    @ 08063df2 7047
 
 @ Called to check whether the equip chain node for a slot has an active marker at a specific zone offset. First calls check_equip_slot_chain_absent(r0=slot_ptr); if chain is empty (returns 0) returns 0 immediately. Otherwise extracts player_id (bit0) and zone_idx (bits[5:1]) from slot_ptr[+2], computes gDuelFieldSlots entry address (player*0x868 + slot_offset*20 + base), reads [slot+0xc] field and checks if nonzero. Returns 1 if nonzero, 0 if zero. Pure read.
 @ 
@@ -19843,10 +19918,10 @@ LAB_08063e04:
     lsls r1,r0,#0x2    @ 08063e0e 8100
     adds r1,r1,r0    @ 08063e10 0918
     lsls r1,r1,#0x2    @ 08063e12 8900
-    ldr r0, DAT_08063e2c                     @ 08063e14 0548
+    ldr r0, player_stride_08063e2c           @ 08063e14 0548
     muls r0,r2    @ 08063e16 5043
     adds r1,r1,r0    @ 08063e18 0918
-    ldr r0, DAT_08063e30                     @ 08063e1a 0548
+    ldr r0, duel_slots_ptr_08063e30          @ 08063e1a 0548
     adds r1,r1,r0    @ 08063e1c 0918
     ldr r0,[r1,#0xc]                         @ 08063e1e c868
     cmp r0,#0x0                              @ 08063e20 0028
@@ -19856,17 +19931,17 @@ LAB_08063e26:
     pop {r4}                                 @ 08063e26 10bc
     pop {r1}                                 @ 08063e28 02bc
     bx r1                                    @ 08063e2a 0847
-DAT_08063e2c:
-    .word  0x00000868                     @ 08063e2c 68080000
-DAT_08063e30:
-    .word  0x0201c510                     @ 08063e30 10c50102
+player_stride_08063e2c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063e2c 68080000
+duel_slots_ptr_08063e30:
+    .word  gDuelFieldSlots                @ 08063e30 10c50102
 
 @ Called by eval_equip_chain_score_for_slot (0x0803a9a8). Checks that the current gDuelFieldState (0x0201bb90) equip chain is inactive and the score has not exceeded the threshold: reads [gDuelFieldState+0x8] to confirm no chain active; reads player_id from [+0x4] and zone_idx from [+0x20], locates the corresponding slot in gDuelFieldSlots (0x0201c510); verifies that slot[+0x8] (ATK) is nonzero; then calls eval_equip_chain_score_for_slot (r0=player_id, r1=zone_idx). Returns 1 if score <= 3 (within threshold); returns 0 if score exceeds threshold or any pre-check fails.
 @ Side effects: no external writes.
 @ Constants: player_stride=0x868, gDuelFieldState=0x0201bb90, gDuelFieldSlots=0x0201c510, score_threshold=3.
 check_equip_chain_score_within_threshold:
     push {r4,lr}                             @ 08063e34 10b5
-    ldr r1, DAT_08063e6c                     @ 08063e36 0d49
+    ldr r1, chain_state_ptr_08063e6c         @ 08063e36 0d49
     ldr r0,[r1,#0x8]                         @ 08063e38 8868
     cmp r0,#0x0                              @ 08063e3a 0028
     bne LAB_08063e78                         @ 08063e3c 1cd1
@@ -19877,10 +19952,10 @@ check_equip_chain_score_within_threshold:
     lsls r0,r3,#0x2    @ 08063e46 9800
     adds r0,r0,r3    @ 08063e48 c018
     lsls r0,r0,#0x2    @ 08063e4a 8000
-    ldr r1, DAT_08063e70                     @ 08063e4c 0849
+    ldr r1, player_stride_08063e70           @ 08063e4c 0849
     muls r1,r2    @ 08063e4e 5143
     adds r0,r0,r1    @ 08063e50 4018
-    ldr r1, DAT_08063e74                     @ 08063e52 0849
+    ldr r1, duel_slots_ptr_08063e74          @ 08063e52 0849
     adds r0,r0,r1    @ 08063e54 4018
     ldrh r0,[r0,#0x8]                        @ 08063e56 0089
     cmp r0,#0x0                              @ 08063e58 0028
@@ -19892,12 +19967,12 @@ check_equip_chain_score_within_threshold:
     bgt LAB_08063e78                         @ 08063e66 07dc
     movs r0,#0x1    @ 08063e68 0120
     b LAB_08063e7a                           @ 08063e6a 06e0
-DAT_08063e6c:
-    .word  0x0201bb90                     @ 08063e6c 90bb0102
-DAT_08063e70:
-    .word  0x00000868                     @ 08063e70 68080000
-DAT_08063e74:
-    .word  0x0201c510                     @ 08063e74 10c50102
+chain_state_ptr_08063e6c:
+    .word  gEquipChainSlotRefs            @ 08063e6c 90bb0102
+player_stride_08063e70:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063e70 68080000
+duel_slots_ptr_08063e74:
+    .word  gDuelFieldSlots                @ 08063e74 10c50102
 LAB_08063e78:
     movs r0,#0x0    @ 08063e78 0020
 LAB_08063e7a:
@@ -19941,12 +20016,12 @@ check_equip_slot_eligible_neo_daedalus_with_offering_guard:
     ands r0,r1    @ 08063e9e 0840
     cmp r0,#0x0                              @ 08063ea0 0028
     bne LAB_08063ee4                         @ 08063ea2 1fd1
-    ldr r1, DWORD_08063ed8                   @ 08063ea4 0c49
+    ldr r1, gp1lp_ptr_08063ed8               @ 08063ea4 0c49
     ldrb r4,[r4,#0x2]                        @ 08063ea6 a478
     lsls r4,r4,#0x1f    @ 08063ea8 e407
     movs r3,#0x1    @ 08063eaa 0123
     lsrs r2,r4,#0x1f    @ 08063eac e20f
-    ldr r0, DWORD_08063edc                   @ 08063eae 0b48
+    ldr r0, player_stride_08063edc           @ 08063eae 0b48
     muls r0,r2    @ 08063eb0 5043
     movs r2,#0x8e    @ 08063eb2 8e22
     lsls r2,r2,#0x1    @ 08063eb4 5200
@@ -19958,7 +20033,7 @@ check_equip_slot_eligible_neo_daedalus_with_offering_guard:
     cmp r0,#0x0                              @ 08063ec0 0028
     bne LAB_08063f20                         @ 08063ec2 2dd1
     lsrs r0,r4,#0x1f    @ 08063ec4 e00f
-    ldr r2, DWORD_08063ee0                   @ 08063ec6 064a
+    ldr r2, ultimate_offering_cid_08063ee0   @ 08063ec6 064a
     movs r1,#0xb    @ 08063ec8 0b21
     bl check_value_in_slot_chain             @ 08063eca cbf7e1fe
     cmp r0,#0x0                              @ 08063ece 0028
@@ -19966,12 +20041,12 @@ check_equip_slot_eligible_neo_daedalus_with_offering_guard:
     movs r0,#0x1    @ 08063ed2 0120
     b LAB_08063f22                           @ 08063ed4 25e0
     .zero  0x2
-DWORD_08063ed8:
+gp1lp_ptr_08063ed8:
     .word  gP1LifePoints                  @ 08063ed8 e0c40102
-DWORD_08063edc:
-    .word  0x00000868                     @ 08063edc 68080000
-DWORD_08063ee0:
-    .word  0x000012f3                     @ 08063ee0 f3120000
+player_stride_08063edc:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063edc 68080000
+ultimate_offering_cid_08063ee0:
+    .word  ULTIMATE_OFFERING_CID          @ 08063ee0 f3120000
 LAB_08063ee4:
     ldrb r1,[r4,#0x2]                        @ 08063ee4 a178
     lsls r0,r1,#0x1f    @ 08063ee6 c807
@@ -19982,11 +20057,11 @@ LAB_08063ee4:
     bl check_value_in_slot_chain             @ 08063ef0 cbf7cefe
     cmp r0,#0x0                              @ 08063ef4 0028
     beq LAB_08063f20                         @ 08063ef6 13d0
-    ldr r2, DWORD_08063f18                   @ 08063ef8 074a
+    ldr r2, gp1lp_ptr_08063f18               @ 08063ef8 074a
     ldrb r1,[r4,#0x2]                        @ 08063efa a178
     lsls r0,r1,#0x1f    @ 08063efc c807
     lsrs r0,r0,#0x1f    @ 08063efe c00f
-    ldr r1, DWORD_08063f1c                   @ 08063f00 0649
+    ldr r1, player_stride_08063f1c           @ 08063f00 0649
     muls r0,r1    @ 08063f02 4843
     adds r2,#0x10    @ 08063f04 1032
     adds r0,r0,r2    @ 08063f06 8018
@@ -19997,10 +20072,10 @@ LAB_08063ee4:
     adds r1,r5,#0x0    @ 08063f10 291c
     bl check_neo_daedalus_placement_eligible @ 08063f12 f8f781f9
     b LAB_08063f22                           @ 08063f16 04e0
-DWORD_08063f18:
+gp1lp_ptr_08063f18:
     .word  gP1LifePoints                  @ 08063f18 e0c40102
-DWORD_08063f1c:
-    .word  0x00000868                     @ 08063f1c 68080000
+player_stride_08063f1c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063f1c 68080000
 LAB_08063f20:
     movs r0,#0x0    @ 08063f20 0020
 LAB_08063f22:
@@ -20019,12 +20094,12 @@ check_equip_slot_eligible_neo_daedalus_with_lp_bit_guard:
     push {r4,r5,lr}                          @ 08063f28 30b5
     adds r4,r0,#0x0    @ 08063f2a 041c
     adds r5,r1,#0x0    @ 08063f2c 0d1c
-    ldr r2, DWORD_08063f58                   @ 08063f2e 0a4a
+    ldr r2, gp1lp_ptr_08063f58               @ 08063f2e 0a4a
     ldrb r1,[r4,#0x2]                        @ 08063f30 a178
     lsls r0,r1,#0x1f    @ 08063f32 c807
     movs r3,#0x1    @ 08063f34 0123
     lsrs r0,r0,#0x1f    @ 08063f36 c00f
-    ldr r1, DWORD_08063f5c                   @ 08063f38 0849
+    ldr r1, player_stride_08063f5c           @ 08063f38 0849
     muls r0,r1    @ 08063f3a 4843
     movs r1,#0x8e    @ 08063f3c 8e21
     lsls r1,r1,#0x1    @ 08063f3e 4900
@@ -20039,10 +20114,10 @@ check_equip_slot_eligible_neo_daedalus_with_lp_bit_guard:
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 08063f50 f8f77af9
     b LAB_08063f62                           @ 08063f54 05e0
     .zero  0x2
-DWORD_08063f58:
+gp1lp_ptr_08063f58:
     .word  gP1LifePoints                  @ 08063f58 e0c40102
-DWORD_08063f5c:
-    .word  0x00000868                     @ 08063f5c 68080000
+player_stride_08063f5c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08063f5c 68080000
 LAB_08063f60:
     movs r0,#0x0    @ 08063f60 0020
 LAB_08063f62:
@@ -20108,7 +20183,29 @@ LAB_08063fbe:
     pop {r4,r5}                              @ 08063fbe 30bc
     pop {r1}                                 @ 08063fc0 02bc
     bx r1                                    @ 08063fc2 0847
-    ROM_INCBIN 0x63fc4, 0x24
+
+@ fn_eligible for CID=0x1976 (Simultaneous Loss, pw=92219931). Reached via card effect handler dispatch table at ROM 0x09e42da8. slot_ptr (r0 on entry) is NOT used -- pure global read. Checks gP1LP[+0x10] (player0 LP_SLOT_ACTIVE_OFF) OR gP1LP[+0x878] (player1 LP_SLOT_ACTIVE_OFF). 0x878 = PLAYER_BLOCK_STRIDE(0x868) + LP_SLOT_ACTIVE_OFF(0x10). Both bne branch targets land at 0x08063fe4 (movs r0,#1; bx lr). 0x08063fe2 is alignment pad (0x0000), NOT a branch target, not executed. Returns 1 if either player LP_SLOT_ACTIVE field is nonzero, 0 if both zero. Lit pool @ 0x08063fdc: gP1LifePoints(0x0201c4e0). Lit pool @ 0x08063fe0: 0x00000878 (player1 stride+LP_SLOT_ACTIVE_OFF).
+check_either_player_lp_slot_active:
+    ldr r1, gp1lp_ptr_08063fdc               @ 08063fc4 0549
+    ldr r0,[r1,#0x10]                        @ 08063fc6 0869
+    cmp r0,#0x0                              @ 08063fc8 0028
+    bne LAB_08063fe4                         @ 08063fca 0bd1
+    ldr r2, p1_lp_zone_off_08063fe0          @ 08063fcc 044a
+    adds r0,r1,r2    @ 08063fce 8818
+    ldr r0,[r0,#0x0]                         @ 08063fd0 0068
+    cmp r0,#0x0                              @ 08063fd2 0028
+    bne LAB_08063fe4                         @ 08063fd4 06d1
+    movs r0,#0x0    @ 08063fd6 0020
+    b LAB_08063fe6                           @ 08063fd8 05e0
+    .zero  0x2
+gp1lp_ptr_08063fdc:
+    .word  gP1LifePoints                  @ 08063fdc e0c40102
+p1_lp_zone_off_08063fe0:
+    .word  0x00000878                     @ 08063fe0 78080000  PLAYER_BLOCK_STRIDE(0x868) + LP_SLOT_ACTIVE_OFF(0x10) = player1 LP zone active offset 0x878
+LAB_08063fe4:
+    movs r0,#0x1    @ 08063fe4 0120
+LAB_08063fe6:
+    bx lr                                    @ 08063fe6 7047
 
 @ Called by count_paired_slots_with_field5_default (0x08032c94). Routes to a different field5 paired card table based on slot[+0x0] card_id: 0x1988 (Burst Return) maps to 0x18a7 (Elemental Hero Burstinatrix); 0x198a (Bubble Illusion) maps to 0x18f9 (Elemental Hero Bubbleman). Calls count_paired_slots_with_field5_default to check whether a paired slot exists. Returns 1 if paired count > 0; returns 0 otherwise.
 @ Side effects: no external writes.
@@ -20117,22 +20214,22 @@ check_slot_paired_field5_by_card_type:
     push {lr}                                @ 08063fe8 00b5
     adds r3,r0,#0x0    @ 08063fea 031c
     ldrh r2,[r3,#0x0]                        @ 08063fec 1a88
-    ldr r0, DAT_08063ffc                     @ 08063fee 0348
+    ldr r0, burst_return_cid_08063ffc        @ 08063fee 0348
     cmp r2,r0                                @ 08063ff0 8242
     beq LAB_08064000                         @ 08063ff2 05d0
     adds r0,#0x2    @ 08063ff4 0230
     cmp r2,r0                                @ 08063ff6 8242
     beq LAB_08064008                         @ 08063ff8 06d0
     b LAB_0806400a                           @ 08063ffa 06e0
-DAT_08063ffc:
-    .word  0x00001988                     @ 08063ffc 88190000
+burst_return_cid_08063ffc:
+    .word  BURST_RETURN_CID               @ 08063ffc 88190000
 LAB_08064000:
-    ldr r1, DAT_08064004                     @ 08064000 0049
+    ldr r1, burstinatrix_cid_08064004        @ 08064000 0049
     b LAB_0806400a                           @ 08064002 02e0
-DAT_08064004:
-    .word  0x000018a7                     @ 08064004 a7180000
+burstinatrix_cid_08064004:
+    .word  EHERO_BURSTINATRIX_CID         @ 08064004 a7180000
 LAB_08064008:
-    ldr r1, DAT_0806401c                     @ 08064008 0449
+    ldr r1, bubbleman_cid_0806401c           @ 08064008 0449
 LAB_0806400a:
     ldrb r3,[r3,#0x2]                        @ 0806400a 9b78
     lsls r0,r3,#0x1f    @ 0806400c d807
@@ -20142,8 +20239,8 @@ LAB_0806400a:
     beq LAB_08064020                         @ 08064016 03d0
     movs r0,#0x1    @ 08064018 0120
     b LAB_08064022                           @ 0806401a 02e0
-DAT_0806401c:
-    .word  0x000018f9                     @ 0806401c f9180000
+bubbleman_cid_0806401c:
+    .word  EHERO_BUBBLEMAN_CID            @ 0806401c f9180000
 LAB_08064020:
     movs r0,#0x0    @ 08064020 0020
 LAB_08064022:
@@ -20172,7 +20269,7 @@ check_slot_clayman_pair_in_active_chain:
     lsls r1,r1,#0x3    @ 08064036 c900
     cmp r0,r1                                @ 08064038 8842
     bne LAB_0806406c                         @ 0806403a 17d1
-    ldr r1, DWORD_08064064                   @ 0806403c 0949
+    ldr r1, chain_state_ptr_08064064         @ 0806403c 0949
     ldr r0,[r1,#0x8]                         @ 0806403e 8868
     cmp r0,#0x0                              @ 08064040 0028
     bne LAB_0806406c                         @ 08064042 13d1
@@ -20183,7 +20280,7 @@ check_slot_clayman_pair_in_active_chain:
     cmp r3,r0                                @ 0806404c 8342
     bne LAB_0806406c                         @ 0806404e 0dd1
     ldr r1,[r1,#0x20]                        @ 08064050 096a
-    ldr r2, DWORD_08064068                   @ 08064052 054a
+    ldr r2, clayman_pair_cid_08064068        @ 08064052 054a
     adds r0,r3,#0x0    @ 08064054 181c
     bl check_slot_card_pair_allowed          @ 08064056 cdf785fa
     cmp r0,#0x0                              @ 0806405a 0028
@@ -20191,10 +20288,10 @@ check_slot_clayman_pair_in_active_chain:
     movs r0,#0x1    @ 0806405e 0120
     b LAB_0806406e                           @ 08064060 05e0
     .zero  0x2
-DWORD_08064064:
-    .word  0x0201bb90                     @ 08064064 90bb0102
-DWORD_08064068:
-    .word  0x000018a8                     @ 08064068 a8180000
+chain_state_ptr_08064064:
+    .word  gEquipChainSlotRefs            @ 08064064 90bb0102
+clayman_pair_cid_08064068:
+    .word  EHERO_CLAYMAN_CID              @ 08064068 a8180000
 LAB_0806406c:
     movs r0,#0x0    @ 0806406c 0020
 LAB_0806406e:
@@ -20243,13 +20340,13 @@ LAB_0806409a:
 LAB_080640a8:
     movs r7,#0x0    @ 080640a8 0027
     movs r1,#0x0    @ 080640aa 0021
-    ldr r2, DWORD_08064190                   @ 080640ac 384a
-    ldr r3, DWORD_08064194                   @ 080640ae 394b
+    ldr r2, phase_flags_ptr_08064190         @ 080640ac 384a
+    ldr r3, chain_count_off_08064194         @ 080640ae 394b
     adds r0,r2,r3    @ 080640b0 d018
     ldr r0,[r0,#0x0]                         @ 080640b2 0068
     cmp r7,r0                                @ 080640b4 8742
     bcs LAB_080640ce                         @ 080640b6 0ad2
-    ldr r4, DWORD_08064198                   @ 080640b8 374c
+    ldr r4, chain_base_off_08064198          @ 080640b8 374c
     adds r3,r2,r4    @ 080640ba 1319
     adds r2,r0,#0x0    @ 080640bc 021c
 LAB_080640be:
@@ -20296,13 +20393,13 @@ LAB_080640ce:
     lsls r0,r4,#0x2    @ 0806410c a000
     adds r0,r0,r4    @ 0806410e 0019
     lsls r0,r0,#0x2    @ 08064110 8000
-    ldr r3, DWORD_0806419c                   @ 08064112 224b
+    ldr r3, player_stride_0806419c           @ 08064112 224b
     .hword 0x469a    @ 08064114 9a46
     .hword 0x4653    @ 08064116 5346
     muls r3,r1    @ 08064118 4b43
     adds r1,r3,#0x0    @ 0806411a 191c
     adds r0,r0,r1    @ 0806411c 4018
-    ldr r1, DWORD_080641a0                   @ 0806411e 2049
+    ldr r1, duel_slots_ptr_080641a0          @ 0806411e 2049
     .hword 0x4689    @ 08064120 8946
     adds r1,r0,r1    @ 08064122 4118
     ldrh r0,[r1,#0x8]                        @ 08064124 0889
@@ -20326,7 +20423,7 @@ LAB_080640ce:
     adds r0,r5,#0x0    @ 0806414a 281c
     adds r1,r4,#0x0    @ 0806414c 211c
     bl get_slot_field5_score                 @ 0806414e d6f703fc
-    ldr r1, DWORD_080641a4                   @ 08064152 1449
+    ldr r1, score_max_080641a4               @ 08064152 1449
     cmp r0,r1                                @ 08064154 8842
     bgt LAB_080641a8                         @ 08064156 27dc
     .hword 0x4643    @ 08064158 4346
@@ -20356,18 +20453,18 @@ LAB_080640ce:
 LAB_0806418c:
     movs r0,#0x1    @ 0806418c 0120
     b LAB_080641aa                           @ 0806418e 0ce0
-DWORD_08064190:
-    .word  0x0201b290                     @ 08064190 90b20102
-DWORD_08064194:
-    .word  0x000004cc                     @ 08064194 cc040000
-DWORD_08064198:
-    .word  0x000004d4                     @ 08064198 d4040000
-DWORD_0806419c:
-    .word  0x00000868                     @ 0806419c 68080000
-DWORD_080641a0:
-    .word  0x0201c510                     @ 080641a0 10c50102
-DWORD_080641a4:
-    .word  0x000005dc                     @ 080641a4 dc050000
+phase_flags_ptr_08064190:
+    .word  gDuelPhaseFlags                @ 08064190 90b20102
+chain_count_off_08064194:
+    .word  LP_BAR_ANIM_STATE_OFF          @ 08064194 cc040000  STATE_CHAIN_COUNT_OFFSET=0x4cc: chain slot count in gDuelPhaseFlags+0x4cc
+chain_base_off_08064198:
+    .word  SPRITE_ROW_ENTRY_DATA_OFF      @ 08064198 d4040000  STATE_CHAIN_BASE_OFFSET=0x4d4: chain slot byte array base in gDuelPhaseFlags+0x4d4
+player_stride_0806419c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806419c 68080000
+duel_slots_ptr_080641a0:
+    .word  gDuelFieldSlots                @ 080641a0 10c50102
+score_max_080641a4:
+    .word  LP_COST_1500                   @ 080641a4 dc050000  SCORE_MAX=0x5dc (1500)
 LAB_080641a8:
     movs r0,#0x0    @ 080641a8 0020
 LAB_080641aa:
@@ -20393,15 +20490,15 @@ check_equip_slot_eligible_with_monster_slot_and_field6:
     ldrb r1,[r4,#0x2]                        @ 080641be a178
     lsls r0,r1,#0x1f    @ 080641c0 c807
     lsrs r0,r0,#0x1f    @ 080641c2 c00f
-    ldr r1, DWORD_080641f0                   @ 080641c4 0a49
+    ldr r1, monster_slot_fnptr_080641f0      @ 080641c4 0a49
     bl count_monster_slots_by_fnptr          @ 080641c6 cff725f8
     cmp r0,#0x0                              @ 080641ca 0028
     beq LAB_080641fc                         @ 080641cc 16d0
-    ldr r2, DWORD_080641f4                   @ 080641ce 094a
+    ldr r2, gp1lp_ptr_080641f4               @ 080641ce 094a
     ldrb r1,[r4,#0x2]                        @ 080641d0 a178
     lsls r0,r1,#0x1f    @ 080641d2 c807
     lsrs r0,r0,#0x1f    @ 080641d4 c00f
-    ldr r1, DWORD_080641f8                   @ 080641d6 0849
+    ldr r1, player_stride_080641f8           @ 080641d6 0849
     muls r0,r1    @ 080641d8 4843
     adds r2,#0x10    @ 080641da 1032
     adds r0,r0,r2    @ 080641dc 8018
@@ -20413,12 +20510,12 @@ check_equip_slot_eligible_with_monster_slot_and_field6:
     bl check_equip_slot_eligible_by_tier_and_field6 @ 080641e8 f7f7fcff
     b LAB_080641fe                           @ 080641ec 07e0
     .zero  0x2
-DWORD_080641f0:
-    .word  0x0804b30d                     @ 080641f0 0db30408
-DWORD_080641f4:
+monster_slot_fnptr_080641f0:
+    .word  0x0804b30d                     @ 080641f0 0db30408  fn-ptr check_card_id_is_special_summon_type+1 @0x0804b30c
+gp1lp_ptr_080641f4:
     .word  gP1LifePoints                  @ 080641f4 e0c40102
-DWORD_080641f8:
-    .word  0x00000868                     @ 080641f8 68080000
+player_stride_080641f8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080641f8 68080000
 LAB_080641fc:
     movs r0,#0x0    @ 080641fc 0020
 LAB_080641fe:
@@ -20453,24 +20550,24 @@ check_equip_slot_eligible_neo_daedalus_with_sacred_beast_pair:
     ldrb r1,[r4,#0x2]                        @ 0806422c a178
     lsls r0,r1,#0x1f    @ 0806422e c807
     lsrs r0,r0,#0x1f    @ 08064230 c00f
-    ldr r1, DWORD_08064250                   @ 08064232 0749
+    ldr r1, uria_lord_cid_08064250           @ 08064232 0749
     bl count_paired_slots_with_field5_default @ 08064234 cef72efd
     cmp r0,#0x0                              @ 08064238 0028
     bne LAB_0806424c                         @ 0806423a 07d1
     ldrb r4,[r4,#0x2]                        @ 0806423c a478
     lsls r0,r4,#0x1f    @ 0806423e e007
     lsrs r0,r0,#0x1f    @ 08064240 c00f
-    ldr r1, DWORD_08064254                   @ 08064242 0449
+    ldr r1, hamon_lord_cid_08064254          @ 08064242 0449
     bl count_paired_slots_with_field5_default @ 08064244 cef726fd
     cmp r0,#0x0                              @ 08064248 0028
     beq LAB_08064258                         @ 0806424a 05d0
 LAB_0806424c:
     movs r0,#0x1    @ 0806424c 0120
     b LAB_0806425a                           @ 0806424e 04e0
-DWORD_08064250:
-    .word  0x000019a3                     @ 08064250 a3190000
-DWORD_08064254:
-    .word  0x000019a4                     @ 08064254 a4190000
+uria_lord_cid_08064250:
+    .word  URIA_LORD_CID                  @ 08064250 a3190000
+hamon_lord_cid_08064254:
+    .word  HAMON_LORD_CID                 @ 08064254 a4190000
 LAB_08064258:
     movs r0,#0x0    @ 08064258 0020
 LAB_0806425a:
@@ -20521,15 +20618,15 @@ check_slot_hero_kid_in_extra_deck:
     ldrb r0,[r0,#0x2]                        @ 0806428a 8078
     lsls r0,r0,#0x1f    @ 0806428c c007
     lsrs r0,r0,#0x1f    @ 0806428e c00f
-    ldr r1, DWORD_080642a0                   @ 08064290 0349
+    ldr r1, hero_kid_cid_080642a0            @ 08064290 0349
     bl count_extra_deck_cards_by_id          @ 08064292 d2f723ff
     cmp r0,#0x0                              @ 08064296 0028
     beq LAB_080642a4                         @ 08064298 04d0
     movs r0,#0x1    @ 0806429a 0120
     b LAB_080642a6                           @ 0806429c 03e0
     .zero  0x2
-DWORD_080642a0:
-    .word  0x000019a7                     @ 080642a0 a7190000
+hero_kid_cid_080642a0:
+    .word  HERO_KID_CID                   @ 080642a0 a7190000
 LAB_080642a4:
     movs r0,#0x0    @ 080642a4 0020
 LAB_080642a6:
@@ -20575,11 +20672,11 @@ check_equip_slot_eligible_neo_daedalus_with_type_and_field6:
     bl check_equip_slot_eligible_by_tier_and_field6 @ 080642e2 f7f77fff
     cmp r0,#0x0                              @ 080642e6 0028
     beq LAB_0806430c                         @ 080642e8 10d0
-    ldr r2, DWORD_08064304                   @ 080642ea 064a
+    ldr r2, gp1lp_ptr_08064304               @ 080642ea 064a
     ldrb r4,[r4,#0x2]                        @ 080642ec a478
     lsls r0,r4,#0x1f    @ 080642ee e007
     lsrs r0,r0,#0x1f    @ 080642f0 c00f
-    ldr r1, DWORD_08064308                   @ 080642f2 0549
+    ldr r1, player_stride_08064308           @ 080642f2 0549
     muls r0,r1    @ 080642f4 4843
     adds r2,#0x10    @ 080642f6 1032
     adds r0,r0,r2    @ 080642f8 8018
@@ -20588,10 +20685,10 @@ check_equip_slot_eligible_neo_daedalus_with_type_and_field6:
     beq LAB_0806430c                         @ 080642fe 05d0
     movs r0,#0x1    @ 08064300 0120
     b LAB_0806430e                           @ 08064302 04e0
-DWORD_08064304:
+gp1lp_ptr_08064304:
     .word  gP1LifePoints                  @ 08064304 e0c40102
-DWORD_08064308:
-    .word  0x00000868                     @ 08064308 68080000
+player_stride_08064308:
+    .word  PLAYER_BLOCK_STRIDE            @ 08064308 68080000
 LAB_0806430c:
     movs r0,#0x0    @ 0806430c 0020
 LAB_0806430e:
@@ -20628,11 +20725,11 @@ check_slot_spell_zone_placeable_and_chain_absent:
     bl check_spell_zone_slot_placeable       @ 0806432e d7f779fc
     cmp r0,#0x0                              @ 08064332 0028
     beq LAB_0806434c                         @ 08064334 0ad0
-    ldr r2, DWORD_08064350                   @ 08064336 064a
+    ldr r2, gp1lp_ptr_08064350               @ 08064336 064a
     ldrb r4,[r4,#0x2]                        @ 08064338 a478
     lsls r0,r4,#0x1f    @ 0806433a e007
     lsrs r0,r0,#0x1f    @ 0806433c c00f
-    ldr r1, DWORD_08064354                   @ 0806433e 0549
+    ldr r1, player_stride_08064354           @ 0806433e 0549
     muls r0,r1    @ 08064340 4843
     adds r2,#0x14    @ 08064342 1432
     adds r0,r0,r2    @ 08064344 8018
@@ -20642,10 +20739,10 @@ check_slot_spell_zone_placeable_and_chain_absent:
 LAB_0806434c:
     movs r0,#0x0    @ 0806434c 0020
     b LAB_0806435a                           @ 0806434e 04e0
-DWORD_08064350:
+gp1lp_ptr_08064350:
     .word  gP1LifePoints                  @ 08064350 e0c40102
-DWORD_08064354:
-    .word  0x00000868                     @ 08064354 68080000
+player_stride_08064354:
+    .word  PLAYER_BLOCK_STRIDE            @ 08064354 68080000
 LAB_08064358:
     movs r0,#0x1    @ 08064358 0120
 LAB_0806435a:
@@ -20677,7 +20774,7 @@ check_slot_zone_mask_eligible_in_active_chain:
     lsls r1,r1,#0x3    @ 0806436e c900
     cmp r0,r1                                @ 08064370 8842
     bne LAB_080643d8                         @ 08064372 31d1
-    ldr r2, DWORD_080643cc                   @ 08064374 154a
+    ldr r2, chain_state_ptr_080643cc         @ 08064374 154a
     ldr r0,[r2,#0x8]                         @ 08064376 9068
     cmp r0,#0x0                              @ 08064378 0028
     bne LAB_080643c8                         @ 0806437a 25d1
@@ -20689,10 +20786,10 @@ check_slot_zone_mask_eligible_in_active_chain:
     lsls r0,r2,#0x2    @ 08064386 9000
     adds r0,r0,r2    @ 08064388 8018
     lsls r0,r0,#0x2    @ 0806438a 8000
-    ldr r7, DWORD_080643d0                   @ 0806438c 104f
+    ldr r7, player_stride_080643d0           @ 0806438c 104f
     muls r1,r7    @ 0806438e 7943
     adds r0,r0,r1    @ 08064390 4018
-    ldr r6, DWORD_080643d4                   @ 08064392 104e
+    ldr r6, duel_slots_ptr_080643d4          @ 08064392 104e
     adds r0,r0,r6    @ 08064394 8019
     ldrh r0,[r0,#0x8]                        @ 08064396 0089
     cmp r0,#0x0                              @ 08064398 0028
@@ -20721,12 +20818,12 @@ check_slot_zone_mask_eligible_in_active_chain:
 LAB_080643c8:
     movs r0,#0x0    @ 080643c8 0020
     b LAB_080643da                           @ 080643ca 06e0
-DWORD_080643cc:
-    .word  0x0201bb90                     @ 080643cc 90bb0102
-DWORD_080643d0:
-    .word  0x00000868                     @ 080643d0 68080000
-DWORD_080643d4:
-    .word  0x0201c510                     @ 080643d4 10c50102
+chain_state_ptr_080643cc:
+    .word  gEquipChainSlotRefs            @ 080643cc 90bb0102
+player_stride_080643d0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080643d0 68080000
+duel_slots_ptr_080643d4:
+    .word  gDuelFieldSlots                @ 080643d4 10c50102
 LAB_080643d8:
     movs r0,#0x1    @ 080643d8 0120
 LAB_080643da:

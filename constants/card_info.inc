@@ -1081,7 +1081,7 @@
 @ Source: asm/06_equip_eligibility_b.s Seg-9 (0x08059de0..0x0805b480)
 @ =============================================================================
 @ Special sentinel constants (non-CID domain but stored in card_info.inc by context):
-.equ SPECIAL_EQUIP_SENTINEL_ID,    0x000019a3  @ apply_card_equip_activation special_equip_id sentinel (no card-stats.s entry); dispatch branch guard; conf: high
+.equ URIA_LORD_CID,                0x000019a3  @ Uria, Lord of Searing Flames (pw=06007213; card-stats.s card_2012 slot=0x19A3); partner CID check in apply_card_equip_activation @0x0805aee4; CONST_RENAME from SPECIAL_EQUIP_SENTINEL_ID (F07 Seg-10)
 .equ ZONE_STATUS_MASK,             0x0000303e  @ slot[+2] zone flags combined mask; slot[+2]&0x303e==0x201c placement check; check_card_normal_summon_eligible_full plates L19781+L19867; conf: high
 .equ SPECIAL_EQUIP_TARGET_CID_A,   0x0000131e  @ check_equip_card_can_target_partner special-case CID (no card-stats.s entry; gap between 0x131D Gravekeeper Servant and 0x131F Upstart Goblin); asm/02 L34470 notes chain effect node type 0x131e; conf: high
 @ New CID equates (20 values; all absent from card_info.inc per grep; passcodes from card-stats.s):
@@ -1236,3 +1236,14 @@
 .equ HERO_BARRIER_CID,       0x0000195f  @ Hero Barrier (pw=44676200; card-stats.s card_4586 slot=0x195F); Block A fn check_opp_active_player_duel_phase_leq3 shared CID; conf: high
 .equ D_D_DYNAMITE_CID,       0x0000188b  @ D.D. Dynamite (pw=08628798; card-stats.s card_1802 slot=0x188B); Block B fn check_opp_alt_hand_count_nonzero_for_cid_188b; conf: high
 .equ DES_FROG_CID,           0x00001918  @ Des Frog (pw=84451804; card-stats.s card_1909 slot=0x1918); DWORD_08063810 in check_field5_paired_slot_trio_complete param; sibling of TADPOLE_CID=0x1919; conf: high
+
+@ =============================================================================
+@ file 07 Seg-10 additions: equip slot eligibility predicate card IDs (disasm blocks + CID checks)
+@ Source: asm/07_equip_effect_chain.s Seg-10 (0x08063830..0x080643e0)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ FIRE_DARTS_CID,        0x00001926  @ Fire Darts (pw=43061293; card-stats.s card_1923 slot=0x1926); Block1 fn check_zone_field0c_is_zero_for_player; conf: high
+.equ CHTHONIAN_BLAST_CID,   0x0000195e  @ Chthonian Blast (pw=18271561; card-stats.s card_1964 slot=0x195E); Block3 fn check_slot_zone_code_and_link_field_for_cid_195e; conf: high
+.equ SIMULTANEOUS_LOSS_CID, 0x00001976  @ Simultaneous Loss (pw=92219931; card-stats.s card_1987 slot=0x1976); Block4 fn check_either_player_lp_slot_active; conf: high
+.equ EHERO_CLAYMAN_CID,     0x000018a8  @ Elemental Hero Clayman (pw=84327329; card-stats.s card_1815 slot=0x18A8); DWORD_08064068 clayman_pair check in check_slot_clayman_pair_in_active_chain; conf: high
+.equ HERO_KID_CID,          0x000019a7  @ Hero Kid (pw=32679370; card-stats.s card_2016 slot=0x19A7); DWORD_080642a0 in check_slot_hero_kid_in_extra_deck; conf: high

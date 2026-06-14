@@ -75,7 +75,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 7 | 0x613b4..0x61eb4 | 34+1 | 65 | 1 (0x61c66/2a disasm) | ✅ | 45be161 |
 | 8 | 0x61eb4..0x62d28 | 34+6 | 69 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) all disasm | ✅ | 926cdab |
 | 9 | 0x62d28..0x63830 | 34+3 | 43 | 3 (0x62ebe/3e disasm, 0x62f38/28 disasm, 0x636f8/38 disasm) | ✅ | db741f1 |
-| 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ⬜ | — |
+| 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ✅ | TBD |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **35 个 ROM_INCBIN 块 (无 switchD 表)** — 绝大多数预判为 card effect handler dispatch table (0x09e4xxxx) 引用的谓词代码 →
@@ -264,6 +264,29 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - CSV sync: +3 rows (3 disasm new fn)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
+### 4.10 Seg-10 完成记录 (2026-06-14)
+
+范围: ROM 0x08063830..0x080643e0 (33 原有 fn + 4 disasm 新 fn = 37 fn)
+
+**落地数据**:
+- EQ=54 (gP1LifePoints x8 [DWORD_/PTR_] + PLAYER_BLOCK_STRIDE x15 + gEquipChainSlotRefs x4 + gDuelFieldSlots x6 + P1LP_BLOCK2_OFF_1CE8 x1 + FIELD_STATE_OFF x1 + EQUIP_FLAG_TARGET_ICID_TABLE_OFF x1 + gDuelPhaseFlags x1 + LP_BAR_ANIM_STATE_OFF x1 + SPRITE_ROW_ENTRY_DATA_OFF x1 + LP_COST_1500 x1 + 4 disasm lit-pool slots (gP1LifePoints x3 + PLAYER_BLOCK_STRIDE x1) + CID x10: URIA_LORD_CID(0x19a3)/FIRE_DARTS_CID(0x1926)/CHTHONIAN_BLAST_CID(0x195e)/SIMULTANEOUS_LOSS_CID(0x1976)/EHERO_CLAYMAN_CID(0x18a8)/HERO_KID_CID(0x19a7)/ABSOLUTE_END_CID reuse x1/HERO_BARRIER_CID reuse x1/DARK_RULER_VANDALGYON_CID reuse x1/cid_195e)
+- REF=0 (gP1LifePoints PTR slots handled as RENAME)
+- RENAME=3 (PTR_gP1LifePoints_0806385c/_08063878/_08063890 -> gp1lp_ptr_*)
+- FUNC_RENAME=0
+- PLATE=2 (FUN_0807d014->tick_equip_target_validity_prng_lp_display + FUN_08059fc4->tick_equip_activation_if_pair_eligible)
+- disasm=4 blocks (4 new fn):
+  - Block1 0x6384e/0x2a: check_zone_field0c_is_zero_for_player@0x08063850 (lit pool: gP1LifePoints/PLAYER_BLOCK_STRIDE; reads zone[+0x0c]; zero->1)
+  - Block2 0x63cf0/0x14: check_chain_field8_is_zero@0x08063cf0 (lit pool: gEquipChainSlotRefs; reads chain_slot[+0x8]; zero->1)
+  - Block3 0x63db4/0x40: check_slot_zone_code_and_link_field_for_cid_195e@0x08063db4 (ands r2,r0; field_mask 0xe5<<15=0x00728000; Chthonian Blast CID 0x195e)
+  - Block4 0x63fc4/0x24: check_either_player_lp_slot_active@0x08063fc4 (bne target=0x08063fe4 both branches; lit pool gP1LifePoints+p1_lp_zone_off)
+- CONST_RENAME: SPECIAL_EQUIP_SENTINEL_ID -> URIA_LORD_CID (Ghidra equate rename via FixF07Seg10UriaLordEquate.py; constants/card_info.inc line 1084 updated; asm/06 slot uria_lord_cid_18105 label updated)
+- fn-ptr fix: FixF07Seg10FnPtrSlots.py removes equate refs at 4 fn-ptr slots (0x08063890/0x0806390c/0x08063c60/0x080641f0) so exporter emits raw .word +1 values (not function symbol addresses)
+- constants: card_info.inc +5 new CID (FIRE_DARTS/CHTHONIAN_BLAST/SIMULTANEOUS_LOSS/EHERO_CLAYMAN/HERO_KID) + CONST_RENAME SPECIAL_EQUIP_SENTINEL_ID->URIA_LORD_CID
+- CSV sync: +4 rows (4 disasm new fn); naming-proposals.csv manually added 4 rows at correct address-order positions
+- §5.1: 0 (all 4 blocks have THUMB+1 handler table refs; no orphan blocks in Seg-10)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **File 07 全 10 段完成** (asm/07_equip_effect_chain.s 细化完毕)
+
 ---
 
 ## §5.1 零引用块登记 (Seg-1)
@@ -290,7 +313,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | Seg-7 | 0x613b4..0x61eb4 | 34 | 57 | 1 | check_equip_slot_eligible_by_card_id_graveyard_threshold 簇 |
 | Seg-8 | 0x61eb4..0x62d28 | 34 | 49 | 5 | check_equip_slot_eligible_by_zone_slot_flag_and_status 簇 |
 | Seg-9 | 0x62d28..0x63830 | 34+3 | 43 | 3 all disasm | store_slot_effect_value_from_card + 效果值存取簇 ✅ |
-| Seg-10 | 0x63830..0x643e0 | 33 | 54 | 4 | check_opponent_monster_slot_present 簇 (文件末) |
+| Seg-10 | 0x63830..0x643e0 | 33+4 | 54 | 4 all disasm | check_opponent_monster_slot_present 簇 (文件末) ✅ |
 
 执行约定同 file 00..06: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。
 
