@@ -376,3 +376,9 @@
 @ Source: asm/07_equip_effect_chain.s Seg-5 (0x0805fc94..0x08060898)
 @ =============================================================================
 .equ ZONE_DETAIL_FIELD_MASK_F88, 0x00f88000  @ slot[+0x14] bits[23:11] mask; used with 0x708000 (0xe1<<15) expected value in check_equip_slot_eligible_neo_daedalus_with_zone_field_guard; 1 Seg-5 slot DAT_08060264; conf: high
+
+@ =============================================================================
+@ file 07 Seg-8 additions: ATK threshold constant
+@ Source: asm/07_equip_effect_chain.s Seg-8 (0x08061eb4..0x08062d28)
+@ =============================================================================
+.equ ATK_THRESHOLD_2999, 0x00000bb7  @ ATK threshold 2999; cmp halfword[+0x14] vs 0xbb7; bls->fail means ATK must be >2999 (>=3000) to pass; distinct from LP_COST_3000=0xbb8; 4 ROM refs (0x8062084/0x80a0db0/0x80bb1fc/0x89143ac); Seg-8 DWORD_08062084 in check_equip_slot_eligible_zone_type3c0_high_atk_field5; conf: high

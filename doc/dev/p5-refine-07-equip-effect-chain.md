@@ -73,7 +73,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ✅ | 3fcbbce |
 | 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ✅ | d959091 |
 | 7 | 0x613b4..0x61eb4 | 34+1 | 65 | 1 (0x61c66/2a disasm) | ✅ | 45be161 |
-| 8 | 0x61eb4..0x62d28 | 34 | 49 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) | ⬜ | — |
+| 8 | 0x61eb4..0x62d28 | 34+6 | 69 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) all disasm | ✅ | TBD |
 | 9 | 0x62d28..0x63830 | 34 | 40 | 3 (0x62ebe/3e, 0x62f38/28, 0x636f8/38) | ⬜ | — |
 | 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ⬜ | — |
 
@@ -222,6 +222,27 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - card_info.inc +7 CID: REVERSAL_OF_GRAVES(0x14f0)/BLASTING_THE_RUINS(0x16dc)/BURST_STREAM_OF_DESTRUCTION(0x175b)/SANCTUARY_IN_THE_SKY(0x175e)/INFERNO_FIRE_BLAST(0x17f6)/PROTECTOR_OF_SANCTUARY(0x178b)/MASK_OF_RESTRICT(0x13f2)
 - ewram.inc +1: LP_GAP_THRESHOLD_7000(0x1b58=7000 decimal)
 - CSV sync: +1 row (check_player_lp_status_nonzero_for_cid_1776) + rename row (check_banisher_of_light_absent_from_field)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+### 4.08 Seg-8 完成记录 (2026-06-14)
+
+范围: ROM 0x08061eb4..0x08062d28 (34 原有 fn + 6 disasm 新 fn = 40 fn)
+
+**落地数据**:
+- EQ=64 (gP1LifePoints x12 + PLAYER_BLOCK_STRIDE x16 + BANISHER_OF_THE_LIGHT_CID x5 + gEquipChainSlotRefs x3 + gDuelFieldSlots x3 + FIELD_STATE_OFF x3 + PROTECTOR_OF_SANCTUARY_CID x2 + gP1FieldArrayCBase x1 + HORUS_LV4_CID x1 + SILENT_SWORDSMAN_LV5_CID x1 + SILENT_MAGICIAN_LV8_CID x1 + RING_OF_MAGNETISM_CID x1 + ATK_THRESHOLD_2999 x1 [NEW 0xbb7] + 14 disasm lit-pool slots [gP1LifePoints/PLAYER_BLOCK_STRIDE/P1LP_BLOCK2_OFF_1CE8/FIELD_STATE_OFF/gEquipChainSlotRefs/gDuelFieldSlots])
+- REF=3 (gP1LifePoints PTR slots: 08062204 / 080622d4 / 08062924)
+- RENAME=2 (zone_pair_pred_07ac_ptr_08062bc8 + zone_pair_pred_1abc_ptr_08062bcc; EOL: fn-ptr targets ASCII)
+- FUNC_RENAME=0
+- PLATE=3 (2 stale FUN_ substring replacements: FUN_08059110->tick_equip_activation_if_field_spell_hand_ok + FUN_080619c0->check_equip_slot_eligible_by_active_ctx_score_threshold; 1 CJK full ASCII rewrite: check_equip_slot_eligible_horus_lv4_chain_with_banisher@0x08062090)
+- disasm=5 blocks (6 new fn):
+  - Block1 0x62378/0x2c: check_equip_slot_eligible_opp_lp_zone_count_lte3_for_cid_17f3@0x08062378 (Mind Wipe CID=0x17f3; opp zone_count in {1,2,3} -> return 1)
+  - Block2 0x623ec/0x60: check_equip_slot_eligible_opp_is_active_field_eq2_for_cid_17fc@0x080623ec (Taunt CID=0x17fc; opp is active player AND field_state==2) + check_equip_slot_eligible_opp_lp_zone_count_above7_for_cid_1801@0x08062420 (Heavy Slump CID=0x1801; opp zone_count>7)
+  - Block3 0x6246e/0x2a: check_equip_slot_eligible_opp_lp_field14_nonzero_for_cid_1804@0x08062470 (Cemetary Bomb CID=0x1804; opp field[+0x14]!=0)
+  - Block4 0x62a9c/0x2c: check_equip_slot_eligible_opp_lp_field0c_zero_for_cid_184d@0x08062a9c (Mind Haxorz CID=0x184d; opp zone_count==0->1, nonzero->2)
+  - Block5 0x62c52/0x66: check_equip_slot_eligible_chain_refs_slot_status_for_cid_1853@0x08062c54 (Covering Fire CID=0x1853; chain refs + field slot status dual-guard)
+- carve=0; §5.1=0
+- constants: duel_field.inc +1 (ATK_THRESHOLD_2999=0xbb7); card_info.inc +4 CID (MIND_WIPE=0x17f3/HEAVY_SLUMP=0x1801/MIND_HAXORZ=0x184d/COVERING_FIRE=0x1853)
+- CSV sync: +6 rows (6 disasm new fn; tags=disasm;seg8)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 ---

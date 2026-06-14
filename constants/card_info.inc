@@ -1216,3 +1216,13 @@
 .equ INFERNO_FIRE_BLAST_CID,         0x000017f6  @ Inferno Fire Blast (pw=52684508; card-stats.s L21686 slot=0x17F6); inline computed via adds r0,#0x9b from 0x175b in check_dragon_spell_target_slot_available; plate reference only
 .equ PROTECTOR_OF_SANCTUARY_CID,     0x0000178b  @ Protector of the Sanctuary (pw=24221739; card-stats.s L20464 slot=0x178B); Seg-7 DWORD_08061dc0
 .equ MASK_OF_RESTRICT_CID,           0x000013f2  @ Mask of Restrict (pw=29549364; card-stats.s L11234 slot=0x13F2); Seg-7 DWORD_08061c5c
+
+@ =============================================================================
+@ file 07 Seg-8 additions: equip slot eligibility predicate card IDs (disasm blocks)
+@ Source: asm/07_equip_effect_chain.s Seg-8 (0x08061eb4..0x08062d28)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ MIND_WIPE_CID,      0x000017f3  @ Mind Wipe (pw=52817046; card-stats.s card_1664 slot=0x17F3); Block1 fn check_equip_slot_eligible_opp_lp_zone_count_lte3_for_cid_17f3; conf: high
+.equ HEAVY_SLUMP_CID,    0x00001801  @ Heavy Slump (pw=52417194; card-stats.s card_1678 slot=0x1801); Block2-F2 fn check_equip_slot_eligible_opp_lp_zone_count_above7_for_cid_1801; conf: high
+.equ MIND_HAXORZ_CID,    0x0000184d  @ Mind Haxorz (pw=75392615; card-stats.s card_1744 slot=0x184D); Block4 fn check_equip_slot_eligible_opp_lp_field0c_zero_for_cid_184d; conf: high
+.equ COVERING_FIRE_CID,  0x00001853  @ Covering Fire (pw=74458486; card-stats.s card_1750 slot=0x1853); Block5 fn check_equip_slot_eligible_chain_refs_slot_status_for_cid_1853; conf: high
