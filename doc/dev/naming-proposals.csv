@@ -1531,6 +1531,8 @@ address,name,proposed_name,score,tags
 0x0805e694,check_equip_slot_eligible_type_range18to20_with_prereqs,,,
 0x0805e6f4,check_equip_slot_eligible_without_banisher_mode1,,,
 0x0805e734,check_umi_matches_active_effect_slot,,,
+0x0805e744,check_equip_type480_cross_player_for_cid_13f9,,,disasm;handler;refine-f07seg3
+0x0805e778,check_equip_type_bits_range6_8_for_cid_13fa,,,disasm;handler;refine-f07seg3
 0x0805e790,check_revival_jam_equip_paired_field5,,,
 0x0805e81c,check_field_state2_bit19_equip_eligible,,,
 0x0805e864,check_equip_zone_slot_activation_eligible,,,
@@ -1545,9 +1547,18 @@ address,name,proposed_name,score,tags
 0x0805ec74,check_any_two_monster_slots_accept_card_pair,,,
 0x0805eca8,check_equip_or_facedown_slot_eligible_by_dispatch,,,
 0x0805ed2c,check_equip_count_exceeds_one,,,
+0x0805ed4c,check_slot_count_exceeds_2_for_cid_144e,,,disasm;handler;refine-f07seg3
 0x0805ed74,check_lp_zone_offset_is_zero,,,
+0x0805ed90,check_zone_field6_hw_zero_for_cid_1450,,,disasm;handler;refine-f07seg3
+0x0805edc0,check_zone_field6_hw_nonzero_for_cid_1451,,,disasm;handler;refine-f07seg3
+0x0805edf0,check_opponent_lp_above_3000_for_cid_1460,,,disasm;handler;refine-f07seg3
 0x0805ee20,check_opponent_has_monsters_and_lp_zone_positive,,,
 0x0805ee60,check_facedown_slot_with_free_monster_zone_and_matching_set,,,
+0x0805ee9c,check_free_monster_zone_for_cid_1468,,,disasm;handler;refine-f07seg3
+0x0805eeb8,check_neo_daedalus_no_banisher_for_cid_146f,,,disasm;handler;refine-f07seg3
+0x0805eee4,check_field_state24_neo_daedalus_for_cid_1472,,,disasm;handler;refine-f07seg3
+0x0805ef10,check_chain_match_opponent_for_cid_1475,,,disasm;handler;refine-f07seg3
+0x0805ef4c,check_field_0c_nonzero_no_banisher_for_cid_147f,,,disasm;handler;refine-f07seg3
 0x0805ef88,check_neo_daedalus_group_effect_eligible,,,
 0x0805efb8,check_spell_zone_placeable_with_chain_or_monster_condition,,,
 0x0805f020,check_equip_field_spell_neo_daedalus_and_monster_slots,,,

@@ -19519,7 +19519,7 @@ populate_effect_node_snapshot_slots:
 populate_effect_node_snapshot_cyber_blader_slotword:
     .word  0xcaa80000                     @ 0805b884 0000a8ca  0xcaa80000 = CYBER_BLADER_CID(0x1955)<<19; lsls r0,slot_word,#0x13 tests bits[12:0]==0x1955
 populate_effect_node_snapshot_effect_zone:
-    .word  0x0201d5b4                     @ 0805b888 b4d50102  EWRAM ptr (periodic fix)
+    .word  0x0201d5b4                     @ 0805b888 b4d50102  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF(0x10a4)
 populate_effect_node_snapshot_lvmod:
     .word  LEVEL_MODULATION_CID           @ 0805b88c 44190000
 populate_effect_node_snapshot_spcancel:

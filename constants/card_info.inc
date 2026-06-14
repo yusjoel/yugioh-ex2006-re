@@ -1157,3 +1157,10 @@
 .equ cid_135b,                   0x0000135b  @ unassigned slot 0x135b (not in card-stats.s; neighbors: 0x135a=Attack and Receive, 0x135c=Ceasefire); conf: low
 .equ SPELL_STOPPING_STATUTE_CID, 0x000018dd  @ Spell-Stopping Statute (pw=10048942; card-stats.s slot=0x18DD); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
 .equ ROYAL_SURRENDER_CID,        0x000018de  @ Royal Surrender (pw=56058951; card-stats.s slot=0x18DE); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+
+@ =============================================================================
+@ file 07 Seg-3 additions: score predicate cluster / card effect handler dispatch CIDs
+@ Source: asm/07_equip_effect_chain.s Seg-3 (0x0805e358..0x0805f1cc)
+@ =============================================================================
+.equ REVIVAL_JAM_CID,            0x000013c7  @ Revival Jam (pw=31709826; card-stats.s card_0843 slot=0x13C7); check_revival_jam_equip_paired_field5 literal pool; conf: high
+.equ RED_MOON_BABY_CID,          0x00001415  @ Red-Moon Baby (pw=56387350; card-stats.s card_0896 slot=0x1415); check_equip_or_facedown_slot_eligible_by_dispatch literal pool; conf: high
