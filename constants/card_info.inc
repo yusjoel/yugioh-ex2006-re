@@ -1226,3 +1226,13 @@
 .equ HEAVY_SLUMP_CID,    0x00001801  @ Heavy Slump (pw=52417194; card-stats.s card_1678 slot=0x1801); Block2-F2 fn check_equip_slot_eligible_opp_lp_zone_count_above7_for_cid_1801; conf: high
 .equ MIND_HAXORZ_CID,    0x0000184d  @ Mind Haxorz (pw=75392615; card-stats.s card_1744 slot=0x184D); Block4 fn check_equip_slot_eligible_opp_lp_field0c_zero_for_cid_184d; conf: high
 .equ COVERING_FIRE_CID,  0x00001853  @ Covering Fire (pw=74458486; card-stats.s card_1750 slot=0x1853); Block5 fn check_equip_slot_eligible_chain_refs_slot_status_for_cid_1853; conf: high
+
+@ =============================================================================
+@ file 07 Seg-9 additions: equip slot eligibility predicate card IDs (disasm blocks)
+@ Source: asm/07_equip_effect_chain.s Seg-9 (0x08062d28..0x08063830)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ THREATENING_ROAR_CID,  0x00001886  @ Threatening Roar (pw=36361633; card-stats.s card_1797 slot=0x1886); Block A fn check_opp_active_player_duel_phase_leq3 shared CID; conf: high
+.equ HERO_BARRIER_CID,       0x0000195f  @ Hero Barrier (pw=44676200; card-stats.s card_4586 slot=0x195F); Block A fn check_opp_active_player_duel_phase_leq3 shared CID; conf: high
+.equ D_D_DYNAMITE_CID,       0x0000188b  @ D.D. Dynamite (pw=08628798; card-stats.s card_1802 slot=0x188B); Block B fn check_opp_alt_hand_count_nonzero_for_cid_188b; conf: high
+.equ DES_FROG_CID,           0x00001918  @ Des Frog (pw=84451804; card-stats.s card_1909 slot=0x1918); DWORD_08063810 in check_field5_paired_slot_trio_complete param; sibling of TADPOLE_CID=0x1919; conf: high

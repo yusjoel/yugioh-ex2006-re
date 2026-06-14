@@ -1763,7 +1763,9 @@ address,name,proposed_name,score,tags
 0x08062dfc,check_equip_slot_eligible_by_zone_type_dispatch,,,
 0x08062e1c,check_equip_slot_eligible_neo_daedalus_chain_absent_effect_loop,,,
 0x08062e8c,check_equip_slot_eligible_neo_daedalus_chain_absent_setcode,,,
+0x08062ec0,check_opp_active_player_duel_phase_leq3,,,disasm;handler_table;shared_elig
 0x08062efc,check_extra_deck_card_below_limit,,,
+0x08062f38,check_opp_alt_hand_count_nonzero_for_cid_188b,,,disasm;handler_table
 0x08062f60,check_equip_zone_multi_target_eligible,,,
 0x08063020,check_phase2_opp_equip_chain_clear,,,
 0x0806305c,check_equip_slot_eligible_with_monster_zone_dispatch,,,
@@ -1786,6 +1788,7 @@ address,name,proposed_name,score,tags
 0x08063600,check_equip_slot_eligible_by_tier_class_banisher_guard,,,
 0x0806363c,check_equip_slot_eligible_with_dual_activation_dispatch,,,
 0x080636cc,check_equip_slot_eligible_vandalgyon_pair_with_neo_daedalus,,,duel_field
+0x080636f8,check_zone_non_field_type_or_has_monsters_for_cid_1911,,,disasm;handler_table
 0x08063730,check_equip_slot_eligible_neo_daedalus_tadpole_extra_deck,,,duel_field
 0x08063794,check_equip_slot_eligible_polymerization_deck_pair_effect,,,duel_field
 0x080637c0,check_spell_zone_placeable_with_hand_match,,,duel_field

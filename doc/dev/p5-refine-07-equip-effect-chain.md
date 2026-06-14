@@ -74,7 +74,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ✅ | d959091 |
 | 7 | 0x613b4..0x61eb4 | 34+1 | 65 | 1 (0x61c66/2a disasm) | ✅ | 45be161 |
 | 8 | 0x61eb4..0x62d28 | 34+6 | 69 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) all disasm | ✅ | 926cdab |
-| 9 | 0x62d28..0x63830 | 34 | 40 | 3 (0x62ebe/3e, 0x62f38/28, 0x636f8/38) | ⬜ | — |
+| 9 | 0x62d28..0x63830 | 34+3 | 43 | 3 (0x62ebe/3e disasm, 0x62f38/28 disasm, 0x636f8/38 disasm) | ✅ | — |
 | 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -245,6 +245,25 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - CSV sync: +6 rows (6 disasm new fn; tags=disasm;seg8)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
+### 4.09 Seg-9 完成记录 (2026-06-14)
+
+范围: ROM 0x08062d28..0x08063830 (34 原有 fn + 3 disasm 新 fn = 37 fn)
+
+**落地数据**:
+- EQ=40 (gP1LifePoints x12 + PLAYER_BLOCK_STRIDE x13 + gDuelFieldSlots x3 + FIELD_STATE_OFF x4 + P1LP_BLOCK2_OFF_1CE8 x1 + BANISHER_OF_THE_LIGHT_CID x1 + RING_OF_MAGNETISM_CID x1 + PROTECTOR_OF_SANCTUARY_CID x1 + DARK_RULER_VANDALGYON_CID x1 + TADPOLE_CID x1 + POLYMERIZATION_CID x1 + DES_FROG_CID x1 [NEW]) + 7 disasm literal pool EQ slots (gP1LifePoints x3 + PLAYER_BLOCK_STRIDE x2 + P1LP_BLOCK2_OFF_1CE8 x1 + FIELD_STATE_OFF x1)
+- REF=0 (PTR_gP1LifePoints_ handled as RENAME; no data-ref type slots)
+- RENAME=3 (PTR_gP1LifePoints_08062dec / _080632ec / _08063780 -> gp1lp_ptr_*)
+- FUNC_RENAME=0 (all 34 named fn semantics match existing names)
+- PLATE=0 (no stale FUN_ in Seg-9 range; no CJK in segment)
+- disasm=3 blocks (3 new fn):
+  - Block A 0x62ebe/0x3e: check_opp_active_player_duel_phase_leq3@0x08062ec0 (2B pad; shared fn_eligible for CIDs: ABSOLUTE_END=0x17fd/THREATENING_ROAR=0x1886/HERO_BARRIER=0x195f; subs r1,r1,r0 -> opp_player; bhi #3 phase>3->0; phase<=3->1)
+  - Block B 0x62f38/0x28: check_opp_alt_hand_count_nonzero_for_cid_188b@0x08062f38 (D.D. Dynamite CID=0x188b; 0x4048=EOR -> opp_player; reads [gP1LP+opp*0x868+0x1c] banished count; nonzero->1)
+  - Block C 0x636f8/0x38: check_zone_non_field_type_or_has_monsters_for_cid_1911@0x080636f8 (Cyber Archfiend CID=0x1911; 0x8859=ldrh slot[+2] imm5=1 offset=2; if zone_type&0xfc0!=0x140->1; if field zone: monster_count[player]!=0->1)
+- carve=0; §5.1=0 (all 3 ROM_INCBIN have THUMB+1 handler table refs)
+- constants: card_info.inc +4 CID (THREATENING_ROAR=0x1886/D_D_DYNAMITE=0x188b/HERO_BARRIER=0x195f/DES_FROG=0x1918)
+- CSV sync: +3 rows (3 disasm new fn)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
 ---
 
 ## §5.1 零引用块登记 (Seg-1)
@@ -270,7 +289,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | Seg-6 | 0x60898..0x613b4 | 34 | 47 | 3 | check_equip_slot_eligible_by_lp_slot_and_effect_dispatch 簇 |
 | Seg-7 | 0x613b4..0x61eb4 | 34 | 57 | 1 | check_equip_slot_eligible_by_card_id_graveyard_threshold 簇 |
 | Seg-8 | 0x61eb4..0x62d28 | 34 | 49 | 5 | check_equip_slot_eligible_by_zone_slot_flag_and_status 簇 |
-| Seg-9 | 0x62d28..0x63830 | 34 | 40 | 3 | store_slot_effect_value_from_card + 效果值存取簇 |
+| Seg-9 | 0x62d28..0x63830 | 34+3 | 43 | 3 all disasm | store_slot_effect_value_from_card + 效果值存取簇 ✅ |
 | Seg-10 | 0x63830..0x643e0 | 33 | 54 | 4 | check_opponent_monster_slot_present 簇 (文件末) |
 
 执行约定同 file 00..06: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。
