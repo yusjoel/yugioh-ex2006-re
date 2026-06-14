@@ -310,6 +310,7 @@
 @ file 02 Seg-2 additions: duel field equip chain globals
 @ =============================================================================
 .equ gDuelFieldSlots,        0x0201c510  @ duel field zone slot array; player*0x868 + slot*0x14; 1007 raw refs
+.equ gDuelFieldSlotsEffectZoneBase, 0x0201d5b4  @ gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF(0x10a4); effect zone partition base; 2 raw ROM refs (0x080478f0, 0x0805b888)
 .equ gEquipNodePool,         0x0201d9c0  @ equip chain node pool; node_idx*8 stride; 55 raw refs
 .equ gEquipChainSlotRefs,    0x0201bb90  @ equip chain slot reference array (replace_slot_chain_ref_by_id); 260 raw refs
 .equ gDuelFieldSlotState,    0x0201c520  @ parallel slot state flags at gDuelFieldSlots+0x10; 51 raw refs
@@ -446,3 +447,8 @@
 @ =============================================================================
 .equ EQUIP_CTX_PLAYER_OFF,    0x00000000  @ [gEquipChainSlotRefs+0x0] activation player id field; check_equip_slot_eligible_by_opposite_side_and_effect_ctx ldr/cmp vs r5(player_id); asm/02 plate confirms activation_player_offset=0; 1 F06 Seg-1 ref
 .equ EQUIP_CTX_SLOT_REF_OFF,  0x0000001c  @ [gEquipChainSlotRefs+0x1c] context zone slot reference field; check_equip_slot_eligible_by_opposite_side_and_effect_ctx ldr/cmp vs r4(zone_idx); asm/02 plate confirms context_slot_ref_offset=0x1c; 1 F06 Seg-1 ref
+
+@ =============================================================================
+@ file 07 Seg-4 additions: equip dispatch context sub-structure
+@ =============================================================================
+.equ gDuelEquipCtx,    0x0201bbbc  @ equip dispatch context struct (= gEquipChainSlotRefs+0x2c, stride=0x38 per player); check_equip_slot_at_turn_player_side indexes [+8]/[+1c]; 1 Seg-4 slot

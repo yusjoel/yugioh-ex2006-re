@@ -1164,3 +1164,12 @@
 @ =============================================================================
 .equ REVIVAL_JAM_CID,            0x000013c7  @ Revival Jam (pw=31709826; card-stats.s card_0843 slot=0x13C7); check_revival_jam_equip_paired_field5 literal pool; conf: high
 .equ RED_MOON_BABY_CID,          0x00001415  @ Red-Moon Baby (pw=56387350; card-stats.s card_0896 slot=0x1415); check_equip_or_facedown_slot_eligible_by_dispatch literal pool; conf: high
+
+@ =============================================================================
+@ file 07 Seg-4 additions: turn/side predicate cluster / card effect handler dispatch CIDs
+@ Source: asm/07_equip_effect_chain.s Seg-4 (0x0805f1cc..0x0805fc94)
+@ =============================================================================
+.equ FUSHI_NO_TORI_CID,          0x00001506  @ Fushi No Tori spirit monster (pw=38538445; card-stats.s card_1073 slot=0x1506); dispatch_slot_placement_check_by_card_id path; 1 Seg-4 slot
+.equ TSUKUYOMI_CID,              0x00001694  @ Tsukuyomi spirit monster (pw=34853266; card-stats.s card_1376 slot=0x1694); dispatch_slot_placement_check_by_card_id path; 1 Seg-4 slot
+.equ SWARM_OF_SCARABS_CID,       0x0000152a  @ Swarm of Scarabs (pw=15383415; card-stats.s card_1104 slot=0x152a); distinct from EQUIP_ZONE_SPRITE_ATTR_MODE1=0x152a (sprite domain); check_light_of_intervention_and_swarm_absent; 1 Seg-4 slot
+.equ LIFE_ABSORBING_MACHINE_CID, 0x000014c0  @ Life Absorbing Machine (pw=14318794; card-stats.s card_1011 slot=0x14c0); check_slot_has_life_absorbing_machine_node immediate arg; no literal pool slot (inline imm); 0 slots

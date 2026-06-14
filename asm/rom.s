@@ -1256,6 +1256,7 @@ zone_monster_field_bonus_table:                 @ GBA 0x09e3f094; 14 entries x 1
 	@ [6] Harpie Lady 1: Yami+300
 	.hword  0x182a,    0,    0,    0,    0,    0,  300,    0
 	@ [7..12]: CID-encoded associated-card entries (Destiny Board + Spirit Messages cluster)
+zone_monster_field_bonus_dest_entry7:           @ GBA 0x09e3f104; offset +0x70 from base (entry 7)
 	@ [7]
 	.hword  0x1468,    0, 0x1497,    0, 0x1498,    0, 0x1499,    0
 	@ [8]
