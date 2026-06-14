@@ -75,7 +75,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 7 | 0x613b4..0x61eb4 | 34+1 | 65 | 1 (0x61c66/2a disasm) | ✅ | 45be161 |
 | 8 | 0x61eb4..0x62d28 | 34+6 | 69 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) all disasm | ✅ | 926cdab |
 | 9 | 0x62d28..0x63830 | 34+3 | 43 | 3 (0x62ebe/3e disasm, 0x62f38/28 disasm, 0x636f8/38 disasm) | ✅ | db741f1 |
-| 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ✅ | TBD |
+| 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ✅ | 55d0efe |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **35 个 ROM_INCBIN 块 (无 switchD 表)** — 绝大多数预判为 card effect handler dispatch table (0x09e4xxxx) 引用的谓词代码 →
