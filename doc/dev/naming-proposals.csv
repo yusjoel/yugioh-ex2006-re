@@ -1407,6 +1407,12 @@ address,name,proposed_name,score,tags
 0x08059fc4,tick_equip_activation_if_pair_eligible,card_name_08059fc4,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x0805a00c,enqueue_equip_zone_sprite_with_neg_attr,,,
 0x0805a030,tick_equip_banisher_field_count_display_seq,,,
+0x0805a0ac,tick_bonding_or_photon_activation_seq,,,
+0x0805a0f8,tick_bonding_photon_state0_start_lp_bar,,,
+0x0805a118,tick_bonding_photon_state1_trigger_display,,,
+0x0805a134,tick_bonding_photon_state2_set_activation,,,
+0x0805a148,tick_bonding_photon_state3_confirm_sprite,,,
+0x0805a1cc,tick_bonding_photon_state4_end_lp_bar,,,
 0x0805a1dc,tick_equip_activation_sprite_mode2_by_type,,,
 0x0805a204,check_neo_daedalus_placement_eligible_for_slot,,,
 0x0805a238,check_spell_zone_slot_face_down,,,

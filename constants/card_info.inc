@@ -1075,3 +1075,33 @@
 @ =============================================================================
 .equ CLIFF_THE_TRAP_REMOVER_CID,   0x0000161e  @ Cliff the Trap Remover (pw=06967870; card-stats.s card_1282 slot=0x161E); tick_equip_lp_score_and_card_id_seq LP-score dispatch; 2 Seg-6 slots; conf: high
 .equ OTOHIME_CID,                  0x00001503  @ Otohime (pw=39751093; card-stats.s card_1070 slot=0x1503); tick_equip_activation_if_not_otohime guard: CID filter to bypass equip activation state machine; 1 Seg-6 slot; conf: high
+
+@ =============================================================================
+@ file 06 Seg-9 additions: CID equates for equip placement and effect dispatch
+@ Source: asm/06_equip_eligibility_b.s Seg-9 (0x08059de0..0x0805b480)
+@ =============================================================================
+@ Special sentinel constants (non-CID domain but stored in card_info.inc by context):
+.equ SPECIAL_EQUIP_SENTINEL_ID,    0x000019a3  @ apply_card_equip_activation special_equip_id sentinel (no card-stats.s entry); dispatch branch guard; conf: high
+.equ ZONE_STATUS_MASK,             0x0000303e  @ slot[+2] zone flags combined mask; slot[+2]&0x303e==0x201c placement check; check_card_normal_summon_eligible_full plates L19781+L19867; conf: high
+.equ SPECIAL_EQUIP_TARGET_CID_A,   0x0000131e  @ check_equip_card_can_target_partner special-case CID (no card-stats.s entry; gap between 0x131D Gravekeeper Servant and 0x131F Upstart Goblin); asm/02 L34470 notes chain effect node type 0x131e; conf: high
+@ New CID equates (20 values; all absent from card_info.inc per grep; passcodes from card-stats.s):
+.equ SPELLBINDING_CIRCLE_CID,      0x00001103  @ Spellbinding Circle (pw=18807108; card-stats.s slot=0x1103); check_card_zone_activation_blocked dispatch; conf: high
+.equ SHADOW_SPELL_CID,             0x00001243  @ Shadow Spell (pw=29267084; card-stats.s slot=0x1243); check_card_zone_activation_blocked dispatch; conf: high
+.equ ANTI_SPELL_FRAGRANCE_CID,     0x00001390  @ Anti-Spell Fragrance (pw=58921041; card-stats.s slot=0x1390); check_card_zone_activation_blocked (2 slots); note: same value as FIELD_SPELL_CARD_REF_OFF in duel_field.inc but different domain -- CID vs offset; conf: high
+.equ SMOKE_GRENADE_OF_THIEF_CID,   0x0000150d  @ Smoke Grenade of the Thief (pw=63789924; card-stats.s slot=0x150D); check_card_placement_rules dispatch; conf: high
+.equ SPELL_CANCELLER_CID,          0x000015da  @ Spell Canceller (pw=84636823; card-stats.s slot=0x15DA); check_card_zone_activation_blocked dispatch; conf: high
+.equ WAVE_MOTION_CANNON_CID,       0x000015ee  @ Wave-Motion Cannon (pw=38992735; card-stats.s slot=0x15EE); dispatch_card_effect_by_stat_type dispatch; conf: high
+.equ FAIRY_OF_THE_SPRING_CID,      0x00001664  @ Fairy of the Spring (pw=20188127; card-stats.s slot=0x1664); check_card_placement_rules dispatch; conf: high
+.equ CURSED_SEAL_FORBIDDEN_SPELL_CID, 0x000016dd @ Cursed Seal of the Forbidden Spell (pw=58851034; card-stats.s slot=0x16DD); check_card_placement_rules dispatch; conf: high
+.equ STRAY_LAMBS_CID,              0x00001710  @ Stray Lambs (pw=60764581; card-stats.s slot=0x1710); dispatch_card_effect_by_stat_type dispatch; conf: high
+.equ INVADER_OF_DARKNESS_CID,      0x00001722  @ Invader of Darkness (pw=56647086; card-stats.s slot=0x1722); check_card_placement_rules dispatch; conf: high
+.equ AGENT_OF_JUDGMENT_SATURN_CID, 0x0000173f  @ The Agent of Judgment - Saturn (pw=91345518; card-stats.s slot=0x173F); dispatch_card_effect_by_stat_type dispatch; conf: high
+.equ SPIRIT_RYU_CID,               0x000014d7  @ Spirit Ryu (pw=67957315; card-stats.s card_1031 slot=0x14D7); check_equip_card_can_target_partner special-case CID; conf: high
+.equ LEVEL_MODULATION_CID,         0x00001944  @ Level Modulation (pw=61850482; card-stats.s slot=0x1944); check_card_placement_rules dispatch (2 slots); conf: high
+.equ CREEPING_DOOM_MANTA_CID,      0x00001832  @ Creeping Doom Manta (pw=52571838; card-stats.s slot=0x1832); check_card_placement_rules dispatch; conf: high
+.equ PITCH_BLACK_WARWOLF_CID,      0x00001833  @ Pitch-Black Warwolf (pw=88975532; card-stats.s slot=0x1833); check_card_placement_rules dispatch; conf: high
+.equ MIRAGE_DRAGON_CID,            0x00001834  @ Mirage Dragon (pw=15960641; card-stats.s slot=0x1834); check_card_placement_rules dispatch; conf: high
+.equ IMPENETRABLE_FORMATION_CID,   0x000018d3  @ Impenetrable Formation (pw=96631852; card-stats.s slot=0x18D3); dispatch_card_effect_by_stat_type dispatch; conf: high
+.equ MECHANICAL_HOUND_CID,         0x00001910  @ Mechanical Hound (pw=22512237; card-stats.s slot=0x1910); check_card_placement_rules dispatch; conf: high
+.equ ANCIENT_GEAR_CANNON_CID,      0x000019bb  @ Ancient Gear Cannon (pw=80045583; card-stats.s slot=0x19BB); check_card_placement_rules dispatch; conf: high
+.equ TRIAL_OF_THE_PRINCESSES_CID,  0x000019d8  @ Trial of the Princesses (pw=72709014; card-stats.s slot=0x19D8); dispatch_card_effect_by_stat_type dispatch; conf: high

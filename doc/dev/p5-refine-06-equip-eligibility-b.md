@@ -83,7 +83,7 @@
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | 8fd1210 |
 | 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ✅ | 11c409d |
-| 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
+| 9 | 0x59de0..0x5b480 | 22+6 | 140 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ✅ | TBD |
 | 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -207,6 +207,24 @@
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **commit**: 11c409d
 
+### 4.09 Seg-9 完成记录 (2026-06-14, commit TBD)
+
+- **段范围**: 0x08059de0..0x0805b480, 22 named fn + 6 new disasm'd fn
+- **EQ=140**: gDuelPhaseFlags x20 + EQUIP_ACTIVATION_STEP_OFF x20 + gP1LifePoints x18 + gDuelCardCtxBase x5 + gDuelFieldSlots x5 + ELIGIB_SPRITE_CTRL_OFF x4 + ELIGIB_ANIM_STATE_OFF x3 + EQUIP_ACTIVE_CTX_OFF x1 + ZONE_STATUS_MASK x4 (card_info.inc 新建) + SPECIAL_EQUIP_SENTINEL_ID x3 (card_info.inc 新建) + SPECIAL_EQUIP_TARGET_CID_A x1 (card_info.inc 新建) + 20 CID (card_info.inc 新建) + LP_BAR_ANIM_STATE_OFF x2 + LP_BANISHER_CTX_OFF x1 + PLAYER_BLOCK_STRIDE x1 + misc x4
+- **REF=1**: DWORD_08059e2c fn-ptr -> set_equip_activation_state_by_mode_alt (0x080905e8)
+- **RENAME=5**: PTR_gP1LifePoints_08059e5c / PTR_gP1LifePoints_0805a090 (PTR_ label clarity) + cid_18f5_17017 / cid_1684_17555 (neutral CID slot labels) + tick_bonding_photon_state_table (dispatch table rename)
+- **PLATE=7**: P1-P4 CJK mojibake repair (tick_bonding_or_photon_activation_seq / tick_equip_zone14_activation_display_seq / tick_equip_zone14_state_by_phase_and_eligib / tick_equip_zone14_eligib_by_photon_laser_cid); P5-P7 stale FUN_ -> current name (3 functions)
+- **disasm=2 blocks / 6 new fn**:
+  - Block1 (0x5a0aa/0x36 but code at 0x5a0ac): tick_bonding_or_photon_activation_seq @ 0x0805a0ac (THUMB dispatch; lit pool 0x5a0d4/d8/dc; clearListing->setTMode->DisassembleCommand->createFunction+plate)
+  - Block2 (0x5a0f8/0xe4): 5 sub-fns (tick_bonding_photon_state0_start_lp_bar / tick_bonding_photon_state1_trigger_display / tick_bonding_photon_state2_set_activation / tick_bonding_photon_state3_confirm_sprite / tick_bonding_photon_state4_end_lp_bar; 14 lit pool DWORDs + HWord pad via FixF06Seg9Block2Pools.py)
+- **新建 constants**: card_info.inc +23 (SPECIAL_EQUIP_SENTINEL_ID=0x19a3 / ZONE_STATUS_MASK=0x303e / SPECIAL_EQUIP_TARGET_CID_A=0x131e + 20 new CIDs)
+- **CSV sync**: naming-proposals.csv +6 new disasm fn rows (0x0805a0ac/f8/118/134/148/1cc)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0)
+- **§5.1=0**
+- **验收**: FUN_ 残留=0 (Seg-9 lines 15895-18793); CJK=0; 2 ROM_INCBIN blocks replaced; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **commit**: TBD
+
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
 - **段范围**: 0x08055440..0x080565e8, 22 fn
@@ -239,7 +257,7 @@
 | Seg-6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | set_lp_row_type2 + equip activation LP display seq |
 | Seg-7 | 0x58550..0x58cec | 22 | 58 | — | tick_equip_activation_neo_daedalus_gate + Neo Daedalus 效果簇 ✅ |
 | Seg-8 | 0x58cec..0x59de0 | 22+13 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | tick_equip_score_lp_display_seq + switch 派发 ✅ |
-| Seg-9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | tick_equip_zone14_activation_display_seq + 2 ROM_INCBIN 数据块 |
+| Seg-9 | 0x59de0..0x5b480 | 22+6 | 140 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | tick_equip_zone14_activation_display_seq + 2 ROM_INCBIN 数据块 ✅ |
 | Seg-10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | find_zone_slot_match_by_type_in_node_list + switch 派发 (文件末) |
 
 执行约定同 file 00..05: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;
