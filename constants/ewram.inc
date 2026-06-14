@@ -459,3 +459,8 @@
 .equ LP_SLOT_ACTIVE_OFF,        0x00000010  @ [gP1LifePoints+player*0x868+0x10] LP slot activation count; nonzero = LP slot active/present; ~10 Seg-5 uses
 .equ LP_LOOP_CEIL_OFF,          0x0000000c  @ [gP1LifePoints+player*0x868+0x0c] LP slot count ceiling for loop bounds; ~7 Seg-5 uses
 .equ HAND_SLOT_TO_ZONE_COUNT_NEG_OFF, 0xfffffbf4  @ gP1HandSlotArray(0x0201c8f8)+0xfffffbf4=gP1ZoneHandCount(0x0201c4ec); neg delta -0x40c; distinct from HAND_ARRAY_TO_COUNT_NEG_OFF=-0x404; 1 Seg-5 slot DWORD_0805feac
+
+@ =============================================================================
+@ file 07 Seg-7 additions: LP gap threshold constant
+@ =============================================================================
+.equ LP_GAP_THRESHOLD_7000,          0x00001b58  @ LP gap threshold 7000 (0x1b58=7000 decimal); check_equip_slot_eligible_by_lp_gap_7000_vs_opponent: opponent LP must exceed player LP by at least 7000; Seg-7 DWORD_080618b0

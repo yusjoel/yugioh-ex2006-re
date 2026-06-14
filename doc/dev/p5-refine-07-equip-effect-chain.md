@@ -72,7 +72,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ✅ | 667391b |
 | 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ✅ | 3fcbbce |
 | 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ✅ | d959091 |
-| 7 | 0x613b4..0x61eb4 | 34 | 57 | 1 (0x61c66/2a) | ⬜ | — |
+| 7 | 0x613b4..0x61eb4 | 34+1 | 65 | 1 (0x61c66/2a disasm) | ✅ | TBD |
 | 8 | 0x61eb4..0x62d28 | 34 | 49 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) | ⬜ | — |
 | 9 | 0x62d28..0x63830 | 34 | 40 | 3 (0x62ebe/3e, 0x62f38/28, 0x636f8/38) | ⬜ | — |
 | 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ⬜ | — |
@@ -205,6 +205,23 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - card_info.inc +12 CID: QUEENS_KNIGHT(0x157f)/CONTRACT_WITH_EXODIA(0x165b)/SAGES_STONE(0x167e)/OJAMA_YELLOW(0x16b3)/FENRIR(0x16c6)/CHAOS_END(0x16d1)/CHAOS_EMPEROR_DRAGON(0x16e4)/RIGHT_LEG/LEFT_LEG/RIGHT_ARM/LEFT_ARM/EXODIA_THE_FORBIDDEN_ONE (0x0fb7-0x0fbb)
 - CSV sync: +3 rows (3 disasm new fn)
 - carve=0; §5.1=0
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+### 4.07 Seg-7 完成记录 (2026-06-14)
+
+范围: ROM 0x080613b4..0x08061eb4 (34 原有 fn + 1 disasm 新 fn = 35 fn)
+
+**落地数据**:
+- EQ=44 (PLAYER_BLOCK_STRIDE x18 + BANISHER_OF_THE_LIGHT_CID x3 + gDuelFieldSlots x3 + gP1FieldArrayCBase x2 + gEquipChainSlotRefs x4 + gDuelFieldSlots_p2_base x1 + UMI_CARD_ID x1 + LP_GAP_THRESHOLD_7000 x1 + FIELD5_SCORE_THRESHOLD_1999 x1 + FIELD_STATE_OFF x2 + BURST_STREAM_OF_DESTRUCTION_CID x1 + BLUE_EYES_WHITE_DRAGON_CID x1 + RED_EYES_B_DRAGON_CID x1 + SANCTUARY_IN_THE_SKY_CID x1 + MASK_OF_RESTRICT_CID x1 + PROTECTOR_OF_SANCTUARY_CID x1 + REVERSAL_OF_GRAVES_CID x1 + BLASTING_THE_RUINS_CID x1)
+- REF=17 (gP1LifePoints x16 [10 DWORD_ + 6 PTR_] + gP1ZoneHandCount x1) + 2 disasm REF slots (gp1lp_ptr_08061c84 + player_stride_08061c88 as EQ)
+- RENAME=2 (zone_pair_pred_07ad_ptr_08061d74 + zone_pair_pred_1e95_ptr_08061eb0 with EOL)
+- FUNC_RENAME=1: check_zera_ritual_absent_from_field -> check_banisher_of_light_absent_from_field @0x08061d40 (CID 0x1332 = Banisher of the Light, not Zera Ritual 0x1245)
+- PLATE=10 (7 CJK full rewrites + 2 gDuelEffectCtx->gEquipChainSlotRefs semantic fixes + 1 post-FUNC_RENAME "Zera Ritual"->Banisher correction)
+- disasm=1 block (0x61c66/0x2a): check_player_lp_status_nonzero_for_cid_1776@0x08061c68 (CID 0x1776 Corpse of Yata-Garasu, handler table 0x09e4204c; reads gP1LP[player*0x868+0x10]; nonzero->2, zero->0)
+- carve=0; §5.1=0
+- card_info.inc +7 CID: REVERSAL_OF_GRAVES(0x14f0)/BLASTING_THE_RUINS(0x16dc)/BURST_STREAM_OF_DESTRUCTION(0x175b)/SANCTUARY_IN_THE_SKY(0x175e)/INFERNO_FIRE_BLAST(0x17f6)/PROTECTOR_OF_SANCTUARY(0x178b)/MASK_OF_RESTRICT(0x13f2)
+- ewram.inc +1: LP_GAP_THRESHOLD_7000(0x1b58=7000 decimal)
+- CSV sync: +1 row (check_player_lp_status_nonzero_for_cid_1776) + rename row (check_banisher_of_light_absent_from_field)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 ---

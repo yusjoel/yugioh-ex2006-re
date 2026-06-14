@@ -1204,3 +1204,15 @@
 .equ RIGHT_ARM_FORBIDDEN_ONE_CID,   0x00000fb9  @ Right Arm of the Forbidden One (pw=70903634; card-stats.s card_0019 slot=0x0FB9); Exodia set check Block1; conf: high
 .equ LEFT_ARM_FORBIDDEN_ONE_CID,    0x00000fba  @ Left Arm of the Forbidden One (pw=07902349; card-stats.s card_0020 slot=0x0FBA); Exodia set check Block1; conf: high
 .equ EXODIA_THE_FORBIDDEN_ONE_CID,  0x00000fbb  @ Exodia the Forbidden One (pw=33396948; card-stats.s card_0021 slot=0x0FBB); Exodia set check Block1; conf: high
+
+@ =============================================================================
+@ file 07 Seg-7 additions: equip slot eligibility predicate card IDs
+@ Source: asm/07_equip_effect_chain.s Seg-7 (0x080613b4..0x08061eb4)
+@ =============================================================================
+.equ REVERSAL_OF_GRAVES_CID,         0x000014f0  @ Reversal of Graves (pw=17484499; card-stats.s L13743 slot=0x14F0); Seg-7 DWORD_080613cc
+.equ BLASTING_THE_RUINS_CID,         0x000016dc  @ Blasting the Ruins (pw=21466326; card-stats.s L18696 slot=0x16DC); Seg-7 DWORD_080613d0
+.equ BURST_STREAM_OF_DESTRUCTION_CID, 0x0000175b @ Burst Stream of Destruction (pw=17655904; card-stats.s L20061 slot=0x175B); Seg-7 DAT_08061ad4
+.equ SANCTUARY_IN_THE_SKY_CID,       0x0000175e  @ The Sanctuary in the Sky (pw=56433456; card-stats.s L20087 slot=0x175E); note SANCTUARY_CID_SHIFTED(0xbaf00000) is CID<<19 not raw CID; Seg-7 DAT_08061b90
+.equ INFERNO_FIRE_BLAST_CID,         0x000017f6  @ Inferno Fire Blast (pw=52684508; card-stats.s L21686 slot=0x17F6); inline computed via adds r0,#0x9b from 0x175b in check_dragon_spell_target_slot_available; plate reference only
+.equ PROTECTOR_OF_SANCTUARY_CID,     0x0000178b  @ Protector of the Sanctuary (pw=24221739; card-stats.s L20464 slot=0x178B); Seg-7 DWORD_08061dc0
+.equ MASK_OF_RESTRICT_CID,           0x000013f2  @ Mask of Restrict (pw=29549364; card-stats.s L11234 slot=0x13F2); Seg-7 DWORD_08061c5c
