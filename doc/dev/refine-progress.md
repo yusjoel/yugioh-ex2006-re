@@ -86,7 +86,7 @@
 | 6 | 0x57458..0x58550 (22 fn, 99 槽, ROM_INCBIN x2) | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec (22 fn, 58 槽) | ✅ | 8fd1210 |
 | 8 | 0x58cec..0x59de0 (22 fn+13 new, 107 槽, ROM_INCBIN x2 + switchD) | ✅ | 11c409d |
-| 9 | 0x59de0..0x5b480 (22 fn+6 new, 140 槽, ROM_INCBIN x2) | ✅ | TBD |
+| 9 | 0x59de0..0x5b480 (22 fn+6 new, 140 槽, ROM_INCBIN x2) | ✅ | 8c4bd9a |
 | 10 | 0x5b480..0x5c2f0 (15 fn, 69 槽, switchD x2) | ⬜ | — |
 
 **Seg-10 完成**: vija/shuen 32fn 全符号化, gVijaState 新全局, BG3HOFS plate 订正, CJK plate/EOL ASCII 转换; DWORD_SLOTS 永久修复 literal pool label 丢失问题; byte-identical 9689337d; file 00 全 10 段完成 ✅。
