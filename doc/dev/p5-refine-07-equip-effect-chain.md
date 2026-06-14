@@ -66,7 +66,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x5c2f0..0x5cfec | 34+5 | 66 | 5 (0x5c40a/5e disasm, 0x5c4aa/2a §5.1, 0x5c608/28 disasm, 0x5cd86/2a disasm, 0x5cf1c/20 disasm) | ✅ | TBD |
+| 1 | 0x5c2f0..0x5cfec | 34+5 | 66 | 5 (0x5c40a/5e disasm, 0x5c4aa/2a §5.1, 0x5c608/28 disasm, 0x5cd86/2a disasm, 0x5cf1c/20 disasm) | ✅ | 7e1caa2 |
 | 2 | 0x5cfec..0x5e358 | 34 | 83 | 2 (0x5dd3e/1a, 0x5ddda/d2) | ⬜ | — |
 | 3 | 0x5e358..0x5f1cc | 34 | 40 | 4 (0x5e744/4c, 0x5ed4a/2a, 0x5ed8e/92, 0x5ee9c/ec) | ⬜ | — |
 | 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ⬜ | — |
