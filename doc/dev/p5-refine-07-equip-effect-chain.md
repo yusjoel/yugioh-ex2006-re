@@ -1,0 +1,125 @@
+# 函数/数据细化计划 — `asm/07_equip_effect_chain.s`
+
+> 阶段目标: 把 `asm/07_equip_effect_chain.s` (ROM `0x0805C2F0 ~ 0x080643E0`, 装备效果链 +
+> 卡效果按 card_id 派发 `dispatch_effect_by_card_id_*` + 大量 `check_equip_slot_eligible_*` /
+> `check_*_score` 谓词 + Neo Daedalus/zone 效果) **逐段地址序细化完成**, 全程 byte-identical
+> (`SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b`)。
+>
+> 这是 refine 第 **8** 个文件 (file 00..06 已全 10 段完成, 见对应 `p5-refine-0N-*.md`)。
+> 方法论 + R1-R9 细化清单 + 三条硬规则见 `doc/dev/methodology/refine-loop.md` 与 file 00 doc §一。
+
+---
+
+## 一、细化要求 (checklist)
+
+沿用 file 00..06 doc §一 的 **R1-R9** + **三条硬规则** (严格地址序 Seg-1..10 不回头 / 函数间
+ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见
+`doc/dev/p5-refine-00-system-str-vija.md` §一。复用资产清单见 `doc/dev/p5-refine-05-equip-eligibility-a.md` §一。
+
+**跨文件踩坑沿用** (file 00..06 沉淀, 务必遵守):
+- Ghidra EOL/plate **一律 ASCII** (CJK 会 Jython 双重 UTF-8 mojibake); **段内常残留命名期 CJK mojibake plate,
+  executor 必 grep 段内非 ASCII, 逐个整段 ASCII 重写** (substring 替换对 CJK 静默 no-op; file 05 Seg-10 / file 06 Seg-5/7/9 反复)。
+- **⚠ ROM_INCBIN 分类核心 (file 06 已确认 5 次, file 07 有 35 块, 主线工作)**: `0x09e4xxxx` 区有
+  **card effect handler dispatch table** (格式 `CID_word + fn_ptr1(+1) [+ fn_ptr2(+1)...] + zero_pad`,
+  FS 运行时加载), 用 **THUMB|1** 指针引用代码段谓词函数。每个函数间 ROM_INCBIN 块 ref-scan (raw + THUMB|1 穷举 2B-step):
+  - THUMB+1 命中**别一律当压缩偶合**; 核命中点周边 ROM: 前 4/8B 是合法 CID (`data/card-stats.s` 有 slot) +
+    命中 = `<块>+1` 对齐 fn_ptr → **真引用 → R4 disasm 不 §5.1** (disasm 后块字节不变, byte-identical 不受影响;
+    plate 注明 "reached via card effect handler dispatch table 0x09e4xxxx, <Card> CID 0xXXXX")。
+  - 块内可能含**多 sub-fn**, 经 dispatch table raw 指针或 `mov pc,r0` 到达 (file 06 Seg-6/8 范式), 逐 sub-fn 边界核 + createFunction。
+  - 仅 raw=0 且 THUMB+1=0 (或命中确非 table 结构) → 真孤儿 → §5.1。
+  详见 memory `feedback-card-effect-handler-table-thumb-ref`。
+- **R4 disasm 范式** (file 00 Seg-5c): clearListing 整 range → setTMode → 逐 stub DisassembleCommand;
+  literal pool 须 clearListing+createDWord 强制 split 才能 export label; 重跑前先 clearListing 整 range 再 setTMode (否则 ContextChangeException)。
+- **C5 双向核 (file 06 Seg-9 抓 9 同名+SPIRIT_RYU 误标)**: 标 **new** 的 CID 逐一 grep card_info.inc **0 命中**;
+  标 **reuse** 的逐一 grep **确存在** (反向核); 记 grep 证据。**C5 偏移放宽** (不同 base 的 `*_OFF` 各建独立);
+  **卡 ID / 掩码 / 位域 / 阈值等非偏移标量严格去重** (值碰撞必复用, 除非 state_code 碰 CID 才 RENAME-only)。
+- **C13 残留 100% 覆盖**: executor 必 python 精确清点段内 DAT_/DWORD_/PTR_ 槽总数 (别漏 DWORD_, file 05 Seg-9/file 06 Seg-5/8 反复);
+  EQ+REF+RENAME 三表并集 == 段内全集 (穷举对账 missing=0/extra=0); 严防越界。
+- **卡牌 ID**: 查 `data/card-stats.s` 坐实 passcode→slot_id→卡名 (**card record# != slot_id**, file 06 Seg-6 Otohime 教训);
+  passcode 注释逐一 python 核对 (file 05/06 反复抓错); 未分配 → 中性 `cid_<hex>` 低置信, 勿臆造 (红线 3)。
+- **C8 stale FUN_**: **穷举 pattern `FUN_[0-9a-f]{8}` 扫段内全部 asm 行 (含每个函数 plate 上方行 + 一 plate 多 FUN_,
+  含跨模块)**; 对每个 FUN_ 地址查现名 (naming-proposals.csv / asm label) 替换; 真无名 → 裸地址措辞; 落地后 grep 段范围 == 0。
+- **EOL 数学自检**: 移位/算术/分支方向等式 python 实算 + 机器码核验 (file 05 Seg-7 <<19 / Seg-10 ble 方向); 算不准 → 中性 "exact semantics not decoded"。
+- **fn-ptr +1 永久踩坑**: re-export 后须重补已知周期性修复槽: asm/03 (0x37884/0x389dc/0x389f8/0x3aa74) /
+  asm/04 (0x40ab4/0x42638/0x45efc/0x478f0) / asm/05 Seg-8 6 槽 / asm/06 各段 fn-ptr 槽。file 07 新 fn-ptr 同样处理。
+- 复用 file 00..06 已建 constants/*.inc 与 carve label。
+
+**file 02..06 已建可复用资产** (新建前必 grep): 见 `doc/dev/p5-refine-05-equip-eligibility-a.md` §一
+(ewram.inc / duel_field.inc / card_info.inc ~430+ CID / oam_attr.inc / gl_scrollbar.inc / bitops.inc / 全局 / caller hub)。
+
+---
+
+## 二、落地工作流 (pipeline)
+
+同 file 00..06 doc §二:
+```
+备份 .rep → Ghidra 脚本 (RefineF07Seg<N>*.py: equate/label/ref/rename/plate/disasm)
+→ ghidra-export-range.bat 080000c0 084c7637 → inject_modes.py → split_all_s.py
+→ build + byte-identical SHA1 9689337d → (改/建函数名才) ExportFunctionInventory + sync CSV → commit
+```
+3-agent: executor (proposal) → reviewer (C1-C13 review) → fixer (模式A改proposal / 模式B落地)。
+重段 (>~120 槽 或 多 ROM_INCBIN) 按函数边界拆 Seg-Na/Nb (地址序不回头)。
+
+---
+
+## 三、当前进度 (07_equip_effect_chain.s)
+
+| Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
+|-----|------|-----|--------|-----------------|------|--------|
+| 1 | 0x5c2f0..0x5cfec | 34 | 57 | 5 (0x5c40a/5e, 0x5c4aa/2a, 0x5c608/28, 0x5cd86/2a, 0x5cf1c/20) | ⬜ | — |
+| 2 | 0x5cfec..0x5e358 | 34 | 83 | 2 (0x5dd3e/1a, 0x5ddda/d2) | ⬜ | — |
+| 3 | 0x5e358..0x5f1cc | 34 | 40 | 4 (0x5e744/4c, 0x5ed4a/2a, 0x5ed8e/92, 0x5ee9c/ec) | ⬜ | — |
+| 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ⬜ | — |
+| 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ⬜ | — |
+| 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ⬜ | — |
+| 7 | 0x613b4..0x61eb4 | 34 | 57 | 1 (0x61c66/2a) | ⬜ | — |
+| 8 | 0x61eb4..0x62d28 | 34 | 49 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) | ⬜ | — |
+| 9 | 0x62d28..0x63830 | 34 | 40 | 3 (0x62ebe/3e, 0x62f38/28, 0x636f8/38) | ⬜ | — |
+| 10 | 0x63830..0x643e0 | 33 | 54 | 4 (0x6384e/2a, 0x63cf0/14, 0x63db4/40, 0x63fc4/24) | ⬜ | — |
+
+图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
+**35 个 ROM_INCBIN 块 (无 switchD 表)** — 绝大多数预判为 card effect handler dispatch table (0x09e4xxxx) 引用的谓词代码 →
+逐块 ref-scan 按 §一 handler-table 法分类 (THUMB+1 命中核 CID+fn_ptr 结构 → R4 disasm; 真 0 引用 → §5.1)。
+重段提示: Seg-2 (83 槽) / Seg-1+Seg-7 (57 槽) 较重, 必要时拆 Seg-Na/Nb。
+
+---
+
+## 四、逐段完成记录
+
+(各段落地后由 fixer 追加 4.0N 小节)
+
+---
+
+## 五、批次路线图 (地址序, Seg-1..Seg-10)
+
+> 按 file 07 范围 `[0x0805c2f0, 0x080643e0)` (339 named fn, ~516 DAT_/DWORD_/PTR_ 槽, 35 ROM_INCBIN 块, 0 switchD)
+> 按**函数数**均分 10 段 (~34 fn/段, 边界=函数结束处=下一函数起点)。
+
+| Seg | 地址范围 | ~fn | ~slots | ROM_INCBIN 数 | 主题 (初判) |
+|---|---|---|---|---|---|
+| Seg-1 | 0x5c2f0..0x5cfec | 34 | 57 | 5 | dispatch_effect_by_card_id_with_display_lookup + 效果派发簇头 |
+| Seg-2 | 0x5cfec..0x5e358 | 34 | 83 | 2 | check_spell_zone_effect_activatable + spell/zone 效果谓词簇 |
+| Seg-3 | 0x5e358..0x5f1cc | 34 | 40 | 4 | check_monster_slot_field5_score_in_range + score 谓词簇 |
+| Seg-4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 | check_equip_slot_at_turn_player_side + turn/side 谓词簇 |
+| Seg-5 | 0x5fc94..0x60898 | 34 | 44 | 3 | check_equip_slot_eligible_by_chain_score_and_owner 簇 |
+| Seg-6 | 0x60898..0x613b4 | 34 | 47 | 3 | check_equip_slot_eligible_by_lp_slot_and_effect_dispatch 簇 |
+| Seg-7 | 0x613b4..0x61eb4 | 34 | 57 | 1 | check_equip_slot_eligible_by_card_id_graveyard_threshold 簇 |
+| Seg-8 | 0x61eb4..0x62d28 | 34 | 49 | 5 | check_equip_slot_eligible_by_zone_slot_flag_and_status 簇 |
+| Seg-9 | 0x62d28..0x63830 | 34 | 40 | 3 | store_slot_effect_value_from_card + 效果值存取簇 |
+| Seg-10 | 0x63830..0x643e0 | 33 | 54 | 4 | check_opponent_monster_slot_present 簇 (文件末) |
+
+执行约定同 file 00..06: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。
+
+### 5.1 未引用数据登记表 (规则 3)
+
+| 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
+|---|---|---|---|---|
+| (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
+
+---
+
+## 六、相关文档
+- `doc/dev/methodology/refine-loop.md` (方法论)
+- `doc/dev/p5-refine-00-system-str-vija.md` (file 00 完整记录 + §一 R1-R9 详版)
+- `doc/dev/p5-refine-06-equip-eligibility-b.md` (file 06: handler-table disasm 分类 / cascading sub-fn / CJK plate 重写 / C5 双向核)
+- `doc/dev/refine-progress.md` (25 文件跨文件总进度)
