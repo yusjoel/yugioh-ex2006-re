@@ -1186,3 +1186,21 @@
 .equ THUNDER_OF_RULER_CID,      0x000015f0  @ Thunder of Ruler (pw=91781589; card-stats.s line 16213 slot=0x15F0); disasm Block3 F1 handler fn
 .equ METEORAIN_CID,             0x000015f2  @ Meteorain (pw=64274292; card-stats.s line 16239 slot=0x15F2); disasm Block3 F2 handler fn
 .equ PINEAPPLE_BLAST_CID,       0x000015f3  @ Pineapple Blast (pw=90669991; card-stats.s L16252 slot=0x15F3); disasm Block3 F3 handler fn
+
+@ =============================================================================
+@ file 07 Seg-6 additions: equip slot eligibility predicate card IDs
+@ Source: asm/07_equip_effect_chain.s Seg-6 (0x08060898..0x080613b4)
+@ =============================================================================
+.equ QUEENS_KNIGHT_CID,             0x0000157f  @ Queen's Knight (pw=25652259; card-stats.s card_1158 slot=0x157F); companion dispatch in check_equip_slot_eligible_by_companion_card_and_paired_slot; conf: high
+.equ CONTRACT_WITH_EXODIA_CID,      0x0000165b  @ Contract with Exodia (pw=33244944; card-stats.s card_1331 slot=0x165B); dispatch handler fn check_exodia_set_in_extra_for_cid_165b; conf: high
+.equ SAGES_STONE_CID,               0x0000167e  @ Sage's Stone (pw=13604200; card-stats.s card_1355 slot=0x167E); companion dispatch; conf: high
+.equ OJAMA_YELLOW_CID,              0x000016b3  @ Ojama Yellow (pw=42941100; card-stats.s card_1399 slot=0x16B3); Ojama trio check; conf: high
+.equ FENRIR_CID,                    0x000016c6  @ Fenrir (pw=00218704; card-stats.s card_1416 slot=0x16C6); dispatch handler fn check_zone_type580_direction_mismatch_for_cid_16c6; conf: high
+.equ CHAOS_END_CID,                 0x000016d1  @ Chaos End (pw=61044390; card-stats.s card_1427 slot=0x16D1); dispatch handler fn check_lp_zone_hand_above6_for_cid_16d1; conf: high
+.equ CHAOS_EMPEROR_DRAGON_CID,      0x000016e4  @ Chaos Emperor Dragon - Envoy of the End (pw=82301904; card-stats.s card_1445 slot=0x16E4); BLS+CED envoy paired check; conf: high
+@ Exodia piece CIDs -- Block1 literal pool slots (all new; 0 hits in card_info.inc)
+.equ RIGHT_LEG_FORBIDDEN_ONE_CID,   0x00000fb7  @ Right Leg of the Forbidden One (pw=08124921; card-stats.s card_0017 slot=0x0FB7); Exodia set check Block1; conf: high
+.equ LEFT_LEG_FORBIDDEN_ONE_CID,    0x00000fb8  @ Left Leg of the Forbidden One (pw=44519536; card-stats.s card_0018 slot=0x0FB8); Exodia set check Block1; conf: high
+.equ RIGHT_ARM_FORBIDDEN_ONE_CID,   0x00000fb9  @ Right Arm of the Forbidden One (pw=70903634; card-stats.s card_0019 slot=0x0FB9); Exodia set check Block1; conf: high
+.equ LEFT_ARM_FORBIDDEN_ONE_CID,    0x00000fba  @ Left Arm of the Forbidden One (pw=07902349; card-stats.s card_0020 slot=0x0FBA); Exodia set check Block1; conf: high
+.equ EXODIA_THE_FORBIDDEN_ONE_CID,  0x00000fbb  @ Exodia the Forbidden One (pw=33396948; card-stats.s card_0021 slot=0x0FBB); Exodia set check Block1; conf: high

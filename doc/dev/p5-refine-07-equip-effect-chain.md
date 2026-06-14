@@ -71,7 +71,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 3 | 0x5e358..0x5f1cc | 34 | 40 | 4 (0x5e744/4c, 0x5ed4a/2a, 0x5ed8e/92, 0x5ee9c/ec) | ✅ | 2b80239 |
 | 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ✅ | 667391b |
 | 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ✅ | 3fcbbce |
-| 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ⬜ | — |
+| 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ✅ | — |
 | 7 | 0x613b4..0x61eb4 | 34 | 57 | 1 (0x61c66/2a) | ⬜ | — |
 | 8 | 0x61eb4..0x62d28 | 34 | 49 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) | ⬜ | — |
 | 9 | 0x62d28..0x63830 | 34 | 40 | 3 (0x62ebe/3e, 0x62f38/28, 0x636f8/38) | ⬜ | — |
@@ -188,6 +188,23 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - carve=0
 - CSV sync: +6 rows (6 disasm new fn)
 - §5.1: 0
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+### 4.06 Seg-6 完成记录 (2026-06-14)
+
+范围: ROM 0x08060898..0x080613b4 (34 原有 fn + 3 disasm 新 fn = 37 fn)
+
+**落地数据**:
+- EQ=47 (gP1LifePoints x10 + PLAYER_BLOCK_STRIDE x9 + P1LP_BLOCK2_OFF_1CE8 x2 + FIELD_STATE_OFF x1 + ZONE_DETAIL_FIELD_MASK_F88 x1 + gDuelFieldSlots x2 + gEquipChainSlotRefs x1 + CID REUSE x17 (FRIENDSHIP/UNITY/MUSTERING_DS/DMG/DON_ZALOOG x2/BANISHER/TERRORKING/CLIFF/DS_CHICK/DS_GORG/DS_MEANAE/CRIMSON_NINJA/BLS_ENVOY x2/OJAMA_GREEN/OJAMA_BLACK) + CID NEW x4 (SAGES_STONE/QUEENS_KNIGHT/OJAMA_YELLOW/CHAOS_EMPEROR_DRAGON))
+- REF=0; RENAME=0; FUNC_RENAME=0
+- PLATE=6 (6 CJK plate full ASCII rewrites: 0x08060974/0x08060a5c/0x08060c30/0x08060e24/0x08060fe8/0x080612e4; 0x08060fe8 also corrects semantic error DUEL_STATE_PTR->gEquipChainSlotRefs)
+- disasm=3 blocks (3 new fn):
+  - Block1 0x60a86/0x90: check_exodia_set_in_extra_for_cid_165b@0x08060a88 (Contract with Exodia CID 0x165b; 5 Exodia piece CIDs + EXODIA_NECROSS in literal pool)
+  - Block2 0x6106e/0x2e: check_zone_type580_direction_mismatch_for_cid_16c6@0x08061070 (Fenrir CID 0x16c6; leaf fn)
+  - Block3 0x6121c/0x28: check_lp_zone_hand_above6_for_cid_16d1@0x0806121c (Chaos End CID 0x16d1; literal pool: gP1LifePoints+PLAYER_BLOCK_STRIDE)
+- card_info.inc +12 CID: QUEENS_KNIGHT(0x157f)/CONTRACT_WITH_EXODIA(0x165b)/SAGES_STONE(0x167e)/OJAMA_YELLOW(0x16b3)/FENRIR(0x16c6)/CHAOS_END(0x16d1)/CHAOS_EMPEROR_DRAGON(0x16e4)/RIGHT_LEG/LEFT_LEG/RIGHT_ARM/LEFT_ARM/EXODIA_THE_FORBIDDEN_ONE (0x0fb7-0x0fbb)
+- CSV sync: +3 rows (3 disasm new fn)
+- carve=0; §5.1=0
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 ---
