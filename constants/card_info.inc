@@ -1281,3 +1281,27 @@
 .equ MAGICAL_BLAST_CID,                0x00001984  @ Magical Blast (pw=91819979; card_1751 slot=0x1984)
 .equ MEMORY_CRUSHER_CID,               0x000019cf  @ Memory Crusher (pw=48700891; card_2058 slot=0x19CF)
 .equ GUARDIAN_EXODE_CID,               0x000019f0  @ Guardian Exode (pw=55737443; card_2064 slot=0x19F0)
+
+@ =============================================================================
+@ file 08 Seg-2 additions: equip effect handler card IDs
+@ Source: asm/08_equip_oam_neodaed.s, Seg-2 (0x0806544c..0x08066448)
+@ dispatch_equip_draw_counter_sprite_tick / tick_dragon_summon_effect_display_state_machine
+@ All values verified against data/card-stats.s slot_id field.
+@ =============================================================================
+.equ TIME_WIZARD_CID,                  0x00000fb6  @ Time Wizard (pw=71625222; card_0016 slot=0x0FB6); fn_eligible handler via handler table 0x09e4631c
+.equ DRAGON_CAPTURE_JAR_CID,           0x000010ef  @ Dragon Capture Jar (pw=50045299; card_0291 slot=0x10EF); drive_equip_slot_bitmap_or_activation_scan dispatch
+.equ DARK_RABBIT_CID,                  0x00001126  @ Dark Rabbit (pw=99261403; card_0341 slot=0x1126); write_equip_lp_delta_dark_rabbit handler
+.equ SKELENGEL_CID,                    0x000011c2  @ Skelengel (pw=60694853; card_0450 slot=0x11C2); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ FLUTE_SUMMONING_DRAGON_CID,       0x000012ca  @ The Flute of Summoning Dragon (pw=43973174; card_0651 slot=0x12CA); tick_dragon_summon_effect dispatch
+.equ AIRKNIGHT_PARSHATH_CID,           0x0000139f  @ Airknight Parshath (pw=18036057; card_0816 slot=0x139F); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ CARD_OF_SAFE_RETURN_CID,          0x00001403  @ Card of Safe Return (pw=57953380; card_0878 slot=0x1403); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ DES_LACOODA_CID,                  0x00001533  @ Des Lacooda (pw=02326738; card_1112 slot=0x1533); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ CALL_OF_THE_MUMMY_CID,            0x0000153b  @ Call of the Mummy (pw=04861205; card_1119 slot=0x153B); tick_dragon_summon_effect dispatch
+.equ HIDDEN_SOLDIER_CID,               0x00001572  @ Hidden Soldier (pw=02916282; card_1149 slot=0x1572); tick_dragon_summon_effect dispatch
+.equ PRECIOUS_CARDS_FROM_BEYOND_CID,   0x00001662  @ Precious Cards from Beyond (pw=68304813; card_1338 slot=0x1662); dispatch_draw_counter; NOTE: same value as CARD_STAT_LP_THRESHOLD_5730 (L85) -- distinct semantic domain (CID vs LP threshold)
+.equ MOLTEN_ZOMBIE_CID,                0x000016f7  @ Molten Zombie (pw=04732017; card_1456 slot=0x16F7); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ DON_TURTLE_CID,                   0x000016fd  @ Don Turtle (pw=03493978; card_1462 slot=0x16FD); tick_dragon_summon_effect dispatch
+.equ AVATAR_OF_THE_POT_CID,            0x00001748  @ Avatar of The Pot (pw=99284890; card_1523 slot=0x1748); dispatch_equip_draw_counter_sprite_tick dispatch
+.equ ATOMIC_FIREFLY_CID,               0x0000174e  @ Atomic Firefly (pw=83887306; card_1529 slot=0x174E); write_equip_lp_delta_atomic_firefly handler
+.equ MAGNET_CIRCLE_LV2_CID,            0x000019ac  @ Magnet Circle LV2 (pw=84327329; card_2021 slot=0x19AC); tick_dragon_summon_effect dispatch
+.equ CHAINSAW_INSECT_CID,              0x000019c7  @ Chainsaw Insect (pw=77252217; card_2042 slot=0x19C7); dispatch_equip_draw_counter_sprite_tick dispatch

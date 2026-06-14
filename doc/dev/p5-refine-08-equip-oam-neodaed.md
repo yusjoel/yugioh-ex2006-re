@@ -61,7 +61,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|-------------------|------|--------|
 | 1 | 0x643e0..0x6544c | 20 | 87 | 2 (0x6456c/2c, 0x645ee/1e) | ✅ | f0d7a85 |
-| 2 | 0x6544c..0x66448 | 20 | 72 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ⬜ | — |
+| 2 | 0x6544c..0x66448 | 20 | 79 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ✅ | TBD |
 | 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ⬜ | — |
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ⬜ | — |
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ⬜ | — |
@@ -94,6 +94,23 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **CSV sync**: +2 行 (2 新 disasm 函数)
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra 脚本**: `RefineF08Seg1Slots.py` + `DisassembleF08Seg1Blocks.py`
+
+### 4.02 Seg-2 完成记录 (0x6544c..0x66448)
+
+- **EQ**: 65 槽 (LP delta x5 [NEG_500/NEG_2000 reuse + NEG_1000 新建+reuse + NEG_800 reuse]; PLAYER_BLOCK_STRIDE x10 reuse; gEquipChainSlotRefs x1 / gDuelPhaseFlags x7 / gDuelFieldSlots x4 / gDuelCardCtxBase x2 / gEquipZoneCountTable x1 reuse; EQUIP_ACTIVE_CTX_OFF x1 reuse / EQUIP_PHASE_FRAME_OFF x3 新建; LP_BANISHER_CTX_OFF x1 reuse; 21 CID reuse + 17 CID 新建; OAM_ATTR_P1_SPRITE x1 新建)
+- **REF**: 13 槽 (gP1LifePoints fn-ptr x9 + THUMB callback fn-ptr x2 + switchD table ptr x1 + dispatch jump table ptr x1)
+- **RENAME**: 10 (PTR_gP1LifePoints_* 改名为描述性 slot label; 含 dispatch_equip_chain_state_jump_table: label)
+- **PLATE**: 11 (FUN_08064880 x8 → dispatch_equip_lp_delta_by_card_id; FUN_080655da x1 → restore_equip_effect_frame; FUN_080712a0 x1 → dispatch_equip_chain_state_if_tile_count_valid; gEquipEffectCtx x1 → gEquipChainSlotRefs)
+- **DISASM**: 3 ROM_INCBIN → THUMB (18 新函数):
+  - Block1 `check_equip_eligible_state_dispatch_for_time_wizard` @ 0x08065d78 (0x3c B, CID=0x0fb6 Time Wizard fn_eligible handler; dispatches via 34-entry raw-addr jump table at 0x08065db4 to Block2 sub-fns)
+  - Block2 12 sub-fn stubs @ 0x08065e3c..0x080660d7 (0x29c B): `equip_state_stub_{80/7f/7e/78/77/6d/64/63/61/60/5f/default}_time_wizard`; reached via raw-addr bx dispatch from table at 0x08065db4
+  - Block3 5 case stubs @ 0x080662a4..0x0806630b (0x68 B): `equip_chain_state_stub_{80/7e/7d/78/64}`; reached via jump table at 0x08066230 in dispatch_equip_chain_state_by_slot_ownership
+- **新建 constants**: equip_lp_delta.inc +1 (LP_EQUIP_DELTA_NEG_1000); ewram.inc +1 (EQUIP_PHASE_FRAME_OFF=0x4a4); oam_attr.inc +1 (OAM_ATTR_P1_SPRITE=0x8027); card_info.inc +17 CID (TIME_WIZARD/DRAGON_CAPTURE_JAR/DARK_RABBIT/SKELENGEL/FLUTE_SUMMONING_DRAGON/AIRKNIGHT_PARSHATH/CARD_OF_SAFE_RETURN/DES_LACOODA/CALL_OF_THE_MUMMY/HIDDEN_SOLDIER/PRECIOUS_CARDS_FROM_BEYOND/MOLTEN_ZOMBIE/DON_TURTLE/AVATAR_OF_THE_POT/ATOMIC_FIREFLY/MAGNET_CIRCLE_LV2/CHAINSAW_INSECT)
+- **carve**: 0 (no ROM data tables; all 3 blocks are THUMB code)
+- **§5.1**: 0 (all blocks have confirmed ROM references)
+- **CSV sync**: +18 rows (18 new disasm functions)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg2Slots.py` + `DisassembleF08Seg2Blocks.py`
 
 ---
 

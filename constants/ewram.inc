@@ -431,6 +431,7 @@
 .equ SPRITE_ROW_ANIM_CTL_OFF,   0x00000494  @ [gDuelPhaseFlags+0x494] anim state code (0..0xe); dispatch_sprite_row_anim_by_state reads [base+0x494] as state code; 6 ROM refs Seg-6a
 .equ SPRITE_ROW_QUEUE_ACTIVE_OFF, 0x00000498  @ [gDuelPhaseFlags+0x498] queue active flag (str); dispatch_equip_field_update_by_anim_state queue_state_offset=0x498; 4 ROM refs Seg-6a
 .equ SPRITE_ROW_QUEUE_STATE_OFF, 0x0000049c  @ [gDuelPhaseFlags+0x49c] queue state code (0..0x67); dispatch_sprite_row_queue_by_state uses [base+0x49c] for index; 5 ROM refs Seg-6a
+.equ EQUIP_PHASE_FRAME_OFF,      0x000004a4  @ [gDuelPhaseFlags+0x4a4] dragon-summon/equip effect phase frame counter; adjacent to phase code node +0x4a0 (=0x94<<3); 241 ROM refs; Seg-2 tick_dragon_summon_effect_display_state_machine
 
 @ New global: equip zone rank state struct (EWRAM)
 .equ gEquipZoneRankState,   0x0201e4d0  @ EWRAM base for equip zone rank state machine; advance_equip_zone_rank_state reads halfword [+0x14]; 1 ROM ref Seg-6a (DAT_0804f368)

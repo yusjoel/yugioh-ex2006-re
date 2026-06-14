@@ -139,3 +139,9 @@
 @ =============================================================================
 .equ OAM_ATTR2_CLR_BITS_11_6,  0xfffff03f  @ AND mask clearing bits[11:6]; used to clear OAM char-name tile index field in sprite row packing (submit_slot_card_sprite_row_entry + init variants); 14 ROM refs
 .equ SPRITE_ATTR_TYPE_HIDDEN_Y97, 0x00008061 @ OBJ disabled (bit15=1) | Y=0x61 (97); passed to enqueue_sprite_attr_record when eligib_sprite_ctrl [gP1LP+ELIGIB_SPRITE_CTRL_OFF] != 0; contrast 0x0061 (OBJ enabled) when field==0; 81 ROM refs
+
+@ =============================================================================
+@ file 08 Seg-2 additions: player 1 side sprite attr0
+@ Source: asm/08_equip_oam_neodaed.s, Seg-2 (0x0806544c..0x08066448)
+@ =============================================================================
+.equ OAM_ATTR_P1_SPRITE,  0x00008027  @ player 1 side sprite attr0 (0x8000=OBJ palette select bit; 0x27=tile region); enqueue_slot_player_side_sprite_attr; 1 Seg-2 slot
