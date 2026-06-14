@@ -1835,6 +1835,8 @@ address,name,proposed_name,score,tags
 0x08064418,dispatch_equip_slot_eligible_by_zone_type,,,
 0x080644b4,check_slot_equip_chain_pair_eligible_by_card,,,
 0x08064598,check_slot_equip_target_has_field5,,,
+0x0806456c,check_opponent_chain_zone_count_gt1_for_cid_19df,,,card_effect;refine_disasm
+0x080645f0,check_alt_hand_sum_nonzero_for_cid_19ef,,,card_effect;refine_disasm
 0x0806460c,check_equip_slot_eligible_via_effect_node_and_bitmap,,,duel_field
 0x08064654,invoke_equip_slot_eligibility_via_effect_node_bitmap,,,duel_field
 0x08064660,submit_equip_zone_bitmap_pair_update,,,duel_field

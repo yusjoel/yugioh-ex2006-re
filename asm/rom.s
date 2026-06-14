@@ -57,6 +57,9 @@
 @ Duel Field display constants (init_duel_field_icon_and_bg_vram / render_win_count; f01 Seg-7 0x20fa8 cluster)
 	.include "constants/duel_field.inc"
 
+@ Equip card LP delta penalty constants (s32; distinct from SCORE_DELTA_* ATK/DEF domain; asm/08 Seg-1 cluster)
+	.include "constants/equip_lp_delta.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 

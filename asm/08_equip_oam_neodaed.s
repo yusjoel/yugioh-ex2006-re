@@ -1,12 +1,12 @@
 @ ==== 08_equip_oam_neodaed.s ====
-@ neo daedalus 资格 + 装备 OAM 写入 + zone tile 计数
+@ neo daedalus eligibility + equip OAM write + zone tile count
 .thumb
 @ Checks whether equip slot satisfies neo-daedalus placement eligibility under the condition that no equip slot is currently active. First calls count_equip_slots_active_only(player); if any active equip slot exists returns 0; then calls count_paired_slots_with_field5_default(player, card_id); if paired slot exists returns 0; finally calls check_neo_daedalus_placement_eligible. Scenario: equip activation requires no other equip in active state on field for this neo-daedalus effect to be allowed.
 @ 
 @ Constants:
 @ - (no additional literals; all thresholds determined by callee internals)
 check_equip_slot_eligible_neo_daedalus_with_zero_active_equip:
-    push {r4,r5,lr}                          @ 080643e0 30b5
+    push {r4,r5,lr}                          @ 080643e0 30b5  -- @ neo daedalus eligibility + equip OAM write + zone tile count
     adds r4,r0,#0x0    @ 080643e2 041c
     adds r5,r1,#0x0    @ 080643e4 0d1c
     ldrb r1,[r4,#0x2]                        @ 080643e6 a178
@@ -75,10 +75,10 @@ LAB_0806443c:
     lsls r1,r0,#0x2    @ 08064446 8100
     adds r1,r1,r0    @ 08064448 0918
     lsls r1,r1,#0x2    @ 0806444a 8900
-    ldr r0, DWORD_0806446c                   @ 0806444c 0748
+    ldr r0, dispatch_equip_eligible_zone_type_stride_a @ 0806444c 0748
     muls r0,r2    @ 0806444e 5043
     adds r1,r1,r0    @ 08064450 0918
-    ldr r0, DWORD_08064470                   @ 08064452 0748
+    ldr r0, dispatch_equip_eligible_zone_type_slots_a @ 08064452 0748
     adds r1,r1,r0    @ 08064454 0918
     ldr r0,[r1,#0xc]                         @ 08064456 c868
     movs r1,#0x2    @ 08064458 0221
@@ -90,10 +90,10 @@ LAB_0806443c:
     bl check_equip_slot_eligible_bls_envoy_absent_with_zone_field_match @ 08064464 fcf754fe
     b LAB_080644ae                           @ 08064468 21e0
     .zero  0x2
-DWORD_0806446c:
-    .word  0x00000868                     @ 0806446c 68080000
-DWORD_08064470:
-    .word  0x0201c510                     @ 08064470 10c50102
+dispatch_equip_eligible_zone_type_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806446c 68080000
+dispatch_equip_eligible_zone_type_slots_a:
+    .word  gDuelFieldSlots                @ 08064470 10c50102
 LAB_08064474:
     ldrb r0,[r3,#0x2]                        @ 08064474 9878
     lsls r2,r0,#0x1f    @ 08064476 c207
@@ -103,10 +103,10 @@ LAB_08064474:
     lsls r1,r0,#0x2    @ 0806447e 8100
     adds r1,r1,r0    @ 08064480 0918
     lsls r1,r1,#0x2    @ 08064482 8900
-    ldr r0, DWORD_080644a4                   @ 08064484 0748
+    ldr r0, dispatch_equip_eligible_zone_type_stride_b @ 08064484 0748
     muls r0,r2    @ 08064486 5043
     adds r1,r1,r0    @ 08064488 0918
-    ldr r0, DWORD_080644a8                   @ 0806448a 0748
+    ldr r0, dispatch_equip_eligible_zone_type_slots_b @ 0806448a 0748
     adds r1,r1,r0    @ 0806448c 0918
     ldr r0,[r1,#0xc]                         @ 0806448e c868
     movs r1,#0x4    @ 08064490 0421
@@ -118,10 +118,10 @@ LAB_08064474:
     bl check_equip_slot_eligible_field_spell_effect_type_e_with_zone_field5 @ 0806449c fdf79cf8
     b LAB_080644ae                           @ 080644a0 05e0
     .zero  0x2
-DWORD_080644a4:
-    .word  0x00000868                     @ 080644a4 68080000
-DWORD_080644a8:
-    .word  0x0201c510                     @ 080644a8 10c50102
+dispatch_equip_eligible_zone_type_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080644a4 68080000
+dispatch_equip_eligible_zone_type_slots_b:
+    .word  gDuelFieldSlots                @ 080644a8 10c50102
 LAB_080644ac:
     movs r0,#0x0    @ 080644ac 0020
 LAB_080644ae:
@@ -161,7 +161,7 @@ check_slot_equip_chain_pair_eligible_by_card:
     bl find_equip_chain_pair_across_field    @ 080644cc cbf7d8f8
     lsls r7,r0,#0x10    @ 080644d0 0704
     lsrs r5,r7,#0x10    @ 080644d2 3d0c
-    ldr r0, DWORD_08064558                   @ 080644d4 2048
+    ldr r0, check_chain_pair_pair_not_found  @ 080644d4 2048
     cmp r5,r0                                @ 080644d6 8542
     beq LAB_08064554                         @ 080644d8 3cd0
     ldrb r1,[r6,#0x2]                        @ 080644da b178
@@ -198,11 +198,11 @@ LAB_0806451c:
     bl check_field_spell_neo_daedalus_group_placeable @ 0806451e d7f72dfb
     cmp r0,#0x0                              @ 08064522 0028
     beq LAB_08064554                         @ 08064524 16d0
-    ldr r1, DWORD_0806455c                   @ 08064526 0d49
+    ldr r1, check_chain_pair_lp_base         @ 08064526 0d49
     ldrb r0,[r6,#0x2]                        @ 08064528 b078
     lsls r4,r0,#0x1f    @ 0806452a c407
     lsrs r2,r4,#0x1f    @ 0806452c e20f
-    ldr r0, DWORD_08064560                   @ 0806452e 0c48
+    ldr r0, check_chain_pair_stride          @ 0806452e 0c48
     muls r0,r2    @ 08064530 5043
     adds r1,#0x10    @ 08064532 1031
     adds r0,r0,r1    @ 08064534 4018
@@ -222,19 +222,45 @@ LAB_0806451c:
 LAB_08064554:
     movs r0,#0x0    @ 08064554 0020
     b LAB_08064566                           @ 08064556 06e0
-DWORD_08064558:
-    .word  0x0000ffff                     @ 08064558 ffff0000
-DWORD_0806455c:
+check_chain_pair_pair_not_found:
+    .word  SLOT_CARD_EMPTY                @ 08064558 ffff0000  SLOT_CARD_EMPTY sentinel 0xffff: pair_id == 0xffff means not-found
+check_chain_pair_lp_base:
     .word  gP1LifePoints                  @ 0806455c e0c40102
-DWORD_08064560:
-    .word  0x00000868                     @ 08064560 68080000
+check_chain_pair_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08064560 68080000
 LAB_08064564:
     movs r0,#0x1    @ 08064564 0120
 LAB_08064566:
     pop {r4,r5,r6,r7}                        @ 08064566 f0bc
     pop {r1}                                 @ 08064568 02bc
     bx r1                                    @ 0806456a 0847
-    ROM_INCBIN 0x6456c, 0x2c
+
+@ fn_eligible for CID=0x19df (Success Probability 0%). Reached via card effect handler dispatch table at ROM 0x09e4306c (entry start). fn_eligible+1 = 0x0806456d stored at ROM 0x09e43078. Reads gP1ChainZoneCountBase (gP1LifePoints+0x18) + opponent_id * PLAYER_BLOCK_STRIDE. player_id extracted from slot byte[+2] bit0; opponent = 1-player_id. Returns 1 if opponent chain zone count > 1, else 0. ADDS r2,#0x18 at 0x0806457c: r2 = gP1LifePoints+0x18 = gP1ChainZoneCountBase. Lit pool @ 0x0806458c: gP1LifePoints(0x0201c4e0) / PLAYER_BLOCK_STRIDE(0x868).
+check_opponent_chain_zone_count_gt1_for_cid_19df:
+    ldr r2, gp1lp_ptr_0806458c               @ 0806456c 074a  -- cid_19df = Success Probability 0%; fn_eligible at handler table 0x09e4306c; reads gP1ChainZoneCountBase+opp*0x868, returns 1 if >1
+    ldrb r0,[r0,#0x2]                        @ 0806456e 8078
+    lsls r0,r0,#0x1f    @ 08064570 c007
+    lsrs r0,r0,#0x1f    @ 08064572 c00f
+    movs r1,#0x1    @ 08064574 0121
+    eors r0,r1    @ 08064576 4840
+    ldr r1, player_stride_08064590           @ 08064578 0549
+    muls r0,r1    @ 0806457a 4843
+    adds r2,#0x18    @ 0806457c 1832
+    adds r0,r0,r2    @ 0806457e 8018
+    ldr r0,[r0,#0x0]                         @ 08064580 0068
+    cmp r0,#0x1                              @ 08064582 0128
+    bls LAB_08064594                         @ 08064584 06d9
+    movs r0,#0x1    @ 08064586 0120
+    b LAB_08064596                           @ 08064588 05e0
+    .zero  0x2
+gp1lp_ptr_0806458c:
+    .word  gP1LifePoints                  @ 0806458c e0c40102  gP1LifePoints base for gP1ChainZoneCountBase (+0x18)
+player_stride_08064590:
+    .word  PLAYER_BLOCK_STRIDE            @ 08064590 68080000  PLAYER_BLOCK_STRIDE = 0x868
+LAB_08064594:
+    movs r0,#0x0    @ 08064594 0020
+LAB_08064596:
+    bx lr                                    @ 08064596 7047
 
 @ Called by check_card_field5_is_nonzero (0x0804ad48). Verifies that the equip target slot (zone_type=0x580, 0xb0<<3) has an associated card with nonzero field5: checks slot type field against 0x580; reads slot[+0x14] to obtain associated monster data and verifies bit22 (facing flag) matches slot player_id; locates the corresponding monster slot in gDuelFieldSlots and reads the card_id (bits[12:0]); calls check_card_field5_is_nonzero to verify field5 attribute. Returns 1 if all checks pass; 0 otherwise.
 @ Side effects: no external writes.
@@ -262,7 +288,7 @@ check_slot_equip_target_has_field5:
     lsrs r0,r0,#0x1c    @ 080645be 000f
     cmp r0,#0xe                              @ 080645c0 0e28
     bne LAB_080645e8                         @ 080645c2 11d1
-    ldr r1, PTR_gP1LifePoints_080645e4       @ 080645c4 0749
+    ldr r1, check_equip_target_lp_base       @ 080645c4 0749
     lsls r0,r3,#0x17    @ 080645c6 d805
     lsrs r0,r0,#0x15    @ 080645c8 400d
     adds r0,r0,r1    @ 080645ca 4018
@@ -277,14 +303,33 @@ check_slot_equip_target_has_field5:
     beq LAB_080645e8                         @ 080645de 03d0
     movs r0,#0x1    @ 080645e0 0120
     b LAB_080645ea                           @ 080645e2 02e0
-PTR_gP1LifePoints_080645e4:
-    .word  gP1LifePoints                  @ 080645e4 e0c40102
+check_equip_target_lp_base:
+    .word  gP1LifePoints                  @ 080645e4 e0c40102  gP1LifePoints ptr for check_slot_equip_target_has_field5 LP base
 LAB_080645e8:
     movs r0,#0x0    @ 080645e8 0020
 LAB_080645ea:
     pop {r1}                                 @ 080645ea 02bc
     bx r1                                    @ 080645ec 0847
-    ROM_INCBIN 0x645ee, 0x1e
+pad_080645ee:
+    .hword 0x0000                         @ 080645ee 0000
+
+@ fn_eligible for CID=0x19ef (Elemental Hero Erikshieler). Reached via card effect handler dispatch table at ROM 0x09e45574 (entry start). fn_eligible+1 = 0x080645f1 stored at ROM 0x09e45580. 2B alignment pad at 0x080645ee; fn entry at 0x080645f0. Reads [gP1LifePoints+0x1c] (P1 alt-hand count) and [gP1LifePoints+0x884] (P2 alt-hand count). 0x884 = PLAYER_BLOCK_STRIDE(0x868) + gP1AltHandCountBase_offset(0x1c). Sums both fields; returns 1 if sum nonzero, else 0. Lit pool @ 0x08064604: gP1LifePoints(0x0201c4e0). Lit pool @ 0x08064608: 0x00000884 (P2 alt-hand stride offset).
+check_alt_hand_sum_nonzero_for_cid_19ef:
+    ldr r0, gp1lp_ptr_08064604               @ 080645f0 0448  -- cid_19ef = Elemental Hero Erikshieler; fn_eligible at handler table 0x09e45574
+    ldr r2, p2_alt_hand_stride_08064608      @ 080645f2 054a
+    adds r1,r0,r2    @ 080645f4 8118
+    ldr r2,[r0,#0x1c]                        @ 080645f6 c269
+    ldr r0,[r1,#0x0]                         @ 080645f8 0868
+    adds r0,r2,r0    @ 080645fa 1018
+    cmp r0,#0x0                              @ 080645fc 0028
+    beq LAB_08064602                         @ 080645fe 00d0
+    movs r0,#0x1    @ 08064600 0120
+LAB_08064602:
+    bx lr                                    @ 08064602 7047
+gp1lp_ptr_08064604:
+    .word  gP1LifePoints                  @ 08064604 e0c40102  gP1LifePoints base for P1+P2 alt-hand sum
+p2_alt_hand_stride_08064608:
+    .word  0x00000884                     @ 08064608 84080000  0x884 = PLAYER_BLOCK_STRIDE(0x868) + gP1AltHandCountBase_offset(0x1c); P2 alt-hand field
 
 @ Three-step equip eligibility verification: first calls check_effect_slot_matches_zone_entry to confirm effect slot matches zone entry; then decodes zone_player_id and zone_idx from output and calls invoke_effect_node_with_active_flag_3arg to trigger effect node; if effect node activates successfully, finally calls check_equip_slot_eligible_in_target_bitmap to verify slot eligibility in equip target bitmap. Any step failing returns 0. Called by multiple equip zone handlers (indeg=10).
 @ 
@@ -342,7 +387,7 @@ invoke_equip_slot_eligibility_via_effect_node_bitmap:
     pop {r1}                                 @ 0806465c 02bc
     bx r1                                    @ 0806465e 0847
 
-@ Called to synchronize the equip zone bitmap and submit the default equip target bitmap. Only 4 effective instructions: (1) calls query_equip_zone_bitmap_with_active_flag(slot_ptr) to get equip zone bitmap into r1; (2) calls query_equip_target_bitmap_default(slot_ptr, r1) to submit update. Always returns 0. Called from FUN_080714ec (equip chain dispatcher) in state 0x7e branch to refresh zone bitmap state after equip chain activation.
+@ Called to synchronize the equip zone bitmap and submit the default equip target bitmap. Only 4 effective instructions: (1) calls query_equip_zone_bitmap_with_active_flag(slot_ptr) to get equip zone bitmap into r1; (2) calls query_equip_target_bitmap_default(slot_ptr, r1) to submit update. Always returns 0. Called from dispatch_equip_zone11_target_by_activation_state (equip chain dispatcher) in state 0x7e branch to refresh zone bitmap state after equip chain activation.
 @ 
 @ Parameters:
 @ - r0: u32* slot_ptr (slot pointer)
@@ -393,11 +438,11 @@ invoke_equip_slot_sprite_update_with_zone_check:
     lsls r0,r1,#0x2    @ 08064688 8800
     adds r0,r0,r1    @ 0806468a 4018
     lsls r0,r0,#0x2    @ 0806468c 8000
-    ldr r6, DAT_080646f4                     @ 0806468e 194e
+    ldr r6, invoke_equip_sprite_stride_a     @ 0806468e 194e
     adds r1,r2,#0x0    @ 08064690 111c
     muls r1,r6    @ 08064692 7143
     adds r0,r0,r1    @ 08064694 4018
-    ldr r5, DAT_080646f8                     @ 08064696 184d
+    ldr r5, invoke_equip_sprite_slots_a      @ 08064696 184d
     adds r0,r0,r5    @ 08064698 4019
     ldr r2,[r0,#0x0]                         @ 0806469a 0268
     lsls r2,r2,#0x2    @ 0806469c 9200
@@ -444,10 +489,10 @@ LAB_080646ec:
     strb r0,[r7,#0x4]                        @ 080646ee 3871
     b LAB_0806474c                           @ 080646f0 2ce0
     .zero  0x2
-DAT_080646f4:
-    .word  0x00000868                     @ 080646f4 68080000
-DAT_080646f8:
-    .word  0x0201c510                     @ 080646f8 10c50102
+invoke_equip_sprite_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 080646f4 68080000
+invoke_equip_sprite_slots_a:
+    .word  gDuelFieldSlots                @ 080646f8 10c50102
 LAB_080646fc:
     ldrh r0,[r7,#0x0]                        @ 080646fc 3888
     bl get_card_extended_stat_field6         @ 080646fe 8af07bfb
@@ -474,10 +519,10 @@ LAB_08064714:
     lsrs r2,r2,#0x10    @ 08064728 120c
     bl invoke_zone_slot_sprite_attr_for_equip_type @ 0806472a def7bdfd
     ldrh r1,[r7,#0x0]                        @ 0806472e 3988
-    ldr r0, DAT_08064758                     @ 08064730 0948
+    ldr r0, invoke_equip_sprite_cid_a        @ 08064730 0948
     cmp r1,r0                                @ 08064732 8142
     beq LAB_0806473c                         @ 08064734 02d0
-    ldr r0, DAT_0806475c                     @ 08064736 0948
+    ldr r0, invoke_equip_sprite_cid_b        @ 08064736 0948
     cmp r1,r0                                @ 08064738 8142
     bne LAB_0806474c                         @ 0806473a 07d1
 LAB_0806473c:
@@ -495,12 +540,12 @@ LAB_0806474c:
     pop {r1}                                 @ 08064752 02bc
     bx r1                                    @ 08064754 0847
     .zero  0x2
-DAT_08064758:
-    .word  0x000012c6                     @ 08064758 c6120000
-DAT_0806475c:
-    .word  0x0000145b                     @ 0806475c 5b140000
+invoke_equip_sprite_cid_a:
+    .word  cid_12c6                       @ 08064758 c6120000
+invoke_equip_sprite_cid_b:
+    .word  SCROLL_OF_BEWITCHMENT_CID      @ 0806475c 5b140000
 
-@ Called by enqueue_sprite_attr_with_mode (0x08043054), enqueue_effect_zone_pair_sprite_scan (0x080454c0), and enqueue_equip_slot_bitmap_update (0x0804794c). Large card_type dispatch switch: routes by slot[+0x0] card_id to five equip LP delta fragment functions (write_equip_lp_delta_scaled_by_lp_count, write_equip_lp_delta_by_opponent_side, write_equip_lp_delta_by_own_side, write_equip_lp_delta_by_alt_player, write_equip_lp_delta_negated_atk) and FUN_08064880 to update equip zone sprite attributes; also iterates both players and all equip slots calling enqueue_sprite_attr_with_mode (mode=9); if card_id matches 0x12c6 or 0x145b (Scroll of Bewitchment) additionally calls enqueue_sprite_attr_with_xy_split. Returns fixed 0.
+@ Called by enqueue_sprite_attr_with_mode (0x08043054), enqueue_effect_zone_pair_sprite_scan (0x080454c0), and enqueue_equip_slot_bitmap_update (0x0804794c). Large card_type dispatch switch: routes by slot[+0x0] card_id to five equip LP delta fragment functions (write_equip_lp_delta_scaled_by_lp_count, write_equip_lp_delta_by_opponent_side, write_equip_lp_delta_by_own_side, write_equip_lp_delta_by_alt_player, write_equip_lp_delta_negated_atk) and dispatch_equip_lp_delta_by_card_id to update equip zone sprite attributes; also iterates both players and all equip slots calling enqueue_sprite_attr_with_mode (mode=9); if card_id matches 0x12c6 or 0x145b (Scroll of Bewitchment) additionally calls enqueue_sprite_attr_with_xy_split. Returns fixed 0.
 @ Side effects: enqueues equip zone OAM sprite attrs via enqueue_sprite_attr_with_mode; writes LP-related values to gDuelFieldOutput buffer (str r7+player*4).
 @ Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, gDuelFieldState=0x0201c5d8, equip_sprite_mode=9, CARD_ID_A=0x12c6, CARD_ID_B=0x145b (Scroll of Bewitchment).
 dispatch_equip_sprite_update_by_card_type:
@@ -517,9 +562,9 @@ dispatch_equip_sprite_update_by_card_type:
     movs r6,#0x1    @ 08064774 0126
     subs r0,r6,r0    @ 08064776 301a
     ands r0,r6    @ 08064778 3040
-    ldr r7, DAT_08064874                     @ 0806477a 3e4f
+    ldr r7, dispatch_equip_sprite_stride     @ 0806477a 3e4f
     muls r0,r7    @ 0806477c 7843
-    ldr r1, DAT_08064878                     @ 0806477e 3e49
+    ldr r1, dispatch_equip_sprite_slots_p2   @ 0806477e 3e49
     .hword 0x4688    @ 08064780 8846
     add r0,r8                                @ 08064782 4044
     ldr r0,[r0,#0x0]                         @ 08064784 0068
@@ -583,7 +628,7 @@ dispatch_equip_sprite_update_by_card_type:
     bl enqueue_equip_slot_bitmap_update      @ 080647f8 e3f7a8f8
 LAB_080647fc:
     movs r6,#0x0    @ 080647fc 0026
-    ldr r1, DAT_08064874                     @ 080647fe 1d49
+    ldr r1, dispatch_equip_sprite_stride     @ 080647fe 1d49
     .hword 0x468a    @ 08064800 8a46
 LAB_08064802:
     movs r4,#0x0    @ 08064802 0024
@@ -597,7 +642,7 @@ LAB_08064802:
     muls r7,r0    @ 08064812 4743
 LAB_08064814:
     adds r1,r5,r7    @ 08064814 e919
-    ldr r0, DAT_0806487c                     @ 08064816 1948
+    ldr r0, dispatch_equip_sprite_slots      @ 08064816 1948
     adds r1,r1,r0    @ 08064818 0918
     ldr r0,[r1,#0x0]                         @ 0806481a 0868
     lsls r0,r0,#0x13    @ 0806481c c004
@@ -644,12 +689,12 @@ LAB_08064862:
     pop {r4,r5,r6,r7}                        @ 0806486e f0bc
     pop {r1}                                 @ 08064870 02bc
     bx r1                                    @ 08064872 0847
-DAT_08064874:
-    .word  0x00000868                     @ 08064874 68080000
-DAT_08064878:
-    .word  0x0201c5d8                     @ 08064878 d8c50102
-DAT_0806487c:
-    .word  0x0201c510                     @ 0806487c 10c50102
+dispatch_equip_sprite_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08064874 68080000
+dispatch_equip_sprite_slots_p2:
+    .word  gDuelFieldSlots_p2_base        @ 08064878 d8c50102
+dispatch_equip_sprite_slots:
+    .word  gDuelFieldSlots                @ 0806487c 10c50102
 
 @ Called to compute and write LP delta amounts to output buffer based on equip card_id. Accepts slot pointer r0 and output address r1 (r7), clears [r7+0] and [r7+4] to zero, then routes via large switch on card_id to corresponding LP delta sub-functions: includes write_equip_lp_delta_scaled_by_lp_count (0x161d, Des Koala), write_equip_lp_delta_by_opponent_side (0x13a8, Woodland Sprite), write_equip_lp_delta_by_own_side (0x118a, Ameba), write_equip_lp_delta_by_alt_player, write_equip_lp_delta_negated_atk, write_equip_lp_delta_minar (0x11bc, Minar), write_equip_lp_delta_dark_rabbit and dozens of other named equip card effects. Ends via restore_equip_effect_frame to clean stack frame. Returns 0 via pop {r3}; bx r3 (Sub-case E).
 @ 
@@ -695,7 +740,7 @@ dispatch_equip_lp_delta_by_card_id:
     str r0,[r7,#0x4]                         @ 080648a8 7860
     str r0,[r7,#0x0]                         @ 080648aa 3860
     ldrh r3,[r4,#0x0]                        @ 080648ac 2388
-    ldr r0, DAT_0806490c                     @ 080648ae 1748
+    ldr r0, dispatch_equip_lp_des_koala_cid  @ 080648ae 1748
     cmp r3,r0                                @ 080648b0 8342
     bne LAB_080648b8                         @ 080648b2 01d1
     bl write_equip_lp_delta_scaled_by_lp_count @ 080648b4 00f04afc
@@ -704,7 +749,7 @@ LAB_080648b8:
     ble LAB_080648be                         @ 080648ba 00dd
     b LAB_08064ba4                           @ 080648bc 72e1
 LAB_080648be:
-    ldr r0, DAT_08064910                     @ 080648be 1448
+    ldr r0, dispatch_equip_lp_woodland_sprite_cid @ 080648be 1448
     cmp r3,r0                                @ 080648c0 8342
     bne LAB_080648c8                         @ 080648c2 01d1
     bl write_equip_lp_delta_by_opponent_side @ 080648c4 00f0cafb
@@ -713,7 +758,7 @@ LAB_080648c8:
     ble LAB_080648ce                         @ 080648ca 00dd
     b LAB_08064a24                           @ 080648cc aae0
 LAB_080648ce:
-    ldr r0, DAT_08064914                     @ 080648ce 1148
+    ldr r0, dispatch_equip_lp_ameba_cid      @ 080648ce 1148
     cmp r3,r0                                @ 080648d0 8342
     bne LAB_080648d8                         @ 080648d2 01d1
     bl write_equip_lp_delta_by_own_side      @ 080648d4 00f0f2fb
@@ -745,14 +790,14 @@ LAB_080648fe:
     bl write_equip_lp_delta_dark_rabbit      @ 08064904 00f0a8fd
 LAB_08064908:
     bl restore_equip_effect_frame            @ 08064908 00f067fe
-DAT_0806490c:
-    .word  0x0000161d                     @ 0806490c 1d160000
-DAT_08064910:
-    .word  0x000013a8                     @ 08064910 a8130000
-DAT_08064914:
-    .word  0x0000118a                     @ 08064914 8a110000
+dispatch_equip_lp_des_koala_cid:
+    .word  DES_KOALA_CID                  @ 0806490c 1d160000
+dispatch_equip_lp_woodland_sprite_cid:
+    .word  WOODLAND_SPRITE_CID            @ 08064910 a8130000
+dispatch_equip_lp_ameba_cid:
+    .word  AMEBA_CID                      @ 08064914 8a110000
 LAB_08064918:
-    ldr r0, DAT_0806492c                     @ 08064918 0448
+    ldr r0, dispatch_equip_lp_mooyan_curry_cid @ 08064918 0448
     cmp r3,r0                                @ 0806491a 8342
     bne LAB_08064920                         @ 0806491c 00d1
     b LAB_08064ebc                           @ 0806491e cde2
@@ -764,10 +809,10 @@ LAB_08064926:
     subs r0,#0x1b    @ 08064926 1b38
     b LAB_08064db6                           @ 08064928 45e2
     .zero  0x2
-DAT_0806492c:
-    .word  0x000010f8                     @ 0806492c f8100000
+dispatch_equip_lp_mooyan_curry_cid:
+    .word  MOOYAN_CURRY_CID               @ 0806492c f8100000
 LAB_08064930:
-    ldr r0, DAT_08064950                     @ 08064930 0748
+    ldr r0, dispatch_equip_lp_cid_10fe       @ 08064930 0748
     cmp r3,r0                                @ 08064932 8342
     bne LAB_08064938                         @ 08064934 00d1
     b LAB_08065088                           @ 08064936 a7e3
@@ -786,8 +831,8 @@ LAB_0806494a:
     lsls r0,r5,#0x2    @ 0806494a a800
     b LAB_08064ef8                           @ 0806494c d4e2
     .zero  0x2
-DAT_08064950:
-    .word  0x000010fe                     @ 08064950 fe100000
+dispatch_equip_lp_cid_10fe:
+    .word  cid_10fe                       @ 08064950 fe100000
 LAB_08064954:
     movs r0,#0x88    @ 08064954 8820
     lsls r0,r0,#0x5    @ 08064956 4001
@@ -806,14 +851,14 @@ LAB_08064964:
 LAB_0806496c:
     bl restore_equip_effect_frame            @ 0806496c 00f035fe
 LAB_08064970:
-    ldr r0, DAT_08064998                     @ 08064970 0948
+    ldr r0, dispatch_equip_lp_cid_12e8       @ 08064970 0948
     cmp r3,r0                                @ 08064972 8342
     bne LAB_08064978                         @ 08064974 00d1
     b LAB_08064ed4                           @ 08064976 ade2
 LAB_08064978:
     cmp r3,r0                                @ 08064978 8342
     bgt LAB_080649d0                         @ 0806497a 29dc
-    ldr r0, DAT_0806499c                     @ 0806497c 0748
+    ldr r0, dispatch_equip_lp_griggle_cid    @ 0806497c 0748
     cmp r3,r0                                @ 0806497e 8342
     bne LAB_08064984                         @ 08064980 00d1
     b LAB_080650c4                           @ 08064982 9fe3
@@ -829,17 +874,17 @@ LAB_08064990:
     bgt LAB_080649a0                         @ 08064992 05dc
     subs r0,#0x16    @ 08064994 1638
     b LAB_08064eae                           @ 08064996 8ae2
-DAT_08064998:
-    .word  0x000012e8                     @ 08064998 e8120000
-DAT_0806499c:
-    .word  0x000011c9                     @ 0806499c c9110000
+dispatch_equip_lp_cid_12e8:
+    .word  cid_12e8                       @ 08064998 e8120000
+dispatch_equip_lp_griggle_cid:
+    .word  GRIGGLE_CID                    @ 0806499c c9110000
 LAB_080649a0:
-    ldr r0, DAT_080649a4                     @ 080649a0 0048
+    ldr r0, dispatch_equip_lp_minar_cid      @ 080649a0 0048
     b LAB_08064eae                           @ 080649a2 84e2
-DAT_080649a4:
-    .word  0x000011bc                     @ 080649a4 bc110000
+dispatch_equip_lp_minar_cid:
+    .word  MINAR_CID                      @ 080649a4 bc110000
 LAB_080649a8:
-    ldr r0, DAT_080649c4                     @ 080649a8 0648
+    ldr r0, dispatch_equip_lp_reflect_bounder_cid @ 080649a8 0648
     cmp r3,r0                                @ 080649aa 8342
     bne LAB_080649b2                         @ 080649ac 01d1
     bl write_equip_lp_delta_minar            @ 080649ae 00f055fc
@@ -853,15 +898,15 @@ LAB_080649b2:
 LAB_080649be:
     bl restore_equip_effect_frame            @ 080649be 00f00cfe
     .zero  0x2
-DAT_080649c4:
-    .word  0x0000129a                     @ 080649c4 9a120000
+dispatch_equip_lp_reflect_bounder_cid:
+    .word  REFLECT_BOUNDER_CID            @ 080649c4 9a120000
 LAB_080649c8:
-    ldr r0, DAT_080649cc                     @ 080649c8 0048
+    ldr r0, dispatch_equip_lp_skull_ladybug_cid @ 080649c8 0048
     b LAB_08064aae                           @ 080649ca 70e0
-DAT_080649cc:
-    .word  0x000012a2                     @ 080649cc a2120000
+dispatch_equip_lp_skull_ladybug_cid:
+    .word  SKULL_MARK_LADYBUG_CID         @ 080649cc a2120000
 LAB_080649d0:
-    ldr r0, DAT_080649f4                     @ 080649d0 0848
+    ldr r0, dispatch_equip_lp_snatch_steal_cid @ 080649d0 0848
     cmp r3,r0                                @ 080649d2 8342
     bne LAB_080649d8                         @ 080649d4 00d1
     b LAB_08064f74                           @ 080649d6 cde2
@@ -881,19 +926,19 @@ LAB_080649e4:
     b LAB_080650f8                           @ 080649ee 83e3
 LAB_080649f0:
     bl restore_equip_effect_frame            @ 080649f0 00f0f3fd
-DAT_080649f4:
-    .word  0x00001322                     @ 080649f4 22130000
+dispatch_equip_lp_snatch_steal_cid:
+    .word  SNATCH_STEAL_CID               @ 080649f4 22130000
 LAB_080649f8:
-    ldr r0, DAT_08064a04                     @ 080649f8 0248
+    ldr r0, dispatch_equip_lp_restructer_cid @ 080649f8 0248
     cmp r3,r0                                @ 080649fa 8342
     bne LAB_08064a00                         @ 080649fc 00d1
     b LAB_08065126                           @ 080649fe 92e3
 LAB_08064a00:
     bl restore_equip_effect_frame            @ 08064a00 00f0ebfd
-DAT_08064a04:
-    .word  0x00001307                     @ 08064a04 07130000
+dispatch_equip_lp_restructer_cid:
+    .word  RESTRUCTER_REVOLUTION_CID      @ 08064a04 07130000
 LAB_08064a08:
-    ldr r0, DAT_08064a18                     @ 08064a08 0348
+    ldr r0, dispatch_equip_lp_mystical_elf_cid @ 08064a08 0348
     cmp r3,r0                                @ 08064a0a 8342
     bne LAB_08064a10                         @ 08064a0c 00d1
     b LAB_08064f12                           @ 08064a0e 80e2
@@ -902,13 +947,13 @@ LAB_08064a10:
     bgt LAB_08064a1c                         @ 08064a12 03dc
     subs r0,#0x25    @ 08064a14 2538
     b LAB_08064db6                           @ 08064a16 cee1
-DAT_08064a18:
-    .word  0x0000137a                     @ 08064a18 7a130000
+dispatch_equip_lp_mystical_elf_cid:
+    .word  GIFT_OF_MYSTICAL_ELF_CID       @ 08064a18 7a130000
 LAB_08064a1c:
-    ldr r0, DAT_08064a20                     @ 08064a1c 0048
+    ldr r0, dispatch_equip_lp_eye_of_truth_cid @ 08064a1c 0048
     b LAB_08064c66                           @ 08064a1e 22e1
-DAT_08064a20:
-    .word  0x0000137b                     @ 08064a20 7b130000
+dispatch_equip_lp_eye_of_truth_cid:
+    .word  EYE_OF_TRUTH_CID               @ 08064a20 7b130000
 LAB_08064a24:
     movs r0,#0xa7    @ 08064a24 a720
     lsls r0,r0,#0x5    @ 08064a26 4001
@@ -947,17 +992,17 @@ LAB_08064a56:
 LAB_08064a62:
     bl restore_equip_effect_frame            @ 08064a62 00f0bafd
 LAB_08064a66:
-    ldr r0, DAT_08064a74                     @ 08064a66 0348
+    ldr r0, dispatch_equip_lp_rain_of_mercy_cid @ 08064a66 0348
     cmp r3,r0                                @ 08064a68 8342
     bne LAB_08064a6e                         @ 08064a6a 00d1
     b LAB_08064f84                           @ 08064a6c 8ae2
 LAB_08064a6e:
     bl restore_equip_effect_frame            @ 08064a6e 00f0b4fd
     .zero  0x2
-DAT_08064a74:
-    .word  0x0000141f                     @ 08064a74 1f140000
+dispatch_equip_lp_rain_of_mercy_cid:
+    .word  RAIN_OF_MERCY_CID              @ 08064a74 1f140000
 LAB_08064a78:
-    ldr r0, DAT_08064a94                     @ 08064a78 0648
+    ldr r0, dispatch_equip_lp_amazon_archer_cid @ 08064a78 0648
     cmp r3,r0                                @ 08064a7a 8342
     bne LAB_08064a80                         @ 08064a7c 00d1
     b LAB_080651c4                           @ 08064a7e a1e3
@@ -972,10 +1017,10 @@ LAB_08064a88:
     bl restore_equip_effect_frame            @ 08064a8e 00f0a4fd
 LAB_08064a92:
     b LAB_0806506a                           @ 08064a92 eae2
-DAT_08064a94:
-    .word  0x0000144b                     @ 08064a94 4b140000
+dispatch_equip_lp_amazon_archer_cid:
+    .word  AMAZON_ARCHER_CID              @ 08064a94 4b140000
 LAB_08064a98:
-    ldr r0, DAT_08064ab8                     @ 08064a98 0748
+    ldr r0, dispatch_equip_lp_marie_cid      @ 08064a98 0748
     cmp r3,r0                                @ 08064a9a 8342
     bne LAB_08064aa0                         @ 08064a9c 00d1
     b LAB_08064ee0                           @ 08064a9e 1fe2
@@ -994,10 +1039,10 @@ LAB_08064aae:
     b LAB_08064f02                           @ 08064ab2 26e2
 LAB_08064ab4:
     bl restore_equip_effect_frame            @ 08064ab4 00f091fd
-DAT_08064ab8:
-    .word  0x00001459                     @ 08064ab8 59140000
+dispatch_equip_lp_marie_cid:
+    .word  MARIE_THE_FALLEN_ONE_CID       @ 08064ab8 59140000
 LAB_08064abc:
-    ldr r0, DAT_08064acc                     @ 08064abc 0348
+    ldr r0, dispatch_equip_lp_dm_tome_cid    @ 08064abc 0348
     cmp r3,r0                                @ 08064abe 8342
     bne LAB_08064ac4                         @ 08064ac0 00d1
     b LAB_08064f02                           @ 08064ac2 1ee2
@@ -1006,15 +1051,15 @@ LAB_08064ac4:
     bgt LAB_08064ad0                         @ 08064ac6 03dc
     subs r0,#0x7    @ 08064ac8 0738
     b LAB_08064eae                           @ 08064aca f0e1
-DAT_08064acc:
-    .word  0x00001467                     @ 08064acc 67140000
+dispatch_equip_lp_dm_tome_cid:
+    .word  DARK_MAGICIAN_TOME_CID         @ 08064acc 67140000
 LAB_08064ad0:
-    ldr r0, DAT_08064ad4                     @ 08064ad0 0048
+    ldr r0, dispatch_equip_lp_nightmare_wheel_cid @ 08064ad0 0048
     b LAB_08064db6                           @ 08064ad2 70e1
-DAT_08064ad4:
-    .word  0x000014b2                     @ 08064ad4 b2140000
+dispatch_equip_lp_nightmare_wheel_cid:
+    .word  NIGHTMARE_WHEEL_CID            @ 08064ad4 b2140000
 LAB_08064ad8:
-    ldr r0, DAT_08064b08                     @ 08064ad8 0b48
+    ldr r0, dispatch_equip_lp_toon_cannon_cid @ 08064ad8 0b48
     cmp r3,r0                                @ 08064ada 8342
     bne LAB_08064ae0                         @ 08064adc 00d1
     b write_equip_lp_delta_by_opponent_side  @ 08064ade bde2
@@ -1041,17 +1086,17 @@ LAB_08064af8:
     b LAB_08064f96                           @ 08064b02 48e2
 LAB_08064b04:
     bl restore_equip_effect_frame            @ 08064b04 00f069fd
-DAT_08064b08:
-    .word  0x00001565                     @ 08064b08 65150000
+dispatch_equip_lp_toon_cannon_cid:
+    .word  TOON_CANNON_SOLDIER_CID        @ 08064b08 65150000
 LAB_08064b0c:
-    ldr r0, DAT_08064b18                     @ 08064b0c 0248
+    ldr r0, dispatch_equip_lp_zolga_cid      @ 08064b0c 0248
     cmp r3,r0                                @ 08064b0e 8342
     bne LAB_08064b14                         @ 08064b10 00d1
     b LAB_08064ff8                           @ 08064b12 71e2
 LAB_08064b14:
     bl restore_equip_effect_frame            @ 08064b14 00f061fd
-DAT_08064b18:
-    .word  0x000014f3                     @ 08064b18 f3140000
+dispatch_equip_lp_zolga_cid:
+    .word  ZOLGA_CID                      @ 08064b18 f3140000
 LAB_08064b1c:
     movs r0,#0xa9    @ 08064b1c a920
     lsls r0,r0,#0x5    @ 08064b1e 4001
@@ -1068,13 +1113,13 @@ LAB_08064b26:
 LAB_08064b32:
     bl restore_equip_effect_frame            @ 08064b32 00f052fd
 LAB_08064b36:
-    ldr r0, DAT_08064b3c                     @ 08064b36 0148
+    ldr r0, dispatch_equip_lp_poison_mummy_cid @ 08064b36 0148
     b LAB_08064db6                           @ 08064b38 3de1
     .zero  0x2
-DAT_08064b3c:
-    .word  0x00001525                     @ 08064b3c 25150000
+dispatch_equip_lp_poison_mummy_cid:
+    .word  POISON_MUMMY_CID               @ 08064b3c 25150000
 LAB_08064b40:
-    ldr r0, DAT_08064b64                     @ 08064b40 0848
+    ldr r0, dispatch_equip_lp_dark_room_cid  @ 08064b40 0848
     cmp r3,r0                                @ 08064b42 8342
     bne LAB_08064b48                         @ 08064b44 00d1
     b LAB_080651fc                           @ 08064b46 59e3
@@ -1094,19 +1139,19 @@ LAB_08064b54:
     b LAB_080650b8                           @ 08064b5e abe2
 LAB_08064b60:
     bl restore_equip_effect_frame            @ 08064b60 00f03bfd
-DAT_08064b64:
-    .word  0x0000159b                     @ 08064b64 9b150000
+dispatch_equip_lp_dark_room_cid:
+    .word  DARK_ROOM_OF_NIGHTMARE_CID     @ 08064b64 9b150000
 LAB_08064b68:
-    ldr r0, DAT_08064b74                     @ 08064b68 0248
+    ldr r0, dispatch_equip_lp_gk_cannonholder_cid @ 08064b68 0248
     cmp r3,r0                                @ 08064b6a 8342
     bne LAB_08064b70                         @ 08064b6c 00d1
     b LAB_080650d8                           @ 08064b6e b3e2
 LAB_08064b70:
     bl restore_equip_effect_frame            @ 08064b70 00f033fd
-DAT_08064b74:
-    .word  0x0000158c                     @ 08064b74 8c150000
+dispatch_equip_lp_gk_cannonholder_cid:
+    .word  GRAVEKEEPERS_CANNONHOLDER_CID  @ 08064b74 8c150000
 LAB_08064b78:
-    ldr r0, DAT_08064b90                     @ 08064b78 0548
+    ldr r0, dispatch_equip_lp_wave_cannon_cid @ 08064b78 0548
     cmp r3,r0                                @ 08064b7a 8342
     bne LAB_08064b80                         @ 08064b7c 00d1
     b LAB_08065212                           @ 08064b7e 48e3
@@ -1119,19 +1164,19 @@ LAB_08064b80:
     b LAB_08064faa                           @ 08064b8a 0ee2
 LAB_08064b8c:
     bl restore_equip_effect_frame            @ 08064b8c 00f025fd
-DAT_08064b90:
-    .word  0x000015ee                     @ 08064b90 ee150000
+dispatch_equip_lp_wave_cannon_cid:
+    .word  WAVE_MOTION_CANNON_CID         @ 08064b90 ee150000
 LAB_08064b94:
-    ldr r0, DAT_08064ba0                     @ 08064b94 0248
+    ldr r0, dispatch_equip_lp_secret_barrel_cid @ 08064b94 0248
     cmp r3,r0                                @ 08064b96 8342
     bne LAB_08064b9c                         @ 08064b98 00d1
     b LAB_08065226                           @ 08064b9a 44e3
 LAB_08064b9c:
     bl restore_equip_effect_frame            @ 08064b9c 00f01dfd
-DAT_08064ba0:
-    .word  0x000015f4                     @ 08064ba0 f4150000
+dispatch_equip_lp_secret_barrel_cid:
+    .word  SECRET_BARREL_CID              @ 08064ba0 f4150000
 LAB_08064ba4:
-    ldr r0, DAT_08064bf4                     @ 08064ba4 1348
+    ldr r0, dispatch_equip_lp_sphinx_teleia_cid @ 08064ba4 1348
     cmp r3,r0                                @ 08064ba6 8342
     bne LAB_08064bac                         @ 08064ba8 00d1
     b LAB_080652f0                           @ 08064baa a1e3
@@ -1175,18 +1220,18 @@ LAB_08064be4:
     b LAB_080650de                           @ 08064bee 76e2
 LAB_08064bf0:
     bl restore_equip_effect_frame            @ 08064bf0 00f0f3fc
-DAT_08064bf4:
-    .word  0x000017c8                     @ 08064bf4 c8170000
+dispatch_equip_lp_sphinx_teleia_cid:
+    .word  SPHINX_TELEIA_CID              @ 08064bf4 c8170000
 LAB_08064bf8:
-    ldr r0, DAT_08064c08                     @ 08064bf8 0348
+    ldr r0, dispatch_equip_lp_granadora_cid  @ 08064bf8 0348
     cmp r3,r0                                @ 08064bfa 8342
     bne LAB_08064c02                         @ 08064bfc 01d1
     bl write_equip_lp_delta_granadora        @ 08064bfe 00f033fc
 LAB_08064c02:
     bl restore_equip_effect_frame            @ 08064c02 00f0eafc
     .zero  0x2
-DAT_08064c08:
-    .word  0x0000163f                     @ 08064c08 3f160000
+dispatch_equip_lp_granadora_cid:
+    .word  GRANADORA_CID                  @ 08064c08 3f160000
 LAB_08064c0c:
     movs r0,#0xb5    @ 08064c0c b520
     lsls r0,r0,#0x5    @ 08064c0e 4001
@@ -1203,16 +1248,16 @@ LAB_08064c16:
 LAB_08064c22:
     bl restore_equip_effect_frame            @ 08064c22 00f0dafc
 LAB_08064c26:
-    ldr r0, DAT_08064c34                     @ 08064c26 0348
+    ldr r0, dispatch_equip_lp_inferno_cid    @ 08064c26 0348
     cmp r3,r0                                @ 08064c28 8342
     bne LAB_08064c30                         @ 08064c2a 01d1
     bl write_equip_lp_delta_inferno          @ 08064c2c 00f0befb
 LAB_08064c30:
     bl restore_equip_effect_frame            @ 08064c30 00f0d3fc
-DAT_08064c34:
-    .word  0x000016c5                     @ 08064c34 c5160000
+dispatch_equip_lp_inferno_cid:
+    .word  INFERNO_CID                    @ 08064c34 c5160000
 LAB_08064c38:
-    ldr r0, DAT_08064c60                     @ 08064c38 0948
+    ldr r0, dispatch_equip_lp_stealth_bird_cid @ 08064c38 0948
     cmp r3,r0                                @ 08064c3a 8342
     bne LAB_08064c40                         @ 08064c3c 00d1
     b LAB_08065070                           @ 08064c3e 17e2
@@ -1233,20 +1278,20 @@ LAB_08064c4e:
 LAB_08064c5a:
     bl restore_equip_effect_frame            @ 08064c5a 00f0befc
     .zero  0x2
-DAT_08064c60:
-    .word  0x000016fa                     @ 08064c60 fa160000
+dispatch_equip_lp_stealth_bird_cid:
+    .word  STEALTH_BIRD_CID               @ 08064c60 fa160000
 LAB_08064c64:
-    ldr r0, DAT_08064c70                     @ 08064c64 0248
+    ldr r0, dispatch_equip_lp_burning_algae_cid @ 08064c64 0248
 LAB_08064c66:
     cmp r3,r0                                @ 08064c66 8342
     bne LAB_08064c6c                         @ 08064c68 00d1
     b LAB_08064f74                           @ 08064c6a 83e1
 LAB_08064c6c:
     bl restore_equip_effect_frame            @ 08064c6c 00f0b5fc
-DAT_08064c70:
-    .word  0x000016f5                     @ 08064c70 f5160000
+dispatch_equip_lp_burning_algae_cid:
+    .word  BURNING_ALGAE_CID              @ 08064c70 f5160000
 LAB_08064c74:
-    ldr r0, DAT_08064c84                     @ 08064c74 0348
+    ldr r0, dispatch_equip_lp_guardian_joan_cid @ 08064c74 0348
     cmp r3,r0                                @ 08064c76 8342
     bne LAB_08064c7c                         @ 08064c78 00d1
     b LAB_08065294                           @ 08064c7a 0be3
@@ -1255,20 +1300,20 @@ LAB_08064c7c:
     bgt LAB_08064c88                         @ 08064c7e 03dc
     subs r0,#0x9    @ 08064c80 0938
     b LAB_08064d2a                           @ 08064c82 52e0
-DAT_08064c84:
-    .word  0x0000170b                     @ 08064c84 0b170000
+dispatch_equip_lp_guardian_joan_cid:
+    .word  GUARDIAN_ANGEL_JOAN_CID        @ 08064c84 0b170000
 LAB_08064c88:
-    ldr r0, DAT_08064c98                     @ 08064c88 0348
+    ldr r0, dispatch_equip_lp_saturn_cid     @ 08064c88 0348
     cmp r3,r0                                @ 08064c8a 8342
     bne LAB_08064c92                         @ 08064c8c 01d1
     bl write_equip_lp_delta_saturn           @ 08064c8e 00f0f9fb
 LAB_08064c92:
     bl restore_equip_effect_frame            @ 08064c92 00f0a2fc
     .zero  0x2
-DAT_08064c98:
-    .word  0x0000173f                     @ 08064c98 3f170000
+dispatch_equip_lp_saturn_cid:
+    .word  AGENT_OF_JUDGMENT_SATURN_CID   @ 08064c98 3f170000
 LAB_08064c9c:
-    ldr r0, DAT_08064cc4                     @ 08064c9c 0948
+    ldr r0, dispatch_equip_lp_solar_ray_cid  @ 08064c9c 0948
     cmp r3,r0                                @ 08064c9e 8342
     bne LAB_08064ca6                         @ 08064ca0 01d1
     bl write_equip_lp_delta_solar_ray        @ 08064ca2 00f009fc
@@ -1289,10 +1334,10 @@ LAB_08064cb2:
 LAB_08064cc0:
     adds r0,#0x8    @ 08064cc0 0830
     b LAB_08064db6                           @ 08064cc2 78e0
-DAT_08064cc4:
-    .word  0x00001767                     @ 08064cc4 67170000
+dispatch_equip_lp_solar_ray_cid:
+    .word  SOLAR_RAY_CID                  @ 08064cc4 67170000
 LAB_08064cc8:
-    ldr r0, DAT_08064ce4                     @ 08064cc8 0648
+    ldr r0, dispatch_equip_lp_goblin_thief_cid @ 08064cc8 0648
     cmp r3,r0                                @ 08064cca 8342
     bne LAB_08064cd2                         @ 08064ccc 01d1
     bl write_equip_lp_delta_goblin_thief     @ 08064cce 00f0bdfb
@@ -1306,15 +1351,15 @@ LAB_08064cd2:
 LAB_08064cde:
     bl restore_equip_effect_frame            @ 08064cde 00f07cfc
     .zero  0x2
-DAT_08064ce4:
-    .word  0x00001761                     @ 08064ce4 61170000
+dispatch_equip_lp_goblin_thief_cid:
+    .word  GOBLIN_THIEF_CID               @ 08064ce4 61170000
 LAB_08064ce8:
-    ldr r0, DAT_08064cec                     @ 08064ce8 0048
+    ldr r0, dispatch_equip_lp_backfire_cid   @ 08064ce8 0048
     b LAB_08064db6                           @ 08064cea 64e0
-DAT_08064cec:
-    .word  0x00001762                     @ 08064cec 62170000
+dispatch_equip_lp_backfire_cid:
+    .word  BACKFIRE_CID                   @ 08064cec 62170000
 LAB_08064cf0:
-    ldr r0, DAT_08064d18                     @ 08064cf0 0948
+    ldr r0, dispatch_equip_lp_elephant_statue_cid @ 08064cf0 0948
     cmp r3,r0                                @ 08064cf2 8342
     bne LAB_08064cf8                         @ 08064cf4 00d1
     b LAB_080653e8                           @ 08064cf6 77e3
@@ -1336,10 +1381,10 @@ LAB_08064d0a:
     bl write_equip_lp_delta_marshmallon      @ 08064d10 00f0e2fb
 LAB_08064d14:
     bl restore_equip_effect_frame            @ 08064d14 00f061fc
-DAT_08064d18:
-    .word  0x00001794                     @ 08064d18 94170000
+dispatch_equip_lp_elephant_statue_cid:
+    .word  ELEPHANT_STATUE_CID            @ 08064d18 94170000
 LAB_08064d1c:
-    ldr r0, DAT_08064d34                     @ 08064d1c 0548
+    ldr r0, dispatch_equip_lp_card7_cid      @ 08064d1c 0548
     cmp r3,r0                                @ 08064d1e 8342
     bne LAB_08064d24                         @ 08064d20 00d1
     b LAB_08064eea                           @ 08064d22 e2e0
@@ -1353,19 +1398,19 @@ LAB_08064d2a:
     b LAB_0806506a                           @ 08064d2e 9ce1
 LAB_08064d30:
     bl restore_equip_effect_frame            @ 08064d30 00f053fc
-DAT_08064d34:
-    .word  0x000017a5                     @ 08064d34 a5170000
+dispatch_equip_lp_card7_cid:
+    .word  CARD_7_CID                     @ 08064d34 a5170000
 LAB_08064d38:
-    ldr r0, DAT_08064d44                     @ 08064d38 0248
+    ldr r0, dispatch_equip_lp_andro_sphinx_cid @ 08064d38 0248
     cmp r3,r0                                @ 08064d3a 8342
     bne LAB_08064d40                         @ 08064d3c 00d1
     b LAB_080652bc                           @ 08064d3e bde2
 LAB_08064d40:
     bl restore_equip_effect_frame            @ 08064d40 00f04bfc
-DAT_08064d44:
-    .word  0x000017c7                     @ 08064d44 c7170000
+dispatch_equip_lp_andro_sphinx_cid:
+    .word  ANDRO_SPHINX_CID               @ 08064d44 c7170000
 LAB_08064d48:
-    ldr r0, DAT_08064d80                     @ 08064d48 0d48
+    ldr r0, dispatch_equip_lp_vandalgyon_cid @ 08064d48 0d48
     cmp r3,r0                                @ 08064d4a 8342
     bne LAB_08064d50                         @ 08064d4c 00d1
     b LAB_08065076                           @ 08064d4e 92e1
@@ -1396,19 +1441,19 @@ LAB_08064d76:
     subs r0,#0x21    @ 08064d7a 2138
     b LAB_08064db6                           @ 08064d7c 1be0
     .zero  0x2
-DAT_08064d80:
-    .word  0x0000190a                     @ 08064d80 0a190000
+dispatch_equip_lp_vandalgyon_cid:
+    .word  DARK_RULER_VANDALGYON_CID      @ 08064d80 0a190000
 LAB_08064d84:
-    ldr r0, DAT_08064d90                     @ 08064d84 0248
+    ldr r0, dispatch_equip_lp_cemetary_bomb_cid @ 08064d84 0248
     cmp r3,r0                                @ 08064d86 8342
     bne LAB_08064d8c                         @ 08064d88 00d1
     b LAB_080653fc                           @ 08064d8a 37e3
 LAB_08064d8c:
     bl restore_equip_effect_frame            @ 08064d8c 00f025fc
-DAT_08064d90:
-    .word  0x00001804                     @ 08064d90 04180000
+dispatch_equip_lp_cemetary_bomb_cid:
+    .word  CEMETARY_BOMB_CID              @ 08064d90 04180000
 LAB_08064d94:
-    ldr r0, DAT_08064db0                     @ 08064d94 0648
+    ldr r0, dispatch_equip_lp_brain_jacker_cid @ 08064d94 0648
     cmp r3,r0                                @ 08064d96 8342
     bne LAB_08064d9c                         @ 08064d98 00d1
     b LAB_08064f6c                           @ 08064d9a e7e0
@@ -1422,20 +1467,20 @@ LAB_08064d9c:
 LAB_08064daa:
     bl restore_equip_effect_frame            @ 08064daa 00f016fc
     .zero  0x2
-DAT_08064db0:
-    .word  0x00001877                     @ 08064db0 77180000
+dispatch_equip_lp_brain_jacker_cid:
+    .word  BRAIN_JACKER_CID               @ 08064db0 77180000
 LAB_08064db4:
-    ldr r0, DAT_08064dc0                     @ 08064db4 0248
+    ldr r0, dispatch_equip_lp_poison_fangs_cid @ 08064db4 0248
 LAB_08064db6:
     cmp r3,r0                                @ 08064db6 8342
     bne LAB_08064dbc                         @ 08064db8 00d1
     b write_equip_lp_delta_by_opponent_side  @ 08064dba 4fe1
 LAB_08064dbc:
     bl restore_equip_effect_frame            @ 08064dbc 00f00dfc
-DAT_08064dc0:
-    .word  0x0000187b                     @ 08064dc0 7b180000
+dispatch_equip_lp_poison_fangs_cid:
+    .word  POISON_FANGS_CID               @ 08064dc0 7b180000
 LAB_08064dc4:
-    ldr r0, DAT_08064de8                     @ 08064dc4 0848
+    ldr r0, dispatch_equip_lp_legendary_belt_cid @ 08064dc4 0848
     cmp r3,r0                                @ 08064dc6 8342
     bne LAB_08064dcc                         @ 08064dc8 00d1
     b LAB_08065324                           @ 08064dca abe2
@@ -1455,15 +1500,15 @@ LAB_08064dd8:
     b LAB_080650f0                           @ 08064de2 85e1
 LAB_08064de4:
     bl restore_equip_effect_frame            @ 08064de4 00f0f9fb
-DAT_08064de8:
-    .word  0x000018d0                     @ 08064de8 d0180000
+dispatch_equip_lp_legendary_belt_cid:
+    .word  LEGENDARY_BLACK_BELT_CID       @ 08064de8 d0180000
 LAB_08064dec:
-    ldr r0, DAT_08064df0                     @ 08064dec 0048
+    ldr r0, dispatch_equip_lp_eh_flame_wingman_cid @ 08064dec 0048
     b LAB_08064ea4                           @ 08064dee 59e0
-DAT_08064df0:
-    .word  0x000018c8                     @ 08064df0 c8180000
+dispatch_equip_lp_eh_flame_wingman_cid:
+    .word  ELEMENTAL_HERO_FLAME_WINGMAN_CID @ 08064df0 c8180000
 LAB_08064df4:
-    ldr r0, DAT_08064e04                     @ 08064df4 0348
+    ldr r0, dispatch_equip_lp_kozaky_cid     @ 08064df4 0348
     cmp r3,r0                                @ 08064df6 8342
     bne LAB_08064dfc                         @ 08064df8 00d1
     b write_equip_lp_delta_atomic_firefly    @ 08064dfa 73e3
@@ -1472,20 +1517,20 @@ LAB_08064dfc:
     bgt LAB_08064e08                         @ 08064dfe 03dc
     subs r0,#0x6    @ 08064e00 0638
     b LAB_08064ea4                           @ 08064e02 4fe0
-DAT_08064e04:
-    .word  0x000018d7                     @ 08064e04 d7180000
+dispatch_equip_lp_kozaky_cid:
+    .word  KOZAKYS_SELF_DESTRUCT_CID      @ 08064e04 d7180000
 LAB_08064e08:
-    ldr r0, DAT_08064e14                     @ 08064e08 0248
+    ldr r0, dispatch_equip_lp_rock_bombardment_cid @ 08064e08 0248
 LAB_08064e0a:
     cmp r3,r0                                @ 08064e0a 8342
     bne LAB_08064e10                         @ 08064e0c 00d1
     b write_equip_lp_delta_negated_atk       @ 08064e0e ede1
 LAB_08064e10:
     bl restore_equip_effect_frame            @ 08064e10 00f0e3fb
-DAT_08064e14:
-    .word  0x000018da                     @ 08064e14 da180000
+dispatch_equip_lp_rock_bombardment_cid:
+    .word  ROCK_BOMBARDMENT_CID           @ 08064e14 da180000
 LAB_08064e18:
-    ldr r0, DAT_08064e48                     @ 08064e18 0b48
+    ldr r0, dispatch_equip_lp_steam_healer_cid @ 08064e18 0b48
     cmp r3,r0                                @ 08064e1a 8342
     bne LAB_08064e20                         @ 08064e1c 00d1
     b LAB_08065294                           @ 08064e1e 39e2
@@ -1512,34 +1557,34 @@ LAB_08064e38:
     b LAB_08065558                           @ 08064e42 89e3
 LAB_08064e44:
     bl restore_equip_effect_frame            @ 08064e44 00f0c9fb
-DAT_08064e48:
-    .word  0x00001987                     @ 08064e48 87190000
+dispatch_equip_lp_steam_healer_cid:
+    .word  ELEMENTAL_HERO_STEAM_HEALER_CID @ 08064e48 87190000
 LAB_08064e4c:
-    ldr r0, DAT_08064e50                     @ 08064e4c 0048
+    ldr r0, dispatch_equip_lp_spiritual_fire_cid @ 08064e4c 0048
     b LAB_08064e0a                           @ 08064e4e dce7
-DAT_08064e50:
-    .word  0x00001929                     @ 08064e50 29190000
+dispatch_equip_lp_spiritual_fire_cid:
+    .word  SPIRITUAL_FIRE_ART_CID         @ 08064e50 29190000
 LAB_08064e54:
-    ldr r0, DAT_08064e6c                     @ 08064e54 0548
+    ldr r0, dispatch_equip_lp_oxygeddon_cid  @ 08064e54 0548
     cmp r3,r0                                @ 08064e56 8342
     bne LAB_08064e5c                         @ 08064e58 00d1
     b LAB_0806556e                           @ 08064e5a 88e3
 LAB_08064e5c:
     cmp r3,r0                                @ 08064e5c 8342
     ble LAB_08064ea2                         @ 08064e5e 20dd
-    ldr r0, DAT_08064e70                     @ 08064e60 0348
+    ldr r0, dispatch_equip_lp_magical_blast_cid @ 08064e60 0348
     cmp r3,r0                                @ 08064e62 8342
     bne LAB_08064e68                         @ 08064e64 00d1
     b LAB_08065596                           @ 08064e66 96e3
 LAB_08064e68:
     b restore_equip_effect_frame             @ 08064e68 b7e3
     .zero  0x2
-DAT_08064e6c:
-    .word  0x00001950                     @ 08064e6c 50190000
-DAT_08064e70:
-    .word  0x00001984                     @ 08064e70 84190000
+dispatch_equip_lp_oxygeddon_cid:
+    .word  OXYGEDDON_CID                  @ 08064e6c 50190000
+dispatch_equip_lp_magical_blast_cid:
+    .word  MAGICAL_BLAST_CID              @ 08064e70 84190000
 LAB_08064e74:
-    ldr r0, DAT_08064e90                     @ 08064e74 0648
+    ldr r0, dispatch_equip_lp_memory_crusher_cid @ 08064e74 0648
     cmp r3,r0                                @ 08064e76 8342
     bne LAB_08064e7c                         @ 08064e78 00d1
     b LAB_080655b6                           @ 08064e7a 9ce3
@@ -1555,8 +1600,8 @@ LAB_08064e7c:
 LAB_08064e8c:
     subs r0,#0x29    @ 08064e8c 2938
     b LAB_08064eae                           @ 08064e8e 0ee0
-DAT_08064e90:
-    .word  0x000019cf                     @ 08064e90 cf190000
+dispatch_equip_lp_memory_crusher_cid:
+    .word  MEMORY_CRUSHER_CID             @ 08064e90 cf190000
 LAB_08064e94:
     movs r0,#0xcf    @ 08064e94 cf20
     lsls r0,r0,#0x5    @ 08064e96 4001
@@ -1575,7 +1620,7 @@ LAB_08064ea4:
 LAB_08064eaa:
     b restore_equip_effect_frame             @ 08064eaa 96e3
 LAB_08064eac:
-    ldr r0, DAT_08064eb8                     @ 08064eac 0248
+    ldr r0, dispatch_equip_lp_guardian_exode_cid @ 08064eac 0248
 LAB_08064eae:
     cmp r3,r0                                @ 08064eae 8342
     bne LAB_08064eb4                         @ 08064eb0 00d1
@@ -1583,8 +1628,8 @@ LAB_08064eae:
 LAB_08064eb4:
     b restore_equip_effect_frame             @ 08064eb4 91e3
     .zero  0x2
-DAT_08064eb8:
-    .word  0x000019f0                     @ 08064eb8 f0190000
+dispatch_equip_lp_guardian_exode_cid:
+    .word  GUARDIAN_EXODE_CID             @ 08064eb8 f0190000
 LAB_08064ebc:
     lsls r0,r5,#0x2    @ 08064ebc a800
     b LAB_08064ee2                           @ 08064ebe 10e0
@@ -1778,12 +1823,12 @@ LAB_08065004:
     subs r0,r0,r6    @ 08065006 801b
     lsls r0,r0,#0x2    @ 08065008 8000
     adds r0,r0,r7    @ 0806500a c019
-    ldr r1, DAT_08065014                     @ 0806500c 0149
+    ldr r1, write_equip_lp_snatch_steal_neg1000 @ 0806500c 0149
     str r1,[r0,#0x0]                         @ 0806500e 0160
     lsls r0,r6,#0x2    @ 08065010 b000
     b LAB_080651ae                           @ 08065012 cce0
-DAT_08065014:
-    .word  0xfffffc18                     @ 08065014 18fcffff
+write_equip_lp_snatch_steal_neg1000:
+    .word  PUZZLE_LP_STEP_1000            @ 08065014 18fcffff  PUZZLE_LP_STEP_1000 = -1000 (s32); Snatch Steal LP penalty
 LAB_08065018:
     .hword 0x4641    @ 08065018 4146
     subs r4,r1,r6    @ 0806501a 8c1b
@@ -1820,7 +1865,7 @@ LAB_08065056:
     str r0,[r4,#0x0]                         @ 08065058 2060
     b restore_equip_effect_frame             @ 0806505a bee2
 
-@ Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x13a8, Woodland Sprite). Computes the opponent player_id as (1-r6), shifts left by 2 to get word-aligned offset, then jumps to LAB_080651ac which stores the fixed LP delta 0xfffffe0c (-500) into [r7 + offset] and branches to FUN_080655da (shared tail). Does not return; effect is delivered entirely via side effect.
+@ Inline code fragment entry point inside dispatch_equip_lp_delta_by_card_id, branched to directly by the equip effect dispatch switch (card_type=0x13a8, Woodland Sprite). Computes the opponent player_id as (1-r6), shifts left by 2 to get word-aligned offset, then jumps to LAB_080651ac which stores the fixed LP delta 0xfffffe0c (-500) into [r7 + offset] and branches to restore_equip_effect_frame (shared tail). Does not return; effect is delivered entirely via side effect.
 @ Side effects: [r7 + (1-r6)*4] := 0xfffffe0c (-500, equip card LP deduction delta).
 @ Constants: LP_DELTA=-500 (0xfffffe0c), CARD_ID=0x13a8 (Woodland Sprite).
 write_equip_lp_delta_by_opponent_side:
@@ -1858,12 +1903,12 @@ LAB_0806508c:
     lsls r0,r5,#0x2    @ 0806508c a800
 LAB_0806508e:
     adds r0,r0,r7    @ 0806508e c019
-    ldr r1, DAT_08065098                     @ 08065090 0149
+    ldr r1, write_equip_lp_solar_ray_neg600  @ 08065090 0149
     str r1,[r0,#0x0]                         @ 08065092 0160
     b restore_equip_effect_frame             @ 08065094 a1e2
     .zero  0x2
-DAT_08065098:
-    .word  0xfffffda8                     @ 08065098 a8fdffff
+write_equip_lp_solar_ray_neg600:
+    .word  LP_EQUIP_DELTA_NEG_600         @ 08065098 a8fdffff  LP_EQUIP_DELTA_NEG_600 = -600 (s32); Solar Ray per eligible zone penalty
 LAB_0806509c:
     lsls r0,r5,#0x2    @ 0806509c a800
     b LAB_080651de                           @ 0806509e 9ee0
@@ -1884,7 +1929,7 @@ LAB_080650b8:
     lsls r0,r6,#0x2    @ 080650b8 b000
     b LAB_080654ec                           @ 080650ba 17e2
 
-@ Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x118a, Ameba). Computes own-side player_id offset as r6<<2 then branches to LAB_080653ee which writes the LP delta for the own side to gDuelFieldOutput and continues to FUN_080655da shared tail. Two-instruction fragment; symmetric counterpart of write_equip_lp_delta_by_opponent_side (opponent side).
+@ Inline code fragment entry point inside dispatch_equip_lp_delta_by_card_id, branched to directly by the equip effect dispatch switch (card_type=0x118a, Ameba). Computes own-side player_id offset as r6<<2 then branches to LAB_080653ee which writes the LP delta for the own side to gDuelFieldOutput and continues to restore_equip_effect_frame shared tail. Two-instruction fragment; symmetric counterpart of write_equip_lp_delta_by_opponent_side (opponent side).
 @ Side effects: [r7 + r6*4] := LP delta value determined by LAB_080653ee path.
 @ Constants: CARD_ID=0x118a (Ameba).
 write_equip_lp_delta_by_own_side:
@@ -1898,12 +1943,12 @@ LAB_080650c4:
     subs r0,r3,r6    @ 080650c6 981b
     lsls r0,r0,#0x2    @ 080650c8 8000
     adds r0,r0,r7    @ 080650ca c019
-    ldr r1, DAT_080650d4                     @ 080650cc 0149
+    ldr r1, write_equip_lp_des_koala_max_3000 @ 080650cc 0149
     str r1,[r0,#0x0]                         @ 080650ce 0160
     b restore_equip_effect_frame             @ 080650d0 83e2
     .zero  0x2
-DAT_080650d4:
-    .word  0x00000bb8                     @ 080650d4 b80b0000
+write_equip_lp_des_koala_max_3000:
+    .word  LP_COST_3000                   @ 080650d4 b80b0000  LP_COST_3000 = 3000 LP threshold for Des Koala scaled LP path
 LAB_080650d8:
     movs r0,#0x1    @ 080650d8 0120
     subs r0,r0,r6    @ 080650da 801b
@@ -1913,11 +1958,11 @@ LAB_080650de:
     subs r0,r0,r6    @ 080650e0 801b
     lsls r0,r0,#0x2    @ 080650e2 8000
     adds r0,r0,r7    @ 080650e4 c019
-    ldr r1, DAT_080650ec                     @ 080650e6 0149
+    ldr r1, write_equip_lp_neg400            @ 080650e6 0149
     str r1,[r0,#0x0]                         @ 080650e8 0160
     b restore_equip_effect_frame             @ 080650ea 76e2
-DAT_080650ec:
-    .word  0xfffffe70                     @ 080650ec 70feffff
+write_equip_lp_neg400:
+    .word  ZONE_EFFECT_ATK_PENALTY_500    @ 080650ec 70feffff  ZONE_EFFECT_ATK_PENALTY_500 = 0xfffffe70 = -400 (name misleading, actual value -400)
 LAB_080650f0:
     movs r0,#0x1    @ 080650f0 0120
     subs r0,r0,r6    @ 080650f2 801b
@@ -1927,12 +1972,12 @@ LAB_080650f8:
     lsls r0,r5,#0x2    @ 080650f8 a800
 LAB_080650fa:
     adds r0,r0,r7    @ 080650fa c019
-    ldr r1, DAT_08065104                     @ 080650fc 0149
+    ldr r1, write_equip_lp_legendary_belt_neg300 @ 080650fc 0149
     str r1,[r0,#0x0]                         @ 080650fe 0160
     b restore_equip_effect_frame             @ 08065100 6be2
     .zero  0x2
-DAT_08065104:
-    .word  0xfffffed4                     @ 08065104 d4feffff
+write_equip_lp_legendary_belt_neg300:
+    .word  LP_EQUIP_DELTA_NEG_300         @ 08065104 d4feffff  LP_EQUIP_DELTA_NEG_300 = -300 (s32); Legendary Black Belt range path (distinct domain from SCORE_DELTA_NEG_300)
 LAB_08065108:
     .hword 0x4640    @ 08065108 4046
     subs r4,r0,r6    @ 0806510a 841b
@@ -1952,10 +1997,10 @@ LAB_08065112:
 LAB_08065126:
     lsls r2,r5,#0x2    @ 08065126 aa00
     adds r2,r2,r7    @ 08065128 d219
-    ldr r1, PTR_gP1LifePoints_08065144       @ 0806512a 0649
+    ldr r1, write_equip_lp_des_koala_lp_base @ 0806512a 0649
     movs r0,#0x1    @ 0806512c 0120
     ands r5,r0    @ 0806512e 0540
-    ldr r0, DAT_08065148                     @ 08065130 0548
+    ldr r0, write_equip_lp_des_koala_stride  @ 08065130 0548
     muls r0,r5    @ 08065132 6843
     adds r1,#0xc    @ 08065134 0c31
     adds r0,r0,r1    @ 08065136 4018
@@ -1965,12 +2010,12 @@ LAB_08065126:
     lsls r0,r0,#0x3    @ 0806513e c000
     adds r0,r0,r1    @ 08065140 4018
     b LAB_080654d0                           @ 08065142 c5e1
-PTR_gP1LifePoints_08065144:
-    .word  gP1LifePoints                  @ 08065144 e0c40102
-DAT_08065148:
-    .word  0x00000868                     @ 08065148 68080000
+write_equip_lp_des_koala_lp_base:
+    .word  gP1LifePoints                  @ 08065144 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_scaled_by_lp_count Des Koala path LP base
+write_equip_lp_des_koala_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08065148 68080000
 
-@ Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x161d, Des Koala). Reads LP count from gP1LifePoints + (1-r2)*0x868 + 0x0c, then computes LP*400 via the shift chain: (((LP<<1+LP)<<3)+LP)<<4 = LP*400 (python: ((((1<<1)+1)<<3)+1)<<4 == 400). Writes the negated scaled value to [r7 + (1-r2)*4], then branches to LAB_080655d6.
+@ Inline code fragment entry point inside dispatch_equip_lp_delta_by_card_id, branched to directly by the equip effect dispatch switch (card_type=0x161d, Des Koala). Reads LP count from gP1LifePoints + (1-r2)*0x868 + 0x0c, then computes LP*400 via the shift chain: (((LP<<1+LP)<<3)+LP)<<4 = LP*400 (python: ((((1<<1)+1)<<3)+1)<<4 == 400). Writes the negated scaled value to [r7 + (1-r2)*4], then branches to LAB_080655d6.
 @ Side effects: [r7 + (1-r2)*4] := -(lp_count * 400) (LP-proportional equip effect delta).
 @ Constants: CARD_ID=0x161d (Des Koala), lp_scale=400 (python: ((((1<<1)+1)<<3)+1)<<4 == 400), player_stride=0x868, lp_state_offset=0x0c.
 write_equip_lp_delta_scaled_by_lp_count:
@@ -1978,10 +2023,10 @@ write_equip_lp_delta_scaled_by_lp_count:
     subs r1,r2,r6    @ 0806514e 911b
     lsls r3,r1,#0x2    @ 08065150 8b00
     adds r3,r3,r7    @ 08065152 db19
-    ldr r2, PTR_gP1LifePoints_08065170       @ 08065154 064a
+    ldr r2, write_equip_lp_alt_player_lp_base @ 08065154 064a
     .hword 0x4640    @ 08065156 4046
     ands r1,r0    @ 08065158 0140
-    ldr r0, DAT_08065174                     @ 0806515a 0648
+    ldr r0, write_equip_lp_alt_player_stride @ 0806515a 0648
     muls r0,r1    @ 0806515c 4843
     adds r2,#0xc    @ 0806515e 0c32
     adds r0,r0,r2    @ 08065160 8018
@@ -1992,10 +2037,10 @@ write_equip_lp_delta_scaled_by_lp_count:
     adds r0,r0,r1    @ 0806516a 4018
     lsls r0,r0,#0x4    @ 0806516c 0001
     b LAB_080655d6                           @ 0806516e 32e2
-PTR_gP1LifePoints_08065170:
-    .word  gP1LifePoints                  @ 08065170 e0c40102
-DAT_08065174:
-    .word  0x00000868                     @ 08065174 68080000
+write_equip_lp_alt_player_lp_base:
+    .word  gP1LifePoints                  @ 08065170 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_by_alt_player LP base
+write_equip_lp_alt_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08065174 68080000
 LAB_08065178:
     lsrs r0,r2,#0x1f    @ 08065178 d00f
     .hword 0x4642    @ 0806517a 4246
@@ -2005,10 +2050,10 @@ LAB_08065178:
     lsls r0,r1,#0x2    @ 08065182 8800
     adds r0,r0,r1    @ 08065184 4018
     lsls r0,r0,#0x2    @ 08065186 8000
-    ldr r1, DAT_080651b8                     @ 08065188 0b49
+    ldr r1, write_equip_lp_ka2_stride        @ 08065188 0b49
     muls r1,r2    @ 0806518a 5143
     adds r0,r0,r1    @ 0806518c 4018
-    ldr r1, DAT_080651bc                     @ 0806518e 0b49
+    ldr r1, write_equip_lp_ka2_slots         @ 0806518e 0b49
     adds r0,r0,r1    @ 08065190 4018
     ldr r0,[r0,#0x0]                         @ 08065192 0068
     lsls r0,r0,#0x13    @ 08065194 c004
@@ -2029,29 +2074,29 @@ LAB_080651ac:
     lsls r0,r0,#0x2    @ 080651ac 8000
 LAB_080651ae:
     adds r0,r0,r7    @ 080651ae c019
-    ldr r1, DAT_080651c0                     @ 080651b0 0349
+    ldr r1, write_equip_lp_woodland_neg500   @ 080651b0 0349
     str r1,[r0,#0x0]                         @ 080651b2 0160
     b restore_equip_effect_frame             @ 080651b4 11e2
     .zero  0x2
-DAT_080651b8:
-    .word  0x00000868                     @ 080651b8 68080000
-DAT_080651bc:
-    .word  0x0201c510                     @ 080651bc 10c50102
-DAT_080651c0:
-    .word  0xfffffe0c                     @ 080651c0 0cfeffff
+write_equip_lp_ka2_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080651b8 68080000
+write_equip_lp_ka2_slots:
+    .word  gDuelFieldSlots                @ 080651bc 10c50102
+write_equip_lp_woodland_neg500:
+    .word  LP_EQUIP_DELTA_NEG_500         @ 080651c0 0cfeffff  LP_EQUIP_DELTA_NEG_500 = -500 (s32); Woodland Sprite / Goblin Thief opp side (distinct domain from SCORE_DELTA_NEG_500)
 LAB_080651c4:
     .hword 0x4643    @ 080651c4 4346
     subs r0,r3,r6    @ 080651c6 981b
     lsls r0,r0,#0x2    @ 080651c8 8000
     adds r0,r0,r7    @ 080651ca c019
-    ldr r1, DAT_080651d4                     @ 080651cc 0149
+    ldr r1, write_equip_lp_gk_cannon_neg1200 @ 080651cc 0149
     str r1,[r0,#0x0]                         @ 080651ce 0160
     b restore_equip_effect_frame             @ 080651d0 03e2
     .zero  0x2
-DAT_080651d4:
-    .word  0xfffffb50                     @ 080651d4 50fbffff
+write_equip_lp_gk_cannon_neg1200:
+    .word  LP_EQUIP_DELTA_NEG_1200        @ 080651d4 50fbffff  LP_EQUIP_DELTA_NEG_1200 = -1200 (s32); Toon Cannon Soldier / Secret Barrel range
 
-@ Inline code fragment entry point inside FUN_08064880, branched to by equip effect dispatch switch (CARD_ID=0x14e0, Dragon's Gunfire). Loads r1 from r8 (value=1 from parent frame), subtracts r6 to get delta player index, shifts left 2 bits then branches to LAB_080651dc. Shared path stores fixed value 0xfffffce0 (-800) into [r7 + delta*4], then branches to FUN_080655da.
+@ Inline code fragment entry point inside dispatch_equip_lp_delta_by_card_id, branched to by equip effect dispatch switch (CARD_ID=0x14e0, Dragon's Gunfire). Loads r1 from r8 (value=1 from parent frame), subtracts r6 to get delta player index, shifts left 2 bits then branches to LAB_080651dc. Shared path stores fixed value 0xfffffce0 (-800) into [r7 + delta*4], then branches to restore_equip_effect_frame.
 @ Side effects: [r7 + (r1-r6)*4] := 0xfffffce0 (-800, equip LP delta).
 @ Constants: LP_DELTA=-800 (0xfffffce0), CARD_ID=0x14e0 (Dragon's Gunfire).
 write_equip_lp_delta_by_alt_player:
@@ -2061,14 +2106,14 @@ LAB_080651dc:
     lsls r0,r0,#0x2    @ 080651dc 8000
 LAB_080651de:
     adds r0,r0,r7    @ 080651de c019
-    ldr r1, DAT_080651e8                     @ 080651e0 0149
+    ldr r1, write_equip_lp_dragon_gunfire_neg800 @ 080651e0 0149
     str r1,[r0,#0x0]                         @ 080651e2 0160
     b restore_equip_effect_frame             @ 080651e4 f9e1
     .zero  0x2
-DAT_080651e8:
-    .word  0xfffffce0                     @ 080651e8 e0fcffff
+write_equip_lp_dragon_gunfire_neg800:
+    .word  LP_EQUIP_DELTA_NEG_800         @ 080651e8 e0fcffff  LP_EQUIP_DELTA_NEG_800 = -800 (s32); Dragon Gunfire shared path
 
-@ Inline code fragment entry point inside FUN_08064880, branched to by the equip effect dispatch switch. Computes opponent player_id (1-r6), shifts left 2 bits and adds r7 to get the output address; reads ATK from slot[+0x8] via r4 (caller-frame slot pointer), negates it via rsbs r1,r4,#0, then stores -ATK into the output address and branches to FUN_080655da. Delivers -ATK as the equip effect LP delta for the opponent side.
+@ Inline code fragment entry point inside dispatch_equip_lp_delta_by_card_id, branched to by the equip effect dispatch switch. Computes opponent player_id (1-r6), shifts left 2 bits and adds r7 to get the output address; reads ATK from slot[+0x8] via r4 (caller-frame slot pointer), negates it via rsbs r1,r4,#0, then stores -ATK into the output address and branches to restore_equip_effect_frame. Delivers -ATK as the equip effect LP delta for the opponent side.
 @ Side effects: [r7 + (1-r6)*4] := -slot_atk (equip effect LP delta based on target ATK negation).
 @ Constants: none.
 write_equip_lp_delta_negated_atk:
@@ -2110,9 +2155,9 @@ LAB_08065226:
     bl count_occupied_all_field_zones        @ 0806522c cdf76eff
     lsls r3,r4,#0x2    @ 08065230 a300
     adds r3,r3,r7    @ 08065232 db19
-    ldr r2, PTR_gP1LifePoints_08065254       @ 08065234 074a
+    ldr r2, write_equip_lp_minar_lp_base     @ 08065234 074a
     ands r4,r5    @ 08065236 2c40
-    ldr r1, DAT_08065258                     @ 08065238 0749
+    ldr r1, write_equip_lp_minar_stride      @ 08065238 0749
     muls r1,r4    @ 0806523a 6143
     adds r2,#0xc    @ 0806523c 0c32
     adds r1,r1,r2    @ 0806523e 8918
@@ -2126,28 +2171,28 @@ LAB_08065226:
     rsbs r1,r1,#0    @ 0806524e 4942
     str r1,[r3,#0x0]                         @ 08065250 1960
     b restore_equip_effect_frame             @ 08065252 c2e1
-PTR_gP1LifePoints_08065254:
-    .word  gP1LifePoints                  @ 08065254 e0c40102
-DAT_08065258:
-    .word  0x00000868                     @ 08065258 68080000
+write_equip_lp_minar_lp_base:
+    .word  gP1LifePoints                  @ 08065254 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_minar LP base
+write_equip_lp_minar_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08065258 68080000
 
-@ Minar equip effect (card_id 0x11bc): calls get_slot_field5_score to get the field5 score of the equipped slot, negates it, and writes the result into the opponent player's LP delta slot. Dispatched from FUN_08064880 when card_id matches 0x11bc. Side effect: writes -(field5_score) into r7[opponent_idx*4]; accumulated upstream as opponent LP penalty.
+@ Minar equip effect (card_id 0x11bc): calls get_slot_field5_score to get the field5 score of the equipped slot, negates it, and writes the result into the opponent player's LP delta slot. Dispatched from dispatch_equip_lp_delta_by_card_id when card_id matches 0x11bc. Side effect: writes -(field5_score) into r7[opponent_idx*4]; accumulated upstream as opponent LP penalty.
 @ 
 @ Constants:
 @ - CARD_ID_MINAR = 0x11bc (Minar)
 @ - gEquipEffectCtx = 0x0201bb90 (equip effect context base)
 write_equip_lp_delta_minar:
-    ldr r1, DAT_0806526c                     @ 0806525c 0349
+    ldr r1, write_equip_lp_equip_chain_ref   @ 0806525c 0349
     ldr r0,[r1,#0x0]                         @ 0806525e 0868
     ldr r1,[r1,#0x1c]                        @ 08065260 c969
     bl get_slot_field5_score                 @ 08065262 d5f779fb
     movs r1,#0x1    @ 08065266 0121
     subs r1,r1,r6    @ 08065268 891b
     b LAB_08065564                           @ 0806526a 7be1
-DAT_0806526c:
-    .word  0x0201bb90                     @ 0806526c 90bb0102
+write_equip_lp_equip_chain_ref:
+    .word  gEquipChainSlotRefs            @ 0806526c 90bb0102
 LAB_08065270:
-    ldr r1, PTR_gP1LifePoints_08065290       @ 08065270 0749
+    ldr r1, write_equip_lp_wave_cannon_lp_base_a @ 08065270 0749
     ldr r0,[r4,#0x14]                        @ 08065272 6069
     lsls r0,r0,#0x17    @ 08065274 c005
     lsrs r0,r0,#0x15    @ 08065276 400d
@@ -2162,10 +2207,10 @@ LAB_08065270:
     movs r1,#0x1    @ 0806528a 0121
     subs r1,r1,r6    @ 0806528c 891b
     b LAB_08065564                           @ 0806528e 69e1
-PTR_gP1LifePoints_08065290:
-    .word  gP1LifePoints                  @ 08065290 e0c40102
+write_equip_lp_wave_cannon_lp_base_a:
+    .word  gP1LifePoints                  @ 08065290 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_wave_cannon P1 LP base
 LAB_08065294:
-    ldr r1, PTR_gP1LifePoints_080652b8       @ 08065294 0849
+    ldr r1, write_equip_lp_wave_cannon_lp_base_b @ 08065294 0849
     ldr r0,[r4,#0x14]                        @ 08065296 6069
     lsls r0,r0,#0x17    @ 08065298 c005
     lsrs r0,r0,#0x15    @ 0806529a 400d
@@ -2183,10 +2228,10 @@ LAB_080652aa:
     str r0,[r1,#0x0]                         @ 080652b2 0860
     b restore_equip_effect_frame             @ 080652b4 91e1
     .zero  0x2
-PTR_gP1LifePoints_080652b8:
-    .word  gP1LifePoints                  @ 080652b8 e0c40102
+write_equip_lp_wave_cannon_lp_base_b:
+    .word  gP1LifePoints                  @ 080652b8 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_wave_cannon P2 LP base
 LAB_080652bc:
-    ldr r1, PTR_gP1LifePoints_080652ec       @ 080652bc 0b49
+    ldr r1, write_equip_lp_greed_lp_base_a   @ 080652bc 0b49
     ldr r0,[r4,#0x14]                        @ 080652be 6069
     lsls r0,r0,#0x17    @ 080652c0 c005
     lsrs r0,r0,#0x15    @ 080652c2 400d
@@ -2209,10 +2254,10 @@ LAB_080652bc:
     str r0,[r1,#0x0]                         @ 080652e6 0860
     b restore_equip_effect_frame             @ 080652e8 77e1
     .zero  0x2
-PTR_gP1LifePoints_080652ec:
-    .word  gP1LifePoints                  @ 080652ec e0c40102
+write_equip_lp_greed_lp_base_a:
+    .word  gP1LifePoints                  @ 080652ec e0c40102  gP1LifePoints ptr for write_equip_lp_delta_scaled_by_lp_count Greed P1 LP base
 LAB_080652f0:
-    ldr r1, PTR_gP1LifePoints_08065320       @ 080652f0 0b49
+    ldr r1, write_equip_lp_greed_lp_base_b   @ 080652f0 0b49
     ldr r0,[r4,#0x14]                        @ 080652f2 6069
     lsls r0,r0,#0x17    @ 080652f4 c005
     lsrs r0,r0,#0x15    @ 080652f6 400d
@@ -2235,10 +2280,10 @@ LAB_080652f0:
     str r0,[r2,#0x0]                         @ 0806531a 1060
     b restore_equip_effect_frame             @ 0806531c 5de1
     .zero  0x2
-PTR_gP1LifePoints_08065320:
-    .word  gP1LifePoints                  @ 08065320 e0c40102
+write_equip_lp_greed_lp_base_b:
+    .word  gP1LifePoints                  @ 08065320 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_scaled_by_lp_count Greed P2 LP base
 LAB_08065324:
-    ldr r1, PTR_gP1LifePoints_08065344       @ 08065324 0749
+    ldr r1, write_equip_lp_secret_barrel_lp_base @ 08065324 0749
     ldr r0,[r4,#0x14]                        @ 08065326 6069
     lsls r0,r0,#0x17    @ 08065328 c005
     lsrs r0,r0,#0x15    @ 0806532a 400d
@@ -2253,17 +2298,17 @@ LAB_08065324:
     .hword 0x4642    @ 0806533e 4246
     subs r1,r2,r6    @ 08065340 911b
     b LAB_08065564                           @ 08065342 0fe1
-PTR_gP1LifePoints_08065344:
-    .word  gP1LifePoints                  @ 08065344 e0c40102
+write_equip_lp_secret_barrel_lp_base:
+    .word  gP1LifePoints                  @ 08065344 e0c40102  gP1LifePoints ptr for write_equip_lp_secret_barrel LP base
 
-@ KA-2 Des Scissors (0x174a) or Needle Burrower (0x174b) equip effect: calls get_card_extended_stat_field5 to get the equipped card's field5 value, multiplies by 500 via five-step shift arithmetic (lsls/subs/lsls/adds/lsls), negates, and writes into the opponent LP delta slot. Dispatched from FUN_08064880 on either card_id.
+@ KA-2 Des Scissors (0x174a) or Needle Burrower (0x174b) equip effect: calls get_card_extended_stat_field5 to get the equipped card's field5 value, multiplies by 500 via five-step shift arithmetic (lsls/subs/lsls/adds/lsls), negates, and writes into the opponent LP delta slot. Dispatched from dispatch_equip_lp_delta_by_card_id on either card_id.
 @ 
 @ Constants:
 @ - CARD_ID_KA2_DES_SCISSORS = 0x174a (KA-2 Des Scissors)
 @ - CARD_ID_NEEDLE_BURROWER = 0x174b (Needle Burrower)
 @ - LP_DELTA_PER_FIELD5 = 500 (opponent loses 500 LP per field5 point)
 write_equip_lp_delta_ka2_des_scissors:
-    ldr r1, PTR_gP1LifePoints_08065378       @ 08065348 0b49
+    ldr r1, write_equip_lp_snatch_steal_lp_base @ 08065348 0b49
     ldr r0,[r4,#0x14]                        @ 0806534a 6069
     lsls r0,r0,#0x17    @ 0806534c c005
     lsrs r0,r0,#0x15    @ 0806534e 400d
@@ -2286,10 +2331,10 @@ write_equip_lp_delta_ka2_des_scissors:
     lsls r1,r1,#0x2    @ 08065372 8900
     b LAB_080655b0                           @ 08065374 1ce1
     .zero  0x2
-PTR_gP1LifePoints_08065378:
-    .word  gP1LifePoints                  @ 08065378 e0c40102
+write_equip_lp_snatch_steal_lp_base:
+    .word  gP1LifePoints                  @ 08065378 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_snatch_steal LP base
 LAB_0806537c:
-    ldr r1, PTR_gP1LifePoints_080653a8       @ 0806537c 0a49
+    ldr r1, write_equip_lp_guardian_joan_lp_base @ 0806537c 0a49
     ldr r0,[r4,#0x14]                        @ 0806537e 6069
     lsls r0,r0,#0x17    @ 08065380 c005
     lsrs r0,r0,#0x15    @ 08065382 400d
@@ -2312,10 +2357,10 @@ LAB_080653a2:
     lsls r0,r0,#0x2    @ 080653a2 8000
     str r0,[r2,#0x0]                         @ 080653a4 1060
     b restore_equip_effect_frame             @ 080653a6 18e1
-PTR_gP1LifePoints_080653a8:
-    .word  gP1LifePoints                  @ 080653a8 e0c40102
+write_equip_lp_guardian_joan_lp_base:
+    .word  gP1LifePoints                  @ 080653a8 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_guardian_joan LP base
 
-@ Inferno equip effect (card_id 0x16c5): writes fixed value -1500 into the opponent LP delta slot. No card stat query; uses literal DAT_080653bc = 0xfffffa24 (-1500). Opponent index computed as (1 - equip_owner_player_id). Dispatched from FUN_08064880 on card_id 0x16c5.
+@ Inferno equip effect (card_id 0x16c5): writes fixed value -1500 into the opponent LP delta slot. No card stat query; uses literal DAT_080653bc = 0xfffffa24 (-1500). Opponent index computed as (1 - equip_owner_player_id). Dispatched from dispatch_equip_lp_delta_by_card_id on card_id 0x16c5.
 @ 
 @ Constants:
 @ - CARD_ID_INFERNO = 0x16c5 (Inferno)
@@ -2326,14 +2371,14 @@ write_equip_lp_delta_inferno:
 LAB_080653b0:
     lsls r0,r0,#0x2    @ 080653b0 8000
     adds r0,r0,r7    @ 080653b2 c019
-    ldr r1, DAT_080653bc                     @ 080653b4 0149
+    ldr r1, write_equip_lp_inferno_neg1500   @ 080653b4 0149
     str r1,[r0,#0x0]                         @ 080653b6 0160
     b restore_equip_effect_frame             @ 080653b8 0fe1
     .zero  0x2
-DAT_080653bc:
-    .word  0xfffffa24                     @ 080653bc 24faffff
+write_equip_lp_inferno_neg1500:
+    .word  LP_EQUIP_DELTA_NEG_1500        @ 080653bc 24faffff  LP_EQUIP_DELTA_NEG_1500 = -1500 (s32); Inferno equip penalty
 
-@ Fuhma Shuriken equip effect (card_id 0x16cc): writes fixed value -700 into the target player LP delta slot. Target player index is (r8 - r6) where r8=parent_player_id and r6=equip_owner_player_id; entry .hword 0x4643 = mov r3,r8 reads parent frame r8. Dispatched from FUN_08064880 on card_id 0x16cc.
+@ Fuhma Shuriken equip effect (card_id 0x16cc): writes fixed value -700 into the target player LP delta slot. Target player index is (r8 - r6) where r8=parent_player_id and r6=equip_owner_player_id; entry .hword 0x4643 = mov r3,r8 reads parent frame r8. Dispatched from dispatch_equip_lp_delta_by_card_id on card_id 0x16cc.
 @ 
 @ Constants:
 @ - CARD_ID_FUHMA_SHURIKEN = 0x16cc (Fuhma Shuriken)
@@ -2344,14 +2389,14 @@ write_equip_lp_delta_fuhma_shuriken:
 LAB_080653c4:
     lsls r0,r0,#0x2    @ 080653c4 8000
     adds r0,r0,r7    @ 080653c6 c019
-    ldr r1, DAT_080653d0                     @ 080653c8 0149
+    ldr r1, write_equip_lp_fuhma_neg700      @ 080653c8 0149
     str r1,[r0,#0x0]                         @ 080653ca 0160
     b restore_equip_effect_frame             @ 080653cc 05e1
     .zero  0x2
-DAT_080653d0:
-    .word  0xfffffd44                     @ 080653d0 44fdffff
+write_equip_lp_fuhma_neg700:
+    .word  SCORE_DELTA_NEG_700            @ 080653d0 44fdffff  SCORE_DELTA_NEG_700 = -700; Fuhma Shuriken LP penalty (same value as score domain -700)
 
-@ Blasting the Ruins equip effect (card_id 0x16dc): writes fixed value -3000 into the opponent LP delta slot. No card stat query; uses literal DAT_080653e4 = 0xfffff448 (-3000). Opponent index computed as (1 - equip_owner_player_id). Dispatched from FUN_08064880 on card_id 0x16dc.
+@ Blasting the Ruins equip effect (card_id 0x16dc): writes fixed value -3000 into the opponent LP delta slot. No card stat query; uses literal DAT_080653e4 = 0xfffff448 (-3000). Opponent index computed as (1 - equip_owner_player_id). Dispatched from dispatch_equip_lp_delta_by_card_id on card_id 0x16dc.
 @ 
 @ Constants:
 @ - CARD_ID_BLASTING_THE_RUINS = 0x16dc (Blasting the Ruins)
@@ -2361,31 +2406,31 @@ write_equip_lp_delta_blasting_the_ruins:
     subs r0,r0,r6    @ 080653d6 801b
     lsls r0,r0,#0x2    @ 080653d8 8000
     adds r0,r0,r7    @ 080653da c019
-    ldr r1, DAT_080653e4                     @ 080653dc 0149
+    ldr r1, write_equip_lp_blasting_ruins_neg3000 @ 080653dc 0149
     str r1,[r0,#0x0]                         @ 080653de 0160
     b restore_equip_effect_frame             @ 080653e0 fbe0
     .zero  0x2
-DAT_080653e4:
-    .word  0xfffff448                     @ 080653e4 48f4ffff
+write_equip_lp_blasting_ruins_neg3000:
+    .word  LP_EQUIP_DELTA_NEG_3000        @ 080653e4 48f4ffff  LP_EQUIP_DELTA_NEG_3000 = -3000 (s32); Blasting the Ruins penalty
 LAB_080653e8:
     .hword 0x4641    @ 080653e8 4146
     subs r0,r1,r6    @ 080653ea 881b
     lsls r0,r0,#0x2    @ 080653ec 8000
 LAB_080653ee:
     adds r0,r0,r7    @ 080653ee c019
-    ldr r1, DAT_080653f8                     @ 080653f0 0149
+    ldr r1, write_equip_lp_granadora_atk_neg2000 @ 080653f0 0149
     str r1,[r0,#0x0]                         @ 080653f2 0160
     b restore_equip_effect_frame             @ 080653f4 f1e0
     .zero  0x2
-DAT_080653f8:
-    .word  0xfffff830                     @ 080653f8 30f8ffff
+write_equip_lp_granadora_atk_neg2000:
+    .word  LP_EQUIP_DELTA_NEG_2000        @ 080653f8 30f8ffff  LP_EQUIP_DELTA_NEG_2000 = -2000 (s32); Granadora attack-position penalty
 LAB_080653fc:
     lsls r2,r5,#0x2    @ 080653fc aa00
     adds r2,r2,r7    @ 080653fe d219
-    ldr r1, PTR_gP1LifePoints_0806541c       @ 08065400 0649
+    ldr r1, write_equip_lp_vandalgyon_lp_base_a @ 08065400 0649
     movs r0,#0x1    @ 08065402 0120
     ands r5,r0    @ 08065404 0540
-    ldr r0, DAT_08065420                     @ 08065406 0648
+    ldr r0, write_equip_lp_vandalgyon_stride_a @ 08065406 0648
     muls r0,r5    @ 08065408 6843
     adds r1,#0x14    @ 0806540a 1431
     adds r0,r0,r1    @ 0806540c 4018
@@ -2396,17 +2441,17 @@ LAB_080653fc:
     adds r0,r0,r1    @ 08065416 4018
     lsls r0,r0,#0x2    @ 08065418 8000
     b LAB_080654d2                           @ 0806541a 5ae0
-PTR_gP1LifePoints_0806541c:
-    .word  gP1LifePoints                  @ 0806541c e0c40102
-DAT_08065420:
-    .word  0x00000868                     @ 08065420 68080000
+write_equip_lp_vandalgyon_lp_base_a:
+    .word  gP1LifePoints                  @ 0806541c e0c40102  gP1LifePoints ptr for write_equip_lp_delta_vandalgyon P1 LP base
+write_equip_lp_vandalgyon_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 08065420 68080000
 LAB_08065424:
     lsls r2,r5,#0x2    @ 08065424 aa00
     adds r2,r2,r7    @ 08065426 d219
-    ldr r1, PTR_gP1LifePoints_08065444       @ 08065428 0649
+    ldr r1, write_equip_lp_vandalgyon_lp_base_b @ 08065428 0649
     .hword 0x4643    @ 0806542a 4346
     ands r5,r3    @ 0806542c 1d40
-    ldr r0, DAT_08065448                     @ 0806542e 0648
+    ldr r0, write_equip_lp_vandalgyon_stride_b @ 0806542e 0648
     muls r0,r5    @ 08065430 6843
     adds r1,#0x1c    @ 08065432 1c31
     adds r0,r0,r1    @ 08065434 4018
@@ -2417,12 +2462,12 @@ LAB_08065424:
     subs r0,r0,r1    @ 0806543e 401a
     lsls r0,r0,#0x2    @ 08065440 8000
     b LAB_080654d2                           @ 08065442 46e0
-PTR_gP1LifePoints_08065444:
-    .word  gP1LifePoints                  @ 08065444 e0c40102
-DAT_08065448:
-    .word  0x00000868                     @ 08065448 68080000
+write_equip_lp_vandalgyon_lp_base_b:
+    .word  gP1LifePoints                  @ 08065444 e0c40102  gP1LifePoints ptr for write_equip_lp_delta_vandalgyon P2 LP base
+write_equip_lp_vandalgyon_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08065448 68080000
 
-@ Goblin Thief equip effect (card_id 0x1761): writes -500 into the opponent LP delta slot, then fall-through into write_equip_lp_delta_dark_rabbit (0x08065458) to write +500 into the own LP delta slot. Net effect: opponent loses 500 LP, owner gains 500 LP. Dispatched from FUN_08064880 on card_id 0x1761.
+@ Goblin Thief equip effect (card_id 0x1761): writes -500 into the opponent LP delta slot, then fall-through into write_equip_lp_delta_dark_rabbit (0x08065458) to write +500 into the own LP delta slot. Net effect: opponent loses 500 LP, owner gains 500 LP. Dispatched from dispatch_equip_lp_delta_by_card_id on card_id 0x1761.
 @ 
 @ Constants:
 @ - CARD_ID_GOBLIN_THIEF = 0x1761 (Goblin Thief)

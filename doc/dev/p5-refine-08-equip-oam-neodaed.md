@@ -60,7 +60,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|-------------------|------|--------|
-| 1 | 0x643e0..0x6544c | 20 | 87 | 2 (0x6456c/2c, 0x645ee/1e) | ⬜ | — |
+| 1 | 0x643e0..0x6544c | 20 | 87 | 2 (0x6456c/2c, 0x645ee/1e) | ✅ | (pending) |
 | 2 | 0x6544c..0x66448 | 20 | 72 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ⬜ | — |
 | 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ⬜ | — |
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ⬜ | — |
@@ -80,7 +80,20 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 
 ## 四、逐段完成记录
 
-(各段落地后由 fixer 追加 4.0N 小节)
+### 4.01 Seg-1 完成记录 (0x643e0..0x6544c)
+
+- **EQ**: 87 槽 (PLAYER_BLOCK_STRIDE x12, gDuelFieldSlots x5, gP1LifePoints x1, gDuelFieldSlots_p2_base x1, gEquipChainSlotRefs x1, 29 CID reuse, 4 duel_field.inc reuse, 27 new CID, 8 LP delta new)
+- **RENAME**: 13 (PTR_gP1LifePoints_* → write_equip_lp_*_lp_base 描述性标签)
+- **PLATE**: 17 (3 stale FUN_ → 当前名; 14 函数 entry plate 新设; file header mojibake 修正 via split_manifest.tsv)
+- **DISASM**: 2 ROM_INCBIN → THUMB:
+  - Block1 `check_opponent_chain_zone_count_gt1_for_cid_19df` @ 0x0806456c (0x2c B, CID=0x19df Success Probability 0%)
+  - Block2 `check_alt_hand_sum_nonzero_for_cid_19ef` @ 0x080645f0 (0x1e B, CID=0x19ef Elemental Hero Erikshieler; 2B pad @ 0x080645ee)
+- **新建 inc**: `constants/equip_lp_delta.inc` (8 LP penalty equates: NEG_300/500/600/800/1200/1500/2000/3000)
+- **card_info.inc**: +27 CID (DES_KOALA/WOODLAND_SPRITE/cid_10fe/cid_12e8/GRIGGLE/REFLECT_BOUNDER 等)
+- **rom.s**: 加入 equip_lp_delta.inc .include
+- **CSV sync**: +2 行 (2 新 disasm 函数)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra 脚本**: `RefineF08Seg1Slots.py` + `DisassembleF08Seg1Blocks.py`
 
 ---
 

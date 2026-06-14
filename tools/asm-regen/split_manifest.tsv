@@ -13,7 +13,7 @@
 0x08049014	05_equip_eligibility_a.s	效果区 LP/形状 sprite + 装备 slot 资格判定 (一)
 0x080537c0	06_equip_eligibility_b.s	装备资格按 slot flag 派发 + neo daedalus 效果
 0x0805c2f0	07_equip_effect_chain.s	按卡 ID 效果派发 + 装备链极性资格判定
-0x080643e0	08_equip_oam_neodaed.s	neo daedalus 资格 + 装备 OAM 写入 + zone tile 计数
+0x080643e0	08_equip_oam_neodaed.s	neo daedalus eligibility + equip OAM write + zone tile count
 0x0806e76c	09_equip_lp_display.s	slot sprite type11 + 装备 LP 计数显示状态机
 0x08079e60	10_equip_effect_dispatch.s	neo daedalus zone OAM + 装备判据/效果按类型派发
 0x080850d8	11_effect_slot_puzzletext.s	效果 slot attr + 交换 sprite + duel puzzle 文本队列

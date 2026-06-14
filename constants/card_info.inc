@@ -1247,3 +1247,37 @@
 .equ SIMULTANEOUS_LOSS_CID, 0x00001976  @ Simultaneous Loss (pw=92219931; card-stats.s card_1987 slot=0x1976); Block4 fn check_either_player_lp_slot_active; conf: high
 .equ EHERO_CLAYMAN_CID,     0x000018a8  @ Elemental Hero Clayman (pw=84327329; card-stats.s card_1815 slot=0x18A8); DWORD_08064068 clayman_pair check in check_slot_clayman_pair_in_active_chain; conf: high
 .equ HERO_KID_CID,          0x000019a7  @ Hero Kid (pw=32679370; card-stats.s card_2016 slot=0x19A7); DWORD_080642a0 in check_slot_hero_kid_in_extra_deck; conf: high
+
+@ =============================================================================
+@ file 08 Seg-1 additions: equip LP delta dispatch card IDs
+@ Source: asm/08_equip_oam_neodaed.s, Seg-1 (0x080643e0..0x0806544c)
+@ dispatch_equip_lp_delta_by_card_id BST node card IDs.
+@ All values verified against data/card-stats.s or confirmed unallocated.
+@ =============================================================================
+.equ DES_KOALA_CID,                    0x0000161d  @ Des Koala (pw=69579761; card_1589 slot=0x161D); write_equip_lp_delta_scaled_by_lp_count path
+.equ WOODLAND_SPRITE_CID,              0x000013a8  @ Woodland Sprite (pw=06979239; card_1178 slot=0x13A8); write_equip_lp_delta_by_opponent_side dispatch
+.equ cid_10fe,                         0x000010fe  @ unallocated slot 0x10fe; not in card-stats.s; dispatch_equip_lp_delta_by_card_id node
+.equ cid_12e8,                         0x000012e8  @ unallocated slot 0x12e8; not in card-stats.s; dispatch node
+.equ GRIGGLE_CID,                      0x000011c9  @ Griggle (pw=95744531; card_0393 slot=0x11C9); dispatch node
+.equ REFLECT_BOUNDER_CID,              0x0000129a  @ Reflect Bounder (pw=02851070; card_0670 slot=0x129A); dispatch node
+.equ GIFT_OF_MYSTICAL_ELF_CID,         0x0000137a  @ Gift of The Mystical Elf (pw=98299011; card_0788 slot=0x137A)
+.equ RAIN_OF_MERCY_CID,                0x0000141f  @ Rain of Mercy (pw=66719324; card_0899 slot=0x141F)
+.equ AMAZON_ARCHER_CID,                0x0000144b  @ Amazon Archer (pw=91869203; card_0944 slot=0x144B)
+.equ MARIE_THE_FALLEN_ONE_CID,         0x00001459  @ Marie the Fallen One (pw=57579381; card_0948 slot=0x1459)
+.equ DARK_MAGICIAN_TOME_CID,           0x00001467  @ Dark Magician's Tome of Black Magic (pw=67227834; card_0960 slot=0x1467)
+.equ NIGHTMARE_WHEEL_CID,              0x000014b2  @ Nightmare Wheel (pw=54704216; card_1018 slot=0x14B2)
+.equ ZOLGA_CID,                        0x000014f3  @ Zolga (pw=16268841; card_1068 slot=0x14F3)
+.equ POISON_MUMMY_CID,                 0x00001525  @ Poison Mummy (pw=43716289; card_1096 slot=0x1525)
+.equ TOON_CANNON_SOLDIER_CID,          0x00001565  @ Toon Cannon Soldier (pw=79875176; card_1128 slot=0x1565)
+.equ SECRET_BARREL_CID,                0x000015f4  @ Secret Barrel (pw=27053506; card_1175 slot=0x15F4)
+.equ INFERNO_CID,                      0x000016c5  @ Inferno (pw=74823665; card_1301 slot=0x16C5)
+.equ STEALTH_BIRD_CID,                 0x000016fa  @ Stealth Bird (pw=03510565; card_1347 slot=0x16FA)
+.equ GOBLIN_THIEF_CID,                 0x00001761  @ Goblin Thief (pw=45311864; card_1338 slot=0x1761)
+.equ SOLAR_RAY_CID,                    0x00001767  @ Solar Ray (pw=44472639; card_1342 slot=0x1767)
+.equ ELEPHANT_STATUE_CID,              0x00001794  @ Elephant Statue of Disaster (pw=12160911; card_1381 slot=0x1794)
+.equ ANDRO_SPHINX_CID,                 0x000017c7  @ Andro Sphinx (pw=15013468; card_1442 slot=0x17C7)
+.equ ELEMENTAL_HERO_FLAME_WINGMAN_CID, 0x000018c8  @ Elemental Hero Flame Wingman (pw=35809262; card_1688 slot=0x18C8)
+.equ ROCK_BOMBARDMENT_CID,             0x000018da  @ Rock Bombardment (pw=20781762; card_1695 slot=0x18DA)
+.equ MAGICAL_BLAST_CID,                0x00001984  @ Magical Blast (pw=91819979; card_1751 slot=0x1984)
+.equ MEMORY_CRUSHER_CID,               0x000019cf  @ Memory Crusher (pw=48700891; card_2058 slot=0x19CF)
+.equ GUARDIAN_EXODE_CID,               0x000019f0  @ Guardian Exode (pw=55737443; card_2064 slot=0x19F0)
