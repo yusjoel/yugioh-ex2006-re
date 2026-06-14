@@ -1105,3 +1105,15 @@
 .equ MECHANICAL_HOUND_CID,         0x00001910  @ Mechanical Hound (pw=22512237; card-stats.s slot=0x1910); check_card_placement_rules dispatch; conf: high
 .equ ANCIENT_GEAR_CANNON_CID,      0x000019bb  @ Ancient Gear Cannon (pw=80045583; card-stats.s slot=0x19BB); check_card_placement_rules dispatch; conf: high
 .equ TRIAL_OF_THE_PRINCESSES_CID,  0x000019d8  @ Trial of the Princesses (pw=72709014; card-stats.s slot=0x19D8); dispatch_card_effect_by_stat_type dispatch; conf: high
+
+@ =============================================================================
+@ file 06 Seg-10 additions: equip zone eligibility / special-summon check CIDs
+@ Source: asm/06_equip_eligibility_b.s Seg-10 (0x0805b480..0x0805c2f0)
+@ =============================================================================
+.equ GORGONS_EYE_CID,              0x000012bf  @ Gorgon's Eye (pw=52648457; card-stats.s slot=0x12bf); populate_effect_node_snapshot + check_card_special_summon_eligible_full; conf: high
+.equ RITE_OF_SPIRIT_CID,           0x000015ac  @ Rite of Spirit (pw=30450531; card-stats.s slot=0x15ac); check_card_special_summon_eligible_full; conf: high
+.equ SILENT_INSECT_CID,            0x000019c6  @ Silent Insect (pw=40867519; card-stats.s slot=0x19c6); populate_effect_node_snapshot; conf: high
+.equ cid_134e,                     0x0000134e  @ unassigned slot 0x134e (between Driving Snow 0x134d and Numinous Healer 0x1352 gap); populate_effect_node_snapshot; conf: low
+.equ cid_134f,                     0x0000134f  @ unassigned slot 0x134f (gap); populate_effect_node_snapshot; conf: low
+.equ cid_1350,                     0x00001350  @ unassigned slot 0x1350 (gap); populate_effect_node_snapshot; conf: low
+.equ cid_1351,                     0x00001351  @ unassigned slot 0x1351 (gap between 0x1350 and Numinous Healer 0x1352); populate_effect_node_snapshot; conf: low

@@ -84,7 +84,7 @@
 | 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | 8fd1210 |
 | 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ✅ | 11c409d |
 | 9 | 0x59de0..0x5b480 | 22+6 | 140 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ✅ | 8c4bd9a |
-| 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ⬜ | — |
+| 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ✅ | pending |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 重段提示: Seg-4 (149 槽) / Seg-9 (146 槽, 2 ROM_INCBIN) 较重, 必要时拆 Seg-Na/Nb
@@ -224,6 +224,21 @@
 - **验收**: FUN_ 残留=0 (Seg-9 lines 15895-18793); CJK=0; 2 ROM_INCBIN blocks replaced; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **commit**: 8c4bd9a
+
+### 4.10 Seg-10 完成记录 (2026-06-14, commit pending) [FILE 06 FINAL]
+
+- **段范围**: 0x0805b480..0x0805c2f0, 15 fn, file 06 末段
+- **EQ=56**: 49 reuse (ewram/scrollbar/duel_field/card_info.inc 已有常量) + 7 new CID (card_info.inc: GORGONS_EYE_CID=0x12bf / RITE_OF_SPIRIT_CID=0x15ac / SILENT_INSECT_CID=0x19c6 / cid_134e/134f/1350/1351) + 1 new scalar (duel_field.inc: ZONE_STATUS_SUMMON_ELIGIBLE=0x201c)
+- **REF=12**: 3x gDuelFieldSlots / 1x gDuelPhaseFlags / 2x gDuelFieldSlotState / 3x gP1FieldArrayCBase / 1x gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF (0x0201d5b4) / 2x internal switchdataD ptr (find_zone_slot_match outer/inner table)
+- **RENAME=13**: 1x DAT_ compound (populate_effect_node_snapshot_cyber_blader_slotword 0xcaa80000) + 4x PTR_gP1LifePoints_ (scan_equip_slots_eligible_for_card_p1lp / scan_equip_slots_eligible_banisher_guard_p1lp / get_lp_count_minus_zone_slot_offset_p1lp / dispatch_effect_for_neo_daedalus_slot_with_monster_count_p1lp) + 8x switchD sub-labels (outer: __outer_dispatch/__outer_table/__zone_type_valid/__zone_type_invalid; inner: __inner_dispatch/__inner_table/__node_zone_match/__node_next)
+- **PLATE_SUB=5**: 10 FUN_ stale refs across 5 functions (populate_effect_node_snapshot/scan_equip_zone_candidates_with_snapshot/check_card_normal_summon_eligible_full/check_card_special_summon_eligible_full/scan_equip_slots_eligible_for_card); all 10 replacements applied
+- **carve=0, disasm=0, §5.1=0, FUNC_RENAME=0** -> no CSV sync needed
+- **新建 constants**: card_info.inc +7 (GORGONS_EYE_CID/RITE_OF_SPIRIT_CID/SILENT_INSECT_CID/cid_134e/cid_134f/cid_1350/cid_1351); duel_field.inc +1 (ZONE_STATUS_SUMMON_ELIGIBLE=0x201c)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0) + asm/06 Seg-10 x1 (gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x0805b888)
+- **验收**: FUN_ 残留=0 (lines 19045-20977); CJK=0; DAT_/PTR_ auto-names=0
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **commit**: pending
+- **FILE 06 COMPLETE**: 全 10 段 Seg-1..10 全部完成 (EQ/REF/RENAME/PLATE 全覆盖; 8 ROM_INCBIN blocks: 5 disasm'd + 3 carve'd; 3 switchD tables handled; 0 §5.1 orphans)
 
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 

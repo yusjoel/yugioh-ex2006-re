@@ -364,3 +364,9 @@
 @ Source: asm/06_equip_eligibility_b.s Seg-8 (0x08058cec..0x08059de0)
 @ =============================================================================
 .equ OP31_EFFECT_NODE_COUNT_CODE,   0x0000013d  @ invoke_card_display_op_0x31_sub10 first arg (sub-op code 0x13d); tick_equip_effect_node_count_display_seq L14826; distinct from LP_ROW_OFF=0x13e; conf: high
+
+@ =============================================================================
+@ file 06 Seg-10 additions: zone summon eligibility value
+@ Source: asm/06_equip_eligibility_b.s Seg-10 (0x0805b480..0x0805c2f0)
+@ =============================================================================
+.equ ZONE_STATUS_SUMMON_ELIGIBLE,  0x0000201c  @ slot[+2] & ZONE_STATUS_MASK(0x303e) == 0x201c tests summon-eligible zone status; check_card_normal/special_summon_eligible_full; conf: med
