@@ -248,6 +248,7 @@
 .equ LP_CARD_TRACK_NEXT_OFF,  0x00001daa  @ [gP1LifePoints+0x1daa] 5-entry hword clear loop base; tick_card_display_op2b_lp_clear_seq strh x5 starting here; 44 raw ROM refs
 .equ LP_CARD_TRACK_AUX_OFF,   0x00001db2  @ [gP1LifePoints+0x1db2] auxiliary LP track field cleared separately; 1 raw ROM ref
 .equ PLAYER_BLOCK_STRIDE,           0x868   @ player data block stride (0x868=2152 bytes; 2146 raw refs)
+.equ P2_ZONE1_LP_OFF,              0x87c   @ [gP1LifePoints+0x87c] P2 zone-1 LP region start; 0x87c = PLAYER_BLOCK_STRIDE(0x868) + 0x14 (one zone slot stride); check_spell_zone_chain_occupied_eligible loads [gP1LifePoints+0x87c]; conf: med
 .equ GAME_STR_RAW_ID_MASK,     0xfffe0000   @ raw game string ID mask: bits[31:17]==0 (485 raw refs)
 
 .equ gDuelDispCtx,               0x0203eeb0  @ display context struct for duel field / scene rendering

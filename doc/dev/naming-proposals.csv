@@ -1501,7 +1501,12 @@ address,name,proposed_name,score,tags
 0x0805dbe0,check_effect_dispatch_result_above4,,,
 0x0805dc00,check_equip_zone_descriptor_field5_player_match,,,
 0x0805dc6c,check_equip_slot_eligible_type6c0_by_gust_or_driving_snow,,,
+0x0805dd40,check_equip_zone_eligible_cid_134e,,,duel_field
 0x0805dd58,check_equip_slot_pair_field6_field9_eligible,,,
+0x0805dddc,check_equip_zone_eligible_numinous_healer_and_recv,,,duel_field
+0x0805de10,check_equip_zone_eligible_appropriate,,,duel_field
+0x0805de50,check_equip_zone_eligible_forced_requisition,,,duel_field
+0x0805de7c,check_equip_zone_eligible_minor_goblin_official,,,duel_field
 0x0805deac,check_equip_slot_eligible_with_lp_offset_threshold,,,
 0x0805df14,check_equip_slot_eligible_with_hand_field5_count,,,
 0x0805df44,check_field_active_slot_or_zone_pair,,,

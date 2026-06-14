@@ -67,7 +67,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x5c2f0..0x5cfec | 34+5 | 66 | 5 (0x5c40a/5e disasm, 0x5c4aa/2a §5.1, 0x5c608/28 disasm, 0x5cd86/2a disasm, 0x5cf1c/20 disasm) | ✅ | 7e1caa2 |
-| 2 | 0x5cfec..0x5e358 | 34 | 83 | 2 (0x5dd3e/1a, 0x5ddda/d2) | ⬜ | — |
+| 2 | 0x5cfec..0x5e358 | 34 | 83 | 2 (0x5dd3e/1a, 0x5ddda/d2) | ✅ | TBD |
 | 3 | 0x5e358..0x5f1cc | 34 | 40 | 4 (0x5e744/4c, 0x5ed4a/2a, 0x5ed8e/92, 0x5ee9c/ec) | ⬜ | — |
 | 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ⬜ | — |
 | 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ⬜ | — |
@@ -99,6 +99,23 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 - disasm=4 blocks (5 new fn): check_equip_slots_for_dreamer_blade_rabbit_dispatch@0x5c40c + check_equip_slots_for_sage_burial_army_dispatch@0x5c43c + check_equip_slots_for_cid_11a0_dispatch@0x5c608 + check_equip_slots_for_confiscation_duo_sentry_dispatch@0x5cd88 + check_equip_slots_for_adhesive_tape_trap_hole_dispatch@0x5cf1c
 - §5.1: 1 orphan block (0x5c4aa/0x2a, 0-引用 THUMB code)
 - card_info.inc +11 CID: SANGA_OF_THUNDER(0x1119)/SCAPEGOAT(0x12d2)/GRACEFUL_CHARITY(0x12cc)/GREENKAPPA(0x11f0)/REAPER_OF_CARDS(0x0ffa)/HARPIES_FEATHER_DUSTER(0x1246)/DRIVING_SNOW(0x134d)/NOBLEMAN_EXTERMINATION(0x1364)/BAIT_DOLL(0x149b)/cid_131c(0x131c)/cid_12fb(0x12fb)
+- CSV sync: +5 rows (5 disasm new fn)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+### 4.02 Seg-2 完成记录 (2026-06-14)
+
+范围: ROM 0x0805cfec..0x0805e358 (34 原有 fn + 5 disasm 新 fn = 39 fn)
+
+**落地数据**:
+- EQ=65 (PLAYER_BLOCK_STRIDE x16 + P1LP_BLOCK2_OFF_1CE8 x6 + FIELD_STATE_OFF x6 + EFFECT_ZONE_BITMASK_OFF x1 + P2_ZONE1_LP_OFF x1 + 20 CID REUSE + 15 CID NEW)
+- REF=27 (gP1LifePoints x14 + gDuelFieldSlots x7 + gEquipChainSlotRefs x4 + gDuelPhaseFlags x1 + fn-ptr x1)
+- RENAME=0 FUNC_RENAME=0
+- PLATE=3 (check_equip_zone_effect_eligible_by_card_id BST desc + invoke_effect_node_handler zone-flag-guard + check_field_active_slot_or_zone_pair outer-loop)
+- disasm=2 blocks (5 new fn): check_equip_zone_eligible_cid_134e@0x5dd40 + check_equip_zone_eligible_numinous_healer_and_recv@0x5dddc + check_equip_zone_eligible_appropriate@0x5de10 + check_equip_zone_eligible_forced_requisition@0x5de50 + check_equip_zone_eligible_minor_goblin_official@0x5de7c
+- Literal pool fix: FixF07Seg1Seg2LiteralPools.py (13 slots: 8 Seg-1 + 5 Seg-2)
+- Periodic fn-ptr fixes: asm/03 x4 (check_level_conv_lab_node_match+1 x2 + check_card_is_amazoness_type+1 x2) + asm/04 x3 (zone_monster_field_bonus_table+7*16 + apply_nitro_unit_equip_activation+1 + 0x0201d5b4) + asm/06 x1 (0x0201d5b4) + asm/07 x1 (check_equip_slot_eligible_by_equip_type+1)
+- card_info.inc +19 new CID (DARK_HOLE/RAIGEKI/ALPHA_MAGNET_WARRIOR/BETA_MAGNET_WARRIOR/GAMMA_MAGNET_WARRIOR/cid_12f7/MAGIC_DRAIN/RIRYOKU_FIELD/TUTAN_MASK/CURSE_OF_ROYAL/TRAP_JAMMER/ARMOR_BREAK/NUMINOUS_HEALER/FORCED_REQUISITION/MINOR_GOBLIN_OFFICIAL/ATTACK_AND_RECEIVE/cid_135b/SPELL_STOPPING_STATUTE/ROYAL_SURRENDER)
+- ewram.inc +1 (P2_ZONE1_LP_OFF=0x87c)
 - CSV sync: +5 rows (5 disasm new fn)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 

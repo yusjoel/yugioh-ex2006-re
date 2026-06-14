@@ -1133,3 +1133,27 @@
 .equ BAIT_DOLL_CID,              0x0000149b  @ Bait Doll (pw=07165085; card-stats.s slot=0x149b); dedicated path in check_equip_target_zone_validity_by_card_id; conf: high
 .equ cid_131c,                   0x0000131c  @ unassigned slot 0x131c (not in card-stats.s); dispatch upper boundary in check_equip_target_zone_validity_by_card_id; conf: low
 .equ cid_12fb,                   0x000012fb  @ unassigned slot 0x12fb (not in card-stats.s); count_field_copies_of_card arg in check_equip_slot_eligible_without_reserved_field_card; conf: low
+
+@ =============================================================================
+@ file 07 Seg-2 additions: spell/zone effect eligibility predicates BST CIDs
+@ Source: asm/07_equip_effect_chain.s Seg-2 (0x0805cfec..0x0805e358)
+@ =============================================================================
+.equ DARK_HOLE_CID,              0x000010f6  @ Dark Hole (pw=53129443; card-stats.s slot=0x10F6); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ RAIGEKI_CID,                0x000010f7  @ Raigeki (pw=12580477; card-stats.s slot=0x10F7); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ ALPHA_MAGNET_WARRIOR_CID,   0x00001288  @ Alpha The Magnet Warrior (pw=99785935; card-stats.s slot=0x1288); check_equip_eligible_with_magnet_warrior_trio; conf: high
+.equ BETA_MAGNET_WARRIOR_CID,    0x0000129b  @ Beta The Magnet Warrior (pw=39256679; card-stats.s slot=0x129B); check_equip_eligible_with_magnet_warrior_trio; conf: high
+.equ GAMMA_MAGNET_WARRIOR_CID,   0x000012b8  @ Gamma The Magnet Warrior (pw=27175001; card-stats.s slot=0x12B8); check_equip_eligible_with_magnet_warrior_trio; conf: high
+.equ cid_12f7,                   0x000012f7  @ unassigned slot 0x12f7 (not in card-stats.s; neighbors: 0x12f8=Tribute to the Doomed, 0x12f9=Soul Release); conf: low
+.equ MAGIC_DRAIN_CID,            0x0000140d  @ Magic Drain (pw=59344077; card-stats.s slot=0x140D); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ RIRYOKU_FIELD_CID,          0x0000148f  @ Riryoku Field (pw=70344351; card-stats.s slot=0x148F); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ TUTAN_MASK_CID,             0x0000153e  @ Tutan Mask (pw=86120751; card-stats.s slot=0x153E); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ CURSE_OF_ROYAL_CID,         0x00001541  @ Curse of Royal (pw=02314238; card-stats.s slot=0x1541); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ TRAP_JAMMER_CID,            0x00001721  @ Trap Jammer (pw=19737124; card-stats.s slot=0x1721); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ ARMOR_BREAK_CID,            0x0000176b  @ Armor Break (pw=79649195; card-stats.s slot=0x176B); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ NUMINOUS_HEALER_CID,        0x00001352  @ Numinous Healer (pw=02130625; card-stats.s slot=0x1352); check_equip_zone_eligible_numinous_healer_and_recv dispatch handler; conf: high
+.equ FORCED_REQUISITION_CID,     0x00001354  @ Forced Requisition (pw=74923978; card-stats.s slot=0x1354); check_equip_zone_eligible_forced_requisition dispatch handler; conf: high
+.equ MINOR_GOBLIN_OFFICIAL_CID,  0x00001355  @ Minor Goblin Official (pw=01918087; card-stats.s slot=0x1355); check_equip_zone_eligible_minor_goblin_official dispatch handler; conf: high
+.equ ATTACK_AND_RECEIVE_CID,     0x0000135a  @ Attack and Receive (pw=93553943; card-stats.s slot=0x135A); check_equip_zone_eligible_numinous_healer_and_recv shared handler; conf: high
+.equ cid_135b,                   0x0000135b  @ unassigned slot 0x135b (not in card-stats.s; neighbors: 0x135a=Attack and Receive, 0x135c=Ceasefire); conf: low
+.equ SPELL_STOPPING_STATUTE_CID, 0x000018dd  @ Spell-Stopping Statute (pw=10048942; card-stats.s slot=0x18DD); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
+.equ ROYAL_SURRENDER_CID,        0x000018de  @ Royal Surrender (pw=56058951; card-stats.s slot=0x18DE); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
