@@ -1173,3 +1173,16 @@
 .equ TSUKUYOMI_CID,              0x00001694  @ Tsukuyomi spirit monster (pw=34853266; card-stats.s card_1376 slot=0x1694); dispatch_slot_placement_check_by_card_id path; 1 Seg-4 slot
 .equ SWARM_OF_SCARABS_CID,       0x0000152a  @ Swarm of Scarabs (pw=15383415; card-stats.s card_1104 slot=0x152a); distinct from EQUIP_ZONE_SPRITE_ATTR_MODE1=0x152a (sprite domain); check_light_of_intervention_and_swarm_absent; 1 Seg-4 slot
 .equ LIFE_ABSORBING_MACHINE_CID, 0x000014c0  @ Life Absorbing Machine (pw=14318794; card-stats.s card_1011 slot=0x14c0); check_slot_has_life_absorbing_machine_node immediate arg; no literal pool slot (inline imm); 0 slots
+
+@ =============================================================================
+@ file 07 Seg-5 additions: equip slot eligibility predicate card IDs
+@ Source: asm/07_equip_effect_chain.s Seg-5 (0x0805fc94..0x08060898)
+@ =============================================================================
+.equ PEOPLE_RUNNING_ABOUT_CID,  0x000015ca  @ People Running About (pw=12143771; card-stats.s card_1245 slot=0x15CA); resistance triple check; 1 Seg-5 slot DWORD_0806054c
+.equ OPPRESSED_PEOPLE_CID,      0x000015cb  @ Oppressed People (pw=58538870; card-stats.s card_1246 slot=0x15CB); resistance triple check; 1 Seg-5 slot DWORD_08060550
+.equ UNITED_RESISTANCE_CID,     0x000015cc  @ United Resistance (pw=85936485; card-stats.s card_1247 slot=0x15CC); resistance triple check; 1 Seg-5 slot DWORD_08060554
+.equ REASONING_CID,             0x0000159a  @ Reasoning (pw=58577036; card-stats.s line 15381 slot=0x159A); disasm Block1 handler fn; 1 Seg-5 block
+.equ HELPING_ROBO_FOR_COMBAT_CID, 0x000015dc @ Helping Robo For Combat (pw=47025270; card-stats.s line 16005 slot=0x15DC); disasm Block2 handler fn; 1 Seg-5 block
+.equ THUNDER_OF_RULER_CID,      0x000015f0  @ Thunder of Ruler (pw=91781589; card-stats.s line 16213 slot=0x15F0); disasm Block3 F1 handler fn
+.equ METEORAIN_CID,             0x000015f2  @ Meteorain (pw=64274292; card-stats.s line 16239 slot=0x15F2); disasm Block3 F2 handler fn
+.equ PINEAPPLE_BLAST_CID,       0x000015f3  @ Pineapple Blast (pw=90669991; card-stats.s L16252 slot=0x15F3); disasm Block3 F3 handler fn

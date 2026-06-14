@@ -370,3 +370,9 @@
 @ Source: asm/06_equip_eligibility_b.s Seg-10 (0x0805b480..0x0805c2f0)
 @ =============================================================================
 .equ ZONE_STATUS_SUMMON_ELIGIBLE,  0x0000201c  @ slot[+2] & ZONE_STATUS_MASK(0x303e) == 0x201c tests summon-eligible zone status; check_card_normal/special_summon_eligible_full; conf: med
+
+@ =============================================================================
+@ file 07 Seg-5 additions: zone detail field bit-field mask
+@ Source: asm/07_equip_effect_chain.s Seg-5 (0x0805fc94..0x08060898)
+@ =============================================================================
+.equ ZONE_DETAIL_FIELD_MASK_F88, 0x00f88000  @ slot[+0x14] bits[23:11] mask; used with 0x708000 (0xe1<<15) expected value in check_equip_slot_eligible_neo_daedalus_with_zone_field_guard; 1 Seg-5 slot DAT_08060264; conf: high

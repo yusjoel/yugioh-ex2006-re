@@ -70,7 +70,7 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
 | 2 | 0x5cfec..0x5e358 | 34 | 83 | 2 (0x5dd3e/1a, 0x5ddda/d2) | ✅ | da58892 |
 | 3 | 0x5e358..0x5f1cc | 34 | 40 | 4 (0x5e744/4c, 0x5ed4a/2a, 0x5ed8e/92, 0x5ee9c/ec) | ✅ | 2b80239 |
 | 4 | 0x5f1cc..0x5fc94 | 34 | 45 | 5 (0x5f47e/1e, 0x5f8b4/40, 0x5f92e/3a, 0x5fa5c/28, 0x5fc10/2c) | ✅ | 667391b |
-| 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ⬜ | — |
+| 5 | 0x5fc94..0x60898 | 34 | 44 | 3 (0x6008c/28, 0x60386/32, 0x60588/7c) | ✅ | (pending) |
 | 6 | 0x60898..0x613b4 | 34 | 47 | 3 (0x60a86/90, 0x6106e/2e, 0x6121c/28) | ⬜ | — |
 | 7 | 0x613b4..0x61eb4 | 34 | 57 | 1 (0x61c66/2a) | ⬜ | — |
 | 8 | 0x61eb4..0x62d28 | 34 | 49 | 5 (0x62378/2c, 0x623ec/60, 0x6246e/2a, 0x62a9c/2c, 0x62c52/66) | ⬜ | — |
@@ -164,6 +164,29 @@ ROM_INCBIN 必 carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详�
   - EWRAM offset: asm/04/06/07 x2 (0x80478f0/0x805b888 -> gDuelFieldSlotsEffectZoneBase at 0x0201d5b4, fix primary symbol)
 - constants: ewram.inc +2 (gDuelEquipCtx=0x0201bbbc, gDuelFieldSlotsEffectZoneBase=0x0201d5b4); card_info.inc +4 CID (FUSHI_NO_TORI/TSUKUYOMI/SWARM_OF_SCARABS/LIFE_ABSORBING_MACHINE); rom.s +1 label (zone_monster_field_bonus_dest_entry7 at 0x09e3f104)
 - CSV sync: +5 rows (5 disasm new fn)
+- §5.1: 0
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+### 4.05 Seg-5 完成记录 (2026-06-14)
+
+范围: ROM 0x0805fc94..0x08060898 (34 原有 fn + 6 disasm 新 fn = 40 fn)
+
+**落地数据**:
+- EQ=52 (gP1LifePoints x17 (slot label gp1lp_ptr_*) + PLAYER_BLOCK_STRIDE x14 (slot label player_stride_*) + CID REUSE x16 (SECOND_GOBLIN/BANISHER_OF_THE_LIGHT/BLUE_EYES_WHITE_DRAGON/NECROVALLEY/RING_OF_MAGNETISM/EQUIP_LOCKDOWN/PITCH_BLACK_POWER_STONE + 9 others) + CID NEW x3 (PEOPLE_RUNNING_ABOUT/OPPRESSED_PEOPLE/UNITED_RESISTANCE 0x15ca/cb/cc) + scalar NEW x2 (LP_SLOT_ACTIVE_OFF=0x10 / HAND_SLOT_TO_ZONE_COUNT_NEG_OFF=0xfffffbf4))
+- REF=0; RENAME=0; FUNC_RENAME=0
+- PLATE=10 (4 stale FUN_ substring subs + 6 CJK plate full ASCII rewrites)
+  - FUN_ subs: check_equip_slot_eligible_type_b0_with_bit17_and_not_bit14 / check_equip_slot_eligible_with_monster_count_gate / check_equip_slot_eligible_by_lp_status_and_slot_value / check_equip_slot_eligible_neo_daedalus_with_lp_slot_effect
+  - CJK rewrites: 0x0806019c / 0x080601dc / 0x080602a8 / 0x08060484 / 0x08060684 / 0x080607b4
+- disasm=3 blocks (6 new fn):
+  - Block1 0x6008c/0x28: check_equip_slot_eligible_by_lp_slot_for_cid_159a (Reasoning CID 0x159a)
+  - Block2 0x60386/0x32: pad_word@0x60386 + check_equip_slot_eligible_by_type_and_player_for_cid_15dc@0x60388 (Helping Robo for Combat CID 0x15dc)
+  - Block3 0x60588/0x7c: F1=check_equip_slot_eligible_by_active_player_phase_for_cid_15f0@0x60588 (Thunder of Ruler CID 0x15f0) + F2=check_equip_slot_eligible_by_active_player_phase_for_cid_15f2@0x605b8 (Meteorain CID 0x15f2) + F3=check_equip_slot_eligible_by_monster_zone_type_for_cid_15f3@0x605f0 (Pineapple Blast CID 0x15f3)
+  - Block4 0x60800/0x8: check_equip_slot_eligible_active_player_with_chain_and_node_count@0x60800 (Pitch-Black Power Stone CID 0x1624, body continues in named asm@0x60808)
+- Literal pool fix: FixF07Seg5LiteralPools.py (9 DWORD slots: Block1 x2 + Block3-F1 x3 + Block3-F2 x3 + Block4 named-asm-area x1)
+- Periodic fn-ptr fix: FixF07Seg4PeriodicFnPtrs.py (known periodic fn-ptr slots asm/03..07)
+- constants: card_info.inc +8 CID (PEOPLE_RUNNING_ABOUT/OPPRESSED_PEOPLE/UNITED_RESISTANCE + REASONING/HELPING_ROBO_FOR_COMBAT/THUNDER_OF_RULER/METEORAIN/PINEAPPLE_BLAST); ewram.inc +3 (LP_SLOT_ACTIVE_OFF=0x10 / LP_LOOP_CEIL_OFF=0xc / HAND_SLOT_TO_ZONE_COUNT_NEG_OFF=0xfffffbf4); duel_field.inc +1 (ZONE_DETAIL_FIELD_MASK_F88=0x00f88000)
+- carve=0
+- CSV sync: +6 rows (6 disasm new fn)
 - §5.1: 0
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 

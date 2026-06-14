@@ -452,3 +452,10 @@
 @ file 07 Seg-4 additions: equip dispatch context sub-structure
 @ =============================================================================
 .equ gDuelEquipCtx,    0x0201bbbc  @ equip dispatch context struct (= gEquipChainSlotRefs+0x2c, stride=0x38 per player); check_equip_slot_at_turn_player_side indexes [+8]/[+1c]; 1 Seg-4 slot
+
+@ =============================================================================
+@ file 07 Seg-5 additions: LP slot/hand offset constants
+@ =============================================================================
+.equ LP_SLOT_ACTIVE_OFF,        0x00000010  @ [gP1LifePoints+player*0x868+0x10] LP slot activation count; nonzero = LP slot active/present; ~10 Seg-5 uses
+.equ LP_LOOP_CEIL_OFF,          0x0000000c  @ [gP1LifePoints+player*0x868+0x0c] LP slot count ceiling for loop bounds; ~7 Seg-5 uses
+.equ HAND_SLOT_TO_ZONE_COUNT_NEG_OFF, 0xfffffbf4  @ gP1HandSlotArray(0x0201c8f8)+0xfffffbf4=gP1ZoneHandCount(0x0201c4ec); neg delta -0x40c; distinct from HAND_ARRAY_TO_COUNT_NEG_OFF=-0x404; 1 Seg-5 slot DWORD_0805feac
