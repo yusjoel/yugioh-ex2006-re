@@ -69,7 +69,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ✅ | (see §4.07) |
 | 8a | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | ✅ | 638c7d4 |
 | 8b | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | ✅ | (see §4.09) |
-| 8c | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | ✅ | (see §4.10) |
+| 8c | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | ✅ | 4c7b3d0 |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
 
