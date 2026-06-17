@@ -1023,6 +1023,7 @@
 .equ SPELL_SHIELD_TYPE8_CID,         0x000015f1  @ Spell Shield Type-8 (pw=38275183); lookup_equip_card_score BST
 .equ BREAKER_MAGICAL_WARRIOR_CID,    0x00001617  @ Breaker the Magical Warrior (pw=71413901); classify_equip_tier_abcx BST
 .equ ANTI_SPELL_CID,                 0x00001634  @ Anti-Spell (pw=53112492); classify_equip_tier_abcx BST
+.equ SPELL_ABSORBING_LIFE_CID,       0x00001635  @ The Spell Absorbing Life (pw=99517131; card-stats.s card_1301 slot=0x1635); tick_equip_zone_slot_and_lp_indicator_state_machine dispatch by card_id (CID=0x1635 path: submit_effect_zone_lp_and_shape_sprites); conf: high
 .equ SKILL_DRAIN_CID,                0x0000166c  @ Skill Drain (pw=82732705); get_card_lp_cost_by_id BST
 .equ DARK_SCORPION_GORG_THE_STRONG_CID, 0x00001685 @ Dark Scorpion - Gorg the Strong (pw=48768179); lookup_equip_card_score BST
 .equ SPELL_VANISHING_CID,            0x000016a6  @ Spell Vanishing (pw=29735721); classify_equip_tier_abce BST
@@ -1156,6 +1157,8 @@
 .equ MINOR_GOBLIN_OFFICIAL_CID,  0x00001355  @ Minor Goblin Official (pw=01918087; card-stats.s slot=0x1355); check_equip_zone_eligible_minor_goblin_official dispatch handler; conf: high
 .equ ATTACK_AND_RECEIVE_CID,     0x0000135a  @ Attack and Receive (pw=93553943; card-stats.s slot=0x135A); check_equip_zone_eligible_numinous_healer_and_recv shared handler; conf: high
 .equ cid_135b,                   0x0000135b  @ unassigned slot 0x135b (not in card-stats.s; neighbors: 0x135a=Attack and Receive, 0x135c=Ceasefire); conf: low
+.equ CEASEFIRE_CID,              0x0000135c  @ Ceasefire (pw=36468556; card-stats.s card_0764 slot=0x135C); tick_equip_zone_slot_and_lp_indicator_state_machine dispatch by card_id (CID=0x135c path: submit_lp_indicator_with_slot_xor_flag); conf: high
+.equ MAGICAL_HATS_CID,           0x00001362  @ Magical Hats (pw=81210420; card-stats.s card_0769 slot=0x1362); fn_eligible handler check_equip_eligible_magical_hats via dispatch table @0x1e40490; conf: high
 .equ SPELL_STOPPING_STATUTE_CID, 0x000018dd  @ Spell-Stopping Statute (pw=10048942; card-stats.s slot=0x18DD); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
 .equ ROYAL_SURRENDER_CID,        0x000018de  @ Royal Surrender (pw=56058951; card-stats.s slot=0x18DE); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
 

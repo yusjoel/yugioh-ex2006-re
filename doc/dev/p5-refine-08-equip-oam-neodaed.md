@@ -68,7 +68,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ✅ | (see §4.06) |
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ✅ | (see §4.07) |
 | 8a | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | ✅ | 638c7d4 |
-| 8b | 0x6b56c..0x6cbe8 | 14 | 63 | 7 ROM_INCBIN 待分类 | ⬜ | — |
+| 8b | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | ✅ | (see §4.09) |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
 
@@ -257,6 +257,36 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg8aSlots.py` + `DisassembleF08Seg8aBlocks.py` + `FixF08Seg8aLiteralPools.py` + `FixF08Seg8aPlateIds.py`
 
+### 4.09 Seg-8b 完成记录 (0x6b56c..0x6c0cc)
+
+- **EQ**: 17 槽 (15 reuse + 2 NEW: CEASEFIRE_CID=0x135c / SPELL_ABSORBING_LIFE_CID=0x1635)
+  - NUMINOUS_HEALER_CID x1 / gDuelPhaseFlags x3 / PLAYER_BLOCK_STRIDE x3 / gDuelFieldSlots x2 / gDuelCardCtxBase x1 / gP1LifePoints x3 / LP_CARD_TRACK_NEXT_OFF x1 / gEquipZoneCountTable x1 reuse
+  - CEASEFIRE_CID=0x135c (Ceasefire pw=36468556; card-stats.s card_0764) NEW card_info.inc
+  - SPELL_ABSORBING_LIFE_CID=0x1635 (The Spell Absorbing Life pw=99517131; card-stats.s card_1301) NEW card_info.inc
+- **REF**: 2 槽
+  - DWORD_0806bb28 -> check_equip_slot_eligible_by_equip_type+1 (THUMB+1 fn ptr; asm/05 L18412)
+  - PTR_DAT_0806b7d4 -> cid_135b_dispatch_jump_table (10-entry raw-addr table label)
+- **RENAME**: 0 (disasm 阶段替换 ROM_INCBIN start label)
+- **FUNC_RENAME**: 0
+- **PLATE**: 2 (dispatch_neo_daedalus_placement_check_by_state @ 0x0806c0cc: stale FUN_0806b53c -> dispatch_spear_cretin_activate_if_chain_subtype; dispatch_numinous_healer_lp_zone_sprites: inline CID ref symbolize x2)
+- **DISASM**: 5 ROM_INCBIN -> THUMB (30 新函数):
+  - Block1 0x0806b784/0x4c (1 fn): `check_equip_eligible_cid_135b` (fn_eligible CID=0x135b; THUMB+1 @0x1e40448)
+  - Block2 0x0806b7fc/0x27c (10 stubs): `cid_135b_state_stub_{b7fc/b8a8/b8d4/b944/b950/b990/b9f0/ba00/ba28/ba64}`; dispatched from 10-entry table @0x6b7d4
+  - Block3 0x0806bb74/0x44 (1 fn): `check_equip_eligible_magical_hats` (fn_eligible CID=0x1362 Magical Hats pw=81210420; THUMB+1 @0x1e40490)
+  - Block4 0x0806bc2c/0x374 (11 stubs): `magical_hats_state_stub_{bc2c/bc86/bc96/bcaa/bd4c/bda8/bdce/bdf2/bf3a/bf4c/default_bf56}`; dispatched from 29-entry table @0x6bbb8; nested literal pool @0x6bf9c -> 7-entry sub-table @0x6bfa0
+  - Block5 0x0806bfbc/0x110 (7 sub-stubs): `magical_hats_zone_state_stub_{bfbc/c050/c066/c080/c08e/c0a0/c0ae}`; dispatched from nested 7-entry table @0x6bfa0
+- **carve**: 0 (all 5 blocks are THUMB code)
+- **ss5.1**: 0 (all blocks have confirmed refs)
+- **附带修正**:
+  - FixF08Seg8bLiteralPools.py: 32 literal pool DWORD labels forced (DAT_ labels in .byte sequences)
+  - asm/08 L3-6: .equ aliases added (check_equip_activation_at_slot11_1 / check_equip_slot_eligible_by_equip_type_1 / check_activation_ctx_zone11_match_cb_1 / check_zone_activation_ctx_match_cb_1) -- fn-ptr +1 periodic fix
+  - .word slots 0x08065c50/0x08065c60 -> check_equip_activation_at_slot11_1 (THUMB+1 restore)
+  - .word slot 0x0806bb28 -> check_equip_slot_eligible_by_equip_type_1 (THUMB+1 restore)
+- **新建 constants**: card_info.inc +3 (MAGICAL_HATS_CID=0x1362 / CEASEFIRE_CID=0x135c / SPELL_ABSORBING_LIFE_CID=0x1635)
+- **CSV sync**: +30 rows (30 new disasm functions: 2 fn_eligible handlers + 28 state stubs)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg8bSlots.py` + `DisassembleF08Seg8bBlocks.py` + `FixF08Seg8bLiteralPools.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -274,7 +304,8 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-6 ✅ | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
 | Seg-7 ✅ | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
 | Seg-8a ✅ | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | Germ/Momonga/Spear Cretin dispatch stubs (21 new fn); 误名订正 x2 |
-| Seg-8b | 0x6b56c..0x6cbe8 | 14 | 63 | 7 ROM_INCBIN 待分类 | OAM sprite 数据表/dispatch 大簇 (待拆 8b/8c) |
+| Seg-8b ✅ | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | cid_135b/Magical Hats/Ceasefire/SpellAbsorbing dispatch stubs (30 new fn); 嵌套跳表 0x6bc2c->0x6bfa0->0x6bfbc |
+| Seg-8c | 0x6c0cc..0x6cbe8 | 9 | — | 2 (0x6c3d8/0x44 + 0x6c440/0x298) | — |
 | Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
 | Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
 
