@@ -1305,3 +1305,13 @@
 .equ ATOMIC_FIREFLY_CID,               0x0000174e  @ Atomic Firefly (pw=83887306; card_1529 slot=0x174E); write_equip_lp_delta_atomic_firefly handler
 .equ MAGNET_CIRCLE_LV2_CID,            0x000019ac  @ Magnet Circle LV2 (pw=84327329; card_2021 slot=0x19AC); tick_dragon_summon_effect dispatch
 .equ CHAINSAW_INSECT_CID,              0x000019c7  @ Chainsaw Insect (pw=77252217; card_2042 slot=0x19C7); dispatch_equip_draw_counter_sprite_tick dispatch
+
+@ =============================================================================
+@ file 08 Seg-3 additions: dispatch_equip_zone_sprite_by_slot_state cluster
+@ Source: asm/08_equip_oam_neodaed.s, Seg-3 (0x08066448..0x08067160)
+@ =============================================================================
+.equ DE_SPELL_CID,                     0x000012eb  @ De-Spell (pw=19159413; card_0673 slot=0x12EB); dispatch_equip_zone_sprite_by_slot_state second card-id check; value grep=0 (new)
+.equ CYBER_STEIN_CID,                  0x0000114a  @ Cyber-Stein (pw=69015963; card_0361 slot=0x114A); dispatch_equip_oam_by_zone_state_with_cyberstein state=0x7e cmp; value grep=0 (new)
+.equ ICID_RESERVED_A,                  0x0000162c  @ Internal CID 0x162c (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)
+.equ ICID_RESERVED_B,                  0x0000184c  @ Internal CID 0x184c (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)
+.equ ICID_RESERVED_C,                  0x00001051  @ Internal CID 0x1051 (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)

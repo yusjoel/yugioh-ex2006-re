@@ -62,7 +62,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 |-----|------|-----|--------|-------------------|------|--------|
 | 1 | 0x643e0..0x6544c | 20 | 87 | 2 (0x6456c/2c, 0x645ee/1e) | ✅ | f0d7a85 |
 | 2 | 0x6544c..0x66448 | 20 | 79 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ✅ | 4b6b4a4 |
-| 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ⬜ | — |
+| 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ✅ | pending |
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ⬜ | — |
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ⬜ | — |
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ⬜ | — |
@@ -111,6 +111,30 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **CSV sync**: +18 rows (18 new disasm functions)
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg2Slots.py` + `DisassembleF08Seg2Blocks.py`
+
+### 4.03 Seg-3 完成记录 (0x66448..0x67160)
+
+- **EQ**: 51 槽 (DE_SPELL_CID/CYBER_STEIN_CID/ICID_RESERVED_A/B/C 新建 x5; OAM_ATTR_P2_SPRITE 新建 x1; PLAYER_BLOCK_STRIDE x14 / gDuelFieldSlots x7 / gDuelPhaseFlags x9 / gDuelCardCtxBase x3 / gP1HandSlotArray x2 / gEquipZoneCountTable x1 / EQUIP_PHASE_FRAME_OFF x3 / P1LP_BLOCK2_OFF_1CE8 x1 / gDuelEquipCtx x1 / LP_CARD_TRACK_NEXT_OFF x1 / gP1SlotSetCodeArray x1 reuse; ARMED_NINJA_CID/RAVIEL_LORD_CID/TADPOLE_CID/POLYMERIZATION_CID/BATTLE_SCARRED_CID/SHADOW_SPELL_CID/NINJITSU_ART_OF_DECOY_CID/SANGA_OF_THUNDER_CID reuse)
+- **REF**: 4 槽 (gP1LifePoints raw-addr x2: dispatch_reserved_icid_lp_base + render_equip_zone_lp_base; dispatch_equip_zone_by_effect_type_jump_table ptr x1; switchD_08066f02__switchdataD_08066f0c ptr x1)
+- **RENAME**: 2 (via EQ plan descriptive slot labels; no explicit FUNC_RENAME)
+- **PLATE**: 2 (apply_lp_delta_for_slot_player stale FUN_ x2: FUN_08073428->apply_lp_delta_for_slot_by_series_code + FUN_08074770->dispatch_dragon_summon_or_lp_delta_by_slot_type)
+- **DISASM**: 1 ROM_INCBIN 0x080668c0/0x1cc -> R4 THUMB disasm (8 raw refs; 0 THUMB+1; dispatch via MOV PC,r0 from jump table at 0x08066890):
+  - `dispatch_equip_effect_type_stub_80` @ 0x080668c0 (state=0x80, entry[11])
+  - `dispatch_equip_effect_type_stub_7f` @ 0x0806691c (state=0x7f, entry[10])
+  - `dispatch_equip_effect_type_stub_7e` @ 0x08066934 (state=0x7e, entry[9])
+  - `dispatch_equip_effect_type_stub_7d` @ 0x08066a58 (state=0x7d, entry[8])
+  - `dispatch_equip_effect_type_stub_78` @ 0x08066a62 (state=0x78, entry[3])
+  - `dispatch_equip_effect_type_stub_77` @ 0x08066a6e (state=0x77, entry[2])
+  - `dispatch_equip_effect_type_stub_76` @ 0x08066a7a (state=0x76, entry[1])
+  - `dispatch_equip_effect_type_stub_75` @ 0x08066a86 (state=0x75, entry[0])
+  - States 0x79..0x7c (entries[4..7]) -> fall-through to LAB_08066a8c (outside block)
+- **switchD_08066f02**: already fully disassembled inline; no additional disasm action
+- **新建 constants**: card_info.inc +5 (DE_SPELL_CID=0x12eb/CYBER_STEIN_CID=0x114a/ICID_RESERVED_A=0x162c/ICID_RESERVED_B=0x184c/ICID_RESERVED_C=0x1051); oam_attr.inc +1 (OAM_ATTR_P2_SPRITE=0x8059)
+- **carve**: 0 (block is THUMB code, not data table)
+- **§5.1**: 0 (block has 8 confirmed raw refs)
+- **CSV sync**: +8 rows (8 new disasm stub functions)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg3Slots.py` + `DisassembleF08Seg3Blocks.py`
 
 ---
 

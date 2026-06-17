@@ -145,3 +145,4 @@
 @ Source: asm/08_equip_oam_neodaed.s, Seg-2 (0x0806544c..0x08066448)
 @ =============================================================================
 .equ OAM_ATTR_P1_SPRITE,  0x00008027  @ player 1 side sprite attr0 (0x8000=OBJ palette select bit; 0x27=tile region); enqueue_slot_player_side_sprite_attr; 1 Seg-2 slot
+.equ OAM_ATTR_P2_SPRITE,  0x00008059  @ player 2 side sprite attr0 (0x8000=OBJ palette select bit; 0x59=tile region); dispatch_lp_counter_or_sprite_by_zone_state player_id==1 path; sibling of OAM_ATTR_P1_SPRITE=0x8027; 1 Seg-3 slot
