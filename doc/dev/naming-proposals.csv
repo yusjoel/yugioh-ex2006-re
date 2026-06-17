@@ -1969,6 +1969,7 @@ address,name,proposed_name,score,tags
 0x08069420,enqueue_effect_slot_sprites_for_two_players_with_lp_row,,,
 0x080694a8,dispatch_equip_slot_sprite_by_card_id_scapegoat_or_lambs,,,
 0x080695d4,dispatch_equip_zone_sprite_banisher_loop_by_lp_state,,,
+0x080696d8,check_equip_eligible_set_slot8_flag_for_cid_12da,,,
 0x080696f4,tick_equip_lp_indicator_by_state_and_slot_score,,,duel_field
 0x08069780,tick_equip_field_spell_placement_state_machine,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08069874,tick_equip_activation_sprite_with_lp_row_state_machine,,,duel_field
@@ -1976,6 +1977,7 @@ address,name,proposed_name,score,tags
 0x08069b5c,build_equip_zone_bitmap_if_triple_active,,,
 0x08069be0,invoke_equip_oam_for_reserved_card_zone14_if_eligible,,,
 0x08069c68,enqueue_equip_zone_sprites_for_spell_slot_entries,,,
+0x08069cdc,check_zone_activation_ctx_match_cb,,,
 0x08069d08,dispatch_zone_activation_display_by_confirm_state,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08069df8,enqueue_slot_card_sprite_for_zone_entry,,,
 0x08069e40,tick_equip_monster_zone_placement_state_machine,card_ids_08069e40,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings

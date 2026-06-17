@@ -471,3 +471,10 @@
 @ =============================================================================
 .equ gEquipLpZoneEntryBase,  0x0201e500  @ EWRAM base for equip LP zone entry descriptor buffer; dispatch_equip_lp_field_state_by_card_id reads [+0] for card_type bits for sprite_code selection; 28 raw ROM refs across 0x0806xxxx/0807xx/0809xx/080axx/080bxx/080cxx; (Seg-5 name; Seg-6 may refine)
 .equ EQUIP_OAM_ENTRY_ATTR_14F8, 0x000014f8  @ OAM entry attr word OR component; dispatch_equip_slot_sprite_by_lp_state_neo_daedalus: lsls r1,r1,#0xd; orrs r1,EQUIP_OAM_ENTRY_ATTR_14F8; sp[0x4] = combined attr; then bl setup_equip_oam_entry_with_sprite_attr; 2 ROM code refs (conf: med; exact OAM attr structure TBD)
+
+@ =============================================================================
+@ file 08 Seg-6 additions: LP activation link flag offset (gP1LifePoints domain)
+@ Source: asm/08_equip_oam_neodaed.s, Seg-6 (0x080690dc..0x0806a118)
+@ Domain exception: same value as EFFECT_ZONE_BITMASK_OFF=0x10d0 (duel_field.inc, base=gDuelFieldSlots)
+@ =============================================================================
+.equ LP_ACTIVATION_LINK_FLAG_OFF,  0x000010d0  @ [gP1LifePoints+0x10d0] activation link flag; bit0+bit1 tested for LP link status in tick_equip_activation_sprite_with_lp_row_state_machine; asm/08 L12689; domain=gP1LifePoints (distinct from EFFECT_ZONE_BITMASK_OFF=0x10d0 base=gDuelFieldSlots)

@@ -153,3 +153,10 @@
 .equ OAM_EQUIP_SPRITE_TILE_P2_1B,  0x0000801b  @ equip sprite OAM attr0 tile region P2 (bit15+0x1b); player_id==1 path in enqueue_equip_sprite_attrs_via_zone_entry_check; sibling of OAM_EFFECT_SLOT_TILE_P1=0x8056; 0 existing refs; conf: high
 .equ OAM_EQUIP_SPRITE_TILE_P2_1C,  0x0000801c  @ equip sprite OAM attr0 tile region P2 (bit15+0x1c); second sprite code for same zone check fn; sibling of OAM_EQUIP_SPRITE_TILE_P2_1B=0x801b; 3 raw refs; conf: high
 .equ EQUIP_SLOT_SCORE_CAP,          0x0000ffff  @ equip slot sprite score saturation cap; apply_equip_slot_sprite_via_zone_match_and_score: cmp score,cap; ble ok; saturate to cap; domain distinct from SLOT_CARD_EMPTY=0xffff (card domain) and OAM_ATTR0_HIDDEN=0xffff (OAM domain); Seg-4 domain precedent; conf: high
+
+@ =============================================================================
+@ file 08 Seg-6 additions: activation sprite code + zone entry flags clear mask
+@ Source: asm/08_equip_oam_neodaed.s, Seg-6 (0x080690dc..0x0806a118)
+@ =============================================================================
+.equ OAM_SPRITE_CODE_P1_ACTIVATION, 0x00008019  @ P1 activation sprite code (bit15+0x19); tick_equip_activation_sprite_with_lp_row_state_machine: player_id==1 -> sprite_code=0x8019, player_id==0 -> 0x19 inline; asm/08 L12694; conf: high
+.equ ZONE_ENTRY_FLAGS_CLR_MASK,     0x00001fff  @ 13-bit clear mask for zone entry sprite data halfword bits[12:0]; dispatch_equip_slot_sprite_by_card_id_scapegoat_or_lambs: ands r2,r3 preserving player-id bit packing in bit13+; asm/08 L12161; conf: high

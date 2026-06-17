@@ -1336,3 +1336,13 @@
 .equ BLAST_SPHERE_CID,              0x00001286  @ Blast Sphere (pw=26302522; card-stats.s L7763 slot=0x1286); invoke_equip_zone_entry_with_lp_chain_state card_id branch; conf: high
 .equ BIRDFACE_CID,                  0x0000139d  @ Birdface (pw=45547649; card-stats.s L10597 slot=0x139D); tick_equip_effect_display_state_machine caseD_7f named card branch; conf: high
 .equ IMPERIAL_ORDER_CID,            0x00001360  @ Imperial Order (pw=61740673; card-stats.s L9986 slot=0x1360); fn_eligible slot for check_equip_eligible_always_false stub; conf: high
+
+@ =============================================================================
+@ file 08 Seg-6 additions: equip/activation sprite CIDs
+@ Source: asm/08_equip_oam_neodaed.s, Seg-6 (0x080690dc..0x0806a118)
+@ All values verified against data/card-stats.s slot_id field or confirmed unallocated.
+@ =============================================================================
+.equ WIDESPREAD_RUIN_CID,          0x00001254  @ Widespread Ruin (pw=77754944; card-stats.s slot=0x1254); tick_equip_multi_card_score_state_machine CID check; conf: high
+.equ BOTTOMLESS_SHIFTING_SAND_CID, 0x00001540  @ Bottomless Shifting Sand (pw=76532077; card-stats.s slot=0x1540); 0xaa<<5=0x1540 imm-encoded in tick_equip_multi_card_score_state_machine; conf: high
+.equ HAMMER_SHOT_CID,              0x000017f2  @ Hammer Shot (pw=26412047; card-stats.s slot=0x17F2); tick_equip_multi_card_score_state_machine CID check; conf: high
+.equ cid_12da,                     0x000012da  @ unallocated slot 0x12da; not in card-stats.s (gap 0x12D7..0x12DC: Tragedy=0x12D7, Ectoplasmer=0x12DC); fn_eligible handler at 0x080696d8; dispatch table 0x09e3fba4; conf: high

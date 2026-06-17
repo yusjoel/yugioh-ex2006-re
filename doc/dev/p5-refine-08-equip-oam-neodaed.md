@@ -65,7 +65,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ✅ | d6a40a5 |
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ✅ | 5b5eeae |
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ✅ | 82b4d8a |
-| 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ⬜ | — |
+| 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ✅ | (see §4.06) |
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ⬜ | — |
 | 8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 (大表簇, 见 §五) + switchD_0806ac1e | ⬜ | — |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
@@ -173,6 +173,30 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra script**: `RefineF08Seg5Slots.py`
 
+### 4.06 Seg-6 完成记录 (0x690dc..0x6a118)
+
+- **EQ**: 82 槽 (within boundary) + 7 EQ-only beyond boundary (Seg-7 literal pool)
+  - CID x15 (LORD_OF_D/GRACEFUL_CHARITY/SPIRAL_SPEAR_STRIKE/PARASITE_PARACIDE/SCAPEGOAT/STRAY_LAMBS/WIDESPREAD_RUIN/HAMMER_SHOT/CHTHONIAN_BLAST x2/cid_12fb/cid_12f7/cid_131c/JAR_ROBBER) — 11 reuse + 4 new
+  - gDuelPhaseFlags x12+1 / EQUIP_PHASE_FRAME_OFF x8+3 / PLAYER_BLOCK_STRIDE x10+2 / P1LP_BLOCK2_OFF_1CE8 x6 / EQUIP_ACTIVE_CTX_OFF x1 / LP_CARD_TRACK_BASE_OFF x1 / ELIGIB_SPRITE_CTRL_OFF x2 / ELIGIB_ANIM_STATE_OFF x1 / LP_BANISHER_CTX_OFF x1 / ELIGIB_STATE_CTRL_OFF x1 / ELIGIB_ACT_TYPE_OFF x1 / LP_ACTIVATION_LINK_FLAG_OFF x1 NEW / gEquipChainEntryBase x1 / gP1FieldArrayCBase x1 / gP1SlotSetCodeArray x1 / gP1ChainZoneArray x1 / gEquipLpZoneEntryBase x1 / gEquipChainSlotRefs x1 / gDuelFieldSlots x1 / gP1HandSlotArray x1 / gDuelCardCtxBase x2+1 / gEquipZoneRankState x1 / OAM_SPRITE_CODE_P1_ACTIVATION x1 NEW / ZONE_ENTRY_FLAGS_CLR_MASK x1 NEW / gP1LifePoints x11
+- **REF**: 3 (invoke_effect_node_with_active_flag_3arg fn-ptr @ 0x08069ae8; check_zone_activation_ctx_match_cb fn-ptr @ 0x08069d7c; switchD_08069edc table ptr @ 0x08069eec)
+- **RENAME_ONLY**: 8 (PTR_gP1LifePoints_* x6 + 2 token-table addr raw .word with ASCII EOL; Ruling A: no equate for 0x09e3fXXX ROM FS addrs)
+- **PLATE**: 1 (tick_dragon_summon_display_if_slots_paired: CJK mojibake + wrong card name "Stamping Destruction" -> "Lord of D." fix)
+- **DISASM**: 1 ROM_INCBIN -> THUMB (check_equip_eligible_set_slot8_flag_for_cid_12da @ 0x080696d8, 0x1c B; fn_eligible handler CID=0x12da; dispatch table ref at 0x09e3fba8)
+- **CREATE_FUNC**: 1 (check_zone_activation_ctx_match_cb @ 0x08069cdc, already disasm'd inline; fn-ptr callback to init_zone_activation_display_fields)
+- **新建 constants**:
+  - `constants/card_info.inc` +4 (WIDESPREAD_RUIN_CID=0x1254 / BOTTOMLESS_SHIFTING_SAND_CID=0x1540 / HAMMER_SHOT_CID=0x17f2 / cid_12da=0x12da)
+  - `constants/ewram.inc` +1 (LP_ACTIVATION_LINK_FLAG_OFF=0x10d0; base=gP1LifePoints)
+  - `constants/oam_attr.inc` +2 (OAM_SPRITE_CODE_P1_ACTIVATION=0x8019 / ZONE_ENTRY_FLAGS_CLR_MASK=0x1fff)
+- **Ruling A**: SCAPEGOAT/STRAY_LAMBS OAM token table ROM addrs (0x09e3f11c/12c) -> RENAME-only with ASCII EOL (no equate; sibling modules all use raw .word for 0x09e3fXXX)
+- **Ruling B**: ZONE_ENTRY_FLAGS_CLR_MASK -> oam_attr.inc (no new equip_sprite.inc)
+- **C5 fix**: DAT_08069778 = 0x1da8 -> LP_CARD_TRACK_BASE_OFF (was LP_BANISHER_CTX_OFF which = 0x1d70, wrong value)
+- **C6 fix**: DAT_08069f54 + DWORD_0806a050 label prefix -> gduelcardctxbase_* (was gduelphaseflagss_*)
+- **附带修正**: RepairF08Seg3DataLabels.py (14 DWORD data labels in 0x08066900..0x08066b00 lost after Seg-6 CREATE_FUNC); FixF08Seg6ThumbPlusPtrLabels.py (created _1 labels at odd THUMB+1 addrs for GAS export); fn-ptr +1 fix (check_equip_activation_at_slot11 @ 0x08065c50/c60 -> +1 form)
+- **§5.1**: 0 (switchD_08069edc 10-entry inline; all blocks have ROM refs)
+- **CSV sync**: +2 rows (check_equip_eligible_set_slot8_flag_for_cid_12da + check_zone_activation_ctx_match_cb)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg6Slots.py` + `RepairF08Seg3DataLabels.py` + `FixF08Seg6ThumbPlusPtrLabels.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -187,7 +211,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-3 | 0x66448..0x67160 | 20 | 56 | 1 inc + 1 sw | dispatch_equip_zone_sprite_by_slot_state + switchD_08066f02 |
 | Seg-4 | 0x67160..0x67fa4 | 20 | 74 | 0 | dispatch_effect_zone_lp_sprites_by_slot_flags 簇 |
 | Seg-5 ✅ | 0x67fa4..0x690dc | 20 | 65 | 0 + 1 sw | scan_effect_slots_for_equip_sprite_field6 + switchD_080686a2 |
-| Seg-6 | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
+| Seg-6 ✅ | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
 | Seg-7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
 | Seg-8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 inc + 1 sw | 重: dispatch_lp_row_or_banisher_sprite + OAM sprite 数据表/dispatch 大簇 (拆 8a/8b/8c) |
 | Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
