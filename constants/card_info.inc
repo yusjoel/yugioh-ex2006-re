@@ -1315,3 +1315,15 @@
 .equ ICID_RESERVED_A,                  0x0000162c  @ Internal CID 0x162c (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)
 .equ ICID_RESERVED_B,                  0x0000184c  @ Internal CID 0x184c (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)
 .equ ICID_RESERVED_C,                  0x00001051  @ Internal CID 0x1051 (cid=0xFFFF reserved slot, no card-stats.s entry); dispatch_zone_state_for_reserved_icid_slot; value grep=0 (new)
+
+@ =============================================================================
+@ file 08 Seg-4 additions: dispatch_effect_zone_lp_sprites_by_slot_flags cluster
+@ Source: asm/08_equip_oam_neodaed.s, Seg-4 (0x08067160..0x08067fa4)
+@ Domain-crited constants: CARD_FIELD3_THRESHOLD_1499/1500 (field3=ATK AI targeting threshold)
+@ are domain-distinct from FIELD5_SCORE_THRESHOLD_1499 (field5 score gate) and
+@ CARD_STAT_LP_THRESHOLD_1500/LP_COST_1500 (LP domain); per-slot data-equate only.
+@ =============================================================================
+.equ SOUL_ABSORBING_BONE_TOWER_CID, 0x00001744  @ Soul-Absorbing Bone Tower (pw=63012333; card_1523 slot=0x1744); enqueue_equip_zone_sprite_with_deck_count deck-count=2; value grep=0 (new)
+.equ MALICE_ASCENDANT_CID,          0x000019d0  @ Malice Ascendant (pw=14255590; card_2070 slot=0x19D0); enqueue_equip_zone_sprite_with_deck_count count_extra_deck_cards_by_id; value grep=0 (new)
+.equ CARD_FIELD3_THRESHOLD_1499,    0x000005db  @ field3(ATK) targeting threshold 1499; Crush Card Virus: field3>1499 -> target; field3(ATK)-domain distinct from FIELD5_SCORE_THRESHOLD_1499(score) and LP thresholds; tick_equip_head_slot_sprite_state_machine 3 slots
+.equ CARD_FIELD3_THRESHOLD_1500,    0x000005dc  @ field3(ATK) targeting threshold 1500; Deck Devastation Virus: field3_raw<=1500 -> target; field3(ATK)-domain distinct from CARD_STAT_LP_THRESHOLD_1500(LP render)/LP_COST_1500(LP cost); tick_equip_head_slot_sprite_state_machine 3 slots

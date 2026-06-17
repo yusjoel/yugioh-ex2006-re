@@ -63,7 +63,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 1 | 0x643e0..0x6544c | 20 | 87 | 2 (0x6456c/2c, 0x645ee/1e) | ✅ | f0d7a85 |
 | 2 | 0x6544c..0x66448 | 20 | 79 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ✅ | 4b6b4a4 |
 | 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ✅ | d6a40a5 |
-| 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ⬜ | — |
+| 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ✅ | (see §4.04) |
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ⬜ | — |
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ⬜ | — |
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ⬜ | — |
@@ -135,6 +135,23 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **CSV sync**: +8 rows (8 new disasm stub functions)
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg3Slots.py` + `DisassembleF08Seg3Blocks.py`
+
+### 4.04 Seg-4 完成记录 (0x67160..0x67fa4)
+
+- **EQ**: 73 槽 (gDuelPhaseFlags x13 / gDuelFieldSlots x8 / PLAYER_BLOCK_STRIDE x14 / EQUIP_PHASE_FRAME_OFF x6 / EQUIP_ACTIVE_CTX_OFF x1 / gP1LifePoints x2 / gDuelCardCtxBase x1 / gP1SlotSetCodeArray x1 / LP_BANISHER_CTX_OFF x1 / P1LP_BLOCK2_OFF_1CE8 x2 / FIELD_STATE_OFF x1 / CHAIN_LINK_COUNTER_OFF x1 / DUEL_ACTIVE_PLAYER_OFF x1 / LP_COST_3000 x2 / LP_COST_5000 x1 / SWORDS_OF_REVEALING_LIGHT_CID x1 / CRUSH_CARD_CID x3 / DECK_DEVASTATION_VIRUS_CID x3 / MAGICAL_LABYRINTH_CID x1 / WALL_SHADOW_CID x1 / NEEDLE_WORM_CID x1 / SOUL_ABSORBING_BONE_TOWER_CID x1 NEW / MALICE_ASCENDANT_CID x1 NEW / CARD_FIELD3_THRESHOLD_1499 x3 NEW / CARD_FIELD3_THRESHOLD_1500 x3 NEW)
+- **REF**: 1 (fn-ptr DAT_08067270 -> check_activation_ctx_zone11_match_cb+1 THUMB+1)
+- **CREATE_FUNC**: 1 (check_activation_ctx_zone11_match_cb @ 0x080671bc + plate)
+- **FUNC_RENAME**: 0
+- **PLATE**: 1 (new fn check_activation_ctx_zone11_match_cb plate)
+- **carve**: 0 (no ROM_INCBIN/ROM data blocks in Seg-4)
+- **disasm**: 0
+- **新建 constants**: card_info.inc +4 (SOUL_ABSORBING_BONE_TOWER_CID=0x1744 / MALICE_ASCENDANT_CID=0x19d0 / CARD_FIELD3_THRESHOLD_1499=0x5db / CARD_FIELD3_THRESHOLD_1500=0x5dc)
+- **域裁定 (C5)**: CARD_FIELD3_THRESHOLD_1499 (0x5db) / CARD_FIELD3_THRESHOLD_1500 (0x5dc) 同值多域新建: field3=ATK AI 选标阈值 (Crush Card/DDV), 语义截然不同于 FIELD5_SCORE_THRESHOLD_1499 (field5 score gate) / CARD_STAT_LP_THRESHOLD_1500 (LP 渲染) / LP_COST_1500 (LP 费用). per-slot 仅作用本段 6 槽.
+- **附带修正 (Seg-2 regression)**: re-export 后发现 Seg-2 disassembled block literal pools (0x08066906..0x0806699e) 以 `.byte` 序列导出但缺少 DAT_ label 定义, 导致 build 失败. 已修正: 将相关 `.byte` 块和 ROM_INCBIN (0x6695e, 0x12) 替换为带标签的 `.word` 条目 (DAT_08066908/8960/8964/8968/896c/8988/898c/899c/869d4/869e8 + 0x08066a48/4c/50/54). 并修正 Seg-2 的 2 个 check_equip_activation_at_slot11 fn-ptr +1 缺失 (0x08065c50/c60).
+- **§5.1**: 0
+- **CSV sync**: +1 row (check_activation_ctx_zone11_match_cb 新建函数)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra script**: `RefineF08Seg4Slots.py`
 
 ---
 

@@ -1920,6 +1920,7 @@ address,name,proposed_name,score,tags
 0x08066ee0,tick_equip_activation_display_seq,card_name_08066ee0,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x080670a0,tick_equip_activation_display_state,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08067160,dispatch_effect_zone_lp_sprites_by_slot_flags,,,
+0x080671bc,check_activation_ctx_zone11_match_cb,,,
 0x080671e8,dispatch_activation_display_sprites_by_state,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080672a4,dispatch_equip_oam_by_zone_state_with_bit2_gate,card_ids_080672a4,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08067334,tick_zone_sprite_pipeline_opponent_side,,,
