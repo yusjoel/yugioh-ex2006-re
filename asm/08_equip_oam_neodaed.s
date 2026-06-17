@@ -6821,6 +6821,7 @@ lp_cost_5000_dispatch_071b8:
     .word  LP_COST_5000                   @ 080671b8 88130000  LP_COST_5000=0x1388: r1 arg to enqueue_sprite_attr_record_with_cap (5000 LP cap param)
 
 @ Callback: given (r0=player_id, r1=zone_idx), checks if gDuelPhaseFlags[EQUIP_ACTIVE_CTX_OFF] slot player_id matches r0 AND r1==0xb (chain zone 11). Returns 0x800 on match, 0 on mismatch. Called via fn-ptr stored at DAT_08067270. Params: r0=player_id, r1=zone_idx. Returns: r0=u32 (0x800 or 0). indeg=0 (fn-ptr only: 1 THUMB+1 ref, raw=0).
+.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1
 check_activation_ctx_zone11_match_cb:
     adds r2,r1,#0x0    @ 080671bc 0a1c
     ldr r1, gDuelPhaseFlags_dispatch_effect_zone_80671dc @ 080671be 0749
@@ -6943,7 +6944,7 @@ LAB_08067254:
 PTR_gP1LifePoints_0806726c:
     .word  gP1LifePoints                  @ 0806726c e0c40102
 cb_check_zone11_match_08067270:
-    .word  check_activation_ctx_zone11_match_cb+1 @ 08067270 bd710608  fn-ptr: check_activation_ctx_zone11_match_cb+1 (THUMB+1=0x080671bd); callback arg to init_zone_activation_display_fields; 1 THUMB+1 ref raw=0
+    .word  check_activation_ctx_zone11_match_cb_1 @ 08067270 bd710608  fn-ptr: check_activation_ctx_zone11_match_cb+1 (THUMB+1=0x080671bd); callback arg to init_zone_activation_display_fields; 1 THUMB+1 ref raw=0
 LAB_08067274:
     bl check_activation_display_state_is_confirmed @ 08067274 2ff04efc
     cmp r0,#0x0                              @ 08067278 0028
@@ -13230,6 +13231,7 @@ LAB_08069cd4:
     bx r1                                    @ 08069cda 0847
 
 @ Inline callback between enqueue_equip_zone_sprites_for_spell_slot_entries and dispatch_zone_activation_display_by_confirm_state. r0=player_id, r1=zone_type. Loads [gDuelPhaseFlags+EQUIP_ACTIVE_CTX_OFF], checks active zone player_id; returns 0x800 if player mismatch AND zone_type==0xb, else 0. indeg=1 (fn-ptr DAT_08069d7c).
+.equ check_zone_activation_ctx_match_cb_1, check_zone_activation_ctx_match_cb+1
 check_zone_activation_ctx_match_cb:
     adds r2,r1,#0x0    @ 08069cdc 0a1c
     ldr r1, gduelphaseflagss_08069cfc        @ 08069cde 0749
@@ -13331,7 +13333,7 @@ player_block_stride_08069d74:
 gduelphaseflagss_08069d78:
     .word  gDuelPhaseFlags                @ 08069d78 90b20102
 fn_ptr_check_zone_match_cb_08069d7c:
-    .word  check_zone_activation_ctx_match_cb+1 @ 08069d7c dd9c0608  check_zone_activation_ctx_match_cb+1 (THUMB+1=0x08069cdd); callback to init_zone_activation_display_fields
+    .word  check_zone_activation_ctx_match_cb_1 @ 08069d7c dd9c0608  check_zone_activation_ctx_match_cb+1 (THUMB+1=0x08069cdd); callback to init_zone_activation_display_fields
 LAB_08069d80:
     bl check_activation_display_state_is_confirmed @ 08069d80 2cf0c8fe
     cmp r0,#0x0                              @ 08069d84 0028
@@ -15420,7 +15422,7 @@ dispatch_lp_row_or_banisher_sprite_by_state_with_slot_check:
     ands r0,r1    @ 0806ab1c 0840
     cmp r0,#0x0                              @ 0806ab1e 0028
     bne LAB_0806abcc                         @ 0806ab20 54d1
-    ldr r0, DAT_0806ab60                     @ 0806ab22 0f48
+    ldr r0, gduelphaseflags_0806ab60         @ 0806ab22 0f48
     movs r1,#0x94    @ 0806ab24 9421
     lsls r1,r1,#0x3    @ 0806ab26 c900
     adds r0,r0,r1    @ 0806ab28 4018
@@ -15434,11 +15436,11 @@ dispatch_lp_row_or_banisher_sprite_by_state_with_slot_check:
     lsrs r0,r3,#0x1f    @ 0806ab38 d80f
     cmp r6,r0                                @ 0806ab3a 8642
     bne LAB_0806ab6c                         @ 0806ab3c 16d1
-    ldr r2, PTR_gP1LifePoints_0806ab64       @ 0806ab3e 094a
+    ldr r2, lp_base_slot_player_0806ab64     @ 0806ab3e 094a
     adds r1,r0,#0x0    @ 0806ab40 011c
     adds r0,r5,#0x0    @ 0806ab42 281c
     ands r0,r1    @ 0806ab44 0840
-    ldr r1, DAT_0806ab68                     @ 0806ab46 0849
+    ldr r1, player_block_stride_0806ab68     @ 0806ab46 0849
     muls r0,r1    @ 0806ab48 4843
     adds r2,#0xc    @ 0806ab4a 0c32
     adds r0,r0,r2    @ 0806ab4c 8018
@@ -15450,18 +15452,18 @@ dispatch_lp_row_or_banisher_sprite_by_state_with_slot_check:
     bl set_lp_row_type6_with_value           @ 0806ab58 37f076f8
     b LAB_0806ab8c                           @ 0806ab5c 16e0
     .zero  0x2
-DAT_0806ab60:
-    .word  0x0201b290                     @ 0806ab60 90b20102
-PTR_gP1LifePoints_0806ab64:
+gduelphaseflags_0806ab60:
+    .word  gDuelPhaseFlags                @ 0806ab60 90b20102
+lp_base_slot_player_0806ab64:
     .word  gP1LifePoints                  @ 0806ab64 e0c40102
-DAT_0806ab68:
-    .word  0x00000868                     @ 0806ab68 68080000
+player_block_stride_0806ab68:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806ab68 68080000
 LAB_0806ab6c:
-    ldr r2, PTR_gP1LifePoints_0806ab90       @ 0806ab6c 084a
+    ldr r2, lp_base_opponent_0806ab90        @ 0806ab6c 084a
     lsrs r0,r3,#0x1f    @ 0806ab6e d80f
     subs r0,r5,r0    @ 0806ab70 281a
     ands r0,r5    @ 0806ab72 2840
-    ldr r1, DAT_0806ab94                     @ 0806ab74 0749
+    ldr r1, player_block_stride_0806ab94     @ 0806ab74 0749
     muls r0,r1    @ 0806ab76 4843
     adds r2,#0xc    @ 0806ab78 0c32
     adds r0,r0,r2    @ 0806ab7a 8018
@@ -15475,13 +15477,13 @@ LAB_0806ab6c:
 LAB_0806ab8c:
     movs r0,#0x7f    @ 0806ab8c 7f20
     b LAB_0806abce                           @ 0806ab8e 1ee0
-PTR_gP1LifePoints_0806ab90:
+lp_base_opponent_0806ab90:
     .word  gP1LifePoints                  @ 0806ab90 e0c40102
-DAT_0806ab94:
-    .word  0x00000868                     @ 0806ab94 68080000
+player_block_stride_0806ab94:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806ab94 68080000
 LAB_0806ab98:
-    ldr r0, PTR_gP1LifePoints_0806abc4       @ 0806ab98 0a48
-    ldr r1, DAT_0806abc8                     @ 0806ab9a 0b49
+    ldr r0, lp_base_face_down_0806abc4       @ 0806ab98 0a48
+    ldr r1, lp_card_track_base_off_0806abc8  @ 0806ab9a 0b49
     adds r0,r0,r1    @ 0806ab9c 4018
     ldrh r5,[r0,#0x0]                        @ 0806ab9e 0588
     adds r0,r6,#0x0    @ 0806aba0 301c
@@ -15499,10 +15501,10 @@ LAB_0806ab98:
     bl enqueue_lp_counter_sprite_by_player   @ 0806abbc dff7c0fc
     movs r0,#0x64    @ 0806abc0 6420
     b LAB_0806abce                           @ 0806abc2 04e0
-PTR_gP1LifePoints_0806abc4:
+lp_base_face_down_0806abc4:
     .word  gP1LifePoints                  @ 0806abc4 e0c40102
-DAT_0806abc8:
-    .word  0x00001da8                     @ 0806abc8 a81d0000
+lp_card_track_base_off_0806abc8:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 0806abc8 a81d0000
 LAB_0806abcc:
     movs r0,#0x0    @ 0806abcc 0020
 LAB_0806abce:
@@ -15549,7 +15551,7 @@ dispatch_equip_effect_slot_display_by_state_and_card:
     beq LAB_0806ac04                         @ 0806ac00 00d0
     b switchD_0806ac1e__caseD_65             @ 0806ac02 d1e0
 LAB_0806ac04:
-    ldr r0, DAT_0806ac20                     @ 0806ac04 0648
+    ldr r0, gduelphaseflags_0806ac20         @ 0806ac04 0648
     movs r1,#0x94    @ 0806ac06 9421
     lsls r1,r1,#0x3    @ 0806ac08 c900
     adds r0,r0,r1    @ 0806ac0a 4018
@@ -15560,15 +15562,15 @@ LAB_0806ac04:
     b switchD_0806ac1e__caseD_65             @ 0806ac14 c8e0
 LAB_0806ac16:
     lsls r0,r0,#0x2    @ 0806ac16 8000
-    ldr r1, DAT_0806ac24                     @ 0806ac18 0249
+    ldr r1, switchd_0806ac1e_data_ptr_0806ac24 @ 0806ac18 0249
     adds r0,r0,r1    @ 0806ac1a 4018
     ldr r0,[r0,#0x0]                         @ 0806ac1c 0068
 switchD_0806ac1e__switchD:
     .hword 0x4687    @ 0806ac1e 8746
-DAT_0806ac20:
-    .word  0x0201b290                     @ 0806ac20 90b20102
-DAT_0806ac24:
-    .word  0x0806ac28                     @ 0806ac24 28ac0608
+gduelphaseflags_0806ac20:
+    .word  gDuelPhaseFlags                @ 0806ac20 90b20102
+switchd_0806ac1e_data_ptr_0806ac24:
+    .word  switchD_0806ac1e__switchdataD_0806ac28 @ 0806ac24 28ac0608  switchD_0806ac1e data table ptr; table at 0x0806ac28 (inline in dispatch_equip_effect_slot_display_by_state_and_card)
 switchD_0806ac1e__switchdataD_0806ac28:
     .word  0x0806ad9a                     @ 0806ac28 9aad0608
     .word  0x0806ada8                     @ 0806ac2c a8ad0608
@@ -15640,8 +15642,8 @@ switchD_0806ac1e__caseD_7d:
     .hword 0x466a    @ 0806ace6 6a46
     movs r0,#0x1    @ 0806ace8 0120
     .hword 0x4684    @ 0806acea 8446
-    ldr r7, DAT_0806ad24                     @ 0806acec 0d4f
-    ldr r6, DAT_0806ad28                     @ 0806acee 0e4e
+    ldr r7, player_block_stride_0806ad24     @ 0806acec 0d4f
+    ldr r6, gp1slotsetcodearray_0806ad28     @ 0806acee 0e4e
 LAB_0806acf0:
     lsrs r0,r4,#0x1f    @ 0806acf0 e00f
     .hword 0x4661    @ 0806acf2 6146
@@ -15668,16 +15670,16 @@ LAB_0806acf0:
     bl setup_lp_row_type12_from_array        @ 0806ad1c 37f03ef8
     movs r0,#0x7c    @ 0806ad20 7c20
     b LAB_0806adaa                           @ 0806ad22 42e0
-DAT_0806ad24:
-    .word  0x00000868                     @ 0806ad24 68080000
-DAT_0806ad28:
-    .word  0x0201c740                     @ 0806ad28 40c70102
+player_block_stride_0806ad24:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806ad24 68080000
+gp1slotsetcodearray_0806ad28:
+    .word  gP1SlotSetCodeArray            @ 0806ad28 40c70102
 switchD_0806ac1e__caseD_7c:
     add r5,sp,#0xc                           @ 0806ad2c 03ad
     movs r4,#0x84    @ 0806ad2e 8424
     lsls r4,r4,#0x1    @ 0806ad30 6400
-    ldr r0, PTR_gP1LifePoints_0806ad58       @ 0806ad32 0948
-    ldr r1, DAT_0806ad5c                     @ 0806ad34 0949
+    ldr r0, lp_base_card_lookup_0806ad58     @ 0806ad32 0948
+    ldr r1, lp_card_track_base_off_0806ad5c  @ 0806ad34 0949
     adds r0,r0,r1    @ 0806ad36 4018
     ldrh r0,[r0,#0x0]                        @ 0806ad38 0088
     bl card_name_lookup_by_internal_id       @ 0806ad3a 83f05fff
@@ -15692,16 +15694,16 @@ switchD_0806ac1e__caseD_7c:
     bl trigger_card_display_op31_if_not_active @ 0806ad50 28f01efb
     movs r0,#0x7b    @ 0806ad54 7b20
     b LAB_0806adaa                           @ 0806ad56 28e0
-PTR_gP1LifePoints_0806ad58:
+lp_base_card_lookup_0806ad58:
     .word  gP1LifePoints                  @ 0806ad58 e0c40102
-DAT_0806ad5c:
-    .word  0x00001da8                     @ 0806ad5c a81d0000
+lp_card_track_base_off_0806ad5c:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 0806ad5c a81d0000
 switchD_0806ac1e__caseD_7b:
     ldrb r6,[r6,#0x2]                        @ 0806ad60 b678
     lsls r4,r6,#0x1f    @ 0806ad62 f407
     lsrs r4,r4,#0x1f    @ 0806ad64 e40f
-    ldr r0, PTR_gP1LifePoints_0806ad80       @ 0806ad66 0648
-    ldr r1, DAT_0806ad84                     @ 0806ad68 0649
+    ldr r0, lp_base_hand_sprite_0806ad80     @ 0806ad66 0648
+    ldr r1, lp_card_track_next_off_0806ad84  @ 0806ad68 0649
     adds r0,r0,r1    @ 0806ad6a 4018
     ldrh r0,[r0,#0x0]                        @ 0806ad6c 0088
     bl resolve_slot_id_to_zone_ptr           @ 0806ad6e c6f70ffb
@@ -15711,10 +15713,10 @@ switchD_0806ac1e__caseD_7b:
     movs r0,#0x7a    @ 0806ad7a 7a20
     b LAB_0806adaa                           @ 0806ad7c 15e0
     .zero  0x2
-PTR_gP1LifePoints_0806ad80:
+lp_base_hand_sprite_0806ad80:
     .word  gP1LifePoints                  @ 0806ad80 e0c40102
-DAT_0806ad84:
-    .word  0x00001daa                     @ 0806ad84 aa1d0000
+lp_card_track_next_off_0806ad84:
+    .word  LP_CARD_TRACK_NEXT_OFF         @ 0806ad84 aa1d0000
 switchD_0806ac1e__caseD_7a:
     ldrb r6,[r6,#0x2]                        @ 0806ad88 b678
     lsls r0,r6,#0x1f    @ 0806ad8a f007
@@ -15750,8 +15752,287 @@ LAB_0806adaa:
     .word  0x0806ae90                     @ 0806ae0c 90ae0608
     .word  0x0806ae48                     @ 0806ae10 48ae0608
     .word  0x0806ae18                     @ 0806ae14 18ae0608
-DAT_0806ae18:
-    ROM_INCBIN 0x6ae18, 0x25c
+
+@ Default/case0 stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[8] at 0x0806ae14. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_default_ae18:
+    ldr r1, DAT_0806ae44                     @ 0806ae18 0a49
+    adds r0,r5,#0x0    @ 0806ae1a 281c
+    bl query_equip_target_bitmap_default     @ 0806ae1c dcf76efd
+    movs r0,#0xfc    @ 0806ae20 fc20
+    lsls r0,r0,#0x4    @ 0806ae22 0001
+    ldrh r1,[r5,#0x2]                        @ 0806ae24 6988
+    ands r0,r1    @ 0806ae26 0840
+    movs r1,#0xa8    @ 0806ae28 a821
+    lsls r1,r1,#0x3    @ 0806ae2a c900
+    cmp r0,r1                                @ 0806ae2c 8842
+    bne LAB_0806ae40                         @ 0806ae2e 07d1
+    adds r0,r5,#0x0    @ 0806ae30 281c
+    movs r1,#0x0    @ 0806ae32 0021
+    bl render_slot_card_sprite_and_effects   @ 0806ae34 ddf7f4f8
+    adds r0,r5,#0x0    @ 0806ae38 281c
+    movs r1,#0x1    @ 0806ae3a 0121
+    bl render_slot_card_sprite_and_effects   @ 0806ae3c ddf7f0f8
+LAB_0806ae40:
+    movs r0,#0x7f    @ 0806ae40 7f20
+    b LAB_0806b01e                           @ 0806ae42 ece0
+DAT_0806ae44:
+    .byte  0x1f, 0x00, 0x1f, 0x00
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[7] at 0x0806ae10. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_ae48:
+    ldr r2, DAT_0806ae84                     @ 0806ae48 0e4a
+    adds r1,r7,r2    @ 0806ae4a b918
+    ldr r0, DAT_0806ae88                     @ 0806ae4c 0e48
+    ldr r2, DAT_0806ae8c                     @ 0806ae4e 0f4a
+    adds r0,r0,r2    @ 0806ae50 8018
+    ldr r0,[r0,#0x0]                         @ 0806ae52 0068
+    str r0,[r1,#0x0]                         @ 0806ae54 0860
+    movs r0,#0x95    @ 0806ae56 9520
+    lsls r0,r0,#0x3    @ 0806ae58 c000
+    adds r1,r7,r0    @ 0806ae5a 3918
+    movs r0,#0x5    @ 0806ae5c 0520
+    str r0,[r1,#0x0]                         @ 0806ae5e 0860
+    movs r0,#0x0    @ 0806ae60 0020
+    strh r0,[r5,#0xa]                        @ 0806ae62 6881
+    strh r0,[r5,#0x8]                        @ 0806ae64 2881
+    bl check_field_spell_neo_daedalus_group_placeable @ 0806ae66 d0f789fe
+    strh r0,[r5,#0xc]                        @ 0806ae6a a881
+    movs r0,#0x1    @ 0806ae6c 0120
+    bl check_field_spell_neo_daedalus_group_placeable @ 0806ae6e d0f785fe
+    strh r0,[r5,#0xe]                        @ 0806ae72 e881
+    movs r0,#0x1e    @ 0806ae74 1e20
+    bl enqueue_sprite_attr_type10_halfword   @ 0806ae76 dff76dfc
+    bl increment_lp_bar_display_counter      @ 0806ae7a dff777fc
+LAB_0806ae7e:
+    movs r0,#0x7e    @ 0806ae7e 7e20
+    b LAB_0806b01e                           @ 0806ae80 cde0
+    .zero  0x2
+DAT_0806ae84:
+    .word  0x000004a4                     @ 0806ae84 a4040000
+DAT_0806ae88:
+    .word  0x0201c4e0                     @ 0806ae88 e0c40102
+DAT_0806ae8c:
+    .word  0x00001ce8                     @ 0806ae8c e81c0000
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[6] at 0x0806ae0c. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_ae90:
+    ldr r3, DAT_0806af34                     @ 0806ae90 284b
+    ldr r1, DAT_0806af38                     @ 0806ae92 2949
+    adds r0,r7,r1    @ 0806ae94 7818
+    ldr r2,[r0,#0x0]                         @ 0806ae96 0268
+    movs r0,#0x1    @ 0806ae98 0120
+    ands r0,r2    @ 0806ae9a 1040
+    ldr r1, DAT_0806af3c                     @ 0806ae9c 2749
+    muls r1,r0    @ 0806ae9e 4143
+    adds r0,r3,#0x0    @ 0806aea0 181c
+    adds r0,#0x10    @ 0806aea2 1030
+    adds r0,r1,r0    @ 0806aea4 0818
+    ldr r0,[r0,#0x0]                         @ 0806aea6 0068
+    cmp r0,#0x0                              @ 0806aea8 0028
+    beq LAB_0806af4a                         @ 0806aeaa 4ed0
+    adds r6,r2,#0x0    @ 0806aeac 161c
+    movs r2,#0x98    @ 0806aeae 9822
+    lsls r2,r2,#0x2    @ 0806aeb0 9200
+    adds r0,r3,r2    @ 0806aeb2 9818
+    adds r1,r1,r0    @ 0806aeb4 0918
+    .hword 0x4689    @ 0806aeb6 8946
+    ldr r0,[r1,#0x0]                         @ 0806aeb8 0868
+    lsls r1,r0,#0x12    @ 0806aeba 8104
+    lsrs r1,r1,#0x1f    @ 0806aebc c90f
+    .hword 0x4688    @ 0806aebe 8846
+    lsls r0,r0,#0x13    @ 0806aec0 c004
+    lsrs r4,r0,#0x13    @ 0806aec2 c40c
+    adds r0,r6,#0x0    @ 0806aec4 301c
+    adds r1,r4,#0x0    @ 0806aec6 211c
+    bl enqueue_sprite_attr_for_slot_indicator @ 0806aec8 ddf71cfc
+    adds r0,r6,#0x0    @ 0806aecc 301c
+    movs r1,#0xd    @ 0806aece 0d21
+    movs r2,#0x0    @ 0806aed0 0022
+    bl get_zone_card_attribute_by_type       @ 0806aed2 d0f7a1fb
+    cmp r0,#0x0                              @ 0806aed6 0028
+    bne LAB_0806aee0                         @ 0806aed8 02d1
+    adds r0,r6,#0x0    @ 0806aeda 301c
+    bl enqueue_lp_field_state_sprite_by_player @ 0806aedc dff712fb
+LAB_0806aee0:
+    adds r0,r6,#0x0    @ 0806aee0 301c
+    bl enqueue_equip_zone_sprite_for_player  @ 0806aee2 d9f711ff
+    adds r0,r4,#0x0    @ 0806aee6 201c
+    bl check_card_field5_is_nonzero          @ 0806aee8 dff72eff
+    cmp r0,#0x0                              @ 0806aeec 0028
+    beq LAB_0806af4e                         @ 0806aeee 2ed0
+    adds r0,r4,#0x0    @ 0806aef0 201c
+    bl get_card_extended_stat_field5         @ 0806aef2 83f0adff
+    cmp r0,#0x4                              @ 0806aef6 0428
+    bgt LAB_0806af4e                         @ 0806aef8 29dc
+    adds r0,r6,#0x0    @ 0806aefa 301c
+    adds r1,r4,#0x0    @ 0806aefc 211c
+    movs r2,#0x0    @ 0806aefe 0022
+    bl eval_equip_placement_full_check       @ 0806af00 d0f750fe
+    cmp r0,#0x0                              @ 0806af04 0028
+    beq LAB_0806af4e                         @ 0806af06 22d0
+    .hword 0x4640    @ 0806af08 4046
+    bl count_available_monster_slots         @ 0806af0a c8f755fb
+    cmp r0,#0x0                              @ 0806af0e 0028
+    ble LAB_0806af40                         @ 0806af10 16dd
+    .hword 0x4640    @ 0806af12 4046
+    adds r0,#0x2    @ 0806af14 0230
+    lsls r0,r0,#0x1    @ 0806af16 4000
+    adds r1,r5,#0x0    @ 0806af18 291c
+    adds r1,#0x8    @ 0806af1a 0831
+    adds r1,r1,r0    @ 0806af1c 0918
+    ldrh r0,[r1,#0x0]                        @ 0806af1e 0888
+    cmp r0,#0x0                              @ 0806af20 0028
+    beq LAB_0806af40                         @ 0806af22 0dd0
+    movs r1,#0x97    @ 0806af24 9721
+    lsls r1,r1,#0x3    @ 0806af26 c900
+    adds r0,r7,r1    @ 0806af28 7818
+    .hword 0x4649    @ 0806af2a 4946
+    bl write_word_from_deref_src             @ 0806af2c c5f72cfe
+    movs r0,#0x7d    @ 0806af30 7d20
+    b LAB_0806b01e                           @ 0806af32 74e0
+DAT_0806af34:
+    .byte  0xe0, 0xc4, 0x01, 0x02
+DAT_0806af38:
+    .word  0x000004a4                     @ 0806af38 a4040000
+DAT_0806af3c:
+    .word  0x00000868                     @ 0806af3c 68080000
+LAB_0806af40:
+    adds r0,r6,#0x0    @ 0806af40 301c
+    movs r1,#0x1    @ 0806af42 0121
+    movs r2,#0x0    @ 0806af44 0022
+    bl enqueue_equip_zone_sprite_attr_full   @ 0806af46 def759fb
+LAB_0806af4a:
+    movs r0,#0x7a    @ 0806af4a 7a20
+    b LAB_0806b01e                           @ 0806af4c 67e0
+LAB_0806af4e:
+    movs r0,#0x7c    @ 0806af4e 7c20
+    b LAB_0806b01e                           @ 0806af50 65e0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[5] at 0x0806ae08. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_af52:
+    ldr r1, DAT_0806af80                     @ 0806af52 0b49
+    ldr r4,[r1,#0x0]                         @ 0806af54 0c68
+    lsls r4,r4,#0x12    @ 0806af56 a404
+    lsrs r4,r4,#0x1f    @ 0806af58 e40f
+    adds r0,r4,#0x0    @ 0806af5a 201c
+    movs r2,#0x0    @ 0806af5c 0022
+    movs r3,#0x0    @ 0806af5e 0023
+    bl invoke_setup_equip_oam_with_attr2     @ 0806af60 40f06eff
+    adds r0,r4,#0x0    @ 0806af64 201c
+    bl get_first_placeable_monster_slot      @ 0806af66 c8f765fb
+    lsls r4,r4,#0x1    @ 0806af6a 6400
+    adds r2,r5,#0x0    @ 0806af6c 2a1c
+    adds r2,#0x8    @ 0806af6e 0832
+    adds r2,r2,r4    @ 0806af70 1219
+    movs r1,#0x1    @ 0806af72 0121
+    lsls r1,r0    @ 0806af74 8140
+    ldrh r0,[r2,#0x0]                        @ 0806af76 1088
+    orrs r1,r0    @ 0806af78 0143
+    strh r1,[r2,#0x0]                        @ 0806af7a 1180
+    b LAB_0806af4a                           @ 0806af7c e5e7
+    .zero  0x2
+DAT_0806af80:
+    .word  0x0201b748                     @ 0806af80 48b70102
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[4] at 0x0806ae04. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_af84:
+    ldr r1, DAT_0806afa0                     @ 0806af84 0649
+    adds r0,r7,r1    @ 0806af86 7818
+    ldr r0,[r0,#0x0]                         @ 0806af88 0068
+    movs r1,#0x1    @ 0806af8a 0121
+    ands r1,r0    @ 0806af8c 0140
+    ldr r2, DAT_0806afa4                     @ 0806af8e 054a
+    muls r1,r2    @ 0806af90 5143
+    ldr r2, DAT_0806afa8                     @ 0806af92 054a
+    adds r1,r1,r2    @ 0806af94 8918
+    movs r2,#0x0    @ 0806af96 0022
+    bl enqueue_hand_sprite_by_zone_set_code  @ 0806af98 d9f74cfd
+    b LAB_0806af4a                           @ 0806af9c d5e7
+    .zero  0x2
+DAT_0806afa0:
+    .word  0x000004a4                     @ 0806afa0 a4040000
+DAT_0806afa4:
+    .word  0x00000868                     @ 0806afa4 68080000
+DAT_0806afa8:
+    .word  0x0201c740                     @ 0806afa8 40c70102
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[2] at 0x0806adfc. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_afac:
+    movs r2,#0x95    @ 0806afac 9522
+    lsls r2,r2,#0x3    @ 0806afae d200
+    adds r3,r7,r2    @ 0806afb0 bb18
+    ldr r0,[r3,#0x0]                         @ 0806afb2 1868
+    subs r0,#0x1    @ 0806afb4 0138
+    str r0,[r3,#0x0]                         @ 0806afb6 1860
+    cmp r0,#0x0                              @ 0806afb8 0028
+    ble LAB_0806afbe                         @ 0806afba 00dd
+    b LAB_0806ae7e                           @ 0806afbc 5fe7
+LAB_0806afbe:
+    ldr r0, DAT_0806afe0                     @ 0806afbe 0848
+    adds r2,r7,r0    @ 0806afc0 3a18
+    ldr r0,[r2,#0x0]                         @ 0806afc2 1068
+    movs r1,#0x1    @ 0806afc4 0121
+    subs r1,r1,r0    @ 0806afc6 091a
+    str r1,[r2,#0x0]                         @ 0806afc8 1160
+    movs r0,#0x5    @ 0806afca 0520
+    str r0,[r3,#0x0]                         @ 0806afcc 1860
+    ldr r0, DAT_0806afe4                     @ 0806afce 0548
+    ldr r2, DAT_0806afe8                     @ 0806afd0 054a
+    adds r0,r0,r2    @ 0806afd2 8018
+    ldr r0,[r0,#0x0]                         @ 0806afd4 0068
+    cmp r1,r0                                @ 0806afd6 8142
+    beq LAB_0806afdc                         @ 0806afd8 00d0
+    b LAB_0806ae7e                           @ 0806afda 50e7
+LAB_0806afdc:
+    movs r0,#0x78    @ 0806afdc 7820
+    b LAB_0806b01e                           @ 0806afde 1ee0
+DAT_0806afe0:
+    .byte  0xa4, 0x04, 0x00, 0x00
+DAT_0806afe4:
+    .word  0x0201c4e0                     @ 0806afe4 e0c40102
+DAT_0806afe8:
+    .word  0x00001ce8                     @ 0806afe8 e81c0000
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[1] at 0x0806adf8. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_afec:
+    movs r4,#0x0    @ 0806afec 0024
+    adds r5,#0x8    @ 0806afee 0835
+    ldr r6, DAT_0806b02c                     @ 0806aff0 0e4e
+LAB_0806aff2:
+    ldr r0,[r6,#0x0]                         @ 0806aff2 3068
+    eors r0,r4    @ 0806aff4 6040
+    lsls r1,r0,#0x1    @ 0806aff6 4100
+    adds r1,r5,r1    @ 0806aff8 6918
+    ldrh r1,[r1,#0x0]                        @ 0806affa 0988
+    bl enqueue_equip_multi_slot_marker_sprite @ 0806affc d9f7a4fe
+    adds r4,#0x1    @ 0806b000 0134
+    cmp r4,#0x1                              @ 0806b002 012c
+    ble LAB_0806aff2                         @ 0806b004 f5dd
+    movs r4,#0x0    @ 0806b006 0024
+    ldr r5, DAT_0806b02c                     @ 0806b008 084d
+LAB_0806b00a:
+    ldr r0,[r5,#0x0]                         @ 0806b00a 2868
+    eors r0,r4    @ 0806b00c 6040
+    bl enqueue_duel_field_card_slot_sprite   @ 0806b00e dff7affa
+    adds r4,#0x1    @ 0806b012 0134
+    cmp r4,#0x1                              @ 0806b014 012c
+    ble LAB_0806b00a                         @ 0806b016 f8dd
+    bl decrement_lp_bar_display_counter      @ 0806b018 dff72afc
+
+@ Case stub (shared, table[0]+[3]): dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entries at 0x0806adf4 and 0x0806ae00. Block range 0x0806ae18..0x0806b073.
+equip_effect_state_stub_b01c:
+    movs r0,#0x0    @ 0806b01c 0020
+LAB_0806b01e:
+    pop {r3,r4}                              @ 0806b01e 18bc
+    .hword 0x4698    @ 0806b020 9846
+    .hword 0x46a1    @ 0806b022 a146
+    pop {r4,r5,r6,r7}                        @ 0806b024 f0bc
+    pop {r1}                                 @ 0806b026 02bc
+    bx r1                                    @ 0806b028 0847
+    .zero  0x2
+DAT_0806b02c:
+    .word  0x0201e1c8                     @ 0806b02c c8e10102
+    ROM_INCBIN 0x6b030, 0x44
     .word  0x0806b1ea                     @ 0806b074 eab10608
     .word  0x0806b1f4                     @ 0806b078 f4b10608
     .word  0x0806b1f4                     @ 0806b07c f4b10608
@@ -15761,8 +16042,206 @@ DAT_0806ae18:
     .word  0x0806b124                     @ 0806b08c 24b10608
     .word  0x0806b0d6                     @ 0806b090 d6b00608
     .word  0x0806b098                     @ 0806b094 98b00608
-DAT_0806b098:
-    ROM_INCBIN 0x6b098, 0x19c
+
+@ Default/case0 stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[8] at 0x0806b094. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_default_b098:
+    adds r0,r6,#0x0    @ 0806b098 301c
+    bl count_available_monster_slots         @ 0806b09a c8f78dfa
+    cmp r0,#0x0                              @ 0806b09e 0028
+    bne LAB_0806b0a4                         @ 0806b0a0 00d1
+    b equip_effect_state_stub_b1f4           @ 0806b0a2 a7e0
+LAB_0806b0a4:
+    adds r0,r6,#0x0    @ 0806b0a4 301c
+    bl check_field_spell_neo_daedalus_group_placeable @ 0806b0a6 d0f769fd
+    cmp r0,#0x0                              @ 0806b0aa 0028
+    bne LAB_0806b0b0                         @ 0806b0ac 00d1
+    b equip_effect_state_stub_b1f4           @ 0806b0ae a1e0
+LAB_0806b0b0:
+    ldrh r4,[r5,#0x0]                        @ 0806b0b0 2c88
+    adds r0,r5,#0x0    @ 0806b0b2 281c
+    bl lookup_slot_display_value_by_card_id  @ 0806b0b4 16f08afc
+    adds r2,r0,#0x0    @ 0806b0b8 021c
+    adds r0,r6,#0x0    @ 0806b0ba 301c
+    adds r1,r4,#0x0    @ 0806b0bc 211c
+    bl dispatch_effect_handler_by_card_id    @ 0806b0be 22f0f7fc
+    cmp r0,#0x0                              @ 0806b0c2 0028
+    bne LAB_0806b0d2                         @ 0806b0c4 05d1
+    adds r0,r6,#0x0    @ 0806b0c6 301c
+    movs r1,#0xd    @ 0806b0c8 0d21
+    bl trigger_card_display_op31_if_not_active @ 0806b0ca 28f061f9
+    movs r0,#0x7b    @ 0806b0ce 7b20
+    b LAB_0806b1f6                           @ 0806b0d0 91e0
+LAB_0806b0d2:
+    movs r0,#0x7f    @ 0806b0d2 7f20
+    b LAB_0806b1f6                           @ 0806b0d4 8fe0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[7] at 0x0806b090. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b0d6:
+    ldrh r1,[r5,#0x0]                        @ 0806b0d6 2988
+    ldr r0, DAT_0806b0ec                     @ 0806b0d8 0448
+    cmp r1,r0                                @ 0806b0da 8142
+    beq LAB_0806b100                         @ 0806b0dc 10d0
+    cmp r1,r0                                @ 0806b0de 8142
+    bgt LAB_0806b0f4                         @ 0806b0e0 08dc
+    ldr r0, DAT_0806b0f0                     @ 0806b0e2 0348
+    cmp r1,r0                                @ 0806b0e4 8142
+    beq LAB_0806b100                         @ 0806b0e6 0bd0
+    b LAB_0806b118                           @ 0806b0e8 16e0
+    .zero  0x2
+DAT_0806b0ec:
+    .word  0x000014dd                     @ 0806b0ec dd140000
+DAT_0806b0f0:
+    .word  0x0000136a                     @ 0806b0f0 6a130000
+LAB_0806b0f4:
+    ldr r0, DAT_0806b10c                     @ 0806b0f4 0548
+    cmp r1,r0                                @ 0806b0f6 8142
+    beq LAB_0806b100                         @ 0806b0f8 02d0
+    ldr r0, DAT_0806b110                     @ 0806b0fa 0548
+    cmp r1,r0                                @ 0806b0fc 8142
+    bne LAB_0806b118                         @ 0806b0fe 0bd1
+LAB_0806b100:
+    ldr r1, DAT_0806b114                     @ 0806b100 0449
+    movs r0,#0x0    @ 0806b102 0020
+    str r0,[r1,#0x8]                         @ 0806b104 8860
+    movs r0,#0x7c    @ 0806b106 7c20
+    b LAB_0806b1f6                           @ 0806b108 75e0
+    .zero  0x2
+DAT_0806b10c:
+    .word  0x000015b6                     @ 0806b10c b6150000
+DAT_0806b110:
+    .word  0x0000194f                     @ 0806b110 4f190000
+DAT_0806b114:
+    .word  0x0201e4f0                     @ 0806b114 f0e40102
+LAB_0806b118:
+    adds r0,r6,#0x0    @ 0806b118 301c
+    movs r1,#0x30    @ 0806b11a 3021
+    bl trigger_card_display_op31_if_not_active @ 0806b11c 28f038f9
+    movs r0,#0x7e    @ 0806b120 7e20
+    b LAB_0806b1f6                           @ 0806b122 68e0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[6] at 0x0806b08c. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b124:
+    ldrh r4,[r5,#0x0]                        @ 0806b124 2c88
+    adds r0,r5,#0x0    @ 0806b126 281c
+    bl lookup_slot_display_value_by_card_id  @ 0806b128 16f050fc
+    adds r3,r0,#0x0    @ 0806b12c 031c
+    adds r0,r6,#0x0    @ 0806b12e 301c
+    movs r1,#0x6    @ 0806b130 0621
+    adds r2,r4,#0x0    @ 0806b132 221c
+    bl init_effect_slot_display_context      @ 0806b134 29f046f8
+    movs r0,#0x7c    @ 0806b138 7c20
+    b LAB_0806b1f6                           @ 0806b13a 5ce0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[4] at 0x0806b084. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b13c:
+    ldrh r1,[r5,#0x0]                        @ 0806b13c 2988
+    ldr r0, DAT_0806b158                     @ 0806b13e 0648
+    cmp r1,r0                                @ 0806b140 8142
+    beq LAB_0806b19e                         @ 0806b142 2cd0
+    cmp r1,r0                                @ 0806b144 8142
+    bgt LAB_0806b174                         @ 0806b146 15dc
+    subs r0,#0xd9    @ 0806b148 d938
+    cmp r1,r0                                @ 0806b14a 8142
+    beq LAB_0806b19e                         @ 0806b14c 27d0
+    cmp r1,r0                                @ 0806b14e 8142
+    bgt LAB_0806b160                         @ 0806b150 06dc
+    ldr r0, DAT_0806b15c                     @ 0806b152 0248
+    b LAB_0806b182                           @ 0806b154 15e0
+    .zero  0x2
+DAT_0806b158:
+    .word  0x000015b6                     @ 0806b158 b6150000
+DAT_0806b15c:
+    .word  0x0000136a                     @ 0806b15c 6a130000
+LAB_0806b160:
+    ldr r0, DAT_0806b170                     @ 0806b160 0348
+    cmp r1,r0                                @ 0806b162 8142
+    beq LAB_0806b19e                         @ 0806b164 1bd0
+    adds r0,#0x56    @ 0806b166 5630
+    cmp r1,r0                                @ 0806b168 8142
+    beq LAB_0806b19e                         @ 0806b16a 18d0
+    b LAB_0806b1c8                           @ 0806b16c 2ce0
+    .zero  0x2
+DAT_0806b170:
+    .word  0x0000152f                     @ 0806b170 2f150000
+LAB_0806b174:
+    ldr r0, DAT_0806b188                     @ 0806b174 0448
+    cmp r1,r0                                @ 0806b176 8142
+    bgt LAB_0806b190                         @ 0806b178 0adc
+    subs r0,#0x1    @ 0806b17a 0138
+    cmp r1,r0                                @ 0806b17c 8142
+    bge LAB_0806b19e                         @ 0806b17e 0eda
+    ldr r0, DAT_0806b18c                     @ 0806b180 0248
+LAB_0806b182:
+    cmp r1,r0                                @ 0806b182 8142
+    beq LAB_0806b1b2                         @ 0806b184 15d0
+    b LAB_0806b1c8                           @ 0806b186 1fe0
+DAT_0806b188:
+    .byte  0xe6, 0x17, 0x00, 0x00
+DAT_0806b18c:
+    .word  0x00001612                     @ 0806b18c 12160000
+LAB_0806b190:
+    movs r0,#0xc8    @ 0806b190 c820
+    lsls r0,r0,#0x5    @ 0806b192 4001
+    cmp r1,r0                                @ 0806b194 8142
+    beq LAB_0806b19e                         @ 0806b196 02d0
+    adds r0,#0x4f    @ 0806b198 4f30
+    cmp r1,r0                                @ 0806b19a 8142
+    bne LAB_0806b1c8                         @ 0806b19c 14d1
+LAB_0806b19e:
+    bl get_monster_slot_entry_ptr            @ 0806b19e 29f09df8
+    adds r1,r0,#0x0    @ 0806b1a2 011c
+    ldrh r5,[r5,#0x0]                        @ 0806b1a4 2d88
+    lsls r3,r5,#0x10    @ 0806b1a6 2b04
+    adds r0,r6,#0x0    @ 0806b1a8 301c
+    movs r2,#0x1    @ 0806b1aa 0122
+    bl invoke_setup_equip_oam_with_attr2     @ 0806b1ac 40f048fe
+    b LAB_0806b1e6                           @ 0806b1b0 19e0
+LAB_0806b1b2:
+    bl get_monster_slot_entry_ptr            @ 0806b1b2 29f093f8
+    adds r1,r0,#0x0    @ 0806b1b6 011c
+    movs r0,#0x0    @ 0806b1b8 0020
+    str r0,[sp,#0x0]                         @ 0806b1ba 0090
+    adds r0,r6,#0x0    @ 0806b1bc 301c
+    movs r2,#0x0    @ 0806b1be 0022
+    movs r3,#0x1    @ 0806b1c0 0123
+    bl setup_equip_oam_entry_with_sprite_attr @ 0806b1c2 40f0cdfd
+    b LAB_0806b1e6                           @ 0806b1c6 0ee0
+LAB_0806b1c8:
+    bl get_monster_slot_entry_ptr            @ 0806b1c8 29f088f8
+    adds r1,r0,#0x0    @ 0806b1cc 011c
+    movs r0,#0x0    @ 0806b1ce 0020
+    str r0,[sp,#0x0]                         @ 0806b1d0 0090
+    adds r0,r6,#0x0    @ 0806b1d2 301c
+    movs r2,#0x1    @ 0806b1d4 0122
+    movs r3,#0x0    @ 0806b1d6 0023
+    bl setup_equip_oam_entry_with_sprite_attr @ 0806b1d8 40f0c2fd
+    b LAB_0806b1e6                           @ 0806b1dc 03e0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[3] at 0x0806b080. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b1de:
+    movs r0,#0x1    @ 0806b1de 0120
+    subs r0,r0,r6    @ 0806b1e0 801b
+    bl set_lp_row_type7_if_opponent_linked   @ 0806b1e2 36f075fd
+LAB_0806b1e6:
+    movs r0,#0x78    @ 0806b1e6 7820
+    b LAB_0806b1f6                           @ 0806b1e8 05e0
+
+@ Case stub: dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entry[0] at 0x0806b074. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b1ea:
+    adds r0,r6,#0x0    @ 0806b1ea 301c
+    bl enqueue_lp_counter_sprite_by_player   @ 0806b1ec dff7a8f9
+    movs r0,#0x64    @ 0806b1f0 6420
+    b LAB_0806b1f6                           @ 0806b1f2 00e0
+
+@ Case stub (shared, table[1]+[2]+[5]): dispatch_equip_effect_slot_display_by_state_and_card (0x0806abec) raw-addr jump table entries at 0x0806b078, 0x0806b07c, 0x0806b088. Block range 0x0806b098..0x0806b233.
+equip_effect_state_stub_b1f4:
+    movs r0,#0x0    @ 0806b1f4 0020
+LAB_0806b1f6:
+    add sp,#0x4                              @ 0806b1f6 01b0
+    pop {r4,r5,r6}                           @ 0806b1f8 70bc
+    pop {r1}                                 @ 0806b1fa 02bc
+    bx r1                                    @ 0806b1fc 0847
+    ROM_INCBIN 0x6b1fe, 0x36
     .word  0x0806b30a                     @ 0806b234 0ab30608
     .word  0x0806b314                     @ 0806b238 14b30608
     .word  0x0806b314                     @ 0806b23c 14b30608
@@ -15792,10 +16271,79 @@ DAT_0806b098:
     .word  0x0806b2ce                     @ 0806b29c ceb20608
     .word  0x0806b314                     @ 0806b2a0 14b30608
     .word  0x0806b2a8                     @ 0806b2a4 a8b20608
-DAT_0806b2a8:
-    ROM_INCBIN 0x6b2a8, 0x74
 
-@ Neo-Daedalus effect series specialized display dispatch function. Receives effect_slot_node ptr (r4=r0). Reads global state code [0x0201b290+0x94*8]. State 0x7e: returns 0 directly (already done). State 0x64: calls enqueue_lp_counter_sprite_by_player (player=bit0 of [r4+2]), checks [gP1LifePoints+0x4a4] if nonzero calls decrement_lp_bar_display_counter, returns 0. Other paths (state 0x7f/0x80): checks card_id=[r4,#0] against 0x1339: 0x1339 path calls submit_lp_indicator_with_slot_xor_flag (player_id, r1=(1-player)*0xfa*2, r0=r4); 0x133a path calls submit_effect_zone_lp_and_shape_sprites (player_id, 0xfa*4). Clears [gP1LifePoints+0x4a4] to 0, calls count_available_monster_slots; if 0 returns 0x64. Calls check_field_spell_neo_daedalus_group_placeable; if 0 returns 0x64. Calls dispatch_effect_handler_by_card_id; if 0 calls trigger_card_display_op31_if_not_active (op=0xd) returns 0x64. If success checks display_flag; if 1 writes [gP1LifePoints+0x4a4]:=1 and enters 0x7e handling; else formats card name and calls invoke_card_display_op_0x31_sub1 returns 0x7e. State 0x7e path: calls setup_equip_oam_entry_with_sprite_attr (two variants for 0x1339/0x133a).
+@ Case stub: dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entry[28] at 0x0806b2a4. Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_b2a8:
+    ldrb r1,[r4,#0x2]                        @ 0806b2a8 a178
+    lsls r0,r1,#0x1f    @ 0806b2aa c807
+    lsrs r0,r0,#0x1f    @ 0806b2ac c00f
+    ldrh r1,[r4,#0x0]                        @ 0806b2ae 2188
+    movs r2,#0x0    @ 0806b2b0 0022
+    bl dispatch_effect_handler_by_card_id    @ 0806b2b2 22f0fdfb
+    cmp r0,#0x0                              @ 0806b2b6 0028
+    bne LAB_0806b2ca                         @ 0806b2b8 07d1
+    ldrb r4,[r4,#0x2]                        @ 0806b2ba a478
+    lsls r0,r4,#0x1f    @ 0806b2bc e007
+    lsrs r0,r0,#0x1f    @ 0806b2be c00f
+    movs r1,#0x15    @ 0806b2c0 1521
+    bl trigger_card_display_op31_if_not_active @ 0806b2c2 28f065f8
+    movs r0,#0x78    @ 0806b2c6 7820
+    b LAB_0806b316                           @ 0806b2c8 25e0
+LAB_0806b2ca:
+    movs r0,#0x7e    @ 0806b2ca 7e20
+    b LAB_0806b316                           @ 0806b2cc 23e0
+
+@ Case stub: dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entry[26] at 0x0806b29c. Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_b2ce:
+    ldrb r1,[r4,#0x2]                        @ 0806b2ce a178
+    lsls r0,r1,#0x1f    @ 0806b2d0 c807
+    lsrs r0,r0,#0x1f    @ 0806b2d2 c00f
+    ldrh r2,[r4,#0x0]                        @ 0806b2d4 2288
+    movs r1,#0x6    @ 0806b2d6 0621
+    movs r3,#0x0    @ 0806b2d8 0023
+    bl init_effect_slot_display_context      @ 0806b2da 28f073ff
+    movs r0,#0x7d    @ 0806b2de 7d20
+    b LAB_0806b316                           @ 0806b2e0 19e0
+
+@ Case stub: dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entry[25] at 0x0806b298. Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_b2e2:
+    ldrb r4,[r4,#0x2]                        @ 0806b2e2 a478
+    lsls r4,r4,#0x1f    @ 0806b2e4 e407
+    lsrs r4,r4,#0x1f    @ 0806b2e6 e40f
+    bl get_monster_slot_entry_ptr            @ 0806b2e8 28f0f8ff
+    adds r1,r0,#0x0    @ 0806b2ec 011c
+    adds r0,r4,#0x0    @ 0806b2ee 201c
+    bl enqueue_hand_sprite_with_flip_flag_set @ 0806b2f0 d9f79afb
+    movs r0,#0x64    @ 0806b2f4 6420
+    b LAB_0806b316                           @ 0806b2f6 0ee0
+
+@ Case stub: dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entry[20] at 0x0806b284. Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_b2f8:
+    ldrb r4,[r4,#0x2]                        @ 0806b2f8 a478
+    lsls r1,r4,#0x1f    @ 0806b2fa e107
+    lsrs r1,r1,#0x1f    @ 0806b2fc c90f
+    movs r0,#0x1    @ 0806b2fe 0120
+    subs r0,r0,r1    @ 0806b300 401a
+    bl set_lp_row_type7_if_opponent_linked   @ 0806b302 36f0e5fc
+    movs r0,#0x64    @ 0806b306 6420
+    b LAB_0806b316                           @ 0806b308 05e0
+
+@ Case stub: dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entry[0] at 0x0806b234. Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_b30a:
+    ldrb r4,[r4,#0x2]                        @ 0806b30a a478
+    lsls r0,r4,#0x1f    @ 0806b30c e007
+    lsrs r0,r0,#0x1f    @ 0806b30e c00f
+    bl enqueue_lp_counter_sprite_by_player   @ 0806b310 dff716f9
+
+@ Default stub (most table entries): dispatch_germ_momonga_trigger_display_by_state (0x0806b31c) raw-addr jump table entries[1..19,21..24,27] at 0x0806b238..0x0806b2a0 (most point here). Block range 0x0806b2a8..0x0806b31b.
+equip_germ_momonga_state_stub_default_b314:
+    movs r0,#0x0    @ 0806b314 0020
+LAB_0806b316:
+    pop {r4}                                 @ 0806b316 10bc
+    pop {r1}                                 @ 0806b318 02bc
+    bx r1                                    @ 0806b31a 0847
+
+@ Giant Germ / Nimble Momonga trigger effect specialized display dispatch function. Receives effect_slot_node ptr (r4=r0). Reads global state code [0x0201b290+0x94*8]. State 0x7e: returns 0 directly (already done). State 0x64: calls enqueue_lp_counter_sprite_by_player (player=bit0 of [r4+2]), checks [gP1LifePoints+0x4a4] if nonzero calls decrement_lp_bar_display_counter, returns 0. Other paths (state 0x7f/0x80): checks card_id=[r4,#0] against 0x1339: 0x1339 path calls submit_lp_indicator_with_slot_xor_flag (player_id, r1=(1-player)*0xfa*2, r0=r4); 0x133a path calls submit_effect_zone_lp_and_shape_sprites (player_id, 0xfa*4). Clears [gP1LifePoints+0x4a4] to 0, calls count_available_monster_slots; if 0 returns 0x64. Calls check_field_spell_neo_daedalus_group_placeable; if 0 returns 0x64. Calls dispatch_effect_handler_by_card_id; if 0 calls trigger_card_display_op31_if_not_active (op=0xd) returns 0x64. If success checks display_flag; if 1 writes [gP1LifePoints+0x4a4]:=1 and enters 0x7e handling; else formats card name and calls invoke_card_display_op_0x31_sub1 returns 0x7e. State 0x7e path: calls setup_equip_oam_entry_with_sprite_attr (two variants for 0x1339/0x133a).
 @ 
 @ Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id, [r0+0]=card_id)
 @ Returns: r0=u8 new_state (0x64/0x7e/0x7f or 0)
@@ -15804,8 +16352,8 @@ DAT_0806b2a8:
 @ Constants:
 @ - STATE_DISPLAY_BASE=0x0201b290
 @ - STATE_IDX_OFFSET=0x94*8=0x4a0
-@ - CARD_ID_0x1339=0x1339 (Neo-Daedalus group A)
-@ - CARD_ID_0x133a=0x133a (Neo-Daedalus group B)
+@ - GIANT_GERM_CID=0x1339 (Giant Germ)
+@ - NIMBLE_MOMONGA_CID=0x133a (Nimble Momonga)
 @ - INIT_FLAG_OFF=0x4a4 (gP1LifePoints init_flag field)
 @ - LP_ARG_A=0xfa*2=0x1f4 (submit_lp_indicator arg for 0x1339)
 @ - LP_ARG_B=0xfa*4=0x3e8 (submit_effect_zone_lp arg for 0x133a)
@@ -15813,11 +16361,11 @@ DAT_0806b2a8:
 @ - TEXT_FMT_B=0x34 (format string index for 0x133a card name)
 @ - PLAYER_STRIDE=0x868
 @ - DECK_ARRAY=0x0201c740+player*0x868+0x98*4=0x260 (card pair array offset)
-dispatch_neo_daedalus_effect_display_by_state:
+dispatch_germ_momonga_trigger_display_by_state:
     push {r4,r5,r6,lr}                       @ 0806b31c 70b5
     sub sp,#0x104                            @ 0806b31e c1b0
     adds r4,r0,#0x0    @ 0806b320 041c
-    ldr r5, DWORD_0806b340                   @ 0806b322 074d
+    ldr r5, gduelphaseflags_0806b340         @ 0806b322 074d
     movs r1,#0x94    @ 0806b324 9421
     lsls r1,r1,#0x3    @ 0806b326 c900
     adds r0,r5,r1    @ 0806b328 6818
@@ -15834,8 +16382,8 @@ LAB_0806b332:
 LAB_0806b33c:
     b LAB_0806b52c                           @ 0806b33c f6e0
     .zero  0x2
-DWORD_0806b340:
-    .word  0x0201b290                     @ 0806b340 90b20102
+gduelphaseflags_0806b340:
+    .word  gDuelPhaseFlags                @ 0806b340 90b20102
 LAB_0806b344:
     cmp r0,#0x7f                             @ 0806b344 7f28
     beq LAB_0806b3dc                         @ 0806b346 49d0
@@ -15844,7 +16392,7 @@ LAB_0806b344:
     b LAB_0806b52c                           @ 0806b34c eee0
 LAB_0806b34e:
     ldrh r1,[r4,#0x0]                        @ 0806b34e 2188
-    ldr r0, DWORD_0806b360                   @ 0806b350 0348
+    ldr r0, giant_germ_cid_0806b360          @ 0806b350 0348
     cmp r1,r0                                @ 0806b352 8142
     beq LAB_0806b364                         @ 0806b354 06d0
     adds r0,#0x1    @ 0806b356 0130
@@ -15852,8 +16400,8 @@ LAB_0806b34e:
     beq LAB_0806b37a                         @ 0806b35a 0ed0
     b LAB_0806b388                           @ 0806b35c 14e0
     .zero  0x2
-DWORD_0806b360:
-    .word  0x00001339                     @ 0806b360 39130000
+giant_germ_cid_0806b360:
+    .word  GIANT_GERM_CID                 @ 0806b360 39130000  GIANT_GERM_CID=0x1339: Giant Germ; dispatch_germ_momonga_trigger_display_by_state CID check
 LAB_0806b364:
     ldrb r2,[r4,#0x2]                        @ 0806b364 a278
     lsls r0,r2,#0x1f    @ 0806b366 d007
@@ -15873,8 +16421,8 @@ LAB_0806b37a:
     lsls r1,r1,#0x2    @ 0806b382 8900
     bl submit_effect_zone_lp_and_shape_sprites @ 0806b384 ddf746fe
 LAB_0806b388:
-    ldr r0, DWORD_0806b3d4                   @ 0806b388 1248
-    ldr r2, DWORD_0806b3d8                   @ 0806b38a 134a
+    ldr r0, gduelphaseflags_0806b3d4         @ 0806b388 1248
+    ldr r2, equip_phase_frame_off_0806b3d8   @ 0806b38a 134a
     adds r0,r0,r2    @ 0806b38c 8018
     movs r1,#0x0    @ 0806b38e 0021
     str r1,[r0,#0x0]                         @ 0806b390 0160
@@ -15910,10 +16458,10 @@ LAB_0806b3b2:
 LAB_0806b3d0:
     movs r0,#0x64    @ 0806b3d0 6420
     b LAB_0806b52e                           @ 0806b3d2 ace0
-DWORD_0806b3d4:
-    .word  0x0201b290                     @ 0806b3d4 90b20102
-DWORD_0806b3d8:
-    .word  0x000004a4                     @ 0806b3d8 a4040000
+gduelphaseflags_0806b3d4:
+    .word  gDuelPhaseFlags                @ 0806b3d4 90b20102
+equip_phase_frame_off_0806b3d8:
+    .word  EQUIP_PHASE_FRAME_OFF          @ 0806b3d8 a4040000
 LAB_0806b3dc:
     ldrb r2,[r4,#0x2]                        @ 0806b3dc a278
     lsls r0,r2,#0x1f    @ 0806b3de d007
@@ -15929,7 +16477,7 @@ LAB_0806b3dc:
     bl dispatch_effect_handler_by_card_id    @ 0806b3f4 22f05cfb
     cmp r0,#0x0                              @ 0806b3f8 0028
     beq LAB_0806b3d0                         @ 0806b3fa e9d0
-    ldr r1, DWORD_0806b41c                   @ 0806b3fc 0749
+    ldr r1, gduelcardctxbase_0806b41c        @ 0806b3fc 0749
     ldrb r2,[r4,#0x2]                        @ 0806b3fe a278
     lsls r0,r2,#0x1f    @ 0806b400 d007
     lsrs r0,r0,#0x1f    @ 0806b402 c00f
@@ -15939,27 +16487,27 @@ LAB_0806b3dc:
     ldr r1,[r0,#0x0]                         @ 0806b40a 0168
     cmp r1,#0x1                              @ 0806b40c 0129
     bne LAB_0806b424                         @ 0806b40e 09d1
-    ldr r0, DWORD_0806b420                   @ 0806b410 0348
+    ldr r0, gp1lifepoints_0806b420           @ 0806b410 0348
     movs r4,#0xea    @ 0806b412 ea24
     lsls r4,r4,#0x5    @ 0806b414 6401
     adds r0,r0,r4    @ 0806b416 0019
     str r1,[r0,#0x0]                         @ 0806b418 0160
     b LAB_0806b460                           @ 0806b41a 21e0
-DWORD_0806b41c:
-    .word  0x0201e2a0                     @ 0806b41c a0e20102
-DWORD_0806b420:
+gduelcardctxbase_0806b41c:
+    .word  gDuelCardCtxBase               @ 0806b41c a0e20102
+gp1lifepoints_0806b420:
     .word  gP1LifePoints                  @ 0806b420 e0c40102
 LAB_0806b424:
     ldrh r1,[r4,#0x0]                        @ 0806b424 2188
-    ldr r0, DWORD_0806b434                   @ 0806b426 0348
+    ldr r0, giant_germ_cid_0806b434          @ 0806b426 0348
     cmp r1,r0                                @ 0806b428 8142
     beq LAB_0806b438                         @ 0806b42a 05d0
     adds r0,#0x1    @ 0806b42c 0130
     cmp r1,r0                                @ 0806b42e 8142
     beq LAB_0806b44a                         @ 0806b430 0bd0
     b LAB_0806b45a                           @ 0806b432 12e0
-DWORD_0806b434:
-    .word  0x00001339                     @ 0806b434 39130000
+giant_germ_cid_0806b434:
+    .word  GIANT_GERM_CID                 @ 0806b434 39130000
 LAB_0806b438:
     adds r0,r1,#0x0    @ 0806b438 081c
     bl card_name_lookup_by_internal_id       @ 0806b43a 83f0dffb
@@ -15982,14 +16530,14 @@ LAB_0806b460:
     movs r0,#0x7e    @ 0806b460 7e20
     b LAB_0806b52e                           @ 0806b462 64e0
 LAB_0806b464:
-    ldr r6, DWORD_0806b498                   @ 0806b464 0c4e
+    ldr r6, gp1lifepoints_0806b498           @ 0806b464 0c4e
     movs r1,#0xea    @ 0806b466 ea21
     lsls r1,r1,#0x5    @ 0806b468 4901
     adds r0,r6,r1    @ 0806b46a 7018
     ldr r0,[r0,#0x0]                         @ 0806b46c 0068
     cmp r0,#0x0                              @ 0806b46e 0028
     beq LAB_0806b3d0                         @ 0806b470 aed0
-    ldr r2, DWORD_0806b49c                   @ 0806b472 0a4a
+    ldr r2, equip_phase_frame_off_0806b49c   @ 0806b472 0a4a
     adds r0,r5,r2    @ 0806b474 a818
     ldr r1,[r0,#0x0]                         @ 0806b476 0168
     adds r2,r1,#0x0    @ 0806b478 0a1c
@@ -16000,7 +16548,7 @@ LAB_0806b464:
     bl increment_lp_bar_display_counter      @ 0806b482 dff773f9
 LAB_0806b486:
     ldrh r1,[r4,#0x0]                        @ 0806b486 2188
-    ldr r0, DWORD_0806b4a0                   @ 0806b488 0548
+    ldr r0, giant_germ_cid_0806b4a0          @ 0806b488 0548
     cmp r1,r0                                @ 0806b48a 8142
     beq LAB_0806b4a4                         @ 0806b48c 0ad0
     adds r0,#0x1    @ 0806b48e 0130
@@ -16008,12 +16556,12 @@ LAB_0806b486:
     beq LAB_0806b4dc                         @ 0806b492 23d0
     b LAB_0806b50c                           @ 0806b494 3ae0
     .zero  0x2
-DWORD_0806b498:
+gp1lifepoints_0806b498:
     .word  gP1LifePoints                  @ 0806b498 e0c40102
-DWORD_0806b49c:
-    .word  0x000004a4                     @ 0806b49c a4040000
-DWORD_0806b4a0:
-    .word  0x00001339                     @ 0806b4a0 39130000
+equip_phase_frame_off_0806b49c:
+    .word  EQUIP_PHASE_FRAME_OFF          @ 0806b49c a4040000
+giant_germ_cid_0806b4a0:
+    .word  GIANT_GERM_CID                 @ 0806b4a0 39130000
 LAB_0806b4a4:
     ldrb r2,[r4,#0x2]                        @ 0806b4a4 a278
     lsls r0,r2,#0x1f    @ 0806b4a6 d007
@@ -16022,7 +16570,7 @@ LAB_0806b4a4:
     ldrb r4,[r4,#0x2]                        @ 0806b4ae a478
     lsls r3,r4,#0x1f    @ 0806b4b0 e307
     lsrs r2,r3,#0x1f    @ 0806b4b2 da0f
-    ldr r1, DWORD_0806b4d8                   @ 0806b4b4 0849
+    ldr r1, player_block_stride_0806b4d8     @ 0806b4b4 0849
     muls r1,r2    @ 0806b4b6 5143
     movs r4,#0x98    @ 0806b4b8 9824
     lsls r4,r4,#0x2    @ 0806b4ba a400
@@ -16039,8 +16587,8 @@ LAB_0806b4a4:
     bl setup_equip_oam_entry_with_sprite_attr @ 0806b4d0 40f046fc
     b LAB_0806b50c                           @ 0806b4d4 1ae0
     .zero  0x2
-DWORD_0806b4d8:
-    .word  0x00000868                     @ 0806b4d8 68080000
+player_block_stride_0806b4d8:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806b4d8 68080000
 LAB_0806b4dc:
     ldrb r2,[r4,#0x2]                        @ 0806b4dc a278
     lsls r0,r2,#0x1f    @ 0806b4de d007
@@ -16049,7 +16597,7 @@ LAB_0806b4dc:
     ldrb r4,[r4,#0x2]                        @ 0806b4e6 a478
     lsls r3,r4,#0x1f    @ 0806b4e8 e307
     lsrs r2,r3,#0x1f    @ 0806b4ea da0f
-    ldr r1, DWORD_0806b510                   @ 0806b4ec 0849
+    ldr r1, player_block_stride_0806b510     @ 0806b4ec 0849
     muls r1,r2    @ 0806b4ee 5143
     movs r4,#0x98    @ 0806b4f0 9824
     lsls r4,r4,#0x2    @ 0806b4f2 a400
@@ -16067,14 +16615,14 @@ LAB_0806b4dc:
 LAB_0806b50c:
     movs r0,#0x7f    @ 0806b50c 7f20
     b LAB_0806b52e                           @ 0806b50e 0ee0
-DWORD_0806b510:
-    .word  0x00000868                     @ 0806b510 68080000
+player_block_stride_0806b510:
+    .word  PLAYER_BLOCK_STRIDE            @ 0806b510 68080000
 LAB_0806b514:
     ldrb r4,[r4,#0x2]                        @ 0806b514 a478
     lsls r0,r4,#0x1f    @ 0806b516 e007
     lsrs r0,r0,#0x1f    @ 0806b518 c00f
     bl enqueue_lp_counter_sprite_by_player   @ 0806b51a dff711f8
-    ldr r1, DWORD_0806b538                   @ 0806b51e 0649
+    ldr r1, equip_phase_frame_off_0806b538   @ 0806b51e 0649
     adds r0,r5,r1    @ 0806b520 6818
     ldr r0,[r0,#0x0]                         @ 0806b522 0068
     cmp r0,#0x0                              @ 0806b524 0028
@@ -16088,10 +16636,10 @@ LAB_0806b52e:
     pop {r1}                                 @ 0806b532 02bc
     bx r1                                    @ 0806b534 0847
     .zero  0x2
-DWORD_0806b538:
-    .word  0x000004a4                     @ 0806b538 a4040000
+equip_phase_frame_off_0806b538:
+    .word  EQUIP_PHASE_FRAME_OFF          @ 0806b538 a4040000
 
-@ Conditionally forwards to Neo Daedalus placement check by equip-slot subtype. Takes the subtype field slot[+3] AND 0x30: if == 0x20 (chain subtype), forwards to dispatch_neo_daedalus_placement_check_by_state(slot) and passes through its return value; otherwise returns 0 fixed. A thin filter entry for the chain subtype, entering the Neo Daedalus placement state dispatch only when the subtype matches. Called via fn-ptr by the equip chain display driver (indeg=0).
+@ Conditionally forwards to Spear Cretin activate by equip-slot chain subtype. Takes the subtype field slot[+3] AND 0x30: if == 0x20 (chain subtype), forwards to dispatch_neo_daedalus_placement_check_by_state(slot) and passes through its return value; otherwise returns 0 fixed. A thin filter entry for the chain subtype, entering the Neo Daedalus placement state dispatch only when the subtype matches. Called via fn-ptr by the equip chain display driver (indeg=0).
 @ 
 @ CALLEE-COLUMN GREP: grepping callee=0x0806b53c => 0 hits
 @ 
@@ -16099,7 +16647,7 @@ DWORD_0806b538:
 @ Returns: r0=u32 {subtype 0x20 path=passthrough of dispatch_neo_daedalus_placement_check_by_state, else=0 fixed}
 @ Side effects: no direct external write; indirect via dispatch_neo_daedalus_placement_check_by_state internal side effects
 @ Constants: SUBTYPE_MASK=0x30; SUBTYPE_VALUE=0x20
-dispatch_neo_daedalus_placement_check_if_chain_subtype:
+dispatch_spear_cretin_activate_if_chain_subtype:
     push {lr}                                @ 0806b53c 00b5
     adds r2,r0,#0x0    @ 0806b53e 021c
     movs r0,#0x30    @ 0806b540 3020

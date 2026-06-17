@@ -498,6 +498,7 @@
 .equ COPYCAT_CID,                      0x000012bb  @ Copycat (pw=26376390; card-stats.s slot=0x12bb)
 .equ GIANT_RAT_CID,                    0x00001333  @ Giant Rat (pw=97017120; card-stats.s slot=0x1333)
 .equ KARATE_MAN_CID,                   0x00001337  @ Karate Man (pw=23289281; card-stats.s slot=0x1337)
+.equ GIANT_GERM_CID,                   0x00001339  @ Giant Germ (pw=95178994; card-stats.s slot=0x1339); fn_activate handler dispatch_germ_momonga_trigger_display_by_state; shared with Nimble Momonga (0x133a) for summon-from-deck trigger
 .equ NIMBLE_MOMONGA_CID,               0x0000133a  @ Nimble Momonga (pw=22567609; card-stats.s slot=0x133a)
 .equ SHINING_ANGEL_CID,                0x0000133c  @ Shining Angel (pw=95956346; card-stats.s slot=0x133c)
 .equ MYSTIC_TOMATO_CID,                0x00001342  @ Mystic Tomato (pw=83011277; card-stats.s slot=0x1342)

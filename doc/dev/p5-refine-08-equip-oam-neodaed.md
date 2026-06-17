@@ -67,13 +67,14 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ✅ | 82b4d8a |
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ✅ | (see §4.06) |
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ✅ | (see §4.07) |
-| 8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 (大表簇, 见 §五) + switchD_0806ac1e | ⬜ | — |
+| 8a | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | ✅ | (see §4.08a) |
+| 8b | 0x6b56c..0x6cbe8 | 14 | 63 | 7 ROM_INCBIN 待分类 | ⬜ | — |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **22 ROM_INCBIN + 5 switchD** — 逐块 ref-scan 按 §一 分类 (handler-table THUMB+1→disasm / OAM 数据表 ldr-ref→carve / switchD→R4 disasm / 0 引用→§5.1)。
-**重段提示**: Seg-8 (85 槽 + **11 ROM_INCBIN 含大表 0x374/0x298/0x27c/0x25c/0x19c/0x110**, OAM sprite 数据表/dispatch 簇) 最重, 必拆 Seg-8a/8b/8c;
+**重段提示**: Seg-8 (85 槽 + **11 ROM_INCBIN 含大表 0x374/0x298/0x27c/0x25c/0x19c/0x110**, OAM sprite 数据表/dispatch 簇) 最重, 已拆 Seg-8a (✅)/8b (待);
 Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 
 ---
@@ -217,6 +218,45 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra script**: `RefineF08Seg7Slots.py`
 
+### 4.08a Seg-8a 完成记录 (0x6ab0c..0x6b56c)
+
+**Seg-8 拆分方案**: 8a = 0x6ab0c..0x6b56c (6 fn + 4 ROM_INCBIN); 8b = 0x6b56c..0x6cbe8 (14 fn + 7 ROM_INCBIN 待分类)
+
+**11 块分类表 (§五 路线图 Seg-8 全 11 ROM_INCBIN)**:
+
+| 块地址/大小 | 所在 Seg | 判断结果 |
+|---|---|---|
+| §5.1 0x6adb6/0x3e | 8a | dead code (raw=0, THUMB+1=0) → §5.1 |
+| Block1 0x6ae18/0x25c | 8a | THUMB disasm (8 stubs, dispatch_equip_effect_slot_display_by_state_and_card 跳转表目标) |
+| Block2 0x6b098/0x19c | 8a | THUMB disasm (7 stubs, 同上跳转表继续) |
+| Block3 0x6b2a8/0x74 | 8a | THUMB disasm (6 stubs, dispatch_germ_momonga_trigger_display_by_state 跳转表目标) |
+| 0x6b5f2..0x6cbe8 x7 | 8b | 待 Seg-8b ref-scan 分类 |
+
+- **EQ**: 22 槽 (21 reuse + 1 NEW: GIANT_GERM_CID=0x1339)
+  - EQUIP_PHASE_FRAME_OFF x3 / gP1LifePoints x1 / P1LP_BLOCK2_OFF_1CE8 x1 / gDuelEquipCtx x1 / PLAYER_BLOCK_STRIDE x2 / gP1SlotSetCodeArray x1 / gEquipZoneCountTable x1 / gDuelCardCtxBase x1 (= gduelcardctxbase_0806b41c slot) / NIMBLE_MOMONGA_CID x3 / SPEAR_CRETIN_CID x1 / CID 0x14dd x1 / CID 0x136a x2 / CID 0x15b6 x2 / CID 0x194f x1 / CID 0x152f x1 / CID 0x1612 x1; gP1LifePoints global pointer ref x1
+  - NEW constant: `constants/card_info.inc` +1 (GIANT_GERM_CID=0x1339 Giant Germ pw=95178994)
+- **REF**: 1 (DAT_0806ac24 → switchD_0806ac1e data ptr)
+- **RENAME**: 5 (PTR_ labels renamed to descriptive slot labels)
+- **FUNC_RENAME**: 2
+  - 0x0806b31c: dispatch_neo_daedalus_effect_display_by_state → **dispatch_germ_momonga_trigger_display_by_state** (误名订正: Giant Germ/Nimble Momonga fn_activate handler, not Neo Daedalus)
+  - 0x0806b53c: dispatch_neo_daedalus_placement_check_if_chain_subtype → **dispatch_spear_cretin_activate_if_chain_subtype** (误名订正: Spear Cretin fn_activate handler)
+- **PLATE**: 6 (substring rewrites on 2 renamed functions; all pure ASCII)
+- **DISASM**: 3 ROM_INCBIN → THUMB (21 新函数):
+  - Block1 0x0806ae18/0x25c (8 stubs): `equip_effect_state_stub_{default_ae18/ae48/ae90/af52/af84/afac/afec/b01c}`; switchD_0806ac1e 跳转表目标 (raw-addr, not THUMB+1)
+  - Block2 0x0806b098/0x19c (7 stubs): `equip_effect_state_stub_{default_b098/b0d6/b124/b13c/b1de/b1ea/b1f4}`; 同上跳转表继续
+  - Block3 0x0806b2a8/0x74 (6 stubs): `equip_germ_momonga_state_stub_{b2a8/b2ce/b2e2/b2f8/b30a/default_b314}`; dispatch_germ_momonga_trigger_display_by_state 跳转表目标
+- **§5.1**: +1 → 0x0806adb6 (0x3e B, dead code, raw=0/THUMB+1=0)
+- **附带修正**:
+  - fn-ptr +1 周期性修复: 2 处 `.word check_equip_activation_at_slot11` → `+1` (asm/08 lines ~3691/3700)
+  - `.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1` + `.equ check_zone_activation_ctx_match_cb_1, check_zone_activation_ctx_match_cb+1` (GAS symbol 修复)
+  - FixF08Seg8aLiteralPools.py: 21 DWORD literal pool 强制 split (DAT_ 标签补建)
+  - FixF08Seg8aPlateIds.py: plate rewrite 顺序冲突后补修正 2 处 CARD_ID_0x1339/133a → GIANT_GERM_CID/NIMBLE_MOMONGA_CID
+  - 跨模块 plate 修正: `asm/05_equip_eligibility_a.s` line 4 旧名 dispatch_neo_daedalus_effect_display_by_state → dispatch_germ_momonga_trigger_display_by_state
+- **新建 constants**: `constants/card_info.inc` +1 (GIANT_GERM_CID=0x1339)
+- **CSV sync**: +21 rows (21 new disasm stubs) + 2 FUNC_RENAME 行已手改 (rows 2009/2010)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg8aSlots.py` + `DisassembleF08Seg8aBlocks.py` + `FixF08Seg8aLiteralPools.py` + `FixF08Seg8aPlateIds.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -233,7 +273,8 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-5 ✅ | 0x67fa4..0x690dc | 20 | 65 | 0 + 1 sw | scan_effect_slots_for_equip_sprite_field6 + switchD_080686a2 |
 | Seg-6 ✅ | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
 | Seg-7 ✅ | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
-| Seg-8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 inc + 1 sw | 重: dispatch_lp_row_or_banisher_sprite + OAM sprite 数据表/dispatch 大簇 (拆 8a/8b/8c) |
+| Seg-8a ✅ | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | Germ/Momonga/Spear Cretin dispatch stubs (21 new fn); 误名订正 x2 |
+| Seg-8b | 0x6b56c..0x6cbe8 | 14 | 63 | 7 ROM_INCBIN 待分类 | OAM sprite 数据表/dispatch 大簇 (待拆 8b/8c) |
 | Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
 | Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
 
@@ -245,6 +286,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
 | 0x0806a544 | 4B | Seg-7 | movs r0,#0; bx lr (orphan 4B stub, 0 raw+0 THUMB+1 refs) | pending |
+| 0x0806adb6 | 0x3e B | Seg-8a | dead code (0 raw + 0 THUMB+1 refs; 2B pad + 3 THUMB stubs unreferenced) | pending |
 
 ---
 
