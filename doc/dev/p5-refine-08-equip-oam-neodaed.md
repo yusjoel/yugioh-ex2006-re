@@ -69,12 +69,13 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ✅ | (see §4.07) |
 | 8a | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | ✅ | 638c7d4 |
 | 8b | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | ✅ | (see §4.09) |
+| 8c | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | ✅ | (see §4.10) |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **22 ROM_INCBIN + 5 switchD** — 逐块 ref-scan 按 §一 分类 (handler-table THUMB+1→disasm / OAM 数据表 ldr-ref→carve / switchD→R4 disasm / 0 引用→§5.1)。
-**重段提示**: Seg-8 (85 槽 + **11 ROM_INCBIN 含大表 0x374/0x298/0x27c/0x25c/0x19c/0x110**, OAM sprite 数据表/dispatch 簇) 最重, 已拆 Seg-8a (✅)/8b (待);
+**重段提示**: Seg-8 (85 槽 + **11 ROM_INCBIN 含大表 0x374/0x298/0x27c/0x25c/0x19c/0x110**, OAM sprite 数据表/dispatch 簇) 最重, 已拆 Seg-8a (✅)/8b (✅)/8c (✅) **Seg-8 全完成**;
 Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 
 ---
@@ -287,6 +288,39 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg8bSlots.py` + `DisassembleF08Seg8bBlocks.py` + `FixF08Seg8bLiteralPools.py`
 
+### 4.10 Seg-8c 完成记录 (0x6c0cc..0x6cbe8)
+
+- **EQ**: 39 槽 (34 reuse + 3 NEW + 2 PTR_ RENAME)
+  - gDuelPhaseFlags x3 / EQUIP_PHASE_FRAME_OFF x1 / PLAYER_BLOCK_STRIDE x6 / gP1HandSlotArray x2 / SPEAR_CRETIN_CID x1 / gDuelFieldSlots x3 / gEquipChainSlotRefs x1 / gP1LifePoints x6 / gDuelCardCtxBase x1 / LP_CARD_TRACK_BASE_OFF x1 / RE_FUSION_CID x1 / SYMBOL_OF_HERITAGE_CID x2 / SOUL_RESURRECTION_CID x1 / CALL_OF_THE_HAUNTED_CID x1 / AUTONOMOUS_ACTION_UNIT_CID x1 / gEquipZoneRankState x2 / MAHARAGHI_CID x1 / P1LP_BLOCK2_OFF_1CE8 x2 (reuse)
+  - 3 NEW: OAM_EQUIP_ZONE_CHAIN_SPRITE_P2=0x8052 (oam_attr.inc) / MORPHING_JAR_2_CID=0x1369 (card_info.inc) / SOLOMONS_LAWBOOK_CID=0x137e (card_info.inc) / P2LP_BLOCK2_OFF_1CF4=0x1cf4 (ewram.inc) [4 constants total]
+  - 2 PTR_ RENAME: PTR_gP1LifePoints_0806cb98 -> gp1lifepoints_0806cb98 / PTR_gP1LifePoints_0806cbe0 -> gp1lifepoints_0806cbe0
+- **REF**: 0
+- **RENAME**: 2 (PTR_ slot renames via RENAME_SLOTS in script)
+- **FUNC_RENAME**: 1
+  - 0x0806c0cc: dispatch_neo_daedalus_placement_check_by_state -> **tick_spear_cretin_placement_state_machine** (误名订正: fn CID=0x133b Spear Cretin placement state machine; "neo_daedalus" was callee identity not fn identity)
+- **PLATE**: 2
+  - tick_spear_cretin_placement_state_machine @ 0x0806c0cc: full ASCII rewrite (986 chars); Spear Cretin CID=0x133b placement state machine description
+  - enqueue_spirit_monster_zone_sprite_otohime @ 0x0806cb54: stale FUN_08071d64 -> dispatch_spirit_monster_zone_sprite_by_card_id
+- **DISASM**: 2 ROM_INCBIN -> THUMB (9 新函数):
+  - Block1 0x0806c3d8/0x44 (1 fn): `check_equip_eligible_morphing_jar_2` (fn_eligible CID=0x1369 Morphing Jar #2 pw=79106360; THUMB+1 @card-effect dispatch table)
+  - Block2 0x0806c440/0x298 (8 stubs): `morphing_jar2_state_stub_{c440/c4e8/c52c/c5f8/c63c/c65a/c69c/c6c0}`; dispatched from 9-entry raw-addr jump table at 0x0806c41c..0x0806c43c (entry[8] shared with c440); entry[1,2] share c6c0
+- **carve**: 0 (9-entry jump table 0x0806c41c..0x0806c43c already structured as .word entries in asm; no new rom.s carve)
+- **§5.1**: 0 (both blocks have confirmed ROM references)
+- **域例外 (C5)**:
+  - P2LP_BLOCK2_OFF_1CF4=0x1cf4 (base=gP1LifePoints, abs=gP1LifePoints+0x1cf4=0x0201e1d4) vs FIELD_STATE_OFF=0x1cf4 (base=gDuelFieldSlots, abs=gDuelFieldSlots+0x1cf4=0x0201e204) — 不同 base 不同地址, 独立新建; reviewer C5 域例外已确认
+- **附带修正**:
+  - FixF08Seg8cLiteralPools.py: 17 literal pool DWORD labels forced (Block1 0x806c414 + Block2 0x806c4d8/4dc/4e0/4e4 + 0x806c520/524/528 + 0x806c5e8/5ec/5f0 + 0x806c638 + 0x806c68c/690/694/698 + 0x806c6d4)
+  - FixF08Seg8cRipplePlate.py: cross-module plate fix dispatch_spear_cretin_activate_if_chain_subtype @ 0x0806b53c (3 occurrences of old name replaced)
+  - fn-ptr +1 periodic fix (3 asm/08 slots): check_equip_activation_at_slot11 x2 @ 0x8065c50/c60 + check_equip_slot_eligible_by_equip_type @ 0x806bb28
+  - rom.s: .equ check_activation_ctx_zone11_match_cb_1 + check_zone_activation_ctx_match_cb_1 aliases (permanent; re-export strips asm/08 so must live in rom.s)
+- **新建 constants**:
+  - `constants/card_info.inc` +2 (MORPHING_JAR_2_CID=0x1369 / SOLOMONS_LAWBOOK_CID=0x137e)
+  - `constants/oam_attr.inc` +1 (OAM_EQUIP_ZONE_CHAIN_SPRITE_P2=0x8052)
+  - `constants/ewram.inc` +1 (P2LP_BLOCK2_OFF_1CF4=0x1cf4)
+- **CSV sync**: +9 rows (9 new disasm functions: check_equip_eligible_morphing_jar_2 + 8 morphing_jar2_state_stubs) + 1 FUNC_RENAME 行已手改 (0x0806c0cc)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg8cSlots.py` + `DisassembleF08Seg8cBlocks.py` + `FixF08Seg8cLiteralPools.py` + `FixF08Seg8cRipplePlate.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -305,7 +339,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-7 ✅ | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
 | Seg-8a ✅ | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | Germ/Momonga/Spear Cretin dispatch stubs (21 new fn); 误名订正 x2 |
 | Seg-8b ✅ | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | cid_135b/Magical Hats/Ceasefire/SpellAbsorbing dispatch stubs (30 new fn); 嵌套跳表 0x6bc2c->0x6bfa0->0x6bfbc |
-| Seg-8c | 0x6c0cc..0x6cbe8 | 9 | — | 2 (0x6c3d8/0x44 + 0x6c440/0x298) | — |
+| Seg-8c ✅ | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | Morphing Jar #2 stubs (9 new fn); tick_spear_cretin 误名订正; P2LP domain exception |
 | Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
 | Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
 

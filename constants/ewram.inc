@@ -273,6 +273,7 @@
 
 @ P1 LP display block field
 .equ P1LP_BLOCK2_OFF_1CE8,           0x1ce8  @ [gP1LifePoints+0x1ce8] LP display block2 field; 184 ROM refs
+.equ P2LP_BLOCK2_OFF_1CF4,           0x1cf4  @ [gP1LifePoints+0x1cf4] P2 LP display block2 field (opponent analog of P1LP_BLOCK2_OFF_1CE8=0x1ce8); enqueue_spirit_monster_zone_sprite_otohime opponent LP compare; distinct from FIELD_STATE_OFF=0x1cf4 (base=gDuelFieldSlots vs gP1LifePoints); 103 raw ROM refs
 
 @ Campaign scene globals
 .equ gCampaignDisplayState,       0x02029e90  @ campaign display state buffer (0x20 bytes); med-conf; 6 ROM refs

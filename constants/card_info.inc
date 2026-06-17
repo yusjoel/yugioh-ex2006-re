@@ -794,6 +794,8 @@
 .equ DELINQUENT_DUO_CID,                 0x00001325  @ Delinquent Duo (pw=44763025); equip set D
 .equ THE_FORCEFUL_SENTRY_CID,            0x0000132b  @ The Forceful Sentry (pw=42829885); equip set D
 .equ SPEAR_CRETIN_CID,                   0x0000133b  @ Spear Cretin (pw=58551308); summon category BST
+.equ MORPHING_JAR_2_CID,                 0x00001369  @ Morphing Jar #2 (pw=79106360; card-stats.s slot=0x1369 card_0774); fn_eligible handler check_equip_eligible_morphing_jar_2
+.equ SOLOMONS_LAWBOOK_CID,               0x0000137e  @ Solomon's Lawbook (pw=23471572; card-stats.s slot=0x137e card_0794); enqueue_spirit_monster_zone_sprite_otohime Lawbook/Maharaghi special case
 .equ DE_FUSION_CID,                      0x000013fe  @ De-Fusion (pw=95286165); summon category BST
 .equ JAR_OF_GREED_CID,                   0x0000145a  @ Jar of Greed (pw=83968380); effect zone check
 .equ SPIRITUALISM_CID,                   0x0000147e  @ Spiritualism (pw=15866454); zone pair restriction

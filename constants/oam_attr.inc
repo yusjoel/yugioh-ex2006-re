@@ -161,3 +161,9 @@
 @ =============================================================================
 .equ OAM_SPRITE_CODE_P1_ACTIVATION, 0x00008019  @ P1 activation sprite code (bit15+0x19); tick_equip_activation_sprite_with_lp_row_state_machine: player_id==1 -> sprite_code=0x8019, player_id==0 -> 0x19 inline; asm/08 L12694; conf: high
 .equ ZONE_ENTRY_FLAGS_CLR_MASK,     0x00001fff  @ 13-bit clear mask for zone entry sprite data halfword bits[12:0]; dispatch_equip_slot_sprite_by_card_id_scapegoat_or_lambs: ands r2,r3 preserving player-id bit packing in bit13+; asm/08 L12161; conf: high
+
+@ =============================================================================
+@ file 08 Seg-8c additions: equip zone chain sprite P2 OAM attr0
+@ Source: asm/08_equip_oam_neodaed.s, Seg-8c (0x0806c0cc..0x0806cbe8)
+@ =============================================================================
+.equ OAM_EQUIP_ZONE_CHAIN_SPRITE_P2, 0x00008052  @ equip zone chain sprite OAM attr0 P2 (bit15+0x52); enqueue_equip_zone_sprite_chain_if_slot_matches P1=0x52 inline, P2 via literal pool; 4 raw ROM refs (0x806c364, 0x80a2328, 0x80a2450, 0x80a268c)

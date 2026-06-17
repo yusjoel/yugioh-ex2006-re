@@ -66,6 +66,12 @@
 @ ROM 数据段 symbol（由 tools/ghidra-labeling/ExportRomLabelsToInc.py 从 Ghidra 导出）
 	.include "constants/rom_data.inc"
 
+@ file 08 THUMB fn-ptr +1 aliases -- GAS .equ for _cb_1 symbols
+@ (asm/08 literal pool slots reference these _1 names; function label + GAS auto-|1 for THUMB)
+	.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1
+	.equ check_zone_activation_ctx_match_cb_1, check_zone_activation_ctx_match_cb+1
+
+
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 
