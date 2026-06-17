@@ -1948,6 +1948,7 @@ address,name,proposed_name,score,tags
 0x08068618,advance_equip_effect_display_zone_match_guard,,,duel_field
 0x08068684,tick_equip_effect_display_state_machine,card_ids_08068684,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080687a8,invoke_equip_hand_slot_oam_if_eligible,,,
+0x08068828,check_equip_eligible_always_false,,,duel_field
 0x0806882c,dispatch_equip_slot_sprite_by_zone_type,,,duel_field
 0x080688dc,apply_slot_equip_activation_by_zone_slot_match,,,duel_field
 0x08068990,dispatch_equip_slot_sprite_by_state_and_zone,,,duel_field

@@ -1327,3 +1327,12 @@
 .equ MALICE_ASCENDANT_CID,          0x000019d0  @ Malice Ascendant (pw=14255590; card_2070 slot=0x19D0); enqueue_equip_zone_sprite_with_deck_count count_extra_deck_cards_by_id; value grep=0 (new)
 .equ CARD_FIELD3_THRESHOLD_1499,    0x000005db  @ field3(ATK) targeting threshold 1499; Crush Card Virus: field3>1499 -> target; field3(ATK)-domain distinct from FIELD5_SCORE_THRESHOLD_1499(score) and LP thresholds; tick_equip_head_slot_sprite_state_machine 3 slots
 .equ CARD_FIELD3_THRESHOLD_1500,    0x000005dc  @ field3(ATK) targeting threshold 1500; Deck Devastation Virus: field3_raw<=1500 -> target; field3(ATK)-domain distinct from CARD_STAT_LP_THRESHOLD_1500(LP render)/LP_COST_1500(LP cost); tick_equip_head_slot_sprite_state_machine 3 slots
+
+@ =============================================================================
+@ file 08 Seg-5 additions: equip OAM sprite dispatch CIDs
+@ Source: asm/08_equip_oam_neodaed.s, Seg-5 (0x08067fa4..0x080690dc)
+@ All values verified against data/card-stats.s slot_id field.
+@ =============================================================================
+.equ BLAST_SPHERE_CID,              0x00001286  @ Blast Sphere (pw=26302522; card-stats.s L7763 slot=0x1286); invoke_equip_zone_entry_with_lp_chain_state card_id branch; conf: high
+.equ BIRDFACE_CID,                  0x0000139d  @ Birdface (pw=45547649; card-stats.s L10597 slot=0x139D); tick_equip_effect_display_state_machine caseD_7f named card branch; conf: high
+.equ IMPERIAL_ORDER_CID,            0x00001360  @ Imperial Order (pw=61740673; card-stats.s L9986 slot=0x1360); fn_eligible slot for check_equip_eligible_always_false stub; conf: high

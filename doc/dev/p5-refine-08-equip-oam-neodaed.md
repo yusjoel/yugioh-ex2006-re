@@ -64,7 +64,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 2 | 0x6544c..0x66448 | 20 | 79 | 3 (0x65d78/3c, 0x65e3c/29c, 0x662a4/68) + switchD_08065a44 | ✅ | 4b6b4a4 |
 | 3 | 0x66448..0x67160 | 20 | 56 | 1 (0x668c0/1cc) + switchD_08066f02 | ✅ | d6a40a5 |
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ✅ | 5b5eeae |
-| 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ⬜ | — |
+| 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ✅ | pending |
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ⬜ | — |
 | 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ⬜ | — |
 | 8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 (大表簇, 见 §五) + switchD_0806ac1e | ⬜ | — |
@@ -153,6 +153,26 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra script**: `RefineF08Seg4Slots.py`
 
+### 4.05 Seg-5 完成记录 (0x67fa4..0x690dc)
+
+- **EQ**: 62 槽 (PLAYER_BLOCK_STRIDE x18 / gDuelFieldSlots x14 / gDuelPhaseFlags x6 / gP1FieldArrayCBase x2 / EQUIP_PHASE_FRAME_OFF x2 / gP1HandSlotArray x1 / LP_CARD_TRACK_NEXT_OFF x1 / LP_CARD_TRACK_BASE_OFF x1 / P1LP_BLOCK2_OFF_1CE8 x1 / OAM_EFFECT_SLOT_TILE_P1 x1 reuse / 8 CID reuse [SWORDS_OF_REVEALING_LIGHT/IMPERIAL_ORDER/CRUSH_CARD/BIRDFACE x2/BLAST_SPHERE x2/IMPERIAL_ORDER x1] / BLAST_SPHERE_CID x1 NEW / BIRDFACE_CID x1 NEW / gEquipLpZoneEntryBase x1 NEW / EQUIP_SLOT_SCORE_CAP x1 NEW / OAM_EQUIP_SPRITE_TILE_P2_1B x1 NEW / OAM_EQUIP_SPRITE_TILE_P2_1C x1 NEW / EQUIP_OAM_ENTRY_ATTR_14F8 x1 NEW)
+- **REF**: 4 槽 (PTR_gP1LifePoints_0806867c -> gP1LifePoints; DAT_080686a8 -> switchD_080686a2__switchdataD_080686ac; DWORD_0806905c -> gP1LifePoints; DWORD_080690d0 -> gP1LifePoints)
+- **RENAME**: 65 auto-name slots renamed (DWORD_/DAT_ -> descriptive labels; all via Ghidra equate/label)
+- **PLATE**: 1 (dispatch_equip_slot_sprite_by_zone_type @ 0x0806882c: CJK mojibake plate -> ASCII 575-char rewrite)
+- **DISASM**: 1 (check_equip_eligible_always_false @ 0x08068828, 4B THUMB stub: movs r0,#0; bx lr; IMPERIAL_ORDER fn_eligible handler)
+- **FUNC_RENAME**: 0
+- **carve**: 0 (no ROM data tables in Seg-5 range)
+- **新建 constants**:
+  - `constants/card_info.inc` +3 (BLAST_SPHERE_CID=0x1286 / BIRDFACE_CID=0x139d / IMPERIAL_ORDER_CID=0x1360)
+  - `constants/ewram.inc` +2 (gEquipLpZoneEntryBase=0x0201e500 / EQUIP_OAM_ENTRY_ATTR_14F8=0x000014f8)
+  - `constants/oam_attr.inc` +3 (OAM_EQUIP_SPRITE_TILE_P2_1B=0x0000801b / OAM_EQUIP_SPRITE_TILE_P2_1C=0x0000801c / EQUIP_SLOT_SCORE_CAP=0x0000ffff)
+- **域裁定 (C5)**: EQUIP_SLOT_SCORE_CAP=0xffff 独立新建; 域截然不同于 SLOT_CARD_EMPTY=0xffff (card slot domain) 和 OAM_ATTR0_HIDDEN=0xffff (OAM domain); Seg-4 域裁定先例支持
+- **§5.1**: 0 (Seg-5 无全 ROM 0 引用孤儿块)
+- **附带修正**: switchD_080686a2 table ptr (DAT_080686a8) 已 via REF slot 正确符号化; no ROM_INCBIN blocks in Seg-5
+- **CSV sync**: +1 row (check_equip_eligible_always_false @ 0x08068828 新建函数)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra script**: `RefineF08Seg5Slots.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -166,7 +186,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-2 | 0x6544c..0x66448 | 20 | 72 | 3 inc + 1 sw | write_equip_lp_delta_goblin_thief + LP delta + switchD_08065a44 |
 | Seg-3 | 0x66448..0x67160 | 20 | 56 | 1 inc + 1 sw | dispatch_equip_zone_sprite_by_slot_state + switchD_08066f02 |
 | Seg-4 | 0x67160..0x67fa4 | 20 | 74 | 0 | dispatch_effect_zone_lp_sprites_by_slot_flags 簇 |
-| Seg-5 | 0x67fa4..0x690dc | 20 | 65 | 0 + 1 sw | scan_effect_slots_for_equip_sprite_field6 + switchD_080686a2 |
+| Seg-5 ✅ | 0x67fa4..0x690dc | 20 | 65 | 0 + 1 sw | scan_effect_slots_for_equip_sprite_field6 + switchD_080686a2 |
 | Seg-6 | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
 | Seg-7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
 | Seg-8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 inc + 1 sw | 重: dispatch_lp_row_or_banisher_sprite + OAM sprite 数据表/dispatch 大簇 (拆 8a/8b/8c) |

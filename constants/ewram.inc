@@ -465,3 +465,9 @@
 @ file 07 Seg-7 additions: LP gap threshold constant
 @ =============================================================================
 .equ LP_GAP_THRESHOLD_7000,          0x00001b58  @ LP gap threshold 7000 (0x1b58=7000 decimal); check_equip_slot_eligible_by_lp_gap_7000_vs_opponent: opponent LP must exceed player LP by at least 7000; Seg-7 DWORD_080618b0
+
+@ =============================================================================
+@ file 08 Seg-5 additions: equip LP zone entry base + OAM entry attr
+@ =============================================================================
+.equ gEquipLpZoneEntryBase,  0x0201e500  @ EWRAM base for equip LP zone entry descriptor buffer; dispatch_equip_lp_field_state_by_card_id reads [+0] for card_type bits for sprite_code selection; 28 raw ROM refs across 0x0806xxxx/0807xx/0809xx/080axx/080bxx/080cxx; (Seg-5 name; Seg-6 may refine)
+.equ EQUIP_OAM_ENTRY_ATTR_14F8, 0x000014f8  @ OAM entry attr word OR component; dispatch_equip_slot_sprite_by_lp_state_neo_daedalus: lsls r1,r1,#0xd; orrs r1,EQUIP_OAM_ENTRY_ATTR_14F8; sp[0x4] = combined attr; then bl setup_equip_oam_entry_with_sprite_attr; 2 ROM code refs (conf: med; exact OAM attr structure TBD)

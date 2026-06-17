@@ -146,3 +146,10 @@
 @ =============================================================================
 .equ OAM_ATTR_P1_SPRITE,  0x00008027  @ player 1 side sprite attr0 (0x8000=OBJ palette select bit; 0x27=tile region); enqueue_slot_player_side_sprite_attr; 1 Seg-2 slot
 .equ OAM_ATTR_P2_SPRITE,  0x00008059  @ player 2 side sprite attr0 (0x8000=OBJ palette select bit; 0x59=tile region); dispatch_lp_counter_or_sprite_by_zone_state player_id==1 path; sibling of OAM_ATTR_P1_SPRITE=0x8027; 1 Seg-3 slot
+
+@ =============================================================================
+@ file 08 Seg-5 additions: equip sprite tile region P2 values + score cap
+@ =============================================================================
+.equ OAM_EQUIP_SPRITE_TILE_P2_1B,  0x0000801b  @ equip sprite OAM attr0 tile region P2 (bit15+0x1b); player_id==1 path in enqueue_equip_sprite_attrs_via_zone_entry_check; sibling of OAM_EFFECT_SLOT_TILE_P1=0x8056; 0 existing refs; conf: high
+.equ OAM_EQUIP_SPRITE_TILE_P2_1C,  0x0000801c  @ equip sprite OAM attr0 tile region P2 (bit15+0x1c); second sprite code for same zone check fn; sibling of OAM_EQUIP_SPRITE_TILE_P2_1B=0x801b; 3 raw refs; conf: high
+.equ EQUIP_SLOT_SCORE_CAP,          0x0000ffff  @ equip slot sprite score saturation cap; apply_equip_slot_sprite_via_zone_match_and_score: cmp score,cap; ble ok; saturate to cap; domain distinct from SLOT_CARD_EMPTY=0xffff (card domain) and OAM_ATTR0_HIDDEN=0xffff (OAM domain); Seg-4 domain precedent; conf: high
