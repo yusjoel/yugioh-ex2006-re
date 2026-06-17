@@ -153,6 +153,7 @@
 .equ SLOT_FACE_STATUS_ARRAY_OFF, 0x000010b1 @ gDuelFieldSlots+0x10b1: equip_face_bits status byte array base (16 ROM refs; 2 slots)
 .equ FIELD_SPELL_CARD_REF_OFF,  0x00001390  @ card_id 0x1390 field-spell equip trigger guard (10 ROM refs; 1 slot)
 .equ DUEL_ACTIVE_PLAYER_OFF,    0x00001cb8  @ gP1LifePoints+0x1cb8: active turn player idx (15 ROM refs; 1 slot)
+.equ EQUIP_ZONE_COUNT_TABLE_OFF, 0x00001cb8 @ gDuelFieldSlots+0x1cb8=gEquipZoneCountTable(0x0201e1c8); domain distinct from DUEL_ACTIVE_PLAYER_OFF (base=gP1LifePoints); 1 Seg-7 slot; conf: high
 
 @ =============================================================================
 @ file 02 Seg-6 additions: equip slot active-state tag
@@ -382,3 +383,9 @@
 @ Source: asm/07_equip_effect_chain.s Seg-8 (0x08061eb4..0x08062d28)
 @ =============================================================================
 .equ ATK_THRESHOLD_2999, 0x00000bb7  @ ATK threshold 2999; cmp halfword[+0x14] vs 0xbb7; bls->fail means ATK must be >2999 (>=3000) to pass; distinct from LP_COST_3000=0xbb8; 4 ROM refs (0x8062084/0x80a0db0/0x80bb1fc/0x89143ac); Seg-8 DWORD_08062084 in check_equip_slot_eligible_zone_type3c0_high_atk_field5; conf: high
+
+@ =============================================================================
+@ file 08 Seg-7 additions: LP row type8 all-slots mask
+@ Source: asm/08_equip_oam_neodaed.s, Seg-7 (0x0806a118..0x0806ab0c)
+@ =============================================================================
+.equ LP_ROW_TYPE8_ALL_SLOTS_MASK, 0x0000ffff  @ r1 arg to set_lp_display_row_type8: all 5 equip slots selected; enqueue_lp_row_type8_if_equippable_slots_nonzero L14873; domain distinct from EQUIP_SLOT_SCORE_CAP=0xffff (equip score) / SLOT_CARD_EMPTY=0xffff (card sentinel) / OAM_ATTR0_HIDDEN=0xffff (OAM domain); 1 Seg-7 slot; conf: high

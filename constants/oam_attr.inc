@@ -52,6 +52,7 @@
 @ =============================================================================
 @ file 04 Seg-7 additions: P2 equip/zone sprite palette selectors
 @ =============================================================================
+.equ OAM_ZONE_SPRITE_PAIR_P2_FIRST, 0x00008028  @ OAM attr0 P2 first sprite in zone display pair (bit15+0x28); dispatch_zone_sprite_with_effect_node_and_state P2 path; sibling: OAM_EQUIP_SLOT_SPRITE_P2=0x8029 (second); 1 Seg-7 slot; 15 raw ROM refs; conf: high
 .equ OAM_EQUIP_SLOT_SPRITE_P2,      0x00008029  @ OAM attr0 P2 for equip slot sprite (bit15+0x29; P1=0x8034); 5 slots in Seg-7; 121 raw ROM refs
 .equ OAM_MULTI_SLOT_MARKER_P2,      0x00008048  @ OAM attr0 P2 for multi-slot selection marker sprite (bit15+0x48; P1=0x48 inline); enqueue_equip_multi_slot_marker_sprite; 12 raw ROM refs
 .equ OAM_FIELD_SLOT_SPRITE_P2,      0x00008043  @ OAM attr0 P2 for duel field slot sprite (bit15+0x43; P1=0x43 inline); enqueue_field_slot_sprite_with_state_update; 35 raw ROM refs

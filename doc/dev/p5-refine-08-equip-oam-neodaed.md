@@ -66,7 +66,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 4 | 0x67160..0x67fa4 | 20 | 74 | 0 | ✅ | 5b5eeae |
 | 5 | 0x67fa4..0x690dc | 20 | 65 | 0 + switchD_080686a2 | ✅ | 82b4d8a |
 | 6 | 0x690dc..0x6a118 | 20 | 90 | 1 (0x696d8/1c) + switchD_08069edc | ✅ | (see §4.06) |
-| 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ⬜ | — |
+| 7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | ✅ | (see §4.07) |
 | 8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 (大表簇, 见 §五) + switchD_0806ac1e | ⬜ | — |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
@@ -197,6 +197,26 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg6Slots.py` + `RepairF08Seg3DataLabels.py` + `FixF08Seg6ThumbPlusPtrLabels.py`
 
+### 4.07 Seg-7 完成记录 (0x6a118..0x6ab0c)
+
+- **EQ**: 40 槽 (37 reuse + 3 new)
+  - gP1LifePoints x4 / gDuelFieldSlots x7 / gDuelPhaseFlags x5 / PLAYER_BLOCK_STRIDE x9 / OAM_EQUIP_SPRITE_TILE_P2_1C x1 / OAM_EQUIP_SLOT_SPRITE_P2 x1 / P1LP_BLOCK2_OFF_1CE8 x1 / gDuelEquipCtx x1 / LP_CARD_TRACK_BASE_OFF x1 / gP1SlotSetCodeArray x1 / POLYMERIZATION_CID x1 / MONSTER_REBORN_CID x1 / MIND_HAXORZ_CID x2 / LIGHT_OF_INTERVENTION_CID x1 / EQUIP_CHAIN_SENTINEL x1 (reuse);
+  - 3 NEW: EQUIP_ZONE_COUNT_TABLE_OFF=0x1cb8 (duel_field.inc) + OAM_ZONE_SPRITE_PAIR_P2_FIRST=0x8028 (oam_attr.inc) + LP_ROW_TYPE8_ALL_SLOTS_MASK=0xffff (duel_field.inc)
+- **REF**: 0 / **RENAME**: 0 / **PLATE**: 0 / **DISASM**: 0 / **FUNC_RENAME**: 0 / **carve**: 0
+- **域例外 (C5)**:
+  - EQUIP_ZONE_COUNT_TABLE_OFF=0x1cb8 (base=gDuelFieldSlots, gDuelFieldSlots+0x1cb8=gEquipZoneCountTable=0x0201e1c8) vs DUEL_ACTIVE_PLAYER_OFF=0x1cb8 (base=gP1LifePoints, 结果=0x0201e198) — 不同 base 不同地址, 独立新建
+  - LP_ROW_TYPE8_ALL_SLOTS_MASK=0xffff (LP display all-slots selector) vs EQUIP_SLOT_SCORE_CAP/SLOT_CARD_EMPTY/OAM_ATTR0_HIDDEN (均=0xffff, 不同域)
+- **§5.1**: 0x0806a544 (4B orphan `movs r0,#0; bx lr`, 0 raw+THUMB+1 refs) — 登记留待, .byte 原样不变
+- **Mode A 修正**: #1 补 §5.1 登记 0x0806a544; #2 ZONE14_CHAIN_SLOT_FLAG_OFF -> EQUIP_ZONE_COUNT_TABLE_OFF (reviewer 确认 gDuelFieldSlots+0x1cb8=gEquipZoneCountTable)
+- **附带修正**: re-export 后 asm/08 两处 fn-ptr 引用需 +1:
+  - `check_equip_activation_at_slot11` 两处 (.word fn -> .word fn+1, 0x08065c50/0x08065c60)
+  - `check_activation_ctx_zone11_match_cb_1` -> `check_activation_ctx_zone11_match_cb+1` (0x08067270)
+  - `check_zone_activation_ctx_match_cb_1` -> `check_zone_activation_ctx_match_cb+1` (0x08069d7c)
+- **新建 constants**: duel_field.inc +2 / oam_attr.inc +1 (3 total)
+- **CSV sync**: 无 (0 disasm / 0 FUNC_RENAME)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra script**: `RefineF08Seg7Slots.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -212,7 +232,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-4 | 0x67160..0x67fa4 | 20 | 74 | 0 | dispatch_effect_zone_lp_sprites_by_slot_flags 簇 |
 | Seg-5 ✅ | 0x67fa4..0x690dc | 20 | 65 | 0 + 1 sw | scan_effect_slots_for_equip_sprite_field6 + switchD_080686a2 |
 | Seg-6 ✅ | 0x690dc..0x6a118 | 20 | 90 | 1 inc + 1 sw | tick_dragon_summon_display + switchD_08069edc |
-| Seg-7 | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
+| Seg-7 ✅ | 0x6a118..0x6ab0c | 20 | 47 | 0 | dispatch_equip_zone_sprite_by_lp_state_with_placement 簇 |
 | Seg-8 | 0x6ab0c..0x6cbe8 | 20 | 85 | 11 inc + 1 sw | 重: dispatch_lp_row_or_banisher_sprite + OAM sprite 数据表/dispatch 大簇 (拆 8a/8b/8c) |
 | Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
 | Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
@@ -224,6 +244,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
+| 0x0806a544 | 4B | Seg-7 | movs r0,#0; bx lr (orphan 4B stub, 0 raw+0 THUMB+1 refs) | pending |
 
 ---
 
