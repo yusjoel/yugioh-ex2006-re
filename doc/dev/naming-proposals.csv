@@ -2283,6 +2283,8 @@ address,name,proposed_name,score,tags
 0x08076454,enqueue_equip_slot_sprite_if_not_in_chain,,,
 0x08076490,tick_equip_zone_hand_sprite_by_card_pair,,,duel_field
 0x08076510,check_effect_slot_card_type_flag_by_id,,,
+0x080765b0,fn_eligible_mustering_dark_scorpions,,,card_effect;equip
+0x080767ac,fn_eligible_spell_vanishing,,,card_effect;equip
 0x0807678c,enqueue_effect_node_sprite_type11_mode5,,,
 0x08076908,enqueue_hand_spell_sprite_with_slot_count,,,
 0x080769fc,enqueue_equip_zone_sprite_zone_type15,,,

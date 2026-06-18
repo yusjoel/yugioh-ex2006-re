@@ -493,3 +493,9 @@
 @ Source: asm/09_equip_lp_display.s, Seg-5a (0x08072d20..0x08073a5c)
 @ =============================================================================
 .equ EQUIP_CHAIN_BASE_OFF, 0x00001c88  @ [gP1FieldArrayCBase(0x0201c600)+0x1c88] = gEquipChainEntryBase(0x0201e288); setup_equip_oam_by_placeable_card_id_and_zone + tick_neo_daedalus_equip_display_seq use offset to reach chain entry array; conf: high
+
+@ =============================================================================
+@ file 09 Seg-8 additions: hand spell slot offset (gGraveyardSlots domain)
+@ Source: asm/09_equip_lp_display.s, Seg-8 (0x0807629c..0x0807738c)
+@ =============================================================================
+.equ HAND_SPELL_SLOT_CC8_OFF, 0x00000cc8  @ [gGraveyardSlots+player*PLAYER_BLOCK_STRIDE+slot_idx*4+0xcc8] hand-spell slot set_code subfield; read as ldrh+lsls#19+lsrs#19 = bits[12:0]; 9 raw ROM refs; enqueue_hand_spell_sprite_with_slot_count; conf: med

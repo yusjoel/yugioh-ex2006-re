@@ -1465,3 +1465,14 @@
 @ =============================================================================
 .equ EMBLEM_OF_DRAGON_DESTROYER_CID, 0x00001629  @ Emblem of Dragon Destroyer (pw=06390406; card-stats.s L16811 slot=0x1629); fn_eligible B1 @ 0x08075378; FS THUMB+1 @ 0x09e41678; conf: high
 .equ MAGICAL_DIMENSION_CID,          0x00001678  @ Magical Dimension (pw=28553439; card-stats.s L17552 slot=0x1678); fn_eligible B3 @ 0x08075d0c; FS THUMB+1 @ 0x09e41948; conf: high
+
+@ =============================================================================
+@ file 09 Seg-8 additions: fn_eligible handler CIDs + equip zone display CIDs
+@ Source: asm/09_equip_lp_display.s, Seg-8 (0x0807629c..0x0807738c)
+@ All values verified against data/card-stats.s slot= fields (0-hit in constants).
+@ =============================================================================
+.equ DARK_SCORPION_BURGLARS_CID, 0x00001531  @ Dark Scorpion Burglars (pw=40933924; card-stats.s slot=0x1531); check_effect_slot_card_type_flag_by_id BST; conf: high
+.equ DD_SCOUT_PLANE_CID,         0x000016be  @ D. D. Scout Plane (pw=03773196; card-stats.s slot=0x16be); enqueue_equip_zone_sprite_with_neo_daedalus_and_chain BST; conf: high
+.equ ENERGY_DRAIN_CID,           0x000016e3  @ Energy Drain (pw=56916805; card-stats.s slot=0x16e3); enqueue_effect_slot_sprite_by_card_id_score BST; conf: high
+.equ GIFT_OF_THE_MARTYR_CID,     0x000018ca  @ Gift of the Martyr (pw=98792570; card-stats.s slot=0x18ca); enqueue_effect_slot_sprite_by_card_id_score BST; conf: high
+.equ DEAL_OF_PHANTOM_CID,        0x00001492  @ Deal of Phantom (pw=69122763; card-stats.s slot=0x1492); enqueue_effect_slot_sprite_by_card_id_score plate ref only; computed at runtime as BARK_OF_DARK_RULER_CID(0x14be)-0x2c; no literal pool slot
