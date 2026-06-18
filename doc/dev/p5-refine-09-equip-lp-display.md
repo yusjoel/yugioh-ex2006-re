@@ -65,7 +65,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 |-----|------|-----|--------|-------------------|------|--------|
 | 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | 08b3db1 |
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ✅ | 79000e6 |
-| 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | (pending commit) |
+| 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | c1c490d |
 | 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
 | 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
@@ -97,7 +97,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - 新常量: constants/duel_field.inc (+1: EQUIP_ZONE_WORD_MASK); constants/card_info.inc (+2: FREED_THE_MATCHLESS_GENERAL_CID, DRAGGED_DOWN_INTO_GRAVE_CID)
 - 踩坑: Block2 literal pool words exported as .byte sequences causing "invalid offset" GAS errors; fixed by RefineF09Seg3Block2PoolFix.py (createDWord + label for 4 pool words)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- commit: (see §三 table)
+- commit: c1c490d
 
 ---
 
