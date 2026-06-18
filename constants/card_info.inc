@@ -1408,3 +1408,14 @@
 @ =============================================================================
 .equ FREED_THE_MATCHLESS_GENERAL_CID, 0x000014c4  @ Freed the Matchless General (pw=49681811; card-stats.s card_1013 slot=0x14C4); dispatch_equip_chain_state_if_tile_count_valid chain check param; conf: high
 .equ DRAGGED_DOWN_INTO_GRAVE_CID,     0x000014e8  @ Dragged Down into the Grave (pw=16435215; card-stats.s card_1048 slot=0x14E8); Block1 FS handler fn_eligible CID ref @GBA:0x09e40e94; conf: high
+
+@ =============================================================================
+@ file 09 Seg-4a additions: Spirit monster CIDs for dispatch_spirit_monster_zone_sprite_by_card_id
+@ Source: asm/09_equip_lp_display.s, Seg-4a (0x080719fc..0x08072404)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ YATA_GARASU_CID,         0x000014ff  @ Yata-Garasu (pw=03078576; card-stats.s card_1066 slot=0x14FF); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> enqueue_spirit_zone_sprite_with_lp_check; conf: high
+.equ YAMATA_DRAGON_CID,       0x00001501  @ Yamata Dragon (pw=76862289; card-stats.s card_1068 slot=0x1501); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> dispatch_equip_draw_counter_sprite_tick; conf: high
+.equ HINO_KAGU_TSUCHI_CID,    0x00001504  @ Hino-Kagu-Tsuchi (pw=75745607; card-stats.s card_1071 slot=0x1504); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> enqueue_spirit_zone_sprite_type11; conf: high
+.equ FENGSHENG_MIRROR_CID,    0x00001509  @ Fengsheng Mirror (pw=37406863; card-stats.s card_1076 slot=0x1509); fn_eligible stub at 0x08071f58; FS table ref at GBA:0x09e40f58; conf: high
+.equ DARK_DUST_SPIRIT_CID,    0x00001526  @ Dark Dust Spirit (pw=89111398; card-stats.s card_1100 slot=0x1526); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> submit_equip_zone_bitmap_pair_update; conf: high

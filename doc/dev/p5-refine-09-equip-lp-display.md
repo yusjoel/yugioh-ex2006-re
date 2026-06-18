@@ -66,7 +66,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | 08b3db1 |
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ✅ | 79000e6 |
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | c1c490d |
-| 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
+| 4a | 0x719fc..0x72404 | 9 | 40 | 4 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100) | ✅ | (see §四) |
+| 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
 | 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
@@ -82,6 +83,28 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.04 Seg-4a 完成记录
+
+- 范围: `[0x080719fc, 0x08072404)` -- 9 fn (setup_equip_oam_entry_for_neo_daedalus_zone14 + dispatch_field_spell_display_by_activation_state + dispatch_spirit_monster_zone_sprite_by_card_id + tick_equip_activation_zone13_oam_state + enqueue_slot_card_sprite_if_effect_node_active + dispatch_equip_zone_sprite_by_zone_bit4_state + refresh_equip_zone_bitmap_with_full_mask + tick_equip_lp_row_sprite_extended_state + dispatch_banisher_equip_zone_sprite_by_target_slot)
+- EQ=38 (36 REUSE + 2 NEW: YAMATA_DRAGON_CID=0x1501 / DARK_DUST_SPIRIT_CID=0x1526)
+- REF=0
+- RENAME=2 (DAT_08071ad4 -> neo_daedalus_z14_sub_stubs_1ad4; DAT_08072004 -> field_spell_dispatch_sub_stubs_2004)
+- FUNC_RENAME=0
+- PLATE=1 (PLATE-1: dispatch_spirit_monster_zone_sprite_by_card_id @0x08071d64 -- callee-swap fix: 0x14ff Yata-Garasu and 0x1501 Yamata Dragon had swapped callee names)
+- PLATE-2 (CJK mojibake @0x08072ce4 tick_dragon_summon_display_if_monster_zones_occupied) deferred to Seg-4b
+- DISASM=4 blocks:
+  - B1: fn_eligible_fiber_jar_1a94 @ 0x08071a94 (ROM_INCBIN 0x71a92/0x2a; FS table THUMB+1 ref @GBA:0x09e43c88; CID=0x14fb Fiber Jar)
+  - B2: 7 sub-stubs field_spell_sub_1ad4..1bbc @ 0x08071ad4..0x08071bdb (ROM_INCBIN 0x71ad4/0x108; 6-entry raw dispatch table @ 0x71abc..0x71ad0)
+  - B3: fn_eligible_fengsheng_mirror_1f58 @ 0x08071f58 (ROM_INCBIN 0x71f56/0x32; FS table THUMB+1 ref @GBA:0x09e40f58; CID=0x1509 Fengsheng Mirror)
+  - B4: 11 sub-stubs field_spell_sub_2004..20f4 @ 0x08072004..0x08072103 (ROM_INCBIN 0x72004/0x100; 32-entry raw dispatch table @ 0x71f88..0x72000)
+- carve=0; §5.1=0
+- 新常量: constants/card_info.inc (+5: YATA_GARASU_CID=0x14ff / YAMATA_DRAGON_CID=0x1501 / HINO_KAGU_TSUCHI_CID=0x1504 / FENGSHENG_MIRROR_CID=0x1509 / DARK_DUST_SPIRIT_CID=0x1526)
+- 踩坑: 3 轮 pool fix (5+3 个 DWord/Word 强制): B2 sub_1b64 pool @0x08071b90..0x08071b9b (3 DWords); B4 sub_2088 pool @0x080720a4..0x080720ab (2 DWords); B2 sub_1ba0 dead bytes @0x08071b9c (1 DWord) + 2-byte align pad @0x08071bb6 (1 Word) + DAT_08071bb8=0x0201e1c8 (1 DWord)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (pending)
+
+---
 
 ### 4.03 Seg-3 完成记录
 
