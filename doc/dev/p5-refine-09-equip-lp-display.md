@@ -72,7 +72,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ✅ | (see §四) |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ✅ | (see §四) |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ✅ | (see §四) |
-| 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | (see §四) |
+| 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | 1e38556 |
 | 9 | 0x7738c..0x7850c | 19 | 67 | 9 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
 | 10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
 
@@ -104,7 +104,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - reviewer correction applied: DWORD_080769d4 (0xcc8) EOL = "bits[12:0] via ldrh+lsls#19+lsrs#19" (not "bits[23:22]")
 - 踩坑: B2/B4 8-pass pool fix campaign (PoolFixF09Seg8.py -> b -> c -> d -> e -> f -> g -> h); root cause = DisassembleCommand stops at unconditional branch + clearListing code range wipes adjacent pool DWords + Ghidra merges adjacent DWords back to .byte; fix = split each disasm range at pool boundaries + per-stub DisassembleCommand starting at each unreachable stub entry; literal pool cluster at 0x666c required all 4 DWords forced individually (0x666c/670/674/678); sub_66d8 case targets at 0x76744/48/50 required 3 separate passes (G disassembled 0x76744..0x76747, H disassembled 0x76748..0x76751) due to 'b' stopping flow
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- commit: (pending)
+- commit: 1e38556
 
 ---
 
