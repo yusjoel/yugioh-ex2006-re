@@ -1451,3 +1451,9 @@
 @ =============================================================================
 .equ RELOAD_CID,                  0x000016d9  @ Reload (pw=22589918; card-stats.s L18657 slot=0x16D9); tick_equip_lp_counter BST; DWORD_08074210; conf: high
 .equ DISTURBANCE_STRATEGY_CID,    0x000015aa  @ Disturbance Strategy (pw=77561728; card-stats.s L15563 slot=0x15AA); tick_equip_lp_counter BST; DWORD_08074214; conf: high
+@ =============================================================================
+@ file 09 Seg-6 additions: equip zone dispatch + fn_eligible handler card IDs
+@ Source: asm/09_equip_lp_display.s Seg-6 (0x08074338..0x080752cc)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ DIMENSION_JAR_CID,           0x000015dd  @ Dimension Jar (pw=73414375; card-stats.s L16018 slot=0x15DD); fn_eligible handler via FS table 0x09e44290 THUMB+1 at 0x09e442a0; conf: high

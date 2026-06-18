@@ -2241,6 +2241,7 @@ address,name,proposed_name,score,tags
 0x08074770,dispatch_dragon_summon_or_lp_delta_by_slot_type,,,
 0x0807479c,dispatch_equip_chain_activation_if_zone_pair_aligned,,,duel_field
 0x08074834,enqueue_slot_sprite_type4_from_entry_attr,,,
+0x08074854,fn_eligible_dimension_jar,,,card_effect;equip
 0x080749e0,tick_equip_activation_lp_display_seq,,,
 0x08074af4,dispatch_equip_zone_sprite_with_type11_at_step80,,,
 0x08074b2c,tick_equip_oam_display_by_state_7x,,,

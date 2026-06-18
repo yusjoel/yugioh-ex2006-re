@@ -70,7 +70,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ✅ | (see §四) |
 | 5a | 0x72d20..0x73a5c | 13 | 61 | 6 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c) | ✅ | (see §四) |
 | 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ✅ | (see §四) |
-| 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
+| 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ✅ | (see §四) |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ⬜ | |
 | 9 | 0x7738c..0x7850c | 19 | 67 | 9 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
@@ -84,6 +84,28 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.08 Seg-6 完成记录
+
+- 范围: `[0x08074338, 0x080752cc)` -- 20 fn (apply_equip_activation_for_zone_slot_sprite / dispatch_equip_zone_bitmap_or_neo_daedalus_sprite / enqueue_equip_zone_sprite_full_from_slot / dispatch_equip_zone_sprite_mode2_or_activation / dispatch_dragon_summon_or_lp_delta_by_slot_type / dispatch_equip_chain_activation_if_zone_pair_aligned / enqueue_slot_sprite_type4_from_entry_attr / tick_equip_activation_lp_display_seq / dispatch_equip_zone_sprite_with_type11_at_step80 / tick_equip_oam_display_by_state_7x / dispatch_banisher_sprite_loop_for_opponent_zones / tick_equip_display_seq_when_fewer_monster_zones / tick_equip_oam_display_by_type_code / enqueue_effect_slot_sprites_all_sides / enqueue_effect_slot_sprite_with_type11 / enqueue_effect_slot_sprite_by_zone_capacity_check / enqueue_effect_card_sprites_all_players / dispatch_equip_node_display_by_type_code / enqueue_effect_card_sprite_single_slot / dispatch_equip_display_state_by_code)
+- EQ=55 (all REUSE: gDuelPhaseFlags x9 / PLAYER_BLOCK_STRIDE x12 / gDuelFieldSlots x8 / EQUIP_PHASE_FRAME_OFF x11 / EQUIP_ZONE_SPRITE_ATTR x6 / gDuelCardCtxBase x2 / LP_CARD_TRACK_BASE_OFF x2 / LP_CARD_TRACK_NEXT_OFF x1 / ELIGIB_SPRITE_CTRL_OFF x1 / ELIGIB_ANIM_STATE_OFF x1 / OAM_EQUIP_SPRITE_TILE_P2_1B x1 / gEquipZoneCountTable x1)
+- REF=5 (4x gP1LifePoints=0x0201c4e0: DWORD_08074a48/adc/cdc/d68; 1x gEquipLpActivBitmap=0x0201e220 NEW)
+- RENAME=5 (PTR_DAT_080748a0->equip_zone_dispatch_table_48a0; DAT_08074914->equip_zone_sub_stubs_4914; DWORD_08074aac->check_equip_slot_eligible_bst_filter_ptr_4aac; DWORD_08074d4c->check_equip_slot_eligible_by_type_query_ptr_4d4c; DAT_08075150->equip_display_switch_table_ptr_5150)
+- FUNC_RENAME=0
+- PLATE=1 (C8 stale FUN_0807a680->dispatch_equip_sprite_by_zone_or_capacity_guard in enqueue_effect_slot_sprite_by_zone_capacity_check @0x0807500c) + CJK fix (dispatch_dragon_summon_or_lp_delta_by_slot_type @0x08074770 plate rewritten ASCII)
+- carve=1 (equip_zone_dispatch_table_48a0 @0x080748a0: 29-entry raw-ptr table via Ghidra label renaming + sub-stub symbolic .word entries via disasm)
+- disasm=2 blocks:
+  - B1: fn_eligible_dimension_jar @ 0x08074854 (ROM_INCBIN 0x74852/0x4a; FS THUMB+1 @GBA:0x09e442a0; CID=0x15dd Dimension Jar; literal pool 4 DWords 0x488c/90/94/98; createFunction)
+  - B2: 6 equip_zone sub-stubs @ 0x08074914 (ROM_INCBIN 0x74914/0xcc; raw ptr dispatch from equip_zone_dispatch_table_48a0; labels: sub_914/sub_920/sub_948/sub_964/sub_9b8/epilogue_9d4; force-DWord pool x5)
+- switchD_0807514a: already fully decoded (31-entry .word table + case labels in asm); no additional work
+- §5.1=0 (both ROM_INCBIN blocks confirmed referenced)
+- 新常量: constants/card_info.inc (+1: DIMENSION_JAR_CID=0x15dd); constants/ewram.inc (+1: gEquipLpActivBitmap=0x0201e220)
+- CSV: +1 row (fn_eligible_dimension_jar @ 0x08074854; refine-created function)
+- 踩坑: CJK mojibake plate in dispatch_dragon_summon_or_lp_delta_by_slot_type @0x08074770 (CJK plate from naming phase) -> FixF09Seg6CjkPlate.py ASCII rewrite
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
 
 ### 4.06 Seg-5a 完成记录
 

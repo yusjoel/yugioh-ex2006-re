@@ -394,6 +394,7 @@
 @ =============================================================================
 .equ P1LP_EQUIP_BITMAP_CTR_OFF,     0x00001d3c  @ [gP1LP+player*PLAYER_BLOCK_STRIDE+0x1d3c] modulo-10 equip-slot bitmap anim frame counter; 6 ROM refs; update_duel_field_slot_sprite_state
 .equ gEquipZoneCountTable,          0x0201e1c8  @ equip zone count tracking table base (EWRAM); 55 ROM refs; apply_nitro_unit_equip_activation loop
+.equ gEquipLpActivBitmap,           0x0201e220  @ LP activation zone-hit bitmap base (EWRAM); read as [base+0] u32 zone-occupation word in tick_equip_activation_lp_display_seq state 0x7e; 3 ROM refs (0x08074ab0, 0x0809d690, 0x080a3490); adjacent gEquipZoneCountTable+0x58; conf: med
 
 @ =============================================================================
 @ file 05 Seg-2 additions: LP bar animation counter/state offsets
