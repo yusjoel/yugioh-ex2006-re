@@ -21986,19 +21986,21 @@ LAB_0806dc4a:
     lsrs r0,r0,#0x1f    @ 0806dc58 c00f
     movs r1,#0x49    @ 0806dc5a 4921
     bl trigger_card_display_op31_if_not_active @ 0806dc5c 25f098fb
-    ldr r0, DAT_0806dc6c                     @ 0806dc60 0248
+    ldr r0, DWORD_0806dc6c                   @ 0806dc60 0248
     bl init_zone_activation_display_fields   @ 0806dc62 28f0affe
     movs r0,#0x7f    @ 0806dc66 7f20
     b LAB_0806dffc                           @ 0806dc68 c8e1
-    .byte  0x00, 0x00, 0x11, 0xdb, 0x06, 0x08
+    .zero  0x2
+DWORD_0806dc6c:
+    .word  0x0806db11                     @ 0806dc6c 11db0608
 
 @ State stub for state=0x7f (table entry[9]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[9]. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_7f:
     bl check_activation_display_state_is_confirmed @ 0806dc70 28f050ff
     cmp r0,#0x0                              @ 0806dc74 0028
     beq LAB_0806dcf8                         @ 0806dc76 3fd0
-    ldr r5, DAT_0806dcec                     @ 0806dc78 1c4d
-    ldr r2, DAT_0806dcf0                     @ 0806dc7a 1d4a
+    ldr r5, DWORD_0806dcec                   @ 0806dc78 1c4d
+    ldr r2, DWORD_0806dcf0                   @ 0806dc7a 1d4a
     adds r0,r5,r2    @ 0806dc7c a818
     ldr r0,[r0,#0x0]                         @ 0806dc7e 0068
     .hword 0x4680    @ 0806dc80 8046
@@ -22008,7 +22010,7 @@ cid_13ed_state_stub_7f:
     adds r1,r0,#0x0    @ 0806dc88 011c
     .hword 0x4642    @ 0806dc8a 4246
     lsls r3,r2,#0x2    @ 0806dc8c 9300
-    ldr r6, DAT_0806dcf4                     @ 0806dc8e 194e
+    ldr r6, DWORD_0806dcf4                   @ 0806dc8e 194e
     muls r1,r6    @ 0806dc90 7143
     adds r1,r3,r1    @ 0806dc92 5918
     movs r2,#0x90    @ 0806dc94 9022
@@ -22054,7 +22056,13 @@ cid_13ed_state_stub_7f:
 LAB_0806dce6:
     movs r0,#0x7e    @ 0806dce6 7e20
     b LAB_0806dffc                           @ 0806dce8 88e1
-    .byte  0x00, 0x00, 0xe0, 0xc4, 0x01, 0x02, 0x70, 0x1d, 0x00, 0x00, 0x68, 0x08, 0x00, 0x00
+    .zero  0x2
+DWORD_0806dcec:
+    .word  0x0201c4e0                     @ 0806dcec e0c40102
+DWORD_0806dcf0:
+    .word  0x00001d70                     @ 0806dcf0 701d0000
+DWORD_0806dcf4:
+    .word  0x00000868                     @ 0806dcf4 68080000
 LAB_0806dcf8:
     movs r0,#0x80    @ 0806dcf8 8020
     b LAB_0806dffc                           @ 0806dcfa 7fe1
@@ -22082,8 +22090,8 @@ cid_13ed_state_stub_7d:
     bl check_activation_display_state_is_confirmed @ 0806dd20 28f0f8fe
     cmp r0,#0x0                              @ 0806dd24 0028
     beq LAB_0806dce6                         @ 0806dd26 ded0
-    ldr r5, DAT_0806dd9c                     @ 0806dd28 1c4d
-    ldr r2, DAT_0806dda0                     @ 0806dd2a 1d4a
+    ldr r5, DWORD_0806dd9c                   @ 0806dd28 1c4d
+    ldr r2, DWORD_0806dda0                   @ 0806dd2a 1d4a
     adds r0,r5,r2    @ 0806dd2c a818
     ldr r0,[r0,#0x0]                         @ 0806dd2e 0068
     .hword 0x4680    @ 0806dd30 8046
@@ -22093,7 +22101,7 @@ cid_13ed_state_stub_7d:
     adds r1,r0,#0x0    @ 0806dd38 011c
     .hword 0x4642    @ 0806dd3a 4246
     lsls r3,r2,#0x2    @ 0806dd3c 9300
-    ldr r6, DAT_0806dda4                     @ 0806dd3e 194e
+    ldr r6, DWORD_0806dda4                   @ 0806dd3e 194e
     muls r1,r6    @ 0806dd40 7143
     adds r1,r3,r1    @ 0806dd42 5918
     movs r2,#0x90    @ 0806dd44 9022
@@ -22139,23 +22147,31 @@ cid_13ed_state_stub_7d:
 LAB_0806dd96:
     movs r0,#0x7c    @ 0806dd96 7c20
     b LAB_0806dffc                           @ 0806dd98 30e1
-    .byte  0x00, 0x00, 0xe0, 0xc4, 0x01, 0x02, 0x70, 0x1d, 0x00, 0x00, 0x68, 0x08, 0x00, 0x00
+    .zero  0x2
+DWORD_0806dd9c:
+    .word  0x0201c4e0                     @ 0806dd9c e0c40102
+DWORD_0806dda0:
+    .word  0x00001d70                     @ 0806dda0 701d0000
+DWORD_0806dda4:
+    .word  0x00000868                     @ 0806dda4 68080000
 
 @ State stub for state=0x7c (table entry[6]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[6]. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_7c:
-    ldr r0, DAT_0806ddb4                     @ 0806dda8 0248
+    ldr r0, DWORD_0806ddb4                   @ 0806dda8 0248
     bl init_zone_activation_display_state_p1_entry @ 0806ddaa 28f02dfe
     movs r0,#0x7b    @ 0806ddae 7b20
     b LAB_0806dffc                           @ 0806ddb0 24e1
-    .byte  0x00, 0x00, 0x11, 0xdb, 0x06, 0x08
+    .zero  0x2
+DWORD_0806ddb4:
+    .word  0x0806db11                     @ 0806ddb4 11db0608
 
 @ State stub for state=0x7b (table entry[5]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[5]. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_7b:
     bl check_activation_display_state_is_confirmed @ 0806ddb8 28f0acfe
     cmp r0,#0x0                              @ 0806ddbc 0028
     beq LAB_0806dd96                         @ 0806ddbe ead0
-    ldr r5, DAT_0806de34                     @ 0806ddc0 1c4d
-    ldr r2, DAT_0806de38                     @ 0806ddc2 1d4a
+    ldr r5, DWORD_0806de34                   @ 0806ddc0 1c4d
+    ldr r2, DWORD_0806de38                   @ 0806ddc2 1d4a
     adds r0,r5,r2    @ 0806ddc4 a818
     ldr r0,[r0,#0x0]                         @ 0806ddc6 0068
     .hword 0x4680    @ 0806ddc8 8046
@@ -22165,7 +22181,7 @@ cid_13ed_state_stub_7b:
     adds r1,r0,#0x0    @ 0806ddd0 011c
     .hword 0x4642    @ 0806ddd2 4246
     lsls r3,r2,#0x2    @ 0806ddd4 9300
-    ldr r6, DAT_0806de3c                     @ 0806ddd6 194e
+    ldr r6, DWORD_0806de3c                   @ 0806ddd6 194e
     muls r1,r6    @ 0806ddd8 7143
     adds r1,r3,r1    @ 0806ddda 5918
     movs r2,#0x90    @ 0806dddc 9022
@@ -22210,7 +22226,13 @@ cid_13ed_state_stub_7b:
     strb r0,[r7,#0x6]                        @ 0806de2c b871
     movs r0,#0x7a    @ 0806de2e 7a20
     b LAB_0806dffc                           @ 0806de30 e4e0
-    .byte  0x00, 0x00, 0xe0, 0xc4, 0x01, 0x02, 0x70, 0x1d, 0x00, 0x00, 0x68, 0x08, 0x00, 0x00
+    .zero  0x2
+DWORD_0806de34:
+    .word  0x0201c4e0                     @ 0806de34 e0c40102
+DWORD_0806de38:
+    .word  0x00001d70                     @ 0806de38 701d0000
+DWORD_0806de3c:
+    .word  0x00000868                     @ 0806de3c 68080000
 
 @ State stub for state=0x7a (table entry[4]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[4]. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_7a:
@@ -22264,14 +22286,14 @@ LAB_0806de88:
     ldrh r2,[r1,#0x0]                        @ 0806de96 0a88
     movs r1,#0xb    @ 0806de98 0b21
     bl get_zone_slot_entity_ref_by_type      @ 0806de9a cdf785fa
-    ldr r1, DAT_0806defc                     @ 0806de9e 1749
-    ldr r2, DAT_0806df00                     @ 0806dea0 174a
+    ldr r1, DWORD_0806defc                   @ 0806de9e 1749
+    ldr r2, DWORD_0806df00                   @ 0806dea0 174a
     adds r1,r1,r2    @ 0806dea2 8918
     ldrh r1,[r1,#0x0]                        @ 0806dea4 0988
     cmp r0,r1                                @ 0806dea6 8842
     bne LAB_0806de86                         @ 0806dea8 edd1
-    ldr r0, DAT_0806df04                     @ 0806deaa 1648
-    ldr r3, DAT_0806df08                     @ 0806deac 164b
+    ldr r0, DWORD_0806df04                   @ 0806deaa 1648
+    ldr r3, DWORD_0806df08                   @ 0806deac 164b
     adds r0,r0,r3    @ 0806deae c018
     str r5,[r0,#0x0]                         @ 0806deb0 0560
 LAB_0806deb2:
@@ -22279,19 +22301,19 @@ LAB_0806deb2:
     lsls r4,r7,#0x1f    @ 0806deb4 fc07
     lsrs r0,r4,#0x1f    @ 0806deb6 e00f
     adds r2,r0,#0x0    @ 0806deb8 021c
-    ldr r1, DAT_0806df04                     @ 0806deba 1249
-    ldr r3, DAT_0806df08                     @ 0806debc 124b
+    ldr r1, DWORD_0806df04                   @ 0806deba 1249
+    ldr r3, DWORD_0806df08                   @ 0806debc 124b
     adds r1,r1,r3    @ 0806debe c918
     ldr r1,[r1,#0x0]                         @ 0806dec0 0968
     lsls r1,r1,#0x1    @ 0806dec2 4900
     adds r1,r6,r1    @ 0806dec4 7118
     ldrh r1,[r1,#0x0]                        @ 0806dec6 0988
     lsls r3,r1,#0x2    @ 0806dec8 8b00
-    ldr r6, DAT_0806df0c                     @ 0806deca 104e
+    ldr r6, DWORD_0806df0c                   @ 0806deca 104e
     adds r1,r2,#0x0    @ 0806decc 111c
     muls r1,r6    @ 0806dece 7143
     adds r1,r3,r1    @ 0806ded0 5918
-    ldr r5, DAT_0806df10                     @ 0806ded2 0f4d
+    ldr r5, DWORD_0806df10                   @ 0806ded2 0f4d
     adds r1,r1,r5    @ 0806ded4 4919
     ldr r2,[r1,#0x0]                         @ 0806ded6 0a68
     lsls r2,r2,#0x2    @ 0806ded8 9200
@@ -22310,7 +22332,19 @@ LAB_0806deb2:
     bl enqueue_equip_slot_sprite_with_display_code @ 0806def2 d6f7f7fe
     movs r0,#0x78    @ 0806def6 7820
     b LAB_0806dffc                           @ 0806def8 80e0
-    ROM_INCBIN 0x6defa, 0x1a
+    .zero  0x2
+DWORD_0806defc:
+    .word  0x0201c4e0                     @ 0806defc e0c40102
+DWORD_0806df00:
+    .word  0x00001da8                     @ 0806df00 a81d0000
+DWORD_0806df04:
+    .word  0x0201b290                     @ 0806df04 90b20102
+DWORD_0806df08:
+    .word  0x000004a4                     @ 0806df08 a4040000
+DWORD_0806df0c:
+    .word  0x00000868                     @ 0806df0c 68080000
+DWORD_0806df10:
+    .word  0x0201c600                     @ 0806df10 00c60102
 
 @ State stub for state=0x78 (table entry[2]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[2]. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_78:
@@ -22391,7 +22425,7 @@ DAT_0806dfa4:
 
 @ State stub for state=0x76 (table entry[0]) in CID=0x13ed handler. 11-entry raw-addr table at 0x0806dc10; entry[0] at lowest index. Block range 0x0806dc3c..0x0806e00b.
 cid_13ed_state_stub_76:
-    ldr r1, DAT_0806dfe8                     @ 0806dfa8 0f49
+    ldr r1, DWORD_0806dfe8                   @ 0806dfa8 0f49
     adds r0,r3,r1    @ 0806dfaa 5818
     ldr r1,[r0,#0x0]                         @ 0806dfac 0168
     lsls r1,r1,#0x1    @ 0806dfae 4900
@@ -22419,7 +22453,9 @@ cid_13ed_state_stub_76:
     movs r3,#0x0    @ 0806dfde 0023
     bl invoke_setup_equip_oam_with_attr2     @ 0806dfe0 3df02eff
     b LAB_0806dffa                           @ 0806dfe4 09e0
-    .byte  0x00, 0x00, 0xa4, 0x04, 0x00, 0x00
+    .zero  0x2
+DWORD_0806dfe8:
+    .word  0x000004a4                     @ 0806dfe8 a4040000
 LAB_0806dfec:
     ldrb r7,[r7,#0x2]                        @ 0806dfec bf78
     lsls r0,r7,#0x1f    @ 0806dfee f807
@@ -23067,11 +23103,11 @@ LAB_0806e480:
     lsls r5,r6,#0x2    @ 0806e486 b500
     adds r5,r5,r6    @ 0806e488 ad19
     lsls r5,r5,#0x2    @ 0806e48a ad00
-    ldr r0, DAT_0806e508                     @ 0806e48c 1e48
+    ldr r0, DWORD_0806e508                   @ 0806e48c 1e48
     adds r4,r1,#0x0    @ 0806e48e 0c1c
     muls r4,r0    @ 0806e490 4443
     adds r1,r5,r4    @ 0806e492 2919
-    ldr r2, DAT_0806e50c                     @ 0806e494 1d4a
+    ldr r2, DWORD_0806e50c                   @ 0806e494 1d4a
     .hword 0x4691    @ 0806e496 9146
     add r1,r9                                @ 0806e498 4944
     ldr r0,[r1,#0x0]                         @ 0806e49a 0868
@@ -23112,13 +23148,13 @@ LAB_0806e4cc:
     b de_fusion_state_stub_7e                @ 0806e4e6 99e0
 LAB_0806e4e8:
     ldrh r0,[r7,#0xa]                        @ 0806e4e8 7889
-    ldr r1, DAT_0806e510                     @ 0806e4ea 0949
+    ldr r1, DWORD_0806e510                   @ 0806e4ea 0949
     bl build_equip_set_f_criteria_state      @ 0806e4ec 11f0e8fb
     cmp r0,#0x0                              @ 0806e4f0 0028
     bne LAB_0806e4f6                         @ 0806e4f2 00d1
     b de_fusion_state_stub_7e                @ 0806e4f4 92e0
 LAB_0806e4f6:
-    ldr r0, DAT_0806e514                     @ 0806e4f6 0748
+    ldr r0, DWORD_0806e514                   @ 0806e4f6 0748
     bl count_field_copies_of_card            @ 0806e4f8 c4f750f9
     cmp r0,#0x0                              @ 0806e4fc 0028
     beq LAB_0806e502                         @ 0806e4fe 00d0
@@ -23126,7 +23162,15 @@ LAB_0806e4f6:
 LAB_0806e502:
     movs r0,#0x7f    @ 0806e502 7f20
     b LAB_0806e61e                           @ 0806e504 8be0
-    ROM_INCBIN 0x6e506, 0x12
+    .zero  0x2
+DWORD_0806e508:
+    .word  0x00000868                     @ 0806e508 68080000
+DWORD_0806e50c:
+    .word  0x0201c510                     @ 0806e50c 10c50102
+DWORD_0806e510:
+    .word  0x0201e500                     @ 0806e510 00e50102
+DWORD_0806e514:
+    .word  0x0000159d                     @ 0806e514 9d150000
 
 @ State stub for state=0x7f (table entry[4]) in DE_FUSION_CID=0x13fe handler. 6-entry raw-addr table at 0x0806e448; entry[4] at 0x6e458 -> 0x0806e518. index=state-0x7b; state=0x7f -> index=4. Block range 0x0806e460..0x0806e62b.
 de_fusion_state_stub_7f:
@@ -23141,7 +23185,7 @@ LAB_0806e526:
     lsls r0,r2,#0x1f    @ 0806e528 d007
     lsrs r0,r0,#0x1f    @ 0806e52a c00f
     lsls r1,r4,#0x2    @ 0806e52c a100
-    ldr r2, DAT_0806e598                     @ 0806e52e 1a4a
+    ldr r2, DWORD_0806e598                   @ 0806e52e 1a4a
     adds r1,r1,r2    @ 0806e530 8918
     ldr r2,[r1,#0x0]                         @ 0806e532 0a68
     lsls r1,r2,#0x2    @ 0806e534 9100
@@ -23175,7 +23219,7 @@ LAB_0806e55c:
     bl count_available_monster_slots         @ 0806e570 c5f722f8
     cmp r0,r5                                @ 0806e574 a842
     blt de_fusion_state_stub_7e              @ 0806e576 51db
-    ldr r1, DAT_0806e59c                     @ 0806e578 0849
+    ldr r1, DWORD_0806e59c                   @ 0806e578 0849
     ldrb r7,[r7,#0x2]                        @ 0806e57a bf78
     lsls r0,r7,#0x1f    @ 0806e57c f807
     lsrs r0,r0,#0x1f    @ 0806e57e c00f
@@ -23185,14 +23229,18 @@ LAB_0806e55c:
     ldr r1,[r0,#0x0]                         @ 0806e586 0168
     cmp r1,#0x1                              @ 0806e588 0129
     bne LAB_0806e5a4                         @ 0806e58a 0bd1
-    ldr r0, DAT_0806e5a0                     @ 0806e58c 0448
+    ldr r0, DWORD_0806e5a0                   @ 0806e58c 0448
     movs r2,#0xea    @ 0806e58e ea22
     lsls r2,r2,#0x5    @ 0806e590 5201
     adds r0,r0,r2    @ 0806e592 8018
     str r1,[r0,#0x0]                         @ 0806e594 0160
     b LAB_0806e5aa                           @ 0806e596 08e0
-DAT_0806e598:
-    .byte  0x00, 0xe5, 0x01, 0x02, 0xa0, 0xe2, 0x01, 0x02, 0xe0, 0xc4, 0x01, 0x02
+DWORD_0806e598:
+    .word  0x0201e500                     @ 0806e598 00e50102
+DWORD_0806e59c:
+    .word  0x0201e2a0                     @ 0806e59c a0e20102
+DWORD_0806e5a0:
+    .word  0x0201c4e0                     @ 0806e5a0 e0c40102
 LAB_0806e5a4:
     movs r0,#0x59    @ 0806e5a4 5920
     bl invoke_card_display_op_0x31_sub1      @ 0806e5a6 24f005ff
@@ -23202,22 +23250,24 @@ LAB_0806e5aa:
 
 @ State stub for state=0x7d (table entry[2]) in DE_FUSION_CID=0x13fe handler. 6-entry raw-addr table at 0x0806e448; entry[2] at 0x6e450 -> 0x0806e5ae. index=state-0x7b; state=0x7d -> index=2. Block range 0x0806e460..0x0806e62b.
 de_fusion_state_stub_7d:
-    ldr r0, DAT_0806e5cc                     @ 0806e5ae 0748
+    ldr r0, DWORD_0806e5cc                   @ 0806e5ae 0748
     movs r1,#0xea    @ 0806e5b0 ea21
     lsls r1,r1,#0x5    @ 0806e5b2 4901
     adds r0,r0,r1    @ 0806e5b4 4018
     ldr r0,[r0,#0x0]                         @ 0806e5b6 0068
     cmp r0,#0x0                              @ 0806e5b8 0028
     beq de_fusion_state_stub_7e              @ 0806e5ba 2fd0
-    ldr r0, DAT_0806e5d0                     @ 0806e5bc 0448
+    ldr r0, DWORD_0806e5d0                   @ 0806e5bc 0448
     adds r1,r2,r0    @ 0806e5be 1118
     movs r0,#0x0    @ 0806e5c0 0020
     str r0,[r1,#0x0]                         @ 0806e5c2 0860
     bl increment_lp_bar_display_counter      @ 0806e5c4 dcf7d2f8
     movs r0,#0x7c    @ 0806e5c8 7c20
     b LAB_0806e61e                           @ 0806e5ca 28e0
-DAT_0806e5cc:
-    .byte  0xe0, 0xc4, 0x01, 0x02, 0xa4, 0x04, 0x00, 0x00
+DWORD_0806e5cc:
+    .word  0x0201c4e0                     @ 0806e5cc e0c40102
+DWORD_0806e5d0:
+    .word  0x000004a4                     @ 0806e5d0 a4040000
 
 @ State stub for state=0x7c (table entry[1]) in DE_FUSION_CID=0x13fe handler. 6-entry raw-addr table at 0x0806e448; entry[1] at 0x6e44c -> 0x0806e5d4. index=state-0x7b; state=0x7c -> index=1. Block range 0x0806e460..0x0806e62b.
 de_fusion_state_stub_7c:
@@ -23227,12 +23277,12 @@ de_fusion_state_stub_7c:
     ldrb r7,[r7,#0x2]                        @ 0806e5dc bf78
     lsls r0,r7,#0x1f    @ 0806e5de f807
     lsrs r0,r0,#0x1f    @ 0806e5e0 c00f
-    ldr r4, DAT_0806e608                     @ 0806e5e2 094c
-    ldr r1, DAT_0806e60c                     @ 0806e5e4 0949
+    ldr r4, DWORD_0806e608                   @ 0806e5e2 094c
+    ldr r1, DWORD_0806e60c                   @ 0806e5e4 0949
     adds r4,r4,r1    @ 0806e5e6 6418
     ldr r1,[r4,#0x0]                         @ 0806e5e8 2168
     lsls r1,r1,#0x2    @ 0806e5ea 8900
-    ldr r2, DAT_0806e610                     @ 0806e5ec 084a
+    ldr r2, DWORD_0806e610                   @ 0806e5ec 084a
     adds r1,r1,r2    @ 0806e5ee 8918
     movs r2,#0x1    @ 0806e5f0 0122
     movs r3,#0x20    @ 0806e5f2 2023
@@ -23244,7 +23294,13 @@ de_fusion_state_stub_7c:
     bge LAB_0806e614                         @ 0806e600 08da
     movs r0,#0x7c    @ 0806e602 7c20
     b LAB_0806e61e                           @ 0806e604 0be0
-    .byte  0x00, 0x00, 0x90, 0xb2, 0x01, 0x02, 0xa4, 0x04, 0x00, 0x00, 0x00, 0xe5, 0x01, 0x02
+    .zero  0x2
+DWORD_0806e608:
+    .word  0x0201b290                     @ 0806e608 90b20102
+DWORD_0806e60c:
+    .word  0x000004a4                     @ 0806e60c a4040000
+DWORD_0806e610:
+    .word  0x0201e500                     @ 0806e610 00e50102
 LAB_0806e614:
     movs r0,#0x7b    @ 0806e614 7b20
     b LAB_0806e61e                           @ 0806e616 02e0

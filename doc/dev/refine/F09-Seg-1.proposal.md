@@ -154,11 +154,12 @@ None. All 20 function names verified correct by body inspection (no name-body co
 
 ### PLATE (R5)
 
-One stale FUN_ in existing plate text:
+Two plate fixes in existing plate text:
 
 | function | location | old text | fix |
 |----------|---------|---------|-----|
 | dispatch_equip_zone_token_or_lp_sprite_by_slot_type | asm/09 line 148 | "same caller also calls FUN_0806e898" | substring replace: FUN_0806e898 -> dispatch_equip_chain_state_sprite_by_slot |
+| dispatch_equip_chain_state_sprite_by_slot | asm/09 line 207 | "LP_STATE_BASE = 0x0201b290 (gP1LifePoints)" | substring replace: (gP1LifePoints) -> (gDuelPhaseFlags); treat setPlateComment WARN/not-found as FAIL |
 
 ---
 
@@ -277,3 +278,32 @@ None. All semantics confirmed by consumer evidence or by inspection.
 4. Section 5.1 has 0 entries; all 6 blocks have confirmed references (no misclassification).
 5. Slot labels follow ^[a-z][a-z0-9_]+$ pattern throughout.
 6. C5 dedup: all new equates grepped with value check against all constants/*.inc -- none already exist.
+   - PLAYER_BLOCK_STRIDE=0x868: EXISTS in ewram.inc (18 slots use Reuse, not New -- confirmed)
+   - LP_ACTIVATION_LINK_FLAG_OFF=0x10d0: EXISTS in ewram.inc (2 slots use Reuse -- confirmed)
+   - LP_CARD_TRACK_BASE_OFF=0x1da8: EXISTS in ewram.inc (3 slots use Reuse -- confirmed)
+   - EQUIP_PHASE_FRAME_OFF=0x4a4: EXISTS in ewram.inc (2 slots use Reuse -- confirmed)
+   - D_TRIBE_CID=0x15ae: EXISTS in card_info.inc (1 slot uses Reuse -- confirmed)
+   - DESTINY_BOARD_CID=0x1468: EXISTS in card_info.inc (0 slots directly -- CID only appears in ROM table ref context, not as literal pool slot in Seg-1 code -- no EQ slot needed)
+   - INSECT_IMITATION_CID=0x140b: EXISTS in card_info.inc (1 slot uses Reuse -- confirmed)
+   - LIMITER_REMOVAL_CID=0x1409: EXISTS in card_info.inc (1 slot uses Reuse -- confirmed)
+   - PYRAMID_ENERGY_CID=0x153d: EXISTS in card_info.inc (1 slot uses Reuse -- confirmed)
+   - OAM_EQUIP_SPRITE_TILE_P2_1B=0x801b: EXISTS in oam_attr.inc (1 slot uses Reuse -- confirmed)
+   - OAM_SPRITE_CODE_P1_ACTIVATION=0x8019: EXISTS in oam_attr.inc (1 slot uses Reuse -- confirmed)
+   - EQUIP_SLOT_SCORE_CAP=0xffff: EXISTS in oam_attr.inc (1 slot uses Reuse -- confirmed)
+   - BIG_MARCH_OF_ANIMALS_CID=0x1882: NOT FOUND in any .inc (NEW -- confirmed)
+   - LP_D_TRIBE_BLOCK_OFF=0x1ce4: NOT FOUND in any .inc (NEW -- confirmed)
+   - LP_P2_LOOP_CEIL_OFF=0x874: NOT FOUND in any .inc (NEW -- confirmed)
+   - ICID_RESERVED_D=0x144c: NOT FOUND in any .inc (NEW -- confirmed)
+   - ICID_RESERVED_E=0x1452: NOT FOUND in any .inc (NEW -- confirmed)
+   - OAM_EQUIP_SPRITE_P2_1A=0x801a: NOT FOUND in any .inc (NEW -- confirmed)
+   - CREATURE_SWAP_CID=0x142a: NOT FOUND in card_info.inc (NEW -- confirmed; no literal pool slot in Seg-1, but adding for FS table CID labeling completeness)
+
+---
+
+## Executor Report: F09-Seg-1
+
+- Slots: EQ=35 REF=34 RENAME=3 FUNC_RENAME=0 PLATE=2
+- carve=0 disasm=6 blocks (B1/B2/B3/B4/B5/B6) + 3 inline dispatch tables labeled; disasm range [0x0806f008..0x0806ff4f] (6 non-contiguous sub-ranges); switchD_0806e8b6 already decoded (no action) section=5.1=0
+- New constants/globals: BIG_MARCH_OF_ANIMALS_CID (card_info.inc), CREATURE_SWAP_CID (card_info.inc), ICID_RESERVED_D (card_info.inc), ICID_RESERVED_E (card_info.inc), LP_D_TRIBE_BLOCK_OFF (ewram.inc), LP_P2_LOOP_CEIL_OFF (ewram.inc), OAM_EQUIP_SPRITE_P2_1A (oam_attr.inc)
+- Seek-help: none
+- proposal: doc/dev/refine/F09-Seg-1.proposal.md

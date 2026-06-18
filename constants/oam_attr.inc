@@ -174,3 +174,10 @@
 @ dispatch_equip_lp_sprite_by_trap_card_id
 @ =============================================================================
 .equ SPRITE_RECORD_P2_SIDE, 0x00008020  @ P2-side sprite record attr0 (bit15=1 OBJ palette select | 0x20 tile region); dispatch_equip_lp_sprite_by_trap_card_id player==1 path; P1 uses 0x20 inline; 8 aligned ROM refs; 3 .word slots in asm/08+10+12
+
+@ =============================================================================
+@ file 09 Seg-1 additions: equip chain activation sprite P2 OAM attr0
+@ Source: asm/09_equip_lp_display.s, Seg-1 (0x0806e76c..0x0806ff50)
+@ tick_equip_chain_activation_display_seq state 0x7f
+@ =============================================================================
+.equ OAM_EQUIP_SPRITE_P2_1A,  0x0000801a  @ equip sprite OAM attr0 P2 (bit15+0x1a); tick_equip_chain_activation_display_seq state 0x7f: P2 path uses 0x801a, P1 inline 0x1a; sibling of OAM_EQUIP_SPRITE_TILE_P2_1B(0x801b) and OAM_SPRITE_CODE_P1_ACTIVATION(0x8019); 119 ROM refs; conf:high

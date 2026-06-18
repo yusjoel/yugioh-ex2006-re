@@ -1374,3 +1374,13 @@
 .equ NEO_SPACE_SPAWN_CAT_1422,    0x00001422  @ Neo Space spawn category code 0x1422 (card_5154=card_stat_zero). Category for Multiplication of Ants spawn group. tick_neo_space_oam_seq_by_card_id; conf: high (category use beyond card range)
 .equ NEO_SPACE_SPAWN_CAT_1813,    0x00001813  @ Neo Space spawn category code 0x1813 (CID 6163 > max card 5169 = beyond card range). Category for The Blockman effect group; conf: high (beyond card range)
 .equ NEO_SPACE_SPAWN_CAT_19BA,    0x000019ba  @ Neo Space spawn category code 0x19ba (CID 6586 > max card range). Category for Phantasmal Martyrs group; conf: high (beyond card range)
+
+@ =============================================================================
+@ file 09 Seg-1 additions: equip LP display CIDs + reserved internal CIDs
+@ Source: asm/09_equip_lp_display.s, Seg-1 (0x0806e76c..0x0806ff50)
+@ All values verified against data/card-stats.s or confirmed unallocated (CID=0xFFFF).
+@ =============================================================================
+.equ BIG_MARCH_OF_ANIMALS_CID,  0x00001882  @ The Big March of Animals (card_1795 pw=01689516); enqueue_slot_sprites_by_card_id_scoring scoring branch; conf: high
+.equ CREATURE_SWAP_CID,         0x0000142a  @ Creature Swap (card_0910 pw=31036355); Block1 FS handler fn_eligible CID=0x142a at 0x0806f008; conf: high
+.equ ICID_RESERVED_D,           0x0000144c  @ reserved internal CID (CID=0xFFFF, not in card-stats.s); dispatch_hand_card_slot_sprite_by_state_and_card_id BST state 0x80/0x7e; conf: high
+.equ ICID_RESERVED_E,           0x00001452  @ reserved internal CID (CID=0xFFFF, not in card-stats.s); sibling of ICID_RESERVED_D in same BST; conf: high

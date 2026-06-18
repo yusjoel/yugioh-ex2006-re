@@ -63,7 +63,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|-------------------|------|--------|
-| 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ⬜ | |
+| 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | TBD |
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ⬜ | |
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ⬜ | |
 | 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
@@ -83,7 +83,19 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ## 四、逐段完成记录
 
-(各段落地后由 fixer 追加)
+### 4.01 Seg-1 完成记录
+
+- 范围: `[0x0806e76c, 0x0806ff50)` — 20 fn, enqueue_slot_sprite_type11 + dispatch_equip_zone_token/lp + state machine 簇
+- EQ=40 (33 reuse + 7 NEW: BIG_MARCH_OF_ANIMALS_CID/CREATURE_SWAP_CID/ICID_RESERVED_D/ICID_RESERVED_E/LP_D_TRIBE_BLOCK_OFF/LP_P2_LOOP_CEIL_OFF/OAM_EQUIP_SPRITE_P2_1A)
+- REF=34 (gP1LifePoints×12, gDuelPhaseFlags×9, gDuelFieldSlots×10, gP1HandSlotArray×1, gEquipChainSlotRefs×2)
+- RENAME=3 (DAT_0806f054/fa08/fe88 → eligible_sub_stubs_f054/fa08/fe88)
+- FUNC_RENAME=0; PLATE=2 (FUN_0806e898→dispatch_equip_chain_state_sprite_by_slot; (gP1LifePoints)→(gDuelPhaseFlags))
+- DISASM=6 blocks (Block1: eligible_creature_swap_f008; Block2: 6 dispatch sub-stubs; Block3: eligible_destiny_board_f85c; Block4: 10 dispatch sub-stubs; Block5: eligible_cathedral_of_nobles_fdec; Block6: 8 dispatch sub-stubs) + 3 dispatch tables labeled
+- carve=0; §5.1=0 (all 6 blocks have confirmed refs)
+- 新常量: constants/card_info.inc (+4), constants/ewram.inc (+2), constants/oam_attr.inc (+1)
+- Literal pool fix: FixF08Seg10AndF09Seg1LiteralPools.py (43 DWORDs) + FixF08Seg10CidStateLiteralPools2.py (8 DWORDs) + FixF08ThumbPlusOneLabels.py (2 THUMB+1 labels restored)
+- byte-identical: ✅ SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: TBD
 
 ---
 

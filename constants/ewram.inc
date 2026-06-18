@@ -479,3 +479,10 @@
 @ Domain exception: same value as EFFECT_ZONE_BITMASK_OFF=0x10d0 (duel_field.inc, base=gDuelFieldSlots)
 @ =============================================================================
 .equ LP_ACTIVATION_LINK_FLAG_OFF,  0x000010d0  @ [gP1LifePoints+0x10d0] activation link flag; bit0+bit1 tested for LP link status in tick_equip_activation_sprite_with_lp_row_state_machine; asm/08 L12689; domain=gP1LifePoints (distinct from EFFECT_ZONE_BITMASK_OFF=0x10d0 base=gDuelFieldSlots)
+
+@ =============================================================================
+@ file 09 Seg-1 additions: LP display field offsets (gP1LifePoints domain)
+@ Source: asm/09_equip_lp_display.s, Seg-1 (0x0806e76c..0x0806ff50)
+@ =============================================================================
+.equ LP_D_TRIBE_BLOCK_OFF,  0x00001ce4  @ [gP1LifePoints+0x1ce4] D.Tribe LP score field; enqueue_slot_sprites_by_card_id_scoring D_TRIBE_CID(0x15ae) path reads dword here as scoring param; adjacent to P1LP_BLOCK2_OFF_1CE8(0x1ce8)-4; 2 aligned ROM refs; conf:med
+.equ LP_P2_LOOP_CEIL_OFF,   0x00000874  @ [gP1LifePoints+0x874] P2 LP loop ceiling = PLAYER_BLOCK_STRIDE(0x868) + LP_LOOP_CEIL_OFF(0xc); tick_lp_zone_sprite_display_seq state 0x80 reads P2 ceil at this offset; 7 aligned ROM refs; conf:high
