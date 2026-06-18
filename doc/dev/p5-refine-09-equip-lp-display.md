@@ -71,7 +71,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 5a | 0x72d20..0x73a5c | 13 | 61 | 6 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c) | ✅ | (see §四) |
 | 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ✅ | (see §四) |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ✅ | (see §四) |
-| 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
+| 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ✅ | (see §四) |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ⬜ | |
 | 9 | 0x7738c..0x7850c | 19 | 67 | 9 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
 | 10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
@@ -84,6 +84,31 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.09 Seg-7 完成记录
+
+- 范围: `[0x080752cc, 0x0807629c)` -- 19 fn (enqueue_effect_card_sprite_dual_with_negated / init_effect_slot_display_if_opponent_lp_active / enqueue_effect_slot_sprites_all_players / check_equip_slot_placement_via_neo_daedalus / check_equip_slot_placement_via_target_bitmap / enqueue_equip_zone_sprite_with_slot_setup / invoke_equip_oam_for_zone_type_e_slot / invoke_equip_oam_for_hand_set_code_slot / tick_equip_zone_display_seq_by_type_code / enqueue_graveyard_spell_for_hand_set_code / tick_graveyard_spell_display_by_state / enqueue_effect_slot_sprite_mode2_and_type11 / dispatch_effect_activation_with_lp_counter / set_field_bit_by_slot_match_equip_dir / invoke_equip_zone_lp_shape_with_lp_counter / enqueue_effect_node_sprite_type11_from_slot / enqueue_effect_slot_sprite_with_score_sum / dispatch_zone13_equip_display_by_type_code / tick_effect_display_by_state_and_type_code)
+- EQ=42 (all REUSE: gP1LifePoints x1 / PLAYER_BLOCK_STRIDE x14 / gDuelCardCtxBase x3 / gEquipZoneCountTable x1 / gDuelFieldSlots x6 / gDuelPhaseFlags x4 / EQUIP_PHASE_FRAME_OFF x4 / SLOT_CARD_SET_CODE_MASK x1 / SCROLLBAR_KEEP_BITS_8_0 x1 / SCROLLBAR_CLEAR_BITS_14_6 x1 / gP1HandSlotArray x3 / lookup_equip_score_b_0x1b7 x1 / OAM_EFFECT_SLOT_TILE_P1 x1 / gP1SlotSetCodeArray x1)
+- REF=0
+- RENAME=4 (DAT_08075414->emblem_dispatch_sub_stubs_5414; DWORD_08075c24->dispatch_eff_act_card_id_ptr_5c24 (Ruling A FS ROM ptr + ASCII EOL); DAT_08075d5c->magical_dim_dispatch_sub_stubs_5d5c; DAT_08075fe0->friendship_dispatch_sub_stubs_5fe0)
+- FUNC_RENAME=0
+- PLATE=2 updates (enqueue_effect_slot_sprites_all_players @0x080754b8: gEffectSlots->gEquipZoneCountTable + gSlotData->gDuelFieldSlots; reviewer non-blocking cleanup landed OK)
+- carve=0
+- disasm=6 blocks:
+  - B1: fn_eligible_emblem_of_dragon_destroyer @ 0x08075378 (ROM_INCBIN 0x75378/0x28; FS THUMB+1 @0x09e41678; CID=0x1629; literal pool 1 DWord 0x0807539c; createFunction)
+  - B2: 6 emblem sub-stubs @ 0x08075414 (ROM_INCBIN 0x75414/0xa4; 29-entry dispatch table @0x753a0..0x75413; labels: sub_5414/5446/545a/5492/54a4/default_54ae)
+  - B3: fn_eligible_magical_dimension @ 0x08075d0c (ROM_INCBIN 0x75d0c/0x2c; FS THUMB+1 @0x09e41948; CID=0x1678; literal pool 2 DWords 0x75d30/34; createFunction)
+  - B4: 9 magical_dim sub-stubs @ 0x08075d5c (ROM_INCBIN 0x75d5c/0x214; 9-entry dispatch table @0x75d38..0x75d5b; labels: sub_5d5c/5dc4/5de8/5e20/5e60/5e8c/5ec0/5f02/5f2c; 3 rounds pool fix: PoolFixF09Seg7.py + b.py + c.py for 29+7 DWords)
+  - B5: fn_eligible_friendship @ 0x08075f90 (ROM_INCBIN 0x75f8e/0x2e; 2B pad @0x75f8e; FS THUMB+1 @0x09e41978; CID=0x167a FRIENDSHIP_CID REUSE; literal pool 2 DWords 0x75fb4/b8; createFunction)
+  - B6: 6 friendship sub-stubs @ 0x08075fe0 (ROM_INCBIN 0x75fe0/0x17c; 9-entry dispatch table @0x75fbc..0x75fdb; labels: sub_5fe0/5ff4/6030/609e/6100/default_6146; pool fix for 3 DWord clusters in B6)
+- §5.1=0 (all 6 blocks have confirmed refs)
+- 新常量: constants/card_info.inc (+2: EMBLEM_OF_DRAGON_DESTROYER_CID=0x1629, MAGICAL_DIMENSION_CID=0x1678); FRIENDSHIP_CID=0x167a REUSE
+- CSV: +3 rows (fn_eligible_emblem_of_dragon_destroyer @0x08075378 / fn_eligible_magical_dimension @0x08075d0c / fn_eligible_friendship @0x08075f90; all refine-created functions)
+- 踩坑: B4/B6 多轮 pool fix (PoolFixF09Seg7.py -> b -> c): B4 大段 0x214B 含 THUMB+1 callee ptrs + 多个 data pool clusters; redisasm clearListing 会覆写 force_dword (需先 disasm 再单独 force_dword 不含 re-clearListing); B4+0x52 末尾 ROM_INCBIN 0x75f52/0x16 残留 4 个 pool DWords (PoolFixF09Seg7c.py)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
 
 ### 4.08 Seg-6 完成记录
 

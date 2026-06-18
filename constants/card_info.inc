@@ -1457,3 +1457,11 @@
 @ All values verified against data/card-stats.s slot= fields.
 @ =============================================================================
 .equ DIMENSION_JAR_CID,           0x000015dd  @ Dimension Jar (pw=73414375; card-stats.s L16018 slot=0x15DD); fn_eligible handler via FS table 0x09e44290 THUMB+1 at 0x09e442a0; conf: high
+@ =============================================================================
+@ file 09 Seg-7 additions: fn_eligible handler card IDs (Emblem/Magical Dimension)
+@ Source: asm/09_equip_lp_display.s Seg-7 (0x080752cc..0x0807629c)
+@ All values verified against data/card-stats.s slot= fields.
+@ FRIENDSHIP_CID=0x167a already exists at line 1071 (REUSE).
+@ =============================================================================
+.equ EMBLEM_OF_DRAGON_DESTROYER_CID, 0x00001629  @ Emblem of Dragon Destroyer (pw=06390406; card-stats.s L16811 slot=0x1629); fn_eligible B1 @ 0x08075378; FS THUMB+1 @ 0x09e41678; conf: high
+.equ MAGICAL_DIMENSION_CID,          0x00001678  @ Magical Dimension (pw=28553439; card-stats.s L17552 slot=0x1678); fn_eligible B3 @ 0x08075d0c; FS THUMB+1 @ 0x09e41948; conf: high

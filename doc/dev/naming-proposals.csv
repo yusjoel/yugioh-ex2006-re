@@ -2257,6 +2257,7 @@ address,name,proposed_name,score,tags
 0x0807512c,dispatch_equip_display_state_by_code,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080752cc,enqueue_effect_card_sprite_dual_with_negated,,,duel_field
 0x08075328,init_effect_slot_display_if_opponent_lp_active,,,
+0x08075378,fn_eligible_emblem_of_dragon_destroyer,,,card_effect;equip
 0x080754b8,enqueue_effect_slot_sprites_all_players,,,
 0x08075530,check_equip_slot_placement_via_neo_daedalus,,,
 0x080755dc,check_equip_slot_placement_via_target_bitmap,,,
@@ -2270,7 +2271,9 @@ address,name,proposed_name,score,tags
 0x08075ba4,dispatch_effect_activation_with_lp_counter,,,
 0x08075c40,set_field_bit_by_slot_match_equip_dir,,,
 0x08075cb0,invoke_equip_zone_lp_shape_with_lp_counter,,,
+0x08075d0c,fn_eligible_magical_dimension,,,card_effect;equip
 0x08075f70,enqueue_effect_node_sprite_type11_from_slot,,,
+0x08075f90,fn_eligible_friendship,,,card_effect;equip
 0x0807615c,enqueue_effect_slot_sprite_with_score_sum,,,
 0x080761e8,dispatch_zone13_equip_display_by_type_code,,,duel_field
 0x08076214,tick_effect_display_by_state_and_type_code,card_ids_08076214,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
