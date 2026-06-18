@@ -1427,3 +1427,20 @@
 @ =============================================================================
 .equ FIEND_COMEDIAN_CID,      0x0000151d  @ Fiend Comedian (pw=81172176; card-stats.s L14210 slot=0x151d); fn_eligible_fiend_comedian_2404 stub; FS table THUMB+1 ref at GBA:0x09e41078; conf: high
 .equ LAST_TURN_CID,           0x0000151e  @ Last Turn (pw=28566710; card-stats.s L14212 slot=0x151e); fn_eligible_last_turn_2540 stub; FS table THUMB+1 ref at GBA:0x09e41090; conf: high
+
+@ =============================================================================
+@ file 09 Seg-5a additions: equip oam placeable card CIDs + token result CIDs
+@ Source: asm/09_equip_lp_display.s, Seg-5a (0x08072d20..0x08073a5c)
+@ setup_equip_oam_by_placeable_card_id_and_zone BST: input card_id -> result token card_id mapping.
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ STATUE_OF_THE_WICKED_CID, 0x00001543  @ Statue of the Wicked (pw=90928333; card-stats.s L14666 slot=0x1543); setup_equip_oam BST input CID; DWORD_08072f2c; conf: high
+.equ TRAP_DUSTSHOOT_CID,       0x00001546  @ Trap Dustshoot (pw=64697231; card-stats.s L14705 slot=0x1546); fn_eligible_trap_dustshoot B1 FS THUMB+1 @GBA:0x09e411b0; conf: high
+.equ TOKEN_13FB_CID,           0x000013fb  @ unnamed token slot (card-stats.s L27068 slot=0x13fb copy=0); setup_equip_oam BST result token CID; DWORD_08072f60; conf: high
+.equ TOKEN_14FA_CID,           0x000014fa  @ unnamed token slot (card-stats.s L27120 slot=0x14fa copy=0); setup_equip_oam BST result token CID; DWORD_08072f68; conf: high
+.equ TOKEN_154E_CID,           0x0000154e  @ unnamed token slot (card-stats.s L27133 slot=0x154e copy=0); setup_equip_oam BST result token CID; DWORD_08072f70; conf: high
+.equ TOKEN_15BD_CID,           0x000015bd  @ unnamed token slot (card-stats.s L27146 slot=0x15bd copy=0); setup_equip_oam BST result token CID; DWORD_08072f78; conf: high
+.equ TOKEN_15BE_CID,           0x000015be  @ unnamed token slot (card-stats.s L27159 slot=0x15be copy=0); setup_equip_oam BST result token CID; DWORD_08072f84; conf: high
+.equ TOKEN_1603_CID,           0x00001603  @ unnamed token slot (card-stats.s L27172 slot=0x1603 copy=0); setup_equip_oam BST result token CID; DWORD_08072f8c; conf: high
+.equ TOKEN_1639_CID,           0x00001639  @ unnamed token slot (card-stats.s L27185 slot=0x1639 copy=0); setup_equip_oam BST result token CID; DWORD_08072f94; conf: high
+.equ TOKEN_195A_CID,           0x0000195a  @ unnamed token slot (card-stats.s L27250 slot=0x195a copy=0); setup_equip_oam BST result token CID; DWORD_08072fcc; conf: high

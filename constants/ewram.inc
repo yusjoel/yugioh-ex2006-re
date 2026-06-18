@@ -486,3 +486,9 @@
 @ =============================================================================
 .equ LP_D_TRIBE_BLOCK_OFF,  0x00001ce4  @ [gP1LifePoints+0x1ce4] D.Tribe LP score field; enqueue_slot_sprites_by_card_id_scoring D_TRIBE_CID(0x15ae) path reads dword here as scoring param; adjacent to P1LP_BLOCK2_OFF_1CE8(0x1ce8)-4; 2 aligned ROM refs; conf:med
 .equ LP_P2_LOOP_CEIL_OFF,   0x00000874  @ [gP1LifePoints+0x874] P2 LP loop ceiling = PLAYER_BLOCK_STRIDE(0x868) + LP_LOOP_CEIL_OFF(0xc); tick_lp_zone_sprite_display_seq state 0x80 reads P2 ceil at this offset; 7 aligned ROM refs; conf:high
+
+@ =============================================================================
+@ file 09 Seg-5a additions: equip chain base offset (gP1FieldArrayCBase domain)
+@ Source: asm/09_equip_lp_display.s, Seg-5a (0x08072d20..0x08073a5c)
+@ =============================================================================
+.equ EQUIP_CHAIN_BASE_OFF, 0x00001c88  @ [gP1FieldArrayCBase(0x0201c600)+0x1c88] = gEquipChainEntryBase(0x0201e288); setup_equip_oam_by_placeable_card_id_and_zone + tick_neo_daedalus_equip_display_seq use offset to reach chain entry array; conf: high

@@ -68,7 +68,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | c1c490d |
 | 4a | 0x719fc..0x72404 | 9 | 40 | 4 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100) | ✅ | (see §四) |
 | 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ✅ | (see §四) |
-| 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
+| 5a | 0x72d20..0x73a5c | 13 | 61 | 6 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c) | ✅ | (see §四) |
+| 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ⬜ | |
@@ -83,6 +84,27 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.06 Seg-5a 完成记录
+
+- 范围: `[0x08072d20, 0x08073a5c)` -- 13 fn (enqueue_zone_sprite_attr_type11_from_slot / tick_equip_lp_display_state_by_slot / setup_equip_oam_by_placeable_card_id_and_zone / tick_equip_lp_display_bitmap_state_by_slot / tick_equip_lp_display_type18_state_by_slot / enqueue_equip_zone_sprite_by_slot_lp_state / enqueue_slot_sprite_if_chain_flags_and_node_active / tick_equip_deck_pair_hand_sprite_state / apply_lp_delta_for_slot_by_series_code / tick_neo_daedalus_equip_display_seq / enqueue_slot_sprite_mode3_with_effect_node / dispatch_equip_slot_activation_or_sprite_by_type / enqueue_hand_spell_sprite_by_set_code_match)
+- EQ=48 (38 REUSE + 10 NEW: EQUIP_CHAIN_BASE_OFF / STATUE_OF_THE_WICKED_CID / SPRITE_ATTR_CLR_BIT13 / TOKEN_13FB_CID / TOKEN_14FA_CID / TOKEN_154E_CID / TOKEN_15BD_CID / TOKEN_15BE_CID / TOKEN_1603_CID / TOKEN_1639_CID [TRAP_DUSTSHOOT_CID + TOKEN_195A_CID = 12 NEW .equ created total; EQUIP_CHAIN_BASE_OFF 2nd slot = REUSE])
+- REF=10 (all gP1LifePoints=0x0201c4e0: DWORD_08072d8c/dbc/df0 + PTR_gP1LifePoints_x5 + DWORD_080732f4/337c)
+- RENAME=3 (DAT_080731e4->trap_dustshoot_dispatch_sub_stubs_31e4; DAT_08073628->machine_dup_dispatch_sub_stubs_3628; DAT_08073900->cat_ill_omen_dispatch_sub_stubs_3900)
+- FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- DISASM=6 blocks:
+  - B1: fn_eligible_trap_dustshoot_3140 @ 0x08073140 (ROM_INCBIN 0x7313e/0x2a; FS table THUMB+1 @GBA:0x09e411b0; CID=0x1546 Trap Dustshoot; literal pool 2 DWords)
+  - B2: 6 sub-stubs trap_dustshoot_sub_31e4..default_32a0 @ 0x080731e4..0x080732a7 (ROM_INCBIN 0x731e4/0xc4; 31-entry dispatch table @0x73168..0x731e3; inline pool words at 0x73210/73214/73264/73268)
+  - B3: fn_eligible_machine_dup_and_league_356c @ 0x0807356c (ROM_INCBIN 0x7356c/0x48; FS table THUMB+1 x2 @GBA:0x09e41288/0x09e42dd0; CID=0x157a Machine Duplication + CID=0x1978 League; literal pool 3 DWords)
+  - B4: 7 sub-stubs machine_dup_sub_3628..default_3756 @ 0x08073628..0x0807375f (ROM_INCBIN 0x73628/0x138; 29-entry dispatch table @0x735b4..0x73627; inline pools at 0x736a0/a4 within sub_3690)
+  - B5: fn_eligible_cat_ill_omen_and_owl_of_luck @ 0x08073864 (ROM_INCBIN 0x73864/0x28; FS table THUMB+1 x2 @GBA:0x09e44108/0x09e44138; CID=0x1590 A Cat of Ill Omen + CID=0x1593 An Owl of Luck; literal pool 2 DWords)
+  - B6: 8 sub-stubs cat_ill_omen_sub_3900..default_3a54 @ 0x08073900..0x08073a5b (ROM_INCBIN 0x73900/0x15c; 29-entry dispatch table @0x7388c..0x738ff; multiple inline pools at 0x73990/94/98/39ac/39d4/3a30)
+- 新常量: constants/card_info.inc (+10: STATUE_OF_THE_WICKED_CID/TRAP_DUSTSHOOT_CID/TOKEN_13FB..195A_CID x8 + TOKEN_195A_CID); constants/ewram.inc (+1: EQUIP_CHAIN_BASE_OFF=0x1c88); constants/oam_attr.inc (+1: SPRITE_ATTR_CLR_BIT13=0xffffdfff)
+- 踩坑: force_dword 用 8B clearListing 覆写相邻 inline pool 后的代码 (B4 sub_3690 + B6 sub_3968/39b0 均受影响) -> 改 4B clearListing (force_dword_4b) + 逐段 DisassembleCommand 修复; B4 sub_3690 代码分 5 个分散片段 (pool 中断流) 须 5 次 DisassembleCommand; 修复脚本: PoolFix.py -> PoolFix2.py -> PoolFix3.py -> PoolFix4.py -> PoolFix5.py (5 轮). 教训: 含多处 inline pool 的 sub-stub 须逐块 clearListing(4B)+disasm, 不可一次性 force_dword 整段.
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
 
 ### 4.05 Seg-4b 完成记录
 

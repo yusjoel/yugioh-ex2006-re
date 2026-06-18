@@ -181,3 +181,10 @@
 @ tick_equip_chain_activation_display_seq state 0x7f
 @ =============================================================================
 .equ OAM_EQUIP_SPRITE_P2_1A,  0x0000801a  @ equip sprite OAM attr0 P2 (bit15+0x1a); tick_equip_chain_activation_display_seq state 0x7f: P2 path uses 0x801a, P1 inline 0x1a; sibling of OAM_EQUIP_SPRITE_TILE_P2_1B(0x801b) and OAM_SPRITE_CODE_P1_ACTIVATION(0x8019); 119 ROM refs; conf:high
+
+@ =============================================================================
+@ file 09 Seg-5a additions: sprite attr AND-mask for clearing player_id bit
+@ Source: asm/09_equip_lp_display.s, Seg-5a (0x08072d20..0x08073a5c)
+@ setup_equip_oam_by_placeable_card_id_and_zone
+@ =============================================================================
+.equ SPRITE_ATTR_CLR_BIT13, 0xffffdfff  @ AND mask: clears bit13 (player_id encode bit shift=0xd); setup_equip_oam_by_placeable_card_id_and_zone uses ands r1,SPRITE_ATTR_CLR_BIT13 then orrs r1,r2(player_id<<0xd) to re-encode player bit; conf: high
