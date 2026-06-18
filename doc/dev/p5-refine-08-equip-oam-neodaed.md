@@ -70,7 +70,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 8a | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | ✅ | 638c7d4 |
 | 8b | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | ✅ | (see §4.09) |
 | 8c | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | ✅ | 4c7b3d0 |
-| 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ⬜ | — |
+| 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ✅ | (see §4.11) |
 | 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -321,6 +321,29 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra scripts**: `RefineF08Seg8cSlots.py` + `DisassembleF08Seg8cBlocks.py` + `FixF08Seg8cLiteralPools.py` + `FixF08Seg8cRipplePlate.py`
 
+### 4.11 Seg-9 完成记录 (0x6cbe8..0x6d960)
+
+- **EQ**: 51 槽 (47 reuse + 4 NEW)
+  - gDuelPhaseFlags x5 / LP_CARD_TRACK_BASE_OFF x1 / LP_CARD_TRACK_NEXT_OFF x3 / PLAYER_BLOCK_STRIDE x14 / gDuelFieldSlots x9 / LP_ACTIVATION_LINK_FLAG_OFF x1 / gEquipChainSlotRefs x1 / gEquipZoneCountTable x1 / VALKYRION_THE_MAGNA_WARRIOR_CID x1 / PUPPET_MASTER_CID x1 / EQUIP_PHASE_FRAME_OFF x2 / gDuelCardCtxBase x1 / gP1HandSlotArray x2 / EQUIP_ZONE_COUNT_TABLE_OFF x1 / P1LP_BLOCK2_OFF_1CE8 x3 (reuse)
+  - 4 NEW: MAGIC_CYLINDER_CID=0x1404 (card_info.inc) / DRAINING_SHIELD_CID=0x176a (card_info.inc) / RING_OF_DESTRUCTION_CID=0x138d (card_info.inc) / SPRITE_RECORD_P2_SIDE=0x8020 (oam_attr.inc)
+- **REF**: 0
+- **RENAME**: 12 (PTR_gP1LifePoints_* x11 -> gp1lifepoints_0806xxxx; DWORD_0806d678 -> gp1lifepoints_0806d678)
+- **FUNC_RENAME**: 0 (dispatch_neo_space_placement_by_card_id_and_state 保持现名; file 08 neo_space 已确立非正式域标签 for check_field_spell_neo_daedalus_group_placeable 门控)
+- **PLATE**: 3
+  - tick_equip_lp_display_state_by_zone_match @ 0x0806d3d8: CJK mojibake (636-char, 106 non-ASCII) -> 741-char ASCII rewrite (full state machine description)
+  - enqueue_zone_equip_sprite_if_slot_matches @ 0x0806d514: FUN_08071404 -> enqueue_equip_sprite_guarded_by_zone_type13
+  - enqueue_spirit_zone_sprite_with_lp_check @ 0x0806d680: FUN_08071d64 -> dispatch_spirit_monster_zone_sprite_by_card_id
+- **carve**: 0 (no ROM_INCBIN)
+- **disasm**: 0
+- **§5.1**: 0 (no unref blocks in Seg-9)
+- **新建 constants**:
+  - `constants/card_info.inc` +3 (RING_OF_DESTRUCTION_CID=0x138d / MAGIC_CYLINDER_CID=0x1404 / DRAINING_SHIELD_CID=0x176a)
+  - `constants/oam_attr.inc` +1 (SPRITE_RECORD_P2_SIDE=0x8020)
+- **附带修正**: fn-ptr +1 periodic fix -- added `check_equip_activation_at_slot11_1` + `check_equip_slot_eligible_by_equip_type_1` .equ aliases to rom.s (L71-72); updated asm/08 L3691/L3700/L17485 to use _1 names (GAS emits function address without +1; rom.s aliases ensure THUMB+1 encoding is preserved across re-exports)
+- **CSV sync**: 不需要 (0 disasm / 0 FUNC_RENAME)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra script**: `RefineF08Seg9Slots.py`
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -340,7 +363,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-8a ✅ | 0x6ab0c..0x6b56c | 6 | 22 | 4 ROM_INCBIN (3 disasm + §5.1 1) + switchD_0806ac1e | Germ/Momonga/Spear Cretin dispatch stubs (21 new fn); 误名订正 x2 |
 | Seg-8b ✅ | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | cid_135b/Magical Hats/Ceasefire/SpellAbsorbing dispatch stubs (30 new fn); 嵌套跳表 0x6bc2c->0x6bfa0->0x6bfbc |
 | Seg-8c ✅ | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | Morphing Jar #2 stubs (9 new fn); tick_spear_cretin 误名订正; P2LP domain exception |
-| Seg-9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
+| Seg-9 ✅ | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
 | Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
 
 执行约定同 file 00..07: 每段走 §二 pipeline; 地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。

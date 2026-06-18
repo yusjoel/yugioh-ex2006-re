@@ -1352,3 +1352,13 @@
 .equ BOTTOMLESS_SHIFTING_SAND_CID, 0x00001540  @ Bottomless Shifting Sand (pw=76532077; card-stats.s slot=0x1540); 0xaa<<5=0x1540 imm-encoded in tick_equip_multi_card_score_state_machine; conf: high
 .equ HAMMER_SHOT_CID,              0x000017f2  @ Hammer Shot (pw=26412047; card-stats.s slot=0x17F2); tick_equip_multi_card_score_state_machine CID check; conf: high
 .equ cid_12da,                     0x000012da  @ unallocated slot 0x12da; not in card-stats.s (gap 0x12D7..0x12DC: Tragedy=0x12D7, Ectoplasmer=0x12DC); fn_eligible handler at 0x080696d8; dispatch table 0x09e3fba4; conf: high
+
+@ =============================================================================
+@ file 08 Seg-9 additions: trap card CIDs used in equip LP sprite dispatch
+@ Source: asm/08_equip_oam_neodaed.s, Seg-9 (0x0806cbe8..0x0806d960)
+@ dispatch_equip_lp_sprite_by_trap_card_id + submit_ring_of_destruction_lp_indicators_if_zone_matched
+@ All values verified against data/card-stats.s slot_id field.
+@ =============================================================================
+.equ RING_OF_DESTRUCTION_CID,     0x0000138d  @ Ring of Destruction (pw=83555666; card-stats.s card_0802 slot=0x138D); submit_ring_of_destruction_lp_indicators_if_zone_matched CID dispatch
+.equ MAGIC_CYLINDER_CID,          0x00001404  @ Magic Cylinder (pw=62279055; card-stats.s card_0879 slot=0x1404); dispatch_equip_lp_sprite_by_trap_card_id BST dispatch
+.equ DRAINING_SHIELD_CID,         0x0000176a  @ Draining Shield (pw=43250041; card-stats.s card_1554 slot=0x176A); dispatch_equip_lp_sprite_by_trap_card_id second BST target

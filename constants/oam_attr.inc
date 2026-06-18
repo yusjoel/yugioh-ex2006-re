@@ -167,3 +167,10 @@
 @ Source: asm/08_equip_oam_neodaed.s, Seg-8c (0x0806c0cc..0x0806cbe8)
 @ =============================================================================
 .equ OAM_EQUIP_ZONE_CHAIN_SPRITE_P2, 0x00008052  @ equip zone chain sprite OAM attr0 P2 (bit15+0x52); enqueue_equip_zone_sprite_chain_if_slot_matches P1=0x52 inline, P2 via literal pool; 4 raw ROM refs (0x806c364, 0x80a2328, 0x80a2450, 0x80a268c)
+
+@ =============================================================================
+@ file 08 Seg-9 additions: P2-side sprite record attr
+@ Source: asm/08_equip_oam_neodaed.s, Seg-9 (0x0806cbe8..0x0806d960)
+@ dispatch_equip_lp_sprite_by_trap_card_id
+@ =============================================================================
+.equ SPRITE_RECORD_P2_SIDE, 0x00008020  @ P2-side sprite record attr0 (bit15=1 OBJ palette select | 0x20 tile region); dispatch_equip_lp_sprite_by_trap_card_id player==1 path; P1 uses 0x20 inline; 8 aligned ROM refs; 3 .word slots in asm/08+10+12
