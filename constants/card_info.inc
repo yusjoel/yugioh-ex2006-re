@@ -1419,3 +1419,11 @@
 .equ HINO_KAGU_TSUCHI_CID,    0x00001504  @ Hino-Kagu-Tsuchi (pw=75745607; card-stats.s card_1071 slot=0x1504); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> enqueue_spirit_zone_sprite_type11; conf: high
 .equ FENGSHENG_MIRROR_CID,    0x00001509  @ Fengsheng Mirror (pw=37406863; card-stats.s card_1076 slot=0x1509); fn_eligible stub at 0x08071f58; FS table ref at GBA:0x09e40f58; conf: high
 .equ DARK_DUST_SPIRIT_CID,    0x00001526  @ Dark Dust Spirit (pw=89111398; card-stats.s card_1100 slot=0x1526); dispatch_spirit_monster_zone_sprite_by_card_id BST: -> submit_equip_zone_bitmap_pair_update; conf: high
+
+@ =============================================================================
+@ file 09 Seg-4b additions: fn_eligible CIDs for card effect handler dispatch
+@ Source: asm/09_equip_lp_display.s, Seg-4b (0x08072404..0x08072d20)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ FIEND_COMEDIAN_CID,      0x0000151d  @ Fiend Comedian (pw=81172176; card-stats.s L14210 slot=0x151d); fn_eligible_fiend_comedian_2404 stub; FS table THUMB+1 ref at GBA:0x09e41078; conf: high
+.equ LAST_TURN_CID,           0x0000151e  @ Last Turn (pw=28566710; card-stats.s L14212 slot=0x151e); fn_eligible_last_turn_2540 stub; FS table THUMB+1 ref at GBA:0x09e41090; conf: high

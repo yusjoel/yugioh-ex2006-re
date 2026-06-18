@@ -67,7 +67,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ✅ | 79000e6 |
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | c1c490d |
 | 4a | 0x719fc..0x72404 | 9 | 40 | 4 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100) | ✅ | (see §四) |
-| 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
+| 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ✅ | (see §四) |
 | 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
@@ -83,6 +83,34 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.05 Seg-4b 完成记录
+
+- 范围: `[0x08072404, 0x08072d20)` -- 11 fn (fn_eligible_fiend_comedian_2404 + 5×last_turn_sub_stubs + fn_eligible_last_turn_2540 + 6×vampire_sub_stubs + fn_eligible_vampire_lord_lady_26f4 + 6×equip_zone_sub_stubs + dispatch_lp_delta_display_by_card_pair_diff + tick_dragon_summon_display_if_monster_zones_occupied + 2×fn_ptr_dispatch_table_anchors)
+- EQ=23 (22 REUSE + 1 NEW: LP_DELTA_6000=0x1770)
+- REF=0
+- RENAME=3 (DAT_08072444->last_turn_dispatch_sub_stubs_2444; DAT_08072594->vampire_dispatch_sub_stubs_2594; DAT_0807274c->equip_zone_sub_stubs_274c)
+- FUNC_RENAME=0
+- PLATE=1 (CJK mojibake deferred from Seg-4a @0x08072ce4 tick_dragon_summon_display_if_monster_zones_occupied; ASCII rewrite: "Equip chain dragon-summon display gate driver...")
+- DISASM=4 blocks:
+  - B5: fn_eligible_fiend_comedian_2404 @ 0x08072404 (ROM_INCBIN 0x72404/0x2c; FS table THUMB+1 @GBA:0x09e41078; CID=0x151d Fiend Comedian)
+  - B6: 5 sub-stubs last_turn_sub_2444..2534 + fn_eligible_last_turn_2540 @ 0x08072444..0x08072573 (ROM_INCBIN 0x72444/0x138; 5-entry dispatch table @0x72430..0x72443)
+  - B7: 6 sub-stubs vampire_sub_2594..26bc + fn_eligible_vampire_lord_lady_26f4 @ 0x08072594..0x08072733 (ROM_INCBIN 0x72594/0x1a0; 6-entry dispatch table @0x7257c..0x72593)
+  - B8: 6 sub-stubs equip_zone_sub_274c..2856 @ 0x0807274c..0x0807286f (ROM_INCBIN 0x7274c/0x124; 6-entry dispatch table @0x72734..0x7274b)
+- carve=0; §5.1=0
+- 新常量: constants/card_info.inc (+2: FIEND_COMEDIAN_CID=0x151d, LAST_TURN_CID=0x151e); constants/duel_field.inc (+1: LP_DELTA_6000=0x1770)
+- 踩坑:
+  - pool 地址 0x0007xxxx->0x0807xxxx (GBA 地址空间未映射到 0x0007xxxx)
+  - force_dword 8-byte clearListing 覆写相邻 stub 首 4 字节 -> 改 4-byte clearListing
+  - CodeUnitInsertionException Java 异常须显式 import + except 子句
+  - B6/B7 多处隐藏代码区 (分支目标在 pool DWord 之后) 须逐一 DisassembleCommand
+  - LAB_080726e6/e8 均在 0x726e6..0x726f3 区域; DisassembleCommand 从 0x726d2 仅到达 0x726e8 不到 0x726e6 -> 补 DisassembleCommand @ 0x726e6
+  - pool 小值 (0x1d6c/0x1d70/0x1daa/0x1ce8/0x10d0) 不满 0x02000000 被初始扫描漏掉 -> 手补
+  - 多轮 fix 脚本: RefineF09Seg4bSlots.py -> PoolFix -> DisasmFix -> LabelFix2/3 -> ResetAndFix -> Fix4
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
 
 ### 4.04 Seg-4a 完成记录
 

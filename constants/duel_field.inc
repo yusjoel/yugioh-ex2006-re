@@ -403,3 +403,9 @@
 @ Source: asm/09_equip_lp_display.s, Seg-3 (0x0807104c..0x080719fc)
 @ =============================================================================
 .equ EQUIP_ZONE_WORD_MASK,        0x00f0ffff  @ equip chain node zone_word bitmask; check_effect_slot_equip_zone_pattern ANDs zone_word[+0] with this mask, then compares result against 0x14c0 (equip zone type encoding 0xa6<<5); conf: high
+
+@ =============================================================================
+@ file 09 Seg-4b additions: LP delta constant
+@ Source: asm/09_equip_lp_display.s, Seg-4b (0x08072404..0x08072d20)
+@ =============================================================================
+.equ LP_DELTA_6000,            0x00001770  @ fixed LP delta 6000 (decimal); dispatch_lp_delta_display_by_card_pair_diff asm/09 L8085: v==6 branch loads r2=0x1770=6000 LP delta and calls submit_lp_indicator_with_slot_xor_flag; domain distinct from MARSHMALLON_CID=0x1770 (card ID domain in card_info.inc); conf: high
