@@ -397,3 +397,9 @@
 @ =============================================================================
 .equ LP_DISPLAY_SEQ_PROGRESS_OFF, 0x00001d7a  @ [gDuelFieldSlots+player*0x868+0x1d7a] LP sequence progress halfword; tick_equip_lp_display_seq_with_prng state=0x7e: ldrh->cmp#0->beq exit; adjacent ACTIVATION_STATE_B_OFF=0x1d78; conf: high
 .equ EQUIP_BITMAP_QUERY_KEY,      0x04000400  @ game-internal equip bitmap query key passed as r1 to query_equip_target_bitmap_default->update_equip_target_bitmap_for_field; 0x04000400 exceeds I/O range upper bound 0x040003FE (not a HW register); equip domain placed here; conf: high
+
+@ =============================================================================
+@ file 09 Seg-3 additions: equip zone field bitmask
+@ Source: asm/09_equip_lp_display.s, Seg-3 (0x0807104c..0x080719fc)
+@ =============================================================================
+.equ EQUIP_ZONE_WORD_MASK,        0x00f0ffff  @ equip chain node zone_word bitmask; check_effect_slot_equip_zone_pattern ANDs zone_word[+0] with this mask, then compares result against 0x14c0 (equip zone type encoding 0xa6<<5); conf: high

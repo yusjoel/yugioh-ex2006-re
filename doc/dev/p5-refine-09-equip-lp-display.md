@@ -65,7 +65,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 |-----|------|-----|--------|-------------------|------|--------|
 | 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | 08b3db1 |
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ✅ | 79000e6 |
-| 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ⬜ | |
+| 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ✅ | (pending commit) |
 | 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
 | 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
@@ -82,6 +82,24 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.03 Seg-3 完成记录
+
+- 范围: `[0x0807104c, 0x080719fc)` -- 20 fn, dispatch_equip_chain_effect_slot + enqueue_field_slot_overlay + enqueue_eligible_slot + tick_equip_lp + Neo Daedalus OAM cluster
+- EQ=35 (33 REUSE + 2 NEW: EQUIP_ZONE_WORD_MASK=0x00f0ffff / FREED_THE_MATCHLESS_GENERAL_CID=0x000014c4)
+- REF=0
+- RENAME=4 (DWORD_0807129c -> check_effect_slot_equip_zone_pattern_ptr; DWORD_08071538 -> invoke_effect_node_with_active_flag_3arg_ptr_1538 (`_1538` suffix per C6 fix); PTR_DAT_08071740 -> equip_lp_disp_sub_table; DAT_08071754 -> equip_lp_sub_stubs_754)
+- FUNC_RENAME=0; PLATE=2 (PLATE-1: L6141 CJK mojibake -> ASCII rewrite for dispatch_equip_lp_bar_or_bitmap_by_zone_type; PLATE-2: L6209 stale FUN_08090714->count_effect_node_zone_activations + FUN_08096a4c->set_equip_activation_state_by_mode__08096a4c)
+- DISASM=2 blocks:
+  - Block1: eligible_dragged_down_into_grave_16fc @ 0x080716fc (fn_eligible stub; CID=0x14e8 Dragged Down into the Grave; FS table THUMB+1 ref @GBA:0x09e40e98); literal pool 4 DWords
+  - Block2: 5 sub-stubs equip_lp_sub_{754,77c,78a,7a4,7c4} @ 0x08071754..0x080717ef (raw dispatch; MOV PC,r0 indirect via PTR_DAT_08071740; shared epilogue @0x080717e8); per-stub DisassembleCommand; Block2PoolFix for 4 literal pool DWords (dat_08071774/778/7a0/7b8_pool)
+- carve=0; §5.1=0
+- 新常量: constants/duel_field.inc (+1: EQUIP_ZONE_WORD_MASK); constants/card_info.inc (+2: FREED_THE_MATCHLESS_GENERAL_CID, DRAGGED_DOWN_INTO_GRAVE_CID)
+- 踩坑: Block2 literal pool words exported as .byte sequences causing "invalid offset" GAS errors; fixed by RefineF09Seg3Block2PoolFix.py (createDWord + label for 4 pool words)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see §三 table)
+
+---
 
 ### 4.02 Seg-2 完成记录
 

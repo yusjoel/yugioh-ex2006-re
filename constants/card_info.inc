@@ -1401,3 +1401,10 @@
 .equ GRYPHONS_FEATHER_DUSTER_CID,    0x0000170f  @ Gryphon's Feather Duster (pw=34370473; card-stats.s slot=0x170f); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
 .equ CYCLONE_BOOMERANG_CID,          0x000019b0  @ Cyclone Boomerang (pw=29612557; card-stats.s slot=0x19b0); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
 .equ BAZOO_THE_SOUL_EATER_CID,       0x00001482  @ Bazoo the Soul-Eater (pw=40133511; card-stats.s slot=0x1482); fn_eligible stub at 0x08070478; FS table ref at GBA:0x09e46658; conf: high
+
+@ =============================================================================
+@ file 09 Seg-3 additions: equip chain dispatch / fn_eligible CIDs
+@ Source: asm/09_equip_lp_display.s, Seg-3 (0x0807104c..0x080719fc)
+@ =============================================================================
+.equ FREED_THE_MATCHLESS_GENERAL_CID, 0x000014c4  @ Freed the Matchless General (pw=49681811; card-stats.s card_1013 slot=0x14C4); dispatch_equip_chain_state_if_tile_count_valid chain check param; conf: high
+.equ DRAGGED_DOWN_INTO_GRAVE_CID,     0x000014e8  @ Dragged Down into the Grave (pw=16435215; card-stats.s card_1048 slot=0x14E8); Block1 FS handler fn_eligible CID ref @GBA:0x09e40e94; conf: high
