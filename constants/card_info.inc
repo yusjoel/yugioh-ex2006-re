@@ -1476,3 +1476,12 @@
 .equ ENERGY_DRAIN_CID,           0x000016e3  @ Energy Drain (pw=56916805; card-stats.s slot=0x16e3); enqueue_effect_slot_sprite_by_card_id_score BST; conf: high
 .equ GIFT_OF_THE_MARTYR_CID,     0x000018ca  @ Gift of the Martyr (pw=98792570; card-stats.s slot=0x18ca); enqueue_effect_slot_sprite_by_card_id_score BST; conf: high
 .equ DEAL_OF_PHANTOM_CID,        0x00001492  @ Deal of Phantom (pw=69122763; card-stats.s slot=0x1492); enqueue_effect_slot_sprite_by_card_id_score plate ref only; computed at runtime as BARK_OF_DARK_RULER_CID(0x14be)-0x2c; no literal pool slot
+
+@ =============================================================================
+@ file 09 Seg-9a additions: fn_eligible handler CIDs (check_equip_activation_by_special_card_id)
+@ Source: asm/09_equip_lp_display.s, Seg-9a (0x0807738c..0x08077c50)
+@ All values verified 0-hit in constants/*.inc; passcodes from data/card-stats.s.
+@ =============================================================================
+.equ JADE_INSECT_WHISTLE_CID,    0x00001717  @ Jade Insect Whistle (pw=95214051; card-stats.s L47551 slot=0x1717); fn_eligible B4-embedded @ 0x08077b34; FS THUMB+1 @ 0x09e41de0; conf: high
+.equ LEGENDARY_JUJITSU_MASTER_CID, 0x00001749  @ Legendary Jujitsu Master (pw=25773409; card-stats.s L48081 slot=0x1749); check_equip_activation_by_special_card_id zone13 test path; conf: high
+.equ KANGAROO_CHAMP_CID,         0x00001866  @ Kangaroo Champ (pw=95789089; card-stats.s L51376 slot=0x1866); check_equip_activation_by_special_card_id activation check path; conf: high

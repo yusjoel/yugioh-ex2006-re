@@ -73,7 +73,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ✅ | (see §四) |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ✅ | (see §四) |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | 1e38556 |
-| 9 | 0x7738c..0x7850c | 19 | 67 | 9 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
+| 9a | 0x7738c..0x77c50 | 9+3new | 31 | 5 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8) | ✅ | (see §四) |
+| 9b | 0x77c50..0x7850c | 10 | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
 | 10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -84,6 +85,28 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.11 Seg-9a 完成记录
+
+- 范围: `[0x0807738c, 0x08077c50)` -- 9 named fn + 3 new fn_eligible (fn_eligible_spatial_collapse / fn_eligible_dimension_fusion / fn_eligible_jade_insect_whistle)
+- EQ=26 (all REUSE: PLAYER_BLOCK_STRIDE x6 / gP1AltHandSlotArray x1 / P1LP_BLOCK2_OFF_1CE8 x1 / gDuelPhaseFlags x4 / EQUIP_PHASE_FRAME_OFF x7 / CARD_STAT_LP_THRESHOLD x1 / gEquipZoneCountTable x1 / gP1ZoneHandCount x1 / gP1FieldArrayCBase x1 / gP1LifePoints x2 / PRICKLE_FAIRY_CID x1 / LEGENDARY_JUJITSU_MASTER_CID x1 NEW / KANGAROO_CHAMP_CID x1 NEW / gDuelFieldSlots x1; NEW CIDs added to card_info.inc before script)
+- REF=5 (PTR_DAT_080775ac->spatial_collapse_dispatch_table_75ac@0x08077648; DAT_080775d0->spatial_collapse_dispatch_sub_stubs_75d0; PTR_DAT_08077a18->jade_insect_dispatch_table_7a18@0x08077b00; DAT_08077a3c->jade_insect_dispatch_sub_stubs_7a3c; DAT_08077b88->dimension_fusion_dispatch_sub_stubs_7b88)
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0
+- DISASM=5 blocks:
+  - B1: fn_eligible_spatial_collapse @ 0x0807757c (ROM_INCBIN 0x7757c/0x2c; FS THUMB+1 @0x09e41ca8; CID=0x16df SPATIAL_COLLAPSE_CARD_ID; literal pool x2: 0x775a0/a4; createFunction; 18 instrs)
+  - B2: 6 sub-stubs spatial_collapse @ 0x080775d0 (ROM_INCBIN 0x775d0/0xa8; 9-entry dispatch table @0x080775ac; labels: sub_75d0/75ec/7602/762a/7648/default_7670; 62 instrs)
+  - B3: fn_eligible_dimension_fusion @ 0x080779e4 (ROM_INCBIN 0x779e4/0x30; FS THUMB+1 @0x09e41d68; CID=0x1712 DIMENSION_FUSION_CID; literal pool x2: 0x77a0c/a10; createFunction; 19 instrs)
+  - B4: 6 sub-stubs jade_insect + fn_eligible_jade_insect_whistle @ 0x08077a3c (ROM_INCBIN 0x77a3c/0x120; 9-entry dispatch table @0x08077a18; labels: sub_7a3c/7a70/7ab4/7ac2/7b00/7b2c; embedded fn_eligible @0x08077b34 FS THUMB+1 @0x09e41de0 CID=0x1717 JADE_INSECT_WHISTLE_CID; 111 instrs)
+  - B5: 6 sub-stubs dimension_fusion @ 0x08077b88 (ROM_INCBIN 0x77b88/0xc8; 11-entry dispatch table @0x08077b5c; labels: sub_7b88/7bb6/7c18/7c2c/7c3a/default_7c48; 83 instrs)
+- §5.1=0 (all 5 blocks have confirmed refs)
+- 新常量: constants/card_info.inc (+3: JADE_INSECT_WHISTLE_CID=0x1717 / LEGENDARY_JUJITSU_MASTER_CID=0x1749 / KANGAROO_CHAMP_CID=0x1866)
+- 踩坑1: REF_SLOTS gas_label==slot_label collision: PTR_DAT_080775ac and PTR_DAT_08077a18 had slot_label=gas_label; Ghidra export resolved .word to slot's own address; fix = RefineF09Seg9aRefFix.py (remove duplicate from slot, add unique *_ptr_* label to slot, setPrimary at target)
+- 踩坑2: PoolFixF09Seg9a.py needed for 12 non-EWRAM constant pool DWords (0x4a4/0x1ce8/0x1da8/0x8056/0x1daa) emitted as .byte by Ghidra
+- CSV: +3 rows (fn_eligible_spatial_collapse @0x0807757c / fn_eligible_dimension_fusion @0x080779e4 / fn_eligible_jade_insect_whistle @0x08077b34; all refine-created)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
 
 ### 4.10 Seg-8 完成记录
 
