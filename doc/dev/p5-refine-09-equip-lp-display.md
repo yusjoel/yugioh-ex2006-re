@@ -102,7 +102,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - 新常量: constants/card_info.inc (+5: YATA_GARASU_CID=0x14ff / YAMATA_DRAGON_CID=0x1501 / HINO_KAGU_TSUCHI_CID=0x1504 / FENGSHENG_MIRROR_CID=0x1509 / DARK_DUST_SPIRIT_CID=0x1526)
 - 踩坑: 3 轮 pool fix (5+3 个 DWord/Word 强制): B2 sub_1b64 pool @0x08071b90..0x08071b9b (3 DWords); B4 sub_2088 pool @0x080720a4..0x080720ab (2 DWords); B2 sub_1ba0 dead bytes @0x08071b9c (1 DWord) + 2-byte align pad @0x08071bb6 (1 Word) + DAT_08071bb8=0x0201e1c8 (1 DWord)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- commit: (pending)
+- commit: a9aa009
 
 ---
 
