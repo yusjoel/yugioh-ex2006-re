@@ -389,3 +389,11 @@
 @ Source: asm/08_equip_oam_neodaed.s, Seg-7 (0x0806a118..0x0806ab0c)
 @ =============================================================================
 .equ LP_ROW_TYPE8_ALL_SLOTS_MASK, 0x0000ffff  @ r1 arg to set_lp_display_row_type8: all 5 equip slots selected; enqueue_lp_row_type8_if_equippable_slots_nonzero L14873; domain distinct from EQUIP_SLOT_SCORE_CAP=0xffff (equip score) / SLOT_CARD_EMPTY=0xffff (card sentinel) / OAM_ATTR0_HIDDEN=0xffff (OAM domain); 1 Seg-7 slot; conf: high
+
+@ =============================================================================
+@ file 08 Seg-10 additions: LP display seq progress offset + equip bitmap query key
+@ Source: asm/08_equip_oam_neodaed.s, Seg-10 (0x0806d960..0x0806e76c)
+@ tick_equip_lp_display_seq_with_prng + check_zone_tile_count_for_equip_bitmap_refresh
+@ =============================================================================
+.equ LP_DISPLAY_SEQ_PROGRESS_OFF, 0x00001d7a  @ [gDuelFieldSlots+player*0x868+0x1d7a] LP sequence progress halfword; tick_equip_lp_display_seq_with_prng state=0x7e: ldrh->cmp#0->beq exit; adjacent ACTIVATION_STATE_B_OFF=0x1d78; conf: high
+.equ EQUIP_BITMAP_QUERY_KEY,      0x04000400  @ game-internal equip bitmap query key passed as r1 to query_equip_target_bitmap_default->update_equip_target_bitmap_for_field; 0x04000400 exceeds I/O range upper bound 0x040003FE (not a HW register); equip domain placed here; conf: high

@@ -71,7 +71,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用→§5.1)。**R1-R9 详版**见 `p5-ref
 | 8b | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | ✅ | (see §4.09) |
 | 8c | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | ✅ | 4c7b3d0 |
 | 9 | 0x6cbe8..0x6d960 | 20 | 52 | 0 | ✅ | (see §4.11) |
-| 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ⬜ | — |
+| 10 | 0x6d960..0x6e76c | 11 | 46 | 4 (0x6dbcc/44, 0x6dc3c/3d0, 0x6e3fa/4e, 0x6e460/1cc) | ✅ | (see §4.12) |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **22 ROM_INCBIN + 5 switchD** — 逐块 ref-scan 按 §一 分类 (handler-table THUMB+1→disasm / OAM 数据表 ldr-ref→carve / switchD→R4 disasm / 0 引用→§5.1)。
@@ -344,6 +344,34 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - **Ghidra script**: `RefineF08Seg9Slots.py`
 
+### 4.12 Seg-10 完成记录 (0x6d960..0x6e76c)
+
+- **EQ**: 42 槽 (35 reuse + 7 NEW)
+  - gDuelPhaseFlags x6 / EQUIP_PHASE_FRAME_OFF x4 / PLAYER_BLOCK_STRIDE x5 / gDuelFieldSlots x4 / gEquipChainSlotRefs x3 / DISPLAY_SEQ_ACTIVE_PLAYER_OFF x2 / EQUIP_ACTIVE_CTX_OFF x1 / gP1FieldArrayCBase x1 / gDuelCardCtxBase x1 / P2LP_BLOCK2_OFF_1CF4 x1 / gP1LifePoints x0 (reuse); THE_BLOCKMAN_CID/PHANTASMAL_MARTYRS_CID/EQUIP_ELIG_EXCL_D/LP_ACTIVATION_LINK_FLAG_OFF/OAM_SPRITE_CODE_P1_ACTIVATION (reuse)
+  - 7 NEW: GAP_CID_13ED=0x13ed (card_info.inc) / MULTIPLICATION_OF_ANTS_CID=0x13fc (card_info.inc) / NEO_SPACE_SPAWN_CAT_1422=0x1422 (card_info.inc) / NEO_SPACE_SPAWN_CAT_1813=0x1813 (card_info.inc) / NEO_SPACE_SPAWN_CAT_19BA=0x19ba (card_info.inc) / LP_DISPLAY_SEQ_PROGRESS_OFF=0x1d7a (duel_field.inc) / EQUIP_BITMAP_QUERY_KEY=0x04000400 (duel_field.inc; originally misnamed DISPCNT_SHADOW, corrected by reviewer advisory #2)
+- **REF**: 0
+- **RENAME**: 2 (DWORD_0806e144 / DWORD_0806e6d0 -> gp1lifepoints_0806e144/e6d0)
+- **FUNC_RENAME**: 0
+- **PLATE**: 0 (no stale FUN_; no CJK mojibake in Seg-10)
+- **DISASM**: 4 blocks (19 new functions):
+  - Block1 `check_equip_eligible_state_dispatch_cid_13ed` @ 0x0806dbcc (0x44 B; GAP_CID_13ED=0x13ed fn_eligible handler; THUMB+1 ref @0x09e406d0; literal pool dc04/dc08/dc0c; 11-entry raw-addr table at 0x0806dc10)
+  - Block2 11 stubs @ 0x0806dc3c..0x0806e00b (0x3d0 B): `cid_13ed_state_stub_{80/7f/7e/7d/7c/7b/7a/79/78/77/76}`; dispatched via raw MOV PC,r0 from 11-entry table; states 0x76..0x80 (index=state-0x76)
+  - Block3 `check_equip_eligible_state_dispatch_de_fusion` @ 0x0806e3fc (0x4c B; DE_FUSION_CID=0x13fe fn_eligible handler; 2B pad at 0x0806e3fa; THUMB+1 ref @0x09e407f0; 6-entry raw-addr table at 0x0806e448)
+  - Block4 6 stubs @ 0x0806e460..0x0806e62b (0x1cc B): `de_fusion_state_stub_{80/7f/7e/7d/7c/7b}` (CORRECTED: state determined by table index not stub addr; entry[0]=0x6e618=state_0x7b, entry[5]=0x6e460=state_0x80); states 0x7b..0x80 (index=state-0x7b)
+- **State mapping correction (Mode A #1)**: reviewer C6 hard -- Block4 De-Fusion 6 stub state labels were inverted (proposal had subs r1,#0x7b index confused with descending-addr ordering). Corrected: de_fusion_state_stub_7b @ 0x0806e618 (highest addr, entry[0]), de_fusion_state_stub_80 @ 0x0806e460 (lowest addr, entry[5]).
+- **Name correction (Mode A #2)**: DISPCNT_SHADOW -> EQUIP_BITMAP_QUERY_KEY; 0x04000400 exceeds I/O range, not a HW register; moved from gba_io.inc to duel_field.inc (equip domain).
+- **新建 constants**:
+  - `constants/card_info.inc` +5 (GAP_CID_13ED=0x13ed / MULTIPLICATION_OF_ANTS_CID=0x13fc / NEO_SPACE_SPAWN_CAT_1422=0x1422 / NEO_SPACE_SPAWN_CAT_1813=0x1813 / NEO_SPACE_SPAWN_CAT_19BA=0x19ba)
+  - `constants/duel_field.inc` +2 (LP_DISPLAY_SEQ_PROGRESS_OFF=0x1d7a / EQUIP_BITMAP_QUERY_KEY=0x04000400)
+- **carve**: 0 (all 4 blocks are THUMB code, no ROM data tables)
+- **§5.1**: 0 (all 4 blocks have confirmed ROM references)
+- **fn-ptr +1 periodic fix**: asm/08 L3691/3700 check_equip_activation_at_slot11 -> _1; L17485 check_equip_slot_eligible_by_equip_type -> _1 (re-export resets these each time)
+- **CSV sync**: +19 rows (19 new disasm functions: 2 fn_eligible handlers + 11 cid_13ed stubs + 6 de_fusion stubs)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Ghidra scripts**: `RefineF08Seg10Slots.py` + `DisassembleF08Seg10Blocks.py`
+
+**file 08 全 10 段完成 ✅** (Seg-1..10; 含 Seg-8a/8b/8c 拆分; 总计: disasm=4+18+30+9+2+1+8+21+30+9+19=151 new fn; EQ~742; RENAME~85; PLATE~50; FUNC_RENAME 8; §5.1 +3 孤儿块)
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -364,7 +392,7 @@ Seg-6 (90 槽) / Seg-1 (87 槽) / Seg-10 (4 块含 0x3d0=976B) 次重。
 | Seg-8b ✅ | 0x6b56c..0x6c0cc | 4+30(disasm) | 63 | 5 DISASM | cid_135b/Magical Hats/Ceasefire/SpellAbsorbing dispatch stubs (30 new fn); 嵌套跳表 0x6bc2c->0x6bfa0->0x6bfbc |
 | Seg-8c ✅ | 0x6c0cc..0x6cbe8 | 9+9(disasm) | 39 | 2 DISASM | Morphing Jar #2 stubs (9 new fn); tick_spear_cretin 误名订正; P2LP domain exception |
 | Seg-9 ✅ | 0x6cbe8..0x6d960 | 20 | 52 | 0 | tick_equip_target_query_display_seq 簇 |
-| Seg-10 | 0x6d960..0x6e76c | 11 | 46 | 4 inc | dispatch_field_spell_placement_display (文件末) |
+| Seg-10 ✅ | 0x6d960..0x6e76c | 11+19(disasm) | 46 | 4 inc | dispatch_field_spell_placement_display + De-Fusion/CID_13ED stubs (文件末) |
 
 执行约定同 file 00..07: 每段走 §二 pipeline; 地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。
 

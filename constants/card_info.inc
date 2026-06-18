@@ -1362,3 +1362,15 @@
 .equ RING_OF_DESTRUCTION_CID,     0x0000138d  @ Ring of Destruction (pw=83555666; card-stats.s card_0802 slot=0x138D); submit_ring_of_destruction_lp_indicators_if_zone_matched CID dispatch
 .equ MAGIC_CYLINDER_CID,          0x00001404  @ Magic Cylinder (pw=62279055; card-stats.s card_0879 slot=0x1404); dispatch_equip_lp_sprite_by_trap_card_id BST dispatch
 .equ DRAINING_SHIELD_CID,         0x0000176a  @ Draining Shield (pw=43250041; card-stats.s card_1554 slot=0x176A); dispatch_equip_lp_sprite_by_trap_card_id second BST target
+
+@ =============================================================================
+@ file 08 Seg-10 additions: Neo Space OAM effect CIDs + fn_eligible CIDs
+@ Source: asm/08_equip_oam_neodaed.s, Seg-10 (0x0806d960..0x0806e76c)
+@ tick_neo_space_oam_seq_by_card_id + fn_eligible handlers for CID=0x13ed/0x13fe
+@ Values verified against data/card-stats.s or confirmed as category codes beyond card range.
+@ =============================================================================
+.equ GAP_CID_13ED,                0x000013ed  @ CID 0x13ed = card_5101 = card_stat_zero (unallocated slot). fn_eligible handler at 0x0806dbcc; dispatch table 0x09e406c4: CID@+8=0x13ed. Adjacent to GAP_CID_13EA=0x13ea; conf: high
+.equ MULTIPLICATION_OF_ANTS_CID,  0x000013fc  @ Multiplication of Ants (card_stat_zero slot=0x13fc). tick_neo_space_oam_seq_by_card_id BST case-match. Plate L22365: CARD_ID_Multiplication_of_Ants=0x13fc; conf: high (plate authority)
+.equ NEO_SPACE_SPAWN_CAT_1422,    0x00001422  @ Neo Space spawn category code 0x1422 (card_5154=card_stat_zero). Category for Multiplication of Ants spawn group. tick_neo_space_oam_seq_by_card_id; conf: high (category use beyond card range)
+.equ NEO_SPACE_SPAWN_CAT_1813,    0x00001813  @ Neo Space spawn category code 0x1813 (CID 6163 > max card 5169 = beyond card range). Category for The Blockman effect group; conf: high (beyond card range)
+.equ NEO_SPACE_SPAWN_CAT_19BA,    0x000019ba  @ Neo Space spawn category code 0x19ba (CID 6586 > max card range). Category for Phantasmal Martyrs group; conf: high (beyond card range)
