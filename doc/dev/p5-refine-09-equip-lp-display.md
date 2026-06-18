@@ -64,7 +64,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|-------------------|------|--------|
 | 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | 08b3db1 |
-| 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ⬜ | |
+| 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ✅ | (see §四) |
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ⬜ | |
 | 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
 | 5 | 0x72d20..0x74338 | 20 | 83 | 10 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c, 0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
@@ -82,6 +82,25 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 ---
 
 ## 四、逐段完成记录
+
+### 4.02 Seg-2 完成记录
+
+- 范围: `[0x0806ff50, 0x0807104c)` -- 22 fn, tick_equip_partner_lp_indicator + invoke_equip_oam_setup + dispatch_equip_lp_or_hand_sprite cluster
+- EQ=71 (61 REUSE + 10 NEW: GUARDIAN_BAOU_CID/LEGENDARY_FIEND_CID/INSECT_PRINCESS_CID/AQUA_SPIRIT_CID/THUNDER_CRASH_CID/ENCHANTED_ARROW_CID/TOKEN_THANKSGIVING_CID/TOKEN_FEASTEVIL_CID/GRYPHONS_FEATHER_DUSTER_CID/CYCLONE_BOOMERANG_CID)
+  - DAT_08070754 = OAM_SPRITE_CODE_P1_ACTIVATION (0x8019, REUSE; C4/C5 fix from NEEDS_FIX #1)
+  - DWORD_080703b8 = gDuelPhaseFlags (added; C13 fix from NEEDS_FIX #2)
+  - DWORD_08070edc = gP1HandSlotArray (corrected from double-count; C13 fix from NEEDS_FIX #3)
+- REF=3 (PTR_gP1LifePoints x2 + gEquipChainSlotRefs x1)
+- RENAME=3 (fn-ptr THUMB+1 slots: check_equip_slot_eligible_by_side_and_type_query x2 + invoke_effect_node_with_active_flag_3arg x1)
+- FUNC_RENAME=1 (0x08070900 -> check_zone_tile_count_and_set_summon_restriction_flag; label created, no Ghidra fn object -- fn body was embedded in build_equip_chain_entries_from_zone_slots range; CSV row added manually)
+- PLATE=0
+- DISASM=1 block: fn_eligible_bazoo_the_soul_eater @ 0x08070478 (ROM_INCBIN 0x70476/0x90 eliminated) + literal pool words player_stride_pool_0514/gduel_slots_pool_0518; also re-disasmed check_zone_tile_count fn body 0x08070900..0x08070971 and test_equip_zone body 0x0807097c..0x080709ff (clearListing overspill fix)
+- carve=0; §5.1=0
+- 新常量: constants/card_info.inc (+11: 10 CIDs + BAZOO_THE_SOUL_EATER_CID)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see §三 table)
+
+---
 
 ### 4.01 Seg-1 完成记录
 

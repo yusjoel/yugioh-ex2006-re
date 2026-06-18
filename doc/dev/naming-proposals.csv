@@ -2164,6 +2164,7 @@ address,name,proposed_name,score,tags
 0x0807067c,build_equip_zone_bitmap_for_zone11,,,duel_field
 0x080706f4,dispatch_equip_zone_sprite_or_lp_row_type16,,,
 0x0807076c,build_equip_chain_entries_from_zone_slots,,,
+0x08070900,check_zone_tile_count_and_set_summon_restriction_flag,,,
 0x0807097c,test_equip_zone_target_with_activation_state,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08070aa4,enqueue_slot_sprite_type4_with_card_id,,,
 0x08070ac0,dispatch_slot_lp_sync_by_display_state,,,

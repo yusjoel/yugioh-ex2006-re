@@ -1384,3 +1384,20 @@
 .equ CREATURE_SWAP_CID,         0x0000142a  @ Creature Swap (card_0910 pw=31036355); Block1 FS handler fn_eligible CID=0x142a at 0x0806f008; conf: high
 .equ ICID_RESERVED_D,           0x0000144c  @ reserved internal CID (CID=0xFFFF, not in card-stats.s); dispatch_hand_card_slot_sprite_by_state_and_card_id BST state 0x80/0x7e; conf: high
 .equ ICID_RESERVED_E,           0x00001452  @ reserved internal CID (CID=0xFFFF, not in card-stats.s); sibling of ICID_RESERVED_D in same BST; conf: high
+
+@ =============================================================================
+@ file 09 Seg-2 additions: equip LP/zone dispatch CIDs + Bazoo fn_eligible
+@ Source: asm/09_equip_lp_display.s, Seg-2 (0x0806ff50..0x0807104c)
+@ All values verified against data/card-stats.s slot_id field (pw cross-checked).
+@ =============================================================================
+.equ GUARDIAN_BAOU_CID,              0x0000164d  @ Guardian Baou (pw=73544866; card-stats.s slot=0x164d); enqueue_zone_sprite_by_special_monster_card_id CID dispatch; conf: high
+.equ LEGENDARY_FIEND_CID,            0x0000154d  @ Legendary Fiend (pw=99747800; card-stats.s slot=0x154d); enqueue_zone_sprite_by_special_monster_card_id CID dispatch; conf: high
+.equ INSECT_PRINCESS_CID,            0x00001704  @ Insect Princess (pw=37957847; card-stats.s slot=0x1704); enqueue_zone_sprite_by_special_monster_card_id CID dispatch; conf: high
+.equ AQUA_SPIRIT_CID,                0x00001485  @ Aqua Spirit (pw=40916023; card-stats.s slot=0x1485); dispatch_equip_lp_row_or_oam_by_state_and_hand_slot CID compare; conf: high
+.equ THUNDER_CRASH_CID,              0x000016d7  @ Thunder Crash (pw=69196160; card-stats.s slot=0x16d7); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ ENCHANTED_ARROW_CID,            0x000014aa  @ Enchanted Arrow (pw=93260132; card-stats.s slot=0x14aa); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ TOKEN_THANKSGIVING_CID,         0x00001665  @ Token Thanksgiving (pw=57182235; card-stats.s slot=0x1665); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ TOKEN_FEASTEVIL_CID,            0x000018dc  @ Token Feastevil (pw=83675475; card-stats.s slot=0x18dc); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ GRYPHONS_FEATHER_DUSTER_CID,    0x0000170f  @ Gryphon's Feather Duster (pw=34370473; card-stats.s slot=0x170f); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ CYCLONE_BOOMERANG_CID,          0x000019b0  @ Cyclone Boomerang (pw=29612557; card-stats.s slot=0x19b0); tick_equip_target_count_or_lp_sprite_by_card_id dispatch table; conf: high
+.equ BAZOO_THE_SOUL_EATER_CID,       0x00001482  @ Bazoo the Soul-Eater (pw=40133511; card-stats.s slot=0x1482); fn_eligible stub at 0x08070478; FS table ref at GBA:0x09e46658; conf: high
