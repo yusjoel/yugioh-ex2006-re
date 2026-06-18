@@ -69,7 +69,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 4a | 0x719fc..0x72404 | 9 | 40 | 4 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100) | ✅ | (see §四) |
 | 4b | 0x72404..0x72d20 | 11 | 26 | 4 inc (0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ✅ | (see §四) |
 | 5a | 0x72d20..0x73a5c | 13 | 61 | 6 inc (0x7313e/2a, 0x731e4/c4, 0x7356c/48, 0x73628/138, 0x73864/28, 0x73900/15c) | ✅ | (see §四) |
-| 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ⬜ | |
+| 5b | 0x73a5c..0x74338 | 8 | 27 | 4 inc (0x73b1c/30, 0x73bc8/1bc, 0x73fde/2e, 0x74080/178) | ✅ | (see §四) |
 | 6 | 0x74338..0x752cc | 20 | 65 | 2 inc (0x74852/4a, 0x74914/cc) + 1 sw (0x7514a) | ⬜ | |
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ⬜ | |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ⬜ | |
@@ -101,6 +101,26 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
   - B6: 8 sub-stubs cat_ill_omen_sub_3900..default_3a54 @ 0x08073900..0x08073a5b (ROM_INCBIN 0x73900/0x15c; 29-entry dispatch table @0x7388c..0x738ff; multiple inline pools at 0x73990/94/98/39ac/39d4/3a30)
 - 新常量: constants/card_info.inc (+10: STATUE_OF_THE_WICKED_CID/TRAP_DUSTSHOOT_CID/TOKEN_13FB..195A_CID x8 + TOKEN_195A_CID); constants/ewram.inc (+1: EQUIP_CHAIN_BASE_OFF=0x1c88); constants/oam_attr.inc (+1: SPRITE_ATTR_CLR_BIT13=0xffffdfff)
 - 踩坑: force_dword 用 8B clearListing 覆写相邻 inline pool 后的代码 (B4 sub_3690 + B6 sub_3968/39b0 均受影响) -> 改 4B clearListing (force_dword_4b) + 逐段 DisassembleCommand 修复; B4 sub_3690 代码分 5 个分散片段 (pool 中断流) 须 5 次 DisassembleCommand; 修复脚本: PoolFix.py -> PoolFix2.py -> PoolFix3.py -> PoolFix4.py -> PoolFix5.py (5 轮). 教训: 含多处 inline pool 的 sub-stub 须逐块 clearListing(4B)+disasm, 不可一次性 force_dword 整段.
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
+
+### 4.07 Seg-5b 完成记录
+
+- 范围: `[0x08073a5c, 0x08074338)` -- 8 fn (test_equip_target_slot_by_zone_descriptor_match / enqueue_lp_counter_sprite_by_mode_and_player / tick_equip_zone_sprite_and_lp_counter_state / enqueue_zone_sprite_type5_from_slot / tick_equip_zone_eligibility_display_state_seq / tick_equip_lp_counter_display_state_seq / enqueue_spirit_zone_sprite_type11)
+- EQ=21 (19 REUSE + 2 NEW: RELOAD_CID=0x16d9 Reload pw=22589918 / DISTURBANCE_STRATEGY_CID=0x15aa Disturbance Strategy pw=77561728)
+- REF=4 (all gP1LifePoints=0x0201c4e0: DWORD_08073ae0/b14/3f94/742b0)
+- RENAME=2 (DAT_08073bc8->reasoning_dispatch_sub_stubs_3bc8; DAT_08074080->reversal_quiz_dispatch_sub_stubs_4080)
+- FUNC_RENAME=0; PLATE=1 (enqueue_spirit_zone_sprite_type11 @ 0x08074318: FUN_08071d64->dispatch_spirit_monster_zone_sprite_by_card_id; was already correct in Ghidra, stale only in pre-export asm)
+- carve=0; §5.1=0
+- DISASM=4 blocks:
+  - B7: fn_eligible_reasoning @ 0x08073b1c (ROM_INCBIN 0x73b1c/0x30; FS THUMB+1 @GBA:0x09e412b8; CID=0x159a Reasoning; literal pool 2 DWords at 0x08073b44/48)
+  - B8: 9 sub-stubs reasoning_sub_3bc8..reasoning_default_3d74 @ 0x08073bc8..0x08073d83 (ROM_INCBIN 0x73bc8/0x1bc; 31-entry dispatch table @0x73b4c..0x73bc7 = 0x7c bytes; inline pools at 0x73bf0/f4 + 0x73c44/48/4c + 0x73d14/18/1c/20)
+  - B9: fn_eligible_reversal_quiz @ 0x08073fe0 (ROM_INCBIN 0x73fde/0x2e; 2B pad at 0x73fde; FS THUMB+1 @GBA:0x09e41378; CID=0x15a5 Reversal Quiz; literal pool 2 DWords at 0x08074004/08)
+  - B10: 6 sub-stubs reversal_quiz_sub_4080..reversal_quiz_default_41ee @ 0x08074080..0x080741f7 (ROM_INCBIN 0x74080/0x178; 29-entry dispatch table @0x7400c..0x7407f = 0x74 bytes; inline pools at 0x740b8/bc/c0 + 0x740e4 + 0x7410c/10 + 0x74170/74/78 + 0x741dc/e0)
+- 新常量: constants/card_info.inc (+2: RELOAD_CID=0x16d9, DISTURBANCE_STRATEGY_CID=0x15aa)
+- 踩坑: DisassembleF09Seg5bBlocks.py 初版 force_dword 地址偏 2 字节 (用了 pad+pool 合并地址如 0x73d12 而非实际对齐池 0x73d14) -> 导致 GAS "value too big (0xFFFFFFFC)" 错误; 修复: PoolFixF09Seg5b.py 重跑 clearListing + 重新 disasm + 正确 force_dword 各 pool 的 4B 对齐地址. 教训: inline pool 前 2B pad 不纳入 force_dword 范围, pool 从第一个 4B 对齐位置起.
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - commit: (see git log)
 

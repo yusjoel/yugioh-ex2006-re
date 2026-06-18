@@ -1444,3 +1444,10 @@
 .equ TOKEN_1603_CID,           0x00001603  @ unnamed token slot (card-stats.s L27172 slot=0x1603 copy=0); setup_equip_oam BST result token CID; DWORD_08072f8c; conf: high
 .equ TOKEN_1639_CID,           0x00001639  @ unnamed token slot (card-stats.s L27185 slot=0x1639 copy=0); setup_equip_oam BST result token CID; DWORD_08072f94; conf: high
 .equ TOKEN_195A_CID,           0x0000195a  @ unnamed token slot (card-stats.s L27250 slot=0x195a copy=0); setup_equip_oam BST result token CID; DWORD_08072fcc; conf: high
+@ =============================================================================
+@ file 09 Seg-5b additions: equip LP counter display state machine card IDs
+@ Source: asm/09_equip_lp_display.s Seg-5b (0x08073a5c..0x08074338)
+@ All values verified against data/card-stats.s slot= fields.
+@ =============================================================================
+.equ RELOAD_CID,                  0x000016d9  @ Reload (pw=22589918; card-stats.s L18657 slot=0x16D9); tick_equip_lp_counter BST; DWORD_08074210; conf: high
+.equ DISTURBANCE_STRATEGY_CID,    0x000015aa  @ Disturbance Strategy (pw=77561728; card-stats.s L15563 slot=0x15AA); tick_equip_lp_counter BST; DWORD_08074214; conf: high
