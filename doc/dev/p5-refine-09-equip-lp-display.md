@@ -63,7 +63,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|-------------------|------|--------|
-| 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | TBD |
+| 1 | 0x6e76c..0x6ff50 | 20 | 74 | 6 inc + 1 sw (0x6e8b6) | ✅ | 08b3db1 |
 | 2 | 0x6ff50..0x7104c | 20 | 75 | 1 inc (0x70476/90) | ⬜ | |
 | 3 | 0x7104c..0x719fc | 20 | 39 | 2 inc (0x716fa/42, 0x71754/9c) | ⬜ | |
 | 4 | 0x719fc..0x72d20 | 20 | 66 | 8 inc (0x71a92/2a, 0x71ad4/108, 0x71f56/32, 0x72004/100, 0x72404/2c, 0x72444/138, 0x72594/1a0, 0x7274c/124) | ⬜ | |
@@ -95,7 +95,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - 新常量: constants/card_info.inc (+4), constants/ewram.inc (+2), constants/oam_attr.inc (+1)
 - Literal pool fix: FixF08Seg10AndF09Seg1LiteralPools.py (43 DWORDs) + FixF08Seg10CidStateLiteralPools2.py (8 DWORDs) + FixF08ThumbPlusOneLabels.py (2 THUMB+1 labels restored)
 - byte-identical: ✅ SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- commit: TBD
+- commit: 08b3db1
 
 ---
 
