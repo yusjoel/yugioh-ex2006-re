@@ -800,6 +800,8 @@
 .equ JAR_OF_GREED_CID,                   0x0000145a  @ Jar of Greed (pw=83968380); effect zone check
 .equ SPIRITUALISM_CID,                   0x0000147e  @ Spiritualism (pw=15866454); zone pair restriction
 .equ SPIRIT_MESSAGE_I_CID,               0x00001497  @ Spirit Message "I" (pw=31893528); field spell type B range [0x1497..0x149a]
+.equ SPIRIT_MESSAGE_N_CID,               0x00001498  @ Spirit Message "N" (pw=67287533; card-stats.s slot=0x1498); eligible_destiny_board_f85c CID comparison loop; f09 Seg-1R2 pool@0x6f95c
+.equ SPIRIT_MESSAGE_A_CID,               0x00001499  @ Spirit Message "A" (pw=94772232; card-stats.s slot=0x1499); eligible_destiny_board_f85c CID comparison loop; f09 Seg-1R2 pool@0x6f964
 .equ FUSION_GATE_CID,                    0x0000149c  @ Fusion Gate (pw=33550694); equip blocker
 .equ THE_WARRIOR_RETURNING_ALIVE_CID,    0x000014d2  @ The Warrior Returning Alive (pw=95281259); summon category BST
 .equ THE_DRAGONS_BEAD_CID,               0x000014de  @ The Dragon's Bead (pw=92408984); equip set G
@@ -1485,3 +1487,10 @@
 .equ JADE_INSECT_WHISTLE_CID,    0x00001717  @ Jade Insect Whistle (pw=95214051; card-stats.s L47551 slot=0x1717); fn_eligible B4-embedded @ 0x08077b34; FS THUMB+1 @ 0x09e41de0; conf: high
 .equ LEGENDARY_JUJITSU_MASTER_CID, 0x00001749  @ Legendary Jujitsu Master (pw=25773409; card-stats.s L48081 slot=0x1749); check_equip_activation_by_special_card_id zone13 test path; conf: high
 .equ KANGAROO_CHAMP_CID,         0x00001866  @ Kangaroo Champ (pw=95789089; card-stats.s L51376 slot=0x1866); check_equip_activation_by_special_card_id activation check path; conf: high
+
+@ =============================================================================
+@ file 09 Seg-1 REMEDIATION Cluster-2 additions
+@ Source: asm/09_equip_lp_display.s, [0x0806f85e..0x0806fef4)
+@ eligible_destiny_board_f85c (CID=0x1468) / eligible_sub_stubs_fe88
+@ =============================================================================
+.equ CARD_DISPLAY_OP31_LP_BAR_SUB, 0x0000011d  @ sub-op arg 0x11d=285 to trigger_card_display_op31_if_not_active (0x08093390) LP-bar display path; eligible_sub_stubs_fe88 pool@0x6fed8; sibling r1=0x0d used in other path @0x6febc; conf: med

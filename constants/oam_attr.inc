@@ -188,3 +188,11 @@
 @ setup_equip_oam_by_placeable_card_id_and_zone
 @ =============================================================================
 .equ SPRITE_ATTR_CLR_BIT13, 0xffffdfff  @ AND mask: clears bit13 (player_id encode bit shift=0xd); setup_equip_oam_by_placeable_card_id_and_zone uses ands r1,SPRITE_ATTR_CLR_BIT13 then orrs r1,r2(player_id<<0xd) to re-encode player bit; conf: high
+
+@ =============================================================================
+@ file 09 Seg-1 REMEDIATION Cluster-2 additions: LP sprite OAM attr0
+@ Source: asm/09_equip_lp_display.s, [0x0806f85e..0x0806fef4)
+@ eligible_destiny_board_f85c / equip_lp_sub_fa74 / equip_lp_sub_fb14
+@ Sibling: OAM_EQUIP_SLOT_TILE_P1=0x8055, OAM_SPRITE_TYPE_SEL_P1=0x8050
+@ =============================================================================
+.equ OAM_EQUIP_LP_SPRITE_P1_5E, 0x0000805e  @ OAM attr0 P1 LP sprite type 0x5e (bit15=1 OBJ_DIS|0x5e); passed as r0 to enqueue_sprite_attr_record (0x0803bd2c); 3 pool refs @0x6f934/0x6fb04/0x6fb48 in Cluster-2; conf: med

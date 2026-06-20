@@ -113,8 +113,68 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 > Remediation status after this landing:
 > - Cluster-1 [0x6f008..0x6f1c4]: DONE (this record)
-> - Cluster-2 [0x6f85e..0x6fef2]: 9 ROM_INCBIN + ~11 .byte bodies PENDING (F09-Seg1R2)
-> - Cluster-3 [0x6fdec..0x6ff4f]: partially overlaps Cluster-2 range, same PENDING scope
+> - Cluster-2 [0x6f85e..0x6fef4]: 9 ROM_INCBIN + 11 .byte bodies PENDING (F09-Seg1R2)
+> - Cluster-3 [0x6ff0a..0x6ff50]: .byte blocks PENDING (F09-Seg1R3, simple)
+
+---
+
+### 4.13 Seg-1 Remediation Cluster-2 完成记录
+
+> Remediation landing: 2026-06-20. Eliminates all 9 ROM_INCBIN + 11 .byte companion blocks
+> in [0x0806f85e..0x0806ff0a) -- two fn_eligible stubs (Destiny Board / Cathedral of Nobles)
+> and their dispatch sub-stub clusters. Review noted 1 missed block (equip_lp_sub_fa4c .byte
+> 0x6fa4e/0x10) which was added as Step A2b before landing.
+
+- 范围: `[0x0806f85e, 0x0806ff0a)` Cluster-2 two-cluster group
+- Cluster-2A: Destiny Board (CID=0x1468) eligible_destiny_board_f85c + dispatch stubs
+  - B1: eligible_destiny_board_f85c body @ 0x0806f85e (ROM_INCBIN 0x6f85e/0x136; 114 instrs via 2-script fix; multi-pass CID triplet handling)
+  - B2: eligible_sub_stubs_fa08 body + b+pad @ 0x0806fa0a (ROM_INCBIN 0x6fa0a/0x36 + b+pad 0x6fa40)
+  - B2a: equip_lp_sub_fa4c body @ 0x0806fa4e (.byte 0x10; added per review #1)
+  - B3: equip_lp_sub_fa5e body @ 0x0806fa62 (ROM_INCBIN 0x6fa62/0x12)
+  - B4: equip_lp_sub_fa74 body @ 0x0806fa78 (ROM_INCBIN 0x6fa78/0x8c; 4 createDWord)
+  - B5: equip_lp_sub_fb14 body @ 0x0806fb16 (ROM_INCBIN 0x6fb16/0x32; 1 createDWord)
+  - B2c: equip_lp_sub_fb4c body @ 0x0806fb4e (.byte 0xa)
+  - B2d: equip_lp_sub_fb58 body @ 0x0806fb5a (.byte 0xa)
+  - B2e: equip_lp_sub_fb64 body @ 0x0806fb66 (.byte 0xa)
+  - B2f: equip_lp_sub_fb70 body @ 0x0806fb72 (.byte 0x4)
+  - B2g: equip_lp_sub_fb76 body + shared epilogue @ 0x0806fb78 (.byte 0x10; disasm FIRST)
+- Cluster-2B: Cathedral of Nobles (CID=0x146f) eligible_cathedral_of_nobles_fdec + dispatch stubs
+  - B6: eligible_cathedral_of_nobles_fdec body @ 0x0806fdee (ROM_INCBIN 0x6fdee/0x26; 2 createDWord)
+  - B7: eligible_sub_stubs_fe88 body + b+pad @ 0x0806fe8a (ROM_INCBIN 0x6fe8a/0x4a + b+pad 0x6fed4; 1 createDWord)
+  - B8: equip_chain_act_sub_fedc body @ 0x0806fede (ROM_INCBIN 0x6fede/0x12)
+  - B9: equip_chain_act_sub_fef0 body @ 0x0806fef2 (ROM_INCBIN 0x6fef2/0x18)
+  - B7c: equip_chain_act_sub_ff0a body @ 0x0806ff0c (.byte 0xe)
+  - B7d: equip_chain_act_sub_ff1a body @ 0x0806ff1c (.byte 0x10)
+  - B7e: equip_chain_act_sub_ff2c body @ 0x0806ff2e (.byte 0xe)
+  - B7f: equip_chain_act_sub_ff3c body @ 0x0806ff3e (.byte 0x8)
+  - B7g: equip_chain_act_sub_ff46 body + shared epilogue @ 0x0806ff48 (.byte 0x4 + .word 0x4708; disasm FIRST)
+- DISASM=20 items (9 ROM_INCBIN + 11 .byte companion blocks); b+pad words decoded byte-identical
+- EQ=15 (11 REUSE + 4 NEW): PLAYER_BLOCK_STRIDE/gDuelFieldSlots/SPIRIT_MESSAGE_I_CID/
+  SPIRIT_MESSAGE_L_CID/gDuelPhaseFlags (x4 slots)/GRAVEROBBER_CID/EQUIP_PHASE_FRAME_OFF (REUSE);
+  OAM_EQUIP_LP_SPRITE_P1_5E=0x805e (NEW, 3 slots) / SPIRIT_MESSAGE_N_CID=0x1498 (NEW) /
+  SPIRIT_MESSAGE_A_CID=0x1499 (NEW) / CARD_DISPLAY_OP31_LP_BAR_SUB=0x011d (NEW)
+- REF=2 (equip_lp_tbl_f990->equip_lp_disp_table_f994; equip_chain_tbl_fe10->equip_chain_act_disp_table_fe14)
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- 新常量:
+  - constants/card_info.inc: +2 (SPIRIT_MESSAGE_N_CID=0x1498, SPIRIT_MESSAGE_A_CID=0x1499)
+    inserted after SPIRIT_MESSAGE_I_CID line
+  - constants/card_info.inc: +1 (CARD_DISPLAY_OP31_LP_BAR_SUB=0x011d) in new Cluster-2 section
+  - constants/oam_attr.inc: +1 (OAM_EQUIP_LP_SPRITE_P1_5E=0x805e) in new Cluster-2 section
+- Ghidra scripts:
+  - `tools/ghidra-labeling/DisassembleF09Seg1R2Cluster2.py` (main script; 20 disasm + 15 EQ + 2 REF)
+  - `tools/ghidra-labeling/DisassembleF09Seg1R2B1Fix.py` (fix: B1 unrestricted disasm; 114 instrs)
+- ROM_INCBIN before: 30 (after Cluster-1); after: 21 (reduced by 9 Cluster-2 ROM_INCBIN blocks)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- CSV sync: no (sub-stub labels; no Ghidra function rename)
+
+> Remediation status after this landing:
+> - Cluster-1 [0x6f008..0x6f1c4]: DONE (commit e9636e1)
+> - Cluster-2 [0x6f85e..0x6ff0a]: DONE (this record)
+> - Cluster-3 [0x6ff0a..0x6ff50]: .byte blocks ff0a/ff1a/ff2c/ff3c/ff46 DONE (included above as B7c-B7g)
+>   Note: Cluster-3 was co-disassembled with Cluster-2B in the same session. Seg-1 is now
+>   fully remediated -- zero ROM_INCBIN and zero .byte-code residue in [0x6e76c..0x6ff50).
+>
+> Next remediation targets: Seg-4 remnants at 0x720e2/0x7270e/0x7276a/0x72794
 
 ---
 
