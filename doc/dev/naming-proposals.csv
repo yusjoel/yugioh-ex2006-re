@@ -2314,11 +2314,13 @@ address,name,proposed_name,score,tags
 0x08077d58,enqueue_position_sprites_for_both_players,,,
 0x08077d80,submit_lp_indicator_by_slot_type_and_score,,,
 0x08077e00,enqueue_equip_zone_sprite_by_state_and_equip_count,,,
+0x08077ecc,fn_eligible_dangerous_machine_type6,,,equip_eligible;fn_eligible;refine_created
 0x08078004,dispatch_equip_zone_sprite_by_lp_state_with_ticker,,,
 0x080780f0,enqueue_equip_type11_sprite_and_lp_bar_if_signature_match,,,
 0x08078158,refresh_equip_slot_bitmap_from_zone_struct,,,
 0x080781dc,invoke_equip_zone_bitmap_pair_if_spell_card_type,,,
 0x0807822c,enumerate_equip_slots_for_sprite_bitmap_pair,,,
+0x080782c0,fn_eligible_monster_gate,,,equip_eligible;fn_eligible;refine_created
 0x080784b4,scan_both_players_slots_for_equip_activation,,,
 0x0807850c,invoke_effect_node_with_active_flag_if_player_mismatch,,,
 0x08078550,dispatch_equip_target_slot_select_by_lp_state,,,

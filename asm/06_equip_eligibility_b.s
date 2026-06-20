@@ -7864,7 +7864,7 @@ LAB_0805695c:
     beq LAB_080569b0                         @ 08056978 1ad0
     b LAB_080569ca                           @ 0805697a 26e0
 tick_equip_score_sprite_display_seq_mode_fn:
-    .word  0x080905e9                     @ 0805697c e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 0805697c e9050908  THUMB fn-ptr
 tick_equip_score_sprite_dedication:
     .word  DEDICATION_THROUGH_LIGHT_DARK_CID @ 08056980 13170000
 tick_equip_score_sprite_knights_title:
@@ -9370,7 +9370,7 @@ LAB_080573ac:
     adds r0,#0x1    @ 080573c8 0130
     b LAB_08057424                           @ 080573ca 2be0
 tick_equip_zone14_test_display_seq_mode_fn:
-    .word  0x080905e9                     @ 080573cc e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 080573cc e9050908  THUMB fn-ptr
 LAB_080573d0:
     bl check_activation_display_state_is_confirmed @ 080573d0 3ff0a0fb
     cmp r0,#0x0                              @ 080573d4 0028
@@ -9752,7 +9752,7 @@ LAB_080575da:
     b LAB_08057612                           @ 080575f8 0be0
     .zero  0x2
 tick_equip_lp_bar_z14_mode_fn:
-    .word  0x080905e9                     @ 080575fc e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 080575fc e9050908  THUMB fn-ptr
 LAB_08057600:
     bl check_activation_display_state_is_confirmed @ 08057600 3ff088fa
     cmp r0,#0x0                              @ 08057604 0028
@@ -10910,7 +10910,7 @@ LAB_08057dd0:
     b LAB_08057e92                           @ 08057de8 53e0
     .zero  0x2
 DWORD_08057dec:
-    .word  0x080905e9                     @ 08057dec e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08057dec e9050908  THUMB fn-ptr
 DWORD_08057df0:
     .word  0x0201b290                     @ 08057df0 90b20102
 DWORD_08057df4:
@@ -10953,7 +10953,7 @@ LAB_08057e2a:
 DWORD_08057e30:
     .word  0x0201e2a0                     @ 08057e30 a0e20102
 DWORD_08057e34:
-    .word  0x080905e9                     @ 08057e34 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08057e34 e9050908  THUMB fn-ptr
 DWORD_08057e38:
     .word  0x0201b290                     @ 08057e38 90b20102
 DWORD_08057e3c:
@@ -11134,7 +11134,7 @@ LAB_08057f28:
     bl set_equip_activation_state_by_mode__08096a4c @ 08057f42 3ef083fd
     b LAB_08057f20                           @ 08057f46 ebe7
 tick_equip_sprite_eff_mode_fn:
-    .word  0x080905e9                     @ 08057f48 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08057f48 e9050908  THUMB fn-ptr
 LAB_08057f4c:
     str r2,[sp,#0x0]                         @ 08057f4c 0092
     bl check_activation_display_state_is_confirmed @ 08057f4e 3ef0e1fd
@@ -14690,7 +14690,7 @@ LAB_080595f4:
     b LAB_08059596                           @ 08059608 c5e7
     .zero  0x2
 DWORD_0805960c:
-    .word  0x080905e9                     @ 0805960c e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 0805960c e9050908  THUMB fn-ptr
 DWORD_08059610:
     .word  0x0201b290                     @ 08059610 90b20102
 DWORD_08059614:
@@ -14953,7 +14953,7 @@ LAB_0805979c:
     adds r0,#0x1    @ 080597ac 0130
     b LAB_08059804                           @ 080597ae 29e0
 dat_set_equip_mode_fn_ptr_a:
-    .word  0x080905e9                     @ 080597b0 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 080597b0 e9050908  THUMB fn-ptr
 LAB_080597b4:
     bl check_activation_display_state_is_confirmed @ 080597b4 3df0aef9
     cmp r0,#0x0                              @ 080597b8 0028
@@ -15232,7 +15232,7 @@ tick_equip_atk_zone_seq__case_set_mode_alt:
     b LAB_08059a54                           @ 08059994 5ee0
     .zero  0x2
 dat_set_equip_mode_fn_ptr_b:
-    .word  0x080905e9                     @ 08059998 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08059998 e9050908  THUMB fn-ptr
 tick_equip_atk_zone_state_base_e:
     .word  gDuelPhaseFlags                @ 0805999c 90b20102
 tick_equip_atk_zone_step_off_e:
@@ -15932,7 +15932,7 @@ LAB_08059e0a:
     b LAB_08059e6c                           @ 08059e28 20e0
     .zero  0x2
 set_equip_activation_state_mode_alt_ptr_15934:
-    .word  0x080905e9                     @ 08059e2c e9050908  THUMB fn-ptr: set_equip_activation_state_by_mode_alt+1 = 0x080905e9
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08059e2c e9050908  THUMB fn-ptr
 LAB_08059e30:
     bl check_activation_display_state_is_confirmed @ 08059e30 3cf070fe
     cmp r0,#0x0                              @ 08059e34 0028
@@ -16431,7 +16431,7 @@ tick_bonding_photon_state2_set_activation:
     bl set_equip_activation_state_by_mode__08096a4c @ 0805a13e 3cf085fc
     b LAB_0805a100                           @ 0805a142 dde7
 DAT_0805a144:
-    .word  0x080905e9                     @ 0805a144 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 0805a144 e9050908  THUMB fn-ptr
 
 @ tick_bonding_photon_state3_confirm_sprite @ 0x0805a148
 @ Bonding/Photon state-machine handler: state 3 (confirm sprite display).

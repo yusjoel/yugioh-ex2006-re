@@ -7676,7 +7676,7 @@ check_equip_eligible_amazoness_monster_with_spell480:
     bl check_spell_type480_active_deck_matches @ 0805f286 fef787fb
     b LAB_0805f292                           @ 0805f28a 02e0
 check_card_is_amazoness_type_ptr:
-    .word  0x0804b049                     @ 0805f28c 49b00408  check_card_is_amazoness_type THUMB fn-ptr (+1); used by count_monster_slots_by_fnptr; conf: high
+    .word  check_card_is_amazoness_type+1 @ 0805f28c 49b00408  THUMB fn-ptr
 LAB_0805f290:
     movs r0,#0x0    @ 0805f290 0020
 LAB_0805f292:

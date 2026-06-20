@@ -13432,7 +13432,7 @@ LAB_08081920:
     b LAB_08081980                           @ 08081944 1ce0
     .zero  0x2
 DAT_08081948:
-    .word  0x080905e9                     @ 08081948 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08081948 e9050908  THUMB fn-ptr
 LAB_0808194c:
     bl check_activation_display_state_is_confirmed @ 0808194c 15f0e2f8
     cmp r0,#0x0                              @ 08081950 0028
@@ -13926,7 +13926,7 @@ LAB_08081cac:
 DAT_08081cd0:
     .word  0x000010d3                     @ 08081cd0 d3100000
 DAT_08081cd4:
-    .word  0x080905e9                     @ 08081cd4 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08081cd4 e9050908  THUMB fn-ptr
 LAB_08081cd8:
     adds r0,r4,#0x0    @ 08081cd8 201c
     adds r1,r3,#0x0    @ 08081cda 191c
@@ -14676,7 +14676,7 @@ LAB_08082444:
     bl set_equip_activation_state_by_mode__08096a4c @ 08082456 14f0f9fa
     b LAB_0808240c                           @ 0808245a d7e7
 DWORD_0808245c:
-    .word  0x080905e9                     @ 0808245c e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 0808245c e9050908  THUMB fn-ptr
 LAB_08082460:
     bl check_activation_display_state_is_confirmed @ 08082460 14f058fb
     cmp r0,#0x0                              @ 08082464 0028
@@ -15002,7 +15002,7 @@ LAB_080826b0:
 DWORD_080826c8:
     .word  0x0000010f                     @ 080826c8 0f010000
 DWORD_080826cc:
-    .word  0x080905e9                     @ 080826cc e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 080826cc e9050908  THUMB fn-ptr
 LAB_080826d0:
     movs r5,#0x0    @ 080826d0 0025
 LAB_080826d2:
@@ -15726,7 +15726,7 @@ LAB_08082d46:
     b LAB_08082e10                           @ 08082d5c 58e0
     .zero  0x2
 DWORD_08082d60:
-    .word  0x080905e9                     @ 08082d60 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08082d60 e9050908  THUMB fn-ptr
 LAB_08082d64:
     ldr r7, DWORD_08082dbc                   @ 08082d64 154f
     adds r0,r6,#0x0    @ 08082d66 301c
@@ -17033,7 +17033,7 @@ LAB_0808368c:
 PTR_gP1LifePoints_080836b0:
     .word  gP1LifePoints                  @ 080836b0 e0c40102
 DAT_080836b4:
-    .word  0x080905e9                     @ 080836b4 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 080836b4 e9050908  THUMB fn-ptr
 LAB_080836b8:
     bl check_activation_display_state_is_confirmed @ 080836b8 13f02cfa
     cmp r0,#0x0                              @ 080836bc 0028
@@ -18016,7 +18016,7 @@ LAB_08083d9e:
     adds r0,#0x1    @ 08083dc0 0130
     b LAB_08083e04                           @ 08083dc2 1fe0
 DWORD_08083dc4:
-    .word  0x080905e9                     @ 08083dc4 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08083dc4 e9050908  THUMB fn-ptr
 LAB_08083dc8:
     bl check_activation_display_state_is_confirmed @ 08083dc8 12f0a4fe
     cmp r0,#0x0                              @ 08083dcc 0028
@@ -18204,7 +18204,7 @@ LAB_08083ef8:
     bl set_equip_activation_state_by_mode__08096a4c @ 08083f02 12f0a3fd
     b LAB_08083f30                           @ 08083f06 13e0
 DWORD_08083f08:
-    .word  0x080905e9                     @ 08083f08 e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 08083f08 e9050908  THUMB fn-ptr
 LAB_08083f0c:
     bl check_activation_display_state_is_confirmed @ 08083f0c 12f002fe
     cmp r0,#0x0                              @ 08083f10 0028
@@ -18953,7 +18953,7 @@ DAT_08084534:
 DAT_08084538:
     .word  0x0201c510                     @ 08084538 10c50102
 DAT_0808453c:
-    .word  0x080905e9                     @ 0808453c e9050908
+    .word  set_equip_activation_state_by_mode_alt+1 @ 0808453c e9050908  THUMB fn-ptr
 LAB_08084540:
     bl check_activation_display_state_is_confirmed @ 08084540 12f0e8fa
     cmp r0,#0x0                              @ 08084544 0028

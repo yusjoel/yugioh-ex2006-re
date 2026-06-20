@@ -1494,3 +1494,14 @@
 @ eligible_destiny_board_f85c (CID=0x1468) / eligible_sub_stubs_fe88
 @ =============================================================================
 .equ CARD_DISPLAY_OP31_LP_BAR_SUB, 0x0000011d  @ sub-op arg 0x11d=285 to trigger_card_display_op31_if_not_active (0x08093390) LP-bar display path; eligible_sub_stubs_fe88 pool@0x6fed8; sibling r1=0x0d used in other path @0x6febc; conf: med
+
+@ =============================================================================
+@ file 09 Seg-9b additions: fn_eligible handler CIDs (FS dispatch gate stubs)
+@ Source: asm/09_equip_lp_display.s, Seg-9b (0x08077c50..0x0807850c)
+@ B6: fn_eligible_dangerous_machine_type6 (FS THUMB+1 @0x09e448d0)
+@ B8: fn_eligible_monster_gate (FS THUMB+1 @0x09e41f18)
+@ C5 grep 0x1738 in constants/: 0 hits (rom_data.inc 0x09821738 = ROM addr, distinct domain)
+@ C5 grep 0x175c in constants/: 0 hits
+@ =============================================================================
+.equ DANGEROUS_MACHINE_TYPE6_CID, 0x00001738  @ Dangerous Machine TYPE-6 (pw=76895648; card-stats.s L19607 card_1507 slot=0x1738); fn_eligible_dangerous_machine_type6 FS dispatch gate; conf: high
+.equ MONSTER_GATE_CID,            0x0000175c  @ Monster Gate (pw=43040603; card-stats.s L20076 card_1543 slot=0x175C); fn_eligible_monster_gate FS dispatch gate; conf: high

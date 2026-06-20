@@ -74,7 +74,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 7 | 0x752cc..0x7629c | 19 | 46 | 6 inc (0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | ✅ | (see §四) |
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | 1e38556 |
 | 9a | 0x7738c..0x77c50 | 9+3new | 31 | 5 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8) | ✅ | (see §四) |
-| 9b | 0x77c50..0x7850c | 10 | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ⬜ | |
+| 9b | 0x77c50..0x7850c | 10+2new | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ✅ | (see §四) |
 | 10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -327,6 +327,35 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ---
 
+### 4.17 Seg-9b 完成记录
+
+- 范围: `[0x08077c50, 0x0807850c)` -- 10 named fn + 2 new fn_eligible (fn_eligible_dangerous_machine_type6 / fn_eligible_monster_gate)
+- EQ=33 (all REUSE: gDuelPhaseFlags x3 / gP1LifePoints x8 / PLAYER_BLOCK_STRIDE x9 / LP_CARD_TRACK_BASE_OFF x3 / gEquipChainSlotRefs x2 / gDuelFieldSlots x3 / ACTIVATION_STATE_B_OFF x1 / gDuelCardCtxBase x1 / EQUIP_PHASE_FRAME_OFF x4 / gDuelFieldSlots_p2_base x2 / SANCTUARY_CID_SHIFTED x2 / BLUE_EYES_WHITE_DRAGON_CID x1 / gEquipZoneCountTable x1)
+- REF=3 (PTR_DAT_08077f2c->dangerous_machine_dispatch_table_7f44@0x08077f44 [slot label = dangerous_machine_dispatch_table_ptr_7f2c]; DAT_08077f44->dangerous_machine_dispatch_sub_stubs_7f44 [self-ref]; DAT_08078368->monster_gate_dispatch_sub_stubs_8368 [self-ref])
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0
+- DISASM=4 blocks:
+  - B6: fn_eligible_dangerous_machine_type6 @ 0x08077ecc (ROM_INCBIN 0x77ecc/0x5c; FS THUMB+1 @0x09e448d0; CID=0x1738 DANGEROUS_MACHINE_TYPE6_CID; literal pool: 0x77ee8/0x77f20/0x77f24; createFunction; extended body @LAB_08077eec disasm via FixF09Seg9bResidues.py)
+  - B7: 6 sub-stubs dangerous_machine @ 0x08077f44 (ROM_INCBIN 0x77f44/0xc0; 6-entry dispatch table @0x08077f2c; labels: sub_7f44/7f56/7f6c/7f7a/7f86/7f9c; shared branch targets LAB_08077fae+LAB_08077fd0 disasm via FixF09Seg9bResidues.py; pool: 0x77f98/0x77fcc/0x77ff0/0x77ff4/0x77ff8)
+  - B8: fn_eligible_monster_gate @ 0x080782c0 (ROM_INCBIN 0x782c0/0x2c; FS THUMB+1 @0x09e41f18; CID=0x175c MONSTER_GATE_CID; literal pool: 0x782e4/0x782e8; createFunction)
+  - B9: 8 sub-stubs monster_gate @ 0x08078368 (ROM_INCBIN 0x78368/0x14c; 31-entry dispatch table @0x080782ec; labels: sub_8368/83a0/83a8/8476/847c/848c/849e/default_84a8; 0x0807841c excluded [mid-BL]; pool: 0x78394/0x78398/0x78450/0x78454)
+- §5.1=0 (all 4 blocks have confirmed refs)
+- 新常量: constants/card_info.inc (+2: DANGEROUS_MACHINE_TYPE6_CID=0x1738 / MONSTER_GATE_CID=0x175c)
+- Ghidra scripts:
+  - `tools/ghidra-labeling/RefineF09Seg9bSlots.py` (33 EQ + 3 REF)
+  - `tools/ghidra-labeling/DisassembleF09Seg9bBlocks.py` (B6/B7/B8/B9 disasm)
+  - `tools/ghidra-labeling/FixF09Seg9bPools.py` (4 missing pool DWords: 0x77f98/0x78394/0x78398/0x78454)
+  - `tools/ghidra-labeling/FixF09Seg9bResidues.py` (3 residue blocks: LAB_08077eec/08077fae/08077fd0)
+  - `tools/ghidra-labeling/FixF09Seg9bPools2.py` (2 wrong DWords at 0x77f18/1c -> correct at 0x77f20/24)
+- 踩坑: Multi-round pool fix (5 scripts total): (1) pool addresses in proposal were off (0x77f18/1c=CODE, actual pools at 0x77f20/24); (2) force_dword didn't cover 0x77f98 (fn_ptr pool in B7) and 3 B9 pools; (3) residue ROM_INCBIN at LAB_08077eec/fae/fd0 (conditional branch targets not reached by per-entry DisassembleCommand)
+- ROM_INCBIN before: 14; after: 10 (reduced by 4 B6/B7/B8/B9 blocks)
+- Seg-9b range [0x77c50, 0x7850c): 0 ROM_INCBIN, 0 non-ASCII in exported asm
+- Seg-9 COMPLETE (9a [0x7738c..0x77c50] + 9b [0x77c50..0x7850c] both done)
+- CSV: +2 rows (fn_eligible_dangerous_machine_type6 @0x08077ecc / fn_eligible_monster_gate @0x080782c0; refine-created)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+---
+
 ### 4.10 Seg-8 完成记录
 
 - 范围: `[0x0807629c, 0x0807738c)` -- 19 fn (enqueue_hand_spell_sprite_with_lp_counter / invoke_equip_oam_for_zone_e_bits46 / tick_equip_zone_bitmap_display_seq / enqueue_equip_slot_sprite_if_not_in_chain / tick_equip_zone_hand_sprite_by_card_pair / check_effect_slot_card_type_flag_by_id / fn_eligible_mustering_dark_scorpions [new] / mustering_dark_scorpions_dispatch_sub_stubs_65f0 + 5 sub-stubs / fn_eligible_spell_vanishing [new] / spell_vanishing_dispatch_sub_stubs_67f8 + 7 sub-stubs / enqueue_effect_node_sprite_type11_mode5 / enqueue_hand_spell_sprite_with_slot_count / enqueue_equip_zone_sprite_zone_type15 / tick_zone_sprite_pipeline_by_lp_table_delta / enqueue_equip_zone_sprite_with_neo_daedalus_and_chain / check_equip_slot_match_for_card_render / dispatch_spell_zone_sprite_by_display_state / update_equip_target_bitmap_for_zone15 / enqueue_zone_equip_sprite_black_luster_soldier)
@@ -556,7 +585,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 | Seg-6 | 0x74338..0x752cc | 20 | 65 | 2 inc(0x74852/4a, 0x74914/cc) + 1 sw(0x7514a) | apply_equip_activation_for_zone + dispatch_equip_zone_bitmap_or_neo_daedalus + dispatch_equip_display_state 簇; switchD_0807514a |
 | Seg-7 | 0x752cc..0x7629c | 19 | 46 | 6 inc(0x75378/28, 0x75414/a4, 0x75d0c/2c, 0x75d5c/214, 0x75f8e/2e, 0x75fe0/17c) | enqueue_effect_card_sprite + tick_graveyard_spell_display + dispatch_effect_activation 簇; 含大 inc 0x75d5c/0x214 |
 | Seg-8 | 0x7629c..0x7738c | 19 | 70 | 4 inc(0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw(0x7638c, 0x77144) | tick_equip_zone_bitmap_display + enqueue_equip_zone_sprite_zone_type15 + dispatch_equip_effect_node 簇; **双 switchD** |
-| Seg-9 | 0x7738c..0x7850c | 19 | 67 | 9 inc(0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | invoke_setup_equip_oam + dispatch_equip_lp_bar_display + dispatch_equip_banisher 簇; 9 inc **重段** |
+| Seg-9 | 0x7738c..0x7850c | 19+5new | 67 | 9 inc(0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8, 0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ✅ invoke_setup_equip_oam + dispatch_equip_lp_bar_display + dispatch_equip_banisher 簇; 9 inc **重段**; 5 new fn_eligible (Seg-9a x3 + Seg-9b x2) |
 | Seg-10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc(0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | dispatch_equip_slot_activation_seq + dispatch_equip_slot_sprite_by_zone_flag + tick_neo_daedalus_equip_lp 簇; **最重段** 10 块含 0x1ec/0x1c4/0x154 大表, 建议拆 Seg-10a/10b |
 
 执行约定同 file 00..08: 每段走 §二 pipeline; 地址序不回头; 每完成一段更新 §三 + §四 + refine-progress。
