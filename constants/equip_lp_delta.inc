@@ -15,3 +15,12 @@
 .equ LP_EQUIP_DELTA_NEG_1500, 0xfffffa24  @ -1500 (s32); Inferno equip penalty; 1 ROM ref
 .equ LP_EQUIP_DELTA_NEG_2000, 0xfffff830  @ -2000 (s32); Granadora attack-position penalty; 8 ROM refs
 .equ LP_EQUIP_DELTA_NEG_3000, 0xfffff448  @ -3000 (s32); Blasting the Ruins penalty; 1 ROM ref
+
+@ =============================================================================
+@ file 10 Seg-1 additions: Neo-Daedalus OAM sprite attr base
+@ Source: asm/10_equip_effect_dispatch.s, Seg-1 (0x08079e60..0x0807ae84)
+@ dispatch_neo_daedalus_equip_sprite_by_monster_count asm/10 L540-L546:
+@   ldr r2,DWORD_0807a644; orrs r1,r2 -> r2 is OAM attr base ORed with player_id<<13
+@ C5 grep 0x180d in constants/: 0 hits (confirmed NEW); distinct from MAGICIANS_CIRCLE_CID=0x1818
+@ =============================================================================
+.equ NEO_DAEDALUS_OAM_SPRITE_BASE, 0x0000180d  @ OAM sprite attr2 base for Neo-Daedalus equip zone sprite; ORed with player_id<<13 in dispatch_neo_daedalus_equip_sprite_by_monster_count; conf: high

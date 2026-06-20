@@ -1518,3 +1518,11 @@
 @ C5 grep 0xb4f80000 in constants/: 0 hits; grep FIELD8 in constants/: 0 hits
 @ =============================================================================
 .equ CARD_TYPE_FIELD8_MASK,       0xb4f80000  @ (slot.field8_word<<0x13)==0xb4f80000 identifies specific equip card type; apply_lp_delta_for_specific_equip_card_type lsls+cmp sequence; conf: high
+
+@ =============================================================================
+@ file 10 Seg-1 additions: fn_eligible handler CID (FS dispatch gate stub)
+@ Source: asm/10_equip_effect_dispatch.s, Seg-1 (0x08079e60..0x0807ae84)
+@ BLK7: fn_eligible Magician's Circle (FS THUMB+1 @0x9e42410)
+@ C5 grep 0x1818 in constants/: 0 hits (confirmed NEW)
+@ =============================================================================
+.equ MAGICIANS_CIRCLE_CID,        0x00001818  @ Magician's Circle (pw=74083143; card-stats.s L19836 card_1694 slot=0x1818); fn_eligible BLK7 FS dispatch gate; conf: high

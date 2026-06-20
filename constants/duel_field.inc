@@ -409,3 +409,12 @@
 @ Source: asm/09_equip_lp_display.s, Seg-4b (0x08072404..0x08072d20)
 @ =============================================================================
 .equ LP_DELTA_6000,            0x00001770  @ fixed LP delta 6000 (decimal); dispatch_lp_delta_display_by_card_pair_diff asm/09 L8085: v==6 branch loads r2=0x1770=6000 LP delta and calls submit_lp_indicator_with_slot_xor_flag; domain distinct from MARSHMALLON_CID=0x1770 (card ID domain in card_info.inc); conf: high
+
+@ =============================================================================
+@ file 10 Seg-1 additions: card display op-id + equip paired-slot predicate
+@ Source: asm/10_equip_effect_dispatch.s, Seg-1 (0x08079e60..0x0807ae84)
+@ C5 grep 0x137 in constants/: 0 hits (0x137b EYE_OF_TRUTH_CID distinct); grep 0x181e: 0 hits
+@ =============================================================================
+.equ CARD_DISPLAY_OP_ID_137,   0x00000137  @ op-id argument to invoke_card_display_op_0x31_sub1; dispatch_equip_banisher_activation_by_state asm/10 L954-L955; Banisher activation display operation; conf: high
+.equ EQUIP_PAIRED_SLOT_PRED,   0x0000181e  @ predicate/slot-type filter for count_equipped_paired_slots_for_player; tick_paired_slot_counter_update asm/10 L1391-L1392; encodes paired-slot type attribute; conf: med
+.equ zone_query_hand_tag_12a1, 0x000012a1  @ zone query node-type tag for find_effect_node_in_zone (hand zone=0xb); tick_hand_effect_node_match_display_seq asm/10 L821; NOT PARASITE_PARACIDE_CID (semantic collision, different domain); conf: high
