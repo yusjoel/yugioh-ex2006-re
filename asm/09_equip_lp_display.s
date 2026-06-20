@@ -8100,7 +8100,12 @@ fn_eligible_fengsheng_mirror_1f58:
     bls LAB_08071f74                         @ 08071f70 00d9
     b field_spell_sub_20f4                   @ 08071f72 bfe0
 LAB_08071f74:
-    .byte  0x80, 0x00, 0x03, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46, 0x00, 0x00
+    lsls r0,r0,#0x2    @ 08071f74 8000
+    ldr r1, pool_1f84                        @ 08071f76 0349
+    adds r0,r0,r1    @ 08071f78 4018
+    ldr r0,[r0,#0x0]                         @ 08071f7a 0068
+    .hword 0x4687    @ 08071f7c 8746
+    .zero  0x2
 pool_1f80:
     .word  0x0201b290                     @ 08071f80 90b20102  literal pool fn_eligible_fengsheng_mirror_1f58
 pool_1f84:
@@ -8257,7 +8262,14 @@ field_spell_sub_20d0:
     bl check_zone_eligible_with_deck_flag    @ 080720dc d8f7f6f9
     b field_spell_sub_20f4                   @ 080720e0 08e0
 LAB_080720e2:
-    ROM_INCBIN 0x720e2, 0x12
+    ldrb r1,[r4,#0x2]                        @ 080720e2 a178
+    lsls r0,r1,#0x1f    @ 080720e4 c807
+    lsrs r0,r0,#0x1f    @ 080720e6 c00f
+    ldrh r1,[r4,#0x0]                        @ 080720e8 2188
+    movs r2,#0x1    @ 080720ea 0122
+    bl set_lp_display_row_type5              @ 080720ec 2ff09efd
+    movs r0,#0x7f    @ 080720f0 7f20
+    b LAB_080720f6                           @ 080720f2 00e0
 field_spell_sub_20f4:
     movs r0,#0x0    @ 080720f4 0020  -- raw-dispatch sub-stub 11 (default stub: 26 of 32 table entries point here)
 LAB_080720f6:
@@ -8709,12 +8721,17 @@ fn_eligible_fiend_comedian_2404:
     bls LAB_0807241c                         @ 08072418 00d9
     b LAB_08072538                           @ 0807241a 8de0
 LAB_0807241c:
-    .byte  0x80, 0x00, 0x03, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46, 0x00, 0x00
+    lsls r0,r0,#0x2    @ 0807241c 8000
+    ldr r1, pool_next_addr_242c              @ 0807241e 0349
+    adds r0,r0,r1    @ 08072420 4018
+    ldr r0,[r0,#0x0]                         @ 08072422 0068
+    .hword 0x4687    @ 08072424 8746
+    .zero  0x2
 gduel_phase_pool_2428:
     .word  0x0201b290                     @ 08072428 90b20102  gDuelPhaseFlags=0x0201b290; literal pool fn_eligible_fiend_comedian_2404
 pool_next_addr_242c:
     .word  0x08072430                     @ 0807242c 30240708  0x08072430=next address; literal pool fn_eligible_fiend_comedian_2404
-    .byte  0x34, 0x25, 0x07, 0x08
+    .word  0x08072534                     @ 08072430 34250708
     .word  last_turn_sub_24b4             @ 08072434 b4240708
     .word  last_turn_sub_24ac             @ 08072438 ac240708
     .word  last_turn_sub_248a             @ 0807243c 8a240708
@@ -8872,12 +8889,16 @@ LAB_08072556:
     bls LAB_0807256a                         @ 08072566 00d9
     b LAB_080726e6                           @ 08072568 bde0
 LAB_0807256a:
-    .byte  0x88, 0x00, 0x02, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46
+    lsls r0,r1,#0x2    @ 0807256a 8800
+    ldr r1, pool_b6_2578                     @ 0807256c 0249
+    adds r0,r0,r1    @ 0807256e 4018
+    ldr r0,[r0,#0x0]                         @ 08072570 0068
+    .hword 0x4687    @ 08072572 8746
 pool_b6_2574:
     .word  0x0201b290                     @ 08072574 90b20102  gDuelPhaseFlags=0x0201b290; literal pool fn_eligible_last_turn
 pool_b6_2578:
     .word  0x0807257c                     @ 08072578 7c250708  0x0807257c; literal pool fn_eligible_last_turn
-    .byte  0xbc, 0x26, 0x07, 0x08
+    .word  0x080726bc                     @ 0807257c bc260708
     .word  vampire_sub_2678               @ 08072580 78260708
     .word  vampire_sub_264c               @ 08072584 4c260708
     .word  vampire_sub_2624               @ 08072588 24260708
@@ -9079,12 +9100,27 @@ fn_eligible_vampire_lord_lady_26f4:
     bl invoke_equip_oam_for_hand_set_code_slot @ 08072708 03f0b4f8
     b LAB_08072866                           @ 0807270c abe0
 LAB_0807270e:
-    ROM_INCBIN 0x7270e, 0x1e
+    ldr r0, pool_b7_272c                     @ 0807270e 0748
+    movs r2,#0x94    @ 08072710 9422
+    lsls r2,r2,#0x3    @ 08072712 d200
+    adds r1,r0,r2    @ 08072714 8118
+    ldr r1,[r1,#0x0]                         @ 08072716 0968
+    subs r1,#0x7b    @ 08072718 7b39
+    adds r2,r0,#0x0    @ 0807271a 021c
+    cmp r1,#0x5                              @ 0807271c 0529
+    bls LAB_08072722                         @ 0807271e 00d9
+    b LAB_08072864                           @ 08072720 a0e0
+LAB_08072722:
+    lsls r0,r1,#0x2    @ 08072722 8800
+    ldr r1, pool_b7_2730                     @ 08072724 0249
+    adds r0,r0,r1    @ 08072726 4018
+    ldr r0,[r0,#0x0]                         @ 08072728 0068
+    .hword 0x4687    @ 0807272a 8746
 pool_b7_272c:
     .word  0x0201b290                     @ 0807272c 90b20102  gDuelPhaseFlags=0x0201b290; literal pool fn_eligible_vampire_lord_lady
 pool_b7_2730:
     .word  0x08072734                     @ 08072730 34270708  0x08072734; literal pool fn_eligible_vampire_lord_lady
-    .byte  0x56, 0x28, 0x07, 0x08
+    .word  0x08072856                     @ 08072734 56280708
     .word  equip_zone_sub_2848            @ 08072738 48280708
     .word  equip_zone_sub_2804            @ 0807273c 04280708
     .word  equip_zone_sub_27e4            @ 08072740 e4270708
@@ -9107,16 +9143,46 @@ equip_zone_sub_stubs_274c:
     bne LAB_0807276a                         @ 08072766 00d1
     b LAB_08072864                           @ 08072768 7ce0
 LAB_0807276a:
-    ROM_INCBIN 0x7276a, 0x1e
+    ldr r0, pool_b8_2790                     @ 0807276a 0948
+    lsrs r1,r2,#0x1f    @ 0807276c d10f
+    lsls r1,r1,#0x2    @ 0807276e 8900
+    adds r0,#0x8    @ 08072770 0830
+    adds r1,r1,r0    @ 08072772 0918
+    ldr r0,[r1,#0x0]                         @ 08072774 0868
+    cmp r0,#0x1                              @ 08072776 0128
+    bne LAB_08072794                         @ 08072778 0cd1
+    movs r3,#0xea    @ 0807277a ea23
+    lsls r3,r3,#0x5    @ 0807277c 5b01
+    adds r1,r4,r3    @ 0807277e e118
+    movs r0,#0x0    @ 08072780 0020
+    str r0,[r1,#0x0]                         @ 08072782 0860
+    b LAB_080727ae                           @ 08072784 13e0
+    .zero  0x2
 pool_b8_2788:
     .word  0x0201c4e0                     @ 08072788 e0c40102  gP1LifePoints=0x0201c4e0; literal pool B8
 pool_b8_278c:
     .word  0x00000868                     @ 0807278c 68080000  PLAYER_BLOCK_STRIDE=0x868; literal pool B8
 pool_b8_2790:
     .word  0x0201e2a0                     @ 08072790 a0e20102  gDuelCardCtxBase=0x0201e2a0; literal pool B8
-    ROM_INCBIN 0x72794, 0x20
+LAB_08072794:
+    movs r0,#0x82    @ 08072794 8220
+    lsls r0,r0,#0x1    @ 08072796 4000
+    movs r1,#0xdc    @ 08072798 dc21
+    lsls r1,r1,#0x1    @ 0807279a 4900
+    ldr r2, pool_b8_27b4                     @ 0807279c 054a
+    movs r3,#0xdd    @ 0807279e dd23
+    lsls r3,r3,#0x1    @ 080727a0 5b00
+    movs r4,#0x0    @ 080727a2 0024
+    str r4,[sp,#0x0]                         @ 080727a4 0094
+    movs r4,#0xf    @ 080727a6 0f24
+    str r4,[sp,#0x4]                         @ 080727a8 0194
+    bl invoke_card_display_op_0x31_sub3_with_packed_params @ 080727aa 20f017fe
+LAB_080727ae:
+    movs r0,#0x7f    @ 080727ae 7f20
+    b LAB_08072866                           @ 080727b0 59e0
+    .zero  0x2
 pool_b8_27b4:
-    .word  0x000001b9                     @ 080727b4 b9010000  0x1b9; literal pool B8
+    .word  lookup_equip_score_b_0x1b9     @ 080727b4 b9010000  0x1b9; literal pool B8
 equip_zone_sub_27b8:
     ldr r0, pool_b8_27dc                     @ 080727b8 0848
     adds r1,r2,r0    @ 080727ba 1118
@@ -9157,7 +9223,7 @@ pool_b8_2800:
     .word  0x000004a4                     @ 08072800 a4040000  EQUIP_PHASE_FRAME_OFF=0x4a4; literal pool B8
 equip_zone_sub_2804:
     ldr r2, pool_b8_282c                     @ 08072804 094a
-    ldr r1, DAT_08072830                     @ 08072806 0a49
+    ldr r1, pool_b8_2830                     @ 08072806 0a49
     adds r0,r2,r1    @ 08072808 5018
     ldrh r0,[r0,#0x0]                        @ 0807280a 0088
     cmp r0,#0x0                              @ 0807280c 0028
@@ -9177,12 +9243,18 @@ equip_zone_sub_2804:
     .zero  0x2
 pool_b8_282c:
     .word  0x0201c4e0                     @ 0807282c e0c40102  gP1LifePoints=0x0201c4e0; literal pool B8
-DAT_08072830:
-    .byte  0xa8, 0x1d, 0x00, 0x00
+pool_b8_2830:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 08072830 a81d0000
 pool_b8_2834:
     .word  0x00001daa                     @ 08072834 aa1d0000  LP_CARD_TRACK_NEXT_OFF=0x1daa; literal pool B8
 LAB_08072838:
-    .byte  0x9b, 0x78, 0xd8, 0x07, 0xc0, 0x0f, 0x0d, 0x21, 0x20, 0xf0, 0xa6, 0xfd, 0x7c, 0x20, 0x0e, 0xe0
+    ldrb r3,[r3,#0x2]                        @ 08072838 9b78
+    lsls r0,r3,#0x1f    @ 0807283a d807
+    lsrs r0,r0,#0x1f    @ 0807283c c00f
+    movs r1,#0xd    @ 0807283e 0d21
+    bl trigger_card_display_op31_if_not_active @ 08072840 20f0a6fd
+    movs r0,#0x7c    @ 08072844 7c20
+    b LAB_08072866                           @ 08072846 0ee0
 equip_zone_sub_2848:
     ldrb r3,[r3,#0x2]                        @ 08072848 9b78
     lsls r0,r3,#0x1f    @ 0807284a d807

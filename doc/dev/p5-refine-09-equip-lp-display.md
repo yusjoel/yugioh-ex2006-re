@@ -178,6 +178,49 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ---
 
+### 4.14 Seg-4 Remediation 完成记录
+
+> Remediation landing: 2026-06-20. Eliminates all 4 ROM_INCBIN + 4 .byte CODE + 4 .byte DATA
+> blocks left by commits a9aa009 + 527e3a9 in Seg-4 range [0x080719fc..0x08072d20).
+> All blocks are intra-function LAB_ continuation paths (bne/beq/bls branch targets) or
+> dispatch table DATA slots. No new functions; no FS THUMB+1 stubs; no §5.1 orphans.
+
+- 范围: `[0x080719fc, 0x08072d20)` Seg-4 remediation (full range)
+- DISASM=8 items:
+  - B1: ROM_INCBIN 0x720e2/0x12 -- bne-taken in field_spell_dispatch_sub_stubs_2004 (BL set_lp_display_row_type5 @ 0x080a1c2c; 8 instrs)
+  - B2: ROM_INCBIN 0x7270e/0x1e -- bne-taken in fn_eligible_vampire_lord_lady_26f4 (15 instrs; bls-dispatch path to equip_zone dispatch table)
+  - B3: ROM_INCBIN 0x7276a/0x1e -- bne-taken in equip_zone_sub_stubs_274c (14 instrs + pad; b@0x72784->0x727ae inside B4)
+  - B4: ROM_INCBIN 0x72794/0x20 -- bne-target from B3 + 0x7f return path (14 instrs + pad; BL invoke_card_display_op_0x31_sub3_with_packed_params)
+  - C1: .byte 0x71f74/0xc -- bls-taken indirect dispatch in fn_eligible_fengsheng_mirror_1f58 (5 instrs; mov r15,r0 computed jump)
+  - C2: .byte 0x7241c/0xc -- bls-taken indirect dispatch in fn_eligible_fiend_comedian_2404 (5 instrs; mov r15,r0 computed jump)
+  - C3: .byte 0x7256a/0xa -- bls-taken indirect dispatch in fn_eligible_last_turn_2540 (5 instrs; mov r15,r0 computed jump)
+  - C4: .byte 0x72838/0x10 -- beq-taken in equip_zone_sub_2804 (7 instrs; BL trigger_card_display_op31_if_not_active @ 0x08093390)
+- DATA createDWord=4:
+  - 0x72430 -> .word last_turn_sub_2534 (dispatch table entry[0] in fn_eligible_fiend_comedian_2404)
+  - 0x7257c -> .word vampire_sub_26bc (dispatch table entry[0] in fn_eligible_last_turn_2540)
+  - 0x72734 -> .word equip_zone_sub_2856 (dispatch table entry[0] for equip zone phase dispatch)
+  - 0x72830 -> .word LP_CARD_TRACK_BASE_OFF (literal pool in equip_zone_sub_2804)
+- EQ=2 (all REUSE):
+  - pool_b8_2830 @ 0x08072830: LP_CARD_TRACK_BASE_OFF=0x1da8 (ewram.inc:247)
+  - pool_b8_27b4 @ 0x080727b4: lookup_equip_score_b_0x1b9=0x1b9 (duel_field.inc:332)
+- REF=0; RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- 新常量: NONE (all REUSE)
+- Ghidra scripts:
+  - `tools/ghidra-labeling/DisassembleF09Seg4RBlocks.py` (main: 4 createDWord + 2 EQ + 8 disasm)
+  - `tools/ghidra-labeling/FixF09Seg4RLPPoolLabel.py` (fix: rename LP_CARD_TRACK_BASE_OFF label -> pool_b8_2830 to avoid GAS self-ref)
+- ROM_INCBIN before: 21 (after Seg-1 remediation); after: 17 (reduced by 4 ROM_INCBIN blocks)
+- Seg-4 range [0x719fc, 0x72d20): 0 ROM_INCBIN, 0 .byte-code residue after landing
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+- CSV sync: no (no new Ghidra functions; all CODE blocks are intra-function LAB_ continuations)
+
+> Remediation status after this landing:
+> - Seg-1 [0x6e76c..0x6ff50]: DONE (4.12 + 4.13)
+> - Seg-4 [0x719fc..0x72d20]: DONE (this record)
+> - Next remediation targets: Seg-5 remnants at 0x73218/0x12 + 0x73636/0x56
+
+---
+
 ### 4.11 Seg-9a 完成记录
 
 - 范围: `[0x0807738c, 0x08077c50)` -- 9 named fn + 3 new fn_eligible (fn_eligible_spatial_collapse / fn_eligible_dimension_fusion / fn_eligible_jade_insect_whistle)
