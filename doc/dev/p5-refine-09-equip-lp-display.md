@@ -86,6 +86,38 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ## 四、逐段完成记录
 
+### 4.12 Seg-1 Remediation Cluster-1 完成记录
+
+> Remediation landing: 2026-06-20. Eliminates partial-disasm ROM_INCBIN/.byte
+> residue left by commit 08b3db1 in sub-stub cluster [0x0806f008..0x0806f1c4).
+> Cluster-2 [0x6f85e..0x6fef2] and Cluster-3 [0x6fdec..0x6ff4f] deferred to
+> F09-Seg1R2 and F09-Seg1R3 proposals.
+
+- 范围: `[0x0806f008, 0x0806f1c4)` Cluster-1 sub-stub group
+- DISASM=7 items (5 ROM_INCBIN + 2 .byte blocks):
+  - B2d: equip_disp_sub_f188 body + shared epilogue @ 0x0806f18a (ROM_INCBIN 0x6f18a/0x3a; 27 instrs; creates LAB_0806f1b6/LAB_0806f1b8 for other stubs)
+  - B2c: equip_disp_sub_f0cc body + b+pad @ 0x0806f0ce (ROM_INCBIN 0x6f0ce/0xb2 + b+pad 0x6f180..0x6f183; 83 instrs)
+  - B2b: equip_disp_sub_f0ac body + b+pad @ 0x0806f0ae (ROM_INCBIN 0x6f0ae/0x12 + b+pad 0x6f0c0..0x6f0c3; 10 instrs)
+  - B2a: equip_disp_sub_f078 body + b+pad @ 0x0806f07a (ROM_INCBIN 0x6f07a/0x22 + b+pad 0x6f09c..0x6f09f; 17 instrs)
+  - B1: eligible_creature_swap_f008 body @ 0x0806f00a (ROM_INCBIN 0x6f00a/0x32; code 0x6f00a..0x6f031 20 instrs; computed jump stops DisassembleCommand; pad 0x6f032..0x6f033 .zero 2; createDWord @ 0x6f034+0x6f038)
+  - B2e: eligible_sub_stubs_f054 body @ 0x0806f056 (.byte 0x10; 7 instrs)
+  - B2f: equip_disp_sub_f066 body @ 0x0806f068 (.byte 0x10; 7 instrs)
+- EQ=0 (no new equates; EQ_SLOTS from B1 pool handled via REF)
+- REF=2 (gduel_phase_f034@0x0806f034->gDuelPhaseFlags=0x0201b290 REUSE ewram.inc; equip_disp_tbl_f038@0x0806f038->equip_disp_table_f03c=0x0806f03c REUSE existing label)
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- 新常量: none (all pool refs use existing gDuelPhaseFlags + equip_disp_table_f03c label)
+- Ghidra script: `tools/ghidra-labeling/DisassembleF09Seg1RCluster1.py`
+- ROM_INCBIN before: 35; after: 30 (reduced by 5 Cluster-1 blocks)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
+
+> Remediation status after this landing:
+> - Cluster-1 [0x6f008..0x6f1c4]: DONE (this record)
+> - Cluster-2 [0x6f85e..0x6fef2]: 9 ROM_INCBIN + ~11 .byte bodies PENDING (F09-Seg1R2)
+> - Cluster-3 [0x6fdec..0x6ff4f]: partially overlaps Cluster-2 range, same PENDING scope
+
+---
+
 ### 4.11 Seg-9a 完成记录
 
 - 范围: `[0x0807738c, 0x08077c50)` -- 9 named fn + 3 new fn_eligible (fn_eligible_spatial_collapse / fn_eligible_dimension_fusion / fn_eligible_jade_insect_whistle)
