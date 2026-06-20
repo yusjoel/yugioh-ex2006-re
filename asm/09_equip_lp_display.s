@@ -10755,13 +10755,17 @@ fn_eligible_trap_dustshoot_3140:
     bls LAB_08073156                         @ 08073152 00d9
     b trap_dustshoot_default_32a0            @ 08073154 a4e0
 LAB_08073156:
-    .byte  0x80, 0x00, 0x02, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46
+    lsls r0,r0,#0x2    @ 08073156 8000
+    ldr r1, pool_b1_3164                     @ 08073158 0249
+    adds r0,r0,r1    @ 0807315a 4018
+    ldr r0,[r0,#0x0]                         @ 0807315c 0068
+    .hword 0x4687    @ 0807315e 8746
 pool_b1_3160:
     .word  0x0201b290                     @ 08073160 90b20102  gDuelPhaseFlags=0x0201b290; literal pool fn_eligible_trap_dustshoot
 pool_b1_3164:
     .word  0x08073168                     @ 08073164 68310708  0x08073168=trap_dustshoot_dispatch_table_3168; literal pool fn_eligible_trap_dustshoot
 trap_dustshoot_dispatch_table_3168:
-    .byte  0x90, 0x32, 0x07, 0x08
+    .word  0x08073290                     @ 08073168 90320708  dispatch table: 31 entries (card_zone_type -> B2 sub-stub); index [0..30]
     .word  trap_dustshoot_sub_3280        @ 0807316c 80320708
     .word  trap_dustshoot_sub_326c        @ 08073170 6c320708
     .word  trap_dustshoot_default_32a0    @ 08073174 a0320708
@@ -10819,7 +10823,14 @@ pool_b2_3210:
 pool_b2_3214:
     .word  0x00000868                     @ 08073214 68080000  PLAYER_BLOCK_STRIDE=0x868; literal pool B2
 LAB_08073218:
-    ROM_INCBIN 0x73218, 0x12
+    ldrb r1,[r7,#0x2]                        @ 08073218 b978
+    lsls r0,r1,#0x1f    @ 0807321a c807
+    lsrs r0,r0,#0x1f    @ 0807321c c00f
+    ldrh r1,[r7,#0x0]                        @ 0807321e 3988
+    movs r2,#0x1    @ 08073220 0122
+    bl set_lp_display_row_type5              @ 08073222 2ef003fd
+    movs r0,#0x7f    @ 08073226 7f20
+    b LAB_080732a2                           @ 08073228 3be0
 trap_dustshoot_sub_322a:
     ldr r0, pool_b2_3264                     @ 0807322a 0e48
     ldr r1, pool_b2_3268                     @ 0807322c 0e49
@@ -10852,7 +10863,8 @@ pool_b2_3264:
 pool_b2_3268:
     .word  0x00001da8                     @ 08073268 a81d0000  LP_CARD_TRACK_BASE_OFF=0x1da8; literal pool B2
 trap_dustshoot_sub_326c:
-    .byte  0xbf, 0x78, 0xf9, 0x07
+    ldrb r7,[r7,#0x2]                        @ 0807326c bf78
+    lsls r1,r7,#0x1f    @ 0807326e f907
     lsrs r1,r1,#0x1f    @ 08073270 c90f
     movs r0,#0x1    @ 08073272 0120
     subs r0,r0,r1    @ 08073274 401a
@@ -11317,7 +11329,11 @@ fn_eligible_machine_dup_and_league_356c:
     bls LAB_0807359e                         @ 0807359a 00d9
     b machine_dup_default_3756               @ 0807359c dbe0
 LAB_0807359e:
-    .byte  0x80, 0x00, 0x03, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46
+    lsls r0,r0,#0x2    @ 0807359e 8000
+    ldr r1, pool_b3_35b0                     @ 080735a0 0349
+    adds r0,r0,r1    @ 080735a2 4018
+    ldr r0,[r0,#0x0]                         @ 080735a4 0068
+    .hword 0x4687    @ 080735a6 8746
 pool_b3_35a8:
     .word  0x0201c4e0                     @ 080735a8 e0c40102  gP1LifePoints=0x0201c4e0; literal pool fn_eligible_machine_dup_and_league
 pool_b3_35ac:
@@ -11325,7 +11341,7 @@ pool_b3_35ac:
 pool_b3_35b0:
     .word  0x080735b4                     @ 080735b0 b4350708  0x080735b4=machine_dup_dispatch_table_35b4; literal pool fn_eligible_machine_dup_and_league
 machine_dup_dispatch_table_35b4:
-    .byte  0x4c, 0x37, 0x07, 0x08
+    .word  0x0807374c                     @ 080735b4 4c370708  dispatch table: 29 entries (zone_type -> B4 sub-stub); Machine Dup/League handler
     .word  machine_dup_default_3756       @ 080735b8 56370708
     .word  machine_dup_default_3756       @ 080735bc 56370708
     .word  machine_dup_default_3756       @ 080735c0 56370708
@@ -11362,9 +11378,49 @@ machine_dup_dispatch_sub_stubs_3628:
     bne LAB_08073636                         @ 08073632 00d1
     b machine_dup_default_3756               @ 08073634 8fe0
 LAB_08073636:
-    ROM_INCBIN 0x73636, 0x56
+    ldrb r1,[r5,#0x2]                        @ 08073636 a978
+    lsls r0,r1,#0x1f    @ 08073638 c807
+    lsrs r0,r0,#0x1f    @ 0807363a c00f
+    ldrh r1,[r5,#0x0]                        @ 0807363c 2988
+    adds r2,r4,#0x0    @ 0807363e 221c
+    bl dispatch_effect_handler_by_card_id    @ 08073640 1af036fa
+    strh r0,[r5,#0xa]                        @ 08073644 6881
+    lsls r0,r0,#0x10    @ 08073646 0004
+    cmp r0,#0x0                              @ 08073648 0028
+    bne LAB_0807365c                         @ 0807364a 07d1
+    ldrb r5,[r5,#0x2]                        @ 0807364c ad78
+    lsls r0,r5,#0x1f    @ 0807364e e807
+    lsrs r0,r0,#0x1f    @ 08073650 c00f
+    movs r1,#0xd    @ 08073652 0d21
+    bl trigger_card_display_op31_if_not_active @ 08073654 1ff09cfe
+    movs r0,#0x6e    @ 08073658 6e20
+    b LAB_08073758                           @ 0807365a 7de0
+LAB_0807365c:
+    ldrh r4,[r5,#0xa]                        @ 0807365c 6c89
+    ldrb r2,[r5,#0x2]                        @ 0807365e aa78
+    lsls r0,r2,#0x1f    @ 08073660 d007
+    lsrs r0,r0,#0x1f    @ 08073662 c00f
+    bl count_available_monster_slots         @ 08073664 bff7a8ff
+    cmp r4,r0                                @ 08073668 8442
+    bge LAB_08073670                         @ 0807366a 01da
+    ldrh r0,[r5,#0xa]                        @ 0807366c 6889
+    b LAB_0807367a                           @ 0807366e 04e0
+LAB_08073670:
+    ldrb r1,[r5,#0x2]                        @ 08073670 a978
+    lsls r0,r1,#0x1f    @ 08073672 c807
+    lsrs r0,r0,#0x1f    @ 08073674 c00f
+    bl count_available_monster_slots         @ 08073676 bff79fff
+LAB_0807367a:
+    strh r0,[r5,#0xa]                        @ 0807367a 6881
+    ldrb r5,[r5,#0x2]                        @ 0807367c ad78
+    lsls r0,r5,#0x1f    @ 0807367e e807
+    lsrs r0,r0,#0x1f    @ 08073680 c00f
+    ldr r1, pool_b4_368c                     @ 08073682 0249
+    bl trigger_card_display_op31_if_not_active @ 08073684 1ff084fe
+    movs r0,#0x7e    @ 08073688 7e20
+    b LAB_08073758                           @ 0807368a 65e0
 pool_b4_368c:
-    .word  0x0000011d                     @ 0807368c 1d010000  0x11d=285 zone count upper bound; literal pool B4
+    .word  CARD_DISPLAY_OP31_LP_BAR_SUB   @ 0807368c 1d010000  0x11d=285 zone count upper bound; literal pool B4
 machine_dup_sub_3690:
     ldr r0, pool_b4_36a0                     @ 08073690 0348
     ldrh r2,[r5,#0x0]                        @ 08073692 2a88
@@ -11453,7 +11509,9 @@ machine_dup_sub_3704:
     movs r0,#0x7c    @ 0807372e 7c20
     b LAB_08073758                           @ 08073730 12e0
 LAB_08073732:
-    .byte  0xd7, 0xf7, 0x9d, 0xf8, 0x64, 0x20, 0x0e, 0xe0
+    bl decrement_lp_bar_display_counter      @ 08073732 d7f79df8
+    movs r0,#0x64    @ 08073736 6420
+    b LAB_08073758                           @ 08073738 0ee0
 machine_dup_sub_373a:
     ldrb r5,[r5,#0x2]                        @ 0807373a ad78
     lsls r1,r5,#0x1f    @ 0807373c e907
@@ -11639,13 +11697,17 @@ fn_eligible_cat_ill_omen_and_owl_of_luck:
     bls LAB_0807387a                         @ 08073876 00d9
     b cat_ill_omen_default_3a54              @ 08073878 ece0
 LAB_0807387a:
-    .byte  0x80, 0x00, 0x02, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46
+    lsls r0,r0,#0x2    @ 0807387a 8000
+    ldr r1, pool_b5_3888                     @ 0807387c 0249
+    adds r0,r0,r1    @ 0807387e 4018
+    ldr r0,[r0,#0x0]                         @ 08073880 0068
+    .hword 0x4687    @ 08073882 8746
 pool_b5_3884:
     .word  0x0201b290                     @ 08073884 90b20102  gDuelPhaseFlags=0x0201b290; literal pool fn_eligible_cat_ill_omen_and_owl_of_luck
 pool_b5_3888:
     .word  0x0807388c                     @ 08073888 8c380708  0x0807388c=cat_ill_omen_dispatch_table_388c; literal pool fn_eligible_cat_ill_omen_and_owl_of_luck
 cat_ill_omen_dispatch_table_388c:
-    .byte  0x46, 0x3a, 0x07, 0x08
+    .word  0x08073a46                     @ 0807388c 463a0708  dispatch table: 29 entries (zone_type -> B6 sub-stub); Cat of Ill Omen/Owl of Luck handler
     .word  cat_ill_omen_default_3a54      @ 08073890 543a0708
     .word  cat_ill_omen_default_3a54      @ 08073894 543a0708
     .word  cat_ill_omen_default_3a54      @ 08073898 543a0708
@@ -11691,7 +11753,13 @@ cat_ill_omen_dispatch_sub_stubs_3900:
     movs r0,#0x78    @ 0807391e 7820
     b LAB_08073a56                           @ 08073920 99e0
 LAB_08073922:
-    .byte  0xad, 0x78, 0xe8, 0x07, 0xc0, 0x0f, 0x5e, 0x21, 0x1f, 0xf0, 0x31, 0xfd, 0x7f, 0x20, 0x91, 0xe0
+    ldrb r5,[r5,#0x2]                        @ 08073922 ad78
+    lsls r0,r5,#0x1f    @ 08073924 e807
+    lsrs r0,r0,#0x1f    @ 08073926 c00f
+    movs r1,#0x5e    @ 08073928 5e21
+    bl trigger_card_display_op31_if_not_active @ 0807392a 1ff031fd
+    movs r0,#0x7f    @ 0807392e 7f20
+    b LAB_08073a56                           @ 08073930 91e0
 cat_ill_omen_sub_3932:
     ldrb r1,[r5,#0x2]                        @ 08073932 a978
     lsls r0,r1,#0x1f    @ 08073934 c807
@@ -12207,7 +12275,12 @@ LAB_08073d24:
     bl enqueue_equip_zone_sprite_attr_full   @ 08073d2a d5f767fc
     b LAB_08073d3e                           @ 08073d2e 06e0
 LAB_08073d30:
-    .byte  0x20, 0x1c, 0x01, 0x21, 0x00, 0x22, 0xd5, 0xf7, 0x61, 0xfc, 0x7d, 0x20, 0x1b, 0xe0
+    adds r0,r4,#0x0    @ 08073d30 201c
+    movs r1,#0x1    @ 08073d32 0121
+    movs r2,#0x0    @ 08073d34 0022
+    bl enqueue_equip_zone_sprite_attr_full   @ 08073d36 d5f761fc
+    movs r0,#0x7d    @ 08073d3a 7d20
+    b LAB_08073d76                           @ 08073d3c 1be0
 LAB_08073d3e:
     movs r0,#0x7c    @ 08073d3e 7c20
     b LAB_08073d76                           @ 08073d40 19e0

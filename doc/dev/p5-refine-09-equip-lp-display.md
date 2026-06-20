@@ -221,6 +221,47 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ---
 
+### 4.15 Seg-5 Remediation 完成记录
+
+> Remediation landing: 2026-06-20. Eliminates 2 ROM_INCBIN + 7 .byte CODE + 3 .byte DATA
+> blocks left by commits fa30373 + 4ba8057 in Seg-5 range [0x08072d20..0x08074338).
+> All blocks are intra-function LAB_ continuation paths (bne/beq/bls/bcs branch targets) or
+> dispatch table DATA slots. No new functions; no FS THUMB+1 stubs; no §5.1 orphans.
+
+- 范围: `[0x08072d20, 0x08074338)` Seg-5 remediation (Seg-5a + Seg-5b full range)
+- DISASM=9 items:
+  - A1: .byte 0x73156/0x0a -- bls-taken indirect dispatch in fn_eligible_trap_dustshoot_3140 (5 instrs; mov r15,r0 computed jump)
+  - B1: ROM_INCBIN 0x73218/0x12 -- bne-taken in trap_dustshoot_dispatch_sub_stubs_31e4 (BL set_lp_display_row_type5 @ 0x080a1c2c; 9 instrs; b trap_dustshoot_default_32a0)
+  - A2: .byte 0x7326c/0x04 -- entry stub trap_dustshoot_sub_326c (2 HW entry; fall-through to decoded body at 0x73270)
+  - A3: .byte 0x7359e/0x0a -- bls-taken indirect dispatch in fn_eligible_machine_dup_and_league_356c (5 instrs; mov r15,r0 computed jump)
+  - B2: ROM_INCBIN 0x73636/0x56 -- bne-taken (2-path) in machine_dup_dispatch_sub_stubs_3628 (43 HW total; NOT-taken b@0x7365a->machine_dup_default_3756; taken b@0x7368a->LAB_08073758; BL dispatch_effect_handler_by_card_id @ 0x0808dab0 + BL count_available_monster_slots @ 0x080335b8 x2 + BL trigger_card_display_op31_if_not_active @ 0x08093390)
+  - A4: .byte 0x73732/0x08 -- bcs-taken in machine_dup_sub_3704 (4 HW; BL decrement_lp_bar_display_counter @ 0x0804a870; movs r0,#0x64; b machine_dup_default_3756)
+  - A5: .byte 0x7387a/0x0a -- bls-taken indirect dispatch in fn_eligible_cat_ill_omen_and_owl_of_luck (5 instrs; mov r15,r0 computed jump)
+  - A6: .byte 0x73922/0x10 -- bne-taken in cat_ill_omen_dispatch_sub_stubs_3900 (8 HW; BL trigger_card_display_op31_if_not_active @ 0x08093390; movs r0,#0x7f; b cat_ill_omen_default_3a54)
+  - A7: .byte 0x73d30/0x0e -- beq-taken (2 beq sources at 0x73cb8+0x73cc2) in reasoning_dispatch_sub_stubs_3bc8 (7 HW; BL enqueue_equip_zone_sprite_attr_full @ 0x080495fc; movs r0,#0x7d; b LAB_08073d74)
+- DATA createDWord=3:
+  - 0x73168 -> .word trap_dustshoot_sub_3290 (dispatch table[0] for trap_dustshoot_dispatch_table_3168)
+  - 0x735b4 -> .word machine_dup_sub_374c (dispatch table[0] for machine_dup_dispatch_table_35b4)
+  - 0x7388c -> .word cat_ill_omen_sub_3a46 (dispatch table[0] for cat_ill_omen_dispatch_table_388c)
+- EQ=1 (REUSE): pool_b4_368c @ 0x7368c -> CARD_DISPLAY_OP31_LP_BAR_SUB=0x011d (card_info.inc:1496)
+  Note: pool label stays pool_b4_368c (not renamed to equate name; Seg-4R lesson)
+- REF=0; RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- 新常量: NONE (all REUSE)
+- Ghidra script: `tools/ghidra-labeling/DisassembleF09Seg5RBlocks.py`
+- ROM_INCBIN before: 17 (after Seg-4 remediation); after: 15 (reduced by 2 ROM_INCBIN blocks)
+- Seg-5 range [0x72d20, 0x74338): 0 ROM_INCBIN, 0 .byte-code residue after landing
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- CSV sync: no (no new Ghidra functions; all CODE blocks are intra-function LAB_ continuations)
+
+> Remediation status after this landing:
+> - Seg-1 [0x6e76c..0x6ff50]: DONE (4.12 + 4.13)
+> - Seg-4 [0x719fc..0x72d20]: DONE (4.14)
+> - Seg-5 [0x72d20..0x74338]: DONE (this record)
+> - Last done-segment remnant: Seg-8 0x768dc (not yet remediated; Seg-9b + Seg-10 fully unstarted)
+> - Next remediation targets: Seg-9b/10 when those segments have been landed
+
+---
+
 ### 4.11 Seg-9a 完成记录
 
 - 范围: `[0x0807738c, 0x08077c50)` -- 9 named fn + 3 new fn_eligible (fn_eligible_spatial_collapse / fn_eligible_dimension_fusion / fn_eligible_jade_insect_whistle)
