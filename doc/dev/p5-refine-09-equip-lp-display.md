@@ -75,7 +75,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | 1e38556 |
 | 9a | 0x7738c..0x77c50 | 9+3new | 31 | 5 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8) | ✅ | (see §四) |
 | 9b | 0x77c50..0x7850c | 10+2new | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ✅ | 5f27863 |
-| 10a | 0x7850c..0x79500 | 13+3new | 63 | 5 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154) | ✅ | f5a909f |
+| 10a | 0x7850c..0x79500 | 13+3new | 63 | 5 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154) | ✅ | be48d12 |
 | 10b | 0x79500..0x79e60 | ~6 | ~25 | 5 inc (0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -377,7 +377,7 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - Seg-10a range [0x7850c, 0x79500): 0 ROM_INCBIN, 0 non-ASCII in exported asm
 - CSV: +3 rows (fn_eligible_emissary_of_the_afterlife @0x08078a90 / fn_eligible_first_sarcophagus @0x08078fe0 / fn_eligible_human_wave_tactics @0x080792f8)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- commit: f5a909f
+- commit: be48d12
 
 ---
 
