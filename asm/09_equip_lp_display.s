@@ -18225,7 +18225,7 @@ mustering_dark_scorpions_sub_66d8:
     beq LAB_08076744                         @ 080766fe 21d0
     cmp r2,r0                                @ 08076700 8242
     bgt LAB_08076724                         @ 08076702 0fdc
-    ldr r0, DAT_08076720                     @ 08076704 0648
+    ldr r0, DWORD_08076720                   @ 08076704 0648
     cmp r2,r0                                @ 08076706 8242
     beq LAB_08076738                         @ 08076708 16d0
     adds r0,#0xed    @ 0807670a ed30
@@ -18239,9 +18239,8 @@ DWORD_08076718:
     .word  0x0201c600                     @ 08076718 00c60102
 DWORD_0807671c:
     .word  0x00001656                     @ 0807671c 56160000
-DAT_08076720:
-    .byte  0x31, 0x15
-    movs r0,r0    @ 08076722 0000
+DWORD_08076720:
+    .word  DARK_SCORPION_BURGLARS_CID     @ 08076720 31150000  DARK_SCORPION_BURGLARS_CID=0x1531: Dark Scorpion Burglars (pw=40933924); card_info.inc:1476
 LAB_08076724:
     ldr r0, DWORD_08076734                   @ 08076724 0348
     cmp r2,r0                                @ 08076726 8242
@@ -18270,7 +18269,7 @@ LAB_08076748:
     orrs r0,r1    @ 0807674c 0843
     b LAB_08076756                           @ 0807674e 02e0
 LAB_08076750:
-    .byte  0x10, 0x20
+    movs r0,#0x10    @ 08076750 1020
 LAB_08076752:
     ldrh r2,[r4,#0x8]                        @ 08076752 2289
     orrs r0,r2    @ 08076754 1043
@@ -18280,7 +18279,7 @@ LAB_08076758:
     lsls r1,r3,#0x1f    @ 08076758 d907
     lsrs r0,r1,#0x1f    @ 0807675a c80f
     adds r1,r0,#0x0    @ 0807675c 011c
-    ldr r2, DAT_0807677c                     @ 0807675e 074a
+    ldr r2, DWORD_0807677c                   @ 0807675e 074a
     muls r1,r2    @ 08076760 5143
     adds r1,r1,r5    @ 08076762 4919
     movs r3,#0x95    @ 08076764 9523
@@ -18294,8 +18293,8 @@ LAB_08076758:
     bl invoke_setup_equip_oam_with_attr2     @ 08076774 35f064fb
     movs r0,#0x7f    @ 08076778 7f20
     b LAB_08076786                           @ 0807677a 04e0
-DAT_0807677c:
-    .byte  0x68, 0x08, 0x00, 0x00
+DWORD_0807677c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0807677c 68080000  PLAYER_BLOCK_STRIDE=0x868: player data block stride (2152B); ewram.inc:250
 mustering_dark_scorpions_sub_6780:
     bl decrement_lp_bar_display_counter      @ 08076780 d4f776f8
 LAB_08076784:
@@ -18481,7 +18480,20 @@ spell_vanishing_sub_68cc:
     bl enqueue_lp_counter_sprite_by_player   @ 080768d6 d3f733fe
     b LAB_080768fa                           @ 080768da 0ee0
 LAB_080768dc:
-    ROM_INCBIN 0x768dc, 0x1e
+    lsrs r0,r4,#0x1f    @ 080768dc e00f
+    subs r0,r2,r0    @ 080768de 101a
+    lsrs r1,r4,#0x1f    @ 080768e0 e10f
+    subs r1,r2,r1    @ 080768e2 511a
+    ands r1,r2    @ 080768e4 1140
+    .hword 0x4642    @ 080768e6 4246
+    muls r2,r1    @ 080768e8 4a43
+    adds r1,r2,#0x0    @ 080768ea 111c
+    adds r1,r1,r7    @ 080768ec c919
+    adds r1,r1,r3    @ 080768ee c918
+    movs r2,#0x1    @ 080768f0 0122
+    bl dispatch_equip_zone_sprite_banisher_by_field_count @ 080768f2 cdf757fe
+    movs r0,#0x7e    @ 080768f6 7e20
+    b LAB_080768fc                           @ 080768f8 00e0
 LAB_080768fa:
     movs r0,#0x0    @ 080768fa 0020
 LAB_080768fc:

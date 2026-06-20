@@ -262,6 +262,49 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 
 ---
 
+### 4.16 Seg-8 Remediation 完成记录 (LAST done-segment remnant)
+
+> Remediation landing: 2026-06-21. Eliminates 1 ROM_INCBIN + 1 .byte CODE + 2 .byte DATA
+> blocks left by commit 1e38556 in Seg-8 range [0x0807629c..0x0807738c).
+> All 4 blocks are intra-function code paths (conditional branch targets) or
+> literal pool DATA slots. No new functions; no FS THUMB+1 stubs; no §5.1 orphans.
+> This completes ALL done-segment remediation: done range [0x6e76c..0x7738c) now has
+> zero ROM_INCBIN and zero .byte-code residue.
+
+- 范围: `[0x0807629c, 0x0807738c)` Seg-8 remediation (2 CODE blocks + 2 DATA blocks)
+- DISASM=2 items:
+  - Block A: ROM_INCBIN 0x768dc/0x1e -- beq-taken path of spell_vanishing_sub_6818 inner loop
+    (beq LAB_080768dc @ 0x08076866, hw=0xd039; 15 THUMB instrs: lsrs/subs x2/ands/mov/muls/adds x3/movs/BL pair/movs/b;
+    BL target: dispatch_equip_zone_sprite_banisher_by_field_count @ 0x080445a4 asm/04:9609;
+    fall-through: b LAB_080768fc already decoded; no internal literal pool)
+  - Block B: .byte 0x10,0x20 at LAB_08076750 -- beq-taken path of fn_eligible_mustering_dark_scorpions
+    (beq LAB_08076750 @ 0x0807672e, hw=0xd00f; 1 instr: movs r0,#0x10;
+    fall-through to LAB_08076752: ldrh r2,[r4,#0x8] already decoded)
+- DATA createDWord=2:
+  - Block C @ 0x08076720: Ghidra split artifact (2B DAT_ + 2B fake movs r0,r0) -> true .word 0x00001531
+    = DARK_SCORPION_BURGLARS_CID (REUSE card_info.inc:1476)
+    (consumer: ldr r0,DAT_08076720 @ 0x08076704; cmp r2,r0 @ 0x08076706)
+  - Block D @ 0x0807677c: 4-byte .byte -> .word 0x00000868
+    = PLAYER_BLOCK_STRIDE (REUSE ewram.inc:250)
+    (consumer: ldr r2,DAT_0807677c @ 0x0807675e; muls r1,r2 @ 0x08076760)
+- EQ=2 (all REUSE: DARK_SCORPION_BURGLARS_CID from card_info.inc:1476 / PLAYER_BLOCK_STRIDE from ewram.inc:250)
+  Pool labels: DWORD_08076720 / DWORD_0807677c (differ from equate names, no GAS collision)
+- REF=0; RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0; §5.1=0
+- 新常量: NONE (all REUSE)
+- Ghidra script: `tools/ghidra-labeling/RefineF09Seg8RBlocks.py`
+- ROM_INCBIN before: 15 (after Seg-5 remediation); after: 14 (reduced by 1 ROM_INCBIN block)
+- Seg-8 range [0x7629c, 0x7738c): 0 ROM_INCBIN, 0 .byte-code residue after landing
+- GLOBAL done-range [0x6e76c, 0x7738c) (Seg-1..8 + Seg-9a): 0 ROM_INCBIN, 0 .byte-code residue
+  (Seg-9b [0x77c50+] and Seg-10 [0x7850c+] are forward work not yet done; 14 ROM_INCBIN remain there)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- CSV sync: no (no new Ghidra functions; both CODE blocks are intra-function LAB_ continuations)
+
+> REMEDIATION COMPLETE: All four remediation campaigns (Seg-1/4/5/8) finished.
+> Done-segment range [0x6e76c, 0x7738c) (Seg-1 through Seg-9a, 12 segments total) now has
+> zero partial-disasm residue. Forward work continues at Seg-9b [0x08077c50..0x0807850c).
+
+---
+
 ### 4.11 Seg-9a 完成记录
 
 - 范围: `[0x0807738c, 0x08077c50)` -- 9 named fn + 3 new fn_eligible (fn_eligible_spatial_collapse / fn_eligible_dimension_fusion / fn_eligible_jade_insect_whistle)

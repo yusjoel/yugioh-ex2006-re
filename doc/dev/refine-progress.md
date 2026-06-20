@@ -10,9 +10,11 @@
 >
 > **当前文件**: `09_equip_lp_display.s` (0x0806e76c..0x08079e60)。
 > **下一任务 (正向进度)**: file 09 Seg-9b `[0x08077c50..0x0807850c)` (10 fn, 4 inc: 0x77ecc/5c + 0x77f44/c0 + 0x782c0/2c + 0x78368/14c; EQ=33 REF=3 per Seg-9b proposal)。
-> **修补进度 (REMEDIATION)**: Seg-1 [0x6e76c..0x6ff50] DONE; Seg-4 [0x719fc..0x72d20] DONE; Seg-5 [0x72d20..0x74338] DONE (2026-06-20, ROM_INCBIN 17->15). Last remediation remnant: Seg-8 0x768dc (outside Seg-5 scope). Next remediation target: after Seg-9b/10 are landed.
+> **修补进度 (REMEDIATION)**: Seg-1 DONE; Seg-4 DONE; Seg-5 DONE; **Seg-8 DONE (2026-06-21)**. ALL done-segment remediation COMPLETE. Done range [0x6e76c..0x7738c) has zero ROM_INCBIN + zero .byte-code residue.
 
-上次更新: 2026-06-20 **file 09 Seg-5 REMEDIATION 完成**. DISASM=9 (2 ROM_INCBIN: 0x73218/12+0x73636/56 + 7 .byte CODE: 0x73156/a+0x7326c/4+0x7359e/a+0x73732/8+0x7387a/a+0x73922/10+0x73d30/e); DATA createDWord=3 (0x73168->trap_dustshoot_sub_3290 / 0x735b4->machine_dup_sub_374c / 0x7388c->cat_ill_omen_sub_3a46); EQ=1 REUSE (CARD_DISPLAY_OP31_LP_BAR_SUB=0x011d card_info.inc:1496 at pool_b4_368c); ROM_INCBIN 17->15; 0 residue in Seg-5 range [0x72d20,0x74338); byte-identical 9689337d. Script: DisassembleF09Seg5RBlocks.py.
+上次更新: 2026-06-21 **file 09 Seg-8 REMEDIATION 完成 (LAST done-segment remnant)**. DISASM=2 (Block A: ROM_INCBIN 0x768dc/0x1e->15 THUMB instrs in spell_vanishing_sub_6818 beq-taken path; Block B: .byte 0x10,0x20 at LAB_08076750->movs r0,#0x10 in fn_eligible_mustering_dark_scorpions beq-taken path); DATA createDWord=2 (Block C: DAT_08076720 Ghidra split artifact->DWORD_08076720 .word DARK_SCORPION_BURGLARS_CID=0x1531 REUSE card_info.inc:1476; Block D: DAT_0807677c 4B .byte->DWORD_0807677c .word PLAYER_BLOCK_STRIDE=0x868 REUSE ewram.inc:250); EQ=2 all REUSE; carve=0; REF=0; RENAME=0; NO new constants; ROM_INCBIN 15->14; Seg-8 range [0x7629c,0x7738c): 0 residue; GLOBAL done-range [0x6e76c,0x7738c): 0 ROM_INCBIN 0 .byte-code; byte-identical 9689337d. Script: RefineF09Seg8RBlocks.py. REMEDIATION ALL DONE.
+
+上次更新 (prev): 2026-06-20 **file 09 Seg-5 REMEDIATION 完成**. DISASM=9 (2 ROM_INCBIN: 0x73218/12+0x73636/56 + 7 .byte CODE: 0x73156/a+0x7326c/4+0x7359e/a+0x73732/8+0x7387a/a+0x73922/10+0x73d30/e); DATA createDWord=3 (0x73168->trap_dustshoot_sub_3290 / 0x735b4->machine_dup_sub_374c / 0x7388c->cat_ill_omen_sub_3a46); EQ=1 REUSE (CARD_DISPLAY_OP31_LP_BAR_SUB=0x011d card_info.inc:1496 at pool_b4_368c); ROM_INCBIN 17->15; 0 residue in Seg-5 range [0x72d20,0x74338); byte-identical 9689337d. Script: DisassembleF09Seg5RBlocks.py.
 
 上次更新 (prev): 2026-06-20 **file 09 Seg-4 REMEDIATION 完成**. DISASM=8 (4 ROM_INCBIN: 0x720e2/12+0x7270e/1e+0x7276a/1e+0x72794/20 + 4 .byte CODE: 0x71f74/c+0x7241c/c+0x7256a/a+0x72838/10); DATA createDWord=4 (0x72430/0x7257c/0x72734/0x72830); EQ=2 REUSE (LP_CARD_TRACK_BASE_OFF/lookup_equip_score_b_0x1b9); fix script: FixF09Seg4RLPPoolLabel.py (pool label self-ref rename); ROM_INCBIN 21->17; 0 residue in Seg-4 range; byte-identical 9689337d. Scripts: DisassembleF09Seg4RBlocks.py + FixF09Seg4RLPPoolLabel.py.
 
@@ -142,7 +144,7 @@
 | 5 | 0x72d20..0x74338 (20 fn, 10 inc; split 5a+5b) | ✅ | fa30373 + (this session) |
 | 6 | 0x74338..0x752cc (20 fn, 2 inc + 1 sw) | ✅ | (this session) |
 | 7 | 0x752cc..0x7629c (19 fn, 6 inc) | ✅ | (see p5-refine-09 §四) |
-| 8 | 0x7629c..0x7738c (19 fn, 4 inc + 2 sw) | ⬜ | |
+| 8 | 0x7629c..0x7738c (19 fn, 4 inc + 2 sw) | ✅ | 1e38556 + F09Seg8R |
 | 9 | 0x7738c..0x7850c (19 fn, 9 inc) | ⬜ | |
 | 10 | 0x7850c..0x79e60 (19 fn, 10 inc) | ⬜ | |
 
