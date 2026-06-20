@@ -527,6 +527,7 @@
 .equ EMES_THE_INFINITY_CID,            0x0000172b  @ Emes the Infinity (pw=43580269; card-stats.s slot=0x172b)
 .equ EMISSARY_OF_THE_AFTERLIFE_CID,    0x00001796  @ Emissary of the Afterlife (pw=75043725; card-stats.s slot=0x1796)
 .equ FAMILIAR_KNIGHT_CID,              0x000017c3  @ Familiar Knight (pw=89731911; card-stats.s slot=0x17c3)
+.equ INFERNO_TEMPEST_CID,              0x000017ca  @ Inferno Tempest (pw=14391920; card-stats.s slot=0x17ca); fn_eligible @ 0x08079bdc; THUMB+1 ref 0x9e42230
 .equ MASKED_DRAGON_CID,                0x000017e6  @ Masked Dragon (pw=39191307; card-stats.s slot=0x17e6)
 .equ NINJITSU_ART_OF_DECOY_CID,        0x000017ff  @ Ninjitsu Art of Decoy (pw=89628781; card-stats.s slot=0x17ff)
 .equ SILENT_MAGICIAN_LV8_CID,          0x0000181a  @ Silent Magician LV8 (pw=72443568; card-stats.s slot=0x181a)

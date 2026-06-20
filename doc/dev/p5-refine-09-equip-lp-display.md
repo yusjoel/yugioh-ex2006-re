@@ -76,7 +76,9 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 9a | 0x7738c..0x77c50 | 9+3new | 31 | 5 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8) | ✅ | (see §四) |
 | 9b | 0x77c50..0x7850c | 10+2new | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ✅ | 5f27863 |
 | 10a | 0x7850c..0x79500 | 13+3new | 63 | 5 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154) | ✅ | be48d12 |
-| 10b | 0x79500..0x79e60 | ~6 | ~25 | 5 inc (0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
+| 10b | 0x79500..0x79e60 | 4+3new | 24 | 5 inc (0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ✅ | (see §四) |
+
+**FILE 09 COMPLETE -- all 10 segments done; asm/09 ROM_INCBIN=0; SHA1 9689337d byte-identical**
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **58 ROM_INCBIN + 4 switchD** -- 逐块 ref-scan 按 §一 分类 (handler-table THUMB+1->disasm / dispatch-table raw-ref->carve / switchD->R4 disasm / 0 引用->§5.1)。
@@ -378,6 +380,32 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - CSV: +3 rows (fn_eligible_emissary_of_the_afterlife @0x08078a90 / fn_eligible_first_sarcophagus @0x08078fe0 / fn_eligible_human_wave_tactics @0x080792f8)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - commit: be48d12
+
+---
+
+### 4.19 Seg-10b 完成记录 (FILE 09 FINAL SEGMENT)
+
+- 范围: `[0x08079500, 0x08079e60)` -- 4 named fn + 3 new fn_eligible (fn_eligible_order_to_charge_or_smash / fn_eligible_familiar_knight / fn_eligible_inferno_tempest)
+- EQ=15 (all REUSE: gEquipZoneCountTable x1 / PLAYER_BLOCK_STRIDE x4 / gDuelFieldSlots x4 / gDuelPhaseFlags x3 / EQUIP_PHASE_FRAME_OFF x2 / CARD_DISPLAY_OP31_LP_BAR_SUB x1)
+- REF=3 (0x080796ac->PTR_DAT_080796b0 B7 5-entry dispatch table; 0x08079a64->PTR_DAT_08079a68 B9 29-entry dispatch table; 0x08079c18->PTR_DAT_08079c1c B10 32-entry dispatch table)
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0
+- DISASM=5 blocks:
+  - B6: fn_eligible_order_to_charge_or_smash @ 0x0807965c (ROM_INCBIN 0x7965c/0x50; FS THUMB+1 @0x09e42098 CID=0x179f ORDER_TO_CHARGE_CID + @0x09e42200 CID=0x17b8 ORDER_TO_SMASH_CID; shared fn_eligible; createFunction; pool x4: 0x79670/0x7967c/0x796a4/0x796a8)
+  - B7: 5 sub-stubs equip_act dispatch @ 0x080796c4 (ROM_INCBIN 0x796c4/0x10c; PTR_DAT_080796b0 5-entry table; stubs: equip_act_sub_96c4/970e/9734/9760/default_97c4; pool x10)
+  - B8: fn_eligible_familiar_knight @ 0x08079a1c (ROM_INCBIN 0x79a1c/0x48; FS THUMB+1 @0x09e45ef0; CID=0x17c3 FAMILIAR_KNIGHT_CID REUSE; createFunction; pool x4: 0x79a54/a58/a5c/a60)
+  - B9: 6 sub-stubs + fn_eligible_inferno_tempest @ 0x08079bdc (ROM_INCBIN 0x79adc/0x13c; PTR_DAT_08079a68 29-entry table + FS THUMB+1 @0x09e42230; CID=0x17ca INFERNO_TEMPEST_CID NEW; stubs: sub_9adc/9af8/9b62/9b80/9bb4/default_9bd0 + fn_eligible@0x79bdc; createFunction; pool x11)
+  - B10: 9 sub-stubs neo_daedalus_lp @ 0x08079c9c (ROM_INCBIN 0x79c9c/0x1c4; PTR_DAT_08079c1c 32-entry table; stubs: sub_9c9c/9cd4/9d24/9d74/9da4/9dc0/9dd8/9df0/default_9e4e; pool x19)
+- 踩坑: FixF09Seg10bB10Pool.py needed for B10 sub_9df0 [0x79e0c..0x79e4d] (LAB_08079e2c + LAB_08079e4a undefined); sub_9df0 has code paths AFTER literal pool at 0x79e04/0x79e08 that weren't reached by DisassembleCommand; solution: separate clearListing+setTMode+disasm at 0x79e0c + 0x79e2c.
+- 踩坑: FixF09Seg10bB6Start.py for 0x7965c..0x7965f (B6_LO was 0x79660 instead of 0x7965c in first script; fixed by disasm from 0x7965c; Ghidra function at 0x79660 due to OverlappingFunctionException; 4 bytes exported as orphan code before fn label; byte-identical verified OK).
+- §5.1=0 (all 5 blocks have confirmed refs)
+- 新常量: constants/card_info.inc +1 (INFERNO_TEMPEST_CID=0x17ca after FAMILIAR_KNIGHT_CID)
+- Ghidra scripts: RefineF09Seg10bSlots.py (15 EQ + 3 REF) + DisassembleF09Seg10bBlocks.py (B6-B10) + FixF09Seg10bB6Start.py + FixF09Seg10bB10Pool.py
+- ROM_INCBIN before: 5 (after Seg-10a); after: 0 (file 09 fully zero ROM_INCBIN)
+- Seg-10 COMPLETE (10a [0x7850c..0x79500] + 10b [0x79500..0x79e60] both done)
+- **FILE 09 COMPLETE**: asm/09_equip_lp_display.s [0x6e76c..0x79e60] -- all 10 segments done; ROM_INCBIN=0; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- CSV: +3 rows (fn_eligible_order_to_charge_or_smash @0x08079660 / fn_eligible_familiar_knight @0x08079a1c / fn_eligible_inferno_tempest @0x08079bdc)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: (see git log)
 
 ---
 

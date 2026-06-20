@@ -2342,8 +2342,11 @@ address,name,proposed_name,score,tags
 0x080792f8,fn_eligible_human_wave_tactics,,,card_effect;equip
 0x08079500,apply_equip_activation_for_all_slots_both_players,,,
 0x08079594,dispatch_equip_slot_activation_seq_by_lp_state,,,
+0x08079660,fn_eligible_order_to_charge_or_smash,,,card_effect;equip
 0x080797d0,dispatch_equip_slot_sprite_by_zone_flag_and_count,,,
 0x08079944,tick_neo_daedalus_equip_lp_state,,,
+0x08079a1c,fn_eligible_familiar_knight,,,card_effect;equip
+0x08079bdc,fn_eligible_inferno_tempest,,,card_effect;equip
 0x08079e60,enqueue_neo_daedalus_zone_oam_on_available_slot,,,
 0x08079ec4,apply_partner_flags_on_equip_pair_slot_count_hit,,,
 0x08079f5c,dispatch_equip_sprite_by_zone_type_or_draw_counter,,,
