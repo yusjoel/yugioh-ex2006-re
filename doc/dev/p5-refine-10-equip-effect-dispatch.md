@@ -54,7 +54,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN / switchD | 状态 | commit |
 |-----|------|-----|--------|----------------------|------|--------|
-| 1  | 0x79e60..0x7ae84 | 19 | 61  | 8 inc (0x79fac/30, 0xa00c/e8, 0xa138/28, 0xa178/14c, 0xa3b8/38, 0xa464/11c, 0xa688/44, 0xa71c/f8) | ✅ | TBD |
+| 1  | 0x79e60..0x7ae84 | 19 | 61  | 8 inc (0x79fac/30, 0xa00c/e8, 0xa138/28, 0xa178/14c, 0xa3b8/38, 0xa464/11c, 0xa688/44, 0xa71c/f8) | ✅ | aa53bf0 |
 | 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ⬜ | |
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ⬜ | |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ⬜ | |
@@ -93,7 +93,7 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **§5.1**: 0
 - **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ in [0x79e60, 0x7ae84)
 - **Ghidra scripts**: RefineF10Seg1Slots.py, DisassembleF10Seg1Blocks.py, RefineF10Seg1PoolFix.py
-- **commit**: TBD
+- **commit**: aa53bf0
 
 ---
 
