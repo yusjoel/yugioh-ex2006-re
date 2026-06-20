@@ -2332,11 +2332,14 @@ address,name,proposed_name,score,tags
 0x08078954,enqueue_hand_spell_sprite_for_recycle_zone,,,
 0x080789b0,dispatch_lp_row_and_bitmap_by_equip_state,,,
 0x08078a24,invoke_setup_equip_oam_for_neo_daedalus_zone_e,,,
+0x08078a90,fn_eligible_emissary_of_the_afterlife,,,card_effect;equip
 0x08078bf8,enqueue_graveyard_spell_sprite_for_hand_slot,,,
 0x08078c3c,dispatch_equip_lp_bar_or_paired_zone_sprite,,,
 0x08078c94,dispatch_equip_zone_sprite_seq_by_lp_state,,,
 0x08078ec8,dispatch_equip_banisher_sprite_by_state,,,
 0x08078f7c,scan_both_players_equip_slots_for_sprite_pair,,,
+0x08078fe0,fn_eligible_first_sarcophagus,,,card_effect;equip
+0x080792f8,fn_eligible_human_wave_tactics,,,card_effect;equip
 0x08079500,apply_equip_activation_for_all_slots_both_players,,,
 0x08079594,dispatch_equip_slot_activation_seq_by_lp_state,,,
 0x080797d0,dispatch_equip_slot_sprite_by_zone_flag_and_count,,,

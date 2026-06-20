@@ -13237,7 +13237,7 @@ dat_08045ef4_ptr:
 dat_08045ef8_cid:
     .word  NITRO_UNIT_CID                 @ 08045ef8 d1180000
 dat_08045efc_fnptr:
-    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408  THUMB fn-ptr
+    .word  0x08045531                     @ 08045efc 31550408
 dat_08045f00_cid:
     .word  upd_cid_1672                   @ 08045f00 72160000  card gap; no card-stats entry
 dat_08045f04_cid:

@@ -75,7 +75,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 8 | 0x7629c..0x7738c | 19 | 70 | 4 inc (0x765b0/2c, 0x765f0/19c, 0x767aa/32, 0x767f8/110) + 2 sw (0x7638c, 0x77144) | ✅ | 1e38556 |
 | 9a | 0x7738c..0x77c50 | 9+3new | 31 | 5 inc (0x7757c/2c, 0x775d0/a8, 0x779e4/30, 0x77a3c/120, 0x77b88/c8) | ✅ | (see §四) |
 | 9b | 0x77c50..0x7850c | 10+2new | 36 | 4 inc (0x77ecc/5c, 0x77f44/c0, 0x782c0/2c, 0x78368/14c) | ✅ | 5f27863 |
-| 10 | 0x7850c..0x79e60 | 19 | 88 | 10 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154, 0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
+| 10a | 0x7850c..0x79500 | 13+3new | 63 | 5 inc (0x78a90/44, 0x78b24/d4, 0x78fde/f6, 0x79148/1ec, 0x793ac/154) | ✅ | f5a909f |
+| 10b | 0x79500..0x79e60 | ~6 | ~25 | 5 inc (0x7965c/50, 0x796c4/10c, 0x79a1c/48, 0x79adc/13c, 0x79c9c/1c4) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 **58 ROM_INCBIN + 4 switchD** -- 逐块 ref-scan 按 §一 分类 (handler-table THUMB+1->disasm / dispatch-table raw-ref->carve / switchD->R4 disasm / 0 引用->§5.1)。
@@ -353,6 +354,30 @@ Seg-4 (8 ROM_INCBIN, 66 槽) 和 Seg-9 (9 ROM_INCBIN, 67 槽) 次重; Seg-8 (4 i
 - CSV: +2 rows (fn_eligible_dangerous_machine_type6 @0x08077ecc / fn_eligible_monster_gate @0x080782c0; refine-created)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - commit: 5f27863
+
+---
+
+### 4.18 Seg-10a 完成记录
+
+- 范围: `[0x0807850c, 0x08079500)` -- 13 named fn + 3 new fn_eligible (fn_eligible_emissary_of_the_afterlife / fn_eligible_first_sarcophagus / fn_eligible_human_wave_tactics)
+- EQ=60 (58 REUSE + 2 NEW: CARD_TYPE_FIELD8_MASK=0xb4f80000 / RECYCLE_CID=0x16d5)
+- REF=3 (DWORD_080785bc/d4->invoke_effect_node_with_active_flag_if_player_mismatch+1 self-ref x2; DWORD_08078a20->check_equip_slot_eligible_by_side_match_and_type+1 cross-module fn-ptr)
+- RENAME=0; FUNC_RENAME=0; PLATE=0; carve=0
+- DISASM=5 blocks:
+  - B1: fn_eligible_emissary_of_the_afterlife @ 0x08078a90 (ROM_INCBIN 0x78a90/0x44; FS THUMB+1 @0x09e45e78; CID=0x1796 REUSE; createFunction)
+  - B2: 8 sub-stubs equip_state_dispatch @ 0x08078b24 (ROM_INCBIN 0x78b24/0xd4; 19-entry dispatch table @PTR_DAT_08078ad8; stubs: sub_b24/b38/b58/b70/b7c/b9c/bd8/default_bec)
+  - B3: fn_eligible_first_sarcophagus @ 0x08078fe0 + first_sarcophagus_sub_9040 (ROM_INCBIN 0x78fde/0xf6; 2-byte pad; FS THUMB+1 @0x09e44b10; CID=0x17af REUSE; cross-module raw ref @0x084d6254->0x79040; createFunction)
+  - B4: 9 sub-stubs + fn_eligible_human_wave_tactics @ 0x080792f8 (ROM_INCBIN 0x79148/0x1ec; 29-entry dispatch table @0x080790d4; FS THUMB+1 @0x09e44b28; CID=0x17b2 REUSE; 2-byte pad @0x792f6; 10 entries; createFunction)
+  - B5: 7 sub-stubs equip_zone_seq @ 0x080793ac (ROM_INCBIN 0x793ac/0x154; 30-entry dispatch table @0x08079334; stubs: sub_93ac/93ec/940a/9434/94da/94ec/default_94f6)
+- 踩坑: DisassembleF09Seg10aPoolFix.py needed for 12 constant-value pool DWords (PLAYER_BLOCK_STRIDE=0x868 / EQUIP_PHASE_FRAME_OFF=0x4a4 / CID-related values not in EWRAM/ROM address range); caused DAT_0807XXXX build errors on first attempt. Pattern: constant-valued pools need force_dword even when value < 0x02000000.
+- §5.1=0 (all 5 blocks confirmed refs)
+- 新常量: constants/card_info.inc (+2: RECYCLE_CID=0x16d5 after INFERNO_CID / CARD_TYPE_FIELD8_MASK=0xb4f80000 in new Seg-10a section)
+- Ghidra scripts: RefineF09Seg10aSlots.py (60 EQ + 3 REF) + DisassembleF09Seg10aBlocks.py (5 blocks) + DisassembleF09Seg10aPoolFix.py (12 pool DWords fix)
+- ROM_INCBIN before: 10 (after Seg-9b); after: 5
+- Seg-10a range [0x7850c, 0x79500): 0 ROM_INCBIN, 0 non-ASCII in exported asm
+- CSV: +3 rows (fn_eligible_emissary_of_the_afterlife @0x08078a90 / fn_eligible_first_sarcophagus @0x08078fe0 / fn_eligible_human_wave_tactics @0x080792f8)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- commit: f5a909f
 
 ---
 

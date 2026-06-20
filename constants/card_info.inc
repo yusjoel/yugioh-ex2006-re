@@ -1279,6 +1279,7 @@
 .equ TOON_CANNON_SOLDIER_CID,          0x00001565  @ Toon Cannon Soldier (pw=79875176; card_1128 slot=0x1565)
 .equ SECRET_BARREL_CID,                0x000015f4  @ Secret Barrel (pw=27053506; card_1175 slot=0x15F4)
 .equ INFERNO_CID,                      0x000016c5  @ Inferno (pw=74823665; card_1301 slot=0x16C5)
+.equ RECYCLE_CID,                      0x000016d5  @ Recycle (pw=96316857; card-stats.s slot=0x16D5); enqueue_hand_spell_sprite_for_recycle_zone CID check; conf: high
 .equ STEALTH_BIRD_CID,                 0x000016fa  @ Stealth Bird (pw=03510565; card_1347 slot=0x16FA)
 .equ GOBLIN_THIEF_CID,                 0x00001761  @ Goblin Thief (pw=45311864; card_1338 slot=0x1761)
 .equ SOLAR_RAY_CID,                    0x00001767  @ Solar Ray (pw=44472639; card_1342 slot=0x1767)
@@ -1505,3 +1506,14 @@
 @ =============================================================================
 .equ DANGEROUS_MACHINE_TYPE6_CID, 0x00001738  @ Dangerous Machine TYPE-6 (pw=76895648; card-stats.s L19607 card_1507 slot=0x1738); fn_eligible_dangerous_machine_type6 FS dispatch gate; conf: high
 .equ MONSTER_GATE_CID,            0x0000175c  @ Monster Gate (pw=43040603; card-stats.s L20076 card_1543 slot=0x175C); fn_eligible_monster_gate FS dispatch gate; conf: high
+
+@ =============================================================================
+@ file 09 Seg-10a additions: equip card type mask + fn_eligible CIDs
+@ Source: asm/09_equip_lp_display.s, Seg-10a (0x0807850c..0x08079500)
+@ apply_lp_delta_for_specific_equip_card_type / enqueue_hand_spell_sprite_for_recycle_zone
+@ B1: fn_eligible_emissary_of_the_afterlife (FS THUMB+1 @0x09e45e78) -- REUSE EMISSARY_OF_THE_AFTERLIFE_CID
+@ B3: fn_eligible_first_sarcophagus (FS THUMB+1 @0x09e44b10) -- REUSE THE_FIRST_SARCOPHAGUS_CID
+@ B4: fn_eligible_human_wave_tactics (FS THUMB+1 @0x09e44b28) -- REUSE HUMAN_WAVE_TACTICS_CID
+@ C5 grep 0xb4f80000 in constants/: 0 hits; grep FIELD8 in constants/: 0 hits
+@ =============================================================================
+.equ CARD_TYPE_FIELD8_MASK,       0xb4f80000  @ (slot.field8_word<<0x13)==0xb4f80000 identifies specific equip card type; apply_lp_delta_for_specific_equip_card_type lsls+cmp sequence; conf: high
