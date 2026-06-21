@@ -64,7 +64,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ✅ | (see 4.07b) |
 | 8a | 0x82290..0x82b18 | 7+5fn | 49  | 2 inc (0x827d4/d8, 0x828c4/f8) | ✅ | (see 4.08a) |
 | 8b | 0x82b18..0x83450 | 12 | 67  | 0 inc | ✅ | (see 4.08b) |
-| 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
+| 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ✅ | (see 4.09) |
 | 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
 
 **总计**: 187 fn (全部已命名) / 825 DWORD_/DAT_ 槽 / 39 ROM_INCBIN + 6 switchD。
@@ -374,6 +374,37 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 
 ---
 
+### 4.09 Seg-9 完成记录
+
+- **范围**: [0x08083450, 0x08084318), 18 named fn + 6 new disasm'd fn, 92 slots (EQ81 REF7 RENAME4)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 81 (all REUSE except 4 NEW constants)
+  - REUSE x77: gDuelPhaseFlags x26 / gDuelCardCtxBase x7 / gEquipChainSlotRefs x2 / ELIGIB_SPRITE_CTRL_OFF x7 / ELIGIB_ANIM_STATE_OFF x2 / LP_CARD_TRACK_BASE_OFF x1 / LP_CARD_TRACK_NEXT_OFF x1 / DUAL_LABEL_RENDER_STATE_CLEAR x7 / TRIGGER_OP_PARAM_107 x1 / PLAYER_BLOCK_STRIDE x2 / gDuelFieldSlots x1 / RED_MOON_BABY_CID x1 / DNA_TRANSPLANT_CID x1 / OTOHIME_CID x1 / TSUKUYOMI_CID x1 / EQUIP_SLOT_SCORE_CAP x1 / gP1LifePoints x16 (incl. DWORD_08083d24 added per C13 fix)
+  - NEW x4: GEARFRIED_IRON_KNIGHT_CID_SHIFTED=0x9e180000 / INVOKE_OP31_SUB1_PARAM_109=0x109 / ANCIENT_LAMP_CID=0x1476 / DREAMSPRITE_CID=0x148a
+  - REUSE DUAL_LABEL_RENDER_STATE_CLEAR for all 7 EQUIP_NODE_ATTR_CLEAR_MASK slots (C5 fix)
+- **REF_SLOTS**: 7 (3x set_equip_act_mode fn-ptr 0x08081de5 / 3x set_equip_act_alt fn-ptr 0x080905e9 / 1x check_zone_player fn-ptr 0x08083969 / 1x check_equip_pair fn-ptr 0x08083b55)
+- **RENAME_SLOTS**: 4 (3x PTR_gP1LifePoints_ + DAT_0808424c->book_of_life_eligible_dispatch_state0)
+- **FUNC_RENAME**: 0
+- **PLATE**: 8 CJK mojibake->ASCII rewrites (tick_equip_lamp_dream_zone_activation_3state / check_effect_slot_zone_player_by_type / tick_equip_placement_bitmap_display_4state / tick_equip_activation_sprite_array_4state / tick_equip_lp_row_display_by_state / tick_equip_lamp_dream_activation_3state / dispatch_equip_display_if_confirm_state_two / dispatch_equip_display_by_type_code_or_card_id)
+- **R4 disasm**: 2 blocks
+  - BLK1 0x8420e/0x26: fn_eligible_book_of_life@0x08084210 (2B zero-pad at 0x420e; CID=0x1536 BOOK_OF_LIFE_CID; THUMB+1 ref at 0x09e410b8; dispatch table entry [+0x00]=CID,[+0x14]=fn_eligible+1; 2 pool DWords: 0x422c=gDuelPhaseFlags / 0x4230=0x08084234 JT base; 0x422a=0x4687 THUMB opcode NOT DWord'd; pool-fix: DAT_0808430c=gDuelPhaseFlags + LAB_08084310 code label at movs r0,#1 epilogue)
+  - BLK2 0x8424c/0xcc: 5 unique sub-stubs (states 0,1,3,4 separate; state 2+5 shared at 0x080842cc); clearListing entire range + per-stub DisassembleCommand
+- **createFunction**: 6 (fn_eligible_book_of_life + book_of_life_eligible_state0/1/3/4/2_5)
+- **carve**: 0
+- **§5.1**: 0
+- **NEW constants**:
+  - card_info.inc +4: ANCIENT_LAMP_CID=0x1476 / DREAMSPRITE_CID=0x148a / BOOK_OF_LIFE_CID=0x1536 / GEARFRIED_IRON_KNIGHT_CID_SHIFTED=0x9e180000
+  - duel_field.inc +1: INVOKE_OP31_SUB1_PARAM_109=0x109
+  - ewram.inc +1: LP_ACTIVATION_PENDING_OFF=0x1d40
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ (code) / 0 non-ASCII in [0x83450, 0x84318)
+- **ROM_INCBIN before/after asm/10**: 7 -> 5 (2 eliminated: BLK1+BLK2)
+- **Ghidra scripts**: RefineF10Seg9Slots.py, DisassembleF10Seg9Blocks.py, PoolFixF10Seg9.py
+- **CSV sync**: yes -- fn_eligible_book_of_life + book_of_life_eligible_state0/1/3/4/2_5 (6 new functions)
+- **commit**: (pending)
+
+---
+
 ## 五、段路线图 (Seg-1..10 细节)
 
 按照三条硬规则 (地址序 / 函数间必处理 / 0引用->§5.1) 逐段执行。
@@ -430,10 +461,10 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - 0 ROM_INCBIN (全段无 incbin)
 - EQ56/RENAME8/PLATE6 (6 mojibake->ASCII incl. 2 ARM-corrected STATE_OFFSET=0x4b0 plates)
 
-### Seg-9 [0x08083450, 0x08084318) -- 18 fn, ~89 slots
-- 2 ROM_INCBIN:
-  - 0x0808420e/0x26 (38B), 0x0808424c/0xcc (204B)
-- 旧覆盖: 无
+### Seg-9 [0x08083450, 0x08084318) -- ✅ 完成 (commit see 4.09)
+- 2 ROM_INCBIN 全部消灭 (BLK1 fn_eligible_book_of_life + BLK2 5 unique sub-stubs)
+- EQ81/REF7/RENAME4/PLATE8 (8 mojibake->ASCII); NEW: ANCIENT_LAMP_CID/DREAMSPRITE_CID/BOOK_OF_LIFE_CID/GEARFRIED_IRON_KNIGHT_CID_SHIFTED/INVOKE_OP31_SUB1_PARAM_109/LP_ACTIVATION_PENDING_OFF
+- Pool fix: DAT_0808430c=gDuelPhaseFlags + LAB_08084310 code label (PoolFixF10Seg9.py)
 
 ### Seg-10 [0x08084318, 0x080850d8) -- 19 fn, ~55 slots
 - 5 ROM_INCBIN (fn-eligible 特征):

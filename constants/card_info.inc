@@ -1202,6 +1202,16 @@
 @ =============================================================================
 .equ QUEENS_KNIGHT_CID,             0x0000157f  @ Queen's Knight (pw=25652259; card-stats.s card_1158 slot=0x157F); companion dispatch in check_equip_slot_eligible_by_companion_card_and_paired_slot; conf: high
 .equ CONTRACT_WITH_EXODIA_CID,      0x0000165b  @ Contract with Exodia (pw=33244944; card-stats.s card_1331 slot=0x165B); dispatch handler fn check_exodia_set_in_extra_for_cid_165b; conf: high
+
+@ =============================================================================
+@ file 10 Seg-9 additions: card IDs for equip display eligibility stubs
+@ Source: asm/10_equip_effect_dispatch.s, Seg-9 (0x08083450..0x08084318)
+@ C5 grep verified: 0 hits each in constants/ before adding
+@ =============================================================================
+.equ ANCIENT_LAMP_CID,              0x00001476  @ Ancient Lamp (pw=54912977; card-stats.s card_0950 slot=0x1476); tick_equip_lamp_dream_activation_3state BST comparison; conf: high
+.equ DREAMSPRITE_CID,               0x0000148a  @ Dreamsprite (pw=08687195; card-stats.s card_0968 slot=0x148a); tick_equip_lamp_dream_activation_3state BST comparison; conf: high
+.equ BOOK_OF_LIFE_CID,              0x00001536  @ Book of Life (pw=02204140; card-stats.s card_1115 slot=0x1536); fn_eligible_book_of_life BLK1 dispatch table CID at 0x09e410a4; conf: high
+.equ GEARFRIED_IRON_KNIGHT_CID_SHIFTED, 0x9e180000  @ GEARFRIED_IRON_KNIGHT_CID(0x13c3)<<0x13; lsls r0,#0x13 then cmp sentinel; tick_equip_best_target_display_4state skip-Gearfried path; same pattern as DNA_TRANSPLANT_CID_SHIFTED; conf: high
 .equ SAGES_STONE_CID,               0x0000167e  @ Sage's Stone (pw=13604200; card-stats.s card_1355 slot=0x167E); companion dispatch; conf: high
 .equ OJAMA_YELLOW_CID,              0x000016b3  @ Ojama Yellow (pw=42941100; card-stats.s card_1399 slot=0x16B3); Ojama trio check; conf: high
 .equ FENRIR_CID,                    0x000016c6  @ Fenrir (pw=00218704; card-stats.s card_1416 slot=0x16C6); dispatch handler fn check_zone_type580_direction_mismatch_for_cid_16c6; conf: high

@@ -458,3 +458,10 @@
 @ C5 grep 0x09e3f140 in constants/: 0 hits
 @ =============================================================================
 .equ EQUIP_PAIR_ENTRY_TABLE_BASE, 0x09e3f140  @ ROM equip pair entry table base; enqueue_equip_slot_sprites_for_pair_loop loads r2=base, loop r6=0..2 reads [r2+r6*4]; 1 ROM ref (DAT_080833f8); C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 10 Seg-9 additions: equip LP activation display op params
+@ Source: asm/10_equip_effect_dispatch.s, Seg-9 (0x08083450..0x08084318)
+@ C5 grep verified: 0x00000109 / 0x00001d40 -> 0 hits each in constants/ before adding
+@ =============================================================================
+.equ INVOKE_OP31_SUB1_PARAM_109,  0x00000109  @ r0 arg to invoke_card_display_op_0x31_sub1; tick_equip_lamp_dream_zone_activation_3state state==10 non-confirm branch at 0x080837ca; distinct from TRIGGER_OP_PARAM_107(0x107); C5 grep=0 (new); conf: high

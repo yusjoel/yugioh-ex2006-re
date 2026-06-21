@@ -422,6 +422,7 @@
 .equ ELIGIB_SPRITE_CTRL_OFF,     0x00001d68  @ [gP1LifePoints+0x1d68] sprite display control; 0=display 0x61 attr, non-0=use 0x8061 hidden attr for enqueue_sprite_attr_record; 105 ROM refs
 .equ ELIGIB_ANIM_STATE_OFF,      0x00001d6c  @ [gP1LifePoints+0x1d6c] animation state index; range check [0..0xf] in caseD_1f with thresholds 0xb/0xf; 56 ROM refs
 .equ LP_BANISHER_CTX_OFF,        0x00001d70  @ [gP1LifePoints+0x1d70] banisher zone LP context field; adjacent to ELIGIB_SPRITE_CTRL_OFF(+0x1d68) +8 and ELIGIB_ANIM_STATE_OFF(+0x1d6c) +4; 39 ROM refs; F06 Seg-7 (tick_equip_zone_target_lp_step2_off x2)
+.equ LP_ACTIVATION_PENDING_OFF,  0x00001d40  @ [gP1LifePoints+0x1d40] LP activation pending flag; computed inline as movs r1,#0xea; lsls r1,r1,#0x5 = 0xea<<5; written by tick_equip_lamp/dream zone state machines; 9 fns in F10 Seg-9; C5 grep=0 (new); conf: high
 
 @ =============================================================================
 @ file 05 Seg-6 additions: sprite row queue/anim subsystem offsets + equip zone rank state

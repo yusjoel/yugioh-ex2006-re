@@ -2574,6 +2574,12 @@ address,name,proposed_name,score,tags
 0x0808416c,dispatch_equip_display_if_confirm_state_two,game_str_0808416c,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08084180,dispatch_equip_display_by_type_code_or_card_id,game_str_08084180,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080841c0,enqueue_effect_node_sprites_for_both_players,,,
+0x08084210,fn_eligible_book_of_life,,,
+0x0808424c,book_of_life_eligible_state0,,,
+0x0808429a,book_of_life_eligible_state1,,,
+0x080842ac,book_of_life_eligible_state3,,,
+0x080842ba,book_of_life_eligible_state4,,,
+0x080842cc,book_of_life_eligible_state2_5,,,
 0x08084318,advance_equip_lp_display_seq,,,
 0x080843fc,dispatch_equip_display_by_activity_if_slot_group_le4,game_str_080843fc,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08084418,enqueue_equip_sprite_attr_if_equipped,,,
