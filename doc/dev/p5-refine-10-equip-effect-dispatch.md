@@ -123,7 +123,7 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **残留**: 0 ROM_INCBIN / 0 non-ASCII in [0x7ae84, 0x7be2c)
 - **ROM_INCBIN before/after**: 31 -> 23 (8 eliminated)
 - **Ghidra scripts**: RefineF10Seg2Slots.py, DisassembleF10Seg2Blocks.py, RefineF10Seg2PoolFix.py
-- **commit**: (see below)
+- **commit**: 1472a5a
 - **CSV**: +4 fn_eligible rows + 1 FUNC_RENAME update
 
 ---
