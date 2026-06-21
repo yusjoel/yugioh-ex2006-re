@@ -2832,7 +2832,7 @@ DAT_080b6754:
 DAT_080b6758:
     .word  0x0201c520                     @ 080b6758 20c50102
 
-@ Equip target selection case fragment (best field7 score strategy). Inlined in FUN_080b5d98 (0x080b5d98) BST dispatch body; no independent push/pop frame. Uses parent frame registers: r6=equip_card_zone_ptr, r7=work_score (initialized to -1), r8=equip_zone_bitmap. Iterates slots [0..4]: for each bitmap-set slot checks equip_zone bit offset (player_bit determines range); if set, calls get_slot_field7_score(player, slot) and updates best score into r7. After loop if best score < 0 -> jumps to FUN_080b6be0 (failure exit). Otherwise determines target player and best_slot, tail-jumps to FUN_080b6bd8 (success: calls FUN_08080c9c + returns 1). Side effects: via FUN_080b6bd8 -> FUN_08080c9c writes equip target reference.
+@ Equip target selection case fragment (best field7 score strategy). Inlined in FUN_080b5d98 (0x080b5d98) BST dispatch body; no independent push/pop frame. Uses parent frame registers: r6=equip_card_zone_ptr, r7=work_score (initialized to -1), r8=equip_zone_bitmap. Iterates slots [0..4]: for each bitmap-set slot checks equip_zone bit offset (player_bit determines range); if set, calls get_slot_field7_score(player, slot) and updates best score into r7. After loop if best score < 0 -> jumps to FUN_080b6be0 (failure exit). Otherwise determines target player and best_slot, tail-jumps to FUN_080b6bd8 (success: calls enqueue_equip_slot_sprite_with_code_rotation + returns 1). Side effects: via FUN_080b6bd8 -> enqueue_equip_slot_sprite_with_code_rotation writes equip target reference.
 @ 
 @ Constants:
 @ - SLOT_LOOP_MAX=4 (cmp r4,#0x4)

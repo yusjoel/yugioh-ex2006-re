@@ -431,3 +431,14 @@
 .equ EQUIP_CRITERIA_TARGETED_FLAG_OFF, 0x000005a4  @ gDuelPhaseFlags+0x5a4: targeted-card criteria flag in equip eligibility logic; check_equip_slot_eligible_with_criteria_and_target; x11 slots; conf: high
 .equ EQUIP_CRITERIA_DISPLAY_ARR_OFF,   0x000005ac  @ gDuelPhaseFlags+0x5ac: criteria display code array base; fill_equip_criteria_display_code_array writes [base+i*4]; x9 slots; conf: high
 .equ EQUIP_CRITERIA_ARR_NEG_OFF,       0xfffffa54  @ negated EQUIP_CRITERIA_DISPLAY_ARR_OFF (-0x5ac mod 2^32 = 0xfffffa54); find_first_equip_slot_criteria_by_state_code recovers gDuelPhaseFlags base via adds r1,r4,r0; x1 slot; conf: high
+
+@ =============================================================================
+@ file 10 Seg-7a additions: effect slot type mask + stack alloc + display op id
+@ Source: asm/10_equip_effect_dispatch.s, Seg-7a (0x08080ba0..0x08081900)
+@ C5 grep 0xffffc01f/0xfffffe00/0x00000119 in constants/: 0 hits each
+@   (0xfffffe00 exists in oam_attr.inc as OAM_ATTR1_X_CLEAR but semantics differ: stack -0x200 vs OAM mask)
+@   (0x00000119 exists in gba_mem.inc as RESULT_SCREEN_FONT_CTX_OFF but semantics differ: op sub-id vs struct off)
+@ =============================================================================
+.equ EFFECT_SLOT_TYPE_CLEAR_MASK, 0xffffc01f  @ AND mask clearing bits[13:5] of zone attr; assemble_effect_slot_attr_with_zone_lookup clears equip type field before ORing zone_type; x2 slots (c30/c94); conf: high
+.equ STACK_ALLOC_NEG_512,         0xfffffe00  @ -0x200 used with add sp,r4 to allocate 512B stack frame in dispatch_equip_card_display_op_by_card_id (0x08080ea0); SP_FRAME=0x200 comment; conf: high
+.equ EQUIP_DISP_OP_ID_0x119,      0x00000119  @ display op sub-id 0x119; trigger_card_display_op_0x119 asm/10 L16748; exceeds 8-bit immediate range; x2 slots (DAT_08081788/DAT_080818c4); conf: high

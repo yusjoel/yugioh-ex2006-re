@@ -60,7 +60,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ✅ | (see 4.04) |
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ✅ Seg-5a+5b | 9404095 / (see 4.06) |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ✅ | (see 4.06b) |
-| 7  | 0x80ba0..0x82290 | 19 | 152 | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
+| 7a | 0x80ba0..0x81900 | 9+24sub | 101 | 0 inc + 0 sw | ✅ | (see 4.07a) |
+| 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
 | 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
 | 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
@@ -259,6 +260,32 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ / 0 non-ASCII in [0x7f730, 0x80ba0); 1 stale FUN_08080c9c in push_to_effect_slot_array plate (Seg-7 caller, fixed when Seg-7 processed)
 - **Ghidra scripts**: RefineF10Seg6Slots.py, RefineF10Seg6CJKFix.py, RefineF10Seg6ThumbFix.py
 - **CSV sync**: no (FUNC_RENAME=0)
+
+### 4.07a Seg-7a 完成记录
+
+- **范围**: [0x08080ba0, 0x08081900), 9 main fn + 24 named sub-stubs (dispatch_equip_card_display_op_by_card_id BST hub + sub-stubs), 101 literal-pool slots, 0 ROM_INCBIN, 0 switchD
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 101 (71 REUSE + 30 NEW CID + 4 neutral cid_NNN + 3 NEW non-CID)
+  - REUSE x71: PLAYER_BLOCK_STRIDE x3 / gDuelFieldSlots x3 / SLOT_FACE_STATUS_ARRAY_OFF x2 / DEMO_CLEAR_BITS_15_14 x2 / DUAL_LABEL_RENDER_STATE_CLEAR x2 + 43 card CID (REAPER_ON_NIGHTMARE/JOWLS_OF_DARK_DEMISE/SPELLBINDING_CIRCLE/HANE_HANE/RELINQUISHED/CYBER_RAIDER/COPYCAT/BRAIN_CONTROL/SNATCH_STEAL/MAGICAL_HATS/DRIVING_SNOW/RING_OF_DESTRUCTION/AQUA_SPIRIT/WINGED_MINION/BLAST_WITH_CHAIN/DRAGON_MANIPULATOR/OTOHIME/SECRET_OF_THE_BANDIT/ENEMY_CONTROLLER/GRAVEKEEPERS_ASSAILANT/INFERNO_FIRE_BLAST/CHECKMATE/FREEZING_BEAST/YZ_TANK_DRAGON/DIFFUSION_WAVE_MOTION/DARK_SCORPION_GORG_THE_STRONG/TSUKUYOMI/FALLING_DOWN/ENERGY_DRAIN/ORCA_MEGA_FORTRESS/ARCANE_ARCHER_OF_THE_FOREST/ORDER_TO_CHARGE/ARMED_DRAGON_LV5/ELEMENTAL_HERO_THUNDER_GIANT/HARPIES_HUNTING_GROUND/OVERPOWERING_EYE/WHITE_NINJA/CHARMER_RANGE_MAX/ELEMENTAL_HERO_TEMPEST/A_RIVAL_APPEARS/OJAMUSCLE/HERO_HEART/URIA_LORD/GAP_CID_13EA/SUMMONED_SKULL/REVIVAL_JAM/GRADIUS/RED_EYES_B_DRAGON)
+  - NEW CID x30: SPIRIT_REAPER/RAIGEKI_BREAK/TRAP_MASTER/MAN_EATER_BUG/THE_RELIABLE_GUARDIAN/REINFORCEMENTS/DUST_TORNADO/KRYUEL/MASK_OF_DISPEL/THOUSAND_KNIVES/COLLECTED_POWER/VISER_DES/RYU_KISHIN_CLOWN/DOUBLE_SNARE/COLLAPSE/BOOK_OF_MOON/MONSTER_RELIEF/A_MAN_WITH_WDJAT/SOUL_TAKER/GUARDIAN_CEAL/GALE_LIZARD/COMPULSORY_EVACUATION_DEVICE/SHIELD_CRASH/GRANMARG_THE_ROCK_MONARCH/CATNIPPED_KITTY/ASSAULT_ON_GHQ/PATROID/VW_TIGER_CATAPULT/KARMA_CUT/GENERATION_SHIFT _CID (all in card_info.inc, pw=34460239 for GENERATION_SHIFT)
+  - Neutral CID x4: cid_128a/cid_1326/cid_127 (x2)/cid_125 (not in card-stats.s; EOL "equip BST unassigned slot")
+  - NEW non-CID x3 (duel_field.inc): EFFECT_SLOT_TYPE_CLEAR_MASK=0xffffc01f / STACK_ALLOC_NEG_512=0xfffffe00 / EQUIP_DISP_OP_ID_0x119=0x119
+  - NEW internal-ID x1 (card_info.inc): HANE_HANE_INTERNAL_ID_0x1f5=0x1f5 (icid for card_name_lookup; not a CID)
+- **REF_SLOTS**: 0
+- **RENAME_SLOTS**: 0
+- **FUNC_RENAME**: 0
+- **PLATE**: 30 C8 stale FUN_ substitutions (assemble_effect_slot_attr_with_zone_lookup: FUN_08080c9c->enqueue_equip_slot_sprite_with_code_rotation; pack_effect_slot_attr_with_type_flags: FUN_08080d28->pack_equip_slot_sprite_with_code_attr; 24 sub-stubs: FUN_08080ea0->dispatch_equip_card_display_op_by_card_id; dispatch_card_display_op_by_id_match: FUN_080817c8->trigger_card_display_op_0x6f + FUN_080818dc->trigger_card_display_op_0x112; trigger_card_display_op_0x89: FUN_080818dc->trigger_card_display_op_0x112; cross-file asm/15 exec_equip_target_by_best_field7_score: FUN_08080c9c->enqueue_equip_slot_sprite_with_code_rotation)
+- **Note C8**: FUN_08081de4 in find_effect_slot_by_side_and_type plate is Seg-7b function (not yet named); deferred to Seg-7b
+- **carve**: 0 (no ROM_INCBIN in range)
+- **disasm**: 0
+- **§5.1**: 0
+- **NEW constants**:
+  - card_info.inc +35: 30 NEW CID + cid_128a/cid_1326/cid_127/cid_125 (neutral) + HANE_HANE_INTERNAL_ID_0x1f5
+  - duel_field.inc +3: EFFECT_SLOT_TYPE_CLEAR_MASK/STACK_ALLOC_NEG_512/EQUIP_DISP_OP_ID_0x119
+- **残留**: 0 DAT_/DWORD_ actual labels in [0x80ba0, 0x81900); 3 historical references in plate comment prose (harmless)
+- **Ghidra scripts**: RefineF10Seg7aSlots.py
+- **CSV sync**: no (FUNC_RENAME=0, disasm=0)
 
 ---
 

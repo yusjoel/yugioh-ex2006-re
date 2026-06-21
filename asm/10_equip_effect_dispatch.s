@@ -14654,7 +14654,7 @@ push_to_effect_slot_array:
 
 @ Assembles effect slot attribute from player_flag (r1 bit0), col_nibble (r2 bits[3:0]), and gDuelFieldSlots zone field data (zone_type bits[14:9], direction bit[14]); combines into packed u16 slot attribute word; advances [r0+6] slot_write_ptr and writes result to [r0+8+slot*2].
 @ 
-@ Called by FUN_08080c9c after enqueue_equip_slot_sprite_by_player to update effect_node slot attribute.
+@ Called by enqueue_equip_slot_sprite_with_code_rotation after enqueue_equip_slot_sprite_by_player to update effect_node slot attribute.
 @ 
 @ Side effects: [r0+6] bits[4:2] := advanced slot_write_ptr; [r0+8+slot*2] := assembled r6 (u16).
 @ 
@@ -14681,10 +14681,10 @@ assemble_effect_slot_attr_with_zone_lookup:
     lsls r3,r2,#0x2    @ 08080bc4 9300
     adds r3,r3,r2    @ 08080bc6 9b18
     lsls r3,r3,#0x2    @ 08080bc8 9b00
-    ldr r2, DAT_08080c28                     @ 08080bca 174a
+    ldr r2, assemble_zone_lookup_stride_c28  @ 08080bca 174a
     muls r1,r2    @ 08080bcc 5143
     adds r3,r3,r1    @ 08080bce 5b18
-    ldr r4, DAT_08080c2c                     @ 08080bd0 164c
+    ldr r4, assemble_zone_lookup_dfs_c2c     @ 08080bd0 164c
     adds r3,r3,r4    @ 08080bd2 1b19
     ldr r1,[r3,#0x0]                         @ 08080bd4 1968
     lsls r2,r1,#0x2    @ 08080bd6 8a00
@@ -14694,18 +14694,18 @@ assemble_effect_slot_attr_with_zone_lookup:
     lsrs r1,r1,#0x1f    @ 08080bde c90f
     orrs r1,r2    @ 08080be0 1143
     lsls r1,r1,#0x5    @ 08080be2 4901
-    ldr r2, DAT_08080c30                     @ 08080be4 124a
+    ldr r2, assemble_zone_lookup_type_clr_c30 @ 08080be4 124a
     ands r6,r2    @ 08080be6 1640
     orrs r6,r1    @ 08080be8 0e43
     lsrs r1,r1,#0x3    @ 08080bea c908
     adds r4,r4,r1    @ 08080bec 6418
-    ldr r1, DAT_08080c34                     @ 08080bee 1149
+    ldr r1, assemble_zone_lookup_face_off_c34 @ 08080bee 1149
     adds r4,r4,r1    @ 08080bf0 6418
     ldrb r4,[r4,#0x0]                        @ 08080bf2 2478
     lsls r1,r4,#0x19    @ 08080bf4 6106
     lsrs r1,r1,#0x1e    @ 08080bf6 890f
     lsls r1,r1,#0xe    @ 08080bf8 8903
-    ldr r2, DAT_08080c38                     @ 08080bfa 0f4a
+    ldr r2, assemble_zone_lookup_dir_clr_c38 @ 08080bfa 0f4a
     ands r6,r2    @ 08080bfc 1640
     orrs r6,r1    @ 08080bfe 0e43
     ldrb r4,[r0,#0x6]                        @ 08080c00 8479
@@ -14728,20 +14728,20 @@ assemble_effect_slot_attr_with_zone_lookup:
     pop {r4,r5,r6}                           @ 08080c22 70bc
     pop {r0}                                 @ 08080c24 01bc
     bx r0                                    @ 08080c26 0047
-DAT_08080c28:
-    .word  0x00000868                     @ 08080c28 68080000
-DAT_08080c2c:
-    .word  0x0201c510                     @ 08080c2c 10c50102
-DAT_08080c30:
-    .word  0xffffc01f                     @ 08080c30 1fc0ffff
-DAT_08080c34:
-    .word  0x000010b1                     @ 08080c34 b1100000
-DAT_08080c38:
-    .word  0xffff3fff                     @ 08080c38 ff3fffff
+assemble_zone_lookup_stride_c28:
+    .word  PLAYER_BLOCK_STRIDE            @ 08080c28 68080000
+assemble_zone_lookup_dfs_c2c:
+    .word  gDuelFieldSlots                @ 08080c2c 10c50102
+assemble_zone_lookup_type_clr_c30:
+    .word  EFFECT_SLOT_TYPE_CLEAR_MASK    @ 08080c30 1fc0ffff
+assemble_zone_lookup_face_off_c34:
+    .word  SLOT_FACE_STATUS_ARRAY_OFF     @ 08080c34 b1100000
+assemble_zone_lookup_dir_clr_c38:
+    .word  DEMO_CLEAR_BITS_15_14          @ 08080c38 ff3fffff
 
 @ Similar structure to assemble_effect_slot_attr_with_zone_lookup (0x08080ba0) but with different r3 usage: extracts player_flag (r1 bit0), col_nibble (r2 bits[3:0]<<1), and type_flags (r3 bits[12:5] via lsls#0x17;lsrs#0x12); applies 0xffffc01f and 0xffff3fff dual masks to clear then merges into r5; advances [r0+6] slot_write_ptr and writes to [r0+8+slot*2].
 @ 
-@ Called by FUN_08080d28 after enqueue_equip_slot_sprite_with_display_code.
+@ Called by pack_equip_slot_sprite_with_code_attr after enqueue_equip_slot_sprite_with_display_code.
 @ 
 @ Side effects: [r0+6] bits[4:2] := advanced slot_write_ptr; [r0+8+slot*2] := r5 (packed u16 slot attribute).
 @ 
@@ -14765,10 +14765,10 @@ pack_effect_slot_attr_with_type_flags:
     orrs r5,r2    @ 08080c5a 1543
     lsls r3,r3,#0x17    @ 08080c5c db05
     lsrs r3,r3,#0x12    @ 08080c5e 9b0c
-    ldr r1, DAT_08080c94                     @ 08080c60 0c49
+    ldr r1, pack_effect_slot_type_clr_c94    @ 08080c60 0c49
     ands r5,r1    @ 08080c62 0d40
     orrs r5,r3    @ 08080c64 1d43
-    ldr r1, DAT_08080c98                     @ 08080c66 0c49
+    ldr r1, pack_effect_slot_dir_clr_c98     @ 08080c66 0c49
     ands r5,r1    @ 08080c68 0d40
     ldrb r4,[r0,#0x6]                        @ 08080c6a 8479
     lsls r3,r4,#0x1b    @ 08080c6c e306
@@ -14791,10 +14791,10 @@ pack_effect_slot_attr_with_type_flags:
     pop {r0}                                 @ 08080c8e 01bc
     bx r0                                    @ 08080c90 0047
     .zero  0x2
-DAT_08080c94:
-    .word  0xffffc01f                     @ 08080c94 1fc0ffff
-DAT_08080c98:
-    .word  0xffff3fff                     @ 08080c98 ff3fffff
+pack_effect_slot_type_clr_c94:
+    .word  EFFECT_SLOT_TYPE_CLEAR_MASK    @ 08080c94 1fc0ffff
+pack_effect_slot_dir_clr_c98:
+    .word  DEMO_CLEAR_BITS_15_14          @ 08080c98 ff3fffff
 
 @ Compound operation: (1) call assemble_effect_slot_attr_with_zone_lookup(r5,r6,r4) to assemble equip slot attr; (2) call enqueue_equip_slot_sprite_by_player(player_id, slot_idx) to write OAM sprite; (3) extract bits[16:15] (display_code) from [r5+4], +1 AND 0x7, write back to bits[17:15]; (4) if slot_idx<=4 and entry[+8] (ldrh) nonzero and entry card_id is 0x1596 or 0x1598, call enqueue_sprite_attr_with_mode with mode=2 for conditional sprite. Used by 20+ equip state machine callers. Side effects: [r5+4] bits[17:15]:=(old+1)&7 (display_code rotate); OAM sprite via enqueue_equip_slot_sprite_by_player; conditional OAM sprite via enqueue_sprite_attr_with_mode. Constants: DISPLAY_CODE_MASK=0xfffc7fff, PLAYER_STRIDE=0x868, gDuelFieldSlots=0x0201c510, SPECIAL_ID_A=0x1596, SPECIAL_ID_B=0x1598, MAX_SLOT_IDX=4.
 enqueue_equip_slot_sprite_with_code_rotation:
@@ -14814,7 +14814,7 @@ enqueue_equip_slot_sprite_with_code_rotation:
     movs r0,#0x7    @ 08080cba 0720
     ands r1,r0    @ 08080cbc 0140
     lsls r1,r1,#0xf    @ 08080cbe c903
-    ldr r0, DAT_08080d14                     @ 08080cc0 1448
+    ldr r0, enqueue_equip_sprite_rot_state_clr_d14 @ 08080cc0 1448
     ands r0,r2    @ 08080cc2 1040
     orrs r0,r1    @ 08080cc4 0843
     str r0,[r5,#0x4]                         @ 08080cc6 6860
@@ -14823,10 +14823,10 @@ enqueue_equip_slot_sprite_with_code_rotation:
     lsls r0,r4,#0x2    @ 08080ccc a000
     adds r0,r0,r4    @ 08080cce 0019
     lsls r0,r0,#0x2    @ 08080cd0 8000
-    ldr r1, DAT_08080d18                     @ 08080cd2 1149
+    ldr r1, pack_equip_slot_sprite_stride_d18 @ 08080cd2 1149
     muls r1,r2    @ 08080cd4 5143
     adds r0,r0,r1    @ 08080cd6 4018
-    ldr r1, DAT_08080d1c                     @ 08080cd8 1049
+    ldr r1, pack_equip_slot_sprite_dfs_d1c   @ 08080cd8 1049
     adds r1,r0,r1    @ 08080cda 4118
     ldrh r0,[r1,#0x8]                        @ 08080cdc 0889
     cmp r0,#0x0                              @ 08080cde 0028
@@ -14836,10 +14836,10 @@ enqueue_equip_slot_sprite_with_code_rotation:
     ldr r0,[r1,#0x0]                         @ 08080ce6 0868
     lsls r0,r0,#0x13    @ 08080ce8 c004
     lsrs r1,r0,#0x13    @ 08080cea c10c
-    ldr r2, DAT_08080d20                     @ 08080cec 0c4a
+    ldr r2, dispatch_bst_spirit_reaper_cid_d20 @ 08080cec 0c4a
     cmp r1,r2                                @ 08080cee 9142
     beq LAB_08080cf8                         @ 08080cf0 02d0
-    ldr r0, DAT_08080d24                     @ 08080cf2 0c48
+    ldr r0, dispatch_bst_reaper_nightmare_cid_d24 @ 08080cf2 0c48
     cmp r1,r0                                @ 08080cf4 8142
     bne LAB_08080d0a                         @ 08080cf6 08d1
 LAB_08080cf8:
@@ -14857,16 +14857,16 @@ LAB_08080d0a:
     pop {r0}                                 @ 08080d0e 01bc
     bx r0                                    @ 08080d10 0047
     .zero  0x2
-DAT_08080d14:
-    .word  0xfffc7fff                     @ 08080d14 ff7ffcff
-DAT_08080d18:
-    .word  0x00000868                     @ 08080d18 68080000
-DAT_08080d1c:
-    .word  0x0201c510                     @ 08080d1c 10c50102
-DAT_08080d20:
-    .word  0x00001596                     @ 08080d20 96150000
-DAT_08080d24:
-    .word  0x00001598                     @ 08080d24 98150000
+enqueue_equip_sprite_rot_state_clr_d14:
+    .word  DUAL_LABEL_RENDER_STATE_CLEAR  @ 08080d14 ff7ffcff
+pack_equip_slot_sprite_stride_d18:
+    .word  PLAYER_BLOCK_STRIDE            @ 08080d18 68080000
+pack_equip_slot_sprite_dfs_d1c:
+    .word  gDuelFieldSlots                @ 08080d1c 10c50102
+dispatch_bst_spirit_reaper_cid_d20:
+    .word  SPIRIT_REAPER_CID              @ 08080d20 96150000
+dispatch_bst_reaper_nightmare_cid_d24:
+    .word  REAPER_ON_NIGHTMARE_CID        @ 08080d24 98150000
 
 @ Compound operation: (1) call pack_effect_slot_attr_with_type_flags(r0, player_id, slot_idx, display_code) to pack attr and get effect node ptr; (2) call enqueue_equip_slot_sprite_with_display_code(player_id, slot_idx, display_code) to write OAM sprite; (3) read effect node ptr [+4] display_code bits[16:15], +1 AND 0x7, write back to bits[17:15] (same display_code rotate as 08080c9c). Entry .hword 0x4646=mov r6,r8; r1/r2/r3 saved to r4/r5/r6; .hword 0x4640=mov r8,r0 gets effect node ptr. Side effects: [effect_node_ptr+4] bits[17:15]:=(old+1)&7 (display_code rotate); OAM sprite via enqueue_equip_slot_sprite_with_display_code. Constants: DISPLAY_CODE_MASK=0xfffc7fff.
 pack_equip_slot_sprite_with_code_attr:
@@ -14890,7 +14890,7 @@ pack_equip_slot_sprite_with_code_attr:
     movs r0,#0x7    @ 08080d4e 0720
     ands r1,r0    @ 08080d50 0140
     lsls r1,r1,#0xf    @ 08080d52 c903
-    ldr r0, DAT_08080d68                     @ 08080d54 0448
+    ldr r0, pack_equip_code_attr_state_clr_d68 @ 08080d54 0448
     ands r0,r2    @ 08080d56 1040
     orrs r0,r1    @ 08080d58 0843
     .hword 0x4641    @ 08080d5a 4146
@@ -14900,8 +14900,8 @@ pack_equip_slot_sprite_with_code_attr:
     pop {r4,r5,r6}                           @ 08080d62 70bc
     pop {r0}                                 @ 08080d64 01bc
     bx r0                                    @ 08080d66 0047
-DAT_08080d68:
-    .word  0xfffc7fff                     @ 08080d68 ff7ffcff
+pack_equip_code_attr_state_clr_d68:
+    .word  DUAL_LABEL_RENDER_STATE_CLEAR  @ 08080d68 ff7ffcff
 
 @ Reads side flag and type nibble from effect node slot array. Layout: base[+4].bits[17:15] = slot count N; slot array starts at base+8, stride 2 bytes. addr = base + r1*2 + 8; extracts bit[0]=side flag and bits[4:1]=type_nibble. Returns packed u16: low byte = side(0=P1,1=P2), bits[11:8] = type_nibble (4-bit). 93 callers use 'lsls r0,#0x10; lsrs r0,#0x18' to extract type nibble, or 'lsls r1,r0,#0x18; lsrs r1,#0x18' to extract side bit. r0=ptr effect_node, r1=u8 slot_index [0..N-1]. Returns u16 packed_fields (low=side, bits[11:8]=type_nibble). Constants: EFFECT_SLOT_STRIDE=2, EFFECT_NODE_ARRAY_OFFSET=8, EFFECT_NODE_COUNT_SHIFT=15.
 read_effect_slot_side_and_type:
@@ -14979,11 +14979,11 @@ LAB_08080db4:
     lsls r0,r1,#0x2    @ 08080dd0 8800
     adds r0,r0,r1    @ 08080dd2 4018
     lsls r0,r0,#0x2    @ 08080dd4 8000
-    ldr r7, DAT_08080e4c                     @ 08080dd6 1d4f
+    ldr r7, check_zone_entry_stride_e4c      @ 08080dd6 1d4f
     adds r1,r2,#0x0    @ 08080dd8 111c
     muls r1,r7    @ 08080dda 7943
     adds r0,r0,r1    @ 08080ddc 4018
-    ldr r1, DAT_08080e50                     @ 08080dde 1c49
+    ldr r1, check_zone_entry_dfs_e50         @ 08080dde 1c49
     .hword 0x468c    @ 08080de0 8c46
     add r0,r12                               @ 08080de2 6044
     ldr r0,[r0,#0x0]                         @ 08080de4 0068
@@ -15027,7 +15027,7 @@ LAB_08080db4:
     lsrs r1,r1,#0x17    @ 08080e30 c90d
     lsls r1,r1,#0x2    @ 08080e32 8900
     add r1,r12                               @ 08080e34 6144
-    ldr r2, DAT_08080e54                     @ 08080e36 074a
+    ldr r2, check_zone_entry_face_off_e54    @ 08080e36 074a
     adds r1,r1,r2    @ 08080e38 8918
     ldrb r1,[r1,#0x0]                        @ 08080e3a 0978
     lsls r1,r1,#0x19    @ 08080e3c 4906
@@ -15038,12 +15038,12 @@ LAB_08080db4:
     movs r0,#0x1    @ 08080e46 0120
     b LAB_08080e5a                           @ 08080e48 07e0
     .zero  0x2
-DAT_08080e4c:
-    .word  0x00000868                     @ 08080e4c 68080000
-DAT_08080e50:
-    .word  0x0201c510                     @ 08080e50 10c50102
-DAT_08080e54:
-    .word  0x000010b1                     @ 08080e54 b1100000
+check_zone_entry_stride_e4c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08080e4c 68080000
+check_zone_entry_dfs_e50:
+    .word  gDuelFieldSlots                @ 08080e50 10c50102
+check_zone_entry_face_off_e54:
+    .word  SLOT_FACE_STATUS_ARRAY_OFF     @ 08080e54 b1100000
 LAB_08080e58:
     movs r0,#0x0    @ 08080e58 0020
 LAB_08080e5a:
@@ -15092,11 +15092,11 @@ LAB_08080e98:
 @ Large card_id dispatch hub (indeg=2, game_str/card_ids/duel_field context). Reads effect struct [+0] u16 card_id (ldrh r1,[r5,#0]); uses binary search tree in ROM to find display op handler stub and tail-jump. Each branch calls a prenamed trigger_card_display_op_0xNN stub (0x5f/0x62/0x63/0x64/0x66/0x6b/0x6c/0x6d/0x6e/0x6f/0x76/0x77/0x78/0x7a/0x80/0x112/0x119 etc.). Also has trigger_card_display_op_by_equip_type (0x1298=Cyber Raider) for equip type sub-dispatch. sp allocated via add sp,r4 (r4=0xfffffe00, 0x200 bytes) for game_str format buffer. Side effects: card display op state (IWRAM) via trigger_card_display_op31_if_not_active. Constants: SP_FRAME=0x200 (r4=0xfffffe00), first check card_id=0x15a8->trigger_card_display_op_0x119, card_id=0x13ab->trigger_card_display_op_0x77.
 dispatch_equip_card_display_op_by_card_id:
     push {r4,r5,lr}                          @ 08080ea0 30b5
-    ldr r4, DAT_08080f14                     @ 08080ea2 1c4c
+    ldr r4, dispatch_bst_hub_stack_alloc_f14 @ 08080ea2 1c4c
     add sp,r4                                @ 08080ea4 a544
     adds r5,r0,#0x0    @ 08080ea6 051c
     ldrh r1,[r5,#0x0]                        @ 08080ea8 2988
-    ldr r0, DAT_08080f18                     @ 08080eaa 1b48
+    ldr r0, dispatch_bst_raigeki_break_cid_f18 @ 08080eaa 1b48
     cmp r1,r0                                @ 08080eac 8142
     bne LAB_08080eb4                         @ 08080eae 01d1
     bl trigger_card_display_op_0x119         @ 08080eb0 00f006fd
@@ -15105,7 +15105,7 @@ LAB_08080eb4:
     ble LAB_08080eba                         @ 08080eb6 00dd
     b LAB_08081360                           @ 08080eb8 52e2
 LAB_08080eba:
-    ldr r0, DAT_08080f1c                     @ 08080eba 1848
+    ldr r0, dispatch_bst_jowls_dark_demise_cid_f1c @ 08080eba 1848
     cmp r1,r0                                @ 08080ebc 8142
     bne LAB_08080ec4                         @ 08080ebe 01d1
     bl trigger_card_display_op_0x77          @ 08080ec0 00f088fc
@@ -15130,7 +15130,7 @@ LAB_08080eda:
 LAB_08080ee4:
     cmp r1,r0                                @ 08080ee4 8142
     bgt LAB_08080f80                         @ 08080ee6 4bdc
-    ldr r0, DAT_08080f20                     @ 08080ee8 0d48
+    ldr r0, dispatch_bst_spellbinding_circle_cid_f20 @ 08080ee8 0d48
     cmp r1,r0                                @ 08080eea 8142
     bne LAB_08080ef2                         @ 08080eec 01d1
     bl trigger_card_display_op_0x64          @ 08080eee 00f059fc
@@ -15152,16 +15152,16 @@ LAB_08080f0e:
     adds r0,#0xb    @ 08080f0e 0b30
     b LAB_08081606                           @ 08080f10 79e3
     .zero  0x2
-DAT_08080f14:
-    .word  0xfffffe00                     @ 08080f14 00feffff
-DAT_08080f18:
-    .word  0x000015a8                     @ 08080f18 a8150000
-DAT_08080f1c:
-    .word  0x000013ab                     @ 08080f1c ab130000
-DAT_08080f20:
-    .word  0x00001103                     @ 08080f20 03110000
+dispatch_bst_hub_stack_alloc_f14:
+    .word  STACK_ALLOC_NEG_512            @ 08080f14 00feffff
+dispatch_bst_raigeki_break_cid_f18:
+    .word  RAIGEKI_BREAK_CID              @ 08080f18 a8150000
+dispatch_bst_jowls_dark_demise_cid_f1c:
+    .word  JOWLS_OF_DARK_DEMISE_CID       @ 08080f1c ab130000
+dispatch_bst_spellbinding_circle_cid_f20:
+    .word  SPELLBINDING_CIRCLE_CID        @ 08080f20 03110000
 LAB_08080f24:
-    ldr r0, DAT_08080f3c                     @ 08080f24 0548
+    ldr r0, dispatch_bst_trap_master_cid_f3c @ 08080f24 0548
     cmp r1,r0                                @ 08080f26 8142
     bne LAB_08080f2e                         @ 08080f28 01d1
     bl trigger_card_display_op_0x5f          @ 08080f2a 00f035fc
@@ -15172,10 +15172,10 @@ LAB_08080f2e:
     bl trigger_card_display_op_0x66          @ 08080f34 00f03afc
 LAB_08080f38:
     bl trigger_card_display_op_0x112         @ 08080f38 00f0d0fc
-DAT_08080f3c:
-    .word  0x00001086                     @ 08080f3c 86100000
+dispatch_bst_trap_master_cid_f3c:
+    .word  TRAP_MASTER_CID                @ 08080f3c 86100000
 LAB_08080f40:
-    ldr r0, DAT_08080f68                     @ 08080f40 0948
+    ldr r0, dispatch_bst_man_eater_bug_cid_f68 @ 08080f40 0948
     cmp r1,r0                                @ 08080f42 8142
     bne LAB_08080f4a                         @ 08080f44 01d1
     bl trigger_card_display_op_0x6d          @ 08080f46 00f03bfc
@@ -15194,10 +15194,10 @@ LAB_08080f58:
 LAB_08080f62:
     bl trigger_card_display_op_0x112         @ 08080f62 00f0bbfc
     .zero  0x2
-DAT_08080f68:
-    .word  0x0000119b                     @ 08080f68 9b110000
+dispatch_bst_man_eater_bug_cid_f68:
+    .word  MAN_EATER_BUG_CID              @ 08080f68 9b110000
 LAB_08080f6c:
-    ldr r0, DAT_08080f7c                     @ 08080f6c 0348
+    ldr r0, dispatch_bst_hane_hane_cid_f7c   @ 08080f6c 0348
     cmp r1,r0                                @ 08080f6e 8142
     bne LAB_08080f76                         @ 08080f70 01d1
     bl trigger_card_display_op_0x6e          @ 08080f72 00f027fc
@@ -15205,10 +15205,10 @@ LAB_08080f76:
     adds r0,#0x27    @ 08080f76 2730
     b LAB_08081352                           @ 08080f78 ebe1
     .zero  0x2
-DAT_08080f7c:
-    .word  0x000011c3                     @ 08080f7c c3110000
+dispatch_bst_hane_hane_cid_f7c:
+    .word  HANE_HANE_CID                  @ 08080f7c c3110000
 LAB_08080f80:
-    ldr r0, DAT_08080fb4                     @ 08080f80 0c48
+    ldr r0, dispatch_bst_cid_128a_fb4        @ 08080f80 0c48
     cmp r1,r0                                @ 08080f82 8142
     bne LAB_08080f8a                         @ 08080f84 01d1
     bl trigger_card_display_op_0x64          @ 08080f86 00f00dfc
@@ -15233,10 +15233,10 @@ LAB_08080fa6:
     bl trigger_card_display_op_0x7a          @ 08080fac 00f016fc
 LAB_08080fb0:
     bl trigger_card_display_op_0x112         @ 08080fb0 00f094fc
-DAT_08080fb4:
-    .word  0x0000128a                     @ 08080fb4 8a120000
+dispatch_bst_cid_128a_fb4:
+    .word  cid_128a                       @ 08080fb4 8a120000  equip BST unassigned slot
 LAB_08080fb8:
-    ldr r0, DAT_08080fd0                     @ 08080fb8 0548
+    ldr r0, dispatch_bst_relinquished_cid_fd0 @ 08080fb8 0548
     cmp r1,r0                                @ 08080fba 8142
     bne LAB_08080fc2                         @ 08080fbc 01d1
     bl trigger_card_display_op_0x63          @ 08080fbe 00f0effb
@@ -15247,10 +15247,10 @@ LAB_08080fc2:
     bl trigger_card_display_op_0x63          @ 08080fc8 00f0eafb
 LAB_08080fcc:
     bl trigger_card_display_op_0x112         @ 08080fcc 00f086fc
-DAT_08080fd0:
-    .word  0x00001281                     @ 08080fd0 81120000
+dispatch_bst_relinquished_cid_fd0:
+    .word  RELINQUISHED_CID               @ 08080fd0 81120000
 LAB_08080fd4:
-    ldr r0, DAT_08080ff0                     @ 08080fd4 0648
+    ldr r0, dispatch_bst_cyber_raider_cid_ff0 @ 08080fd4 0648
     cmp r1,r0                                @ 08080fd6 8142
     bne LAB_08080fde                         @ 08080fd8 01d1
     bl trigger_card_display_op_by_equip_type @ 08080fda 00f0cdfb
@@ -15264,10 +15264,10 @@ LAB_08080fde:
 LAB_08080fec:
     adds r0,#0x1    @ 08080fec 0130
     b LAB_0808104a                           @ 08080fee 2ce0
-DAT_08080ff0:
-    .word  0x00001298                     @ 08080ff0 98120000
+dispatch_bst_cyber_raider_cid_ff0:
+    .word  CYBER_RAIDER_CID               @ 08080ff0 98120000
 LAB_08080ff4:
-    ldr r0, DWORD_08081008                   @ 08080ff4 0448
+    ldr r0, dispatch_bst_copycat_cid_1008    @ 08080ff4 0448
     cmp r1,r0                                @ 08080ff6 8142
     bne LAB_08080ffe                         @ 08080ff8 01d1
     bl trigger_card_display_op_0x44          @ 08080ffa 00f0c7fb
@@ -15276,15 +15276,15 @@ LAB_08080ffe:
     bgt LAB_0808100c                         @ 08081000 04dc
     subs r0,#0x12    @ 08081002 1238
     bl dispatch_card_display_op_by_id_match  @ 08081004 00f0a8fb
-DWORD_08081008:
-    .word  0x000012bb                     @ 08081008 bb120000
+dispatch_bst_copycat_cid_1008:
+    .word  COPYCAT_CID                    @ 08081008 bb120000
 LAB_0808100c:
-    ldr r0, DAT_08081010                     @ 0808100c 0048
+    ldr r0, dispatch_bst_brain_control_cid_1010 @ 0808100c 0048
     b LAB_08081462                           @ 0808100e 28e2
-DAT_08081010:
-    .word  0x000012c3                     @ 08081010 c3120000
+dispatch_bst_brain_control_cid_1010:
+    .word  BRAIN_CONTROL_CID              @ 08081010 c3120000
 LAB_08081014:
-    ldr r0, DAT_08081058                     @ 08081014 1048
+    ldr r0, dispatch_bst_reliable_guardian_cid_1058 @ 08081014 1048
     cmp r1,r0                                @ 08081016 8142
     bne LAB_0808101e                         @ 08081018 01d1
     bl trigger_card_display_op_0x86          @ 0808101a 00f0edfb
@@ -15318,10 +15318,10 @@ LAB_0808104a:
 LAB_08081052:
     bl trigger_card_display_op_0x112         @ 08081052 00f043fc
     .zero  0x2
-DAT_08081058:
-    .word  0x0000132a                     @ 08081058 2a130000
+dispatch_bst_reliable_guardian_cid_1058:
+    .word  THE_RELIABLE_GUARDIAN_CID      @ 08081058 2a130000
 LAB_0808105c:
-    ldr r0, DAT_08081074                     @ 0808105c 0548
+    ldr r0, dispatch_bst_reinforcements_cid_1074 @ 0808105c 0548
     cmp r1,r0                                @ 0808105e 8142
     bne LAB_08081066                         @ 08081060 01d1
     bl trigger_card_display_op_0x85          @ 08081062 00f0c7fb
@@ -15332,10 +15332,10 @@ LAB_08081066:
     bl trigger_card_display_op_0x86          @ 0808106c 00f0c4fb
 LAB_08081070:
     bl trigger_card_display_op_0x112         @ 08081070 00f034fc
-DAT_08081074:
-    .word  0x000012f1                     @ 08081074 f1120000
+dispatch_bst_reinforcements_cid_1074:
+    .word  REINFORCEMENTS_CID             @ 08081074 f1120000
 LAB_08081078:
-    ldr r0, DAT_080810a0                     @ 08081078 0948
+    ldr r0, dispatch_bst_snatch_steal_cid_10a0 @ 08081078 0948
     cmp r1,r0                                @ 0808107a 8142
     bne LAB_08081082                         @ 0808107c 01d1
     bl trigger_card_display_op_0x78          @ 0808107e 00f0abfb
@@ -15354,10 +15354,10 @@ LAB_08081090:
 LAB_0808109a:
     bl trigger_card_display_op_0x112         @ 0808109a 00f01ffc
     .zero  0x2
-DAT_080810a0:
-    .word  0x00001322                     @ 080810a0 22130000
+dispatch_bst_snatch_steal_cid_10a0:
+    .word  SNATCH_STEAL_CID               @ 080810a0 22130000
 LAB_080810a4:
-    ldr r0, DAT_080810b4                     @ 080810a4 0348
+    ldr r0, dispatch_bst_cid_1326_10b4       @ 080810a4 0348
     cmp r1,r0                                @ 080810a6 8142
     bne LAB_080810ae                         @ 080810a8 01d1
     bl trigger_card_display_op_0x89          @ 080810aa 00f0abfb
@@ -15365,10 +15365,10 @@ LAB_080810ae:
     adds r0,#0x3    @ 080810ae 0330
     b LAB_080816da                           @ 080810b0 13e3
     .zero  0x2
-DAT_080810b4:
-    .word  0x00001326                     @ 080810b4 26130000
+dispatch_bst_cid_1326_10b4:
+    .word  cid_1326                       @ 080810b4 26130000  equip BST unassigned slot
 LAB_080810b8:
-    ldr r0, DAT_080810e4                     @ 080810b8 0a48
+    ldr r0, dispatch_bst_magical_hats_cid_10e4 @ 080810b8 0a48
     cmp r1,r0                                @ 080810ba 8142
     bne LAB_080810c0                         @ 080810bc 00d1
     b LAB_080817e4                           @ 080810be 91e3
@@ -15393,19 +15393,19 @@ LAB_080810d8:
     b LAB_080817fc                           @ 080810de 8de3
 LAB_080810e0:
     bl trigger_card_display_op_0x112         @ 080810e0 00f0fcfb
-DAT_080810e4:
-    .word  0x00001362                     @ 080810e4 62130000
+dispatch_bst_magical_hats_cid_10e4:
+    .word  MAGICAL_HATS_CID               @ 080810e4 62130000
 LAB_080810e8:
-    ldr r0, DAT_080810f4                     @ 080810e8 0248
+    ldr r0, dispatch_bst_driving_snow_cid_10f4 @ 080810e8 0248
     cmp r1,r0                                @ 080810ea 8142
     ble LAB_080810f2                         @ 080810ec 01dd
     bl trigger_card_display_op_0x112         @ 080810ee 00f0f5fb
 LAB_080810f2:
     b LAB_08081808                           @ 080810f2 89e3
-DAT_080810f4:
-    .word  0x0000134d                     @ 080810f4 4d130000
+dispatch_bst_driving_snow_cid_10f4:
+    .word  DRIVING_SNOW_CID               @ 080810f4 4d130000
 LAB_080810f8:
-    ldr r0, DAT_08081118                     @ 080810f8 0748
+    ldr r0, dispatch_bst_dust_tornado_cid_1118 @ 080810f8 0748
     cmp r1,r0                                @ 080810fa 8142
     bne LAB_08081100                         @ 080810fc 00d1
     b LAB_0808180c                           @ 080810fe 85e3
@@ -15423,10 +15423,10 @@ LAB_0808110c:
     b LAB_08081814                           @ 08081112 7fe3
 LAB_08081114:
     bl trigger_card_display_op_0x112         @ 08081114 00f0e2fb
-DAT_08081118:
-    .word  0x0000137c                     @ 08081118 7c130000
+dispatch_bst_dust_tornado_cid_1118:
+    .word  DUST_TORNADO_CID               @ 08081118 7c130000
 LAB_0808111c:
-    ldr r0, DAT_0808112c                     @ 0808111c 0348
+    ldr r0, dispatch_bst_ring_destruction_cid_112c @ 0808111c 0348
     cmp r1,r0                                @ 0808111e 8142
     bne LAB_08081124                         @ 08081120 00d1
     b trigger_card_display_op_0x6d           @ 08081122 4de3
@@ -15435,15 +15435,15 @@ LAB_08081124:
     bgt LAB_08081130                         @ 08081126 03dc
     subs r0,#0x5    @ 08081128 0538
     b dispatch_card_display_op_by_id_match   @ 0808112a 15e3
-DAT_0808112c:
-    .word  0x0000138d                     @ 0808112c 8d130000
+dispatch_bst_ring_destruction_cid_112c:
+    .word  RING_OF_DESTRUCTION_CID        @ 0808112c 8d130000
 LAB_08081130:
-    ldr r0, DAT_08081134                     @ 08081130 0048
+    ldr r0, dispatch_bst_kryuel_cid_1134     @ 08081130 0048
     b LAB_0808163a                           @ 08081132 82e2
-DAT_08081134:
-    .word  0x0000139e                     @ 08081134 9e130000
+dispatch_bst_kryuel_cid_1134:
+    .word  KRYUEL_CID                     @ 08081134 9e130000
 LAB_08081138:
-    ldr r0, DAT_08081180                     @ 08081138 1148
+    ldr r0, dispatch_bst_double_snare_cid_1180 @ 08081138 1148
     cmp r1,r0                                @ 0808113a 8142
     bne LAB_08081142                         @ 0808113c 01d1
     bl trigger_card_display_op_0x119         @ 0808113e 00f0bffb
@@ -15484,10 +15484,10 @@ LAB_08081174:
     b LAB_08081764                           @ 0808117a f3e2
 LAB_0808117c:
     bl trigger_card_display_op_0x112         @ 0808117c 00f0aefb
-DAT_08081180:
-    .word  0x000014c3                     @ 08081180 c3140000
+dispatch_bst_double_snare_cid_1180:
+    .word  DOUBLE_SNARE_CID               @ 08081180 c3140000
 LAB_08081184:
-    ldr r0, DAT_08081198                     @ 08081184 0448
+    ldr r0, dispatch_bst_mask_dispel_cid_1198 @ 08081184 0448
     cmp r1,r0                                @ 08081186 8142
     bne LAB_0808118c                         @ 08081188 00d1
     b LAB_080818ac                           @ 0808118a 8fe3
@@ -15498,8 +15498,8 @@ LAB_0808118c:
     b LAB_080818bc                           @ 08081192 93e3
 LAB_08081194:
     bl trigger_card_display_op_0x112         @ 08081194 00f0a2fb
-DAT_08081198:
-    .word  0x000013f0                     @ 08081198 f0130000
+dispatch_bst_mask_dispel_cid_1198:
+    .word  MASK_OF_DISPEL_CID             @ 08081198 f0130000
 LAB_0808119c:
     movs r0,#0xa1    @ 0808119c a120
     lsls r0,r0,#0x5    @ 0808119e 4001
@@ -15521,17 +15521,17 @@ LAB_080811b2:
 LAB_080811ba:
     b trigger_card_display_op_0x112          @ 080811ba 8fe3
 LAB_080811bc:
-    ldr r0, DAT_080811c8                     @ 080811bc 0248
+    ldr r0, dispatch_bst_thousand_knives_cid_11c8 @ 080811bc 0248
     cmp r1,r0                                @ 080811be 8142
     bne LAB_080811c4                         @ 080811c0 00d1
     b trigger_card_display_op_0x62           @ 080811c2 ebe2
 LAB_080811c4:
     adds r0,#0x30    @ 080811c4 3030
     b LAB_08081724                           @ 080811c6 ade2
-DAT_080811c8:
-    .word  0x0000142e                     @ 080811c8 2e140000
+dispatch_bst_thousand_knives_cid_11c8:
+    .word  THOUSAND_KNIVES_CID            @ 080811c8 2e140000
 LAB_080811cc:
-    ldr r0, DAT_080811f8                     @ 080811cc 0a48
+    ldr r0, dispatch_bst_collected_power_cid_11f8 @ 080811cc 0a48
     cmp r1,r0                                @ 080811ce 8142
     bne LAB_080811d4                         @ 080811d0 00d1
     b trigger_card_display_op_0x6f           @ 080811d2 f9e2
@@ -15557,10 +15557,10 @@ LAB_080811ec:
 LAB_080811f4:
     b trigger_card_display_op_0x112          @ 080811f4 72e3
     .zero  0x2
-DAT_080811f8:
-    .word  0x0000148d                     @ 080811f8 8d140000
+dispatch_bst_collected_power_cid_11f8:
+    .word  COLLECTED_POWER_CID            @ 080811f8 8d140000
 LAB_080811fc:
-    ldr r0, DAT_08081210                     @ 080811fc 0448
+    ldr r0, dispatch_bst_aqua_spirit_cid_1210 @ 080811fc 0448
     cmp r1,r0                                @ 080811fe 8142
     bne LAB_08081204                         @ 08081200 00d1
     b LAB_08081790                           @ 08081202 c5e2
@@ -15572,10 +15572,10 @@ LAB_08081204:
 LAB_0808120c:
     b trigger_card_display_op_0x112          @ 0808120c 66e3
     .zero  0x2
-DAT_08081210:
-    .word  0x00001485                     @ 08081210 85140000
+dispatch_bst_aqua_spirit_cid_1210:
+    .word  AQUA_SPIRIT_CID                @ 08081210 85140000
 LAB_08081214:
-    ldr r0, DAT_08081234                     @ 08081214 0748
+    ldr r0, dispatch_bst_viser_des_cid_1234  @ 08081214 0748
     cmp r1,r0                                @ 08081216 8142
     bne LAB_0808121c                         @ 08081218 00d1
     b trigger_card_display_op_0x64           @ 0808121a c3e2
@@ -15594,10 +15594,10 @@ LAB_08081228:
 LAB_08081230:
     b trigger_card_display_op_0x112          @ 08081230 54e3
     .zero  0x2
-DAT_08081234:
-    .word  0x000014ac                     @ 08081234 ac140000
+dispatch_bst_viser_des_cid_1234:
+    .word  VISER_DES_CID                  @ 08081234 ac140000
 LAB_08081238:
-    ldr r0, DAT_08081248                     @ 08081238 0348
+    ldr r0, dispatch_bst_winged_minion_cid_1248 @ 08081238 0348
     cmp r1,r0                                @ 0808123a 8142
     bne LAB_08081240                         @ 0808123c 00d1
     b trigger_card_display_op_0x6f           @ 0808123e c3e2
@@ -15606,15 +15606,15 @@ LAB_08081240:
     bgt LAB_0808124c                         @ 08081242 03dc
     subs r0,#0x7    @ 08081244 0738
     b LAB_080816ea                           @ 08081246 50e2
-DAT_08081248:
-    .word  0x000014b9                     @ 08081248 b9140000
+dispatch_bst_winged_minion_cid_1248:
+    .word  WINGED_MINION_CID              @ 08081248 b9140000
 LAB_0808124c:
-    ldr r0, DAT_08081250                     @ 0808124c 0048
+    ldr r0, dispatch_bst_ryu_kishin_clown_cid_1250 @ 0808124c 0048
     b dispatch_card_display_op_by_id_match   @ 0808124e 83e2
-DAT_08081250:
-    .word  0x000014bb                     @ 08081250 bb140000
+dispatch_bst_ryu_kishin_clown_cid_1250:
+    .word  RYU_KISHIN_CLOWN_CID           @ 08081250 bb140000
 LAB_08081254:
-    ldr r0, DAT_08081284                     @ 08081254 0b48
+    ldr r0, dispatch_bst_blast_with_chain_cid_1284 @ 08081254 0b48
     cmp r1,r0                                @ 08081256 8142
     bne LAB_0808125c                         @ 08081258 00d1
     b trigger_card_display_op_0x119          @ 0808125a 31e3
@@ -15642,10 +15642,10 @@ LAB_08081274:
 LAB_08081280:
     b LAB_08081722                           @ 08081280 4fe2
     .zero  0x2
-DAT_08081284:
-    .word  0x00001514                     @ 08081284 14150000
+dispatch_bst_blast_with_chain_cid_1284:
+    .word  BLAST_WITH_CHAIN_CID           @ 08081284 14150000
 LAB_08081288:
-    ldr r0, DAT_0808129c                     @ 08081288 0448
+    ldr r0, dispatch_bst_dragon_manipulator_cid_129c @ 08081288 0448
     cmp r1,r0                                @ 0808128a 8142
     bne LAB_08081290                         @ 0808128c 00d1
     b LAB_08081858                           @ 0808128e e3e2
@@ -15657,10 +15657,10 @@ LAB_08081290:
 LAB_08081298:
     b trigger_card_display_op_0x112          @ 08081298 20e3
     .zero  0x2
-DAT_0808129c:
-    .word  0x000014ce                     @ 0808129c ce140000
+dispatch_bst_dragon_manipulator_cid_129c:
+    .word  DRAGON_MANIPULATOR_CID         @ 0808129c ce140000
 LAB_080812a0:
-    ldr r0, DAT_080812b8                     @ 080812a0 0548
+    ldr r0, dispatch_bst_collapse_cid_12b8   @ 080812a0 0548
     cmp r1,r0                                @ 080812a2 8142
     bne LAB_080812a8                         @ 080812a4 00d1
     b trigger_card_display_op_0x6f           @ 080812a6 8fe2
@@ -15674,10 +15674,10 @@ LAB_080812a8:
 LAB_080812b4:
     adds r0,#0x8    @ 080812b4 0830
     b LAB_08081342                           @ 080812b6 44e0
-DAT_080812b8:
-    .word  0x000014eb                     @ 080812b8 eb140000
+dispatch_bst_collapse_cid_12b8:
+    .word  COLLAPSE_CID                   @ 080812b8 eb140000
 LAB_080812bc:
-    ldr r0, DAT_080812d4                     @ 080812bc 0548
+    ldr r0, dispatch_bst_otohime_cid_12d4    @ 080812bc 0548
     cmp r1,r0                                @ 080812be 8142
     bne LAB_080812c4                         @ 080812c0 00d1
     b LAB_08081790                           @ 080812c2 65e2
@@ -15691,15 +15691,15 @@ LAB_080812c4:
 LAB_080812d0:
     b trigger_card_display_op_0x112          @ 080812d0 04e3
     .zero  0x2
-DAT_080812d4:
-    .word  0x00001503                     @ 080812d4 03150000
+dispatch_bst_otohime_cid_12d4:
+    .word  OTOHIME_CID                    @ 080812d4 03150000
 LAB_080812d8:
-    ldr r0, DAT_080812dc                     @ 080812d8 0048
+    ldr r0, dispatch_bst_secret_bandit_cid_12dc @ 080812d8 0048
     b dispatch_card_display_op_by_id_match   @ 080812da 3de2
-DAT_080812dc:
-    .word  0x00001511                     @ 080812dc 11150000
+dispatch_bst_secret_bandit_cid_12dc:
+    .word  SECRET_OF_THE_BANDIT_CID       @ 080812dc 11150000
 LAB_080812e0:
-    ldr r0, DAT_08081304                     @ 080812e0 0848
+    ldr r0, dispatch_bst_monster_relief_cid_1304 @ 080812e0 0848
     cmp r1,r0                                @ 080812e2 8142
     bne LAB_080812e8                         @ 080812e4 00d1
     b trigger_card_display_op_0x6e           @ 080812e6 6de2
@@ -15720,20 +15720,20 @@ LAB_080812f4:
 LAB_08081300:
     adds r0,#0x1    @ 08081300 0130
     b LAB_08081710                           @ 08081302 05e2
-DAT_08081304:
-    .word  0x00001579                     @ 08081304 79150000
+dispatch_bst_monster_relief_cid_1304:
+    .word  MONSTER_RELIEF_CID             @ 08081304 79150000
 LAB_08081308:
-    ldr r0, DAT_08081314                     @ 08081308 0248
+    ldr r0, dispatch_bst_book_of_moon_cid_1314 @ 08081308 0248
     cmp r1,r0                                @ 0808130a 8142
     bne LAB_08081310                         @ 0808130c 00d1
     b LAB_080818c8                           @ 0808130e dbe2
 LAB_08081310:
     adds r0,#0x34    @ 08081310 3430
     b LAB_08081724                           @ 08081312 07e2
-DAT_08081314:
-    .word  0x00001538                     @ 08081314 38150000
+dispatch_bst_book_of_moon_cid_1314:
+    .word  BOOK_OF_MOON_CID               @ 08081314 38150000
 LAB_08081318:
-    ldr r0, DAT_08081330                     @ 08081318 0548
+    ldr r0, dispatch_bst_enemy_controller_cid_1330 @ 08081318 0548
     cmp r1,r0                                @ 0808131a 8142
     bne LAB_08081320                         @ 0808131c 00d1
     b trigger_card_display_op_0x64           @ 0808131e 41e2
@@ -15747,10 +15747,10 @@ LAB_08081320:
 LAB_0808132c:
     adds r0,#0x1    @ 0808132c 0130
     b dispatch_card_display_op_by_id_match   @ 0808132e 13e2
-DAT_08081330:
-    .word  0x00001581                     @ 08081330 81150000
+dispatch_bst_enemy_controller_cid_1330:
+    .word  ENEMY_CONTROLLER_CID           @ 08081330 81150000
 LAB_08081334:
-    ldr r0, DAT_0808134c                     @ 08081334 0548
+    ldr r0, dispatch_bst_gravekeepers_assailant_cid_134c @ 08081334 0548
     cmp r1,r0                                @ 08081336 8142
     bne LAB_0808133c                         @ 08081338 00d1
     b LAB_08081790                           @ 0808133a 29e2
@@ -15765,10 +15765,10 @@ LAB_08081342:
 LAB_08081348:
     b trigger_card_display_op_0x112          @ 08081348 c8e2
     .zero  0x2
-DAT_0808134c:
-    .word  0x0000158d                     @ 0808134c 8d150000
+dispatch_bst_gravekeepers_assailant_cid_134c:
+    .word  GRAVEKEEPERS_ASSAILANT_CID     @ 0808134c 8d150000
 LAB_08081350:
-    ldr r0, DAT_0808135c                     @ 08081350 0248
+    ldr r0, dispatch_bst_a_man_with_wdjat_cid_135c @ 08081350 0248
 LAB_08081352:
     cmp r1,r0                                @ 08081352 8142
     bne LAB_08081358                         @ 08081354 00d1
@@ -15776,10 +15776,10 @@ LAB_08081352:
 LAB_08081358:
     b trigger_card_display_op_0x112          @ 08081358 c0e2
     .zero  0x2
-DAT_0808135c:
-    .word  0x0000158e                     @ 0808135c 8e150000
+dispatch_bst_a_man_with_wdjat_cid_135c:
+    .word  A_MAN_WITH_WDJAT_CID           @ 0808135c 8e150000
 LAB_08081360:
-    ldr r0, DAT_080813ac                     @ 08081360 1248
+    ldr r0, dispatch_bst_inferno_fire_blast_cid_13ac @ 08081360 1248
     cmp r1,r0                                @ 08081362 8142
     bne LAB_08081368                         @ 08081364 00d1
     b LAB_08081888                           @ 08081366 8fe2
@@ -15788,7 +15788,7 @@ LAB_08081368:
     ble LAB_0808136e                         @ 0808136a 00dd
     b LAB_0808155e                           @ 0808136c f7e0
 LAB_0808136e:
-    ldr r0, DAT_080813b0                     @ 0808136e 1048
+    ldr r0, dispatch_bst_checkmate_cid_13b0  @ 0808136e 1048
     cmp r1,r0                                @ 08081370 8142
     bne LAB_08081376                         @ 08081372 00d1
     b LAB_080817e4                           @ 08081374 36e2
@@ -15825,12 +15825,12 @@ LAB_0808139c:
 LAB_080813a8:
     adds r0,#0x3    @ 080813a8 0330
     b LAB_0808150a                           @ 080813aa aee0
-DAT_080813ac:
-    .word  0x000017f6                     @ 080813ac f6170000
-DAT_080813b0:
-    .word  0x0000169b                     @ 080813b0 9b160000
+dispatch_bst_inferno_fire_blast_cid_13ac:
+    .word  INFERNO_FIRE_BLAST_CID         @ 080813ac f6170000
+dispatch_bst_checkmate_cid_13b0:
+    .word  CHECKMATE_CID                  @ 080813b0 9b160000
 LAB_080813b4:
-    ldr r0, DAT_080813c8                     @ 080813b4 0448
+    ldr r0, dispatch_bst_freezing_beast_cid_13c8 @ 080813b4 0448
     cmp r1,r0                                @ 080813b6 8142
     ble LAB_080813bc                         @ 080813b8 00dd
     b trigger_card_display_op_0x112          @ 080813ba 8fe2
@@ -15842,10 +15842,10 @@ LAB_080813bc:
 LAB_080813c4:
     b LAB_08081808                           @ 080813c4 20e2
     .zero  0x2
-DAT_080813c8:
-    .word  0x000015d7                     @ 080813c8 d7150000
+dispatch_bst_freezing_beast_cid_13c8:
+    .word  FREEZING_BEAST_CID             @ 080813c8 d7150000
 LAB_080813cc:
-    ldr r0, DAT_080813e4                     @ 080813cc 0548
+    ldr r0, dispatch_bst_yz_tank_dragon_cid_13e4 @ 080813cc 0548
     cmp r1,r0                                @ 080813ce 8142
     bne LAB_080813d4                         @ 080813d0 00d1
     b trigger_card_display_op_0x62           @ 080813d2 e3e1
@@ -15859,20 +15859,20 @@ LAB_080813d4:
 LAB_080813e0:
     adds r0,#0x10    @ 080813e0 1030
     b LAB_08081742                           @ 080813e2 aee1
-DAT_080813e4:
-    .word  0x000015fa                     @ 080813e4 fa150000
+dispatch_bst_yz_tank_dragon_cid_13e4:
+    .word  YZ_TANK_DRAGON_CID             @ 080813e4 fa150000
 LAB_080813e8:
-    ldr r0, DAT_080813f4                     @ 080813e8 0248
+    ldr r0, dispatch_bst_diffusion_wave_motion_cid_13f4 @ 080813e8 0248
     cmp r1,r0                                @ 080813ea 8142
     bne LAB_080813f0                         @ 080813ec 00d1
     b trigger_card_display_op_0x6f           @ 080813ee ebe1
 LAB_080813f0:
     adds r0,#0xf    @ 080813f0 0f30
     b LAB_080816ea                           @ 080813f2 7ae1
-DAT_080813f4:
-    .word  0x000015ff                     @ 080813f4 ff150000
+dispatch_bst_diffusion_wave_motion_cid_13f4:
+    .word  DIFFUSION_WAVE_MOTION_CID      @ 080813f4 ff150000
 LAB_080813f8:
-    ldr r0, DAT_0808141c                     @ 080813f8 0848
+    ldr r0, dispatch_bst_soul_taker_cid_141c @ 080813f8 0848
     cmp r1,r0                                @ 080813fa 8142
     bne LAB_08081400                         @ 080813fc 00d1
     b trigger_card_display_op_0x62           @ 080813fe cde1
@@ -15893,20 +15893,20 @@ LAB_0808140c:
 LAB_08081418:
     adds r0,#0x2    @ 08081418 0230
     b LAB_08081710                           @ 0808141a 79e1
-DAT_0808141c:
-    .word  0x0000166f                     @ 0808141c 6f160000
+dispatch_bst_soul_taker_cid_141c:
+    .word  SOUL_TAKER_CID                 @ 0808141c 6f160000
 LAB_08081420:
-    ldr r0, DAT_0808142c                     @ 08081420 0248
+    ldr r0, dispatch_bst_guardian_ceal_cid_142c @ 08081420 0248
     cmp r1,r0                                @ 08081422 8142
     bne LAB_08081428                         @ 08081424 00d1
     b trigger_card_display_op_0x62           @ 08081426 b9e1
 LAB_08081428:
     adds r0,#0x1e    @ 08081428 1e30
     b LAB_0808168e                           @ 0808142a 30e1
-DAT_0808142c:
-    .word  0x0000164b                     @ 0808142c 4b160000
+dispatch_bst_guardian_ceal_cid_142c:
+    .word  GUARDIAN_CEAL_CID              @ 0808142c 4b160000
 LAB_08081430:
-    ldr r0, DAT_08081448                     @ 08081430 0548
+    ldr r0, dispatch_bst_dark_scorpion_gorg_cid_1448 @ 08081430 0548
     cmp r1,r0                                @ 08081432 8142
     bne LAB_08081438                         @ 08081434 00d1
     b trigger_card_display_op_0x64           @ 08081436 b5e1
@@ -15920,10 +15920,10 @@ LAB_08081438:
 LAB_08081444:
     adds r0,#0x1    @ 08081444 0130
     b LAB_0808150a                           @ 08081446 60e0
-DAT_08081448:
-    .word  0x00001685                     @ 08081448 85160000
+dispatch_bst_dark_scorpion_gorg_cid_1448:
+    .word  DARK_SCORPION_GORG_THE_STRONG_CID @ 08081448 85160000
 LAB_0808144c:
-    ldr r0, DAT_0808145c                     @ 0808144c 0348
+    ldr r0, dispatch_bst_tsukuyomi_cid_145c  @ 0808144c 0348
     cmp r1,r0                                @ 0808144e 8142
     bne LAB_08081454                         @ 08081450 00d1
     b LAB_080818c8                           @ 08081452 39e2
@@ -15932,10 +15932,10 @@ LAB_08081454:
     bgt LAB_08081460                         @ 08081456 03dc
     subs r0,#0x4    @ 08081458 0438
     b LAB_080816da                           @ 0808145a 3ee1
-DAT_0808145c:
-    .word  0x00001694                     @ 0808145c 94160000
+dispatch_bst_tsukuyomi_cid_145c:
+    .word  TSUKUYOMI_CID                  @ 0808145c 94160000
 LAB_08081460:
-    ldr r0, DAT_0808146c                     @ 08081460 0248
+    ldr r0, dispatch_bst_falling_down_cid_146c @ 08081460 0248
 LAB_08081462:
     cmp r1,r0                                @ 08081462 8142
     bne LAB_08081468                         @ 08081464 00d1
@@ -15943,10 +15943,10 @@ LAB_08081462:
 LAB_08081468:
     b trigger_card_display_op_0x112          @ 08081468 38e2
     .zero  0x2
-DAT_0808146c:
-    .word  0x0000169a                     @ 0808146c 9a160000
+dispatch_bst_falling_down_cid_146c:
+    .word  FALLING_DOWN_CID               @ 0808146c 9a160000
 LAB_08081470:
-    ldr r0, DAT_080814a0                     @ 08081470 0b48
+    ldr r0, dispatch_bst_compulsory_evacuation_cid_14a0 @ 08081470 0b48
     cmp r1,r0                                @ 08081472 8142
     bne LAB_08081478                         @ 08081474 00d1
     b trigger_card_display_op_0x6e           @ 08081476 a5e1
@@ -15974,20 +15974,20 @@ LAB_08081490:
 LAB_0808149c:
     adds r0,#0x10    @ 0808149c 1030
     b LAB_08081742                           @ 0808149e 50e1
-DAT_080814a0:
-    .word  0x0000171a                     @ 080814a0 1a170000
+dispatch_bst_compulsory_evacuation_cid_14a0:
+    .word  COMPULSORY_EVACUATION_DEVICE_CID @ 080814a0 1a170000
 LAB_080814a4:
-    ldr r0, DAT_080814b0                     @ 080814a4 0248
+    ldr r0, dispatch_bst_gale_lizard_cid_14b0 @ 080814a4 0248
     cmp r1,r0                                @ 080814a6 8142
     bne LAB_080814ac                         @ 080814a8 00d1
     b LAB_08081794                           @ 080814aa 73e1
 LAB_080814ac:
     b LAB_08081722                           @ 080814ac 39e1
     .zero  0x2
-DAT_080814b0:
-    .word  0x000016ba                     @ 080814b0 ba160000
+dispatch_bst_gale_lizard_cid_14b0:
+    .word  GALE_LIZARD_CID                @ 080814b0 ba160000
 LAB_080814b4:
-    ldr r0, DAT_080814cc                     @ 080814b4 0548
+    ldr r0, dispatch_bst_energy_drain_cid_14cc @ 080814b4 0548
     cmp r1,r0                                @ 080814b6 8142
     bne LAB_080814bc                         @ 080814b8 00d1
     b LAB_080817e4                           @ 080814ba 93e1
@@ -16001,10 +16001,10 @@ LAB_080814bc:
 LAB_080814c8:
     adds r0,#0x3    @ 080814c8 0330
     b LAB_080816da                           @ 080814ca 06e1
-DAT_080814cc:
-    .word  0x000016e3                     @ 080814cc e3160000
+dispatch_bst_energy_drain_cid_14cc:
+    .word  ENERGY_DRAIN_CID               @ 080814cc e3160000
 LAB_080814d0:
-    ldr r0, DAT_080814e4                     @ 080814d0 0448
+    ldr r0, dispatch_bst_orca_mega_fortress_cid_14e4 @ 080814d0 0448
     cmp r1,r0                                @ 080814d2 8142
     bne LAB_080814d8                         @ 080814d4 00d1
     b trigger_card_display_op_0x119          @ 080814d6 f3e1
@@ -16016,10 +16016,10 @@ LAB_080814d8:
 LAB_080814e0:
     b trigger_card_display_op_0x112          @ 080814e0 fce1
     .zero  0x2
-DAT_080814e4:
-    .word  0x00001708                     @ 080814e4 08170000
+dispatch_bst_orca_mega_fortress_cid_14e4:
+    .word  ORCA_MEGA_FORTRESS_OF_DARKNESS_CID @ 080814e4 08170000
 LAB_080814e8:
-    ldr r0, DAT_08081514                     @ 080814e8 0a48
+    ldr r0, dispatch_bst_shield_crash_cid_1514 @ 080814e8 0a48
     cmp r1,r0                                @ 080814ea 8142
     bne LAB_080814f0                         @ 080814ec 00d1
     b trigger_card_display_op_0x6d           @ 080814ee 67e1
@@ -16046,20 +16046,20 @@ LAB_0808150a:
 LAB_08081510:
     b trigger_card_display_op_0x112          @ 08081510 e4e1
     .zero  0x2
-DAT_08081514:
-    .word  0x00001773                     @ 08081514 73170000
+dispatch_bst_shield_crash_cid_1514:
+    .word  SHIELD_CRASH_CID               @ 08081514 73170000
 LAB_08081518:
-    ldr r0, DAT_08081524                     @ 08081518 0248
+    ldr r0, dispatch_bst_arcane_archer_cid_1524 @ 08081518 0248
     cmp r1,r0                                @ 0808151a 8142
     bne LAB_08081520                         @ 0808151c 00d1
     b LAB_08081808                           @ 0808151e 73e1
 LAB_08081520:
     adds r0,#0x10    @ 08081520 1030
     b dispatch_card_display_op_by_id_match   @ 08081522 19e1
-DAT_08081524:
-    .word  0x00001753                     @ 08081524 53170000
+dispatch_bst_arcane_archer_cid_1524:
+    .word  ARCANE_ARCHER_OF_THE_FOREST_CID @ 08081524 53170000
 LAB_08081528:
-    ldr r0, DAT_08081540                     @ 08081528 0548
+    ldr r0, dispatch_bst_order_to_charge_cid_1540 @ 08081528 0548
     cmp r1,r0                                @ 0808152a 8142
     bne LAB_08081530                         @ 0808152c 00d1
     b LAB_080817e4                           @ 0808152e 59e1
@@ -16073,10 +16073,10 @@ LAB_08081530:
 LAB_0808153c:
     adds r0,#0xc    @ 0808153c 0c30
     b LAB_0808163a                           @ 0808153e 7ce0
-DAT_08081540:
-    .word  0x0000179f                     @ 08081540 9f170000
+dispatch_bst_order_to_charge_cid_1540:
+    .word  ORDER_TO_CHARGE_CID            @ 08081540 9f170000
 LAB_08081544:
-    ldr r0, DAT_08081554                     @ 08081544 0348
+    ldr r0, dispatch_bst_armed_dragon_lv5_cid_1554 @ 08081544 0348
     cmp r1,r0                                @ 08081546 8142
     bne LAB_0808154c                         @ 08081548 00d1
     b trigger_card_display_op_0x62           @ 0808154a 27e1
@@ -16085,14 +16085,14 @@ LAB_0808154c:
     bgt LAB_08081558                         @ 0808154e 03dc
     subs r0,#0x22    @ 08081550 2238
     b LAB_0808168e                           @ 08081552 9ce0
-DAT_08081554:
-    .word  0x000017da                     @ 08081554 da170000
+dispatch_bst_armed_dragon_lv5_cid_1554:
+    .word  ARMED_DRAGON_LV5_CID           @ 08081554 da170000
 LAB_08081558:
     movs r0,#0xbf    @ 08081558 bf20
     lsls r0,r0,#0x5    @ 0808155a 4001
     b LAB_08081652                           @ 0808155c 79e0
 LAB_0808155e:
-    ldr r0, DAT_0808159c                     @ 0808155e 0f48
+    ldr r0, dispatch_bst_ehero_thunder_giant_cid_159c @ 0808155e 0f48
     cmp r1,r0                                @ 08081560 8142
     bne LAB_08081566                         @ 08081562 00d1
     b trigger_card_display_op_0x6d           @ 08081564 2ce1
@@ -16129,10 +16129,10 @@ LAB_0808158c:
 LAB_08081598:
     adds r0,#0x3    @ 08081598 0330
     b LAB_0808168e                           @ 0808159a 78e0
-DAT_0808159c:
-    .word  0x000018c9                     @ 0808159c c9180000
+dispatch_bst_ehero_thunder_giant_cid_159c:
+    .word  ELEMENTAL_HERO_THUNDER_GIANT_CID @ 0808159c c9180000
 LAB_080815a0:
-    ldr r0, DAT_080815b4                     @ 080815a0 0448
+    ldr r0, dispatch_bst_harpies_hunting_ground_cid_15b4 @ 080815a0 0448
     cmp r1,r0                                @ 080815a2 8142
     bne LAB_080815a8                         @ 080815a4 00d1
     b LAB_08081808                           @ 080815a6 2fe1
@@ -16144,10 +16144,10 @@ LAB_080815a8:
 LAB_080815b0:
     b trigger_card_display_op_0x112          @ 080815b0 94e1
     .zero  0x2
-DAT_080815b4:
-    .word  0x0000183f                     @ 080815b4 3f180000
+dispatch_bst_harpies_hunting_ground_cid_15b4:
+    .word  HARPIES_HUNTING_GROUND_CID     @ 080815b4 3f180000
 LAB_080815b8:
-    ldr r0, DAT_080815d0                     @ 080815b8 0548
+    ldr r0, dispatch_bst_granmarg_rock_monarch_cid_15d0 @ 080815b8 0548
     cmp r1,r0                                @ 080815ba 8142
     bne LAB_080815c0                         @ 080815bc 00d1
     b trigger_card_display_op_0x119          @ 080815be 7fe1
@@ -16161,20 +16161,20 @@ LAB_080815c0:
 LAB_080815cc:
     adds r0,#0x8    @ 080815cc 0830
     b LAB_0808168e                           @ 080815ce 5ee0
-DAT_080815d0:
-    .word  0x0000185f                     @ 080815d0 5f180000
+dispatch_bst_granmarg_rock_monarch_cid_15d0:
+    .word  GRANMARG_THE_ROCK_MONARCH_CID  @ 080815d0 5f180000
 LAB_080815d4:
-    ldr r0, DAT_080815e0                     @ 080815d4 0248
+    ldr r0, dispatch_bst_catnipped_kitty_cid_15e0 @ 080815d4 0248
     cmp r1,r0                                @ 080815d6 8142
     bne LAB_080815dc                         @ 080815d8 00d1
     b trigger_card_display_op_0x64           @ 080815da e3e0
 LAB_080815dc:
     adds r0,#0x5    @ 080815dc 0530
     b LAB_0808163a                           @ 080815de 2ce0
-DAT_080815e0:
-    .word  0x00001863                     @ 080815e0 63180000
+dispatch_bst_catnipped_kitty_cid_15e0:
+    .word  CATNIPPED_KITTY_CID            @ 080815e0 63180000
 LAB_080815e4:
-    ldr r0, DAT_08081610                     @ 080815e4 0a48
+    ldr r0, dispatch_bst_overpowering_eye_cid_1610 @ 080815e4 0a48
     cmp r1,r0                                @ 080815e6 8142
     bne LAB_080815ec                         @ 080815e8 00d1
     b LAB_080817e4                           @ 080815ea fbe0
@@ -16201,20 +16201,20 @@ LAB_08081606:
 LAB_0808160c:
     b trigger_card_display_op_0x112          @ 0808160c 66e1
     .zero  0x2
-DAT_08081610:
-    .word  0x00001893                     @ 08081610 93180000
+dispatch_bst_overpowering_eye_cid_1610:
+    .word  OVERPOWERING_EYE_CID           @ 08081610 93180000
 LAB_08081614:
-    ldr r0, DAT_08081620                     @ 08081614 0248
+    ldr r0, dispatch_bst_assault_ghq_cid_1620 @ 08081614 0248
     cmp r1,r0                                @ 08081616 8142
     bne LAB_0808161c                         @ 08081618 00d1
     b LAB_080817e4                           @ 0808161a e3e0
 LAB_0808161c:
     adds r0,#0x6    @ 0808161c 0630
     b LAB_080816da                           @ 0808161e 5ce0
-DAT_08081620:
-    .word  0x0000188a                     @ 08081620 8a180000
+dispatch_bst_assault_ghq_cid_1620:
+    .word  ASSAULT_ON_GHQ_CID             @ 08081620 8a180000
 LAB_08081624:
-    ldr r0, DAT_08081644                     @ 08081624 0748
+    ldr r0, dispatch_bst_white_ninja_cid_1644 @ 08081624 0748
     cmp r1,r0                                @ 08081626 8142
     bne LAB_0808162c                         @ 08081628 00d1
     b trigger_card_display_op_0x6d           @ 0808162a c9e0
@@ -16234,10 +16234,10 @@ LAB_0808163a:
 LAB_08081640:
     b trigger_card_display_op_0x112          @ 08081640 4ce1
     .zero  0x2
-DAT_08081644:
-    .word  0x000018be                     @ 08081644 be180000
+dispatch_bst_white_ninja_cid_1644:
+    .word  WHITE_NINJA_CID                @ 08081644 be180000
 LAB_08081648:
-    ldr r0, DAT_0808165c                     @ 08081648 0448
+    ldr r0, dispatch_bst_charmer_range_max_cid_165c @ 08081648 0448
     cmp r1,r0                                @ 0808164a 8142
     bgt LAB_08081650                         @ 0808164c 00dc
     b trigger_card_display_op_0x77           @ 0808164e c1e0
@@ -16250,10 +16250,10 @@ LAB_08081652:
 LAB_08081658:
     b trigger_card_display_op_0x112          @ 08081658 40e1
     .zero  0x2
-DAT_0808165c:
-    .word  0x000018c2                     @ 0808165c c2180000
+dispatch_bst_charmer_range_max_cid_165c:
+    .word  CHARMER_RANGE_MAX_CID          @ 0808165c c2180000
 LAB_08081660:
-    ldr r0, DAT_08081698                     @ 08081660 0d48
+    ldr r0, dispatch_bst_ehero_tempest_cid_1698 @ 08081660 0d48
     cmp r1,r0                                @ 08081662 8142
     bne LAB_08081668                         @ 08081664 00d1
     b LAB_080817e4                           @ 08081666 bde0
@@ -16287,20 +16287,20 @@ LAB_0808168e:
 LAB_08081694:
     b trigger_card_display_op_0x112          @ 08081694 22e1
     .zero  0x2
-DAT_08081698:
-    .word  0x00001957                     @ 08081698 57190000
+dispatch_bst_ehero_tempest_cid_1698:
+    .word  ELEMENTAL_HERO_TEMPEST_CID     @ 08081698 57190000
 LAB_0808169c:
-    ldr r0, DAT_080816a8                     @ 0808169c 0248
+    ldr r0, dispatch_bst_patroid_cid_16a8    @ 0808169c 0248
     cmp r1,r0                                @ 0808169e 8142
     bne LAB_080816a4                         @ 080816a0 00d1
     b LAB_080817cc                           @ 080816a2 93e0
 LAB_080816a4:
     adds r0,#0x19    @ 080816a4 1930
     b dispatch_card_display_op_by_id_match   @ 080816a6 57e0
-DAT_080816a8:
-    .word  0x000018f0                     @ 080816a8 f0180000
+dispatch_bst_patroid_cid_16a8:
+    .word  PATROID_CID                    @ 080816a8 f0180000
 LAB_080816ac:
-    ldr r0, DAT_080816c8                     @ 080816ac 0648
+    ldr r0, dispatch_bst_a_rival_appears_cid_16c8 @ 080816ac 0648
     cmp r1,r0                                @ 080816ae 8142
     bne LAB_080816b4                         @ 080816b0 00d1
     b trigger_card_display_op_0x64           @ 080816b2 77e0
@@ -16316,10 +16316,10 @@ LAB_080816b4:
     b LAB_080818d8                           @ 080816c4 08e1
 LAB_080816c6:
     b trigger_card_display_op_0x112          @ 080816c6 09e1
-DAT_080816c8:
-    .word  0x0000192b                     @ 080816c8 2b190000
+dispatch_bst_a_rival_appears_cid_16c8:
+    .word  A_RIVAL_APPEARS_CID            @ 080816c8 2b190000
 LAB_080816cc:
-    ldr r0, DAT_080816e4                     @ 080816cc 0548
+    ldr r0, dispatch_bst_ojamuscle_cid_16e4  @ 080816cc 0548
     cmp r1,r0                                @ 080816ce 8142
     bne LAB_080816d4                         @ 080816d0 00d1
     b LAB_080817e4                           @ 080816d2 87e0
@@ -16334,18 +16334,18 @@ LAB_080816da:
 LAB_080816e0:
     b trigger_card_display_op_0x112          @ 080816e0 fce0
     .zero  0x2
-DAT_080816e4:
-    .word  0x00001945                     @ 080816e4 45190000
+dispatch_bst_ojamuscle_cid_16e4:
+    .word  OJAMUSCLE_CID                  @ 080816e4 45190000
 LAB_080816e8:
-    ldr r0, DAT_080816f0                     @ 080816e8 0148
+    ldr r0, dispatch_bst_vw_tiger_catapult_cid_16f0 @ 080816e8 0148
 LAB_080816ea:
     cmp r1,r0                                @ 080816ea 8142
     beq trigger_card_display_op_0x64         @ 080816ec 5ad0
     b trigger_card_display_op_0x112          @ 080816ee f5e0
-DAT_080816f0:
-    .word  0x00001953                     @ 080816f0 53190000
+dispatch_bst_vw_tiger_catapult_cid_16f0:
+    .word  VW_TIGER_CATAPULT_CID          @ 080816f0 53190000
 LAB_080816f4:
-    ldr r0, DAT_08081718                     @ 080816f4 0848
+    ldr r0, dispatch_bst_hero_heart_cid_1718 @ 080816f4 0848
     cmp r1,r0                                @ 080816f6 8142
     beq LAB_080817e4                         @ 080816f8 74d0
     cmp r1,r0                                @ 080816fa 8142
@@ -16365,10 +16365,10 @@ LAB_08081710:
     b LAB_08081808                           @ 08081714 78e0
 LAB_08081716:
     b trigger_card_display_op_0x112          @ 08081716 e1e0
-DAT_08081718:
-    .word  0x000019ab                     @ 08081718 ab190000
+dispatch_bst_hero_heart_cid_1718:
+    .word  HERO_HEART_CID                 @ 08081718 ab190000
 LAB_0808171c:
-    ldr r0, DAT_0808172c                     @ 0808171c 0348
+    ldr r0, dispatch_bst_uria_lord_cid_172c  @ 0808171c 0348
     cmp r1,r0                                @ 0808171e 8142
     beq LAB_0808180c                         @ 08081720 74d0
 LAB_08081722:
@@ -16378,10 +16378,10 @@ LAB_08081724:
     beq trigger_card_display_op_0x6d         @ 08081726 4bd0
     b trigger_card_display_op_0x112          @ 08081728 d8e0
     .zero  0x2
-DAT_0808172c:
-    .word  0x000019a3                     @ 0808172c a3190000
+dispatch_bst_uria_lord_cid_172c:
+    .word  URIA_LORD_CID                  @ 0808172c a3190000
 LAB_08081730:
-    ldr r0, DAT_08081748                     @ 08081730 0548
+    ldr r0, dispatch_bst_karma_cut_cid_1748  @ 08081730 0548
     cmp r1,r0                                @ 08081732 8142
     beq trigger_card_display_op_0x64         @ 08081734 36d0
     cmp r1,r0                                @ 08081736 8142
@@ -16394,17 +16394,17 @@ LAB_08081742:
     cmp r1,r0                                @ 08081742 8142
     beq LAB_0808180c                         @ 08081744 62d0
     b trigger_card_display_op_0x112          @ 08081746 c9e0
-DAT_08081748:
-    .word  0x000019db                     @ 08081748 db190000
+dispatch_bst_karma_cut_cid_1748:
+    .word  KARMA_CUT_CID                  @ 08081748 db190000
 LAB_0808174c:
-    ldr r0, DAT_08081760                     @ 0808174c 0448
+    ldr r0, dispatch_bst_generation_shift_cid_1760 @ 0808174c 0448
     cmp r1,r0                                @ 0808174e 8142
     beq LAB_080817e0                         @ 08081750 46d0
     cmp r1,r0                                @ 08081752 8142
     blt LAB_080817e4                         @ 08081754 46db
     adds r0,#0x14    @ 08081756 1430
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) near card ID 0x12a9 range. Takes r0=threshold, r1=card_id. If r1==r0 (exact match), tail-jumps to FUN_080817c8 (sub_id=0x6f); otherwise tail-jumps to FUN_080818dc (sub_id=0x112, default). Both branches are unconditional tail jumps; does not return to self.
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) near card ID 0x12a9 range. Takes r0=threshold, r1=card_id. If r1==r0 (exact match), tail-jumps to trigger_card_display_op_0x6f (sub_id=0x6f); otherwise tail-jumps to trigger_card_display_op_0x112 (sub_id=0x112, default). Both branches are unconditional tail jumps; does not return to self.
 @ 
 @ Constants:
 @ - sub_id_match=0x6f (display op sub-code on exact ID match)
@@ -16414,20 +16414,20 @@ dispatch_card_display_op_by_id_match:
     beq trigger_card_display_op_0x6f         @ 0808175a 35d0
     b trigger_card_display_op_0x112          @ 0808175c bee0
     .zero  0x2
-DAT_08081760:
-    .word  0x000019dd                     @ 08081760 dd190000
+dispatch_bst_generation_shift_cid_1760:
+    .word  GENERATION_SHIFT_CID           @ 08081760 dd190000
 LAB_08081764:
-    ldr r0, DAT_08081774                     @ 08081764 0348
+    ldr r0, dispatch_bst_gap_cid_13ea_1774   @ 08081764 0348
     bl card_name_lookup_by_internal_id       @ 08081766 6df049fa
     adds r2,r0,#0x0    @ 0808176a 021c
     .hword 0x4668    @ 0808176c 6846
     movs r1,#0x45    @ 0808176e 4521
     b LAB_08081896                           @ 08081770 91e0
     .zero  0x2
-DAT_08081774:
-    .word  0x000013ea                     @ 08081774 ea130000
+dispatch_bst_gap_cid_13ea_1774:
+    .word  GAP_CID_13EA                   @ 08081774 ea130000
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x1298 (Cyber Raider). Reads equip type halfword from [r5+0xc]; if equal to 2, uses sub_id=0x8b; otherwise uses DAT_08081788=0x119 as default sub_id. Both paths jump to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, sub_id).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card ID 0x1298 (Cyber Raider). Reads equip type halfword from [r5+0xc]; if equal to 2, uses sub_id=0x8b; otherwise uses DAT_08081788=0x119 as default sub_id. Both paths jump to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, sub_id).
 @ 
 @ Constants:
 @ - CARD_ID=0x1298 (Cyber Raider)
@@ -16435,7 +16435,7 @@ DAT_08081774:
 @ - sub_id_type2=0x8b
 @ - sub_id_default=0x119
 trigger_card_display_op_by_equip_type:
-    ldr r2, DAT_08081788                     @ 08081778 034a
+    ldr r2, trigger_equip_type_op_id_0x119_1788 @ 08081778 034a
     ldrh r0,[r5,#0xc]                        @ 0808177a a889
     cmp r0,#0x2                              @ 0808177c 0228
     beq LAB_08081782                         @ 0808177e 00d0
@@ -16444,10 +16444,10 @@ LAB_08081782:
     movs r2,#0x8b    @ 08081782 8b22
     b LAB_080818e0                           @ 08081784 ace0
     .zero  0x2
-DAT_08081788:
-    .word  0x00000119                     @ 08081788 19010000
+trigger_equip_type_op_id_0x119_1788:
+    .word  EQUIP_DISP_OP_ID_0x119         @ 08081788 19010000
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for a specific card ID path. Sets r2=0x44 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag from effect struct r5 and calls trigger_card_display_op31_if_not_active(player_flag, 0x44).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for a specific card ID path. Sets r2=0x44 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag from effect struct r5 and calls trigger_card_display_op31_if_not_active(player_flag, 0x44).
 @ 
 @ Constants:
 @ - sub_id=0x44 (display op sub-code)
@@ -16461,7 +16461,7 @@ LAB_08081794:
     movs r2,#0x61    @ 08081794 6122
     b LAB_080818e0                           @ 08081796 a3e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for multiple card ID paths including 0x1103 range. Sets r2=0x5f (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x5f).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for multiple card ID paths including 0x1103 range. Sets r2=0x5f (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x5f).
 @ 
 @ Constants:
 @ - sub_id=0x5f (display op sub-code)
@@ -16469,7 +16469,7 @@ trigger_card_display_op_0x5f:
     movs r2,#0x5f    @ 08081798 5f22
     b LAB_080818e0                           @ 0808179a a1e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card IDs 0x0ffe and 0x12a4 range. Sets r2=0x62 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x62).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card IDs 0x0ffe and 0x12a4 range. Sets r2=0x62 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x62).
 @ 
 @ Constants:
 @ - sub_id=0x62 (display op sub-code)
@@ -16477,7 +16477,7 @@ trigger_card_display_op_0x62:
     movs r2,#0x62    @ 0808179c 6222
     b LAB_080818e0                           @ 0808179e 9fe0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card IDs 0x1281 and 0x1284 range. Sets r2=0x63 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x63).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card IDs 0x1281 and 0x1284 range. Sets r2=0x63 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x63).
 @ 
 @ Constants:
 @ - sub_id=0x63 (display op sub-code)
@@ -16485,7 +16485,7 @@ trigger_card_display_op_0x63:
     movs r2,#0x63    @ 080817a0 6322
     b LAB_080818e0                           @ 080817a2 9de0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for multiple card ID paths including 0x1103, 0x1290, 0x12b1 ranges. Sets r2=0x64 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x64).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for multiple card ID paths including 0x1103, 0x1290, 0x12b1 ranges. Sets r2=0x64 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x64).
 @ 
 @ Constants:
 @ - sub_id=0x64 (display op sub-code)
@@ -16496,7 +16496,7 @@ LAB_080817a8:
     movs r2,#0x65    @ 080817a8 6522
     b LAB_080818e0                           @ 080817aa 99e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x1086 (Trap Master) range. Sets r2=0x66 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x66).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card ID 0x1086 (Trap Master) range. Sets r2=0x66 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x66).
 @ 
 @ Constants:
 @ - sub_id=0x66 (display op sub-code)
@@ -16505,7 +16505,7 @@ trigger_card_display_op_0x66:
     movs r2,#0x66    @ 080817ac 6622
     b LAB_080818e0                           @ 080817ae 97e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for multiple card ID paths including 0x119b-0xd, 0x132a-0x9 ranges. Sets r2=0x6b (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6b).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for multiple card ID paths including 0x119b-0xd, 0x132a-0x9 ranges. Sets r2=0x6b (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6b).
 @ 
 @ Constants:
 @ - sub_id=0x6b (display op sub-code)
@@ -16513,20 +16513,20 @@ trigger_card_display_op_0x6b:
     movs r2,#0x6b    @ 080817b0 6b22
     b LAB_080818e0                           @ 080817b2 95e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x11c3 (Hane-Hane) range. Unlike simple sub-code stubs, first looks up card name string by internal ID icid=0x1f5, then formats with text template text_id=0x6c via format_game_text_with_text_arg(sp_buf, 0x6c, card_name), then passes formatted buffer ptr as r2 to LAB_08081896, which calls trigger_card_display_op31_if_not_active(player_flag, sp_buf). Formatted result written to hub-allocated 0x200-byte stack frame.
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card ID 0x11c3 (Hane-Hane) range. Unlike simple sub-code stubs, first looks up card name string by internal ID icid=0x1f5, then formats with text template text_id=0x6c via format_game_text_with_text_arg(sp_buf, 0x6c, card_name), then passes formatted buffer ptr as r2 to LAB_08081896, which calls trigger_card_display_op31_if_not_active(player_flag, sp_buf). Formatted result written to hub-allocated 0x200-byte stack frame.
 @ 
 @ Constants:
 @ - icid=0x1f5 (internal card ID for card_name_lookup_by_internal_id)
 @ - text_id=0x6c (text template number)
 trigger_card_display_op_with_card_name_0x6c:
-    ldr r2, DAT_080817bc                     @ 080817b4 014a
+    ldr r2, trigger_op_name_0x6c_hane_hane_icid_17bc @ 080817b4 014a
     .hword 0x4668    @ 080817b6 6846
     movs r1,#0x6c    @ 080817b8 6c21
     b LAB_08081896                           @ 080817ba 6ce0
-DAT_080817bc:
-    .word  0x000001f5                     @ 080817bc f5010000
+trigger_op_name_0x6c_hane_hane_icid_17bc:
+    .word  HANE_HANE_INTERNAL_ID_0x1f5    @ 080817bc f5010000
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for multiple card ID paths including 0x119b, 0x136c, 0x1388 ranges. Sets r2=0x6d (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6d).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for multiple card ID paths including 0x119b, 0x136c, 0x1388 ranges. Sets r2=0x6d (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6d).
 @ 
 @ Constants:
 @ - sub_id=0x6d (display op sub-code)
@@ -16534,7 +16534,7 @@ trigger_card_display_op_0x6d:
     movs r2,#0x6d    @ 080817c0 6d22
     b LAB_080818e0                           @ 080817c2 8de0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card IDs 0x11c3 and 0x138d range. Sets r2=0x6e (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6e).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card IDs 0x11c3 and 0x138d range. Sets r2=0x6e (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6e).
 @ 
 @ Constants:
 @ - sub_id=0x6e (display op sub-code)
@@ -16542,7 +16542,7 @@ trigger_card_display_op_0x6e:
     movs r2,#0x6e    @ 080817c4 6e22
     b LAB_080818e0                           @ 080817c6 8be0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) directly, and by dispatch_card_display_op_by_id_match (0x08081758) on exact ID match via tail jump. Sets r2=0x6f (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6f).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) directly, and by dispatch_card_display_op_by_id_match (0x08081758) on exact ID match via tail jump. Sets r2=0x6f (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x6f).
 @ 
 @ Constants:
 @ - sub_id=0x6f (display op sub-code)
@@ -16553,7 +16553,7 @@ LAB_080817cc:
     movs r2,#0x70    @ 080817cc 7022
     b LAB_080818e0                           @ 080817ce 87e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card IDs 0x13ab (Jowls of Dark Demise) and 0x1410 range. Sets r2=0x76 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x76).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card IDs 0x13ab (Jowls of Dark Demise) and 0x1410 range. Sets r2=0x76 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x76).
 @ 
 @ Constants:
 @ - sub_id=0x76 (display op sub-code)
@@ -16562,7 +16562,7 @@ trigger_card_display_op_0x76:
     movs r2,#0x76    @ 080817d0 7622
     b LAB_080818e0                           @ 080817d2 85e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for multiple card ID paths including 0x13ab, 0x1322-0x26 ranges. Sets r2=0x77 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x77).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for multiple card ID paths including 0x13ab, 0x1322-0x26 ranges. Sets r2=0x77 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x77).
 @ 
 @ Constants:
 @ - sub_id=0x77 (display op sub-code)
@@ -16570,7 +16570,7 @@ trigger_card_display_op_0x77:
     movs r2,#0x77    @ 080817d4 7722
     b LAB_080818e0                           @ 080817d6 83e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card IDs 0x1322 (Snatch Steal) and 0x14c3-0x5d range. Sets r2=0x78 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x78).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card IDs 0x1322 (Snatch Steal) and 0x14c3-0x5d range. Sets r2=0x78 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x78).
 @ 
 @ Constants:
 @ - sub_id=0x78 (display op sub-code)
@@ -16579,7 +16579,7 @@ trigger_card_display_op_0x78:
     movs r2,#0x78    @ 080817d8 7822
     b LAB_080818e0                           @ 080817da 81e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x128a+0x10 range. Sets r2=0x7a (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x7a).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card ID 0x128a+0x10 range. Sets r2=0x7a (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x7a).
 @ 
 @ Constants:
 @ - sub_id=0x7a (display op sub-code)
@@ -16599,7 +16599,7 @@ LAB_080817ec:
     movs r2,#0x7e    @ 080817ec 7e22
     b LAB_080818e0                           @ 080817ee 77e0
 
-@ Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x132a-0x9 range. Sets r2=0x80 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x80).
+@ Called by card ID dispatch hub dispatch_equip_card_display_op_by_card_id (0x08080ea0) for card ID 0x132a-0x9 range. Sets r2=0x80 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x80).
 @ 
 @ Constants:
 @ - sub_id=0x80 (display op sub-code)
@@ -16607,14 +16607,14 @@ trigger_card_display_op_0x80:
     movs r2,#0x80    @ 080817f0 8022
     b LAB_080818e0                           @ 080817f2 75e0
 
-@ card-display op dispatch micro-stub: sets sub_id=0x85, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5 (byte[2] bit0 XOR byte[3] bit6), then calls trigger_card_display_op31_if_not_active(player_flag, 0x85). Dispatched from card-display hub FUN_08080ea0 for specific card_id paths. Fully symmetric with sibling trigger_card_display_op_0x86/0x88/0x89.
+@ card-display op dispatch micro-stub: sets sub_id=0x85, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5 (byte[2] bit0 XOR byte[3] bit6), then calls trigger_card_display_op31_if_not_active(player_flag, 0x85). Dispatched from card-display hub dispatch_equip_card_display_op_by_card_id for specific card_id paths. Fully symmetric with sibling trigger_card_display_op_0x86/0x88/0x89.
 @ Side effects: via trigger_card_display_op31_if_not_active writes VRAM card-display op31 buffer.
 @ Constants: SUB_ID=0x85.
 trigger_card_display_op_0x85:
     movs r2,#0x85    @ 080817f4 8522
     b LAB_080818e0                           @ 080817f6 73e0
 
-@ card-display op dispatch micro-stub: sets sub_id=0x86, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x86). Dispatched from card-display hub FUN_08080ea0 for specific card_id paths. Fully symmetric with trigger_card_display_op_0x85/0x88/0x89.
+@ card-display op dispatch micro-stub: sets sub_id=0x86, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x86). Dispatched from card-display hub dispatch_equip_card_display_op_by_card_id for specific card_id paths. Fully symmetric with trigger_card_display_op_0x85/0x88/0x89.
 @ Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
 @ Constants: SUB_ID=0x86.
 trigger_card_display_op_0x86:
@@ -16624,14 +16624,14 @@ LAB_080817fc:
     movs r2,#0x87    @ 080817fc 8722
     b LAB_080818e0                           @ 080817fe 6fe0
 
-@ card-display op dispatch micro-stub: sets sub_id=0x88, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x88). Dispatched from card-display hub FUN_08080ea0 for specific card_id paths.
+@ card-display op dispatch micro-stub: sets sub_id=0x88, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x88). Dispatched from card-display hub dispatch_equip_card_display_op_by_card_id for specific card_id paths.
 @ Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
 @ Constants: SUB_ID=0x88.
 trigger_card_display_op_0x88:
     movs r2,#0x88    @ 08081800 8822
     b LAB_080818e0                           @ 08081802 6de0
 
-@ card-display op dispatch micro-stub: sets sub_id=0x89 (literal value, no shift), unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x89). Note: FUN_080818dc (trigger_card_display_op_0x112) uses movs r2,#0x89; lsls r2,r2,#1 to obtain 0x112; this stub uses 0x89 directly. Dispatched from card-display hub FUN_08080ea0 for specific card_id paths.
+@ card-display op dispatch micro-stub: sets sub_id=0x89 (literal value, no shift), unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x89). Note: trigger_card_display_op_0x112 (trigger_card_display_op_0x112) uses movs r2,#0x89; lsls r2,r2,#1 to obtain 0x112; this stub uses 0x89 directly. Dispatched from card-display hub dispatch_equip_card_display_op_by_card_id for specific card_id paths.
 @ Constants: SUB_ID=0x89.
 trigger_card_display_op_0x89:
     movs r2,#0x89    @ 08081804 8922
@@ -16653,7 +16653,7 @@ LAB_08081818:
     b LAB_080818e0                           @ 0808181a 61e0
 LAB_0808181c:
     add r4,sp,#0x100                         @ 0808181c 40ac
-    ldr r0, DAT_08081838                     @ 0808181e 0648
+    ldr r0, dispatch_bst_summoned_skull_cid_1838 @ 0808181e 0648
     bl card_name_lookup_by_internal_id       @ 08081820 6df0ecf9
     adds r2,r0,#0x0    @ 08081824 021c
     adds r0,r4,#0x0    @ 08081826 201c
@@ -16663,8 +16663,8 @@ LAB_0808181c:
     bl get_game_text_ptr_by_lang_offset      @ 08081830 6df03afa
     b LAB_08081890                           @ 08081834 2ce0
     .zero  0x2
-DAT_08081838:
-    .word  0x00000fbc                     @ 08081838 bc0f0000
+dispatch_bst_summoned_skull_cid_1838:
+    .word  SUMMONED_SKULL_CID             @ 08081838 bc0f0000
 LAB_0808183c:
     movs r0,#0x7    @ 0808183c 0720
     bl get_game_text_ptr_by_lang_offset      @ 0808183e 6df033fa
@@ -16687,26 +16687,26 @@ LAB_08081858:
     movs r1,#0x98    @ 08081862 9821
     b LAB_08081896                           @ 08081864 17e0
 LAB_08081866:
-    ldr r0, DAT_08081874                     @ 08081866 0348
+    ldr r0, dispatch_bst_revival_jam_cid_1874 @ 08081866 0348
     bl card_name_lookup_by_internal_id       @ 08081868 6df0c8f9
     adds r2,r0,#0x0    @ 0808186c 021c
     .hword 0x4668    @ 0808186e 6846
     movs r1,#0x99    @ 08081870 9921
     b LAB_08081896                           @ 08081872 10e0
-DAT_08081874:
-    .word  0x000013c7                     @ 08081874 c7130000
+dispatch_bst_revival_jam_cid_1874:
+    .word  REVIVAL_JAM_CID                @ 08081874 c7130000
 LAB_08081878:
-    ldr r4, DAT_08081880                     @ 08081878 014c
-    ldr r0, DAT_08081884                     @ 0808187a 0248
+    ldr r4, dispatch_bst_cid_127_1880        @ 08081878 014c
+    ldr r0, dispatch_bst_gradius_cid_1884    @ 0808187a 0248
     b LAB_0808188c                           @ 0808187c 06e0
     .zero  0x2
-DAT_08081880:
-    .word  0x00000127                     @ 08081880 27010000
-DAT_08081884:
-    .word  0x00001414                     @ 08081884 14140000
+dispatch_bst_cid_127_1880:
+    .word  cid_127                        @ 08081880 27010000  equip BST unassigned slot
+dispatch_bst_gradius_cid_1884:
+    .word  GRADIUS_CID                    @ 08081884 14140000
 LAB_08081888:
-    ldr r4, DAT_080818a0                     @ 08081888 054c
-    ldr r0, DAT_080818a4                     @ 0808188a 0648
+    ldr r4, dispatch_bst_cid_127_18a0        @ 08081888 054c
+    ldr r0, dispatch_bst_red_eyes_b_dragon_cid_18a4 @ 0808188a 0648
 LAB_0808188c:
     bl card_name_lookup_by_internal_id       @ 0808188c 6df0b6f9
 LAB_08081890:
@@ -16718,10 +16718,10 @@ LAB_08081896:
     .hword 0x466a    @ 0808189a 6a46
     b LAB_080818e0                           @ 0808189c 20e0
     .zero  0x2
-DAT_080818a0:
-    .word  0x00000127                     @ 080818a0 27010000
-DAT_080818a4:
-    .word  0x00000ff8                     @ 080818a4 f80f0000
+dispatch_bst_cid_127_18a0:
+    .word  cid_127                        @ 080818a0 27010000  equip BST unassigned slot
+dispatch_bst_red_eyes_b_dragon_cid_18a4:
+    .word  RED_EYES_B_DRAGON_CID          @ 080818a4 f80f0000
 LAB_080818a8:
     movs r2,#0x9d    @ 080818a8 9d22
     b LAB_080818e0                           @ 080818aa 19e0
@@ -16741,29 +16741,29 @@ LAB_080818bc:
     movs r2,#0xa8    @ 080818bc a822
     b LAB_080818e0                           @ 080818be 0fe0
 
-@ card-display op dispatch stub: loads sub_id=0x119 from literal pool into r2, jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x119). Dispatched from card-display hub FUN_08080ea0 via b branch (not bl). sub_id=0x119 exceeds 8-bit immediate range hence loaded via literal pool.
+@ card-display op dispatch stub: loads sub_id=0x119 from literal pool into r2, jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x119). Dispatched from card-display hub dispatch_equip_card_display_op_by_card_id via b branch (not bl). sub_id=0x119 exceeds 8-bit immediate range hence loaded via literal pool.
 @ Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
 @ Constants: SUB_ID=0x119.
 trigger_card_display_op_0x119:
-    ldr r2, DAT_080818c4                     @ 080818c0 004a
+    ldr r2, trigger_op_0x119_pool_slot_18c4  @ 080818c0 004a
     b LAB_080818e0                           @ 080818c2 0de0
-DAT_080818c4:
-    .word  0x00000119                     @ 080818c4 19010000
+trigger_op_0x119_pool_slot_18c4:
+    .word  EQUIP_DISP_OP_ID_0x119         @ 080818c4 19010000
 LAB_080818c8:
     movs r2,#0x8d    @ 080818c8 8d22
     lsls r2,r2,#0x1    @ 080818ca 5200
     b LAB_080818e0                           @ 080818cc 08e0
 LAB_080818ce:
-    ldr r2, DAT_080818d4                     @ 080818ce 014a
+    ldr r2, dispatch_bst_cid_125_18d4        @ 080818ce 014a
     b LAB_080818e0                           @ 080818d0 06e0
     .zero  0x2
-DAT_080818d4:
-    .word  0x00000125                     @ 080818d4 25010000
+dispatch_bst_cid_125_18d4:
+    .word  cid_125                        @ 080818d4 25010000  equip BST unassigned slot
 LAB_080818d8:
     movs r2,#0x95    @ 080818d8 9522
     b LAB_080818e0                           @ 080818da 01e0
 
-@ card-display op default fallback stub: movs r2,#0x89; lsls r2,r2,#1 yields sub_id=0x112 (=0x89*2=274), then falls into shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5 byte[2]/[3], calls trigger_card_display_op31_if_not_active(player_flag, 0x112). In card-display hub FUN_08080ea0, serves as the final fallback for the vast majority of card_id branches: all paths that do not match a specific card_id jump here via b FUN_080818dc. Also entered from dispatch_card_display_op_by_id_match on the "no match" path.
+@ card-display op default fallback stub: movs r2,#0x89; lsls r2,r2,#1 yields sub_id=0x112 (=0x89*2=274), then falls into shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5 byte[2]/[3], calls trigger_card_display_op31_if_not_active(player_flag, 0x112). In card-display hub dispatch_equip_card_display_op_by_card_id, serves as the final fallback for the vast majority of card_id branches: all paths that do not match a specific card_id jump here via b FUN_080818dc. Also entered from dispatch_card_display_op_by_id_match on the "no match" path.
 @ Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
 @ Constants: SUB_ID=0x112 (=0x89<<1).
 trigger_card_display_op_0x112:

@@ -1549,3 +1549,52 @@
 @ =============================================================================
 .equ DRAGONS_MIRROR_CID,  0x00001921  @ Dragon's Mirror (pw=71490127; card-stats.s card_1918 slot=0x1921); build_equip_set_f_criteria_state cmp branch; conf: high
 .equ NON_FUSION_AREA_CID, 0x0000197a  @ Non-Fusion Area (pw=27581098; card-stats.s card_1991 slot=0x197A); dispatch_equip_criteria_display_by_type_code caseD + build_equip_criteria_for_target_slots; x2 slots; conf: high
+
+@ =============================================================================
+@ file 10 Seg-7a additions: equip BST dispatch CIDs + internal lookup ID
+@ Source: asm/10_equip_effect_dispatch.s, Seg-7a (0x08080ba0..0x08081900)
+@ dispatch_equip_card_display_op_by_card_id BST hub (0x08080ea0) -- 101 literal-pool slots.
+@ All NEW CID values verified 0-hit in constants/*.inc (by value grep);
+@ confirmed vs data/card-stats.s slot= field; passcodes from card-stats.s.
+@ 4 neutral names (cid_128a/cid_1326/cid_127/cid_125): NOT in card-stats.s -- unassigned equip BST slots.
+@ HANE_HANE_INTERNAL_ID_0x1f5: internal lookup key (icid) passed to card_name_lookup_by_internal_id,
+@   NOT a card CID; 0 hits in constants/*.inc by value and 0-hit in card-stats.s.
+@ =============================================================================
+.equ SPIRIT_REAPER_CID,                    0x00001596  @ Spirit Reaper (pw=23205979; card-stats.s slot=0x1596); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ RAIGEKI_BREAK_CID,                    0x000015a8  @ Raigeki Break (pw=04178474; card-stats.s slot=0x15a8); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ TRAP_MASTER_CID,                      0x00001086  @ Trap Master (pw=46461247; card-stats.s slot=0x1086); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ MAN_EATER_BUG_CID,                    0x0000119b  @ Man-Eater Bug (pw=54652250; card-stats.s slot=0x119b); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ THE_RELIABLE_GUARDIAN_CID,            0x0000132a  @ The Reliable Guardian (pw=16430187; card-stats.s card_0721 slot=0x132a); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ REINFORCEMENTS_CID,                   0x000012f1  @ Reinforcements (pw=17814387; card-stats.s slot=0x12f1); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ DUST_TORNADO_CID,                     0x0000137c  @ Dust Tornado (pw=60082869; card-stats.s slot=0x137c); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ KRYUEL_CID,                           0x0000139e  @ Kryuel (pw=82642348; card-stats.s slot=0x139e); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ MASK_OF_DISPEL_CID,                   0x000013f0  @ Mask of Dispel (pw=20765952; card-stats.s slot=0x13f0); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ THOUSAND_KNIVES_CID,                  0x0000142e  @ Thousand Knives (pw=63391643; card-stats.s slot=0x142e); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ COLLECTED_POWER_CID,                  0x0000148d  @ Collected Power (pw=07565547; card-stats.s slot=0x148d); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ VISER_DES_CID,                        0x000014ac  @ Viser Des (pw=56043446; card-stats.s slot=0x14ac); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ RYU_KISHIN_CLOWN_CID,                 0x000014bb  @ Ryu-Kishin Clown (pw=42647539; card-stats.s slot=0x14bb); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ DOUBLE_SNARE_CID,                     0x000014c3  @ Double Snare (pw=03682106; card-stats.s slot=0x14c3); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ COLLAPSE_CID,                         0x000014eb  @ Collapse (pw=55713623; card-stats.s slot=0x14eb); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ BOOK_OF_MOON_CID,                     0x00001538  @ Book of Moon (pw=14087893; card-stats.s slot=0x1538); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ MONSTER_RELIEF_CID,                   0x00001579  @ Monster Relief (pw=37507488; card-stats.s slot=0x1579); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ A_MAN_WITH_WDJAT_CID,                 0x0000158e  @ A Man with Wdjat (pw=51351302; card-stats.s slot=0x158e); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ SOUL_TAKER_CID,                       0x0000166f  @ Soul Taker (pw=81510157; card-stats.s slot=0x166f); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ GUARDIAN_CEAL_CID,                    0x0000164b  @ Guardian Ceal (pw=10755153; card-stats.s card_1316 slot=0x164b); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ GALE_LIZARD_CID,                      0x000016ba  @ Gale Lizard (pw=77491079; card-stats.s slot=0x16ba); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ COMPULSORY_EVACUATION_DEVICE_CID,     0x0000171a  @ Compulsory Evacuation Device (pw=94192409; card-stats.s slot=0x171a); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ SHIELD_CRASH_CID,                     0x00001773  @ Shield Crash (pw=30683373; card-stats.s slot=0x1773); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ GRANMARG_THE_ROCK_MONARCH_CID,        0x0000185f  @ Granmarg the Rock Monarch (pw=60229110; card-stats.s slot=0x185f); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ CATNIPPED_KITTY_CID,                  0x00001863  @ Catnipped Kitty (pw=96501677; card-stats.s slot=0x1863); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ ASSAULT_ON_GHQ_CID,                   0x0000188a  @ Assault on GHQ (pw=62633180; card-stats.s slot=0x188a); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ PATROID_CID,                          0x000018f0  @ Patroid (pw=71930383; card-stats.s slot=0x18f0); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ VW_TIGER_CATAPULT_CID,                0x00001953  @ VW-Tiger Catapult (pw=58859575; card-stats.s slot=0x1953); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ KARMA_CUT_CID,                        0x000019db  @ Karma Cut (pw=71587526; card-stats.s slot=0x19db); dispatch_equip_card_display_op_by_card_id BST; conf: high
+.equ GENERATION_SHIFT_CID,                 0x000019dd  @ Generation Shift (pw=34460239; card-stats.s slot=0x19dd); dispatch_equip_card_display_op_by_card_id BST; conf: high
+@ Neutral CID equates: values not found in card-stats.s -- unassigned equip BST slots
+.equ cid_128a,                             0x0000128a  @ equip BST unassigned slot (0x128a not in card-stats.s; Skull Stalker actual=0x1088)
+.equ cid_1326,                             0x00001326  @ equip BST unassigned slot (0x1326 not in card-stats.s; Call of the Haunted actual=0x137d)
+.equ cid_127,                              0x00000127  @ equip BST unassigned slot (0x0127 not in card-stats.s; Toon Summoned Skull actual=0x127f)
+.equ cid_125,                              0x00000125  @ equip BST unassigned slot (0x0125 not in card-stats.s; Garma Sword Oath actual=0x125f)
+@ HANE_HANE_INTERNAL_ID_0x1f5: internal lookup key passed to card_name_lookup_by_internal_id
+@   (icid=0x1f5 for Hane-Hane display, asm/10 L16523); NOT a CID; 0-hit in card-stats.s slot=
+.equ HANE_HANE_INTERNAL_ID_0x1f5,          0x000001f5  @ Hane-Hane internal name-lookup ID (icid=0x1f5); trigger_card_display_op_with_card_name_0x6c @ asm/10 L16523; NOT a card CID; conf: high
