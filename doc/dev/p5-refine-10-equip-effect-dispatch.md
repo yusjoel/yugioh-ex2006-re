@@ -57,7 +57,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 1  | 0x79e60..0x7ae84 | 19 | 61  | 8 inc (0x79fac/30, 0xa00c/e8, 0xa138/28, 0xa178/14c, 0xa3b8/38, 0xa464/11c, 0xa688/44, 0xa71c/f8) | ✅ | aa53bf0 |
 | 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ✅ | (see below) |
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ✅ | (see 4.03) |
-| 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ⬜ | |
+| 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ✅ | (see 4.04) |
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ⬜ | |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ⬜ | |
 | 7  | 0x80ba0..0x82290 | 19 | 152 | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
@@ -148,6 +148,30 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Ghidra scripts**: RefineF10Seg3Slots.py, DisassembleF10Seg3Blocks.py, RefineF10Seg3CleanLabel.py (label cleanup utility)
 - **commit**: 77736c0
 - **CSV**: +1 fn_eligible_des_frog row
+
+### 4.04 Seg-4 完成记录
+
+- **范围**: [0x0807cd68, 0x0807db20), 19 fn, 53 slots, 2 ROM_INCBIN + 1 inline .byte + switchD_0807d126
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 43 (42 REUSE + 1 NEW: TRIGGER_OP_PARAM_139=0x139 duel_field.inc after TRIGGER_OP_PARAM_107)
+- **RENAME_SLOTS**: 4 (gP1LifePoints already-symbolic x3 + BLK2 base sillva_dispatch_stubs@0x0807d830)
+- **REF_SLOTS**: 6 (check_equip_activation_at_slot11+1 x2 / switchD_0807d126__switchdataD_0807d130 raw-ptr / invoke_effect_node_with_active_flag_3arg+1 / check_equip_slot_eligible_by_card_id_bst+1 / check_card_id_is_normal_summon_type+1)
+- **FUNC_RENAME**: 0
+- **PLATE**: 5 (ASCII; build_equip_eligible_bitmap_for_slots / apply_equip_activation_with_neo_daedalus_lp_output / tick_equip_target_validity_prng_lp_display / tick_equip_activation_display_state_machine / tick_zone_pipeline_with_neo_daedalus_oam_setup)
+- **switchD**: switchD_0807d126 already decoded, no R4 action needed
+- **R4 disasm**:
+  - BLK1 0x7d7e8/0x2c: fn_eligible_sillva_warlord_of_dark_world@0x0807d7e8 (CID=SILLVA_WARLORD_OF_DARK_WORLD_CID=0x1968; 2 pool DWords at 0x7d80c+0x7d810; NOT createDWord at 0x7d808=0x4687 MOV PC,r0 code)
+  - BLK2 0x7d830/0xfc: 5 Sillva dispatch sub-stubs A..E (sillva_state_{80_activate/7f_trigger/7c_7e_hand_enqueue/7b_7d_lp_display/7a_counter}; 9 pool DWords)
+  - inline .byte 0x7db14/0xc: fn_eligible_dark_deal@0x0807db14 (CID=DARK_DEAL_CID=0x1975; no pool, bx lr leaf)
+- **createFunction**: fn_eligible_sillva_warlord_of_dark_world @ 0x0807d7e8, fn_eligible_dark_deal @ 0x0807db14
+- **NEW constants**: TRIGGER_OP_PARAM_139=0x00000139 (duel_field.inc)
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN / 0 .byte code in [0x7cd68, 0x7db20); 0 non-ASCII new writes
+- **ROM_INCBIN before/after**: 21 -> 19 (2 eliminated: BLK1+BLK2; inline .byte also eliminated)
+- **Ghidra scripts**: RefineF10Seg4Slots.py, DisassembleF10Seg4Blocks.py
+- **CSV**: +2 fn_eligible rows (fn_eligible_sillva_warlord_of_dark_world, fn_eligible_dark_deal)
 
 ---
 

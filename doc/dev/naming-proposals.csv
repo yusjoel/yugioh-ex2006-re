@@ -2407,6 +2407,8 @@ address,name,proposed_name,score,tags
 0x0807c750,dispatch_equip_oam_by_zone_type_and_eligibility,,,duel_field
 0x0807c7f0,dispatch_equip_slot_update_by_type_gate,,,
 0x0807c87c,fn_eligible_des_frog,,,card_effect;equip
+0x0807d7e8,fn_eligible_sillva_warlord_of_dark_world,,,card_effect;equip
+0x0807db14,fn_eligible_dark_deal,,,card_effect;equip
 0x0807ca84,tick_equip_spell_zone_placement_scan,,,
 0x0807cb80,tick_equip_activation_face_down_display_seq,,,
 0x0807cc2c,tick_equip_lp_type18_display_seq,,,
