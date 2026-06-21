@@ -1530,3 +1530,14 @@
 @ C5 grep 0x1818 in constants/: 0 hits (confirmed NEW)
 @ =============================================================================
 .equ MAGICIANS_CIRCLE_CID,        0x00001818  @ Magician's Circle (pw=74083143; card-stats.s L19836 card_1694 slot=0x1818); fn_eligible BLK7 FS dispatch gate; conf: high
+
+@ =============================================================================
+@ file 10 Seg-5b additions: equip display criteria CIDs + Flute of Summoning Kuriboh
+@ Source: asm/10_equip_effect_dispatch.s, Seg-5b (0x0807ec10..0x0807f730)
+@ BLK7: fn_eligible_flute_summoning_kuriboh (FS THUMB+1 @0x09e430d0; CID 0x19ec)
+@ FGD_CID 0x157e: F.G.D. (Five-God Dragon) used in check_card_equip_display_criteria_match
+@   and get_equip_display_type_code_by_card_id (slots 0x7f658/0x7f710)
+@ C5 grep 0x19ec in constants/: 0 hits; grep 0x157e in constants/: 0 hits
+@ =============================================================================
+.equ FGD_CID,                     0x0000157e  @ F.G.D. (Five-God Dragon, pw=99267150; card_1157 slot=0x157E); check_card_equip_display_criteria_match / get_equip_display_type_code special case; conf: high
+.equ FLUTE_SUMMONING_KURIBOH_CID, 0x000019ec  @ The Flute of Summoning Kuriboh (pw=20065322; card_2070 slot=0x19EC); BLK7 fn_eligible_flute_summoning_kuriboh FS dispatch gate; conf: high

@@ -500,3 +500,12 @@
 @ Source: asm/09_equip_lp_display.s, Seg-8 (0x0807629c..0x0807738c)
 @ =============================================================================
 .equ HAND_SPELL_SLOT_CC8_OFF, 0x00000cc8  @ [gGraveyardSlots+player*PLAYER_BLOCK_STRIDE+slot_idx*4+0xcc8] hand-spell slot set_code subfield; read as ldrh+lsls#19+lsrs#19 = bits[12:0]; 9 raw ROM refs; enqueue_hand_spell_sprite_with_slot_count; conf: med
+
+@ =============================================================================
+@ file 10 Seg-5b additions: equip display ROM table base + zone entry offset
+@ Source: asm/10_equip_effect_dispatch.s, Seg-5b (0x0807ec10..0x0807f730)
+@ find_equip_display_entry_by_card_id / dispatch_equip_zone_sprite_shape_b_by_state
+@ C5 grep 0x000005cc in constants/: 0 hits; grep 0x09e59e14 in constants/: 0 hits
+@ =============================================================================
+.equ ZONE_ENTRY_OFFSET_5CC,       0x000005cc  @ zone slot entry base offset in dispatch_equip_zone_sprite_shape_b_by_state; gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x5cc; 5 ROM refs; conf: med
+.equ EQUIP_DISPLAY_ROM_TABLE_BASE, 0x09e59e14 @ ROM read-only equip display entry table; 86 entries stride 8B [cid(u16), criteria0..2(u16 x3)]; 1 ROM ref (find_equip_display_entry_by_card_id); conf: high

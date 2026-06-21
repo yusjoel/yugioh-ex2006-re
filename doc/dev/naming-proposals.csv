@@ -2453,6 +2453,8 @@ address,name,proposed_name,score,tags
 0x0807f0a4,tick_prng_pair_zone_sprite_by_field_card,,,
 0x0807f158,enqueue_field_slot_sprite_for_zone11,,,
 0x0807f1ec,enqueue_field_slot_sprite_for_equip_head,,,
+0x0807f280,fn_eligible_flute_summoning_kuriboh,,,
+0x0807f330,dispatch_flute_summoning_kuriboh_by_state_code,,,
 0x0807f458,dispatch_equip_zone_sprite_shape_b_by_state,,,
 0x0807f53c,submit_equip_slot_lp_indicators_from_bitmap,,,
 0x0807f5d4,find_equip_display_entry_by_card_id,,,

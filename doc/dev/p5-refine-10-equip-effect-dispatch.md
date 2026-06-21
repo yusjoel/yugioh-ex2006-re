@@ -58,7 +58,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ✅ | (see below) |
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ✅ | (see 4.03) |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ✅ | (see 4.04) |
-| 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | 🟡 Seg-5a ✅ pending Seg-5b | |
+| 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ✅ Seg-5a+5b | 9404095 / (see 4.06) |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ⬜ | |
 | 7  | 0x80ba0..0x82290 | 19 | 152 | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
 | 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
@@ -207,6 +207,33 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Ghidra scripts**: RefineF10Seg5aSlots.py, DisassembleF10Seg5aBlocks.py, PoolFixF10Seg5a.py, PoolFixF10Seg5a2.py
 - **CSV**: +7 fn_eligible rows (fn_eligible_magical_mallet / fn_eligible_ancient_gear_drill / fn_eligible_bes_covered_core / fn_eligible_dd_guide / fn_eligible_disciple_forbidden_spell / fn_eligible_malice_ascendant / fn_eligible_divine_dragon_excelion)
 - **commit**: 9404095
+
+### 4.06 Seg-5b 完成记录
+
+- **范围**: [0x0807ec10, 0x0807f730), 14 fn + 2 disasm fns (BLK7/BLK8), 40 slots, 2 ROM_INCBIN + 2 switchD (already decoded)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 26 (22 REUSE + 4 NEW: FGD_CID=0x157e / FLUTE_SUMMONING_KURIBOH_CID=0x19ec / ZONE_ENTRY_OFFSET_5CC=0x5cc / EQUIP_DISPLAY_ROM_TABLE_BASE=0x09e59e14)
+- **REF_SLOTS**: 12 (gDuelPhaseFlags x7 / gDuelFieldSlots x4 / gP1HandSlotArray x1)
+- **RENAME_SLOTS**: 0
+- **FUNC_RENAME**: 0
+- **PLATE**: 9 (C8 stale FUN_ substitutions: 5 in-file + cross-file line-11578 /0807f8f0 raw-addr fix + 3 CJK->ASCII rewrites @ 0x0807ec10/0x0807ed04/0x0807f0a4)
+- **R4 disasm**: 2 blocks
+  - BLK7 0x7f280/0x3c: fn_eligible_flute_summoning_kuriboh@0x0807f280 (CID=0x19ec; push+MOV PC,r0 stub; pool at 0x7f2b4=gDuelPhaseFlags, 0x7f2b8=JT-base 0x7f2bc; 0x4687 NOT DWord'd)
+  - BLK8 0x7f330/0x128: dispatch_flute_summoning_kuriboh_by_state_code@0x0807f330 (7 case stubs per-stub DisassembleCommand; 4 pool DWords at 0x7f3c4/0x7f3c8/0x7f400/0x7f428; epilogue pop {r4,r5,r6}+pop{r1}+bx r1)
+- **createFunction**: 2 (fn_eligible_flute_summoning_kuriboh / dispatch_flute_summoning_kuriboh_by_state_code)
+- **switchD disposition**: switchD_0807ed22 + switchD_0807ee92 both already decoded in asm; no R4 action
+- **NEW constants**:
+  - card_info.inc +2: FGD_CID=0x0000157e / FLUTE_SUMMONING_KURIBOH_CID=0x000019ec
+  - ewram.inc +2: ZONE_ENTRY_OFFSET_5CC=0x000005cc / EQUIP_DISPLAY_ROM_TABLE_BASE=0x09e59e14
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN / 0 non-ASCII in [0x7ec10, 0x7f730) after 3 CJK plate rewrites
+- **ROM_INCBIN before/after asm/10**: 13 -> 11 (2 eliminated: BLK7+BLK8)
+- **Ghidra scripts**: RefineF10Seg5bSlots.py, RefineF10Seg5bPlateFix.py, RefineF10Seg5bCJKFix.py, DisassembleF10Seg5bBlocks.py
+- **Pipeline note**: BLK8 needed per-stub DisassembleCommand (7 case stubs) not single-range; initial single disasm stopped at first unconditional branch leaving residual ROM_INCBIN; corrected by re-running with 7 individual stubs after re-export
+- **CSV**: +2 new function rows (fn_eligible_flute_summoning_kuriboh / dispatch_flute_summoning_kuriboh_by_state_code)
+- **commit**: (see below)
 
 ---
 
