@@ -58,7 +58,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ✅ | (see below) |
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ✅ | (see 4.03) |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ✅ | (see 4.04) |
-| 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ⬜ | |
+| 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | 🟡 Seg-5a ✅ pending Seg-5b | |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ⬜ | |
 | 7  | 0x80ba0..0x82290 | 19 | 152 | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
 | 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
@@ -172,6 +172,41 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **ROM_INCBIN before/after**: 21 -> 19 (2 eliminated: BLK1+BLK2; inline .byte also eliminated)
 - **Ghidra scripts**: RefineF10Seg4Slots.py, DisassembleF10Seg4Blocks.py
 - **CSV**: +2 fn_eligible rows (fn_eligible_sillva_warlord_of_dark_world, fn_eligible_dark_deal)
+
+### 4.05 Seg-5a 完成记录
+
+- **范围**: [0x0807db20, 0x0807ec10), ~19 fn, 64 slots (Seg-5 前半), 6 ROM_INCBIN blocks (BLK1..6)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 8 (6 REUSE + 2 NEW)
+  - NEW: TRIGGER_OP_PARAM_10D3=0x10d3 (duel_field.inc after TRIGGER_OP_PARAM_139) + invoke_effect_node_active_fn_ptr=0x08090625 (duel_field.inc; THUMB+1 ptr to invoke_effect_node_with_active_flag_3arg)
+  - REUSE: ELIGIB_SPRITE_CTRL_OFF / FREED_THE_MATCHLESS_GENERAL_CID / LP_ACTIVATION_LINK_FLAG_OFF / EQUIP_PHASE_FRAME_OFF x2 / PLAYER_BLOCK_STRIDE
+- **REF_SLOTS**: 7 (gEquipZoneCountTable@0x7db58 / gDuelPhaseFlags@0x7db88+0x7dcd0+0x7e2ec / gDuelCardCtxBase@0x7dca0 / gEquipChainSlotRefs@0x7dd64 / gDuelFieldSlots@0x7e390)
+- **RENAME_SLOTS**: 1 (DWORD_0807dd5c -> PTR_gP1LifePoints_0807dd5c)
+- **FUNC_RENAME**: 0
+- **PLATE**: 0
+- **NEW constants**:
+  - duel_field.inc +2: TRIGGER_OP_PARAM_10D3=0x000010d3 / invoke_effect_node_active_fn_ptr=0x08090625
+  - card_info.inc +4: BES_COVERED_CORE_CID=0x000019bf / DD_GUIDE_CID=0x000019c0 / DISCIPLE_FORBIDDEN_SPELL_CID=0x000019c2 / DIVINE_DRAGON_EXCELION_CID=0x000019d3
+- **R4 disasm**: 6 blocks (BLK1..6), 31 sub-stubs + 7 createFunction
+  - BLK1 0x7dd68/0x30: fn_eligible_magical_mallet@0x0807dd68 (no pool; 0x4687 MOV PC,r0 code correctly NOT DWord'd)
+  - BLK2 0x7ddac/0x16c: 5 Magical Mallet dispatch sub-stubs + extra sub-stub@0x7dee0 (reached via bl from case4; PoolFixF10Seg5a2 Issue 1)
+  - BLK3 0x7df90/0x2bc: 12 equip_zone dispatch sub-stubs (equip_zone_stub0..11)
+  - BLK4 0x7e398/0x2c: fn_eligible_ancient_gear_drill@0x0807e398 (ag_drill_eligible; pool at 0x7e3bc/0x7e3c0; 0x4687 NOT DWord'd)
+  - BLK5 0x7e438/0x16c: 7 AG Drill dispatch sub-stubs; JT 24-entry DWords@0x7e3c4..0x7e420 (PoolFixF10Seg5a2 Issue 2)
+  - BLK6 0x7e5d4/0x63c: 5 fn_eligible stubs (fn_eligible_bes_covered_core@0x7e5d4 / fn_eligible_dd_guide@0x7e6e0 / fn_eligible_disciple_forbidden_spell@0x7e7e4 / fn_eligible_malice_ascendant@0x7e960 / fn_eligible_divine_dragon_excelion@0x7e9f8); 17 pool DWords
+- **Pool-fix passes**:
+  - DisassembleF10Seg5aBlocks.py: initial pool DWords (BLK1..6 inline pools)
+  - PoolFixF10Seg5a.py: 33 additional createDWord (BLK2/3/5/6 inline pools not caught in initial pass)
+  - PoolFixF10Seg5a2.py: Issue 1 = re-disasm 0x7dee0 + 3 pool DWords; Issue 2 = 24 AG Drill JT DWords@0x7e3c4..0x7e420
+- **createFunction**: 7 (fn_eligible_magical_mallet + fn_eligible_ancient_gear_drill + fn_eligible_bes_covered_core + fn_eligible_dd_guide + fn_eligible_disciple_forbidden_spell + fn_eligible_malice_ascendant + fn_eligible_divine_dragon_excelion)
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN / 0 DAT_ in [0x7db20, 0x7ec10); 0 non-ASCII new writes
+- **ROM_INCBIN before/after**: 19 -> 13 (6 eliminated: BLK1+BLK2+BLK3+BLK4+BLK5+BLK6)
+- **Ghidra scripts**: RefineF10Seg5aSlots.py, DisassembleF10Seg5aBlocks.py, PoolFixF10Seg5a.py, PoolFixF10Seg5a2.py
+- **CSV**: +7 fn_eligible rows (fn_eligible_magical_mallet / fn_eligible_ancient_gear_drill / fn_eligible_bes_covered_core / fn_eligible_dd_guide / fn_eligible_disciple_forbidden_spell / fn_eligible_malice_ascendant / fn_eligible_divine_dragon_excelion)
+- **commit**: pending
 
 ---
 

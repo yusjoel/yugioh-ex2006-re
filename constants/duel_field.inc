@@ -311,6 +311,8 @@
 .equ EQUIP_ACTIVATION_STEP_OFF, 0x000004ac  @ [gDuelPhaseFlags+0x4ac] equip activation state machine step counter; values 0/1/2 in tick_equip_activation_state_machine; 0xa/0xb in type8_entry wrapper; 4 Seg-4 slots; conf: high
 .equ TRIGGER_OP_PARAM_107,      0x00000107  @ trigger_card_display_op31_if_not_active second arg; asm/06 line 6925; 1 Seg-4 slot; conf: med
 .equ TRIGGER_OP_PARAM_139,      0x00000139  @ trigger_card_display_op31_if_not_active 2nd arg; file10 Seg-4 DAT_0807d1d8; state 0x7f of tick_equip_activation_display_state_machine; 28 ROM refs; conf: high
+.equ TRIGGER_OP_PARAM_10D3,     0x000010d3  @ trigger_card_display_op31_if_not_active 2nd arg; file10 Seg-5a DAT_0807dc04; tick_equip_oam_activation_text_display; C5 grep=0 (new); conf: high
+.equ invoke_effect_node_active_fn_ptr, 0x08090625  @ THUMB+1 ptr to invoke_effect_node_with_active_flag_3arg (fn at 0x08090624); ROM literal-pool immediate (not EWRAM slot); 3 cross-file occurrences asm/10; C5 grep=0 (new); conf: high
 .equ LP_COST_5000,              0x00001388  @ get_card_lp_cost_by_id return 5000 LP; asm/06 line 5697; distinct from EQUIP_SLOT_CARD_ID_RANGE_MAX=0x1388 (card_id domain) and gap CID 0x1388 (score BST node); conf: high
 .equ EQUIP_ZONE_SPRITE_ATTR,    0x00000fb6  @ enqueue_equip_zone_sprite_at_slot r2 arg to enqueue_sprite_attr_with_mode; 4022=0xfb6 sprite attr code; asm/06 line 6873; conf: high
 

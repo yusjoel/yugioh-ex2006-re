@@ -2409,6 +2409,13 @@ address,name,proposed_name,score,tags
 0x0807c87c,fn_eligible_des_frog,,,card_effect;equip
 0x0807d7e8,fn_eligible_sillva_warlord_of_dark_world,,,card_effect;equip
 0x0807db14,fn_eligible_dark_deal,,,card_effect;equip
+0x0807dd68,fn_eligible_magical_mallet,,,card_effect;equip
+0x0807e398,fn_eligible_ancient_gear_drill,,,card_effect;equip
+0x0807e5d4,fn_eligible_bes_covered_core,,,card_effect;equip
+0x0807e6e0,fn_eligible_dd_guide,,,card_effect;equip
+0x0807e7e4,fn_eligible_disciple_forbidden_spell,,,card_effect;equip
+0x0807e960,fn_eligible_malice_ascendant,,,card_effect;equip
+0x0807e9f8,fn_eligible_divine_dragon_excelion,,,card_effect;equip
 0x0807ca84,tick_equip_spell_zone_placement_scan,,,
 0x0807cb80,tick_equip_activation_face_down_display_seq,,,
 0x0807cc2c,tick_equip_lp_type18_display_seq,,,
