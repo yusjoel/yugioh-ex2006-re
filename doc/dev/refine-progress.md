@@ -160,7 +160,7 @@
 - 越界 RENAME 18槽: advance/retreat_banlist_password_cursor_slot_dir_field_off + load_banlist_char_by_cursor_slot_*/get_banlist_scroll_pixel_offset_*/get_banlist_password_entry_ptr_*/render_banlist_*/advance/retreat_banlist_pw_char_and_render_* 族
 - 越界 REF 10槽: 7x gBanlistPasswordBuffer (Seg-9 fn) + 3x carve (char_candidate_str/alt_char/ext_char_group)
 
-### file 09 段进度 (equip_lp_display, 进行中)
+### file 09 段进度 (equip_lp_display, 全 10 段完成 ✅)
 
 | Seg | 范围 | 状态 | commit |
 |-----|------|------|--------|
@@ -172,8 +172,8 @@
 | 6 | 0x74338..0x752cc (20 fn, 2 inc + 1 sw) | ✅ | (this session) |
 | 7 | 0x752cc..0x7629c (19 fn, 6 inc) | ✅ | (see p5-refine-09 §四) |
 | 8 | 0x7629c..0x7738c (19 fn, 4 inc + 2 sw) | ✅ | 1e38556 + F09Seg8R |
-| 9 | 0x7738c..0x7850c (19 fn, 9 inc) | ⬜ | |
-| 10 | 0x7850c..0x79e60 (19 fn, 10 inc) | ⬜ | |
+| 9 | 0x7738c..0x7850c (19 fn, 9 inc; split 9a+9b) | ✅ | 0e6580d + 5f27863 |
+| 10 | 0x7850c..0x79e60 (19 fn, 10 inc; split 10a+10b) | ✅ | be48d12 + d0fd739 |
 
 ---
 
