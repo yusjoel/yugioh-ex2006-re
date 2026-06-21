@@ -442,3 +442,12 @@
 .equ EFFECT_SLOT_TYPE_CLEAR_MASK, 0xffffc01f  @ AND mask clearing bits[13:5] of zone attr; assemble_effect_slot_attr_with_zone_lookup clears equip type field before ORing zone_type; x2 slots (c30/c94); conf: high
 .equ STACK_ALLOC_NEG_512,         0xfffffe00  @ -0x200 used with add sp,r4 to allocate 512B stack frame in dispatch_equip_card_display_op_by_card_id (0x08080ea0); SP_FRAME=0x200 comment; conf: high
 .equ EQUIP_DISP_OP_ID_0x119,      0x00000119  @ display op sub-id 0x119; trigger_card_display_op_0x119 asm/10 L16748; exceeds 8-bit immediate range; x2 slots (DAT_08081788/DAT_080818c4); conf: high
+
+@ =============================================================================
+@ file 10 Seg-8a additions: equip display fn-ptr constants + op param
+@ Source: asm/10_equip_effect_dispatch.s, Seg-8a (0x08082290..0x08082b18)
+@ C5 grep 0x080905e9/0x0805000d/0x000001a1 in constants/: 0 hits each
+@ =============================================================================
+.equ set_equip_activation_state_by_mode_alt_fn_ptr, 0x080905e9  @ THUMB+1 ptr to set_equip_activation_state_by_mode_alt (fn at 0x080905e8 PUSH b570 confirmed); 20 ROM refs; asm/10 Seg-8a x2 slots (DWORD_0808245c/080826cc); C5 grep=0 (new); conf: high
+.equ check_equip_slot_eligible_by_card_id_and_prereqs_fn_ptr, 0x0805000d  @ THUMB+1 ptr to check_equip_slot_eligible_by_card_id_and_prereqs (fn at 0x0805000c naming-proposals.csv:1115 PUSH b570 confirmed); 114 ROM refs; asm/10 Seg-8a x1 slot (DWORD_080825a8); C5 grep=0 (new); conf: high
+.equ EQUIP_DISPLAY_OP_PARAM_1A1,  0x000001a1  @ r2 arg to invoke_card_display_op_0x31_sub3_with_packed_params; sibling to EQUIP_ACT_SCORE_MODE_103(r0=0x103)+r1=0x1a0+r3=0x1a2 in tick_equip_activation_display_4state; 15 ROM refs; asm/10 L18252; C5 grep=0 (new); conf: med

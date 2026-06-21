@@ -62,7 +62,8 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ✅ | (see 4.06b) |
 | 7a | 0x80ba0..0x81900 | 9+24sub | 101 | 0 inc + 0 sw | ✅ | (see 4.07a) |
 | 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ✅ | (see 4.07b) |
-| 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
+| 8a | 0x82290..0x82b18 | 7+5fn | 49  | 2 inc (0x827d4/d8, 0x828c4/f8) | ✅ | (see 4.08a) |
+| 8b | 0x82b18..0x83450 | 12 | 67  | 0 inc | ⬜ | |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
 | 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
 
@@ -315,6 +316,34 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 
 ---
 
+### 4.08a Seg-8a 完成记录
+
+- **范围**: [0x08082290, 0x08082b18), 7 named fn + 4 disasm'd sub-stubs + 1 JT (已 decoded), 49 slots (EQ38 RENAME10 R4×1)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 38 (33 REUSE + 5 NEW across 8 slot occurrences)
+  - REUSE x33: gDuelPhaseFlags x9 / gEquipChainSlotRefs x1 / PLAYER_BLOCK_STRIDE x2 / gDuelFieldSlots x3 / gDuelCardCtxBase x2 / DUAL_LABEL_RENDER_STATE_CLEAR x1 / EQUIP_ACT_SCORE_MODE_103 x2 / ELIGIB_SPRITE_CTRL_OFF x2 / ELIGIB_ANIM_STATE_OFF x1 / TRIGGER_OP_PARAM_10D3 x1 / lookup_equip_score_mooyan_p1 x1 / DRAW_DECIMAL_WIN_LABEL_ARG x1 / EQUIP_ACTIVATION_AUX_OFF x1 / DARK_BLADE_THE_DRAGON_KNIGHT_CID x1 / WHITE_HORNS_DRAGON_CID x1
+  - NEW x5 (8 slot occurrences): EQUIP_DISPLAY_OP_PARAM_1A1=0x1a1 x1 / set_equip_activation_state_by_mode_alt_fn_ptr=0x080905e9 x2 / check_equip_slot_eligible_by_card_id_and_prereqs_fn_ptr=0x0805000d x1 / GRAVEDIGGER_GHOUL_CID=0x12ed x1 / DISAPPEAR_CID=0x1515 x1
+- **REF_SLOTS**: 0
+- **RENAME_SLOTS**: 10 (gP1LifePoints literal pool x10 -- 5 fn literal pools each have 2 DWORD_ slots)
+- **FUNC_RENAME**: 0
+- **PLATE**: 6 mojibake->ASCII rewrites (dispatch_equip_activation_display_if_slot_card_id_ok / tick_equip_display_4state_with_effect_slot_array / tick_equip_display_3state_with_effect_node_probe / enqueue_equip_slot_sprite_with_attr_strip / check_effect_slot_zone_field_by_type / tick_equip_display_by_card_id_group_a_4state with ARM-verified BST: 0x12ed->type2, 0x12f9->type5, 0x1480->type3 Kycoo, 0x1515->type1, 0x183c->type3, 0x1996->type5)
+- **R4 disasm**: 2 blocks (BLK1 + BLK2)
+  - BLK1 0x827d4/0xd8: fn_eligible_two_pronged_attack@0x080827d4 (THUMB fn, CID=0x12e7=TWO_PRONGED_ATTACK_CID, FS table THUMB+1 ref at 0x09e3fc60; 4 pool DWords at 0x08082880/84/a4/a8; 0x080828a0=0x4687=THUMB code NOT DWord'd)
+  - BLK2 0x828c4/0xf8: 4 sub-stubs (equip_sub_stub_a/b/c/shared_exit) via JT @0x828ac (already decoded as .word in asm; entries [0]=0x828c4,[1,3,5]=0x82954,[2]=0x828f4,[4]=0x82924); 11 pool DWords at 0x828ec/f0/91c/920/94c/950/988/98c/990/994/9ac
+- **createFunction**: 5 (fn_eligible_two_pronged_attack + equip_sub_stub_a/b/c/shared_exit)
+- **carve**: 0
+- **§5.1**: 0
+- **NEW constants**:
+  - card_info.inc +3: TWO_PRONGED_ATTACK_CID=0x000012e7 / GRAVEDIGGER_GHOUL_CID=0x000012ed / DISAPPEAR_CID=0x00001515
+  - duel_field.inc +3: set_equip_activation_state_by_mode_alt_fn_ptr=0x080905e9 / check_equip_slot_eligible_by_card_id_and_prereqs_fn_ptr=0x0805000d / EQUIP_DISPLAY_OP_PARAM_1A1=0x000001a1
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ / 0 non-ASCII in [0x82290, 0x82b18)
+- **ROM_INCBIN before/after asm/10**: 9 -> 7 (2 eliminated: BLK1+BLK2)
+- **Ghidra scripts**: RefineF10Seg8aSlots.py, DisassembleF10Seg8aBlocks.py
+- **CSV sync**: yes -- fn_eligible_two_pronged_attack + equip_sub_stub_a/b/c/shared_exit (5 new functions)
+
+---
+
 ## 五、段路线图 (Seg-1..10 细节)
 
 按照三条硬规则 (地址序 / 函数间必处理 / 0引用->§5.1) 逐段执行。
@@ -364,9 +393,11 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - 2 ROM_INCBIN + 1 switchD 全部消灭 (7b: ROM_INCBIN 0x82046/fa + 0x82158/138; switchD 已 decoded)
 - **7b highlights**: route_penguin_soldier_equip_display (FS table CID=0x1200) + 6 sub-stubs; 13 mojibake->ASCII; 42 EQ + 6 RENAME
 
-### Seg-8 [0x08082290, 0x08083450) -- 19 fn, ~113 slots
-- 2 ROM_INCBIN:
-  - 0x080827d4/0xd8 (216B), 0x080828c4/0xf8 (248B)
+### Seg-8a [0x08082290, 0x08082b18) -- ✅ 完成 (commit see 4.08a)
+- 2 ROM_INCBIN 全部消灭 (BLK1 fn_eligible_two_pronged_attack + BLK2 4 sub-stubs); 6 mojibake->ASCII; EQ38/RENAME10/PLATE6
+
+### Seg-8b [0x08082b18, 0x08083450) -- 12 fn, ~67 slots
+- 0 ROM_INCBIN
 - 旧覆盖: 无
 
 ### Seg-9 [0x08083450, 0x08084318) -- 18 fn, ~89 slots

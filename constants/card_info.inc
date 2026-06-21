@@ -1602,3 +1602,8 @@
 .equ LEVEL_UP_CID,                         0x000017f5  @ Level Up! (pw=25290459; card-stats.s slot=0x17f5); lookup_slot_display_value_by_card_id BST; conf: high
 .equ INFERNO_RECKLESS_SUMMON_CID,          0x0000198e  @ Inferno Reckless Summon (pw=12247206; card-stats.s slot=0x198e); lookup_slot_display_value_by_card_id BST; conf: high
 .equ GUARDIAN_ELMA_CID,                    0x0000164a  @ Guardian Elma (pw=74367458; card-stats.s slot=0x164a); lookup_slot_display_value_by_card_id BST; conf: high
+@ F10 Seg-8a additions: card IDs in tick_equip_display_by_card_id_group_a_4state BST
+.equ GRAVEDIGGER_GHOUL_CID,                0x000012ed  @ Gravedigger Ghoul (pw=82542267; card-stats.s card_0675); tick_equip_display_by_card_id_group_a_4state BST->type 2; C5 grep=0 (new); conf: high
+.equ DISAPPEAR_CID,                        0x00001515  @ Disappear (pw=24623598; card-stats.s card_1087); tick_equip_display_by_card_id_group_a_4state BST->type 1; C5 grep=0 (new); conf: high
+@ NOTE: CID 0x12e7 (Two-Pronged Attack, fn_eligible_two_pronged_attack BLK1) is TWO_PRONGED_ATTACK_CID
+.equ TWO_PRONGED_ATTACK_CID,              0x000012e7  @ Two-Pronged Attack (pw=83887306; card-stats.s card_0671); FS handler table fn_eligible_two_pronged_attack BLK1 THUMB+1 ref; C5 grep=0 (new); conf: high
