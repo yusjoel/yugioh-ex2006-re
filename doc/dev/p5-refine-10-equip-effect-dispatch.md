@@ -55,7 +55,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN / switchD | 状态 | commit |
 |-----|------|-----|--------|----------------------|------|--------|
 | 1  | 0x79e60..0x7ae84 | 19 | 61  | 8 inc (0x79fac/30, 0xa00c/e8, 0xa138/28, 0xa178/14c, 0xa3b8/38, 0xa464/11c, 0xa688/44, 0xa71c/f8) | ✅ | aa53bf0 |
-| 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ⬜ | |
+| 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ✅ | (see below) |
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ⬜ | |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ⬜ | |
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ⬜ | |
@@ -95,6 +95,36 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Ghidra scripts**: RefineF10Seg1Slots.py, DisassembleF10Seg1Blocks.py, RefineF10Seg1PoolFix.py
 - **commit**: aa53bf0
 - **follow-up (2026-06-21)**: 4 fn_eligible stubs (BLK1/3/5/7) named as Ghidra functions (NameF10Seg1FnEligible.py); CSV +4; byte-identical 9689337d confirmed
+
+### 4.02 Seg-2 完成记录
+
+- **范围**: [0x0807ae84, 0x0807be2c), 18 fn, 51 slots (47 DAT_/DWORD_ + 4 PTR_gP1LifePoints_), 8 ROM_INCBIN
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 31 (all REUSE; SERIAL_SPELL_CID/gEquipChainSlotRefs x3/PLAYER_BLOCK_STRIDE x9/gP1FieldArrayCBase/gDuelFieldSlots x2/gDuelPhaseFlags x5/FIELD_STATE_OFF/PROTECTOR_OF_THE_SANCTUARY_CID/gDuelCardCtxBase x3/EQUIP_ACT_SCORE_MODE_103/LP_CARD_TRACK_NEXT_OFF/gP1ChainZoneArray/gEquipZoneCountTable/LP_CARD_TRACK_BASE_OFF/EQUIP_PHASE_FRAME_OFF x2/LP_BANISHER_CTX_OFF)
+- **REF_SLOTS**: 6 (check_equip_slot_eligible_by_type_query+1 x2 / check_equip_slot_eligible_by_side_and_setcode+1 x2 / check_equip_activation_at_slot11+1 x2)
+- **RENAME_SLOTS**: 14 (gP1LifePoints dup x6 + ROM_INCBIN base labels x4 + PTR_gP1LifePoints_ x4)
+- **FUNC_RENAME**: 1 (tick_equip_zone_target_select_display_seq__0807bc48 -> tick_equip_zone_target_select_display_seq; drop auto-deconflict suffix)
+- **PLATE**: 1 (fn_eligible_hero_kid_hyena shared stub ASCII plate; CID=0x19a7+0x1867)
+- **R4 disasm**: 8 blocks
+  - BLK1 fn_eligible_lighten_the_load @ 0x0807af68 (CID=0x1847); 2B pad at 0x7af66
+  - BLK2 6 Lighten the Load dispatch sub-stubs @ 0x0807afb8..0x0807b0c7
+  - BLK3 fn_eligible_hero_kid_hyena @ 0x0807b4d4 (CID=0x19a7+0x1867 shared); 0x4687 MOV PC,r0 code at 0x7b4f4 correctly NOT createDWord'd
+  - BLK4 7 Hero Kid/Hyena dispatch sub-stubs @ 0x0807b574..0x0807b6b7 (29-entry table)
+  - BLK5 fn_eligible_rescue_cat @ 0x0807b7dc (CID=0x1876)
+  - BLK6 7 Rescue Cat dispatch sub-stubs @ 0x0807b878..0x0807b957 (29-entry table)
+  - BLK7 fn_eligible_gatling_dragon @ 0x0807b9f4 (CID=0x1878)
+  - BLK8 5 Gatling Dragon dispatch sub-stubs @ 0x0807ba30..0x0807bb2f (5-entry table)
+- **PoolFix**: 33 createDWord calls (inline pools in BLK2/4/6/8 + ROM_INCBIN residuals at 0x7ba70/0x14 + 0x7bb0c/0x18)
+- **createFunction**: 4 fn_eligible stubs named
+- **NEW constants**: none (all REUSE)
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN / 0 non-ASCII in [0x7ae84, 0x7be2c)
+- **ROM_INCBIN before/after**: 31 -> 23 (8 eliminated)
+- **Ghidra scripts**: RefineF10Seg2Slots.py, DisassembleF10Seg2Blocks.py, RefineF10Seg2PoolFix.py
+- **commit**: (see below)
+- **CSV**: +4 fn_eligible rows + 1 FUNC_RENAME update
 
 ---
 
