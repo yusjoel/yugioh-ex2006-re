@@ -7481,7 +7481,7 @@ DAT_0808e5bc:
 DAT_0808e5c0:
     .word  0x00001306                     @ 0808e5c0 06130000
 
-@ Counts copies of one card on field and renders the count as sprites. Fixed CARD_BASE=0x132c (DAT_0808e5fc) for query target. Step 1: count_field_copies_of_card(base) returns r4; if r4<=0 returns. Step 2: r0=-1, r1=base, calls enqueue_sprite_attr_by_sign to submit one active marker sprite (palette=0x30). Step 3: loops r4 times calling enqueue_sprite_attr_clamped (r0=card_ptr, r1=0x1f4=COUNT_SPRITE_Y), decrementing r4 to 0. r0=ptr card_ptr (saved to r6 then forwarded to enqueue_sprite_attr_clamped). Returns void (bx r0). 5 callers: FUN_0804a334, FUN_0807fde8, FUN_08095ca0, FUN_080abbd8, FUN_080abe54. Constants: CARD_BASE=0x132c, COUNT_SPRITE_Y=0x1f4 (0xfa<<1).
+@ Counts copies of one card on field and renders the count as sprites. Fixed CARD_BASE=0x132c (DAT_0808e5fc) for query target. Step 1: count_field_copies_of_card(base) returns r4; if r4<=0 returns. Step 2: r0=-1, r1=base, calls enqueue_sprite_attr_by_sign to submit one active marker sprite (palette=0x30). Step 3: loops r4 times calling enqueue_sprite_attr_clamped (r0=card_ptr, r1=0x1f4=COUNT_SPRITE_Y), decrementing r4 to 0. r0=ptr card_ptr (saved to r6 then forwarded to enqueue_sprite_attr_clamped). Returns void (bx r0). 5 callers: FUN_0804a334, dispatch_equip_criteria_display_by_type_code, FUN_08095ca0, FUN_080abbd8, FUN_080abe54. Constants: CARD_BASE=0x132c, COUNT_SPRITE_Y=0x1f4 (0xfa<<1).
 render_field_card_copy_count:
     push {r4,r5,r6,lr}                       @ 0808e5c4 70b5
     adds r6,r0,#0x0    @ 0808e5c6 061c

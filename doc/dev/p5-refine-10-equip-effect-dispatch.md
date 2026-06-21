@@ -59,7 +59,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ✅ | (see 4.03) |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ✅ | (see 4.04) |
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ✅ Seg-5a+5b | 9404095 / (see 4.06) |
-| 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ⬜ | |
+| 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ✅ | (see 4.06b) |
 | 7  | 0x80ba0..0x82290 | 19 | 152 | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
 | 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
@@ -234,6 +234,31 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Pipeline note**: BLK8 needed per-stub DisassembleCommand (7 case stubs) not single-range; initial single disasm stopped at first unconditional branch leaving residual ROM_INCBIN; corrected by re-running with 7 individual stubs after re-export
 - **CSV**: +2 new function rows (fn_eligible_flute_summoning_kuriboh / dispatch_flute_summoning_kuriboh_by_state_code)
 - **commit**: (see below)
+
+### 4.06b Seg-6 完成记录
+
+- **范围**: [0x0807f730, 0x08080ba0), 18 fn, 123 slots (110 DAT_ + 13 DWORD_), 0 ROM_INCBIN + 2 switchD (already decoded)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 66 (63 in EQ_SLOTS + 3 DWORD_EQ_EXTRA; 15 REUSE + 9 NEW)
+  - REUSE: EQUIP_ACTIVE_CTX_OFF x2 / PLAYER_BLOCK_STRIDE x13 / POLYMERIZATION_CID x2 / FUSION_GATE_CID x2 / FGD_CID x2 / EHERO_AVIAN/BURSTINATRIX/CLAYMAN/BUBBLEMAN_CID x1 each / UFOROID_FIGHTER_CID x3 / EHERO_ERIKSHIELER_CID x1 / ELIGIB_SPRITE_CTRL_OFF / ELIGIB_ANIM_STATE_OFF / LP_BANISHER_CTX_OFF / ACTIVATION_STATE_B_OFF x1 each
+  - NEW: EQUIP_ZONE_ATTR_COMPOSITE_OFF=0x59c x4 / EQUIP_CRITERIA_TARGETED_FLAG_OFF=0x5a4 x11 / EQUIP_CRITERIA_DISPLAY_ARR_OFF=0x5ac x9 / DRAGONS_MIRROR_CID=0x1921 x1 / NON_FUSION_AREA_CID=0x197a x2 / OAM_EQUIP_ZONE_SPRITE_P2_4A=0x804a x1 / OAM_EQUIP_ZONE_SPRITE_P2_4B=0x804b x3 / OAM_EQUIP_ZONE_SPRITE_P2_4C=0x804c x1 / EQUIP_CRITERIA_ARR_NEG_OFF=0xfffffa54 x1
+- **REF_SLOTS**: 57 (gDuelPhaseFlags x31 / gDuelPhaseFlags_criteria_count x2 / gDuelPhaseFlags_set_f_flag x3 / gDuelPhaseFlags_criteria_arr_base x1 / gP1LifePoints x1 / gP1HandCountBase x1 / gDuelFieldSlots x4 / gDuelFieldSlotState x1 / gP1FieldArrayCBase x3 / gP1ChainZoneArray x2 / gP1HandSlotArray x3 / gDuelCardCtxBase x2 / fn-ptr slot x1 EOL-only / switchD ptr x2)
+- **RENAME_SLOTS**: 13 (DWORD_ literal pools at 0x08080a78..0x08080a94 x8 + 0x08080b44..0x08080b54 x5)
+- **FUNC_RENAME**: 0
+- **PLATE**: 11 mojibake->ASCII rewrites (initially applied to 3 wrong addresses; RefineF10Seg6CJKFix.py corrected 0x0807f7bc/0x0807fb9c/0x0807fde8) + 7 FUN_ plate substring fixes (5 already clean = [FAIL] harmless)
+- **THUMB fn-ptr fix**: RefineF10Seg6ThumbFix.py removed bad label at mid-code 0x0807fad9; added EOL comment at 0x0807ff88 dispatch_criteria_caseD7d_fn_ptr slot
+- **R4 disasm**: 0 (both switchD already decoded)
+- **carve**: 0 (0 ROM_INCBIN in range)
+- **§5.1**: 0
+- **NEW constants** (12 total):
+  - card_info.inc +2: DRAGONS_MIRROR_CID=0x00001921 / NON_FUSION_AREA_CID=0x0000197a
+  - duel_field.inc +4: EQUIP_ZONE_ATTR_COMPOSITE_OFF=0x0000059c / EQUIP_CRITERIA_TARGETED_FLAG_OFF=0x000005a4 / EQUIP_CRITERIA_DISPLAY_ARR_OFF=0x000005ac / EQUIP_CRITERIA_ARR_NEG_OFF=0xfffffa54
+  - oam_attr.inc +3: OAM_EQUIP_ZONE_SPRITE_P2_4A=0x0000804a / OAM_EQUIP_ZONE_SPRITE_P2_4B=0x0000804b / OAM_EQUIP_ZONE_SPRITE_P2_4C=0x0000804c
+  - ewram.inc +3: gDuelPhaseFlags_criteria_count=0x0201b830 / gDuelPhaseFlags_set_f_flag=0x0201b838 / gDuelPhaseFlags_criteria_arr_base=0x0201b850
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ / 0 non-ASCII in [0x7f730, 0x80ba0); 1 stale FUN_08080c9c in push_to_effect_slot_array plate (Seg-7 caller, fixed when Seg-7 processed)
+- **Ghidra scripts**: RefineF10Seg6Slots.py, RefineF10Seg6CJKFix.py, RefineF10Seg6ThumbFix.py
+- **CSV sync**: no (FUNC_RENAME=0)
 
 ---
 

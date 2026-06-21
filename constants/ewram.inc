@@ -509,3 +509,12 @@
 @ =============================================================================
 .equ ZONE_ENTRY_OFFSET_5CC,       0x000005cc  @ zone slot entry base offset in dispatch_equip_zone_sprite_shape_b_by_state; gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x5cc; 5 ROM refs; conf: med
 .equ EQUIP_DISPLAY_ROM_TABLE_BASE, 0x09e59e14 @ ROM read-only equip display entry table; 86 entries stride 8B [cid(u16), criteria0..2(u16 x3)]; 1 ROM ref (find_equip_display_entry_by_card_id); conf: high
+
+@ =============================================================================
+@ file 10 Seg-6 additions: gDuelPhaseFlags sub-field absolute labels (equip criteria)
+@ Source: asm/10_equip_effect_dispatch.s, Seg-6 (0x0807f730..0x08080ba0)
+@ All are gDuelPhaseFlags(0x0201b290) + field offset; C5 grep 0x0201b830/38/50: 0 hits each
+@ =============================================================================
+gDuelPhaseFlags_criteria_count = 0x0201b830  @ gDuelPhaseFlags+0x5a0: equip criteria count for display loop; push_to_effect_slot_array + build_equip_criteria_for_target_slots; x2 slots; conf: high
+gDuelPhaseFlags_set_f_flag     = 0x0201b838  @ gDuelPhaseFlags+0x5a8: set-f category flag for equip criteria; build_equip_criteria_for_target_slots + push_to_effect_slot_array; x3 slots; conf: high
+gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base addr of equip criteria array block; build_equip_slot_criteria_from_card_range; x1 slot; conf: high

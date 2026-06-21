@@ -1541,3 +1541,11 @@
 @ =============================================================================
 .equ FGD_CID,                     0x0000157e  @ F.G.D. (Five-God Dragon, pw=99267150; card_1157 slot=0x157E); check_card_equip_display_criteria_match / get_equip_display_type_code special case; conf: high
 .equ FLUTE_SUMMONING_KURIBOH_CID, 0x000019ec  @ The Flute of Summoning Kuriboh (pw=20065322; card_2070 slot=0x19EC); BLK7 fn_eligible_flute_summoning_kuriboh FS dispatch gate; conf: high
+
+@ =============================================================================
+@ file 10 Seg-6 additions: equip criteria dispatch CIDs
+@ Source: asm/10_equip_effect_dispatch.s, Seg-6 (0x0807f730..0x08080ba0)
+@ C5 grep 0x1921 in constants/: 0 hits; grep 0x197a in constants/: 0 hits
+@ =============================================================================
+.equ DRAGONS_MIRROR_CID,  0x00001921  @ Dragon's Mirror (pw=71490127; card-stats.s card_1918 slot=0x1921); build_equip_set_f_criteria_state cmp branch; conf: high
+.equ NON_FUSION_AREA_CID, 0x0000197a  @ Non-Fusion Area (pw=27581098; card-stats.s card_1991 slot=0x197A); dispatch_equip_criteria_display_by_type_code caseD + build_equip_criteria_for_target_slots; x2 slots; conf: high

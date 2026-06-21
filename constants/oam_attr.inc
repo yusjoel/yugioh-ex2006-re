@@ -196,3 +196,12 @@
 @ Sibling: OAM_EQUIP_SLOT_TILE_P1=0x8055, OAM_SPRITE_TYPE_SEL_P1=0x8050
 @ =============================================================================
 .equ OAM_EQUIP_LP_SPRITE_P1_5E, 0x0000805e  @ OAM attr0 P1 LP sprite type 0x5e (bit15=1 OBJ_DIS|0x5e); passed as r0 to enqueue_sprite_attr_record (0x0803bd2c); 3 pool refs @0x6f934/0x6fb04/0x6fb48 in Cluster-2; conf: med
+
+@ =============================================================================
+@ file 10 Seg-6 additions: P2 equip zone sprite OAM attr0 variants
+@ Source: asm/10_equip_effect_dispatch.s, Seg-6 (0x0807f730..0x08080ba0)
+@ Sibling of OAM_EQUIP_ZONE_SPRITE_P1=0x8033; C5 grep 0x804a/0x804b/0x804c in constants/: 0 .equ hits
+@ =============================================================================
+.equ OAM_EQUIP_ZONE_SPRITE_P2_4A, 0x0000804a  @ P2 equip zone sprite OAM attr0 variant 0x4a (bit15+0x4a); build_equip_eligibility_state_for_category3_card; sibling of OAM_EQUIP_ZONE_SPRITE_P1=0x8033; 96 raw ROM refs; x1 slot; conf: high
+.equ OAM_EQUIP_ZONE_SPRITE_P2_4B, 0x0000804b  @ P2 equip zone sprite OAM attr0 variant 0x4b (bit15+0x4b); build_equip_eligibility_state_for_category3_card + check_equip_slot_eligible_with_criteria_and_prerequisites; 38 raw ROM refs; x3 slots; conf: high
+.equ OAM_EQUIP_ZONE_SPRITE_P2_4C, 0x0000804c  @ P2 equip zone sprite OAM attr0 variant 0x4c (bit15+0x4c); check_equip_slot_eligible_with_criteria_and_prerequisites; 7 raw ROM refs; x1 slot; conf: high

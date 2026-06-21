@@ -421,3 +421,13 @@
 .equ CARD_DISPLAY_OP_ID_137,   0x00000137  @ op-id argument to invoke_card_display_op_0x31_sub1; dispatch_equip_banisher_activation_by_state asm/10 L954-L955; Banisher activation display operation; conf: high
 .equ EQUIP_PAIRED_SLOT_PRED,   0x0000181e  @ predicate/slot-type filter for count_equipped_paired_slots_for_player; tick_paired_slot_counter_update asm/10 L1391-L1392; encodes paired-slot type attribute; conf: med
 .equ zone_query_hand_tag_12a1, 0x000012a1  @ zone query node-type tag for find_effect_node_in_zone (hand zone=0xb); tick_hand_effect_node_match_display_seq asm/10 L821; NOT PARASITE_PARACIDE_CID (semantic collision, different domain); conf: high
+
+@ =============================================================================
+@ file 10 Seg-6 additions: equip criteria field offsets (gDuelPhaseFlags domain)
+@ Source: asm/10_equip_effect_dispatch.s, Seg-6 (0x0807f730..0x08080ba0)
+@ C5 grep 0x59c/0x5a4/0x5ac/0xfffffa54 in constants/: 0 hits each
+@ =============================================================================
+.equ EQUIP_ZONE_ATTR_COMPOSITE_OFF,    0x0000059c  @ gDuelPhaseFlags+0x59c: composite zone+player attribute field; build_equip_criteria_for_target_slots loads before zone-attr check; x4 slots; conf: high
+.equ EQUIP_CRITERIA_TARGETED_FLAG_OFF, 0x000005a4  @ gDuelPhaseFlags+0x5a4: targeted-card criteria flag in equip eligibility logic; check_equip_slot_eligible_with_criteria_and_target; x11 slots; conf: high
+.equ EQUIP_CRITERIA_DISPLAY_ARR_OFF,   0x000005ac  @ gDuelPhaseFlags+0x5ac: criteria display code array base; fill_equip_criteria_display_code_array writes [base+i*4]; x9 slots; conf: high
+.equ EQUIP_CRITERIA_ARR_NEG_OFF,       0xfffffa54  @ negated EQUIP_CRITERIA_DISPLAY_ARR_OFF (-0x5ac mod 2^32 = 0xfffffa54); find_first_equip_slot_criteria_by_state_code recovers gDuelPhaseFlags base via adds r1,r4,r0; x1 slot; conf: high
