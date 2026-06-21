@@ -2525,6 +2525,13 @@ address,name,proposed_name,score,tags
 0x08081de4,check_effect_node_handler_for_slot,,,
 0x08081e10,tick_equip_activation_display_5state,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08081f28,tick_equip_activation_display_with_card_routing,game_str_08081f28,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
+0x08082048,route_penguin_soldier_equip_display,,,
+0x08082158,route_penguin_soldier_equip_sub0,,,
+0x08082190,route_penguin_soldier_equip_sub1,,,
+0x080821bc,route_penguin_soldier_equip_sub2,,,
+0x08082214,route_penguin_soldier_equip_sub3,,,
+0x08082218,route_penguin_soldier_equip_sub4,,,
+0x08082240,route_penguin_soldier_equip_sub5,,,
 0x08082290,tick_equip_activation_display_4state,,,
 0x080824a4,dispatch_equip_activation_display_if_slot_card_id_ok,game_str_080824a4,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08082510,tick_equip_display_4state_with_effect_slot_array,,,

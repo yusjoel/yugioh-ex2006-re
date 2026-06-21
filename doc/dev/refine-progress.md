@@ -9,9 +9,11 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `10_equip_effect_dispatch.s` (0x08079e60..0x080850d8)。
-> **下一任务**: file 10 Seg-7b [0x08081900..0x08082290) -- 10 fn, 51 slots, 2 ROM_INCBIN (0x82046/fa, 0x82158/138) + 1 switchD (0x81e2c)。Seg-7a 完成。
+> **下一任务**: file 10 Seg-8 [0x08082290..0x08083450) -- 19 fn, 113 slots, 2 ROM_INCBIN (0x827d4/d8 + 0x828c4/f8)。Seg-7 (7a+7b) 完成。
 
-上次更新: 2026-06-21 **file 10 Seg-7a 完成**. EQ=101(71R+30N-CID+4neutral+3N-nonCID+HANE_HANE_INTERNAL_ID: card_info.inc+35/duel_field.inc+3)/PLATE=30(C8 FUN_08080ea0->dispatch_equip_card_display_op_by_card_id x24 sub-stubs+FUN_08080c9c->enqueue_equip_slot_sprite_with_code_rotation x2 in-file+x1 cross-file asm/15+FUN_08080d28->pack_equip_slot_sprite_with_code_attr+FUN_080817c8->trigger_card_display_op_0x6f+FUN_080818dc->trigger_card_display_op_0x112 x2)/REF=0/RENAME=0/FUNC_RENAME=0/carve=0/disasm=0/§5.1=0; NEW constants: card_info.inc +35 (30 NEW CID incl GENERATION_SHIFT_CID pw=34460239; 4 neutral cid_NNN; HANE_HANE_INTERNAL_ID_0x1f5=icid); duel_field.inc +3 (EFFECT_SLOT_TYPE_CLEAR_MASK/STACK_ALLOC_NEG_512/EQUIP_DISP_OP_ID_0x119); Scripts: RefineF10Seg7aSlots.py; byte-identical SHA1 9689337d. 下一任务: Seg-7b [0x08081900..0x08082290).
+上次更新: 2026-06-21 **file 10 Seg-7b 完成 (Seg-7 COMPLETE)**. EQ=42(39R+3N: LEVEL_UP_CID/INFERNO_RECKLESS_SUMMON_CID/GUARDIAN_ELMA_CID card_info.inc)/RENAME=6(5 THUMB fn-ptr + tick_equip_5state_switch_table_ptr)/REF=0/FUNC_RENAME=0/PLATE=14(13 CJK mojibake->ASCII + 1 C8 FUN_08081900->tick_equip_activation_display_3state); disasm=2 blocks (BLK1 route_penguin_soldier_equip_display@0x08082048 fn_routing CID=0x1200 PENGUIN_SOLDIER FS THUMB+1 + BLK2 6 sub-stubs@0x08082158 raw-ptr JT); PoolFix PoolFixF10Seg7b.py 13 DWords; createFunction=7 (route_penguin_soldier_equip_display+sub0..sub5); NEW const: card_info.inc +3; ROM_INCBIN 11->9; CSV +7 rows; byte-identical SHA1 9689337d. 下一任务: Seg-8 [0x08082290..0x08083450).
+
+上次更新 (prev): 2026-06-21 **file 10 Seg-7a 完成**. EQ=101(71R+30N-CID+4neutral+3N-nonCID+HANE_HANE_INTERNAL_ID: card_info.inc+35/duel_field.inc+3)/PLATE=30(C8 FUN_08080ea0->dispatch_equip_card_display_op_by_card_id x24 sub-stubs+FUN_08080c9c->enqueue_equip_slot_sprite_with_code_rotation x2 in-file+x1 cross-file asm/15+FUN_08080d28->pack_equip_slot_sprite_with_code_attr+FUN_080817c8->trigger_card_display_op_0x6f+FUN_080818dc->trigger_card_display_op_0x112 x2)/REF=0/RENAME=0/FUNC_RENAME=0/carve=0/disasm=0/§5.1=0; NEW constants: card_info.inc +35 (30 NEW CID incl GENERATION_SHIFT_CID pw=34460239; 4 neutral cid_NNN; HANE_HANE_INTERNAL_ID_0x1f5=icid); duel_field.inc +3 (EFFECT_SLOT_TYPE_CLEAR_MASK/STACK_ALLOC_NEG_512/EQUIP_DISP_OP_ID_0x119); Scripts: RefineF10Seg7aSlots.py; byte-identical SHA1 9689337d. 下一任务: Seg-7b [0x08081900..0x08082290).
 
 上次更新 (prev): 2026-06-21 **file 10 Seg-6 完成**. EQ=66/REF=57/RENAME=13/FUNC_RENAME=0/PLATE=17(6 CJK-initial mojibake rewrite+3 CJK-residual-fix+7 stale-FUN_ sub+1 cross-file asm/11); carve=0; disasm=0(2 switchD 已预解); §5.1=0; NEW 12 const(card_info.inc +4/ewram.inc +5/duel_field.inc +1/oam_attr.inc +2); Scripts: RefineF10Seg6Slots.py+RefineF10Seg6CJKFix.py+RefineF10Seg6ThumbFix.py; 踩坑: REF 在 THUMB+1 addr 建 GAS label->undefined ref->ThumbFix 删 label+EOL; PLATE_REWRITES 7 项全[FAIL]无害(已 ASCII 或被 CJK_PLATE 覆盖); byte-identical SHA1 9689337d. 下一任务: Seg-7 [0x08080ba0..0x08082290).
 
@@ -69,7 +71,7 @@
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-07-equip-effect-chain.md` |
 | 08 | equip_oam_neodaed | 0x080643e0..0x0806e76c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-08-equip-oam-neodaed.md` |
 | 09 | equip_lp_display | 0x0806e76c..0x08079e60 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-09-equip-lp-display.md` |
-| 10 | equip_effect_dispatch | 0x08079e60..0x080850d8 | Seg-1..5 ✅ / Seg-6..10 待 | 🟡 进行中 (5/10) | `doc/dev/p5-refine-10-equip-effect-dispatch.md` |
+| 10 | equip_effect_dispatch | 0x08079e60..0x080850d8 | Seg-1..7 ✅ / Seg-8..10 待 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-10-equip-effect-dispatch.md` |
 | 11 | effect_slot_puzzletext | 0x080850d8..0x080941c4 | 未拆 | ⬜ | |
 | 12 | equip_activation_scan | 0x080941c4..0x0809d718 | 未拆 | ⬜ | |
 | 13 | equip_placement | 0x0809d718..0x080a78dc | 未拆 | ⬜ | |

@@ -85,6 +85,7 @@ All 55 slots are literal-pool words. Classified by value:
 | DAT_08082020 | 0x0201b290 | gDuelPhaseFlags | ewram.inc |
 | DAT_08082038 | 0x0201b290 | gDuelPhaseFlags | ewram.inc |
 | DAT_080819b8 | 0x0201e2a0 | gDuelCardCtxBase | ewram.inc |
+| DAT_08081ca8 | 0x0201b290 | gDuelPhaseFlags | ewram.inc |
 | DAT_08081c84 | 0x0201e2a0 | gDuelCardCtxBase | ewram.inc |
 | DWORD_08081d28 | 0x0201e2a0 | gDuelCardCtxBase | ewram.inc |
 | DAT_08081b70 | 0x00000868 | PLAYER_BLOCK_STRIDE | duel_field.inc |
@@ -147,7 +148,7 @@ Slots: PTR_gP1LifePoints_08081974, PTR_gP1LifePoints_08081ad0, PTR_gP1LifePoints
 
 | slot | value | action |
 |------|-------|--------|
-| DAT_08081e34 | 0x08081e38 | RENAME -> switchD_08081e2c_table_ptr; EOL: "ptr to switchdataD_08081e38 (5-entry jump table)" |
+| DAT_08081e34 | 0x08081e38 | RENAME -> tick_equip_5state_switch_table_ptr; EOL: "ptr to switchdataD_08081e38 (5-entry jump table)" |
 
 ### FUNC_RENAME (misname corrections)
 None detected. All 12 named functions have plate descriptions consistent with function bodies.
@@ -249,6 +250,7 @@ No 0-reference blocks in [0x08081900, 0x08082290).
 - DAT_08081a10 (0x0000164a): line 16945 `ldr r0, DAT_08081a10; b LAB_08081a20; cmp r1,r0; beq LAB_08081aa0` -> Guardian Elma CID 0x164a from card-stats.s L17110 [confidence: high]
 - DAT_08081a5c (0x0000198e): line 16988 BST node cmp for Inferno Reckless Summon (card-stats.s L26106) [confidence: high]
 - DAT_08081bf4 (0xfffc7fff): line 17187 `ldr r1, DAT_08081bf4; ands r0,r1` -> DISPLAY_CODE_CLEAR_MASK, clear bits[17:15] from effect_node [+4] display_code rotation field [confidence: high; same semantic as 7a DAT_08080d14/d68]
+- DAT_08081ca8 (0x0201b290): line 17302 `ldr r0, DAT_08081ca8` -> gDuelPhaseFlags base; used in dispatch_equip_display_by_type_flag_and_node_activity to read state offset [confidence: high; same value 0x0201b290 = gDuelPhaseFlags, ewram.inc line 317+]
 - DAT_08081c84 (0x0201e2a0): line 17268 `ldr r0, DAT_08081c84; lsls r1,r1,#2; adds r0,#8; adds r1,r1,r0; ldr r0,[r1]` -> gDuelCardCtxBase + player_id*4+8 confirm_flag read [confidence: high]
 - DAT_08081c88 (0x000010d3): line 17278 `ldr r2, DAT_08081c88; bl select_equip_target_slot_by_effect_strategy` -> strategy param 0x10d3 = TRIGGER_OP_PARAM_10D3 (duel_field.inc line 314) [confidence: high]
 - DWORD_08081d54 (0x00000197): line 17377 `ldr r2, DWORD_08081d54` -> r2=0x197 = 2nd param to `invoke_card_display_op_0x31_sub3_with_packed_params`. Context: plate says "r1=0xcb*2=0x196, r2=0x197"; 0x197 is pre-existing lookup_equip_score_mooyan_p0 equate (duel_field.inc line 321). REUSE -- same value, distinct semantic but same constant [confidence: high; C5 grep confirmed 0x00000197 = 1 hit]
@@ -263,7 +265,7 @@ No 0-reference blocks in [0x08081900, 0x08082290).
 Python count of unique auto-name slots with addresses in [0x8081900, 0x8082290): **55 slots**
 
 Breakdown (python-verified):
-- EQ_SLOTS (pure equate, excludes PTR_/gP1LifePoints DWORD + THUMB fn-ptr + switchD table ptr): 42
+- EQ_SLOTS (pure equate, excludes PTR_/gP1LifePoints DWORD + THUMB fn-ptr + switchD table ptr): 42  (41 previously listed + DAT_08081ca8 added per review #2)
 - RENAME_SLOTS: 6
   - THUMB fn-ptr renames: 5 (DAT_08081948, DAT_08081cd4, DAT_08081e90, DAT_08081ec0, DAT_08081fd8)
   - switchD table ptr: 1 (DAT_08081e34)

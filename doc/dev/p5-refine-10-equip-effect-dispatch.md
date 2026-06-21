@@ -61,7 +61,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ✅ Seg-5a+5b | 9404095 / (see 4.06) |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ✅ | (see 4.06b) |
 | 7a | 0x80ba0..0x81900 | 9+24sub | 101 | 0 inc + 0 sw | ✅ | (see 4.07a) |
-| 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ⬜ | |
+| 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ✅ | (see 4.07b) |
 | 8  | 0x82290..0x83450 | 19 | 113 | 2 inc (0x827d4/d8, 0x828c4/f8) | ⬜ | |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
 | 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
@@ -287,6 +287,32 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Ghidra scripts**: RefineF10Seg7aSlots.py
 - **CSV sync**: no (FUNC_RENAME=0, disasm=0)
 
+### 4.07b Seg-7b 完成记录
+
+- **范围**: [0x08081900, 0x08082290), 12 named fn, 55 slots (EQ42 RENAME6 PTR_skip7), 2 ROM_INCBIN + 1 switchD (already decoded)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 42 (39 REUSE + 3 NEW CID)
+  - REUSE x39: gDuelPhaseFlags x15 / gDuelCardCtxBase x3 / PLAYER_BLOCK_STRIDE x1 / gDuelFieldSlots x1 / DUAL_LABEL_RENDER_STATE_CLEAR x1 / ELIGIB_SPRITE_CTRL_OFF x3 / ELIGIB_ANIM_STATE_OFF x1 / TRIGGER_OP_PARAM_10D3 x2 / lookup_equip_score_mooyan_p0 x1 / gEquipChainSlotRefs x1 / PANDEMONIUM_CID / INSECT_IMITATION_CID / THE_KICK_MAN_CID / NINJITSU_ART_OF_TRANSFORMATION_CID / SPIRITUAL_EARTH_ART_CID / TRIAL_OF_THE_PRINCESSES_CID / GENERATION_SHIFT_CID / NOBLEMAN_EATER_BUG_CID / GREENKAPPA_CID / XING_ZHEN_HU_CID
+  - NEW x3 (card_info.inc): LEVEL_UP_CID=0x17f5 / INFERNO_RECKLESS_SUMMON_CID=0x198e / GUARDIAN_ELMA_CID=0x164a
+- **RENAME_SLOTS**: 6 (5 THUMB fn-ptr + 1 switchD table ptr tick_equip_5state_switch_table_ptr)
+- **REF_SLOTS**: 0
+- **FUNC_RENAME**: 0
+- **PLATE**: 13 mojibake->ASCII (dispatch_equip_activation_display_by_confirm_state / tick_equip_slot_display_by_card_id_3state / dispatch_equip_display_by_type_flag_and_node_activity / enqueue_equip_slot_sprite_from_base_offset / check_effect_node_handler_for_slot / tick_equip_activation_display_5state / tick_equip_activation_display_with_card_routing) + 1 C8 FUN_08081900->tick_equip_activation_display_3state
+- **R4 disasm**: 2 blocks (BLK1 + BLK2)
+  - BLK1 0x82046/0xfa: route_penguin_soldier_equip_display@0x08082048 (THUMB fn, CID=0x1200=PENGUIN_SOLDIER_CID, FS table THUMB+1 ref at 0x09e43428; 2B pad at 0x82046; 6 pool DWords at 0x8210c/0x82110/0x82114/0x82118/0x82138/0x8213c; 0x82134=0x4687=THUMB code NOT DWord'd)
+  - BLK2 0x82158/0x138: 6 sub-stubs (route_penguin_soldier_equip_sub0..sub5) via raw-ptr JT at 0x82140; JT already decoded as .word in asm; pool words: 0x82188/0x8218c/0x821a4/0x821f4..0x82200/0x82210/0x82238..0x8223c/0x82268..0x82270/0x8228c (pool fix pass)
+- **Pool-fix pass**: PoolFixF10Seg7b.py -- 13 createDWord for BLK2 sub-stub inline literal pools
+- **createFunction**: 7 (route_penguin_soldier_equip_display + sub0..sub5)
+- **switchD**: switchD_08081e2c already decoded (all 5 case labels present); no R4 action
+- **NEW constants**: card_info.inc +3 (LEVEL_UP_CID/INFERNO_RECKLESS_SUMMON_CID/GUARDIAN_ELMA_CID)
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ (excl. PTR_skip) / 0 non-ASCII in [0x81900, 0x82290)
+- **ROM_INCBIN before/after asm/10**: 11 -> 9 (2 eliminated: BLK1+BLK2)
+- **Ghidra scripts**: RefineF10Seg7bSlots.py, DisassembleF10Seg7bBlocks.py, PoolFixF10Seg7b.py
+- **CSV sync**: yes -- route_penguin_soldier_equip_display + sub0..sub5 (7 new functions); ExportFunctionInventory + sync needed
+
 ---
 
 ## 五、段路线图 (Seg-1..10 细节)
@@ -334,12 +360,9 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **注意**: 123 DAT_/DWORD_ 槽密集; switchD 目标块须 ref-scan 确认是否在本段内
 - 旧覆盖: 无
 
-### Seg-7 [0x08080ba0, 0x08082290) -- 19 fn, ~152 slots
-- 2 ROM_INCBIN + 1 switchD:
-  - 0x08082046/0xfa (250B), 0x08082158/0x138 (312B)
-  - switchD_08081e2c
-- **注意**: 152 槽是全文件最重; 0x82158/0x138 较大; switchD_08081e2c 目标可能含 fn_eligible stubs
-- 旧覆盖: 无
+### Seg-7 [0x08080ba0, 0x08082290) -- ✅ 完成 (7a commit see 4.07a; 7b commit see 4.07b)
+- 2 ROM_INCBIN + 1 switchD 全部消灭 (7b: ROM_INCBIN 0x82046/fa + 0x82158/138; switchD 已 decoded)
+- **7b highlights**: route_penguin_soldier_equip_display (FS table CID=0x1200) + 6 sub-stubs; 13 mojibake->ASCII; 42 EQ + 6 RENAME
 
 ### Seg-8 [0x08082290, 0x08083450) -- 19 fn, ~113 slots
 - 2 ROM_INCBIN:

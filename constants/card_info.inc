@@ -1598,3 +1598,7 @@
 @ HANE_HANE_INTERNAL_ID_0x1f5: internal lookup key passed to card_name_lookup_by_internal_id
 @   (icid=0x1f5 for Hane-Hane display, asm/10 L16523); NOT a CID; 0-hit in card-stats.s slot=
 .equ HANE_HANE_INTERNAL_ID_0x1f5,          0x000001f5  @ Hane-Hane internal name-lookup ID (icid=0x1f5); trigger_card_display_op_with_card_name_0x6c @ asm/10 L16523; NOT a card CID; conf: high
+@ F10 Seg-7b additions: card IDs appearing in lookup_slot_display_value_by_card_id BST
+.equ LEVEL_UP_CID,                         0x000017f5  @ Level Up! (pw=25290459; card-stats.s slot=0x17f5); lookup_slot_display_value_by_card_id BST; conf: high
+.equ INFERNO_RECKLESS_SUMMON_CID,          0x0000198e  @ Inferno Reckless Summon (pw=12247206; card-stats.s slot=0x198e); lookup_slot_display_value_by_card_id BST; conf: high
+.equ GUARDIAN_ELMA_CID,                    0x0000164a  @ Guardian Elma (pw=74367458; card-stats.s slot=0x164a); lookup_slot_display_value_by_card_id BST; conf: high
