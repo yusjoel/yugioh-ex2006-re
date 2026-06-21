@@ -451,3 +451,10 @@
 .equ set_equip_activation_state_by_mode_alt_fn_ptr, 0x080905e9  @ THUMB+1 ptr to set_equip_activation_state_by_mode_alt (fn at 0x080905e8 PUSH b570 confirmed); 20 ROM refs; asm/10 Seg-8a x2 slots (DWORD_0808245c/080826cc); C5 grep=0 (new); conf: high
 .equ check_equip_slot_eligible_by_card_id_and_prereqs_fn_ptr, 0x0805000d  @ THUMB+1 ptr to check_equip_slot_eligible_by_card_id_and_prereqs (fn at 0x0805000c naming-proposals.csv:1115 PUSH b570 confirmed); 114 ROM refs; asm/10 Seg-8a x1 slot (DWORD_080825a8); C5 grep=0 (new); conf: high
 .equ EQUIP_DISPLAY_OP_PARAM_1A1,  0x000001a1  @ r2 arg to invoke_card_display_op_0x31_sub3_with_packed_params; sibling to EQUIP_ACT_SCORE_MODE_103(r0=0x103)+r1=0x1a0+r3=0x1a2 in tick_equip_activation_display_4state; 15 ROM refs; asm/10 L18252; C5 grep=0 (new); conf: med
+
+@ =============================================================================
+@ file 10 Seg-8b additions: ROM equip pair entry table base
+@ Source: asm/10_equip_effect_dispatch.s, Seg-8b (0x08082b18..0x08083450)
+@ C5 grep 0x09e3f140 in constants/: 0 hits
+@ =============================================================================
+.equ EQUIP_PAIR_ENTRY_TABLE_BASE, 0x09e3f140  @ ROM equip pair entry table base; enqueue_equip_slot_sprites_for_pair_loop loads r2=base, loop r6=0..2 reads [r2+r6*4]; 1 ROM ref (DAT_080833f8); C5 grep=0 (new); conf: high

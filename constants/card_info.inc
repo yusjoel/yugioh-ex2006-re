@@ -1607,3 +1607,17 @@
 .equ DISAPPEAR_CID,                        0x00001515  @ Disappear (pw=24623598; card-stats.s card_1087); tick_equip_display_by_card_id_group_a_4state BST->type 1; C5 grep=0 (new); conf: high
 @ NOTE: CID 0x12e7 (Two-Pronged Attack, fn_eligible_two_pronged_attack BLK1) is TWO_PRONGED_ATTACK_CID
 .equ TWO_PRONGED_ATTACK_CID,              0x000012e7  @ Two-Pronged Attack (pw=83887306; card-stats.s card_0671); FS handler table fn_eligible_two_pronged_attack BLK1 THUMB+1 ref; C5 grep=0 (new); conf: high
+@ F10 Seg-8b additions: card IDs in tick_equip_display_with_fn_ptr_routing_3state and tick_equip_display_by_card_id_group_b_3state BST
+.equ SHIFT_CID,                           0x0000140a  @ Shift (pw=59560625; card-stats.s card_0885 slot=0x140A); tick_equip_display_with_fn_ptr_routing_3state BST; C5 grep=0 (new); conf: high
+.equ FIENDS_HAND_MIRROR_CID,              0x00001719  @ Fiend's Hand Mirror (pw=58607704; card-stats.s card_1489 slot=0x1719); tick_equip_display_with_fn_ptr_routing_3state BST; C5 grep=0 (new); conf: high
+.equ BACKUP_SOLDIER_CID,                  0x00001359  @ Backup Soldier (pw=36280194; card-stats.s card_0762 slot=0x1359); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ MIRACLE_DIG_CID,                     0x0000149e  @ Miracle Dig (pw=06343408; card-stats.s card_0988 slot=0x149E); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ KELDO_CID,                           0x000014e7  @ Keldo (pw=80441106; card-stats.s card_1047 slot=0x14E7); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ HIDDEN_BOOK_OF_SPELL_CID,            0x00001630  @ Hidden Book of Spell (pw=21840375; card-stats.s card_1297 slot=0x1630); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ PRIMAL_SEED_CID,                     0x000016d6  @ Primal Seed (pw=23701465; card-stats.s card_1431 slot=0x16D6); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ GRAVEYARD_IN_FOURTH_DIMENSION_CID,   0x000017f7  @ The Graveyard in the Fourth Dimension (pw=88089103; card-stats.s card_1668 slot=0x17F7); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+.equ FORCES_OF_DARKNESS_CID,              0x00001974  @ The Forces of Darkness (pw=29826127; card-stats.s card_1985 slot=0x1974); tick_equip_display_by_card_id_group_b_3state BST; C5 grep=0 (new); conf: high
+@ Neutral CID equates (Seg-8b): values not in card-stats.s -- unassigned equip BST slots
+.equ cid_1568,                             0x00001568  @ unassigned CID 0x1568; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)
+.equ cid_16d3,                             0x000016d3  @ unassigned CID 0x16d3; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)
+.equ cid_1803,                             0x00001803  @ unassigned CID 0x1803; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)

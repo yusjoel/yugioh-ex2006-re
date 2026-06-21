@@ -63,7 +63,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 7a | 0x80ba0..0x81900 | 9+24sub | 101 | 0 inc + 0 sw | ✅ | (see 4.07a) |
 | 7b | 0x81900..0x82290 | 10 | 51  | 2 inc (0x82046/fa, 0x82158/138) + 1 sw (0x81e2c) | ✅ | (see 4.07b) |
 | 8a | 0x82290..0x82b18 | 7+5fn | 49  | 2 inc (0x827d4/d8, 0x828c4/f8) | ✅ | (see 4.08a) |
-| 8b | 0x82b18..0x83450 | 12 | 67  | 0 inc | ⬜ | |
+| 8b | 0x82b18..0x83450 | 12 | 67  | 0 inc | ✅ | (see 4.08b) |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ⬜ | |
 | 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
 
@@ -344,6 +344,36 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 
 ---
 
+### 4.08b Seg-8b 完成记录
+
+- **范围**: [0x08082b18, 0x08083450), 12 named fn, 0 ROM_INCBIN, 0 disasm, 67 slots (EQ56 RENAME8 PTR_skip3)
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 56 (33 REUSE + 23 via 13 NEW constants)
+  - REUSE x33: gDuelPhaseFlags x9 / gDuelCardCtxBase x1 / gDuelFieldSlots x1 / gP1HandSlotArray x1 / PLAYER_BLOCK_STRIDE x3 / ELIGIB_SPRITE_CTRL_OFF x2 / ELIGIB_ANIM_STATE_OFF x1 / LP_CARD_TRACK_BASE_OFF x3 / P1LP_BLOCK2_OFF_1CE8 x1 / DUAL_LABEL_RENDER_STATE_CLEAR x5 / EQUIP_ACTIVE_CTX_OFF x2 / LP_ROW_TYPE8_ALL_SLOTS_MASK x1 / EQUIP_ACTIVATION_AUX_OFF x3 / set_equip_activation_state_by_mode_alt_fn_ptr x1 / DNA_SURGERY_CID x1 / RAY_OF_HOPE_CID x1 / DARK_FACTORY_MASS_PROD_CID x1 / BEHEMOTH_KING_CID x1 / POT_OF_AVARICE_CID x1 / equip_cid_15de_08048a68 x1 / SPELL_ZONE_TARGET_CARD_ID x1 / CARD_DISPLAY_OP31_LP_BAR_SUB x2
+  - NEW x13 (23 slot occurrences): SHIFT_CID=0x140a / FIENDS_HAND_MIRROR_CID=0x1719 / BACKUP_SOLDIER_CID=0x1359 / MIRACLE_DIG_CID=0x149e / KELDO_CID=0x14e7 / HIDDEN_BOOK_OF_SPELL_CID=0x1630 / PRIMAL_SEED_CID=0x16d6 / GRAVEYARD_IN_FOURTH_DIMENSION_CID=0x17f7 / FORCES_OF_DARKNESS_CID=0x1974 / cid_1568=0x1568 / cid_16d3=0x16d3 / cid_1803=0x1803 / EQUIP_PAIR_ENTRY_TABLE_BASE=0x09e3f140
+- **REF_SLOTS**: 0
+- **RENAME_SLOTS**: 8 (4 gP1LifePoints literal pool already-symbolic + 4 fn-ptr DWORD_ with THUMB+1 EOL)
+- **FUNC_RENAME**: 0
+- **PLATE**: 6 mojibake->ASCII rewrites with ARM-verified content:
+  - tick_equip_display_with_fn_ptr_routing_3state (0x08082b88): STATE_OFFSET=0x4b0 / EQUIP_ACTIVE_CTX_OFF=0x484 / BST 3 CIDs
+  - build_equip_chain_pair_slot_entry (0x08082c8c): pair slot entry builder
+  - tick_equip_display_by_card_id_group_b_3state (0x08082f44): STATE_OFFSET=0x4b0 (ARM-corrected from 0x4b4) / SLOT_PALETTE_OFFSET=0x4b4 / 11 BST CIDs
+  - tick_equip_lp_display_by_node_state_4state (0x08083170): STATE_OFFSET=0x4b0 / XOR_OPERAND_OFF=0x4b4 (ARM-corrected)
+  - dispatch_equip_display_if_confirm_state_one (0x080833a8): confirm_state=1 conditional
+  - enqueue_equip_slot_sprites_for_pair_loop (0x080833bc): PAIR_TABLE_BASE=0x09e3f140 / r2 not r7 (B3 note)
+- **carve**: 0
+- **§5.1**: 0
+- **NEW constants**:
+  - card_info.inc +12: SHIFT_CID / FIENDS_HAND_MIRROR_CID / BACKUP_SOLDIER_CID / MIRACLE_DIG_CID / KELDO_CID / HIDDEN_BOOK_OF_SPELL_CID / PRIMAL_SEED_CID / GRAVEYARD_IN_FOURTH_DIMENSION_CID / FORCES_OF_DARKNESS_CID / cid_1568 / cid_16d3 / cid_1803
+  - duel_field.inc +1: EQUIP_PAIR_ENTRY_TABLE_BASE=0x09e3f140
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ (code) / 0 non-ASCII in [0x82b18, 0x83450)
+- **ROM_INCBIN before/after asm/10**: 7 (unchanged, 0 ROM_INCBIN in this seg)
+- **Ghidra scripts**: RefineF10Seg8bSlots.py
+- **CSV sync**: no (FUNC_RENAME=0, no new functions)
+
+---
+
 ## 五、段路线图 (Seg-1..10 细节)
 
 按照三条硬规则 (地址序 / 函数间必处理 / 0引用->§5.1) 逐段执行。
@@ -396,9 +426,9 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 ### Seg-8a [0x08082290, 0x08082b18) -- ✅ 完成 (commit see 4.08a)
 - 2 ROM_INCBIN 全部消灭 (BLK1 fn_eligible_two_pronged_attack + BLK2 4 sub-stubs); 6 mojibake->ASCII; EQ38/RENAME10/PLATE6
 
-### Seg-8b [0x08082b18, 0x08083450) -- 12 fn, ~67 slots
-- 0 ROM_INCBIN
-- 旧覆盖: 无
+### Seg-8b [0x08082b18, 0x08083450) -- ✅ 完成 (commit see 4.08b)
+- 0 ROM_INCBIN (全段无 incbin)
+- EQ56/RENAME8/PLATE6 (6 mojibake->ASCII incl. 2 ARM-corrected STATE_OFFSET=0x4b0 plates)
 
 ### Seg-9 [0x08083450, 0x08084318) -- 18 fn, ~89 slots
 - 2 ROM_INCBIN:
