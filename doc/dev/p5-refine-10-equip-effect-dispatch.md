@@ -206,7 +206,7 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **ROM_INCBIN before/after**: 19 -> 13 (6 eliminated: BLK1+BLK2+BLK3+BLK4+BLK5+BLK6)
 - **Ghidra scripts**: RefineF10Seg5aSlots.py, DisassembleF10Seg5aBlocks.py, PoolFixF10Seg5a.py, PoolFixF10Seg5a2.py
 - **CSV**: +7 fn_eligible rows (fn_eligible_magical_mallet / fn_eligible_ancient_gear_drill / fn_eligible_bes_covered_core / fn_eligible_dd_guide / fn_eligible_disciple_forbidden_spell / fn_eligible_malice_ascendant / fn_eligible_divine_dragon_excelion)
-- **commit**: pending
+- **commit**: 9404095
 
 ---
 
