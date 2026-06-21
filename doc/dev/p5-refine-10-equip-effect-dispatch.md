@@ -146,7 +146,7 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **残留**: 0 ROM_INCBIN in [0x7be2c, 0x7cd68); 0 non-ASCII new writes
 - **ROM_INCBIN before/after**: 23 -> 21 (2 eliminated: BLK1+BLK2)
 - **Ghidra scripts**: RefineF10Seg3Slots.py, DisassembleF10Seg3Blocks.py, RefineF10Seg3CleanLabel.py (label cleanup utility)
-- **commit**: (pending)
+- **commit**: 77736c0
 - **CSV**: +1 fn_eligible_des_frog row
 
 ---
