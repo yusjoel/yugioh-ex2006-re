@@ -2351,12 +2351,16 @@ address,name,proposed_name,score,tags
 0x08079ec4,apply_partner_flags_on_equip_pair_slot_count_hit,,,
 0x08079f5c,dispatch_equip_sprite_by_zone_type_or_draw_counter,,,
 0x08079f80,dispatch_equip_sprite_by_zone_or_chain_bitmap,,,
+0x08079fac,fn_eligible_abyssal_designator,,,card_effect;equip
 0x0807a0f4,enqueue_equip_sprite_and_red_eyes_lp_indicator,,,
+0x0807a138,fn_eligible_big_wave_small_wave,,,card_effect;equip
 0x0807a2c4,enqueue_sprite_attr_for_effect_zone_hit,,,
 0x0807a308,dispatch_face_down_and_lp_counter_sprite_by_state,,,
+0x0807a3b8,fn_eligible_cid_15de,,,card_effect;equip
 0x0807a580,submit_equip_lp_bar_with_slot_sprite,,,
 0x0807a5a4,dispatch_neo_daedalus_equip_sprite_by_monster_count,,,
 0x0807a65c,dispatch_equip_sprite_by_zone_or_capacity_guard,,,
+0x0807a688,fn_eligible_magicians_circle,,,card_effect;equip
 0x0807a814,enqueue_slot_sprite_on_zone_count_and_state_code,,,
 0x0807a8f0,tick_hand_effect_node_match_display_seq,,,
 0x0807a9c8,dispatch_equip_banisher_activation_by_state,,,

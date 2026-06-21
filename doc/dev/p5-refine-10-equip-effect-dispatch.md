@@ -94,6 +94,7 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ in [0x79e60, 0x7ae84)
 - **Ghidra scripts**: RefineF10Seg1Slots.py, DisassembleF10Seg1Blocks.py, RefineF10Seg1PoolFix.py
 - **commit**: aa53bf0
+- **follow-up (2026-06-21)**: 4 fn_eligible stubs (BLK1/3/5/7) named as Ghidra functions (NameF10Seg1FnEligible.py); CSV +4; byte-identical 9689337d confirmed
 
 ---
 

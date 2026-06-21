@@ -196,6 +196,7 @@ LAB_08079fa0:
 LAB_08079fa8:
     pop {r1}                                 @ 08079fa8 02bc
     bx r1                                    @ 08079faa 0847
+fn_eligible_abyssal_designator:
     push {r4,r5,r6,r7,lr}                    @ 08079fac f0b5  -- fn_eligible Abyssal Designator CID=ABYSSAL_DESIGNATOR_CID (0x17f4)
     adds r4,r0,#0x0    @ 08079fae 041c
     ldrb r0,[r4,#0xa]                        @ 08079fb0 a07a
@@ -391,6 +392,7 @@ LAB_0807a12c:
     bx r1                                    @ 0807a132 0847
 enqueue_red_eyes_lp_indicator_cid:
     .word  RED_EYES_B_DRAGON_CID          @ 0807a134 f80f0000  RED_EYES_B_DRAGON_CID=0xff8: Red-Eyes B. Dragon CID guard
+fn_eligible_big_wave_small_wave:
     push {r4,r5,lr}                          @ 0807a138 30b5  -- fn_eligible Big Wave Small Wave CID=BIG_WAVE_SMALL_WAVE_CID (0x17f9)
     adds r5,r0,#0x0    @ 0807a13a 051c
     ldr r0, DWORD_0807a158                   @ 0807a13c 0648
@@ -736,6 +738,7 @@ LAB_0807a3b2:
     pop {r4,r5,r6}                           @ 0807a3b2 70bc
     pop {r1}                                 @ 0807a3b4 02bc
     bx r1                                    @ 0807a3b6 0847
+fn_eligible_cid_15de:
     push {r4,r5,r6,r7,lr}                    @ 0807a3b8 f0b5  -- fn_eligible shared stub: CID 0x1803 (unassigned) + equip_cid_15de_08048a68 (0x15de)
     .hword 0x4657    @ 0807a3ba 5746
     .hword 0x464e    @ 0807a3bc 4e46
@@ -1100,6 +1103,7 @@ LAB_0807a67c:
 LAB_0807a684:
     pop {r1}                                 @ 0807a684 02bc
     bx r1                                    @ 0807a686 0847
+fn_eligible_magicians_circle:
     push {r4,r5,lr}                          @ 0807a688 30b5  -- fn_eligible Magicians Circle CID=MAGICIANS_CIRCLE_CID (0x1818); dispatch table at 0x0807a6d0
     sub sp,#0x4                              @ 0807a68a 81b0
     adds r5,r0,#0x0    @ 0807a68c 051c

@@ -613,3 +613,27 @@ gDuelPhaseFlags, etc.) and only 4 NEW constants. This is manageable as a single 
 without an a/b split.
 
 Recommendation: proceed as F10-Seg-1 without split.
+
+---
+
+## Seg-1 follow-up (2026-06-21): fn_eligible naming consistency fix
+
+The 4 fn_eligible THUMB stubs (BLK1/3/5/7) were disassembled in the original Seg-1 landing but
+left without Ghidra function objects (bare push-prologue code). This follow-up names them to match
+the file-09 fn_eligible convention: fn_eligible_<card_name_snake_case>.
+
+### Chosen names + evidence
+
+| addr | name | CID | evidence |
+|------|------|-----|----------|
+| 0x08079fac | fn_eligible_abyssal_designator | 0x17f4 | card-stats.s card_1665 slot=0x17F4 Abyssal Designator pw=48094997 |
+| 0x0807a138 | fn_eligible_big_wave_small_wave | 0x17f9 | card-stats.s card_1670 slot=0x17F9 Big Wave Small Wave pw=05765811 |
+| 0x0807a3b8 | fn_eligible_cid_15de | 0x1803+0x15de | Both CIDs unassigned: 0x15DD=Dimension Jar, 0x15DF=Roulette Barrel, 0x15DE is a gap; card_info.inc equip_cid_15de_08048a68 confirms "no match in card-stats.s"; neutral cid_15de form used |
+| 0x0807a688 | fn_eligible_magicians_circle | 0x1818 | card-stats.s card_1694 slot=0x1818 Magician's Circle pw=00050755 |
+
+### Pipeline result
+
+- Ghidra script: tools/ghidra-labeling/NameF10Seg1FnEligible.py (createFunction x4)
+- Export + inject_modes + split_all_s + build: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- CSV +4: naming-proposals.csv rows added in address order
+- Backup: ghidra/Yu-Gi-Oh WCT 2006.rep.bak-20260621_131103-pre-F10Seg1FnEligible
