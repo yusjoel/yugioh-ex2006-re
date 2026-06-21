@@ -65,7 +65,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 | 8a | 0x82290..0x82b18 | 7+5fn | 49  | 2 inc (0x827d4/d8, 0x828c4/f8) | ✅ | (see 4.08a) |
 | 8b | 0x82b18..0x83450 | 12 | 67  | 0 inc | ✅ | (see 4.08b) |
 | 9  | 0x83450..0x84318 | 18 | 89  | 2 inc (0x8420e/26, 0x8424c/cc) | ✅ | (see 4.09) |
-| 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ⬜ | |
+| 10 | 0x84318..0x850d8 | 19 | 55  | 5 inc (0x8474e/2a, 0x84790/164, 0x84918/180, 0x84af2/2a, 0x84b34/10c) | ✅ | (see 4.10) |
 
 **总计**: 187 fn (全部已命名) / 825 DWORD_/DAT_ 槽 / 39 ROM_INCBIN + 6 switchD。
 **重段提示**: Seg-7 (152 槽) 和 Seg-6 (123 槽) 最重, 含大型 switchD 派发族; Seg-8 (113 槽) 次重。
@@ -401,7 +401,53 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **ROM_INCBIN before/after asm/10**: 7 -> 5 (2 eliminated: BLK1+BLK2)
 - **Ghidra scripts**: RefineF10Seg9Slots.py, DisassembleF10Seg9Blocks.py, PoolFixF10Seg9.py
 - **CSV sync**: yes -- fn_eligible_book_of_life + book_of_life_eligible_state0/1/3/4/2_5 (6 new functions)
-- **commit**: (pending)
+- **commit**: (pending -- Seg-9 commit pending Seg-10 batch)
+
+---
+
+### 4.10 Seg-10 完成记录
+
+- **范围**: [0x08084318, 0x080850d8), 19 named fn, 56 auto-name slots (EQ52 + RENAME4)
+- **落地日期**: 2026-06-22
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 52 (49 REUSE + 3 NEW fn-ptr in duel_field.inc + 2 NEW CID in card_info.inc)
+  - REUSE x49: gDuelPhaseFlags x12 / gDuelCardCtxBase x2 / gEquipChainSlotRefs x1 / gP1LifePoints x8 / PLAYER_BLOCK_STRIDE x4 / gDuelFieldSlots x2 / lookup_equip_score_mooyan_p1 x1 / set_equip_activation_state_by_mode_alt_fn_ptr x1 / ELIGIB_SPRITE_CTRL_OFF x3 / ELIGIB_ANIM_STATE_OFF x2 / DUAL_LABEL_RENDER_STATE_CLEAR x2 / LP_CARD_TRACK_NEXT_OFF x2 / DNA_TRANSPLANT_CID x2 / LP_CARD_TRACK_BASE_OFF x1 / DNA_SURGERY_CID x1 / SERIAL_SPELL_CID x1 / POLYMERIZATION_CID x1 / gP1HandSlotArray x1 / HYDROGEDDON_CID x1 / OXYGEDDON_CID x1 / OJAMA_KING_CARD_ID (REUSE) x1
+  - NEW fn-ptr x3 (duel_field.inc): check_equip_slot_eligible_by_card_id_bst_special_cases_fn_ptr=0x080557e1 / check_equip_slot_eligible_by_cross_player_and_field6_zero_fn_ptr=0x080554c5 / check_equip_slot_eligible_by_same_side_and_prereqs_fn_ptr=0x08054899
+  - NEW fn-ptr x1 (duel_field.inc -- BLK5 pool, raw in code area): check_equip_slot_target_not_blocked_fn_ptr=0x08084a99
+  - NEW CID x2 (card_info.inc): MOBIUS_THE_FROST_MONARCH_CID=0x17e2 / HADE_HANE_CID=0x17ec
+- **RENAME_SLOTS**: 4 (PTR_gP1LifePoints_08084568 -> gp1_lp_ptr_08084568; DAT_08084790 -> mobius_dispatch_state_stubs; DAT_08084918 -> hade_hane_dispatch_state_stubs; DAT_08084b34 -> ojama_king_dispatch_state_stubs)
+- **REF_SLOTS**: 0
+- **FUNC_RENAME**: 0
+- **PLATE**: 7 mojibake->ASCII rewrites (dispatch_equip_display_by_activity_if_slot_group_le4 / tick_equip_display_with_target_selection / dispatch_equip_display_if_confirm_state_nonzero / scan_equip_target_slots_for_sprites / dispatch_equip_display_if_monster_slot_and_activation / dispatch_equip_display_unless_type_code_80 / dispatch_equip_display_by_ext_field6_type)
+- **R4 disasm**: 5 blocks
+  - BLK1 0x8474e/0x2a: fn_eligible_mobius_the_frost_monarch@0x08084750 (CID=0x17e2; 2B zero-pad; 2 pool DWords 0x08084770/74)
+  - BLK2 0x84790/0x164: 4 Mobius dispatch sub-stubs (0x08084790/e4/0c/70) + fn_eligible_hade_hane@0x080848cc (CID=0x17ec); 13 pool DWords
+  - BLK3 0x84918/0x180: 4 Hade-Hane dispatch sub-stubs (0x08084918/8c/f0/a38); 13 pool DWords; NOTE: cleared range included check_equip_slot_target_not_blocked@0x08084a98 which required DisassembleF10Seg10BlocksFix.py
+  - BLK4 0x84af2/0x2a: fn_eligible_ojama_king@0x08084af4 (CID=0x17ee REUSE; 2B zero-pad; 2 pool DWords 0x08084b14/18; push 0xb570 no r7)
+  - BLK5 0x84b34/0x10c: 3 Ojama King dispatch sub-stubs (0x08084b34/90/b4); 10 pool DWords (3x check_equip_slot_target_not_blocked_fn_ptr=0x08084a99)
+- **createFunction**: 3 (fn_eligible_mobius_the_frost_monarch, fn_eligible_hade_hane, fn_eligible_ojama_king)
+- **Fix script**: DisassembleF10Seg10BlocksFix.py -- disasm check_equip_slot_target_not_blocked@0x08084a98 (cleared by BLK3 range)
+- **carve**: 0
+- **§5.1**: 0
+- **NEW constants**:
+  - card_info.inc +2: MOBIUS_THE_FROST_MONARCH_CID=0x000017e2 / HADE_HANE_CID=0x000017ec
+  - duel_field.inc +4: check_equip_slot_eligible_by_card_id_bst_special_cases_fn_ptr=0x080557e1 / check_equip_slot_eligible_by_cross_player_and_field6_zero_fn_ptr=0x080554c5 / check_equip_slot_eligible_by_same_side_and_prereqs_fn_ptr=0x08054899 / check_equip_slot_target_not_blocked_fn_ptr=0x08084a99
+- **残留**: 0 ROM_INCBIN / 0 DAT_/DWORD_ in [0x84318, 0x850d8) / 0 non-ASCII new writes
+- **ROM_INCBIN before/after asm/10**: 5 -> 0 (5 eliminated; file 10 ZERO ROM_INCBIN)
+- **Ghidra scripts**: RefineF10Seg10Slots.py, DisassembleF10Seg10Blocks.py, DisassembleF10Seg10BlocksFix.py
+- **CSV sync**: yes -- fn_eligible_mobius_the_frost_monarch / fn_eligible_hade_hane / fn_eligible_ojama_king (3 new functions)
+- **commit**: (see refine-progress.md for hash)
+
+---
+
+## *** FILE 10 COMPLETE: 全 10 段完成 (2026-06-22) ***
+
+全 10 段 (Seg-1..Seg-10) byte-identical SHA1=9689337d 落地完成。
+- ROM_INCBIN: 初始 39 -> 最终 0 (全部消灭)
+- switchD: 6 (均已 decoded)
+- 新增函数 (R4 disasm createFunction): fn_eligible x25+ dispatch_stubs 众多
+- 所有 EOL/plate 纯 ASCII; 无 mojibake 残留
+- 下一文件: 11_effect_slot_puzzletext.s (0x080850d8..0x080941c4)
 
 ---
 
@@ -466,12 +512,11 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - EQ81/REF7/RENAME4/PLATE8 (8 mojibake->ASCII); NEW: ANCIENT_LAMP_CID/DREAMSPRITE_CID/BOOK_OF_LIFE_CID/GEARFRIED_IRON_KNIGHT_CID_SHIFTED/INVOKE_OP31_SUB1_PARAM_109/LP_ACTIVATION_PENDING_OFF
 - Pool fix: DAT_0808430c=gDuelPhaseFlags + LAB_08084310 code label (PoolFixF10Seg9.py)
 
-### Seg-10 [0x08084318, 0x080850d8) -- 19 fn, ~55 slots
-- 5 ROM_INCBIN (fn-eligible 特征):
-  - 0x0808474e/0x2a (42B), 0x08084790/0x164 (356B), 0x08084918/0x180 (384B)
-  - 0x08084af2/0x2a (42B), 0x08084b34/0x10c (268B)
-- **注意**: 5 块集中在末尾 [0x8474e..0x84c40); 模式类似 file 09 Seg-10 fn_eligible stubs; THUMB+1 ref-scan 判定
-- 旧覆盖: 无
+### Seg-10 [0x08084318, 0x080850d8) -- ✅ 完成 (commit see 4.10)
+- 5 ROM_INCBIN 全部消灭 (BLK1 fn_eligible_mobius + BLK2 4stubs+fn_eligible_hade_hane + BLK3 4stubs + BLK4 fn_eligible_ojama_king + BLK5 3stubs)
+- EQ52/RENAME4/PLATE7; NEW: MOBIUS_THE_FROST_MONARCH_CID/HADE_HANE_CID + 4 fn-ptr equates
+- Fix: DisassembleF10Seg10BlocksFix.py (check_equip_slot_target_not_blocked clearListing collateral)
+- FILE 10 ROM_INCBIN: 5 -> 0 (全清零)
 
 ---
 

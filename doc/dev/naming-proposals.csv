@@ -2589,6 +2589,9 @@ address,name,proposed_name,score,tags
 0x080845e0,advance_equip_lp_bar_display_seq,,,
 0x08084674,scan_equip_target_slots_for_sprites,,,
 0x08084738,enqueue_equip_zone_sprite_from_slot,,,
+0x08084750,fn_eligible_mobius_the_frost_monarch,,,card_effect;equip
+0x080848cc,fn_eligible_hade_hane,,,card_effect;equip
+0x08084af4,fn_eligible_ojama_king,,,card_effect;equip
 0x08084a98,check_equip_slot_target_not_blocked,,,
 0x08084c40,advance_equip_lp_value_display_seq,,,
 0x08084cec,invoke_effect_action_with_temp_card_id,,,

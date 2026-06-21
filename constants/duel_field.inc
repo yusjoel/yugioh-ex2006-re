@@ -465,3 +465,13 @@
 @ C5 grep verified: 0x00000109 / 0x00001d40 -> 0 hits each in constants/ before adding
 @ =============================================================================
 .equ INVOKE_OP31_SUB1_PARAM_109,  0x00000109  @ r0 arg to invoke_card_display_op_0x31_sub1; tick_equip_lamp_dream_zone_activation_3state state==10 non-confirm branch at 0x080837ca; distinct from TRIGGER_OP_PARAM_107(0x107); C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 10 Seg-10 additions: fn-ptr equates (THUMB+1)
+@ Source: asm/10_equip_effect_dispatch.s, Seg-10 (0x08084318..0x080850d8)
+@ C5 grep verified: 0x080557e1 / 0x080554c5 / 0x08054899 / 0x08084a99 -> 0 hits each in constants/ before adding
+@ =============================================================================
+.equ check_equip_slot_eligible_by_card_id_bst_special_cases_fn_ptr, 0x080557e1  @ THUMB+1 ptr to check_equip_slot_eligible_by_card_id_bst_special_cases (fn@0x080557e0 push f0b5 confirmed asm/06:5044); tick_equip_activation_display_seq_b state=0 fn-ptr mode_a; C5 grep=0 (new); conf: high
+.equ check_equip_slot_eligible_by_cross_player_and_field6_zero_fn_ptr, 0x080554c5  @ THUMB+1 ptr to check_equip_slot_eligible_by_cross_player_and_field6_zero (fn@0x080554c4 push 30b5 confirmed asm/06:4532); tick_equip_activation_display_seq_b state=2 fn-ptr mode_b; C5 grep=0 (new); conf: high
+.equ check_equip_slot_eligible_by_same_side_and_prereqs_fn_ptr, 0x08054899  @ THUMB+1 ptr to check_equip_slot_eligible_by_same_side_and_prereqs (fn@0x08054898 push 30b5 confirmed asm/06:2545+asm/07:19152); tick_equip_activation_display_seq_c state=2 dispatch fn-ptr; C5 grep=0 (new); conf: high
+.equ check_equip_slot_target_not_blocked_fn_ptr, 0x08084a99  @ THUMB+1 ptr to check_equip_slot_target_not_blocked (fn@0x08084a98 push b570 confirmed byte-scan); BLK5 Ojama King sub-stubs pool@0x08084b60/bac/c10; C5 grep=0 (new); conf: high

@@ -1631,3 +1631,10 @@
 .equ cid_1568,                             0x00001568  @ unassigned CID 0x1568; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)
 .equ cid_16d3,                             0x000016d3  @ unassigned CID 0x16d3; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)
 .equ cid_1803,                             0x00001803  @ unassigned CID 0x1803; advance_equip_slot_display_state dispatch; not in card-stats.s; conf: high (unassigned)
+@ =============================================================================
+@ file 10 Seg-10 additions: fn_eligible card IDs
+@ Source: asm/10_equip_effect_dispatch.s, Seg-10 (0x08084318..0x080850d8)
+@ C5 grep verified: 0x000017e2 / 0x000017ec -> 0 hits each in constants/ before adding
+@ =============================================================================
+.equ MOBIUS_THE_FROST_MONARCH_CID,  0x000017e2  @ Mobius the Frost Monarch (pw=04929256; card-stats.s line 21426 card_1647 slot=0x17E2); fn_eligible stub BLK1@0x08084750; dispatch table 0x09e44cbc+0x00; C5 grep=0 (new); conf: high
+.equ HADE_HANE_CID,                 0x000017ec  @ Hade-Hane (pw=28357177; card-stats.s line 21556 card_1657 slot=0x17EC); fn_eligible stub BLK2@0x080848cc; dispatch table 0x09e44d04+0x00; distinct from Hane-Hane CID=0x11c3; C5 grep=0 (new); conf: high
