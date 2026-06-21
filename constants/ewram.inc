@@ -246,6 +246,7 @@
 @ file 04 Seg-3: LP card-tracking array offsets (gP1LifePoints-relative)
 .equ LP_CARD_TRACK_BASE_OFF,  0x00001da8  @ [gP1LifePoints+0x1da8] LP card-ref tracking array base; written by get_zone_slot_card_ref_by_type; cleared by tick_card_display_op2b_lp_clear_seq; 109 raw ROM refs
 .equ LP_CARD_TRACK_NEXT_OFF,  0x00001daa  @ [gP1LifePoints+0x1daa] 5-entry hword clear loop base; tick_card_display_op2b_lp_clear_seq strh x5 starting here; 44 raw ROM refs
+.equ LP_CARD_TRACK_ALT_OFF,   0x00001dac  @ [gP1LifePoints+0x1dac] LP card-track array alt word at base+4; tick_equip_lp_type18_display_seq 3rd LP-delta summand; 4 raw ROM refs (0x0807cc9c, 0x080a2164, 0x080a21a0, 0x080a21e4)
 .equ LP_CARD_TRACK_AUX_OFF,   0x00001db2  @ [gP1LifePoints+0x1db2] auxiliary LP track field cleared separately; 1 raw ROM ref
 .equ PLAYER_BLOCK_STRIDE,           0x868   @ player data block stride (0x868=2152 bytes; 2146 raw refs)
 .equ P2_ZONE1_LP_OFF,              0x87c   @ [gP1LifePoints+0x87c] P2 zone-1 LP region start; 0x87c = PLAYER_BLOCK_STRIDE(0x868) + 0x14 (one zone slot stride); check_spell_zone_chain_occupied_eligible loads [gP1LifePoints+0x87c]; conf: med

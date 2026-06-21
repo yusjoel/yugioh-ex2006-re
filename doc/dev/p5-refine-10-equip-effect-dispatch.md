@@ -56,7 +56,7 @@ carve/disasm 或 §5.1 / 全 ROM 0 引用->§5.1)。**R1-R9 详版**见 `p5-refi
 |-----|------|-----|--------|----------------------|------|--------|
 | 1  | 0x79e60..0x7ae84 | 19 | 61  | 8 inc (0x79fac/30, 0xa00c/e8, 0xa138/28, 0xa178/14c, 0xa3b8/38, 0xa464/11c, 0xa688/44, 0xa71c/f8) | ✅ | aa53bf0 |
 | 2  | 0x7ae84..0x7be2c | 18 | 47  | 8 inc (0xaf66/3a, 0xafb8/110, 0xb4d4/2c, 0xb574/144, 0xb7dc/28, 0xb878/e0, 0xb9f4/28, 0xba30/100) | ✅ | (see below) |
-| 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ⬜ | |
+| 3  | 0x7be2c..0x7cd68 | 19 | 68  | 2 inc (0xc87a/3e, 0xc92c/158) | ✅ | (see 4.03) |
 | 4  | 0x7cd68..0x7db20 | 19 | 53  | 2 inc (0xd7e8/2c, 0xd830/fc) + 1 sw (0xd126) | ⬜ | |
 | 5  | 0x7db20..0x7f730 | 19 | 64  | 8 inc (0xdd68/30, 0xddac/16c, 0xdf90/2bc, 0xe398/2c, 0xe438/16c, 0xe5d4/63c, 0xf280/3c, 0xf330/128) + 2 sw (0xed22, 0xee92) | ⬜ | |
 | 6  | 0x7f730..0x80ba0 | 18 | 123 | 0 inc + 2 sw (0xfe22, 0x806cc) | ⬜ | |
@@ -125,6 +125,29 @@ Seg-5 含最多 ROM_INCBIN (8 inc + 2 switchD) 且有 0xe5d4/0x63c 超大块 (15
 - **Ghidra scripts**: RefineF10Seg2Slots.py, DisassembleF10Seg2Blocks.py, RefineF10Seg2PoolFix.py
 - **commit**: 1472a5a
 - **CSV**: +4 fn_eligible rows + 1 FUNC_RENAME update
+
+### 4.03 Seg-3 完成记录
+
+- **范围**: [0x0807be2c, 0x0807cd68), 19 fn, 68 slots, 2 ROM_INCBIN
+- **落地日期**: 2026-06-21
+- **SHA1**: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b (byte-identical)
+- **EQ_SLOTS**: 52 (50 REUSE + 1 NEW: LP_CARD_TRACK_ALT_OFF=0x00001dac ewram.inc after LP_CARD_TRACK_NEXT_OFF + 3 GAS expr: gDuelPhaseFlags+EQUIP_PHASE_FRAME_OFF=0x0201b734 x3)
+- **RENAME_SLOTS**: 13 (gP1LifePoints already-symbolic x12 + BLK2 base des_frog_dispatch_stubs@0x0807c92c)
+- **REF_SLOTS**: 3 (check_equip_activation_at_slot11+1 x2 + invoke_effect_node_with_active_flag_3arg+1 x1)
+- **FUNC_RENAME**: 1 (tick_equip_activation_display_state drop __0807c388 suffix; note: fn@0x080670a0 already has same base name -> GAS exporter auto-appends __0807c388 in export for deconfliction; no byte-identical impact)
+- **PLATE**: 1 (skip: old substring not found in Ghidra plate, already applied in prior session)
+- **R4 disasm**:
+  - BLK1 0x7c87a/0x3e: fn_eligible_des_frog@0x0807c87c (CID=DES_FROG_CID=0x1918; 2B pad at 0x7c87a; 2 pool DWords at 0x7c8b0+0x7c8b4; NOT createDWord at 0x7c8ac=0x4687 MOV PC,r0 code)
+  - BLK2 0x7c92c/0x158: 9 Des Frog dispatch sub-stubs A..I (des_frog_stub_{a_zone_check/b_display_init/c_incr_counter/d_oam_setup/e_ret77/f_ret76/g_ret64/h_enqueue_lp/i_default_exit}; 11 pool DWords; NOT createDWord at 0x7c95c=0xe00a/0x7ca08=0xe038 THUMB branches)
+- **createFunction**: fn_eligible_des_frog @ 0x0807c87c (CID=0x1918=DES_FROG_CID)
+- **NEW constants**: LP_CARD_TRACK_ALT_OFF=0x00001dac (ewram.inc after LP_CARD_TRACK_NEXT_OFF)
+- **carve**: 0
+- **§5.1**: 0
+- **残留**: 0 ROM_INCBIN in [0x7be2c, 0x7cd68); 0 non-ASCII new writes
+- **ROM_INCBIN before/after**: 23 -> 21 (2 eliminated: BLK1+BLK2)
+- **Ghidra scripts**: RefineF10Seg3Slots.py, DisassembleF10Seg3Blocks.py, RefineF10Seg3CleanLabel.py (label cleanup utility)
+- **commit**: (pending)
+- **CSV**: +1 fn_eligible_des_frog row
 
 ---
 
