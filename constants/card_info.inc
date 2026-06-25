@@ -1660,3 +1660,18 @@
 .equ EARTH_CHANT_CID,              0x00001716  @ Earth Chant (pw=59820352; card-stats.s L19335 card_1391 slot=0x1716); eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible score override set=1; C5 grep=0 (new); conf: high
 .equ END_OF_WORLD_CID,             0x000019d9  @ End of the World (pw=08198712; card-stats.s L26795 card_1989 slot=0x19D9); eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible score override; C5 grep=0 (new); conf: high
 .equ gEquipEffectZoneTable,        0x09e5a0c4  @ ROM base addr of equip effect zone table; array indexed by player_stride*player+zone_idx; lsls/adds/ldr pattern; 14 ROM refs; check_equip_target_slot_by_card_id / find_equip_target_in_effect_zones / eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible / check_neo_daedalus_equip_zone_eligible; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-3b additions: LV/evolution pair card IDs + fusion pair card IDs
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-3b (0x080872e4..0x08087d58)
+@ C5 grep verified: all 10 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ ELEGANT_EGOTIST_CID,     0x000010e4  @ Elegant Egotist (pw=90219263; card-stats.s card_0288 slot=0x10E4); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ GAZELLE_CID,             0x00001291  @ Gazelle the King of Mythical Beasts (pw=05818798; card-stats.s card_0607 slot=0x1291); scan_zone_gadget_pair_check + scan_zone_chimera_pair_check pair target; C5 grep=0 (new); conf: high
+.equ BERFOMET_CID,            0x00001293  @ Berfomet (pw=77207191; card-stats.s card_0609 slot=0x1293); scan_zone_gadget_pair_check + scan_zone_chimera_pair_check pair target; C5 grep=0 (new); conf: high
+.equ BUSTER_BLADER_CID,       0x00001377  @ Buster Blader (pw=78193831; card-stats.s card_0787 slot=0x1377); scan_zone_chimera_pair_check_substate_e Miracle Restoring pair target; C5 grep=0 (new); conf: high
+.equ DARK_SAGE_CID,           0x0000146e  @ Dark Sage (pw=92377303; card-stats.s card_0944 slot=0x146E); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ MIRAGE_KNIGHT_CID,       0x00001643  @ Mirage Knight (pw=49217579; card-stats.s card_1308 slot=0x1643); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ MYSTICAL_SHINE_BALL_CID, 0x0000173d  @ Mystical Shine Ball (pw=39552864; card-stats.s card_1512 slot=0x173D); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ SPIRIT_OF_PHARAOH_CID,   0x00001788  @ Spirit of the Pharaoh (pw=25343280; card-stats.s card_1570 slot=0x1788); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ RELEASE_RESTRAINT_CID,   0x0000187e  @ Release Restraint (pw=75417459; card-stats.s card_1791 slot=0x187E); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+.equ CYBER_BARRIER_DRAGON_CID,0x000019a8  @ Cyber Barrier Dragon (pw=68774379; card-stats.s card_2017 slot=0x19A8); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high

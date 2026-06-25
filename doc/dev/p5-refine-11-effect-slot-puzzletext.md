@@ -76,7 +76,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 1  | 0x80850d8..0x8085d4c | 10 | ~100 | 2 inc (0x850f0/0x28, 0x85130/0x14c) | ✅ | 7d15bd6 |
 | 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | 281d133 |
 | 3a | 0x8086cdc..0x80872e4 | 4  | 46   | 0 inc | ✅ | 3689026 |
-| 3b | 0x80872e4..0x8087d58 | 15 | ~105 | 0 inc | ⬜ | |
+| 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | (pending) |
 | 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
@@ -127,6 +127,22 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: not needed (no new/renamed functions)
 - **commit**: `281d133`
 
+### 4.03b Seg-3b 完成记录
+
+- **范围**: `[0x080872e4, 0x08087d58)` — 15 named fn (write_equip_zone_entries_by_lv_card_id .. scan_zone_opponent_field5_substate_e)
+- **EQ**: 82 槽 (10 NEW CID + 72 REUSE PLAYER_BLOCK_STRIDE x15 / MYSTIC_SWORDSMAN_LV2_CID / TIME_WIZARD_CID / GREAT_DEZARD_CID / A_DEAL_WITH_DARK_RULER_CID / SAGES_STONE_CID / ULTIMATE_INSECT_LV1/3/5/7_CID / HORUS_LV6/8_CID / SILENT_SWORDSMAN_LV3/5/7_CID / SILENT_MAGICIAN_LV4/8_CID / ARMED_DRAGON_LV5/7_CID / THEINEN_THE_GREAT_SPHINX_CID / BERSERK_DRAGON_CID / DARK_MAGICIAN_CID_0FC9 / TRANSCENDENT_WINGS_CID / ATTACK_REFLECTOR_UNIT_CID / TRIAL_OF_THE_PRINCESSES_CID / HARPIE_LADY_CID / FUSHIOH_RICHIE_CID / BLUE_EYES_WHITE_DRAGON_CID / DARK_MIMIC_LV3_CID / SACRED_PHOENIX_CID / GEARFRIED_SWORDMASTER_CID / WINGED_KURIBOH_LV10_CID / WHITE_MAGICIAN_PIKERU_CID / EBON_MAGICIAN_CURRAN_CID / PRINCESS_PIKERU_CID / PRINCESS_CURRAN_CID / POLYMERIZATION_CID x2 / RED_GADGET_CID / GREEN_GADGET_CID x2 / YELLOW_GADGET_CID x2 / BIRDFACE_CID / CARD_STAT_LP_THRESHOLD_1500 / zone_query_hand_tag_12a1 / CHIMERA_FLYING_MYTHICAL_BEAST_CID / MIRACLE_RESTORING_CID / PARASITE_PARACIDE_CID / MAGICAL_LABYRINTH_CID / WALL_SHADOW_CID / DARK_MAGICIAN_CID_0FC9 x3)
+- **REF**: 10 槽 (gP1FieldArrayCBase x3 / gP1SlotSetCodeArray x4 / gP1ChainZoneArray x1 / gP1HandSlotArray x2; all ewram.inc REUSE)
+- **RENAME**: 13 槽 (PTR_gP1LifePoints_ x13 -> ptr_lp_xxxx)
+- **PLATE**: 14 (14 full ASCII rewrites <=488 chars; 3 CORRECTED misnomer base-addr: gDuelCardPool_alt_base->gP1HandSlotArray x2 + gDuelEffectZones/gDuelCardPool_alt->gP1FieldArrayCBase/gP1SlotSetCodeArray)
+- **disasm**: 0
+- **carve**: 0
+- **新增 CID**: 10 -> card_info.inc (ELEGANT_EGOTIST_CID=0x10e4 / GAZELLE_CID=0x1291 / BERFOMET_CID=0x1293 / BUSTER_BLADER_CID=0x1377 / DARK_SAGE_CID=0x146e card_0944 / MIRAGE_KNIGHT_CID=0x1643 / MYSTICAL_SHINE_BALL_CID=0x173d / SPIRIT_OF_PHARAOH_CID=0x1788 / RELEASE_RESTRAINT_CID=0x187e / CYBER_BARRIER_DRAGON_CID=0x19a8)
+- **新增/改名函数**: 0
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed
+- **commit**: (pending)
+
 ### 4.03a Seg-3a 完成记录
 
 - **范围**: `[0x08086cdc, 0x080872e4)` — 4 named fn (dispatch_equip_zone_activation_state / populate_equip_zone_entries_substate_d / populate_equip_zone_entries_substate_e / write_equip_zone_entries_substate_d_range)
@@ -159,8 +175,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - 重函数: dispatch_field_display_state_by_type (32 槽)
 - **Seg-3a** `[0x8086cdc, 0x80872e4)` ✅ -- 4 fn (dispatch_equip_zone_activation_state .. write_equip_zone_entries_substate_d_range)
   - 0 incbin; EQ=36 REUSE / REF=4 / RENAME=6 / PLATE=5 (1 CJK+2 misnomer+2 stale FUN_)
-- **Seg-3b** `[0x80872e4, 0x8087d58)` ⬜ -- 15 fn (write_equip_zone_entries_by_lv_card_id .. scan_zone_opponent_field5_substate_e)
-  - 0 incbin; 重函数: write_equip_zone_entries_by_lv_card_id (49 槽)
+- **Seg-3b** `[0x80872e4, 0x8087d58)` ✅ -- 15 fn (write_equip_zone_entries_by_lv_card_id .. scan_zone_opponent_field5_substate_e)
+  - 0 incbin; EQ=82(10 NEW CID+72 REUSE)/REF=10/RENAME=13/PLATE=14; Seg-3 (3a+3b) fully done
 
 ### region B (0x8087d58..0x808d7f4, ~197 未命名 THUMB fn, 巨块)
 

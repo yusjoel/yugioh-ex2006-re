@@ -4605,9 +4605,7 @@ gp1lp_ptr_872dc:
 player_stride_872e0:
     .word  PLAYER_BLOCK_STRIDE            @ 080872e0 68080000
 
-@ LV card equip zone entry dispatch function. Receives player_id(r0=r8 [0..1]), target_card_id(r1). Phase 1: large BST switch on target_card_id to set sp[0]=base_card_id and sp[4]=evolved_card_id for each LV-pair and evolution card; if no match, sets 0 and jumps to phase 2. Special: 0x10e4 (Elegant Egotist) calls get_card_evolution_target_ids; LV-pairs (0x17d7 Mystic Swordsman LV2/LV4/LV6, 0x17d1 Ult.Insect LV1/LV3/LV5/LV7, 0x17d3 Horus LV6/LV8, 0x17da Armed Dragon LV5/LV7, 0x1814 Silent Swordsman LV5/LV7, 0x1817 Silent Magician LV4/LV8): direct assignment. Phase 2: scans player-side zone slots r5=[0..slot_count-1]: reads gDuelEffectZones[player_stride+slot_idx*4] card_id; calls check_card_pair_allowed(sp[0]/sp[4], card_id); if hit calls write_equip_zone_entry_by_substate(player_id, 0xb, slot_idx). Phase 3: opponent-side zone slots, same check, writes substate=0xd. Returns void (pop{r0};bx r0).
-@ Side effects: [gDuelEffectZones] write via write_equip_zone_entry_by_substate (substate 0xb and 0xd records).
-@ Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, gDuelEffectZones=0x0201c600, ZONE_slot_stride=0x14, gDuelCardPool_alt=0x0201c740.
+@ Equip zone entry writer for LV-card pairs. r0=player_id, r1=target_card_id. BST on r1 maps LV-pair cards (Mystic Swordsman LV2/4/6, Ultimate Insect LV1/3/5/7, Horus LV6/8, Armed Dragon LV5/7, Silent Swordsman LV3/5/7, Silent Magician LV4/8, others) to sp[0]=base_cid sp[4]=evo_cid. Elegant Egotist: calls get_card_evolution_target_ids. Phase 2: scans player gP1FieldArrayCBase slots, check_card_pair_allowed(sp[0/4], slot_card), writes substate=0xb. Phase 3: opponent slots, substate=0xd.
 write_equip_zone_entries_by_lv_card_id:
     push {r4,r5,r6,r7,lr}                    @ 080872e4 f0b5
     .hword 0x464f    @ 080872e6 4f46
@@ -4620,7 +4618,7 @@ write_equip_zone_entries_by_lv_card_id:
     movs r1,#0x0    @ 080872f4 0021
     str r0,[sp,#0x0]                         @ 080872f6 0090
     str r1,[sp,#0x4]                         @ 080872f8 0191
-    ldr r0, DAT_08087338                     @ 080872fa 0f48
+    ldr r0, lv_cid_87338                     @ 080872fa 0f48
     cmp r3,r0                                @ 080872fc 8342
     bne LAB_08087302                         @ 080872fe 00d1
     b LAB_08087508                           @ 08087300 02e1
@@ -4642,38 +4640,38 @@ LAB_0808730e:
 LAB_0808731c:
     cmp r3,r0                                @ 0808731c 8342
     bgt LAB_08087354                         @ 0808731e 19dc
-    ldr r0, DAT_0808733c                     @ 08087320 0648
+    ldr r0, lv_cid_8733c                     @ 08087320 0648
     cmp r3,r0                                @ 08087322 8342
     bne LAB_08087328                         @ 08087324 00d1
     b LAB_08087498                           @ 08087326 b7e0
 LAB_08087328:
     cmp r3,r0                                @ 08087328 8342
     bgt LAB_08087344                         @ 0808732a 0bdc
-    ldr r0, DAT_08087340                     @ 0808732c 0448
+    ldr r0, lv_cid_87340                     @ 0808732c 0448
     cmp r3,r0                                @ 0808732e 8342
     bne LAB_08087334                         @ 08087330 00d1
     b LAB_08087490                           @ 08087332 ade0
 LAB_08087334:
     b LAB_08087590                           @ 08087334 2ce1
     .zero  0x2
-DAT_08087338:
-    .word  0x000017d7                     @ 08087338 d7170000
-DAT_0808733c:
-    .word  0x000010e4                     @ 0808733c e4100000
-DAT_08087340:
-    .word  0x00000fb6                     @ 08087340 b60f0000
+lv_cid_87338:
+    .word  MYSTIC_SWORDSMAN_LV2_CID       @ 08087338 d7170000
+lv_cid_8733c:
+    .word  ELEGANT_EGOTIST_CID            @ 0808733c e4100000
+lv_cid_87340:
+    .word  TIME_WIZARD_CID                @ 08087340 b60f0000
 LAB_08087344:
-    ldr r0, DAT_08087350                     @ 08087344 0248
+    ldr r0, lv_cid_87350                     @ 08087344 0248
     cmp r3,r0                                @ 08087346 8342
     bne LAB_0808734c                         @ 08087348 00d1
     b LAB_080874a8                           @ 0808734a ade0
 LAB_0808734c:
     b LAB_08087590                           @ 0808734c 20e1
     .zero  0x2
-DAT_08087350:
-    .word  0x00001529                     @ 08087350 29150000
+lv_cid_87350:
+    .word  GREAT_DEZARD_CID               @ 08087350 29150000
 LAB_08087354:
-    ldr r0, DAT_0808736c                     @ 08087354 0548
+    ldr r0, lv_cid_8736c                     @ 08087354 0548
     cmp r3,r0                                @ 08087356 8342
     bne LAB_0808735c                         @ 08087358 00d1
     b LAB_080874c0                           @ 0808735a b1e0
@@ -4687,20 +4685,20 @@ LAB_0808735c:
 LAB_08087368:
     b LAB_08087590                           @ 08087368 12e1
     .zero  0x2
-DAT_0808736c:
-    .word  0x0000165a                     @ 0808736c 5a160000
+lv_cid_8736c:
+    .word  A_DEAL_WITH_DARK_RULER_CID     @ 0808736c 5a160000
 LAB_08087370:
-    ldr r0, DAT_0808737c                     @ 08087370 0248
+    ldr r0, lv_cid_8737c                     @ 08087370 0248
     cmp r3,r0                                @ 08087372 8342
     bne LAB_08087378                         @ 08087374 00d1
     b LAB_080874c8                           @ 08087376 a7e0
 LAB_08087378:
     b LAB_08087590                           @ 08087378 0ae1
     .zero  0x2
-DAT_0808737c:
-    .word  0x0000167e                     @ 0808737c 7e160000
+lv_cid_8737c:
+    .word  SAGES_STONE_CID                @ 0808737c 7e160000
 LAB_08087380:
-    ldr r0, DAT_080873a4                     @ 08087380 0848
+    ldr r0, lv_cid_873a4                     @ 08087380 0848
     cmp r3,r0                                @ 08087382 8342
     bne LAB_08087388                         @ 08087384 00d1
     b LAB_080874e0                           @ 08087386 abe0
@@ -4721,15 +4719,15 @@ LAB_08087394:
 LAB_080873a0:
     b LAB_08087590                           @ 080873a0 f6e0
     .zero  0x2
-DAT_080873a4:
-    .word  0x000017d1                     @ 080873a4 d1170000
+lv_cid_873a4:
+    .word  ULTIMATE_INSECT_LV1_CID        @ 080873a4 d1170000
 LAB_080873a8:
-    ldr r0, DAT_080873ac                     @ 080873a8 0048
+    ldr r0, lv_cid_873ac                     @ 080873a8 0048
     b LAB_08087472                           @ 080873aa 62e0
-DAT_080873ac:
-    .word  0x000017c9                     @ 080873ac c9170000
+lv_cid_873ac:
+    .word  THEINEN_THE_GREAT_SPHINX_CID   @ 080873ac c9170000
 LAB_080873b0:
-    ldr r0, DAT_080873c8                     @ 080873b0 0548
+    ldr r0, lv_cid_873c8                     @ 080873b0 0548
     cmp r3,r0                                @ 080873b2 8342
     bne LAB_080873b8                         @ 080873b4 00d1
     b LAB_080874f8                           @ 080873b6 9fe0
@@ -4744,10 +4742,10 @@ LAB_080873be:
     b LAB_08087500                           @ 080873c4 9ce0
 LAB_080873c6:
     b LAB_08087590                           @ 080873c6 e3e0
-DAT_080873c8:
-    .word  0x000017d3                     @ 080873c8 d3170000
+lv_cid_873c8:
+    .word  HORUS_LV6_CID                  @ 080873c8 d3170000
 LAB_080873cc:
-    ldr r0, DAT_080873fc                     @ 080873cc 0b48
+    ldr r0, lv_cid_873fc                     @ 080873cc 0b48
     cmp r3,r0                                @ 080873ce 8342
     bne LAB_080873d4                         @ 080873d0 00d1
     b LAB_080874e8                           @ 080873d2 89e0
@@ -4776,39 +4774,39 @@ LAB_080873f2:
     b LAB_08087520                           @ 080873f8 92e0
 LAB_080873fa:
     b LAB_08087590                           @ 080873fa c9e0
-DAT_080873fc:
-    .word  0x00001822                     @ 080873fc 22180000
+lv_cid_873fc:
+    .word  ULTIMATE_INSECT_LV3_CID        @ 080873fc 22180000
 LAB_08087400:
-    ldr r1, DAT_08087418                     @ 08087400 0549
+    ldr r1, lv_cid_87418                     @ 08087400 0549
     cmp r3,r1                                @ 08087402 8b42
     bne LAB_08087408                         @ 08087404 00d1
     b LAB_08087536                           @ 08087406 96e0
 LAB_08087408:
     cmp r3,r1                                @ 08087408 8b42
     bgt LAB_08087420                         @ 0808740a 09dc
-    ldr r0, DAT_0808741c                     @ 0808740c 0348
+    ldr r0, lv_cid_8741c                     @ 0808740c 0348
     cmp r3,r0                                @ 0808740e 8342
     bne LAB_08087414                         @ 08087410 00d1
     b LAB_08087532                           @ 08087412 8ee0
 LAB_08087414:
     b LAB_08087590                           @ 08087414 bce0
     .zero  0x2
-DAT_08087418:
-    .word  0x00001814                     @ 08087418 14180000
-DAT_0808741c:
-    .word  0x00001812                     @ 0808741c 12180000
+lv_cid_87418:
+    .word  SILENT_SWORDSMAN_LV5_CID       @ 08087418 14180000
+lv_cid_8741c:
+    .word  SILENT_SWORDSMAN_LV3_CID       @ 0808741c 12180000
 LAB_08087420:
-    ldr r0, DAT_0808742c                     @ 08087420 0248
+    ldr r0, lv_cid_8742c                     @ 08087420 0248
     cmp r3,r0                                @ 08087422 8342
     bne LAB_08087428                         @ 08087424 00d1
     b LAB_08087540                           @ 08087426 8be0
 LAB_08087428:
     b LAB_08087590                           @ 08087428 b2e0
     .zero  0x2
-DAT_0808742c:
-    .word  0x00001817                     @ 0808742c 17180000
+lv_cid_8742c:
+    .word  SILENT_MAGICIAN_LV4_CID        @ 0808742c 17180000
 LAB_08087430:
-    ldr r0, DAT_08087450                     @ 08087430 0748
+    ldr r0, lv_cid_87450                     @ 08087430 0748
     cmp r3,r0                                @ 08087432 8342
     bne LAB_08087438                         @ 08087434 00d1
     b LAB_08087558                           @ 08087436 8fe0
@@ -4826,20 +4824,20 @@ LAB_08087438:
     b LAB_08087548                           @ 0808744c 7ce0
 LAB_0808744e:
     b LAB_08087590                           @ 0808744e 9fe0
-DAT_08087450:
-    .word  0x00001907                     @ 08087450 07190000
+lv_cid_87450:
+    .word  TRANSCENDENT_WINGS_CID         @ 08087450 07190000
 LAB_08087454:
-    ldr r0, DAT_08087460                     @ 08087454 0248
+    ldr r0, lv_cid_87460                     @ 08087454 0248
     cmp r3,r0                                @ 08087456 8342
     bne LAB_0808745c                         @ 08087458 00d1
     b LAB_08087550                           @ 0808745a 79e0
 LAB_0808745c:
     b LAB_08087590                           @ 0808745c 98e0
     .zero  0x2
-DAT_08087460:
-    .word  0x0000187e                     @ 08087460 7e180000
+lv_cid_87460:
+    .word  RELEASE_RESTRAINT_CID          @ 08087460 7e180000
 LAB_08087464:
-    ldr r0, DAT_0808747c                     @ 08087464 0548
+    ldr r0, lv_cid_8747c                     @ 08087464 0548
     cmp r3,r0                                @ 08087466 8342
     bne LAB_0808746c                         @ 08087468 00d1
     b LAB_08087564                           @ 0808746a 7be0
@@ -4854,112 +4852,112 @@ LAB_08087472:
 LAB_08087478:
     b LAB_08087590                           @ 08087478 8ae0
     .zero  0x2
-DAT_0808747c:
-    .word  0x000019b5                     @ 0808747c b5190000
+lv_cid_8747c:
+    .word  ATTACK_REFLECTOR_UNIT_CID      @ 0808747c b5190000
 LAB_08087480:
-    ldr r0, DAT_0808748c                     @ 08087480 0248
+    ldr r0, lv_cid_8748c                     @ 08087480 0248
     cmp r3,r0                                @ 08087482 8342
     bne LAB_08087488                         @ 08087484 00d1
     b LAB_0808756c                           @ 08087486 71e0
 LAB_08087488:
     b LAB_08087590                           @ 08087488 82e0
     .zero  0x2
-DAT_0808748c:
-    .word  0x000019d8                     @ 0808748c d8190000
+lv_cid_8748c:
+    .word  TRIAL_OF_THE_PRINCESSES_CID    @ 0808748c d8190000
 LAB_08087490:
-    ldr r0, DAT_08087494                     @ 08087490 0048
+    ldr r0, lv_cid_87494                     @ 08087490 0048
     b LAB_0808758e                           @ 08087492 7ce0
-DAT_08087494:
-    .word  0x0000146e                     @ 08087494 6e140000
+lv_cid_87494:
+    .word  DARK_SAGE_CID                  @ 08087494 6e140000
 LAB_08087498:
-    ldr r0, DAT_080874a4                     @ 08087498 0248
+    ldr r0, lv_cid_874a4                     @ 08087498 0248
     str r0,[sp,#0x0]                         @ 0808749a 0090
     adds r0,#0x1    @ 0808749c 0130
     str r0,[sp,#0x4]                         @ 0808749e 0190
     b LAB_08087590                           @ 080874a0 76e0
     .zero  0x2
-DAT_080874a4:
-    .word  0x00000fe4                     @ 080874a4 e40f0000
+lv_cid_874a4:
+    .word  HARPIE_LADY_CID                @ 080874a4 e40f0000
 LAB_080874a8:
-    ldr r0, DAT_080874ac                     @ 080874a8 0048
+    ldr r0, lv_cid_874ac                     @ 080874a8 0048
     b LAB_0808758e                           @ 080874aa 70e0
-DAT_080874ac:
-    .word  0x00001534                     @ 080874ac 34150000
+lv_cid_874ac:
+    .word  FUSHIOH_RICHIE_CID             @ 080874ac 34150000
 LAB_080874b0:
-    ldr r0, DAT_080874b4                     @ 080874b0 0048
+    ldr r0, lv_cid_874b4                     @ 080874b0 0048
     b LAB_0808758e                           @ 080874b2 6ce0
-DAT_080874b4:
-    .word  0x00000fa7                     @ 080874b4 a70f0000
+lv_cid_874b4:
+    .word  BLUE_EYES_WHITE_DRAGON_CID     @ 080874b4 a70f0000
 LAB_080874b8:
-    ldr r0, DAT_080874bc                     @ 080874b8 0048
+    ldr r0, lv_cid_874bc                     @ 080874b8 0048
     b LAB_0808758e                           @ 080874ba 68e0
-DAT_080874bc:
-    .word  0x00001643                     @ 080874bc 43160000
+lv_cid_874bc:
+    .word  MIRAGE_KNIGHT_CID              @ 080874bc 43160000
 LAB_080874c0:
-    ldr r0, DAT_080874c4                     @ 080874c0 0048
+    ldr r0, lv_cid_874c4                     @ 080874c0 0048
     b LAB_0808758e                           @ 080874c2 64e0
-DAT_080874c4:
-    .word  0x00001644                     @ 080874c4 44160000
+lv_cid_874c4:
+    .word  BERSERK_DRAGON_CID             @ 080874c4 44160000
 LAB_080874c8:
-    ldr r0, DAT_080874cc                     @ 080874c8 0048
+    ldr r0, lv_cid_874cc                     @ 080874c8 0048
     b LAB_0808758e                           @ 080874ca 60e0
-DAT_080874cc:
-    .word  0x00000fc9                     @ 080874cc c90f0000
+lv_cid_874cc:
+    .word  DARK_MAGICIAN_CID_0FC9         @ 080874cc c90f0000
 LAB_080874d0:
-    ldr r0, DAT_080874d4                     @ 080874d0 0048
+    ldr r0, lv_cid_874d4                     @ 080874d0 0048
     b LAB_0808758e                           @ 080874d2 5ce0
-DAT_080874d4:
-    .word  0x0000173d                     @ 080874d4 3d170000
+lv_cid_874d4:
+    .word  MYSTICAL_SHINE_BALL_CID        @ 080874d4 3d170000
 LAB_080874d8:
-    ldr r0, DAT_080874dc                     @ 080874d8 0048
+    ldr r0, lv_cid_874dc                     @ 080874d8 0048
     b LAB_0808758e                           @ 080874da 58e0
-DAT_080874dc:
-    .word  0x00001788                     @ 080874dc 88170000
+lv_cid_874dc:
+    .word  SPIRIT_OF_PHARAOH_CID          @ 080874dc 88170000
 LAB_080874e0:
-    ldr r0, DAT_080874e4                     @ 080874e0 0048
+    ldr r0, lv_cid_874e4                     @ 080874e0 0048
     b LAB_0808758e                           @ 080874e2 54e0
-DAT_080874e4:
-    .word  0x00001822                     @ 080874e4 22180000
+lv_cid_874e4:
+    .word  ULTIMATE_INSECT_LV3_CID        @ 080874e4 22180000
 LAB_080874e8:
-    ldr r0, DAT_080874ec                     @ 080874e8 0048
+    ldr r0, lv_cid_874ec                     @ 080874e8 0048
     b LAB_0808758e                           @ 080874ea 50e0
-DAT_080874ec:
-    .word  0x0000185e                     @ 080874ec 5e180000
+lv_cid_874ec:
+    .word  ULTIMATE_INSECT_LV5_CID        @ 080874ec 5e180000
 LAB_080874f0:
-    ldr r0, DAT_080874f4                     @ 080874f0 0048
+    ldr r0, lv_cid_874f4                     @ 080874f0 0048
     b LAB_0808758e                           @ 080874f2 4ce0
-DAT_080874f4:
-    .word  0x000018af                     @ 080874f4 af180000
+lv_cid_874f4:
+    .word  ULTIMATE_INSECT_LV7_CID        @ 080874f4 af180000
 LAB_080874f8:
-    ldr r0, DAT_080874fc                     @ 080874f8 0048
+    ldr r0, lv_cid_874fc                     @ 080874f8 0048
     b LAB_0808758e                           @ 080874fa 48e0
-DAT_080874fc:
-    .word  0x000017d4                     @ 080874fc d4170000
+lv_cid_874fc:
+    .word  HORUS_LV8_CID                  @ 080874fc d4170000
 LAB_08087500:
-    ldr r0, DAT_08087504                     @ 08087500 0048
+    ldr r0, lv_cid_87504                     @ 08087500 0048
     b LAB_0808758e                           @ 08087502 44e0
-DAT_08087504:
-    .word  0x000017d6                     @ 08087504 d6170000
+lv_cid_87504:
+    .word  DARK_MIMIC_LV3_CID             @ 08087504 d6170000
 LAB_08087508:
-    ldr r0, DAT_0808750c                     @ 08087508 0048
+    ldr r0, lv_cid_8750c                     @ 08087508 0048
     b LAB_0808758e                           @ 0808750a 40e0
-DAT_0808750c:
-    .word  0x000017d8                     @ 0808750c d8170000
+lv_cid_8750c:
+    .word  MYSTIC_SWORDSMAN_LV4_CID       @ 0808750c d8170000
 LAB_08087510:
-    ldr r0, DAT_08087514                     @ 08087510 0048
+    ldr r0, lv_cid_87514                     @ 08087510 0048
     b LAB_0808758e                           @ 08087512 3ce0
-DAT_08087514:
-    .word  0x00001823                     @ 08087514 23180000
+lv_cid_87514:
+    .word  MYSTIC_SWORDSMAN_LV6_CID       @ 08087514 23180000
 LAB_08087518:
-    ldr r0, DAT_0808751c                     @ 08087518 0048
+    ldr r0, lv_cid_8751c                     @ 08087518 0048
     b LAB_0808758e                           @ 0808751a 38e0
-DAT_0808751c:
-    .word  0x000017da                     @ 0808751c da170000
+lv_cid_8751c:
+    .word  ARMED_DRAGON_LV5_CID           @ 0808751c da170000
 LAB_08087520:
-    ldr r0, DAT_08087524                     @ 08087520 0048
+    ldr r0, lv_cid_87524                     @ 08087520 0048
     b LAB_0808758e                           @ 08087522 34e0
-DAT_08087524:
-    .word  0x000017db                     @ 08087524 db170000
+lv_cid_87524:
+    .word  ARMED_DRAGON_LV7_CID           @ 08087524 db170000
 LAB_08087528:
     adds r0,r2,#0x0    @ 08087528 101c
     .hword 0x4669    @ 0808752a 6946
@@ -4969,68 +4967,68 @@ LAB_08087532:
     str r1,[sp,#0x0]                         @ 08087532 0091
     b LAB_08087590                           @ 08087534 2ce0
 LAB_08087536:
-    ldr r0, DAT_0808753c                     @ 08087536 0148
+    ldr r0, lv_cid_8753c                     @ 08087536 0148
     b LAB_0808758e                           @ 08087538 29e0
     .zero  0x2
-DAT_0808753c:
-    .word  0x00001816                     @ 0808753c 16180000
+lv_cid_8753c:
+    .word  SILENT_SWORDSMAN_LV7_CID       @ 0808753c 16180000
 LAB_08087540:
-    ldr r0, DAT_08087544                     @ 08087540 0048
+    ldr r0, lv_cid_87544                     @ 08087540 0048
     b LAB_0808758e                           @ 08087542 24e0
-DAT_08087544:
-    .word  0x0000181a                     @ 08087544 1a180000
+lv_cid_87544:
+    .word  SILENT_MAGICIAN_LV8_CID        @ 08087544 1a180000
 LAB_08087548:
-    ldr r0, DAT_0808754c                     @ 08087548 0048
+    ldr r0, lv_cid_8754c                     @ 08087548 0048
     b LAB_0808758e                           @ 0808754a 20e0
-DAT_0808754c:
-    .word  0x0000185c                     @ 0808754c 5c180000
+lv_cid_8754c:
+    .word  SACRED_PHOENIX_CID             @ 0808754c 5c180000
 LAB_08087550:
-    ldr r0, DAT_08087554                     @ 08087550 0048
+    ldr r0, lv_cid_87554                     @ 08087550 0048
     b LAB_0808758e                           @ 08087552 1ce0
-DAT_08087554:
-    .word  0x0000186b                     @ 08087554 6b180000
+lv_cid_87554:
+    .word  GEARFRIED_SWORDMASTER_CID      @ 08087554 6b180000
 LAB_08087558:
-    ldr r0, DAT_0808755c                     @ 08087558 0048
+    ldr r0, lv_cid_8755c                     @ 08087558 0048
     b LAB_0808758e                           @ 0808755a 18e0
-DAT_0808755c:
-    .word  0x00001906                     @ 0808755c 06190000
+lv_cid_8755c:
+    .word  WINGED_KURIBOH_LV10_CID        @ 0808755c 06190000
 LAB_08087560:
     str r3,[sp,#0x0]                         @ 08087560 0093
     b LAB_08087590                           @ 08087562 15e0
 LAB_08087564:
-    ldr r0, DAT_08087568                     @ 08087564 0048
+    ldr r0, lv_cid_87568                     @ 08087564 0048
     b LAB_0808758e                           @ 08087566 12e0
-DAT_08087568:
-    .word  0x000019a8                     @ 08087568 a8190000
+lv_cid_87568:
+    .word  CYBER_BARRIER_DRAGON_CID       @ 08087568 a8190000
 LAB_0808756c:
-    ldr r0, DAT_0808757c                     @ 0808756c 0348
+    ldr r0, lv_cid_8757c                     @ 0808756c 0348
     cmp r2,r0                                @ 0808756e 8242
     beq LAB_08087584                         @ 08087570 08d0
-    ldr r0, DAT_08087580                     @ 08087572 0348
+    ldr r0, lv_cid_87580                     @ 08087572 0348
     cmp r2,r0                                @ 08087574 8242
     beq LAB_0808758c                         @ 08087576 09d0
     b LAB_08087590                           @ 08087578 0ae0
     .zero  0x2
-DAT_0808757c:
-    .word  0x00001757                     @ 0808757c 57170000
-DAT_08087580:
-    .word  0x0000191d                     @ 08087580 1d190000
+lv_cid_8757c:
+    .word  WHITE_MAGICIAN_PIKERU_CID      @ 0808757c 57170000
+lv_cid_87580:
+    .word  EBON_MAGICIAN_CURRAN_CID       @ 08087580 1d190000
 LAB_08087584:
-    ldr r0, DAT_08087588                     @ 08087584 0048
+    ldr r0, lv_cid_87588                     @ 08087584 0048
     b LAB_0808758e                           @ 08087586 02e0
-DAT_08087588:
-    .word  0x000019cd                     @ 08087588 cd190000
+lv_cid_87588:
+    .word  PRINCESS_PIKERU_CID            @ 08087588 cd190000
 LAB_0808758c:
-    ldr r0, DAT_08087668                     @ 0808758c 3648
+    ldr r0, lv_cid_87668                     @ 0808758c 3648
 LAB_0808758e:
     str r0,[sp,#0x0]                         @ 0808758e 0090
 LAB_08087590:
     movs r5,#0x0    @ 08087590 0025
-    ldr r0, PTR_gP1LifePoints_0808766c       @ 08087592 3648
+    ldr r0, ptr_lp_8766c                     @ 08087592 3648
     movs r2,#0x1    @ 08087594 0122
     .hword 0x4641    @ 08087596 4146
     ands r2,r1    @ 08087598 0a40
-    ldr r3, DAT_08087670                     @ 0808759a 354b
+    ldr r3, stride_87670                     @ 0808759a 354b
     adds r1,r2,#0x0    @ 0808759c 111c
     muls r1,r3    @ 0808759e 5943
     adds r4,r0,#0x0    @ 080875a0 041c
@@ -5047,7 +5045,7 @@ LAB_080875b2:
     adds r0,r6,#0x0    @ 080875b4 301c
     muls r0,r3    @ 080875b6 5843
     adds r1,r1,r0    @ 080875b8 0918
-    ldr r0, DAT_08087674                     @ 080875ba 2e48
+    ldr r0, ref_87674                        @ 080875ba 2e48
     adds r1,r1,r0    @ 080875bc 0918
     ldr r0,[r1,#0x0]                         @ 080875be 0868
     lsls r0,r0,#0x13    @ 080875c0 c004
@@ -5069,7 +5067,7 @@ LAB_080875dc:
     bl write_equip_zone_entry_by_substate    @ 080875e2 06f053f9
 LAB_080875e6:
     adds r5,#0x1    @ 080875e6 0135
-    ldr r3, DAT_08087670                     @ 080875e8 214b
+    ldr r3, stride_87670                     @ 080875e8 214b
     adds r0,r6,#0x0    @ 080875ea 301c
     muls r0,r3    @ 080875ec 5843
     add r0,r9                                @ 080875ee 4844
@@ -5081,7 +5079,7 @@ LAB_080875f6:
     movs r1,#0x1    @ 080875f8 0121
     .hword 0x4640    @ 080875fa 4046
     ands r1,r0    @ 080875fc 0140
-    ldr r2, DAT_08087670                     @ 080875fe 1c4a
+    ldr r2, stride_87670                     @ 080875fe 1c4a
     adds r0,r1,#0x0    @ 08087600 081c
     muls r0,r2    @ 08087602 5043
     adds r3,r7,#0x0    @ 08087604 3b1c
@@ -5097,7 +5095,7 @@ LAB_08087614:
     adds r0,r6,#0x0    @ 08087616 301c
     muls r0,r2    @ 08087618 5043
     adds r1,r1,r0    @ 0808761a 0918
-    ldr r0, DAT_08087678                     @ 0808761c 1648
+    ldr r0, ref_87678                        @ 0808761c 1648
     adds r1,r1,r0    @ 0808761e 0918
     ldr r0,[r1,#0x0]                         @ 08087620 0868
     lsls r0,r0,#0x13    @ 08087622 c004
@@ -5119,7 +5117,7 @@ LAB_0808763e:
     bl write_equip_zone_entry_by_substate    @ 08087644 06f022f9
 LAB_08087648:
     adds r5,#0x1    @ 08087648 0135
-    ldr r2, DAT_08087670                     @ 0808764a 094a
+    ldr r2, stride_87670                     @ 0808764a 094a
     adds r0,r6,#0x0    @ 0808764c 301c
     muls r0,r2    @ 0808764e 5043
     adds r0,r0,r7    @ 08087650 c019
@@ -5135,28 +5133,26 @@ LAB_08087658:
     pop {r0}                                 @ 08087662 01bc
     bx r0                                    @ 08087664 0047
     .zero  0x2
-DAT_08087668:
-    .word  0x000019ce                     @ 08087668 ce190000
-PTR_gP1LifePoints_0808766c:
-    .word  gP1LifePoints                  @ 0808766c e0c40102
-DAT_08087670:
-    .word  0x00000868                     @ 08087670 68080000
-DAT_08087674:
+lv_cid_87668:
+    .word  PRINCESS_CURRAN_CID            @ 08087668 ce190000
+ptr_lp_8766c:
+    .word  gP1LifePoints                  @ 0808766c e0c40102  gP1LifePoints
+stride_87670:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087670 68080000
+ref_87674:
     .word  0x0201c600                     @ 08087674 00c60102
-DAT_08087678:
+ref_87678:
     .word  0x0201c740                     @ 08087678 40c70102
 
-@ Scans player-side equip zone slots and writes substate=0xe for slots where card_id satisfies check_card_pair_allowed with Polymerization. Receives player_id(r0=r6 [0..1]). Reads gP1LifePoints[player_id*0x868+0x14] alt_slot_count; exits if 0. Loop r5=[0..slot_count-1]: reads gDuelCardPool_alt+player_stride+slot_idx*4 card_id bits[18..0]; calls check_card_pair_allowed(card_id, PAIR_KEY=0x12e5 Polymerization); if nonzero calls write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx). Returns void (pop{r0};bx r0). Callers: 0x0804ab4c (equip scan helper), 0x0808d88c (equip zone setup hub).
-@ Side effects: [gDuelEffectZones] write via write_equip_zone_entry_by_substate (substate=0xe records).
-@ Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, alt_slot_count_off=0x14, gDuelCardPool_alt_base=gP1LifePoints+0x418 (0x83<<3), PAIR_KEY=0x12e5 (Polymerization).
+@ Equip zone writer for Polymerization pair. r0=player_id. Reads [gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x14] alt_slot_count. Loops gP1HandSlotArray+player*stride, extracts card_id bits[18:0], calls check_card_pair_allowed(card_id, POLYMERIZATION_CID). Pass -> write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx). Returns void.
 populate_equip_zone_entries_substate_e_by_pair:
     push {r4,r5,r6,r7,lr}                    @ 0808767c f0b5
     adds r6,r0,#0x0    @ 0808767e 061c
     movs r5,#0x0    @ 08087680 0025
-    ldr r3, PTR_gP1LifePoints_080876d0       @ 08087682 134b
+    ldr r3, ptr_lp_876d0                     @ 08087682 134b
     movs r0,#0x1    @ 08087684 0120
     ands r0,r6    @ 08087686 3040
-    ldr r1, DAT_080876d4                     @ 08087688 1249
+    ldr r1, stride_876d4                     @ 08087688 1249
     adds r2,r0,#0x0    @ 0808768a 021c
     muls r2,r1    @ 0808768c 4a43
     adds r0,r3,#0x0    @ 0808768e 181c
@@ -5174,7 +5170,7 @@ LAB_080876a4:
     ldr r0,[r4,#0x0]                         @ 080876a4 2068
     lsls r0,r0,#0x13    @ 080876a6 c004
     lsrs r0,r0,#0x13    @ 080876a8 c00c
-    ldr r1, DAT_080876d8                     @ 080876aa 0b49
+    ldr r1, poly_cid_876d8                   @ 080876aa 0b49
     bl check_card_pair_allowed               @ 080876ac c3f74efa
     cmp r0,#0x0                              @ 080876b0 0028
     beq LAB_080876be                         @ 080876b2 04d0
@@ -5193,31 +5189,24 @@ LAB_080876c8:
     pop {r0}                                 @ 080876ca 01bc
     bx r0                                    @ 080876cc 0047
     .zero  0x2
-PTR_gP1LifePoints_080876d0:
-    .word  gP1LifePoints                  @ 080876d0 e0c40102
-DAT_080876d4:
-    .word  0x00000868                     @ 080876d4 68080000
-DAT_080876d8:
-    .word  0x000012e5                     @ 080876d8 e5120000
+ptr_lp_876d0:
+    .word  gP1LifePoints                  @ 080876d0 e0c40102  gP1LifePoints
+stride_876d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080876d4 68080000
+poly_cid_876d8:
+    .word  POLYMERIZATION_CID             @ 080876d8 e5120000
 
-@ Equip activation scan callback, substate=0xc path. Entry r0=player_id (bit0 extracted), r1=zone_slot_idx_packed (r8 high-reg passes outer zone count address). Iterates gP1LifePoints+player*0x868+0x18 zone slot list (up to [+0x0] entries); extracts card_id (bits[18:0] via lsls/lsrs #0x13); calls check_card_is_equip_target_eligible then check_card_id_is_equip_excluded_range as two gatekeepers. Both pass -> calls write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx) to record eligible slot. Used as function pointer fed into FUN_0809078c (count_zone_pair_hits_with_fn_ptr) via invoke_r10.
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x18
-@ - SUBSTATE=0xc
-@ - gP1LifePoints base (PTR_gP1LifePoints_0808774c)
-@ - ZONE_DATA_BASE=0x0201c880
+@ Equip activation scan callback, substate=0xc. r0=player_id, r8=zone count ptr (fn-ptr frame). Iterates [gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x18] zone list; extracts card_id bits[18:0]; gate 1: check_card_is_equip_target_eligible, gate 2: check_card_id_is_equip_excluded_range. Both pass -> write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx). Used as fn-ptr via count_zone_pair_hits_with_fn_ptr.
 scan_zone_equip_target_eligible_substate_c:
     push {r4,r5,r6,r7,lr}                    @ 080876dc f0b5
     .hword 0x4647    @ 080876de 4746
     push {r7}                                @ 080876e0 80b4
     adds r7,r0,#0x0    @ 080876e2 071c
     movs r5,#0x0    @ 080876e4 0025
-    ldr r0, PTR_gP1LifePoints_0808774c       @ 080876e6 1948
+    ldr r0, ptr_lp_8774c                     @ 080876e6 1948
     movs r2,#0x1    @ 080876e8 0122
     ands r2,r7    @ 080876ea 3a40
-    ldr r3, DAT_08087750                     @ 080876ec 184b
+    ldr r3, stride_87750                     @ 080876ec 184b
     adds r1,r2,#0x0    @ 080876ee 111c
     muls r1,r3    @ 080876f0 5943
     adds r4,r0,#0x0    @ 080876f2 041c
@@ -5233,7 +5222,7 @@ LAB_08087702:
     adds r0,r6,#0x0    @ 08087704 301c
     muls r0,r3    @ 08087706 5843
     adds r1,r1,r0    @ 08087708 0918
-    ldr r0, DAT_08087754                     @ 0808770a 1248
+    ldr r0, ref_87754                        @ 0808770a 1248
     adds r1,r1,r0    @ 0808770c 0918
     ldr r0,[r1,#0x0]                         @ 0808770e 0868
     lsls r0,r0,#0x13    @ 08087710 c004
@@ -5252,7 +5241,7 @@ LAB_08087702:
     bl write_equip_zone_entry_by_substate    @ 0808772e 06f0adf8
 LAB_08087732:
     adds r5,#0x1    @ 08087732 0135
-    ldr r3, DAT_08087750                     @ 08087734 064b
+    ldr r3, stride_87750                     @ 08087734 064b
     adds r0,r6,#0x0    @ 08087736 301c
     muls r0,r3    @ 08087738 5843
     add r0,r8                                @ 0808773a 4044
@@ -5265,28 +5254,22 @@ LAB_08087742:
     pop {r4,r5,r6,r7}                        @ 08087746 f0bc
     pop {r0}                                 @ 08087748 01bc
     bx r0                                    @ 0808774a 0047
-PTR_gP1LifePoints_0808774c:
-    .word  gP1LifePoints                  @ 0808774c e0c40102
-DAT_08087750:
-    .word  0x00000868                     @ 08087750 68080000
-DAT_08087754:
+ptr_lp_8774c:
+    .word  gP1LifePoints                  @ 0808774c e0c40102  gP1LifePoints
+stride_87750:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087750 68080000
+ref_87754:
     .word  0x0201c880                     @ 08087754 80c80102
 
-@ Equip activation write callback, substate=0xc simplified path. Entry r0=player_id. Loads gP1LifePoints+player*0x868+0x18 zone entry count; for each slot directly calls write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx) without eligibility filtering. Sibling pair with scan_zone_equip_target_eligible_substate_c (0x080876dc): this function omits check_card_is_equip_target_eligible and check_card_id_is_equip_excluded_range, writes all player zone slots unconditionally.
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x18
-@ - SUBSTATE=0xc
-@ - gP1LifePoints base (PTR_gP1LifePoints_0808778c)
+@ Equip write callback, substate=0xc, unconditional path. r0=player_id. Reads [gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x18] zone count. Loops: write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx) for every slot, no eligibility check. Sibling of scan_zone_equip_target_eligible_substate_c (0x080876dc) which filters by eligibility.
 write_all_equip_zone_entries_substate_c:
     push {r4,r5,r6,lr}                       @ 08087758 70b5
     adds r5,r0,#0x0    @ 0808775a 051c
     movs r4,#0x0    @ 0808775c 0024
-    ldr r2, PTR_gP1LifePoints_0808778c       @ 0808775e 0b4a
+    ldr r2, ptr_lp_8778c                     @ 0808775e 0b4a
     movs r0,#0x1    @ 08087760 0120
     ands r0,r5    @ 08087762 2840
-    ldr r1, DAT_08087790                     @ 08087764 0a49
+    ldr r1, stride_87790                     @ 08087764 0a49
     muls r0,r1    @ 08087766 4843
     adds r2,#0x18    @ 08087768 1832
     adds r1,r0,r2    @ 0808776a 8118
@@ -5307,105 +5290,92 @@ LAB_08087786:
     pop {r4,r5,r6}                           @ 08087786 70bc
     pop {r0}                                 @ 08087788 01bc
     bx r0                                    @ 0808778a 0047
-PTR_gP1LifePoints_0808778c:
-    .word  gP1LifePoints                  @ 0808778c e0c40102
-DAT_08087790:
-    .word  0x00000868                     @ 08087790 68080000
+ptr_lp_8778c:
+    .word  gP1LifePoints                  @ 0808778c e0c40102  gP1LifePoints
+stride_87790:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087790 68080000
 
-@ Equip activation scan callback, substate=0xd path, Gadget series card pair detection. Entry r1=card_id (candidate pairing card). Dispatch tree maps r1 to pair reference card_id (r6): Green Gadget(0x1807)->Red Gadget(0x180b); Red Gadget(0x180b)->Green Gadget(0x1807)/Yellow Gadget(0x180c); Yellow Gadget(0x180c)->0x180c; Polymerization(0x12e5)->r1 itself; Berfomet(0x1293)->Gazelle(0x1291); Birdface(0x139d)->Harpie Lady(0x0fe4). Iterates gP1LifePoints+player*0x868+0x10 monster zone, checks check_card_pair_allowed(card_id, r6) per slot. Pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
-@ 
-@ Constants:
-@ - GREEN_GADGET_ICID=0x1807
-@ - RED_GADGET_ICID=0x180b
-@ - YELLOW_GADGET_ICID=0x180c
-@ - POLYMERIZATION_ICID=0x12e5
-@ - GAZELLE_ICID=0x1291
-@ - BERFOMET_ICID=0x1293
-@ - BIRDFACE_ICID=0x139d
-@ - HARPIE_LADY_ICID=0x0fe4
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x10
-@ - SUBSTATE=0xd
+@ Equip scan callback, substate=0xd, card-pair dispatch. r1=input_card_id selects pair target r6: Green Gadget->Red Gadget; Red Gadget->Green/Yellow Gadget; Yellow Gadget->itself; Polymerization->input; Berfomet->Gazelle; Birdface->Harpie Lady. Iterates [gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x10] monster zone; check_card_pair_allowed(slot_card, r6). Pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
 scan_zone_gadget_pair_check_substate_d:
     push {r4,r5,r6,r7,lr}                    @ 08087794 f0b5
     .hword 0x4647    @ 08087796 4746
     push {r7}                                @ 08087798 80b4
     .hword 0x4680    @ 0808779a 8046
-    ldr r0, DAT_080877b4                     @ 0808779c 0548
+    ldr r0, gadget_cid_877b4                 @ 0808779c 0548
     cmp r1,r0                                @ 0808779e 8142
     beq LAB_080877f4                         @ 080877a0 28d0
     cmp r1,r0                                @ 080877a2 8142
     bgt LAB_080877bc                         @ 080877a4 0adc
-    ldr r0, DAT_080877b8                     @ 080877a6 0448
+    ldr r0, gadget_cid_877b8                 @ 080877a6 0448
     cmp r1,r0                                @ 080877a8 8142
     beq LAB_080877ec                         @ 080877aa 1fd0
     adds r0,#0x75    @ 080877ac 7530
     cmp r1,r0                                @ 080877ae 8142
     beq LAB_080877e4                         @ 080877b0 18d0
     b LAB_08087810                           @ 080877b2 2de0
-DAT_080877b4:
-    .word  0x0000139d                     @ 080877b4 9d130000
-DAT_080877b8:
-    .word  0x00001293                     @ 080877b8 93120000
+gadget_cid_877b4:
+    .word  BIRDFACE_CID                   @ 080877b4 9d130000
+gadget_cid_877b8:
+    .word  BERFOMET_CID                   @ 080877b8 93120000
 LAB_080877bc:
-    ldr r2, DAT_080877d0                     @ 080877bc 044a
+    ldr r2, gadget_cid_877d0                 @ 080877bc 044a
     cmp r1,r2                                @ 080877be 9142
     beq LAB_08087800                         @ 080877c0 1ed0
     cmp r1,r2                                @ 080877c2 9142
     bgt LAB_080877d8                         @ 080877c4 08dc
-    ldr r0, DAT_080877d4                     @ 080877c6 0348
+    ldr r0, gadget_cid_877d4                 @ 080877c6 0348
     cmp r1,r0                                @ 080877c8 8142
     beq LAB_080877fc                         @ 080877ca 17d0
     b LAB_08087810                           @ 080877cc 20e0
     .zero  0x2
-DAT_080877d0:
-    .word  0x0000180b                     @ 080877d0 0b180000
-DAT_080877d4:
-    .word  0x00001807                     @ 080877d4 07180000
+gadget_cid_877d0:
+    .word  RED_GADGET_CID                 @ 080877d0 0b180000
+gadget_cid_877d4:
+    .word  GREEN_GADGET_CID               @ 080877d4 07180000
 LAB_080877d8:
-    ldr r0, DAT_080877e0                     @ 080877d8 0148
+    ldr r0, gadget_cid_877e0                 @ 080877d8 0148
     cmp r1,r0                                @ 080877da 8142
     beq LAB_08087808                         @ 080877dc 14d0
     b LAB_08087810                           @ 080877de 17e0
-DAT_080877e0:
-    .word  0x0000180c                     @ 080877e0 0c180000
+gadget_cid_877e0:
+    .word  YELLOW_GADGET_CID              @ 080877e0 0c180000
 LAB_080877e4:
-    ldr r6, DAT_080877e8                     @ 080877e4 004e
+    ldr r6, gadget_cid_877e8                 @ 080877e4 004e
     b LAB_08087812                           @ 080877e6 14e0
-DAT_080877e8:
-    .word  0x000012e5                     @ 080877e8 e5120000
+gadget_cid_877e8:
+    .word  POLYMERIZATION_CID             @ 080877e8 e5120000
 LAB_080877ec:
-    ldr r6, DAT_080877f0                     @ 080877ec 004e
+    ldr r6, gadget_cid_877f0                 @ 080877ec 004e
     b LAB_08087812                           @ 080877ee 10e0
-DAT_080877f0:
-    .word  0x00001291                     @ 080877f0 91120000
+gadget_cid_877f0:
+    .word  GAZELLE_CID                    @ 080877f0 91120000
 LAB_080877f4:
-    ldr r6, DAT_080877f8                     @ 080877f4 004e
+    ldr r6, gadget_cid_877f8                 @ 080877f4 004e
     b LAB_08087812                           @ 080877f6 0ce0
-DAT_080877f8:
-    .word  0x00000fe4                     @ 080877f8 e40f0000
+gadget_cid_877f8:
+    .word  HARPIE_LADY_CID                @ 080877f8 e40f0000
 LAB_080877fc:
     adds r6,r2,#0x0    @ 080877fc 161c
     b LAB_08087812                           @ 080877fe 08e0
 LAB_08087800:
-    ldr r6, DAT_08087804                     @ 08087800 004e
+    ldr r6, gadget_cid_87804                 @ 08087800 004e
     b LAB_08087812                           @ 08087802 06e0
-DAT_08087804:
-    .word  0x0000180c                     @ 08087804 0c180000
+gadget_cid_87804:
+    .word  YELLOW_GADGET_CID              @ 08087804 0c180000
 LAB_08087808:
-    ldr r6, DAT_0808780c                     @ 08087808 004e
+    ldr r6, gadget_cid_8780c                 @ 08087808 004e
     b LAB_08087812                           @ 0808780a 02e0
-DAT_0808780c:
-    .word  0x00001807                     @ 0808780c 07180000
+gadget_cid_8780c:
+    .word  GREEN_GADGET_CID               @ 0808780c 07180000
 LAB_08087810:
     adds r6,r1,#0x0    @ 08087810 0e1c
 LAB_08087812:
     movs r5,#0x0    @ 08087812 0025
-    ldr r3, PTR_gP1LifePoints_08087868       @ 08087814 144b
+    ldr r3, ptr_lp_87868                     @ 08087814 144b
     movs r0,#0x1    @ 08087816 0120
     .hword 0x4641    @ 08087818 4146
     ands r0,r1    @ 0808781a 0840
-    ldr r1, DAT_0808786c                     @ 0808781c 1349
+    ldr r1, stride_8786c                     @ 0808781c 1349
     adds r2,r0,#0x0    @ 0808781e 021c
     muls r2,r1    @ 08087820 4a43
     adds r0,r3,#0x0    @ 08087822 181c
@@ -5444,28 +5414,20 @@ LAB_0808785c:
     pop {r0}                                 @ 08087862 01bc
     bx r0                                    @ 08087864 0047
     .zero  0x2
-PTR_gP1LifePoints_08087868:
-    .word  gP1LifePoints                  @ 08087868 e0c40102
-DAT_0808786c:
-    .word  0x00000868                     @ 0808786c 68080000
+ptr_lp_87868:
+    .word  gP1LifePoints                  @ 08087868 e0c40102  gP1LifePoints
+stride_8786c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808786c 68080000
 
-@ Equip activation scan callback, substate=0xe path, filters monster zone cards with extended stat field6==0x16 (equip category code). Entry r0=player_id. Iterates gP1LifePoints+player*0x868+0x14 slot list; extracts card_id (bits[18:0]); calls get_card_extended_stat_field6(card_id) and compares with 0x16. Match -> write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx). field6==0x16 marks cards belonging to an equip-referenceable category.
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x14
-@ - EQUIP_CATEGORY_CODE=0x16
-@ - SUBSTATE=0xe
-@ - gP1LifePoints base (PTR_gP1LifePoints_080878c0)
-@ - MONSTER_ZONE_BASE=0x0201c5d8
+@ Equip scan callback, substate=0xe, field6 category filter. r0=player_id. Iterates gP1HandSlotArray+player*PLAYER_BLOCK_STRIDE (offset 0x14 for zone count). Extracts card_id bits[18:0]; calls get_card_extended_stat_field6(card_id); if == CARD_FIELD6_EQUIP_CONTINUOUS (0x16) -> write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx).
 scan_zone_equip_category_match_substate_e:
     push {r4,r5,r6,r7,lr}                    @ 08087870 f0b5
     adds r6,r0,#0x0    @ 08087872 061c
     movs r5,#0x0    @ 08087874 0025
-    ldr r3, PTR_gP1LifePoints_080878c0       @ 08087876 124b
+    ldr r3, ptr_lp_878c0                     @ 08087876 124b
     movs r0,#0x1    @ 08087878 0120
     ands r0,r6    @ 0808787a 3040
-    ldr r1, DAT_080878c4                     @ 0808787c 1149
+    ldr r1, stride_878c4                     @ 0808787c 1149
     adds r2,r0,#0x0    @ 0808787e 021c
     muls r2,r1    @ 08087880 4a43
     adds r0,r3,#0x0    @ 08087882 181c
@@ -5500,31 +5462,22 @@ LAB_080878ba:
     pop {r4,r5,r6,r7}                        @ 080878ba f0bc
     pop {r0}                                 @ 080878bc 01bc
     bx r0                                    @ 080878be 0047
-PTR_gP1LifePoints_080878c0:
-    .word  gP1LifePoints                  @ 080878c0 e0c40102
-DAT_080878c4:
-    .word  0x00000868                     @ 080878c4 68080000
+ptr_lp_878c0:
+    .word  gP1LifePoints                  @ 080878c0 e0c40102  gP1LifePoints
+stride_878c4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080878c4 68080000
 
-@ Equip activation scan callback, substate=0xd path, triple gate: (1) check_card_field5_is_nonzero, (2) get_card_extended_stat_field4_raw <= 0x5dc (ATK upper bound 1500), (3) find_effect_node_in_zone(player_id, zone=0xb, card_id=0x12a1) returns 0 (no existing node). Entry r0=player_id, r8=fn-ptr frame high-reg. Iterates gP1LifePoints+player*0x868+0x10 zone list; reads full slot DWORD from gDuelCardSlots (0x0201c740); extracts zone type. All pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x10
-@ - SUBSTATE=0xd
-@ - ATK_UPPER_BOUND=0x5dc (1500 ATK)
-@ - PARASITE_PARACIDE_ICID=0x12a1 (effect node key)
-@ - gDuelCardSlots=0x0201c740
-@ - ZONE_B=0xb
+@ Equip scan callback, substate=0xd, triple gate: field5 nonzero + ATK<=1500 + no Parasite node. r0=player_id, r8=fn-ptr frame. Iterates gP1SlotSetCodeArray+player*stride. Gates: check_card_field5_is_nonzero; get_card_extended_stat_field4_raw<=CARD_STAT_LP_THRESHOLD_1500; find_effect_node_in_zone(player_id, 0xb, zone_query_hand_tag_12a1)==0. All pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
 scan_zone_field5_atk_bound_substate_d:
     push {r4,r5,r6,r7,lr}                    @ 080878c8 f0b5
     .hword 0x4647    @ 080878ca 4746
     push {r7}                                @ 080878cc 80b4
     adds r7,r0,#0x0    @ 080878ce 071c
     movs r5,#0x0    @ 080878d0 0025
-    ldr r0, PTR_gP1LifePoints_08087958       @ 080878d2 2148
+    ldr r0, ptr_lp_87958                     @ 080878d2 2148
     movs r2,#0x1    @ 080878d4 0122
     ands r2,r7    @ 080878d6 3a40
-    ldr r3, DAT_0808795c                     @ 080878d8 204b
+    ldr r3, stride_8795c                     @ 080878d8 204b
     adds r1,r2,#0x0    @ 080878da 111c
     muls r1,r3    @ 080878dc 5943
     adds r4,r0,#0x0    @ 080878de 041c
@@ -5540,7 +5493,7 @@ LAB_080878ee:
     adds r0,r6,#0x0    @ 080878f0 301c
     muls r0,r3    @ 080878f2 5843
     adds r1,r1,r0    @ 080878f4 0918
-    ldr r0, DAT_08087960                     @ 080878f6 1a48
+    ldr r0, ref_87960                        @ 080878f6 1a48
     adds r4,r1,r0    @ 080878f8 0c18
     ldr r0,[r4,#0x0]                         @ 080878fa 2068
     lsls r0,r0,#0x13    @ 080878fc c004
@@ -5552,7 +5505,7 @@ LAB_080878ee:
     lsls r0,r0,#0x13    @ 0808790a c004
     lsrs r0,r0,#0x13    @ 0808790c c00c
     bl get_card_extended_stat_field4_raw     @ 0808790e 67f02ffb
-    ldr r1, DAT_08087964                     @ 08087912 1449
+    ldr r1, atk_thr_87964                    @ 08087912 1449
     cmp r0,r1                                @ 08087914 8842
     bgt LAB_0808793e                         @ 08087916 12dc
     ldr r0,[r4,#0x0]                         @ 08087918 2068
@@ -5564,7 +5517,7 @@ LAB_080878ee:
     adds r3,r3,r0    @ 08087924 1b18
     adds r0,r7,#0x0    @ 08087926 381c
     movs r1,#0xb    @ 08087928 0b21
-    ldr r2, DAT_08087968                     @ 0808792a 0f4a
+    ldr r2, zone_qtag_87968                  @ 0808792a 0f4a
     bl find_effect_node_in_zone              @ 0808792c a8f718fa
     cmp r0,#0x0                              @ 08087930 0028
     bne LAB_0808793e                         @ 08087932 04d1
@@ -5574,7 +5527,7 @@ LAB_080878ee:
     bl write_equip_zone_entry_by_substate    @ 0808793a 05f0a7ff
 LAB_0808793e:
     adds r5,#0x1    @ 0808793e 0135
-    ldr r3, DAT_0808795c                     @ 08087940 064b
+    ldr r3, stride_8795c                     @ 08087940 064b
     adds r0,r6,#0x0    @ 08087942 301c
     muls r0,r3    @ 08087944 5843
     add r0,r8                                @ 08087946 4044
@@ -5587,29 +5540,18 @@ LAB_0808794e:
     pop {r4,r5,r6,r7}                        @ 08087952 f0bc
     pop {r0}                                 @ 08087954 01bc
     bx r0                                    @ 08087956 0047
-PTR_gP1LifePoints_08087958:
-    .word  gP1LifePoints                  @ 08087958 e0c40102
-DAT_0808795c:
-    .word  0x00000868                     @ 0808795c 68080000
-DAT_08087960:
+ptr_lp_87958:
+    .word  gP1LifePoints                  @ 08087958 e0c40102  gP1LifePoints
+stride_8795c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808795c 68080000
+ref_87960:
     .word  0x0201c740                     @ 08087960 40c70102
-DAT_08087964:
-    .word  0x000005dc                     @ 08087964 dc050000
-DAT_08087968:
-    .word  0x000012a1                     @ 08087968 a1120000
+atk_thr_87964:
+    .word  CARD_STAT_LP_THRESHOLD_1500    @ 08087964 dc050000
+zone_qtag_87968:
+    .word  zone_query_hand_tag_12a1       @ 08087968 a1120000
 
-@ Equip activation scan callback, substate=0xe path, Chimera/Berfomet/Gazelle fusion pair detection. Entry r0=player_id, r1=card_id. Dispatch tree: Gazelle(0x1291)->sp[0]=0x1291,sp[4]=0x1293+2; Miracle Restoring(0x1631)->sp[0]=0x0fc9(Dark Magician),sp[4]=0x1377(Buster Blader). Iterates gP1LifePoints+player*0x868+0x14 monster zone; dual-pass loop (r4 in {0,1}) checks check_card_pair_allowed(card_id, sp[r4*4]). Pass -> write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx).
-@ 
-@ Constants:
-@ - GAZELLE_ICID=0x1291
-@ - BERFOMET_ICID=0x1293
-@ - CHIMERA_ICID=0x1294
-@ - DARK_MAGICIAN_ICID=0x0fc9
-@ - MIRACLE_RESTORING_ICID=0x1631
-@ - BUSTER_BLADER_ICID=0x1377
-@ - ZONE_LIST_OFFSET=0x14
-@ - SUBSTATE=0xe
-@ - CHIMERA_ZONE_DATA=0x0201c8f8
+@ Equip scan callback, substate=0xe, Chimera/Miracle Restoring pair check. r0=player_id, r1=input_card_id. Dispatch: CHIMERA_FLYING_MYTHICAL_BEAST_CID->sp[0]=GAZELLE_CID, sp[4]=BERFOMET_CID; MIRACLE_RESTORING_CID->sp[0]=DARK_MAGICIAN_CID_0FC9, sp[4]=BUSTER_BLADER_CID. Iterates gP1HandSlotArray+player*stride; dual-pass (r4 in 0..1): check_card_pair_allowed(slot_card, sp[r4*4]). Pass -> write_equip_zone_entry_by_substate(player_id, 0xe, slot_idx).
 scan_zone_chimera_pair_check_substate_e:
     push {r4,r5,r6,r7,lr}                    @ 0808796c f0b5
     .hword 0x464f    @ 0808796e 4f46
@@ -5617,38 +5559,38 @@ scan_zone_chimera_pair_check_substate_e:
     push {r6,r7}                             @ 08087972 c0b4
     sub sp,#0x8                              @ 08087974 82b0
     .hword 0x4680    @ 08087976 8046
-    ldr r0, DAT_08087988                     @ 08087978 0348
+    ldr r0, chimera_cid_87988                @ 08087978 0348
     cmp r1,r0                                @ 0808797a 8142
     beq LAB_08087990                         @ 0808797c 08d0
-    ldr r0, DAT_0808798c                     @ 0808797e 0348
+    ldr r0, chimera_cid_8798c                @ 0808797e 0348
     cmp r1,r0                                @ 08087980 8142
     beq LAB_0808799c                         @ 08087982 0bd0
     b LAB_080879a4                           @ 08087984 0ee0
     .zero  0x2
-DAT_08087988:
-    .word  0x00001294                     @ 08087988 94120000
-DAT_0808798c:
-    .word  0x00001631                     @ 0808798c 31160000
+chimera_cid_87988:
+    .word  CHIMERA_FLYING_MYTHICAL_BEAST_CID @ 08087988 94120000
+chimera_cid_8798c:
+    .word  MIRACLE_RESTORING_CID          @ 0808798c 31160000
 LAB_08087990:
-    ldr r0, DAT_08087998                     @ 08087990 0148
+    ldr r0, chimera_cid_87998                @ 08087990 0148
     str r0,[sp,#0x0]                         @ 08087992 0090
     adds r0,#0x2    @ 08087994 0230
     b LAB_080879a2                           @ 08087996 04e0
-DAT_08087998:
-    .word  0x00001291                     @ 08087998 91120000
+chimera_cid_87998:
+    .word  GAZELLE_CID                    @ 08087998 91120000
 LAB_0808799c:
-    ldr r0, DAT_080879c8                     @ 0808799c 0a48
+    ldr r0, chimera_cid_879c8                @ 0808799c 0a48
     str r0,[sp,#0x0]                         @ 0808799e 0090
-    ldr r0, DAT_080879cc                     @ 080879a0 0a48
+    ldr r0, chimera_cid_879cc                @ 080879a0 0a48
 LAB_080879a2:
     str r0,[sp,#0x4]                         @ 080879a2 0190
 LAB_080879a4:
     movs r5,#0x0    @ 080879a4 0025
-    ldr r2, PTR_gP1LifePoints_080879d0       @ 080879a6 0a4a
+    ldr r2, ptr_lp_879d0                     @ 080879a6 0a4a
     movs r0,#0x1    @ 080879a8 0120
     .hword 0x4641    @ 080879aa 4146
     ands r0,r1    @ 080879ac 0840
-    ldr r1, DAT_080879d4                     @ 080879ae 0949
+    ldr r1, stride_879d4                     @ 080879ae 0949
     adds r3,r0,#0x0    @ 080879b0 031c
     muls r3,r1    @ 080879b2 4b43
     adds r2,#0x14    @ 080879b4 1432
@@ -5662,14 +5604,14 @@ LAB_080879c2:
     movs r4,#0x0    @ 080879c2 0024
     adds r6,r5,#0x1    @ 080879c4 6e1c
     b LAB_080879da                           @ 080879c6 08e0
-DAT_080879c8:
-    .word  0x00000fc9                     @ 080879c8 c90f0000
-DAT_080879cc:
-    .word  0x00001377                     @ 080879cc 77130000
-PTR_gP1LifePoints_080879d0:
-    .word  gP1LifePoints                  @ 080879d0 e0c40102
-DAT_080879d4:
-    .word  0x00000868                     @ 080879d4 68080000
+chimera_cid_879c8:
+    .word  DARK_MAGICIAN_CID_0FC9         @ 080879c8 c90f0000
+chimera_cid_879cc:
+    .word  BUSTER_BLADER_CID              @ 080879cc 77130000
+ptr_lp_879d0:
+    .word  gP1LifePoints                  @ 080879d0 e0c40102  gP1LifePoints
+stride_879d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080879d4 68080000
 LAB_080879d8:
     adds r4,#0x1    @ 080879d8 0134
 LAB_080879da:
@@ -5677,7 +5619,7 @@ LAB_080879da:
     bgt LAB_08087a04                         @ 080879dc 12dc
     lsls r0,r5,#0x2    @ 080879de a800
     adds r0,r0,r7    @ 080879e0 c019
-    ldr r1, DAT_08087a1c                     @ 080879e2 0e49
+    ldr r1, ref_87a1c                        @ 080879e2 0e49
     adds r0,r0,r1    @ 080879e4 4018
     ldr r0,[r0,#0x0]                         @ 080879e6 0068
     lsls r0,r0,#0x13    @ 080879e8 c004
@@ -5706,15 +5648,10 @@ LAB_08087a0e:
     pop {r4,r5,r6,r7}                        @ 08087a16 f0bc
     pop {r0}                                 @ 08087a18 01bc
     bx r0                                    @ 08087a1a 0047
-DAT_08087a1c:
+ref_87a1c:
     .word  0x0201c8f8                     @ 08087a1c f8c80102
 
-@ Equip activation scan callback, substate=0xb path, dual filter: (1) get_card_extended_stat_field6(zone_card)==get_card_extended_stat_field6(r1_card), (2) eval_equip_placement_full_check(player_id, zone_card_id, 0) passes. Entry r0=player_id, r1=target_card_id (r5), r2=zone_slot_idx (r8 via .hword 0x4690=mov r8,r2). Reads gDuelCardSlots (0x0201c600)+player*0x868+slot*4; extracts card_id (bits[18:0]). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xb, zone_slot_idx).
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_DATA_BASE=0x0201c600
-@ - SUBSTATE=0xb
+@ Equip scan callback, substate=0xb. r0=player_id, r1=target_card_id, r2=zone_slot_idx (saved to r8). Reads gP1FieldArrayCBase+player*stride+slot*4; extracts card_id. Gate 1: get_card_extended_stat_field6(zone_card)==get_card_extended_stat_field6(r1_card). Gate 2: eval_equip_placement_full_check(player_id, zone_card, 0). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xb, zone_slot_idx).
 scan_zone_field6_eq_eval_placement_substate_b:
     push {r4,r5,r6,r7,lr}                    @ 08087a20 f0b5
     .hword 0x4647    @ 08087a22 4746
@@ -5725,10 +5662,10 @@ scan_zone_field6_eq_eval_placement_substate_b:
     movs r0,#0x1    @ 08087a2c 0120
     ands r0,r7    @ 08087a2e 3840
     lsls r1,r2,#0x2    @ 08087a30 9100
-    ldr r2, DAT_08087a78                     @ 08087a32 114a
+    ldr r2, stride_87a78                     @ 08087a32 114a
     muls r0,r2    @ 08087a34 5043
     adds r1,r1,r0    @ 08087a36 0918
-    ldr r0, DAT_08087a7c                     @ 08087a38 1048
+    ldr r0, ref_87a7c                        @ 08087a38 1048
     adds r1,r1,r0    @ 08087a3a 0918
     ldr r0,[r1,#0x0]                         @ 08087a3c 0868
     lsls r0,r0,#0x13    @ 08087a3e c004
@@ -5757,28 +5694,20 @@ LAB_08087a6c:
     pop {r0}                                 @ 08087a72 01bc
     bx r0                                    @ 08087a74 0047
     .zero  0x2
-DAT_08087a78:
-    .word  0x00000868                     @ 08087a78 68080000
-DAT_08087a7c:
+stride_87a78:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087a78 68080000
+ref_87a7c:
     .word  0x0201c600                     @ 08087a7c 00c60102
 
-@ Equip activation scan callback, substate=0xd path, specialized Parasite Paracide (icid 0x12a1) parasitic node detection. Entry r0=player_id. Iterates gP1LifePoints+player*0x868+0x10 zone slot list; reads full slot DWORD from gDuelCardSlots (0x0201c740); extracts card_id. Per slot: compares card_id with 0x12a1; if match, parses zone_type from DWORD and builds zone_key; calls find_effect_node_in_zone(player_id, zone=0xb, zone_key) to check for existing parasitic node. If no node (returns 0) -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
-@ 
-@ Constants:
-@ - PARASITE_PARACIDE_ICID=0x12a1
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x10
-@ - gDuelCardSlots=0x0201c740
-@ - ZONE_KEY_B=0xb
-@ - SUBSTATE=0xd
+@ Equip scan callback, substate=0xd, Parasite Paracide node check. r0=player_id. Iterates gP1SlotSetCodeArray+player*stride+0x10. Per slot: card_id==PARASITE_PARACIDE_CID? If so, extracts zone_type, builds zone_key; find_effect_node_in_zone(player_id, 0xb, zone_key)==0 (no existing node) -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
 scan_zone_parasite_node_check_substate_d:
     push {r4,r5,r6,r7,lr}                    @ 08087a80 f0b5
     adds r6,r0,#0x0    @ 08087a82 061c
     movs r4,#0x0    @ 08087a84 0024
-    ldr r0, PTR_gP1LifePoints_08087af0       @ 08087a86 1a48
+    ldr r0, ptr_lp_87af0                     @ 08087a86 1a48
     movs r2,#0x1    @ 08087a88 0122
     ands r2,r6    @ 08087a8a 3240
-    ldr r3, DAT_08087af4                     @ 08087a8c 194b
+    ldr r3, stride_87af4                     @ 08087a8c 194b
     adds r1,r2,#0x0    @ 08087a8e 111c
     muls r1,r3    @ 08087a90 5943
     adds r7,r0,#0x0    @ 08087a92 071c
@@ -5791,14 +5720,14 @@ scan_zone_parasite_node_check_substate_d:
 LAB_08087aa0:
     adds r1,r5,#0x0    @ 08087aa0 291c
     muls r1,r3    @ 08087aa2 5943
-    ldr r0, DAT_08087af8                     @ 08087aa4 1448
+    ldr r0, ref_87af8                        @ 08087aa4 1448
     adds r1,r1,r0    @ 08087aa6 0918
     lsls r0,r4,#0x2    @ 08087aa8 a000
     adds r1,r1,r0    @ 08087aaa 0918
     ldr r1,[r1,#0x0]                         @ 08087aac 0968
     lsls r0,r1,#0x13    @ 08087aae c804
     lsrs r2,r0,#0x13    @ 08087ab0 c20c
-    ldr r0, DAT_08087afc                     @ 08087ab2 1248
+    ldr r0, para_cid_87afc                   @ 08087ab2 1248
     cmp r2,r0                                @ 08087ab4 8242
     bne LAB_08087ada                         @ 08087ab6 10d1
     lsls r3,r1,#0x2    @ 08087ab8 8b00
@@ -5818,7 +5747,7 @@ LAB_08087aa0:
     bl write_equip_zone_entry_by_substate    @ 08087ad6 05f0d9fe
 LAB_08087ada:
     adds r4,#0x1    @ 08087ada 0134
-    ldr r3, DAT_08087af4                     @ 08087adc 054b
+    ldr r3, stride_87af4                     @ 08087adc 054b
     adds r0,r5,#0x0    @ 08087ade 281c
     muls r0,r3    @ 08087ae0 5843
     adds r0,r0,r7    @ 08087ae2 c019
@@ -5829,56 +5758,46 @@ LAB_08087aea:
     pop {r4,r5,r6,r7}                        @ 08087aea f0bc
     pop {r0}                                 @ 08087aec 01bc
     bx r0                                    @ 08087aee 0047
-PTR_gP1LifePoints_08087af0:
-    .word  gP1LifePoints                  @ 08087af0 e0c40102
-DAT_08087af4:
-    .word  0x00000868                     @ 08087af4 68080000
-DAT_08087af8:
+ptr_lp_87af0:
+    .word  gP1LifePoints                  @ 08087af0 e0c40102  gP1LifePoints
+stride_87af4:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087af4 68080000
+ref_87af8:
     .word  0x0201c740                     @ 08087af8 40c70102
-DAT_08087afc:
-    .word  0x000012a1                     @ 08087afc a1120000
+para_cid_87afc:
+    .word  PARASITE_PARACIDE_CID          @ 08087afc a1120000
 
-@ Equip activation scan callback, substate=0xd path, Magical Labyrinth/Dark Magic Curtain family pair + full placement check. Entry r0=player_id, r1=card_id. Dispatch tree maps r1 to pair base r8: Magical Labyrinth(0x1232)->Wall Shadow(0x1117); Dark Magic Curtain(0x12de)->Dark Magician(0x0fc9). Iterates gP1LifePoints+player*0x868+0x10; reads from gDuelCardSlots (0x0201c740); checks check_card_pair_allowed(zone_card, r8). Pass -> eval_equip_placement_full_check(player_id, zone_card_id, 1). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
-@ 
-@ Constants:
-@ - MAGICAL_LABYRINTH_ICID=0x1232
-@ - DARK_MAGIC_CURTAIN_ICID=0x12de (=0x1232+0xac)
-@ - WALL_SHADOW_ICID=0x1117
-@ - DARK_MAGICIAN_ICID=0x0fc9
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x10
-@ - gDuelCardSlots=0x0201c740
-@ - SUBSTATE=0xd
+@ Equip scan callback, substate=0xd, Labyrinth/Dark Magic Curtain pair + placement. r0=player_id, r1=input_card_id. Dispatch: MAGICAL_LABYRINTH_CID->WALL_SHADOW_CID (r8); DARK_MAGIC_CURTAIN_CID->DARK_MAGICIAN_CID_0FC9 (r8). Iterates gP1SlotSetCodeArray+player*stride+0x10; check_card_pair_allowed(slot_card, r8). Pass: eval_equip_placement_full_check(player_id, zone_card, 1). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
 scan_zone_labyrinth_pair_placement_substate_d:
     push {r4,r5,r6,r7,lr}                    @ 08087b00 f0b5
     .hword 0x464f    @ 08087b02 4f46
     .hword 0x4646    @ 08087b04 4646
     push {r6,r7}                             @ 08087b06 c0b4
     adds r7,r0,#0x0    @ 08087b08 071c
-    ldr r0, DAT_08087b18                     @ 08087b0a 0348
+    ldr r0, lab_cid_87b18                    @ 08087b0a 0348
     cmp r1,r0                                @ 08087b0c 8142
     beq LAB_08087b1c                         @ 08087b0e 05d0
     adds r0,#0xac    @ 08087b10 ac30
     cmp r1,r0                                @ 08087b12 8142
     beq LAB_08087b24                         @ 08087b14 06d0
     b LAB_08087b28                           @ 08087b16 07e0
-DAT_08087b18:
-    .word  0x00001232                     @ 08087b18 32120000
+lab_cid_87b18:
+    .word  MAGICAL_LABYRINTH_CID          @ 08087b18 32120000
 LAB_08087b1c:
-    ldr r0, DAT_08087b20                     @ 08087b1c 0048
+    ldr r0, lab_cid_87b20                    @ 08087b1c 0048
     b LAB_08087b26                           @ 08087b1e 02e0
-DAT_08087b20:
-    .word  0x00001117                     @ 08087b20 17110000
+lab_cid_87b20:
+    .word  WALL_SHADOW_CID                @ 08087b20 17110000
 LAB_08087b24:
-    ldr r0, DAT_08087b98                     @ 08087b24 1c48
+    ldr r0, lab_cid_87b98                    @ 08087b24 1c48
 LAB_08087b26:
     .hword 0x4680    @ 08087b26 8046
 LAB_08087b28:
     movs r5,#0x0    @ 08087b28 0025
-    ldr r0, PTR_gP1LifePoints_08087b9c       @ 08087b2a 1c48
+    ldr r0, ptr_lp_87b9c                     @ 08087b2a 1c48
     movs r2,#0x1    @ 08087b2c 0122
     ands r2,r7    @ 08087b2e 3a40
-    ldr r3, DAT_08087ba0                     @ 08087b30 1b4b
+    ldr r3, stride_87ba0                     @ 08087b30 1b4b
     adds r1,r2,#0x0    @ 08087b32 111c
     muls r1,r3    @ 08087b34 5943
     adds r4,r0,#0x0    @ 08087b36 041c
@@ -5894,7 +5813,7 @@ LAB_08087b46:
     adds r0,r6,#0x0    @ 08087b48 301c
     muls r0,r3    @ 08087b4a 5843
     adds r1,r1,r0    @ 08087b4c 0918
-    ldr r0, DAT_08087ba4                     @ 08087b4e 1548
+    ldr r0, ref_87ba4                        @ 08087b4e 1548
     adds r1,r1,r0    @ 08087b50 0918
     ldr r0,[r1,#0x0]                         @ 08087b52 0868
     lsls r0,r0,#0x13    @ 08087b54 c004
@@ -5916,7 +5835,7 @@ LAB_08087b46:
     bl write_equip_zone_entry_by_substate    @ 08087b78 05f088fe
 LAB_08087b7c:
     adds r5,#0x1    @ 08087b7c 0135
-    ldr r3, DAT_08087ba0                     @ 08087b7e 084b
+    ldr r3, stride_87ba0                     @ 08087b7e 084b
     adds r0,r6,#0x0    @ 08087b80 301c
     muls r0,r3    @ 08087b82 5843
     add r0,r9                                @ 08087b84 4844
@@ -5930,22 +5849,16 @@ LAB_08087b8c:
     pop {r4,r5,r6,r7}                        @ 08087b92 f0bc
     pop {r0}                                 @ 08087b94 01bc
     bx r0                                    @ 08087b96 0047
-DAT_08087b98:
-    .word  0x00000fc9                     @ 08087b98 c90f0000
-PTR_gP1LifePoints_08087b9c:
-    .word  gP1LifePoints                  @ 08087b9c e0c40102
-DAT_08087ba0:
-    .word  0x00000868                     @ 08087ba0 68080000
-DAT_08087ba4:
+lab_cid_87b98:
+    .word  DARK_MAGICIAN_CID_0FC9         @ 08087b98 c90f0000
+ptr_lp_87b9c:
+    .word  gP1LifePoints                  @ 08087b9c e0c40102  gP1LifePoints
+stride_87ba0:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087ba0 68080000
+ref_87ba4:
     .word  0x0201c740                     @ 08087ba4 40c70102
 
-@ Equip activation scan callback, substate=0xb path, dual gate: (1) get_card_extended_stat_field6(zone_card)==1; (2) eval_equip_placement_full_check(player_id, zone_card_id, 0) passes. Entry r0=player_id (r5), r2=zone_slot_idx (r6). Reads gDuelCardSlots (0x0201c600)+player*0x868+slot_idx*4; extracts card_id (bits[18:0]). field6==1 and placement check pass -> write_equip_zone_entry_by_substate(player_id, 0xb, slot_idx). Sibling pair with scan_zone_field6_eq_eval_placement_substate_b (0x08087a20): this function compares field6 with fixed 1 rather than target card's field6.
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - gDuelCardSlots=0x0201c600
-@ - FIELD6_EQUIP_ONE=0x1
-@ - SUBSTATE=0xb
+@ Equip scan callback, substate=0xb. r0=player_id, r2=zone_slot_idx. Reads gP1FieldArrayCBase+player*stride+slot*4. Gate 1: get_card_extended_stat_field6(zone_card)==1. Gate 2: eval_equip_placement_full_check(player_id, zone_card, 0). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xb, slot_idx). Sibling of scan_zone_field6_eq_eval_placement_substate_b: uses constant 1 not target card field6.
 scan_zone_field6_one_placement_substate_b:
     push {r4,r5,r6,lr}                       @ 08087ba8 70b5
     adds r5,r0,#0x0    @ 08087baa 051c
@@ -5953,10 +5866,10 @@ scan_zone_field6_one_placement_substate_b:
     movs r0,#0x1    @ 08087bae 0120
     ands r0,r5    @ 08087bb0 2840
     lsls r1,r6,#0x2    @ 08087bb2 b100
-    ldr r2, DAT_08087bec                     @ 08087bb4 0d4a
+    ldr r2, stride_87bec                     @ 08087bb4 0d4a
     muls r0,r2    @ 08087bb6 5043
     adds r1,r1,r0    @ 08087bb8 0918
-    ldr r0, DAT_08087bf0                     @ 08087bba 0d48
+    ldr r0, ref_87bf0                        @ 08087bba 0d48
     adds r1,r1,r0    @ 08087bbc 0918
     ldr r0,[r1,#0x0]                         @ 08087bbe 0868
     lsls r0,r0,#0x13    @ 08087bc0 c004
@@ -5979,9 +5892,9 @@ LAB_08087be6:
     pop {r4,r5,r6}                           @ 08087be6 70bc
     pop {r0}                                 @ 08087be8 01bc
     bx r0                                    @ 08087bea 0047
-DAT_08087bec:
-    .word  0x00000868                     @ 08087bec 68080000
-DAT_08087bf0:
+stride_87bec:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087bec 68080000
+ref_87bf0:
     .word  0x0201c600                     @ 08087bf0 00c60102
 
 @ Single-player zone equip eligibility scan, substate 0xc path. r0=player_id(0/1). Selects player zone by player_id bit0 * STRIDE(0x868); reads gP1LifePoints+0x18+stride for zone_count; returns if zone_count==0. Loop r5=0..zone_count-1: extracts zone_data[r5*4] card_id(bits[18:0]); calls build_equip_slot_criteria_from_card_range to check eligibility; if eligible calls write_equip_zone_entry_by_substate(player_id, 0xc, r5). Dispatched via equip activation scan callback fn-ptr table.
@@ -5989,10 +5902,10 @@ scan_player_zone_equip_criteria_substate_c:
     push {r4,r5,r6,r7,lr}                    @ 08087bf4 f0b5
     adds r6,r0,#0x0    @ 08087bf6 061c
     movs r5,#0x0    @ 08087bf8 0025
-    ldr r3, PTR_gP1LifePoints_08087c44       @ 08087bfa 124b
+    ldr r3, ptr_lp_87c44                     @ 08087bfa 124b
     movs r0,#0x1    @ 08087bfc 0120
     ands r0,r6    @ 08087bfe 3040
-    ldr r1, DAT_08087c48                     @ 08087c00 1149
+    ldr r1, stride_87c48                     @ 08087c00 1149
     muls r1,r0    @ 08087c02 4143
     adds r0,r3,#0x0    @ 08087c04 181c
     adds r0,#0x18    @ 08087c06 1830
@@ -6027,19 +5940,12 @@ LAB_08087c3e:
     pop {r4,r5,r6,r7}                        @ 08087c3e f0bc
     pop {r0}                                 @ 08087c40 01bc
     bx r0                                    @ 08087c42 0047
-PTR_gP1LifePoints_08087c44:
-    .word  gP1LifePoints                  @ 08087c44 e0c40102
-DAT_08087c48:
-    .word  0x00000868                     @ 08087c48 68080000
+ptr_lp_87c44:
+    .word  gP1LifePoints                  @ 08087c44 e0c40102  gP1LifePoints
+stride_87c48:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087c48 68080000
 
-@ Equip activation scan callback, substate=0xe path, dual-player iteration variant. Outer loop r2 in {0,1} (player side toggle via eors r5,r2); inner loop r4=0..zone_count-1. Reads gDuelCardSlots (0x0201c8f8) per slot; extracts card_id (bits[18:0]). Two gates: (1) check_card_field5_is_nonzero(card_id); (2) check_zone_slot_equip_eligible(r8, player_side, slot_idx). Both pass -> write_equip_zone_entry_by_substate(r8, 0xe, slot_idx). r8 holds original player_id throughout as write target; r5 is the scanning player_side variable.
-@ 
-@ Constants:
-@ - ZONE_DATA_BASE=0x0201c8f8
-@ - ZONE_LIST_OFFSET=0x14
-@ - PLAYER_STRIDE=0x868
-@ - SUBSTATE=0xe
-@ - LOOP_PLAYER_COUNT=2
+@ Equip scan callback, substate=0xe, dual-player loop. r8=player_id (write target). Outer loop r2 in 0..1 (both player sides via eors r5,r2); inner loop r4=0..zone_count-1. Reads gP1HandSlotArray+player*stride+0x14 zone count. Gates: check_card_field5_is_nonzero; check_zone_slot_equip_eligible(r8, player_side, slot_idx). Both pass -> write_equip_zone_entry_by_substate(r8, 0xe, slot_idx).
 scan_both_players_field5_eligible_substate_e:
     push {r4,r5,r6,r7,lr}                    @ 08087c4c f0b5
     .hword 0x4657    @ 08087c4e 5746
@@ -6049,7 +5955,7 @@ scan_both_players_field5_eligible_substate_e:
     sub sp,#0x4                              @ 08087c56 81b0
     .hword 0x4680    @ 08087c58 8046
     movs r2,#0x0    @ 08087c5a 0022
-    ldr r0, PTR_gP1LifePoints_08087ce4       @ 08087c5c 2148
+    ldr r0, ptr_lp_87ce4                     @ 08087c5c 2148
     str r0,[sp,#0x0]                         @ 08087c5e 0090
 LAB_08087c60:
     .hword 0x4645    @ 08087c60 4546
@@ -6058,7 +5964,7 @@ LAB_08087c60:
     adds r1,r5,#0x0    @ 08087c66 291c
     movs r0,#0x1    @ 08087c68 0120
     ands r1,r0    @ 08087c6a 0140
-    ldr r7, DAT_08087ce8                     @ 08087c6c 1e4f
+    ldr r7, stride_87ce8                     @ 08087c6c 1e4f
     adds r0,r1,#0x0    @ 08087c6e 081c
     muls r0,r7    @ 08087c70 7843
     ldr r3,[sp,#0x0]                         @ 08087c72 009b
@@ -6079,7 +5985,7 @@ LAB_08087c8c:
     adds r1,r6,#0x0    @ 08087c8e 311c
     muls r1,r7    @ 08087c90 7943
     adds r0,r0,r1    @ 08087c92 4018
-    ldr r1, DAT_08087cec                     @ 08087c94 1549
+    ldr r1, ref_87cec                        @ 08087c94 1549
     adds r0,r0,r1    @ 08087c96 4018
     ldr r0,[r0,#0x0]                         @ 08087c98 0068
     lsls r0,r0,#0x13    @ 08087c9a c004
@@ -6099,7 +6005,7 @@ LAB_08087c8c:
     bl write_equip_zone_entry_by_substate    @ 08087cba 05f0e7fd
 LAB_08087cbe:
     adds r4,#0x1    @ 08087cbe 0134
-    ldr r7, DAT_08087ce8                     @ 08087cc0 094f
+    ldr r7, stride_87ce8                     @ 08087cc0 094f
     adds r0,r6,#0x0    @ 08087cc2 301c
     muls r0,r7    @ 08087cc4 7843
     add r0,r9                                @ 08087cc6 4844
@@ -6118,31 +6024,25 @@ LAB_08087cce:
     pop {r4,r5,r6,r7}                        @ 08087cde f0bc
     pop {r0}                                 @ 08087ce0 01bc
     bx r0                                    @ 08087ce2 0047
-PTR_gP1LifePoints_08087ce4:
-    .word  gP1LifePoints                  @ 08087ce4 e0c40102
-DAT_08087ce8:
-    .word  0x00000868                     @ 08087ce8 68080000
-DAT_08087cec:
+ptr_lp_87ce4:
+    .word  gP1LifePoints                  @ 08087ce4 e0c40102  gP1LifePoints
+stride_87ce8:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087ce8 68080000
+ref_87cec:
     .word  0x0201c8f8                     @ 08087cec f8c80102
 
-@ Equip activation scan callback, substate=0xe path, opponent-side field5 filter scan. Entry r0=player_id. Prefix: subs r3,r1,r0 (r1=1 fixed) -> r3=1-player_id=opponent_player_id; r7 alias holds opponent_player_id. Iterates gP1LifePoints+opponent*0x868+0x14; reads DWORD from monster zone area (0x83<<3=0x418 offset); extracts card_id; calls check_card_field5_is_nonzero(card_id). Pass -> write_equip_zone_entry_by_substate(opponent_id, 0xe, slot_idx). Contrast with scan_both_players_field5_eligible_substate_e (0x08087c4c): this function scans only opponent side, no check_zone_slot_equip_eligible call.
-@ 
-@ Constants:
-@ - PLAYER_STRIDE=0x868
-@ - ZONE_LIST_OFFSET=0x14
-@ - MONSTER_ZONE_OFFSET=0x418 (=0x83<<3)
-@ - SUBSTATE=0xe
+@ Equip scan callback, substate=0xe, opponent-side field5 scan. r0=player_id; opponent=1-player_id. Iterates gP1LifePoints+opponent*PLAYER_BLOCK_STRIDE+0x14 zone count; reads gP1LifePoints+opponent*stride+0x418 (gP1HandSlotArray offset); extracts card_id; check_card_field5_is_nonzero. Pass -> write_equip_zone_entry_by_substate(opponent_id, 0xe, slot_idx). Contrast: scan_both_players_field5_eligible_substate_e (0x08087c4c) scans both sides + checks eligibility.
 scan_zone_opponent_field5_substate_e:
     push {r4,r5,r6,r7,lr}                    @ 08087cf0 f0b5
     .hword 0x4647    @ 08087cf2 4746
     push {r7}                                @ 08087cf4 80b4
     movs r5,#0x0    @ 08087cf6 0025
-    ldr r6, PTR_gP1LifePoints_08087d50       @ 08087cf8 154e
+    ldr r6, ptr_lp_87d50                     @ 08087cf8 154e
     movs r1,#0x1    @ 08087cfa 0121
     subs r3,r1,r0    @ 08087cfc 0b1a
     adds r0,r3,#0x0    @ 08087cfe 181c
     ands r0,r1    @ 08087d00 0840
-    ldr r1, DAT_08087d54                     @ 08087d02 1449
+    ldr r1, stride_87d54                     @ 08087d02 1449
     muls r1,r0    @ 08087d04 4143
     adds r0,r6,#0x0    @ 08087d06 301c
     adds r0,#0x14    @ 08087d08 1430
@@ -6182,10 +6082,10 @@ LAB_08087d46:
     pop {r4,r5,r6,r7}                        @ 08087d4a f0bc
     pop {r0}                                 @ 08087d4c 01bc
     bx r0                                    @ 08087d4e 0047
-PTR_gP1LifePoints_08087d50:
-    .word  gP1LifePoints                  @ 08087d50 e0c40102
-DAT_08087d54:
-    .word  0x00000868                     @ 08087d54 68080000
+ptr_lp_87d50:
+    .word  gP1LifePoints                  @ 08087d50 e0c40102  gP1LifePoints
+stride_87d54:
+    .word  PLAYER_BLOCK_STRIDE            @ 08087d54 68080000
     ROM_INCBIN 0x87d58, 0x5a9c
 
 @ Equip zone write dispatcher, selects gP1LifePoints offset based on substate (r2=0xc/0xd/0xe/0xf) then batch-writes all zone entries via write_equip_zone_entry_by_substate. Entry r0=player_id (r7), r2=substate [0xc..0xf]. Dispatch tree: 0xc->+0x18; 0xd->+0x10; 0xe->+0x14; 0xf->+0x1c. Loads zone count (r5); if count>0 loops r4=0..count-1, calling write_equip_zone_entry_by_substate(player_id, substate, r4) each iteration. Out-of-range substate: r5 stays 0, loop skips.
