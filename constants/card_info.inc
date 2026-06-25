@@ -1782,3 +1782,21 @@
 
 @ Seg-4e raw sentinel: fn21 scan_zone_mokey_mokey_king_substate_e hand slot type check
 .equ sentinel_bc100000,                 0xbc100000  @ hand slot type sentinel (LSLS slot_word,#19 compare); scan_zone_mokey_mokey_king_substate_e fn21 pool 0x0808b8e4
+
+@ =============================================================================
+@ file 11 Seg-4f additions: equip zone scan callbacks [0x0808bb7c..0x0808cabc)
+@ 10 NEW CID equates; C5 grep verified all 10 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ RESCUE_CAT_CID,                    0x00001876  @ Rescue Cat (pw=14878871; card-stats.s card_1783 slot=0x1876); scan_zone_rescue_cat_substate_d; C5 grep=0 (new); conf: high
+.equ FULFILLMENT_CONTRACT_CID,          0x00001880  @ Fulfillment of the Contract (pw=48206762; card-stats.s card_1793 slot=0x1880); scan_zone_fulfillment_contract_substate_e; C5 grep=0 (new); conf: high
+.equ BEAST_SOUL_SWAP_CID,               0x00001889  @ Beast Soul Swap (pw=35149085; card-stats.s card_1800 slot=0x1889); scan_zone_beast_soul_swap_substate_b; C5 grep=0 (new); conf: high
+.equ HERO_SIGNAL_CID,                   0x000018d4  @ Hero Signal (pw=22020907; card-stats.s card_1860 slot=0x18D4); scan_zone_hero_signal_substate_bd; C5 grep=0 (new); conf: high
+.equ WROUGHTWEILER_CID,                 0x000018f7  @ Wroughtweiler (pw=06480253; card-stats.s card_1881 slot=0x18F7); scan_zone_wroughtweiler_substate_e; C5 grep=0 (new); conf: high
+.equ POWER_BOND_CID,                    0x000018fe  @ Power Bond (pw=37630732; card-stats.s card_1887 slot=0x18FE); scan_zone_power_bond_substate_c; C5 grep=0 (new); conf: high
+.equ SUMMON_PRIEST_CID,                 0x00001900  @ Summon Priest (pw=00423585; card-stats.s card_1889 slot=0x1900); scan_zone_summon_priest_substate_d; C5 grep=0 (new); conf: high
+.equ FUSION_RECOVERY_CID,               0x0000191f  @ Fusion Recovery (pw=18511384; card-stats.s card_1916 slot=0x191F); scan_zone_fusion_recovery_substate_e; C5 grep=0 (new); conf: high
+.equ MIRACLE_FUSION_CID,                0x00001920  @ Miracle Fusion (pw=45906428; card-stats.s card_1917 slot=0x1920); scan_zone_miracle_fusion_substate_ce; C5 grep=0 (new); conf: high
+.equ WARRIOR_LADY_WASTELAND_CID,        0x00001939  @ Warrior Lady of the Wasteland (pw=05438492; card-stats.s card_1938 slot=0x1939); scan_zone_warrior_lady_wasteland_substate_d; C5 grep=0 (new); conf: high
+
+@ Seg-4f raw value: fn07+fn08 gDuelPhaseFlags relative negative offset
+.equ VAMPIRE_GENESIS_GDUELPF_NEG_OFF,   0xfffffef4  @ gDuelPhaseFlags relative negative offset -0x10c; scan_zone_vampire_genesis_substate_be fn07+fn08 pool 0x0808bf28; conf: med
