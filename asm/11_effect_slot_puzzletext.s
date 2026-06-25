@@ -20621,7 +20621,7 @@ seg5_pool_cid_ski_ea20:
 seg5_pool_eqzcnt_ea24:
     .word  gEquipZoneCountTable           @ 0808ea24 c8e10102
 
-@ Iterates all slot pairs for a player (player*2 rows, up to 11 slots per row). For each pair, calls check_slot_card_pair_allowed; if non-zero, reads slot attrs and calls enqueue_sprite_attr_with_mode (mode=3) to write OAM. Also calls enqueue_equip_slot_sprite_attr for equip chain slots. r0=u32 player_data_ptr; r1=u8 player_id [0..1]; r2=u8 col_idx [0..10]; r3=u8 row_count [0..1]. Returns void. Callers: FUN_08044e30 (duel_field), FUN_0806c368. Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, mode=3.
+@ Iterates all slot pairs for a player (player*2 rows, up to 11 slots per row). For each pair, calls check_slot_card_pair_allowed; if non-zero, reads slot attrs and calls enqueue_sprite_attr_with_mode (mode=3) to write OAM. Also calls enqueue_equip_slot_sprite_attr for equip chain slots. r0=u32 player_data_ptr; r1=u8 player_id [0..1]; r2=u8 col_idx [0..10]; r3=u8 row_count [0..1]. Returns void. Callers: update_duel_field_slot_sprite_state (duel_field), enqueue_paired_zone_sprite_if_slot_matches. Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, mode=3.
 enqueue_paired_slot_sprite_attrs_for_player:
     push {r4,r5,r6,r7,lr}                    @ 0808ea28 f0b5
     .hword 0x4657    @ 0808ea2a 5746
@@ -20637,22 +20637,22 @@ enqueue_paired_slot_sprite_attrs_for_player:
     lsls r0,r2,#0x2    @ 0808ea3e 9000
     add r0,r10                               @ 0808ea40 5044
     lsls r0,r0,#0x2    @ 0808ea42 8000
-    ldr r4, DAT_0808eb48                     @ 0808ea44 404c
+    ldr r4, seg6_pool_stride_eb48            @ 0808ea44 404c
     muls r1,r4    @ 0808ea46 6143
     adds r0,r0,r1    @ 0808ea48 4018
-    ldr r1, DAT_0808eb4c                     @ 0808ea4a 4049
+    ldr r1, seg6_pool_field_eb4c             @ 0808ea4a 4049
     adds r1,r0,r1    @ 0808ea4c 4118
     ldr r0,[r1,#0x0]                         @ 0808ea4e 0868
     lsls r0,r0,#0x13    @ 0808ea50 c004
     lsrs r2,r0,#0x13    @ 0808ea52 c20c
-    ldr r0, DAT_0808eb50                     @ 0808ea54 3e48
+    ldr r0, seg6_pool_cid_sztar_eb50         @ 0808ea54 3e48
     cmp r2,r0                                @ 0808ea56 8242
     bne LAB_0808eb36                         @ 0808ea58 6dd1
     ldr r1,[r1,#0xc]                         @ 0808ea5a c968
     .hword 0x4689    @ 0808ea5c 8946
     ldr r0,[sp,#0x4]                         @ 0808ea5e 0198
     .hword 0x4651    @ 0808ea60 5146
-    ldr r2, DAT_0808eb50                     @ 0808ea62 3b4a
+    ldr r2, seg6_pool_cid_sztar_eb50         @ 0808ea62 3b4a
     movs r3,#0x1    @ 0808ea64 0123
     bl enqueue_equip_slot_sprite_attr        @ 0808ea66 b4f7a1fb
     movs r7,#0x0    @ 0808ea6a 0027
@@ -20664,7 +20664,7 @@ LAB_0808ea6c:
     movs r1,#0x1    @ 0808ea74 0121
     ands r0,r1    @ 0808ea76 0840
     movs r4,#0x0    @ 0808ea78 0024
-    ldr r2, DAT_0808eb48                     @ 0808ea7a 334a
+    ldr r2, seg6_pool_stride_eb48            @ 0808ea7a 334a
     adds r5,r0,#0x0    @ 0808ea7c 051c
     muls r5,r2    @ 0808ea7e 5543
 LAB_0808ea80:
@@ -20675,7 +20675,7 @@ LAB_0808ea80:
     cmp r0,#0x0                              @ 0808ea8a 0028
     beq LAB_0808eab2                         @ 0808ea8c 11d0
     adds r0,r4,r5    @ 0808ea8e 6019
-    ldr r1, DAT_0808eb4c                     @ 0808ea90 2e49
+    ldr r1, seg6_pool_field_eb4c             @ 0808ea90 2e49
     adds r0,r0,r1    @ 0808ea92 4018
     ldr r0,[r0,#0x0]                         @ 0808ea94 0068
     lsls r1,r0,#0x2    @ 0808ea96 8100
@@ -20687,7 +20687,7 @@ LAB_0808ea80:
     str r0,[sp,#0x0]                         @ 0808eaa2 0090
     ldr r0,[sp,#0x4]                         @ 0808eaa4 0198
     .hword 0x4651    @ 0808eaa6 5146
-    ldr r3, DAT_0808eb54                     @ 0808eaa8 2a4b
+    ldr r3, seg6_pool_cidpk_eb54             @ 0808eaa8 2a4b
     lsrs r2,r3,#0x10    @ 0808eaaa 1a0c
     movs r3,#0x3    @ 0808eaac 0323
     bl enqueue_sprite_attr_with_mode         @ 0808eaae b4f7d1fa
@@ -20699,7 +20699,7 @@ LAB_0808eab2:
     .hword 0x4647    @ 0808eaba 4746
     cmp r7,#0x1                              @ 0808eabc 012f
     ble LAB_0808ea6c                         @ 0808eabe d5dd
-    ldr r0, DAT_0808eb58                     @ 0808eac0 2548
+    ldr r0, seg6_pool_tag_eb58               @ 0808eac0 2548
     cmp r9,r0                                @ 0808eac2 8145
     bne LAB_0808eb36                         @ 0808eac4 37d1
     movs r6,#0x0    @ 0808eac6 0026
@@ -20708,23 +20708,23 @@ LAB_0808eac8:
     adds r0,r6,#0x0    @ 0808eaca 301c
     movs r1,#0x1    @ 0808eacc 0121
     ands r0,r1    @ 0808eace 0840
-    ldr r1, DAT_0808eb48                     @ 0808ead0 1d49
+    ldr r1, seg6_pool_stride_eb48            @ 0808ead0 1d49
     adds r2,r0,#0x0    @ 0808ead2 021c
     muls r2,r1    @ 0808ead4 4a43
-    ldr r3, DAT_0808eb5c                     @ 0808ead6 214b
+    ldr r3, seg6_pool_slotcnt_eb5c           @ 0808ead6 214b
     adds r0,r2,r3    @ 0808ead8 d018
     ldr r0,[r0,#0x0]                         @ 0808eada 0068
     adds r1,r6,#0x1    @ 0808eadc 711c
     str r1,[sp,#0x8]                         @ 0808eade 0291
     cmp r7,r0                                @ 0808eae0 8742
     bcs LAB_0808eb30                         @ 0808eae2 25d2
-    ldr r1, DAT_0808eb60                     @ 0808eae4 1e49
-    ldr r3, DAT_0808eb64                     @ 0808eae6 1f4b
+    ldr r1, seg6_pool_setcode_eb60           @ 0808eae4 1e49
+    ldr r3, slot_set_code_array_neg_off_eb64 @ 0808eae6 1f4b
     adds r0,r1,r3    @ 0808eae8 c818
     adds r0,r0,r2    @ 0808eaea 8018
     .hword 0x4681    @ 0808eaec 8146
     adds r5,r2,r1    @ 0808eaee 5518
-    ldr r0, DAT_0808eb50                     @ 0808eaf0 1748
+    ldr r0, seg6_pool_cid_sztar_eb50         @ 0808eaf0 1748
     lsls r0,r0,#0x10    @ 0808eaf2 0004
     .hword 0x4680    @ 0808eaf4 8046
 LAB_0808eaf6:
@@ -20737,7 +20737,7 @@ LAB_0808eaf6:
     adds r4,r1,r0    @ 0808eb02 0c18
     adds r0,r6,#0x0    @ 0808eb04 301c
     movs r1,#0xb    @ 0808eb06 0b21
-    ldr r2, DAT_0808eb58                     @ 0808eb08 134a
+    ldr r2, seg6_pool_tag_eb58               @ 0808eb08 134a
     adds r3,r4,#0x0    @ 0808eb0a 231c
     bl find_effect_node_in_zone              @ 0808eb0c a1f728f9
     cmp r0,#0x0                              @ 0808eb10 0028
@@ -20770,24 +20770,24 @@ LAB_0808eb36:
     pop {r0}                                 @ 0808eb42 01bc
     bx r0                                    @ 0808eb44 0047
     .zero  0x2
-DAT_0808eb48:
-    .word  0x00000868                     @ 0808eb48 68080000
-DAT_0808eb4c:
-    .word  0x0201c510                     @ 0808eb4c 10c50102
-DAT_0808eb50:
-    .word  0x00001368                     @ 0808eb50 68130000
-DAT_0808eb54:
-    .word  0x13680000                     @ 0808eb54 00006813
-DAT_0808eb58:
-    .word  0x000012a1                     @ 0808eb58 a1120000
-DAT_0808eb5c:
-    .word  0x0201c4f0                     @ 0808eb5c f0c40102
-DAT_0808eb60:
-    .word  0x0201c740                     @ 0808eb60 40c70102
-DAT_0808eb64:
-    .word  0xfffffdb0                     @ 0808eb64 b0fdffff
+seg6_pool_stride_eb48:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808eb48 68080000
+seg6_pool_field_eb4c:
+    .word  gDuelFieldSlots                @ 0808eb4c 10c50102
+seg6_pool_cid_sztar_eb50:
+    .word  SPELL_ZONE_TARGET_CARD_ID      @ 0808eb50 68130000
+seg6_pool_cidpk_eb54:
+    .word  SPELL_ZONE_TARGET_CID_PACKED   @ 0808eb54 00006813  SPELL_ZONE_TARGET_CARD_ID(0x1368) in high 16 bits; lsrs #0x10 -> r2=0x1368 for enqueue arg
+seg6_pool_tag_eb58:
+    .word  zone_query_hand_tag_12a1       @ 0808eb58 a1120000
+seg6_pool_slotcnt_eb5c:
+    .word  gP1SlotCountBase               @ 0808eb5c f0c40102
+seg6_pool_setcode_eb60:
+    .word  gP1SlotSetCodeArray            @ 0808eb60 40c70102
+slot_set_code_array_neg_off_eb64:
+    .word  0xfffffdb0                     @ 0808eb64 b0fdffff  -0x250 neg offset from gP1SlotSetCodeArray to card array
 
-@ Iterates 5 field slots (slot 0..4, stride 0x14) for given player side (r0=player_id). Checks each slot: (1) bit12 activation flag; (2) [slot+0x8] nonzero (has card); (3) check_slot_zone_bit_eligible (r2=1). Returns 1 immediately on first match, 0 if none found. Called by scan_field_slots_for_zone_equip_bitmap_update and FUN_0809a1a4. Params: r0=u8 player_id [0..1]. Constants: PLAYER_STRIDE=0x868, BASE_ADDR=0x0201c510, ZONE_FLAG=1.
+@ Iterates 5 field slots (slot 0..4, stride 0x14) for given player side (r0=player_id). Checks each slot: (1) bit12 activation flag; (2) [slot+0x8] nonzero (has card); (3) check_slot_zone_bit_eligible (r2=1). Returns 1 immediately on first match, 0 if none found. Called by scan_field_slots_for_zone_equip_bitmap_update and eval_equip_slot_pair_eligibility. Params: r0=u8 player_id [0..1]. Constants: PLAYER_STRIDE=0x868, BASE_ADDR=0x0201c510, ZONE_FLAG=1.
 find_first_eligible_zone_slot_for_player:
     push {r4,r5,r6,r7,lr}                    @ 0808eb68 f0b5
     adds r5,r0,#0x0    @ 0808eb6a 051c
@@ -20795,12 +20795,12 @@ find_first_eligible_zone_slot_for_player:
     movs r0,#0x1    @ 0808eb6e 0120
     ands r0,r5    @ 0808eb70 2840
     movs r6,#0x0    @ 0808eb72 0026
-    ldr r1, DAT_0808eba0                     @ 0808eb74 0a49
+    ldr r1, seg6_pool_stride_eba0            @ 0808eb74 0a49
     adds r7,r0,#0x0    @ 0808eb76 071c
     muls r7,r1    @ 0808eb78 4f43
 LAB_0808eb7a:
     adds r1,r6,r7    @ 0808eb7a f119
-    ldr r0, DAT_0808eba4                     @ 0808eb7c 0948
+    ldr r0, seg6_pool_field_eba4             @ 0808eb7c 0948
     adds r1,r1,r0    @ 0808eb7e 0918
     ldr r0,[r1,#0x0]                         @ 0808eb80 0868
     lsls r0,r0,#0x13    @ 0808eb82 c004
@@ -20817,10 +20817,10 @@ LAB_0808eb7a:
     bne LAB_0808eba8                         @ 0808eb9a 05d1
     movs r0,#0x1    @ 0808eb9c 0120
     b LAB_0808ebb2                           @ 0808eb9e 08e0
-DAT_0808eba0:
-    .word  0x00000868                     @ 0808eba0 68080000
-DAT_0808eba4:
-    .word  0x0201c510                     @ 0808eba4 10c50102
+seg6_pool_stride_eba0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808eba0 68080000
+seg6_pool_field_eba4:
+    .word  gDuelFieldSlots                @ 0808eba4 10c50102
 LAB_0808eba8:
     adds r6,#0x14    @ 0808eba8 1436
     adds r4,#0x1    @ 0808ebaa 0134
@@ -20832,11 +20832,11 @@ LAB_0808ebb2:
     pop {r1}                                 @ 0808ebb4 02bc
     bx r1                                    @ 0808ebb6 0847
 
-@ Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x13a4) to confirm active; if active, calls find_first_eligible_zone_slot_for_player to confirm that side has eligible zone slot; if eligible, calls enqueue_equip_slot_bitmap_update to enqueue equip bitmap update. Returns 1=processed, 0=none. Single caller FUN_08090218 (duel_field master). Params: r0=void (entry movs r6,#0 overwrites). Constants: CARD_ID_TARGET=0x13a4, BASE_ADDR=0x0201e1c8.
+@ Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x13a4) to confirm active; if active, calls find_first_eligible_zone_slot_for_player to confirm that side has eligible zone slot; if eligible, calls enqueue_equip_slot_bitmap_update to enqueue equip bitmap update. Returns 1=processed, 0=none. Single caller dispatch_equip_field_scan_sequence (duel_field master). Params: r0=void (entry movs r6,#0 overwrites). Constants: CARD_ID_TARGET=0x13a4, BASE_ADDR=0x0201e1c8.
 scan_field_slots_for_zone_equip_bitmap_update:
     push {r4,r5,r6,r7,lr}                    @ 0808ebb8 f0b5
     movs r6,#0x0    @ 0808ebba 0026
-    ldr r7, DAT_0808ebec                     @ 0808ebbc 0b4f
+    ldr r7, seg6_pool_eqzcnt_ebec            @ 0808ebbc 0b4f
 LAB_0808ebbe:
     ldr r4,[r7,#0x0]                         @ 0808ebbe 3c68
     eors r4,r6    @ 0808ebc0 7440
@@ -20844,7 +20844,7 @@ LAB_0808ebbe:
 LAB_0808ebc4:
     adds r0,r4,#0x0    @ 0808ebc4 201c
     adds r1,r5,#0x0    @ 0808ebc6 291c
-    ldr r2, DAT_0808ebf0                     @ 0808ebc8 094a
+    ldr r2, seg6_pool_cid_tnn_ebf0           @ 0808ebc8 094a
     bl test_slot_has_active_card             @ 0808ebca a3f7bdfc
     cmp r0,#0x0                              @ 0808ebce 0028
     beq LAB_0808ebf4                         @ 0808ebd0 10d0
@@ -20859,10 +20859,10 @@ LAB_0808ebc4:
     bl enqueue_equip_slot_bitmap_update      @ 0808ebe4 b8f7b2fe
     movs r0,#0x1    @ 0808ebe8 0120
     b LAB_0808ec02                           @ 0808ebea 0ae0
-DAT_0808ebec:
-    .word  0x0201e1c8                     @ 0808ebec c8e10102
-DAT_0808ebf0:
-    .word  0x000013a4                     @ 0808ebf0 a4130000
+seg6_pool_eqzcnt_ebec:
+    .word  gEquipZoneCountTable           @ 0808ebec c8e10102
+seg6_pool_cid_tnn_ebf0:
+    .word  THUNDER_NYAN_NYAN_CID          @ 0808ebf0 a4130000  Thunder Nyan Nyan CID; test_slot_has_active_card filter
 LAB_0808ebf4:
     adds r5,#0x1    @ 0808ebf4 0135
     cmp r5,#0x4                              @ 0808ebf6 042d
@@ -20876,7 +20876,7 @@ LAB_0808ec02:
     pop {r1}                                 @ 0808ec04 02bc
     bx r1                                    @ 0808ec06 0847
 
-@ Called by FUN_08090218 (duel_field main control) as one step in equip-chain activation scanner sequence. Iterates 2 players x 10 slots (player 0..1, slot 0..9), reads card_id (bits[12:0]) from each slot, compares with constant 0x1403 (Graveyard zone card ID); also checks [slot+0xc] chain pointer is non-zero. When conditions met, constructs OAM attr (flip/priority/coord fields) then calls apply_equip_activation_with_id_lookup to attempt equip effect activation. Sets flag and returns 1 if any slot activates, else 0. Side effect: injects activation record into equip chain. r0=void (entry movs r0,#0 confirms no APCS input). Returns u32 found_flag (0=no activation, 1=at least one triggered). Constants: base=gP1LifePoints+0x1ce8, card_id=0x1403 (Graveyard zone). Callers: FUN_08090218.
+@ Called by dispatch_equip_field_scan_sequence (duel_field main control) as one step in equip-chain activation scanner sequence. Iterates 2 players x 10 slots (player 0..1, slot 0..9), reads card_id (bits[12:0]) from each slot, compares with constant 0x1403 (Graveyard zone card ID); also checks [slot+0xc] chain pointer is non-zero. When conditions met, constructs OAM attr (flip/priority/coord fields) then calls apply_equip_activation_with_id_lookup to attempt equip effect activation. Sets flag and returns 1 if any slot activates, else 0. Side effect: injects activation record into equip chain. r0=void (entry movs r0,#0 confirms no APCS input). Returns u32 found_flag (0=no activation, 1=at least one triggered). Constants: base=gP1LifePoints+0x1ce8, card_id=0x1403 (Graveyard zone). Callers: dispatch_equip_field_scan_sequence.
 scan_field_slots_for_graveyard_equip_activation:
     push {r4,r5,r6,r7,lr}                    @ 0808ec08 f0b5
     .hword 0x4657    @ 0808ec0a 5746
@@ -20888,8 +20888,8 @@ scan_field_slots_for_graveyard_equip_activation:
     str r0,[sp,#0x0]                         @ 0808ec16 0090
     movs r1,#0x0    @ 0808ec18 0021
 LAB_0808ec1a:
-    ldr r0, PTR_gP1LifePoints_0808ed08       @ 0808ec1a 3b48
-    ldr r2, DAT_0808ed0c                     @ 0808ec1c 3b4a
+    ldr r0, ptr_lp_ed08                      @ 0808ec1a 3b48
+    ldr r2, seg6_pool_lp2off_ed0c            @ 0808ec1c 3b4a
     adds r0,r0,r2    @ 0808ec1e 8018
     ldr r0,[r0,#0x0]                         @ 0808ec20 0068
     .hword 0x4680    @ 0808ec22 8046
@@ -20915,19 +20915,19 @@ LAB_0808ec1a:
     ands r0,r1    @ 0808ec4a 0840
     str r0,[sp,#0x8]                         @ 0808ec4c 0290
 LAB_0808ec4e:
-    ldr r0, DAT_0808ed10                     @ 0808ec4e 3048
+    ldr r0, seg6_pool_stride_ed10            @ 0808ec4e 3048
     .hword 0x4652    @ 0808ec50 5246
     muls r2,r0    @ 0808ec52 4243
     adds r0,r2,#0x0    @ 0808ec54 101c
     ldr r1,[sp,#0x10]                        @ 0808ec56 0499
     adds r5,r1,r0    @ 0808ec58 0d18
-    ldr r2, DAT_0808ed14                     @ 0808ec5a 2e4a
+    ldr r2, seg6_pool_field_ed14             @ 0808ec5a 2e4a
     adds r6,r5,r2    @ 0808ec5c ae18
     ldr r0,[r6,#0x0]                         @ 0808ec5e 3068
     lsls r0,r0,#0x13    @ 0808ec60 c004
     lsrs r3,r0,#0x13    @ 0808ec62 c30c
     ldr r4,[r6,#0xc]                         @ 0808ec64 f468
-    ldr r0, DAT_0808ed18                     @ 0808ec66 2c48
+    ldr r0, seg6_pool_cid_csr_ed18           @ 0808ec66 2c48
     cmp r3,r0                                @ 0808ec68 8342
     bne LAB_0808ece0                         @ 0808ec6a 39d1
     cmp r4,#0x0                              @ 0808ec6c 002c
@@ -20937,7 +20937,7 @@ LAB_0808ec4e:
     movs r2,#0x0    @ 0808ec74 0022
     str r3,[sp,#0x14]                        @ 0808ec76 0593
     bl enqueue_sprite_attr_with_xy_split     @ 0808ec78 b6f7e2fa
-    ldr r1, DAT_0808ed1c                     @ 0808ec7c 2749
+    ldr r1, seg6_pool_slotst_ed1c            @ 0808ec7c 2749
     adds r0,r1,r5    @ 0808ec7e 4819
     ldr r1,[r0,#0x0]                         @ 0808ec80 0168
     lsrs r0,r1,#0x5    @ 0808ec82 4809
@@ -20954,13 +20954,13 @@ LAB_0808ec4e:
     ldr r3,[sp,#0x14]                        @ 0808ec98 059b
     cmp r0,#0x0                              @ 0808ec9a 0028
     beq LAB_0808ece0                         @ 0808ec9c 20d0
-    ldr r0, DAT_0808ed20                     @ 0808ec9e 2048
+    ldr r0, seg6_pool_oam_clrb9_ed20         @ 0808ec9e 2048
     ands r7,r0    @ 0808eca0 0740
     ldr r0,[sp,#0x4]                         @ 0808eca2 0198
     orrs r7,r0    @ 0808eca4 0743
-    ldr r0, DAT_0808ed24                     @ 0808eca6 1f48
+    ldr r0, seg6_pool_oam_xmsk_ed24          @ 0808eca6 1f48
     ands r4,r0    @ 0808eca8 0440
-    ldr r0, DAT_0808ed28                     @ 0808ecaa 1f48
+    ldr r0, seg6_pool_oam_xclr_ed28          @ 0808ecaa 1f48
     ands r0,r7    @ 0808ecac 3840
     orrs r4,r0    @ 0808ecae 0443
     adds r7,r4,#0x0    @ 0808ecb0 271c
@@ -21007,27 +21007,26 @@ LAB_0808ece0:
     pop {r4,r5,r6,r7}                        @ 0808ed02 f0bc
     pop {r1}                                 @ 0808ed04 02bc
     bx r1                                    @ 0808ed06 0847
-PTR_gP1LifePoints_0808ed08:
+ptr_lp_ed08:
     .word  gP1LifePoints                  @ 0808ed08 e0c40102
-DAT_0808ed0c:
-    .word  0x00001ce8                     @ 0808ed0c e81c0000
-DAT_0808ed10:
-    .word  0x00000868                     @ 0808ed10 68080000
-DAT_0808ed14:
-    .word  0x0201c510                     @ 0808ed14 10c50102
-DAT_0808ed18:
-    .word  0x00001403                     @ 0808ed18 03140000
-DAT_0808ed1c:
-    .word  0x0201c520                     @ 0808ed1c 20c50102
-DAT_0808ed20:
-    .word  0xfffffdff                     @ 0808ed20 fffdffff
-DAT_0808ed24:
-    .word  0x000001ff                     @ 0808ed24 ff010000
-DAT_0808ed28:
-    .word  0xfffffe00                     @ 0808ed28 00feffff
+seg6_pool_lp2off_ed0c:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0808ed0c e81c0000
+seg6_pool_stride_ed10:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808ed10 68080000
+seg6_pool_field_ed14:
+    .word  gDuelFieldSlots                @ 0808ed14 10c50102
+seg6_pool_cid_csr_ed18:
+    .word  CARD_OF_SAFE_RETURN_CID        @ 0808ed18 03140000
+seg6_pool_slotst_ed1c:
+    .word  gDuelFieldSlotState            @ 0808ed1c 20c50102
+seg6_pool_oam_clrb9_ed20:
+    .word  OAM_SPRITE_ATTR_CLR_BIT9       @ 0808ed20 fffdffff
+seg6_pool_oam_xmsk_ed24:
+    .word  OAM_ATTR1_X_MASK               @ 0808ed24 ff010000
+seg6_pool_oam_xclr_ed28:
+    .word  OAM_ATTR1_X_CLEAR              @ 0808ed28 00feffff
 
-@ Called exclusively by FUN_080490b4 (duel_field, indeg=3). r0=player_id [0..1]. Prologue: push {r4,r5,r6,r7,lr}; sub sp,#4; r7=player_id; movs r6,#5 (initial loop counter); r3=1. Computes player base: r0 = player_id & 1; *0x868 -> player offset; r5 = gDuelFieldSlots+player*0x868+0x74 (effect zone head); r4 = gDuelFieldSlots+player*0x868+0x64. Loop r6=[5..8] (ble #9, zone slot indices). Per iteration: reads [r4,#0] with lsls #0x13 then compares against DAT_0808ed94=0xa0280000 (skip if not equal); reads [r5,#0] extracts bit5/bit1 with double ~mask combination; if nonzero calls enqueue_sprite_attr_with_shape(player_id, slot_index, 1, r3=1). Step: r5+=0x14; r4+=0x14; slot_index++.
-@ Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_offset_r4=0x64, zone_offset_r5=0x74, slot_stride=0x14, activation_mask=0xa0280000 (after lsls #0x13), slot_limit=9 (ble), bit5_invert_mask=bit5, bit1_invert_mask=bit1.
+@ Called exclusively by tick_duel_field_zone_sprite_update_pipeline (duel_field, indeg=3). r0=player_id [0..1]. Prologue: push {r4,r5,r6,r7,lr}; sub sp,#4; r7=player_id; movs r6,#5 (initial loop counter); r3=1. Computes player base: r0 = player_id & 1; *0x868 -> player offset; r5 = gDuelFieldSlots+player*0x868+0x74 (effect zone head); r4 = gDuelFieldSlots+player*0x868+0x64. Loop r6=[5..8] (ble #9, zone slot indices). Per iteration: reads [r4,#0] with lsls #0x13 then compares against SOLEMN_WISHES_CID_SHIFTED=0xa0280000 (skip if not equal); reads [r5,#0] extracts bit5/bit1 with double ~mask combination; if nonzero calls enqueue_sprite_attr_with_shape(player_id, slot_index, 1, r3=1). Step: r5+=0x14; r4+=0x14; slot_index++. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_offset_r4=0x64, zone_offset_r5=0x74, slot_stride=0x14, activation_mask=SOLEMN_WISHES_CID_SHIFTED (after lsls #0x13), slot_limit=9 (ble), bit5_invert_mask=bit5, bit1_invert_mask=bit1.
 enqueue_zone_sprite_by_activation_flags:
     push {r4,r5,r6,r7,lr}                    @ 0808ed2c f0b5
     sub sp,#0x4                              @ 0808ed2e 81b0
@@ -21035,8 +21034,8 @@ enqueue_zone_sprite_by_activation_flags:
     movs r6,#0x5    @ 0808ed32 0526
     movs r3,#0x1    @ 0808ed34 0123
     ands r0,r3    @ 0808ed36 1840
-    ldr r2, DAT_0808ed8c                     @ 0808ed38 144a
-    ldr r1, DAT_0808ed90                     @ 0808ed3a 1549
+    ldr r2, seg6_pool_field_ed8c             @ 0808ed38 144a
+    ldr r1, seg6_pool_stride_ed90            @ 0808ed3a 1549
     muls r0,r1    @ 0808ed3c 4843
     adds r1,r2,r0    @ 0808ed3e 1118
     adds r5,r1,#0x0    @ 0808ed40 0d1c
@@ -21047,7 +21046,7 @@ enqueue_zone_sprite_by_activation_flags:
 LAB_0808ed4a:
     ldr r0,[r4,#0x0]                         @ 0808ed4a 2068
     lsls r0,r0,#0x13    @ 0808ed4c c004
-    ldr r1, DAT_0808ed94                     @ 0808ed4e 1149
+    ldr r1, seg6_pool_cidsh_swish_ed94       @ 0808ed4e 1149
     cmp r0,r1                                @ 0808ed50 8842
     bne LAB_0808ed7a                         @ 0808ed52 12d1
     ldr r1,[r5,#0x0]                         @ 0808ed54 2968
@@ -21078,14 +21077,14 @@ LAB_0808ed7a:
     pop {r4,r5,r6,r7}                        @ 0808ed86 f0bc
     pop {r0}                                 @ 0808ed88 01bc
     bx r0                                    @ 0808ed8a 0047
-DAT_0808ed8c:
-    .word  0x0201c510                     @ 0808ed8c 10c50102
-DAT_0808ed90:
-    .word  0x00000868                     @ 0808ed90 68080000
-DAT_0808ed94:
-    .word  0xa0280000                     @ 0808ed94 000028a0
+seg6_pool_field_ed8c:
+    .word  gDuelFieldSlots                @ 0808ed8c 10c50102
+seg6_pool_stride_ed90:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808ed90 68080000
+seg6_pool_cidsh_swish_ed94:
+    .word  SOLEMN_WISHES_CID_SHIFTED      @ 0808ed94 000028a0  Solemn Wishes CID(0x1405)<<19; slot state filter post lsls #0x13
 
-@ Called by FUN_08090218 (duel_field main control); large field sprite scanner. Iterates 2 players x 10 slots (player 0..1, slot 0..9), base gP1LifePoints+0xffffe358. For each slot: reads word[0], extracts bits[19:0] and compares with constant 0x28a0 (card_id/type check), checks [slot+0xc] chain pointer. If conditions met: calls enqueue_sprite_attr_with_xy_split for XY-split sprite; checks [slot+0x8] bit5/bit1 inverted logic combination; if inner condition met: calls enqueue_sprite_attr_for_zone_card_id_lookup, then submit_effect_zone_lp_and_shape_sprites (FUN_08049014). r0=void (entry movs r0,#0; str r0,[sp,#0]; movs r1,#1; mov r10,r1 confirms no APCS input). Returns u32 found_flag (0=not triggered, 1=at least one slot matched). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, cmp_val=0x28a0. Callers: FUN_08090218.
+@ Called by dispatch_equip_field_scan_sequence (duel_field main control); large field sprite scanner. Iterates 2 players x 10 slots (player 0..1, slot 0..9), base gP1LifePoints+0xffffe358. For each slot: reads word[0], extracts bits[19:0] and compares with constant 0x28a0 (card_id/type check), checks [slot+0xc] chain pointer. If conditions met: calls enqueue_sprite_attr_with_xy_split for XY-split sprite; checks [slot+0x8] bit5/bit1 inverted logic combination; if inner condition met: calls enqueue_sprite_attr_for_zone_card_id_lookup, then submit_effect_zone_lp_and_shape_sprites. r0=void (entry movs r0,#0; str r0,[sp,#0]; movs r1,#1; mov r10,r1 confirms no APCS input). Returns u32 found_flag (0=not triggered, 1=at least one slot matched). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, cmp_val=0x28a0. Callers: dispatch_equip_field_scan_sequence.
 scan_field_slots_for_card_pair_sprite_update:
     push {r4,r5,r6,r7,lr}                    @ 0808ed98 f0b5
     .hword 0x4657    @ 0808ed9a 5746
@@ -21097,12 +21096,12 @@ scan_field_slots_for_card_pair_sprite_update:
     str r0,[sp,#0x0]                         @ 0808eda6 0090
     movs r1,#0x1    @ 0808eda8 0121
     .hword 0x468a    @ 0808edaa 8a46
-    ldr r1, DAT_0808ee6c                     @ 0808edac 2f49
-    ldr r2, DAT_0808ee70                     @ 0808edae 304a
+    ldr r1, equip_zone_to_slot_state_neg_off_ee6c @ 0808edac 2f49
+    ldr r2, seg6_pool_eqzcnt_ee70            @ 0808edae 304a
     adds r1,r2,r1    @ 0808edb0 5118
     str r1,[sp,#0x4]                         @ 0808edb2 0191
 LAB_0808edb4:
-    ldr r2, DAT_0808ee70                     @ 0808edb4 2e4a
+    ldr r2, seg6_pool_eqzcnt_ee70            @ 0808edb4 2e4a
     ldr r7,[r2,#0x0]                         @ 0808edb6 1768
     eors r7,r0    @ 0808edb8 4740
     movs r3,#0x5    @ 0808edba 0523
@@ -21116,17 +21115,17 @@ LAB_0808edb4:
     movs r2,#0x64    @ 0808edca 6422
     .hword 0x4691    @ 0808edcc 9146
 LAB_0808edce:
-    ldr r0, DAT_0808ee74                     @ 0808edce 2948
+    ldr r0, seg6_pool_stride_ee74            @ 0808edce 2948
     .hword 0x4641    @ 0808edd0 4146
     muls r1,r0    @ 0808edd2 4143
     adds r0,r1,#0x0    @ 0808edd4 081c
     .hword 0x464a    @ 0808edd6 4a46
     adds r5,r2,r0    @ 0808edd8 1518
-    ldr r0, DAT_0808ee78                     @ 0808edda 2748
+    ldr r0, seg6_pool_field_ee78             @ 0808edda 2748
     adds r4,r5,r0    @ 0808eddc 2c18
     ldr r0,[r4,#0x0]                         @ 0808edde 2068
     lsls r0,r0,#0x13    @ 0808ede0 c004
-    ldr r1, DAT_0808ee7c                     @ 0808ede2 2649
+    ldr r1, seg6_pool_cidsh_swish_ee7c       @ 0808ede2 2649
     cmp r0,r1                                @ 0808ede4 8842
     bne LAB_0808ee48                         @ 0808ede6 2fd1
     ldr r6,[r4,#0xc]                         @ 0808ede8 e668
@@ -21193,18 +21192,18 @@ LAB_0808ee48:
     pop {r1}                                 @ 0808ee66 02bc
     bx r1                                    @ 0808ee68 0847
     .zero  0x2
-DAT_0808ee6c:
-    .word  0xffffe358                     @ 0808ee6c 58e3ffff
-DAT_0808ee70:
-    .word  0x0201e1c8                     @ 0808ee70 c8e10102
-DAT_0808ee74:
-    .word  0x00000868                     @ 0808ee74 68080000
-DAT_0808ee78:
-    .word  0x0201c510                     @ 0808ee78 10c50102
-DAT_0808ee7c:
-    .word  0xa0280000                     @ 0808ee7c 000028a0
+equip_zone_to_slot_state_neg_off_ee6c:
+    .word  0xffffe358                     @ 0808ee6c 58e3ffff  gEquipZoneCountTable-gDuelFieldSlotState = -0x1ca8
+seg6_pool_eqzcnt_ee70:
+    .word  gEquipZoneCountTable           @ 0808ee70 c8e10102
+seg6_pool_stride_ee74:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808ee74 68080000
+seg6_pool_field_ee78:
+    .word  gDuelFieldSlots                @ 0808ee78 10c50102
+seg6_pool_cidsh_swish_ee7c:
+    .word  SOLEMN_WISHES_CID_SHIFTED      @ 0808ee7c 000028a0  Solemn Wishes CID(0x1405)<<19; second occurrence
 
-@ Called by FUN_08049014 (duel_field) as last step in effect-zone sprite combined submission. Receives player_side (r0), iterates slots 0..4 (counter r4=0..4). For each slot calls test_slot_has_active_card(card_id=0x144d, player=r0, slot=r4). If active card found: calls enqueue_sprite_attr_with_shape(player=r0, slot=r4, mode=1) to write shape sprite to attribute buffer. Pure side-effect function, no return value. r0=u8 player_side [0..1]. Returns void. Constants: card_id=0x144d, slot_range=0..4, shape_mode=1. Callers: FUN_08049014.
+@ Called by submit_effect_zone_lp_and_shape_sprites (duel_field) as last step in effect-zone sprite combined submission. Receives player_side (r0), iterates slots 0..4 (counter r4=0..4). For each slot calls test_slot_has_active_card(card_id=0x144d, player=r0, slot=r4). If active card found: calls enqueue_sprite_attr_with_shape(player=r0, slot=r4, mode=1) to write shape sprite to attribute buffer. Pure side-effect function, no return value. r0=u8 player_side [0..1]. Returns void. Constants: card_id=0x144d, slot_range=0..4, shape_mode=1. Callers: submit_effect_zone_lp_and_shape_sprites.
 enqueue_active_card_shape_sprites_in_zone:
     push {r4,r5,lr}                          @ 0808ee80 30b5
     adds r5,r0,#0x0    @ 0808ee82 051c
@@ -21212,7 +21211,7 @@ enqueue_active_card_shape_sprites_in_zone:
 LAB_0808ee86:
     adds r0,r5,#0x0    @ 0808ee86 281c
     adds r1,r4,#0x0    @ 0808ee88 211c
-    ldr r2, DAT_0808eeac                     @ 0808ee8a 084a
+    ldr r2, seg6_pool_cid_fp_eeac            @ 0808ee8a 084a
     bl test_slot_has_active_card             @ 0808ee8c a3f75cfb
     cmp r0,#0x0                              @ 0808ee90 0028
     beq LAB_0808ee9e                         @ 0808ee92 04d0
@@ -21228,10 +21227,10 @@ LAB_0808ee9e:
     pop {r0}                                 @ 0808eea6 01bc
     bx r0                                    @ 0808eea8 0047
     .zero  0x2
-DAT_0808eeac:
-    .word  0x0000144d                     @ 0808eeac 4d140000
+seg6_pool_cid_fp_eeac:
+    .word  FIRE_PRINCESS_CID              @ 0808eeac 4d140000  Fire Princess CID; test_slot_has_active_card filter
 
-@ Iterates 2 sides x 5 slots; checks each slot bit12 activation flag and [slot+0xc] field value against chain node constant 0xa2680000. For matching slots calls enqueue_sprite_attr_with_xy_split to enqueue split-XY sprite attr. Inner loop slot 0..4, outer loop player 0..1. Base addr 0x0201e1c8. Single caller FUN_08090218 (duel_field master). Params: r0=void (entry ldr r0,DAT overwrites). Constants: BASE_ADDR=0x0201e1c8, CHAIN_NODE_MAGIC=0xa2680000, PLAYER_STRIDE=0x868.
+@ Iterates 2 sides x 5 slots; checks each slot bit12 activation flag and [slot+0xc] field value against chain node constant FIRE_PRINCESS_CID_SHIFTED=0xa2680000. For matching slots calls enqueue_sprite_attr_with_xy_split to enqueue split-XY sprite attr. Inner loop slot 0..4, outer loop player 0..1. Base addr 0x0201e1c8. Single caller dispatch_equip_field_scan_sequence (duel_field master). Params: r0=void (entry ldr r0,DAT overwrites). Constants: BASE_ADDR=0x0201e1c8, CHAIN_NODE_MAGIC=FIRE_PRINCESS_CID_SHIFTED=0xa2680000, PLAYER_STRIDE=0x868.
 scan_field_slots_for_chain_sprite_enqueue:
     push {r4,r5,r6,r7,lr}                    @ 0808eeb0 f0b5
     .hword 0x4657    @ 0808eeb2 5746
@@ -21242,7 +21241,7 @@ scan_field_slots_for_chain_sprite_enqueue:
     movs r3,#0x0    @ 0808eebc 0023
     .hword 0x4699    @ 0808eebe 9946
 LAB_0808eec0:
-    ldr r0, DAT_0808ef90                     @ 0808eec0 3348
+    ldr r0, seg6_pool_eqzcnt_ef90            @ 0808eec0 3348
     ldr r6,[r0,#0x0]                         @ 0808eec2 0668
     .hword 0x4649    @ 0808eec4 4946
     eors r6,r1    @ 0808eec6 4e40
@@ -21256,18 +21255,18 @@ LAB_0808eed4:
     lsls r0,r7,#0x2    @ 0808eed4 b800
     adds r0,r0,r7    @ 0808eed6 c019
     lsls r0,r0,#0x2    @ 0808eed8 8000
-    ldr r1, DAT_0808ef94                     @ 0808eeda 2e49
+    ldr r1, seg6_pool_stride_ef94            @ 0808eeda 2e49
     .hword 0x4652    @ 0808eedc 5246
     muls r2,r1    @ 0808eede 4a43
     adds r1,r2,#0x0    @ 0808eee0 111c
     adds r5,r0,r1    @ 0808eee2 4518
-    ldr r0, DAT_0808ef98                     @ 0808eee4 2c48
+    ldr r0, seg6_pool_field_ef98             @ 0808eee4 2c48
     adds r4,r5,r0    @ 0808eee6 2c18
     ldr r0,[r4,#0x0]                         @ 0808eee8 2068
     lsls r0,r0,#0x13    @ 0808eeea c004
     ldr r1,[r4,#0xc]                         @ 0808eeec e168
     .hword 0x4688    @ 0808eeee 8846
-    ldr r1, DAT_0808ef9c                     @ 0808eef0 2a49
+    ldr r1, seg6_pool_cidsh_fp_ef9c          @ 0808eef0 2a49
     adds r2,r7,#0x1    @ 0808eef2 7a1c
     str r2,[sp,#0x0]                         @ 0808eef4 0092
     cmp r0,r1                                @ 0808eef6 8842
@@ -21280,7 +21279,7 @@ LAB_0808eed4:
     movs r2,#0x0    @ 0808ef04 0022
     str r3,[sp,#0x4]                         @ 0808ef06 0193
     bl enqueue_sprite_attr_with_xy_split     @ 0808ef08 b6f79af9
-    ldr r1, DAT_0808efa0                     @ 0808ef0c 2449
+    ldr r1, seg6_pool_slotst_efa0            @ 0808ef0c 2449
     adds r0,r1,r5    @ 0808ef0e 4819
     ldr r1,[r0,#0x0]                         @ 0808ef10 0168
     lsrs r0,r1,#0x5    @ 0808ef12 4809
@@ -21318,7 +21317,7 @@ LAB_0808ef50:
     movs r1,#0xfa    @ 0808ef52 fa21
     lsls r1,r1,#0x1    @ 0808ef54 4900
     movs r2,#0x1    @ 0808ef56 0122
-    ldr r3, DAT_0808efa4                     @ 0808ef58 124b
+    ldr r3, seg6_pool_cid_fp_efa4            @ 0808ef58 124b
     bl submit_lp_change_indicator_with_chain_check @ 0808ef5a b9f73ffc
     movs r1,#0x1    @ 0808ef5e 0121
     rsbs r1,r1,#0    @ 0808ef60 4942
@@ -21347,18 +21346,18 @@ LAB_0808ef6e:
     pop {r4,r5,r6,r7}                        @ 0808ef8a f0bc
     pop {r1}                                 @ 0808ef8c 02bc
     bx r1                                    @ 0808ef8e 0847
-DAT_0808ef90:
-    .word  0x0201e1c8                     @ 0808ef90 c8e10102
-DAT_0808ef94:
-    .word  0x00000868                     @ 0808ef94 68080000
-DAT_0808ef98:
-    .word  0x0201c510                     @ 0808ef98 10c50102
-DAT_0808ef9c:
-    .word  0xa2680000                     @ 0808ef9c 000068a2
-DAT_0808efa0:
-    .word  0x0201c520                     @ 0808efa0 20c50102
-DAT_0808efa4:
-    .word  0x0000144d                     @ 0808efa4 4d140000
+seg6_pool_eqzcnt_ef90:
+    .word  gEquipZoneCountTable           @ 0808ef90 c8e10102
+seg6_pool_stride_ef94:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808ef94 68080000
+seg6_pool_field_ef98:
+    .word  gDuelFieldSlots                @ 0808ef98 10c50102
+seg6_pool_cidsh_fp_ef9c:
+    .word  FIRE_PRINCESS_CID_SHIFTED      @ 0808ef9c 000068a2  Fire Princess CID(0x144d)<<19; slot state CHAIN_NODE_MAGIC
+seg6_pool_slotst_efa0:
+    .word  gDuelFieldSlotState            @ 0808efa0 20c50102
+seg6_pool_cid_fp_efa4:
+    .word  FIRE_PRINCESS_CID              @ 0808efa4 4d140000  Fire Princess CID; second occurrence
 
 @ Iterates 2 sides x 5 slots. For each active slot calls check_slot_card_is_equip_whitelist; if pass, reads opposite-side same-slot equip chain data (bit5/bit1 limit checks); calls enqueue_sprite_attr_for_zone_card_id_lookup to enqueue zone sprite attr. When cross-side match found, calls submit_lp_change_indicator_with_chain_check per interval. Returns 1=found and processed at least one eligible slot, 0=none. Params: r0=void (entry movs r0,#0 overwrites). Constants: gDuelFieldBase=0x0201e1c8, player_stride=0x868.
 scan_field_for_whitelist_equip_sprite_and_lp:
@@ -21372,8 +21371,8 @@ scan_field_for_whitelist_equip_sprite_and_lp:
     str r0,[sp,#0x1c]                        @ 0808efb6 0790
     add r7,sp,#0x4                           @ 0808efb8 01af
 LAB_0808efba:
-    ldr r0, PTR_gP1LifePoints_0808f098       @ 0808efba 3748
-    ldr r1, DAT_0808f09c                     @ 0808efbc 3749
+    ldr r0, ptr_lp_f098                      @ 0808efba 3748
+    ldr r1, seg6_pool_lp2off_f09c            @ 0808efbc 3749
     adds r0,r0,r1    @ 0808efbe 4018
     ldr r5,[r0,#0x0]                         @ 0808efc0 0568
     ldr r2,[sp,#0x1c]                        @ 0808efc2 079a
@@ -21383,7 +21382,7 @@ LAB_0808efba:
     adds r0,r5,#0x0    @ 0808efca 281c
     movs r1,#0x1    @ 0808efcc 0121
     ands r0,r1    @ 0808efce 0840
-    ldr r3, DAT_0808f0a0                     @ 0808efd0 334b
+    ldr r3, seg6_pool_stride_f0a0            @ 0808efd0 334b
     adds r2,r0,#0x0    @ 0808efd2 021c
     muls r2,r3    @ 0808efd4 5a43
     str r2,[sp,#0x20]                        @ 0808efd6 0892
@@ -21392,7 +21391,7 @@ LAB_0808efba:
     .hword 0x4651    @ 0808efdc 5146
     muls r1,r0    @ 0808efde 4143
     adds r0,r1,#0x0    @ 0808efe0 081c
-    ldr r2, DAT_0808f0a4                     @ 0808efe2 304a
+    ldr r2, seg6_pool_field_f0a4             @ 0808efe2 304a
     adds r6,r0,r2    @ 0808efe4 8618
 LAB_0808efe6:
     ldr r0,[r6,#0x0]                         @ 0808efe6 3068
@@ -21408,7 +21407,7 @@ LAB_0808efe6:
 LAB_0808effc:
     adds r0,r5,#0x0    @ 0808effc 281c
     .hword 0x4641    @ 0808effe 4146
-    ldr r2, DAT_0808f0a8                     @ 0808f000 294a
+    ldr r2, seg6_pool_cid_eoa_f0a8           @ 0808f000 294a
     bl get_node_entity_id_in_slot            @ 0808f002 a0f72dff
     adds r1,r0,#0x0    @ 0808f006 011c
     lsls r0,r1,#0x18    @ 0808f008 0806
@@ -21431,7 +21430,7 @@ LAB_0808effc:
     lsrs r0,r0,#0x1f    @ 0808f02c c00f
     orrs r1,r0    @ 0808f02e 0143
     lsls r1,r1,#0x6    @ 0808f030 8901
-    ldr r2, DAT_0808f0ac                     @ 0808f032 1e4a
+    ldr r2, seg6_pool_fldmsk_f0ac            @ 0808f032 1e4a
     adds r0,r2,#0x0    @ 0808f034 101c
     ldrh r3,[r7,#0x4]                        @ 0808f036 bb88
     ands r0,r3    @ 0808f038 1840
@@ -21469,7 +21468,7 @@ LAB_0808effc:
     lsls r0,r0,#0x2    @ 0808f078 8000
     ldr r3,[sp,#0x20]                        @ 0808f07a 089b
     adds r0,r0,r3    @ 0808f07c c018
-    ldr r1, DAT_0808f0a4                     @ 0808f07e 0949
+    ldr r1, seg6_pool_field_f0a4             @ 0808f07e 0949
     adds r0,r0,r1    @ 0808f080 4018
     ldr r0,[r0,#0x0]                         @ 0808f082 0068
     lsls r0,r0,#0x13    @ 0808f084 c004
@@ -21483,18 +21482,18 @@ LAB_0808f08a:
 LAB_0808f094:
     movs r0,#0x1    @ 0808f094 0120
     b LAB_0808f160                           @ 0808f096 63e0
-PTR_gP1LifePoints_0808f098:
+ptr_lp_f098:
     .word  gP1LifePoints                  @ 0808f098 e0c40102
-DAT_0808f09c:
-    .word  0x00001ce8                     @ 0808f09c e81c0000
-DAT_0808f0a0:
-    .word  0x00000868                     @ 0808f0a0 68080000
-DAT_0808f0a4:
-    .word  0x0201c510                     @ 0808f0a4 10c50102
-DAT_0808f0a8:
-    .word  0x00001472                     @ 0808f0a8 72140000
-DAT_0808f0ac:
-    .word  0xffff803f                     @ 0808f0ac 3f80ffff
+seg6_pool_lp2off_f09c:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0808f09c e81c0000
+seg6_pool_stride_f0a0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f0a0 68080000
+seg6_pool_field_f0a4:
+    .word  gDuelFieldSlots                @ 0808f0a4 10c50102
+seg6_pool_cid_eoa_f0a8:
+    .word  EMBODIMENT_OF_APOPHIS_CID      @ 0808f0a8 72140000
+seg6_pool_fldmsk_f0ac:
+    .word  slot_field_mask_ffff803f       @ 0808f0ac 3f80ffff
 LAB_0808f0b0:
     ldrh r0,[r6,#0x8]                        @ 0808f0b0 3089
     cmp r0,#0x0                              @ 0808f0b2 0028
@@ -21539,7 +21538,7 @@ LAB_0808f0f8:
 LAB_0808f106:
     adds r0,r5,#0x0    @ 0808f106 281c
     .hword 0x4641    @ 0808f108 4146
-    ldr r2, DAT_0808f130                     @ 0808f10a 094a
+    ldr r2, seg6_pool_cid_eoa_f130           @ 0808f10a 094a
     movs r3,#0x1    @ 0808f10c 0123
     bl enqueue_equip_slot_sprite_attr        @ 0808f10e b4f74df8
     lsls r0,r5,#0x18    @ 0808f112 2806
@@ -21555,15 +21554,15 @@ LAB_0808f106:
     orrs r0,r4    @ 0808f12a 2043
     b LAB_0808f136                           @ 0808f12c 03e0
     .zero  0x2
-DAT_0808f130:
-    .word  0x00001472                     @ 0808f130 72140000
+seg6_pool_cid_eoa_f130:
+    .word  EMBODIMENT_OF_APOPHIS_CID      @ 0808f130 72140000
 LAB_0808f134:
     adds r0,r4,#0x0    @ 0808f134 201c
 LAB_0808f136:
     str r0,[sp,#0x0]                         @ 0808f136 0090
     adds r0,r5,#0x0    @ 0808f138 281c
     .hword 0x4641    @ 0808f13a 4146
-    ldr r2, DAT_0808f170                     @ 0808f13c 0c4a
+    ldr r2, seg6_pool_cid_eoa_f170           @ 0808f13c 0c4a
     movs r3,#0x5    @ 0808f13e 0523
     bl enqueue_sprite_attr_with_mode         @ 0808f140 b3f788ff
 LAB_0808f144:
@@ -21592,14 +21591,14 @@ LAB_0808f160:
     pop {r4,r5,r6,r7}                        @ 0808f16a f0bc
     pop {r1}                                 @ 0808f16c 02bc
     bx r1                                    @ 0808f16e 0847
-DAT_0808f170:
-    .word  0x00001472                     @ 0808f170 72140000
+seg6_pool_cid_eoa_f170:
+    .word  EMBODIMENT_OF_APOPHIS_CID      @ 0808f170 72140000
 
-@ Called exclusively by FUN_08090218 (duel_field main controller). No APCS input (movs r6,#0 at entry; loads global base from DAT_0808f1ac=0x0201e1c8). Double loop player [0..1] x slot [0..4]: calls test_slot_has_active_card(card_id=0x147a) to confirm active; calls count_paired_slots_with_field5_default(card_id=0x146f) for pair count; if both pass: calls enqueue_equip_slot_bitmap_update(player,slot,0,0). Returns r0=u32 hit_flag (1=at least one group processed, 0=none). Constants: BASE_ADDR=0x0201e1c8, CARD_ID_ACTIVE=0x147a, CARD_ID_PAIR=0x146f, player_stride=0x1784.
+@ Called exclusively by dispatch_equip_field_scan_sequence (duel_field main controller). No APCS input (movs r6,#0 at entry; loads global base from gEquipZoneCountTable=0x0201e1c8). Double loop player [0..1] x slot [0..4]: calls test_slot_has_active_card(card_id=MYSTICAL_BEAST_SERKET_CID=0x147a) to confirm active; calls count_paired_slots_with_field5_default(card_id=CATHEDRAL_OF_NOBLES_CID=0x146f) for pair count; if both pass: calls enqueue_equip_slot_bitmap_update(player,slot,0,0). Returns r0=u32 hit_flag (1=at least one group processed, 0=none). Constants: BASE_ADDR=0x0201e1c8, CARD_ID_ACTIVE=0x147a, CARD_ID_PAIR=0x146f.
 scan_field_for_paired_equip_slot_bitmap_update:
     push {r4,r5,r6,r7,lr}                    @ 0808f174 f0b5
     movs r6,#0x0    @ 0808f176 0026
-    ldr r7, DAT_0808f1ac                     @ 0808f178 0c4f
+    ldr r7, seg6_pool_eqzcnt_f1ac            @ 0808f178 0c4f
 LAB_0808f17a:
     ldr r4,[r7,#0x0]                         @ 0808f17a 3c68
     eors r4,r6    @ 0808f17c 7440
@@ -21607,12 +21606,12 @@ LAB_0808f17a:
 LAB_0808f180:
     adds r0,r4,#0x0    @ 0808f180 201c
     adds r1,r5,#0x0    @ 0808f182 291c
-    ldr r2, DAT_0808f1b0                     @ 0808f184 0a4a
+    ldr r2, seg6_pool_cid_mbs_f1b0           @ 0808f184 0a4a
     bl test_slot_has_active_card             @ 0808f186 a3f7dff9
     cmp r0,#0x0                              @ 0808f18a 0028
     beq LAB_0808f1b8                         @ 0808f18c 14d0
     adds r0,r4,#0x0    @ 0808f18e 201c
-    ldr r1, DAT_0808f1b4                     @ 0808f190 0849
+    ldr r1, seg6_pool_cid_con_f1b4           @ 0808f190 0849
     bl count_paired_slots_with_field5_default @ 0808f192 a3f77ffd
     cmp r0,#0x0                              @ 0808f196 0028
     bne LAB_0808f1b8                         @ 0808f198 0ed1
@@ -21624,12 +21623,12 @@ LAB_0808f180:
     movs r0,#0x1    @ 0808f1a6 0120
     b LAB_0808f1c6                           @ 0808f1a8 0de0
     .zero  0x2
-DAT_0808f1ac:
-    .word  0x0201e1c8                     @ 0808f1ac c8e10102
-DAT_0808f1b0:
-    .word  0x0000147a                     @ 0808f1b0 7a140000
-DAT_0808f1b4:
-    .word  0x0000146f                     @ 0808f1b4 6f140000
+seg6_pool_eqzcnt_f1ac:
+    .word  gEquipZoneCountTable           @ 0808f1ac c8e10102
+seg6_pool_cid_mbs_f1b0:
+    .word  MYSTICAL_BEAST_SERKET_CID      @ 0808f1b0 7a140000  Mystical Beast Serket CID; test_slot_has_active_card filter
+seg6_pool_cid_con_f1b4:
+    .word  CATHEDRAL_OF_NOBLES_CID        @ 0808f1b4 6f140000
 LAB_0808f1b8:
     adds r5,#0x1    @ 0808f1b8 0135
     cmp r5,#0x4                              @ 0808f1ba 042d
@@ -21643,11 +21642,11 @@ LAB_0808f1c6:
     pop {r1}                                 @ 0808f1c8 02bc
     bx r1                                    @ 0808f1ca 0847
 
-@ Called exclusively by duel_field master FUN_08090218. Double loop player [0..1] x slot [0..4]; base 0x0201e1c8. Per slot: test_slot_has_active_card(card_id=0x1914). If active: count_equipped_paired_slots_for_player(0) and (1) - both must be 0. If both zero: calls enqueue_equip_slot_bitmap_update, returns 1. Used to trigger equip priority slot refresh when both sides have no pairs. Returns 1=updated, 0=not processed. Constants: CARD_ID=0x1914, BASE_ADDR=0x0201e1c8, player_stride=0x1784 (for count call).
+@ Called exclusively by duel_field master dispatch_equip_field_scan_sequence. Double loop player [0..1] x slot [0..4]; base 0x0201e1c8. Per slot: test_slot_has_active_card(card_id=GIANT_KOZAKY_CID=0x1914). If active: count_equipped_paired_slots_for_player(0) and (1) - both must be 0. If both zero: calls enqueue_equip_slot_bitmap_update, returns 1. Used to trigger equip priority slot refresh when both sides have no pairs. Returns 1=updated, 0=not processed. Constants: CARD_ID=GIANT_KOZAKY_CID=0x1914, BASE_ADDR=0x0201e1c8, KOZAKY_CID=0x1784 (for count call).
 scan_field_for_unpaired_equip_slot_update:
     push {r4,r5,r6,r7,lr}                    @ 0808f1cc f0b5
     movs r6,#0x0    @ 0808f1ce 0026
-    ldr r7, DAT_0808f210                     @ 0808f1d0 0f4f
+    ldr r7, seg6_pool_eqzcnt_f210            @ 0808f1d0 0f4f
 LAB_0808f1d2:
     ldr r4,[r7,#0x0]                         @ 0808f1d2 3c68
     eors r4,r6    @ 0808f1d4 7440
@@ -21655,17 +21654,17 @@ LAB_0808f1d2:
 LAB_0808f1d8:
     adds r0,r4,#0x0    @ 0808f1d8 201c
     adds r1,r5,#0x0    @ 0808f1da 291c
-    ldr r2, DAT_0808f214                     @ 0808f1dc 0d4a
+    ldr r2, seg6_pool_cid_gk_f214            @ 0808f1dc 0d4a
     bl test_slot_has_active_card             @ 0808f1de a3f7b3f9
     cmp r0,#0x0                              @ 0808f1e2 0028
     beq LAB_0808f21c                         @ 0808f1e4 1ad0
     movs r0,#0x0    @ 0808f1e6 0020
-    ldr r1, DAT_0808f218                     @ 0808f1e8 0b49
+    ldr r1, seg6_pool_cid_kzk_f218           @ 0808f1e8 0b49
     bl count_equipped_paired_slots_for_player @ 0808f1ea a3f76ffd
     cmp r0,#0x0                              @ 0808f1ee 0028
     bne LAB_0808f21c                         @ 0808f1f0 14d1
     movs r0,#0x1    @ 0808f1f2 0120
-    ldr r1, DAT_0808f218                     @ 0808f1f4 0849
+    ldr r1, seg6_pool_cid_kzk_f218           @ 0808f1f4 0849
     bl count_equipped_paired_slots_for_player @ 0808f1f6 a3f769fd
     cmp r0,#0x0                              @ 0808f1fa 0028
     bne LAB_0808f21c                         @ 0808f1fc 0ed1
@@ -21677,12 +21676,12 @@ LAB_0808f1d8:
     movs r0,#0x1    @ 0808f20a 0120
     b LAB_0808f22a                           @ 0808f20c 0de0
     .zero  0x2
-DAT_0808f210:
-    .word  0x0201e1c8                     @ 0808f210 c8e10102
-DAT_0808f214:
-    .word  0x00001914                     @ 0808f214 14190000
-DAT_0808f218:
-    .word  0x00001784                     @ 0808f218 84170000
+seg6_pool_eqzcnt_f210:
+    .word  gEquipZoneCountTable           @ 0808f210 c8e10102
+seg6_pool_cid_gk_f214:
+    .word  GIANT_KOZAKY_CID               @ 0808f214 14190000
+seg6_pool_cid_kzk_f218:
+    .word  KOZAKY_CID                     @ 0808f218 84170000  Kozaky CID; count_equipped_paired_slots_for_player arg
 LAB_0808f21c:
     adds r5,#0x1    @ 0808f21c 0135
     cmp r5,#0x4                              @ 0808f21e 042d
@@ -21696,7 +21695,7 @@ LAB_0808f22a:
     pop {r1}                                 @ 0808f22c 02bc
     bx r1                                    @ 0808f22e 0847
 
-@ Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x160f) per slot; among active slots compares [slot+0x4] values (priority/ATK), selects slot with smaller value; calls enqueue_equip_slot_bitmap_update to update equip bitmap. Returns 1=found and updated, 0=not processed. Single caller FUN_08090218. Params: r0=void (entry movs r0,#0 + mov r10,r0 overwrites). Constants: CARD_ID_TARGET=0x160f, BASE_ADDR=0x0201e1c8, PLAYER_STRIDE=0x868.
+@ Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x160f) per slot; among active slots compares [slot+0x4] values (priority/ATK), selects slot with smaller value; calls enqueue_equip_slot_bitmap_update to update equip bitmap. Returns 1=found and updated, 0=not processed. Single caller dispatch_equip_field_scan_sequence. Params: r0=void (entry movs r0,#0 + mov r10,r0 overwrites). Constants: CARD_ID_TARGET=0x160f, BASE_ADDR=0x0201e1c8, PLAYER_STRIDE=0x868.
 scan_field_for_equip_priority_slot_update:
     push {r4,r5,r6,r7,lr}                    @ 0808f230 f0b5
     .hword 0x4657    @ 0808f232 5746
@@ -21706,7 +21705,7 @@ scan_field_for_equip_priority_slot_update:
     movs r0,#0x0    @ 0808f23a 0020
     .hword 0x4682    @ 0808f23c 8246
 LAB_0808f23e:
-    ldr r1, DAT_0808f29c                     @ 0808f23e 1749
+    ldr r1, seg6_pool_eqzcnt_f29c            @ 0808f23e 1749
     ldr r4,[r1,#0x0]                         @ 0808f240 0c68
     .hword 0x4650    @ 0808f242 5046
     eors r4,r0    @ 0808f244 4440
@@ -21716,7 +21715,7 @@ LAB_0808f23e:
 LAB_0808f24c:
     adds r0,r4,#0x0    @ 0808f24c 201c
     .hword 0x4641    @ 0808f24e 4146
-    ldr r2, DAT_0808f2a0                     @ 0808f250 134a
+    ldr r2, seg6_pool_cid_amtgr_f2a0         @ 0808f250 134a
     bl test_slot_has_active_card             @ 0808f252 a3f779f9
     cmp r0,#0x0                              @ 0808f256 0028
     beq LAB_0808f2c8                         @ 0808f258 36d0
@@ -21730,15 +21729,15 @@ LAB_0808f24c:
 LAB_0808f268:
     cmp r6,r8                                @ 0808f268 4645
     beq LAB_0808f2c0                         @ 0808f26a 29d0
-    ldr r0, DAT_0808f2a4                     @ 0808f26c 0d48
+    ldr r0, seg6_pool_stride_f2a4            @ 0808f26c 0d48
     .hword 0x4663    @ 0808f26e 6346
     muls r3,r0    @ 0808f270 4343
     adds r0,r7,r3    @ 0808f272 f818
-    ldr r5, DAT_0808f2a8                     @ 0808f274 0c4d
+    ldr r5, seg6_pool_field_f2a8             @ 0808f274 0c4d
     adds r2,r0,r5    @ 0808f276 4219
     ldr r1,[r2,#0x0]                         @ 0808f278 1168
     lsls r1,r1,#0x13    @ 0808f27a c904
-    ldr r0, DAT_0808f2ac                     @ 0808f27c 0b48
+    ldr r0, seg6_pool_cidsh_amtgr_f2ac       @ 0808f27c 0b48
     cmp r1,r0                                @ 0808f27e 8142
     bne LAB_0808f2c0                         @ 0808f280 1ed1
     ldrh r0,[r2,#0x8]                        @ 0808f282 1089
@@ -21754,16 +21753,16 @@ LAB_0808f268:
     adds r0,r4,#0x0    @ 0808f296 201c
     .hword 0x4641    @ 0808f298 4146
     b LAB_0808f2b4                           @ 0808f29a 0be0
-DAT_0808f29c:
-    .word  0x0201e1c8                     @ 0808f29c c8e10102
-DAT_0808f2a0:
-    .word  0x0000160f                     @ 0808f2a0 0f160000
-DAT_0808f2a4:
-    .word  0x00000868                     @ 0808f2a4 68080000
-DAT_0808f2a8:
-    .word  0x0201c510                     @ 0808f2a8 10c50102
-DAT_0808f2ac:
-    .word  0xb0780000                     @ 0808f2ac 000078b0
+seg6_pool_eqzcnt_f29c:
+    .word  gEquipZoneCountTable           @ 0808f29c c8e10102
+seg6_pool_cid_amtgr_f2a0:
+    .word  AMAZONESS_TIGER_CID            @ 0808f2a0 0f160000
+seg6_pool_stride_f2a4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f2a4 68080000
+seg6_pool_field_f2a8:
+    .word  gDuelFieldSlots                @ 0808f2a8 10c50102
+seg6_pool_cidsh_amtgr_f2ac:
+    .word  AMAZONESS_TIGER_CID_SHIFTED    @ 0808f2ac 000078b0  Amazoness Tiger CID(0x160f)<<19; slot state filter post lsls #0x13
 LAB_0808f2b0:
     adds r0,r4,#0x0    @ 0808f2b0 201c
     adds r1,r6,#0x0    @ 0808f2b2 311c
@@ -21812,7 +21811,7 @@ enqueue_exchange_slot_sprite_attrs:
     bl find_equip_chain_pair_across_field    @ 0808f2fc a0f7c0f9
     lsls r0,r0,#0x10    @ 0808f300 0004
     lsrs r1,r0,#0x10    @ 0808f302 010c
-    ldr r0, DAT_0808f3a4                     @ 0808f304 2748
+    ldr r0, seg6_pool_empty_f3a4             @ 0808f304 2748
     cmp r1,r0                                @ 0808f306 8142
     beq LAB_0808f398                         @ 0808f308 46d0
     lsls r0,r1,#0x18    @ 0808f30a 0806
@@ -21840,14 +21839,14 @@ enqueue_exchange_slot_sprite_attrs:
     bl enqueue_equip_chain_slot_sprite_attr  @ 0808f33a b3f7f5fe
     cmp r4,#0x0                              @ 0808f33e 002c
     bne LAB_0808f398                         @ 0808f340 2ad1
-    ldr r4, PTR_gP1LifePoints_0808f3a8       @ 0808f342 194c
+    ldr r4, ptr_lp_f3a8                      @ 0808f342 194c
     lsls r2,r5,#0x2    @ 0808f344 aa00
     adds r2,r2,r5    @ 0808f346 5219
     lsls r2,r2,#0x2    @ 0808f348 9200
     movs r3,#0x1    @ 0808f34a 0123
     adds r0,r6,#0x0    @ 0808f34c 301c
     ands r0,r3    @ 0808f34e 1840
-    ldr r1, DAT_0808f3ac                     @ 0808f350 1649
+    ldr r1, seg6_pool_stride_f3ac            @ 0808f350 1649
     muls r0,r1    @ 0808f352 4843
     adds r2,r2,r0    @ 0808f354 1218
     adds r0,r4,#0x0    @ 0808f356 201c
@@ -21888,14 +21887,14 @@ LAB_0808f398:
     pop {r0}                                 @ 0808f39e 01bc
     bx r0                                    @ 0808f3a0 0047
     .zero  0x2
-DAT_0808f3a4:
-    .word  0x0000ffff                     @ 0808f3a4 ffff0000
-PTR_gP1LifePoints_0808f3a8:
+seg6_pool_empty_f3a4:
+    .word  SLOT_CARD_EMPTY                @ 0808f3a4 ffff0000  no-pair sentinel from find_equip_chain_pair_across_field
+ptr_lp_f3a8:
     .word  gP1LifePoints                  @ 0808f3a8 e0c40102
-DAT_0808f3ac:
-    .word  0x00000868                     @ 0808f3ac 68080000
+seg6_pool_stride_f3ac:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f3ac 68080000
 
-@ Double-loop field scanner for card 0x14bf (DAT_0808f44c=0xa5f80000=0x14bf<<19): outer i=[0..1] (player side), inner j=[5..9] (monster + spell zone). When [slot+0]>>19 == 0x14bf AND [slot+0x40] bit5+bit1 both 0, calls enqueue_sprite_attr_with_shape (PROGRESS #681) to submit decorative sprite. r0=u32 card_field_bit13 [0..1] -> r10 (callee-save alias for enqueue 1st arg); r1=u32 sprite_kind_id [=1, fixed across 4 callers] -> r9. Returns void. All 4 callers (FUN_08047218/FUN_08047f50/FUN_08048020/FUN_08048364, duel_field) build r0 via lsls#0x12+lsrs#0x1f and r1=#1. Constants: TARGET_CARD_ID=0x14bf, slot_base=gDuelFieldSlots, stride_player=0x868, stride_slot=0x14, slot_attr_offset=0x40.
+@ Double-loop field scanner for card 0x14bf (FATAL_ABACUS_CID_SHIFTED=0xa5f80000=0x14bf<<19): outer i=[0..1] (player side), inner j=[5..9] (monster + spell zone). When [slot+0]>>19 == 0x14bf AND [slot+0x40] bit5+bit1 both 0, calls enqueue_sprite_attr_with_shape to submit decorative sprite. r0=u32 card_field_bit13 [0..1] -> r10 (callee-save alias for enqueue 1st arg); r1=u32 sprite_kind_id [=1, fixed across 4 callers] -> r9. Returns void. All 4 callers (handle_card_effect_zone_eligibility_by_field6/render_slot_card_sprite_from_descriptor/render_slot_card_sprite_and_effects/render_slot_card_sprite_with_chaos_equip_check, duel_field) build r0 via lsls#0x12+lsrs#0x1f and r1=#1. Constants: TARGET_CARD_ID=0x14bf, slot_base=gDuelFieldSlots, stride_player=0x868, stride_slot=0x14, slot_attr_offset=0x40.
 scan_field_slots_for_attached_sprite_by_id:
     push {r4,r5,r6,r7,lr}                    @ 0808f3b0 f0b5
     .hword 0x4657    @ 0808f3b2 5746
@@ -21915,20 +21914,20 @@ LAB_0808f3c6:
     .hword 0x4690    @ 0808f3cc 9046
     ldr r0,[sp,#0x4]                         @ 0808f3ce 0198
     ands r0,r3    @ 0808f3d0 1840
-    ldr r1, DAT_0808f440                     @ 0808f3d2 1b49
+    ldr r1, seg6_pool_stride_f440            @ 0808f3d2 1b49
     muls r1,r0    @ 0808f3d4 4143
-    ldr r7, DAT_0808f444                     @ 0808f3d6 1b4f
+    ldr r7, seg6_pool_slotst_f444            @ 0808f3d6 1b4f
     adds r0,r1,r7    @ 0808f3d8 c819
     adds r5,r0,#0x0    @ 0808f3da 051c
     adds r5,#0x64    @ 0808f3dc 6435
-    ldr r0, DAT_0808f448                     @ 0808f3de 1a48
+    ldr r0, seg6_pool_field_f448             @ 0808f3de 1a48
     adds r1,r1,r0    @ 0808f3e0 0918
     adds r4,r1,#0x0    @ 0808f3e2 0c1c
     adds r4,#0x64    @ 0808f3e4 6434
 LAB_0808f3e6:
     ldr r0,[r4,#0x0]                         @ 0808f3e6 2068
     lsls r0,r0,#0x13    @ 0808f3e8 c004
-    ldr r1, DAT_0808f44c                     @ 0808f3ea 1849
+    ldr r1, seg6_pool_cidsh_fab_f44c         @ 0808f3ea 1849
     cmp r0,r1                                @ 0808f3ec 8842
     bne LAB_0808f41e                         @ 0808f3ee 16d1
     ldr r1,[r5,#0x0]                         @ 0808f3f0 2968
@@ -21971,16 +21970,16 @@ LAB_0808f41e:
     pop {r4,r5,r6,r7}                        @ 0808f43a f0bc
     pop {r0}                                 @ 0808f43c 01bc
     bx r0                                    @ 0808f43e 0047
-DAT_0808f440:
-    .word  0x00000868                     @ 0808f440 68080000
-DAT_0808f444:
-    .word  0x0201c520                     @ 0808f444 20c50102
-DAT_0808f448:
-    .word  0x0201c510                     @ 0808f448 10c50102
-DAT_0808f44c:
-    .word  0xa5f80000                     @ 0808f44c 0000f8a5
+seg6_pool_stride_f440:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f440 68080000
+seg6_pool_slotst_f444:
+    .word  gDuelFieldSlotState            @ 0808f444 20c50102
+seg6_pool_field_f448:
+    .word  gDuelFieldSlots                @ 0808f448 10c50102
+seg6_pool_cidsh_fab_f44c:
+    .word  FATAL_ABACUS_CID_SHIFTED       @ 0808f44c 0000f8a5  Fatal Abacus CID(0x14bf)<<19; slot state filter
 
-@ Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). Double loop 2x9 (player [0..1] x zone_slot [0..8]). Per slot: reads gP1LifePoints+0x1ce8+player_offset, checks state mask (0xa5f80000); if match: calls enqueue_sprite_attr_with_xy_split; builds equip bitmap from bit5/bit1; if equip bitmap nonzero: calls enqueue_sprite_attr_for_zone_card_id_lookup; then calls submit_lp_change_indicator_with_chain_check twice (both player sides). Returns r0=u32 hit_flag (1=at least one slot processed, 0=none). Constants: gP1LifePoints+0x1ce8=player_offset, slot_stride=0x14, state_mask=0xa5f80000.
+@ Called exclusively by dispatch_equip_field_scan_sequence (duel_field main controller, indeg=1). Double loop 2x9 (player [0..1] x zone_slot [0..8]). Per slot: reads gP1LifePoints+0x1ce8+player_offset, checks state mask (FATAL_ABACUS_CID_SHIFTED=0xa5f80000); if match: calls enqueue_sprite_attr_with_xy_split; builds equip bitmap from bit5/bit1; if equip bitmap nonzero: calls enqueue_sprite_attr_for_zone_card_id_lookup; then calls submit_lp_change_indicator_with_chain_check twice (both player sides). Returns r0=u32 hit_flag (1=at least one slot processed, 0=none). Constants: gP1LifePoints+0x1ce8=player_offset, slot_stride=0x14, state_mask=FATAL_ABACUS_CID_SHIFTED=0xa5f80000.
 scan_field_slots_for_lp_change_sprite_update:
     push {r4,r5,r6,r7,lr}                    @ 0808f450 f0b5
     .hword 0x4657    @ 0808f452 5746
@@ -21993,8 +21992,8 @@ scan_field_slots_for_lp_change_sprite_update:
     movs r0,#0x1    @ 0808f460 0120
     .hword 0x4682    @ 0808f462 8246
 LAB_0808f464:
-    ldr r0, PTR_gP1LifePoints_0808f560       @ 0808f464 3e48
-    ldr r2, DAT_0808f564                     @ 0808f466 3f4a
+    ldr r0, ptr_lp_f560                      @ 0808f464 3e48
+    ldr r2, seg6_pool_lp2off_f564            @ 0808f466 3f4a
     adds r0,r0,r2    @ 0808f468 8018
     ldr r6,[r0,#0x0]                         @ 0808f46a 0668
     eors r6,r1    @ 0808f46c 4e40
@@ -22009,17 +22008,17 @@ LAB_0808f464:
     movs r2,#0x64    @ 0808f47e 6422
     .hword 0x4691    @ 0808f480 9146
 LAB_0808f482:
-    ldr r0, DAT_0808f568                     @ 0808f482 3948
+    ldr r0, seg6_pool_stride_f568            @ 0808f482 3948
     .hword 0x4641    @ 0808f484 4146
     muls r1,r0    @ 0808f486 4143
     adds r0,r1,#0x0    @ 0808f488 081c
     .hword 0x464a    @ 0808f48a 4a46
     adds r4,r2,r0    @ 0808f48c 1418
-    ldr r0, DAT_0808f56c                     @ 0808f48e 3748
+    ldr r0, seg6_pool_field_f56c             @ 0808f48e 3748
     adds r5,r4,r0    @ 0808f490 2518
     ldr r0,[r5,#0x0]                         @ 0808f492 2868
     lsls r0,r0,#0x13    @ 0808f494 c004
-    ldr r1, DAT_0808f570                     @ 0808f496 3649
+    ldr r1, seg6_pool_cidsh_fab_f570         @ 0808f496 3649
     cmp r0,r1                                @ 0808f498 8842
     bne LAB_0808f53e                         @ 0808f49a 50d1
     ldr r0,[r5,#0xc]                         @ 0808f49c e868
@@ -22030,7 +22029,7 @@ LAB_0808f482:
     movs r2,#0x0    @ 0808f4a6 0022
     str r3,[sp,#0x4]                         @ 0808f4a8 0193
     bl enqueue_sprite_attr_with_xy_split     @ 0808f4aa b5f7c9fe
-    ldr r0, DAT_0808f56c                     @ 0808f4ae 2f48
+    ldr r0, seg6_pool_field_f56c             @ 0808f4ae 2f48
     adds r0,#0x10    @ 0808f4b0 1030
     adds r0,r0,r4    @ 0808f4b2 0019
     ldr r1,[r0,#0x0]                         @ 0808f4b4 0168
@@ -22048,7 +22047,7 @@ LAB_0808f482:
     ldr r3,[sp,#0x4]                         @ 0808f4cc 019b
     cmp r0,#0x0                              @ 0808f4ce 0028
     beq LAB_0808f53e                         @ 0808f4d0 35d0
-    ldr r0, DAT_0808f574                     @ 0808f4d2 2848
+    ldr r0, seg6_pool_eqzcnt_f574            @ 0808f4d2 2848
     ldr r4,[r0,#0x0]                         @ 0808f4d4 0468
     ldr r0,[r5,#0x0]                         @ 0808f4d6 2868
     lsls r2,r0,#0x2    @ 0808f4d8 8200
@@ -22076,7 +22075,7 @@ LAB_0808f482:
     orrs r2,r0    @ 0808f506 0243
     lsrs r2,r2,#0x1f    @ 0808f508 d20f
     adds r0,r4,#0x0    @ 0808f50a 201c
-    ldr r3, DAT_0808f578                     @ 0808f50c 1a4b
+    ldr r3, seg6_pool_cid_jiw_f578           @ 0808f50c 1a4b
     bl submit_lp_change_indicator_with_chain_check @ 0808f50e b9f765f9
     .hword 0x4651    @ 0808f512 5146
     eors r4,r1    @ 0808f514 4c40
@@ -22096,7 +22095,7 @@ LAB_0808f482:
     orrs r2,r0    @ 0808f530 0243
     lsrs r2,r2,#0x1f    @ 0808f532 d20f
     adds r0,r4,#0x0    @ 0808f534 201c
-    ldr r3, DAT_0808f578                     @ 0808f536 104b
+    ldr r3, seg6_pool_cid_jiw_f578           @ 0808f536 104b
     bl submit_lp_change_indicator_with_chain_check @ 0808f538 b9f750f9
     movs r3,#0x1    @ 0808f53c 0123
 LAB_0808f53e:
@@ -22117,26 +22116,26 @@ LAB_0808f53e:
     pop {r4,r5,r6,r7}                        @ 0808f55a f0bc
     pop {r1}                                 @ 0808f55c 02bc
     bx r1                                    @ 0808f55e 0847
-PTR_gP1LifePoints_0808f560:
+ptr_lp_f560:
     .word  gP1LifePoints                  @ 0808f560 e0c40102
-DAT_0808f564:
-    .word  0x00001ce8                     @ 0808f564 e81c0000
-DAT_0808f568:
-    .word  0x00000868                     @ 0808f568 68080000
-DAT_0808f56c:
-    .word  0x0201c510                     @ 0808f56c 10c50102
-DAT_0808f570:
-    .word  0xa5f80000                     @ 0808f570 0000f8a5
-DAT_0808f574:
-    .word  0x0201e1c8                     @ 0808f574 c8e10102
-DAT_0808f578:
-    .word  0x00001717                     @ 0808f578 17170000
+seg6_pool_lp2off_f564:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0808f564 e81c0000
+seg6_pool_stride_f568:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f568 68080000
+seg6_pool_field_f56c:
+    .word  gDuelFieldSlots                @ 0808f56c 10c50102
+seg6_pool_cidsh_fab_f570:
+    .word  FATAL_ABACUS_CID_SHIFTED       @ 0808f570 0000f8a5  Fatal Abacus CID(0x14bf)<<19; second occurrence
+seg6_pool_eqzcnt_f574:
+    .word  gEquipZoneCountTable           @ 0808f574 c8e10102
+seg6_pool_cid_jiw_f578:
+    .word  JADE_INSECT_WHISTLE_CID        @ 0808f578 17170000
 
-@ Called by FUN_08090218 (duel_field main control); equip-chain bitmap sprite update scanner. Iterates 2 players (r6=0..1) x 5 slots (r5=0..4), base 0x0201e1c8. For each (player, slot): calls test_slot_has_active_card(card_id=0x14fc, player=r4=player_xor_6, slot=r5). If active card found: calls find_equip_chain_pair_across_field(player, slot) to find cross-field pair. If valid pair returned (!=0xffff): extracts player-side/slot-index from result, calls enqueue_equip_slot_bitmap_update to write equip-slot bitmap sprite. r0=void (entry movs r6,#0 / ldr r7,DAT confirms no APCS input). Returns u32 found_flag (0=no pair, 1=at least one pair updated). Constants: card_id=0x14fc, state_base=0x0201e1c8, slot_range=0..4, no_pair=0xffff. Callers: FUN_08090218.
+@ Called by dispatch_equip_field_scan_sequence (duel_field main control); equip-chain bitmap sprite update scanner. Iterates 2 players (r6=0..1) x 5 slots (r5=0..4), base 0x0201e1c8. For each (player, slot): calls test_slot_has_active_card(card_id=0x14fc, player=r4=player_xor_6, slot=r5). If active card found: calls find_equip_chain_pair_across_field(player, slot) to find cross-field pair. If valid pair returned (!=0xffff): extracts player-side/slot-index from result, calls enqueue_equip_slot_bitmap_update to write equip-slot bitmap sprite. r0=void (entry movs r6,#0 / ldr r7,DAT confirms no APCS input). Returns u32 found_flag (0=no pair, 1=at least one pair updated). Constants: card_id=0x14fc, state_base=0x0201e1c8, slot_range=0..4, no_pair=0xffff. Callers: dispatch_equip_field_scan_sequence.
 scan_equip_chain_slots_for_bitmap_update:
     push {r4,r5,r6,r7,lr}                    @ 0808f57c f0b5
     movs r6,#0x0    @ 0808f57e 0026
-    ldr r7, DAT_0808f5e0                     @ 0808f580 174f
+    ldr r7, seg6_pool_eqzcnt_f5e0            @ 0808f580 174f
 LAB_0808f582:
     ldr r4,[r7,#0x0]                         @ 0808f582 3c68
     eors r4,r6    @ 0808f584 7440
@@ -22144,7 +22143,7 @@ LAB_0808f582:
 LAB_0808f588:
     adds r0,r4,#0x0    @ 0808f588 201c
     adds r1,r5,#0x0    @ 0808f58a 291c
-    ldr r2, DAT_0808f5e4                     @ 0808f58c 154a
+    ldr r2, seg6_pool_cid_gopt_f5e4          @ 0808f58c 154a
     bl test_slot_has_active_card             @ 0808f58e a2f7dbff
     cmp r0,#0x0                              @ 0808f592 0028
     beq LAB_0808f5f4                         @ 0808f594 2ed0
@@ -22153,7 +22152,7 @@ LAB_0808f588:
     bl find_equip_chain_pair_across_field    @ 0808f59a a0f771f8
     lsls r0,r0,#0x10    @ 0808f59e 0004
     lsrs r1,r0,#0x10    @ 0808f5a0 010c
-    ldr r0, DAT_0808f5e8                     @ 0808f5a2 1148
+    ldr r0, seg6_pool_empty_f5e8             @ 0808f5a2 1148
     cmp r1,r0                                @ 0808f5a4 8142
     beq LAB_0808f5f4                         @ 0808f5a6 25d0
     movs r0,#0x1    @ 0808f5a8 0120
@@ -22163,10 +22162,10 @@ LAB_0808f588:
     lsls r0,r1,#0x2    @ 0808f5b0 8800
     adds r0,r0,r1    @ 0808f5b2 4018
     lsls r0,r0,#0x2    @ 0808f5b4 8000
-    ldr r1, DAT_0808f5ec                     @ 0808f5b6 0d49
+    ldr r1, seg6_pool_stride_f5ec            @ 0808f5b6 0d49
     muls r1,r2    @ 0808f5b8 5143
     adds r0,r0,r1    @ 0808f5ba 4018
-    ldr r1, DAT_0808f5f0                     @ 0808f5bc 0c49
+    ldr r1, seg6_pool_field_f5f0             @ 0808f5bc 0c49
     adds r1,r0,r1    @ 0808f5be 4118
     ldr r0,[r1,#0x0]                         @ 0808f5c0 0868
     lsls r0,r0,#0x13    @ 0808f5c2 c004
@@ -22183,16 +22182,16 @@ LAB_0808f588:
     movs r0,#0x1    @ 0808f5da 0120
     b LAB_0808f602                           @ 0808f5dc 11e0
     .zero  0x2
-DAT_0808f5e0:
-    .word  0x0201e1c8                     @ 0808f5e0 c8e10102
-DAT_0808f5e4:
-    .word  0x000014fc                     @ 0808f5e4 fc140000
-DAT_0808f5e8:
-    .word  0x0000ffff                     @ 0808f5e8 ffff0000
-DAT_0808f5ec:
-    .word  0x00000868                     @ 0808f5ec 68080000
-DAT_0808f5f0:
-    .word  0x0201c510                     @ 0808f5f0 10c50102
+seg6_pool_eqzcnt_f5e0:
+    .word  gEquipZoneCountTable           @ 0808f5e0 c8e10102
+seg6_pool_cid_gopt_f5e4:
+    .word  GRADIUS_OPTION_CID             @ 0808f5e4 fc140000
+seg6_pool_empty_f5e8:
+    .word  SLOT_CARD_EMPTY                @ 0808f5e8 ffff0000  no-pair sentinel 0xffff
+seg6_pool_stride_f5ec:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f5ec 68080000
+seg6_pool_field_f5f0:
+    .word  gDuelFieldSlots                @ 0808f5f0 10c50102
 LAB_0808f5f4:
     adds r5,#0x1    @ 0808f5f4 0135
     cmp r5,#0x4                              @ 0808f5f6 042d
@@ -22206,7 +22205,7 @@ LAB_0808f602:
     pop {r1}                                 @ 0808f604 02bc
     bx r1                                    @ 0808f606 0847
 
-@ Called by FUN_08090218 (duel_field main control) as one phase in equip-chain activation scan. Iterates 2 players x 11 slots (player=r9, slot 0..10), calls check_node_in_slot_chain(card_id=0x123b, zone=0xb, type=2) for each slot. If node found, reads [slot_entry+0xa] availability; if valid, calls find_slot_idx_by_card_id_in_player_zones to locate equip target slot. When target valid: calls enqueue_equip_zone_sprite_by_side (FUN_080486e4) for flip sprite, then submit_equip_slot_sprite_zone11 (FUN_0804a2c8) for equip-zone sprite. Finally calls enqueue_sprite_attr_for_chain_node_match for match-marker sprite. r0=void (entry movs r0,#0 / mov r9,r0 confirms no APCS input). Returns u32 activation_flag (0=none, non-zero=at least one node matched). Constants: card_id=0x123b, zone=0xb, type=2, base=0x0201c5ec. Callers: FUN_08090218.
+@ Called by dispatch_equip_field_scan_sequence (duel_field main control) as one phase in equip-chain activation scan. Iterates 2 players x 11 slots (player=r9, slot 0..10), calls check_node_in_slot_chain(card_id=0x123b, zone=0xb, type=2) for each slot. If node found, reads [slot_entry+0xa] availability; if valid, calls find_slot_idx_by_card_id_in_player_zones to locate equip target slot. When target valid: calls enqueue_equip_zone_sprite_by_side for flip sprite, then submit_equip_slot_sprite_zone11 for equip-zone sprite. Finally calls enqueue_sprite_attr_for_chain_node_match for match-marker sprite. r0=void (entry movs r0,#0 / mov r9,r0 confirms no APCS input). Returns u32 activation_flag (0=none, non-zero=at least one node matched). Constants: card_id=0x123b, zone=0xb, type=2, base=0x0201c5ec. Callers: dispatch_equip_field_scan_sequence.
 scan_chain_nodes_for_equip_zone_sprite:
     push {r4,r5,r6,r7,lr}                    @ 0808f608 f0b5
     .hword 0x4657    @ 0808f60a 5746
@@ -22217,14 +22216,14 @@ scan_chain_nodes_for_equip_zone_sprite:
     .hword 0x4681    @ 0808f614 8146
     movs r4,#0x0    @ 0808f616 0024
 LAB_0808f618:
-    ldr r1, PTR_gP1LifePoints_0808f6c0       @ 0808f618 2949
-    ldr r3, DAT_0808f6c4                     @ 0808f61a 2a4b
+    ldr r1, ptr_lp_f6c0                      @ 0808f618 2949
+    ldr r3, seg6_pool_lp2off_f6c4            @ 0808f61a 2a4b
     adds r5,r1,r3    @ 0808f61c cd18
     ldr r6,[r5,#0x0]                         @ 0808f61e 2e68
     eors r6,r4    @ 0808f620 6640
     adds r0,r6,#0x0    @ 0808f622 301c
     movs r1,#0xb    @ 0808f624 0b21
-    ldr r2, DAT_0808f6c8                     @ 0808f626 284a
+    ldr r2, seg6_pool_cid_cc_f6c8            @ 0808f626 284a
     movs r3,#0x2    @ 0808f628 0223
     bl check_node_in_slot_chain              @ 0808f62a a0f7c9fb
     adds r4,#0x1    @ 0808f62e 0134
@@ -22233,27 +22232,27 @@ LAB_0808f618:
     beq LAB_0808f6a8                         @ 0808f634 38d0
     movs r0,#0x1    @ 0808f636 0120
     ands r0,r6    @ 0808f638 3040
-    ldr r1, DAT_0808f6cc                     @ 0808f63a 2449
+    ldr r1, seg6_pool_stride_f6cc            @ 0808f63a 2449
     adds r2,r0,#0x0    @ 0808f63c 021c
     muls r2,r1    @ 0808f63e 4a43
-    ldr r1, DAT_0808f6d0                     @ 0808f640 2349
+    ldr r1, seg6_pool_spellz_f6d0            @ 0808f640 2349
     adds r0,r2,r1    @ 0808f642 5018
     ldrh r1,[r0,#0xa]                        @ 0808f644 4189
     cmp r1,#0x0                              @ 0808f646 0029
     beq LAB_0808f6a8                         @ 0808f648 2ed0
-    ldr r3, DAT_0808f6d4                     @ 0808f64a 224b
+    ldr r3, lp_block2_to_zone_chain_neg_off_f6d4 @ 0808f64a 224b
     adds r0,r5,r3    @ 0808f64c e818
     adds r2,r2,r0    @ 0808f64e 1218
     .hword 0x4690    @ 0808f650 9046
 LAB_0808f652:
     lsls r0,r1,#0x3    @ 0808f652 c800
-    ldr r1, DAT_0808f6d8                     @ 0808f654 2049
+    ldr r1, seg6_pool_eqnpool_f6d8           @ 0808f654 2049
     adds r5,r0,r1    @ 0808f656 4518
     ldrh r7,[r5,#0x6]                        @ 0808f658 ef88
     ldr r1,[r5,#0x0]                         @ 0808f65a 2968
-    ldr r0, DAT_0808f6dc                     @ 0808f65c 1f48
+    ldr r0, seg6_pool_eqtmask_f6dc           @ 0808f65c 1f48
     ands r1,r0    @ 0808f65e 0140
-    ldr r0, DAT_0808f6e0                     @ 0808f660 1f48
+    ldr r0, seg6_pool_z11tag_cc_f6e0         @ 0808f660 1f48
     cmp r1,r0                                @ 0808f662 8142
     bne LAB_0808f6a2                         @ 0808f664 1dd1
     ldrh r1,[r5,#0x4]                        @ 0808f666 a988
@@ -22267,7 +22266,7 @@ LAB_0808f652:
     bne LAB_0808f684                         @ 0808f678 04d1
     movs r1,#0x1    @ 0808f67a 0121
     subs r0,r1,r6    @ 0808f67c 881b
-    ldr r1, DAT_0808f6c8                     @ 0808f67e 1249
+    ldr r1, seg6_pool_cid_cc_f6c8            @ 0808f67e 1249
     bl enqueue_equip_zone_sprite_by_side     @ 0808f680 b9f730f8
 LAB_0808f684:
     lsls r2,r4,#0x2    @ 0808f684 a200
@@ -22282,7 +22281,7 @@ LAB_0808f696:
     ldrh r3,[r5,#0x4]                        @ 0808f696 ab88
     adds r0,r6,#0x0    @ 0808f698 301c
     movs r1,#0xb    @ 0808f69a 0b21
-    ldr r2, DAT_0808f6c8                     @ 0808f69c 0a4a
+    ldr r2, seg6_pool_cid_cc_f6c8            @ 0808f69c 0a4a
     bl enqueue_sprite_attr_for_chain_node_match @ 0808f69e b3f7cffd
 LAB_0808f6a2:
     adds r1,r7,#0x0    @ 0808f6a2 391c
@@ -22301,26 +22300,26 @@ LAB_0808f6a8:
     pop {r1}                                 @ 0808f6ba 02bc
     bx r1                                    @ 0808f6bc 0847
     .zero  0x2
-PTR_gP1LifePoints_0808f6c0:
+ptr_lp_f6c0:
     .word  gP1LifePoints                  @ 0808f6c0 e0c40102
-DAT_0808f6c4:
-    .word  0x00001ce8                     @ 0808f6c4 e81c0000
-DAT_0808f6c8:
-    .word  0x0000123b                     @ 0808f6c8 3b120000
-DAT_0808f6cc:
-    .word  0x00000868                     @ 0808f6cc 68080000
-DAT_0808f6d0:
-    .word  0x0201c5ec                     @ 0808f6d0 ecc50102
-DAT_0808f6d4:
-    .word  0xffffe438                     @ 0808f6d4 38e4ffff
-DAT_0808f6d8:
-    .word  0x0201d9c0                     @ 0808f6d8 c0d90102
-DAT_0808f6dc:
-    .word  0x000fffff                     @ 0808f6dc ffff0f00
-DAT_0808f6e0:
-    .word  0x0002123b                     @ 0808f6e0 3b120200
+seg6_pool_lp2off_f6c4:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0808f6c4 e81c0000
+seg6_pool_cid_cc_f6c8:
+    .word  CRUSH_CARD_CID                 @ 0808f6c8 3b120000
+seg6_pool_stride_f6cc:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f6cc 68080000
+seg6_pool_spellz_f6d0:
+    .word  gDuelFieldSpellZoneBase        @ 0808f6d0 ecc50102
+lp_block2_to_zone_chain_neg_off_f6d4:
+    .word  0xffffe438                     @ 0808f6d4 38e4ffff  [gP1LP+1ce8]+0xffffe438 -> gDuelFieldSpellZoneBase+0x14
+seg6_pool_eqnpool_f6d8:
+    .word  gEquipNodePool                 @ 0808f6d8 c0d90102
+seg6_pool_eqtmask_f6dc:
+    .word  EQUIP_NODE_TAG_MASK            @ 0808f6dc ffff0f00  chain node [+0] low-20-bit tag mask
+seg6_pool_z11tag_cc_f6e0:
+    .word  CRUSH_CARD_ZONE11_TAG          @ 0808f6e0 3b120200  Crush Card zone11 node tag = CID|(2<<16)
 
-@ Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). Outer loop 2x (player [0..1]); per player: calls check_node_in_slot_chain(player XOR r4, zone=0xb=0x188c, card_type=2); if node exists: traverses chain node list (base=0x0201d9c0, stride=8), checks [node+0x0] AND 0x000fffff == 0x0002188c (zone11 marker); if match: calls find_slot_idx_by_card_id_in_player_zones; if slot>=0 and player_xor==0: calls enqueue_equip_zone_sprite_by_side; calls submit_equip_slot_sprite_zone11 + enqueue_sprite_attr_for_chain_node_match. Returns r0=u32 hit_count (zone11 sprite processing count, 0=no match). Constants: zone_id=0xb (zone11), chain_base=0x0201d9c0, zone11_marker=0x0002188c.
+@ Called exclusively by dispatch_equip_field_scan_sequence (duel_field main controller, indeg=1). Outer loop 2x (player [0..1]); per player: calls check_node_in_slot_chain(player XOR r4, zone=0xb=0x188c, card_type=2); if node exists: traverses chain node list (base=0x0201d9c0, stride=8), checks [node+0x0] AND EQUIP_NODE_TAG_MASK == DECK_DEV_VIRUS_ZONE11_TAG (zone11 marker); if match: calls find_slot_idx_by_card_id_in_player_zones; if slot>=0 and player_xor==0: calls enqueue_equip_zone_sprite_by_side; calls submit_equip_slot_sprite_zone11 + enqueue_sprite_attr_for_chain_node_match. Returns r0=u32 hit_count (zone11 sprite processing count, 0=no match). Constants: zone_id=0xb (zone11), chain_base=0x0201d9c0, zone11_marker=DECK_DEV_VIRUS_ZONE11_TAG=0x0002188c.
 scan_chain_nodes_for_equip_zone11_sprite:
     push {r4,r5,r6,r7,lr}                    @ 0808f6e4 f0b5
     .hword 0x4657    @ 0808f6e6 5746
@@ -22331,14 +22330,14 @@ scan_chain_nodes_for_equip_zone11_sprite:
     .hword 0x4681    @ 0808f6f0 8146
     movs r4,#0x0    @ 0808f6f2 0024
 LAB_0808f6f4:
-    ldr r1, PTR_gP1LifePoints_0808f79c       @ 0808f6f4 2949
-    ldr r3, DAT_0808f7a0                     @ 0808f6f6 2a4b
+    ldr r1, ptr_lp_f79c                      @ 0808f6f4 2949
+    ldr r3, seg6_pool_lp2off_f7a0            @ 0808f6f6 2a4b
     adds r5,r1,r3    @ 0808f6f8 cd18
     ldr r6,[r5,#0x0]                         @ 0808f6fa 2e68
     eors r6,r4    @ 0808f6fc 6640
     adds r0,r6,#0x0    @ 0808f6fe 301c
     movs r1,#0xb    @ 0808f700 0b21
-    ldr r2, DAT_0808f7a4                     @ 0808f702 284a
+    ldr r2, seg6_pool_cid_ddv_f7a4           @ 0808f702 284a
     movs r3,#0x2    @ 0808f704 0223
     bl check_node_in_slot_chain              @ 0808f706 a0f75bfb
     adds r4,#0x1    @ 0808f70a 0134
@@ -22347,27 +22346,27 @@ LAB_0808f6f4:
     beq LAB_0808f784                         @ 0808f710 38d0
     movs r0,#0x1    @ 0808f712 0120
     ands r0,r6    @ 0808f714 3040
-    ldr r1, DAT_0808f7a8                     @ 0808f716 2449
+    ldr r1, seg6_pool_stride_f7a8            @ 0808f716 2449
     adds r2,r0,#0x0    @ 0808f718 021c
     muls r2,r1    @ 0808f71a 4a43
-    ldr r1, DAT_0808f7ac                     @ 0808f71c 2349
+    ldr r1, seg6_pool_spellz_f7ac            @ 0808f71c 2349
     adds r0,r2,r1    @ 0808f71e 5018
     ldrh r1,[r0,#0xa]                        @ 0808f720 4189
     cmp r1,#0x0                              @ 0808f722 0029
     beq LAB_0808f784                         @ 0808f724 2ed0
-    ldr r3, DAT_0808f7b0                     @ 0808f726 224b
+    ldr r3, lp_block2_to_zone_chain_neg_off_f7b0 @ 0808f726 224b
     adds r0,r5,r3    @ 0808f728 e818
     adds r2,r2,r0    @ 0808f72a 1218
     .hword 0x4690    @ 0808f72c 9046
 LAB_0808f72e:
     lsls r0,r1,#0x3    @ 0808f72e c800
-    ldr r1, DAT_0808f7b4                     @ 0808f730 2049
+    ldr r1, seg6_pool_eqnpool_f7b4           @ 0808f730 2049
     adds r5,r0,r1    @ 0808f732 4518
     ldrh r7,[r5,#0x6]                        @ 0808f734 ef88
     ldr r1,[r5,#0x0]                         @ 0808f736 2968
-    ldr r0, DAT_0808f7b8                     @ 0808f738 1f48
+    ldr r0, seg6_pool_eqtmask_f7b8           @ 0808f738 1f48
     ands r1,r0    @ 0808f73a 0140
-    ldr r0, DAT_0808f7bc                     @ 0808f73c 1f48
+    ldr r0, seg6_pool_z11tag_ddv_f7bc        @ 0808f73c 1f48
     cmp r1,r0                                @ 0808f73e 8142
     bne LAB_0808f77e                         @ 0808f740 1dd1
     ldrh r1,[r5,#0x4]                        @ 0808f742 a988
@@ -22381,7 +22380,7 @@ LAB_0808f72e:
     bne LAB_0808f760                         @ 0808f754 04d1
     movs r1,#0x1    @ 0808f756 0121
     subs r0,r1,r6    @ 0808f758 881b
-    ldr r1, DAT_0808f7a4                     @ 0808f75a 1249
+    ldr r1, seg6_pool_cid_ddv_f7a4           @ 0808f75a 1249
     bl enqueue_equip_zone_sprite_by_side     @ 0808f75c b8f7c2ff
 LAB_0808f760:
     lsls r2,r4,#0x2    @ 0808f760 a200
@@ -22396,7 +22395,7 @@ LAB_0808f772:
     ldrh r3,[r5,#0x4]                        @ 0808f772 ab88
     adds r0,r6,#0x0    @ 0808f774 301c
     movs r1,#0xb    @ 0808f776 0b21
-    ldr r2, DAT_0808f7a4                     @ 0808f778 0a4a
+    ldr r2, seg6_pool_cid_ddv_f7a4           @ 0808f778 0a4a
     bl enqueue_sprite_attr_for_chain_node_match @ 0808f77a b3f761fd
 LAB_0808f77e:
     adds r1,r7,#0x0    @ 0808f77e 391c
@@ -22415,37 +22414,37 @@ LAB_0808f784:
     pop {r1}                                 @ 0808f796 02bc
     bx r1                                    @ 0808f798 0847
     .zero  0x2
-PTR_gP1LifePoints_0808f79c:
+ptr_lp_f79c:
     .word  gP1LifePoints                  @ 0808f79c e0c40102
-DAT_0808f7a0:
-    .word  0x00001ce8                     @ 0808f7a0 e81c0000
-DAT_0808f7a4:
-    .word  0x0000188c                     @ 0808f7a4 8c180000
-DAT_0808f7a8:
-    .word  0x00000868                     @ 0808f7a8 68080000
-DAT_0808f7ac:
-    .word  0x0201c5ec                     @ 0808f7ac ecc50102
-DAT_0808f7b0:
-    .word  0xffffe438                     @ 0808f7b0 38e4ffff
-DAT_0808f7b4:
-    .word  0x0201d9c0                     @ 0808f7b4 c0d90102
-DAT_0808f7b8:
-    .word  0x000fffff                     @ 0808f7b8 ffff0f00
-DAT_0808f7bc:
-    .word  0x0002188c                     @ 0808f7bc 8c180200
+seg6_pool_lp2off_f7a0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0808f7a0 e81c0000
+seg6_pool_cid_ddv_f7a4:
+    .word  DECK_DEVASTATION_VIRUS_CID     @ 0808f7a4 8c180000
+seg6_pool_stride_f7a8:
+    .word  PLAYER_BLOCK_STRIDE            @ 0808f7a8 68080000
+seg6_pool_spellz_f7ac:
+    .word  gDuelFieldSpellZoneBase        @ 0808f7ac ecc50102
+lp_block2_to_zone_chain_neg_off_f7b0:
+    .word  0xffffe438                     @ 0808f7b0 38e4ffff  same offset as f6d4 (distinct slot)
+seg6_pool_eqnpool_f7b4:
+    .word  gEquipNodePool                 @ 0808f7b4 c0d90102
+seg6_pool_eqtmask_f7b8:
+    .word  EQUIP_NODE_TAG_MASK            @ 0808f7b8 ffff0f00  chain node [+0] low-20-bit tag mask; second occurrence
+seg6_pool_z11tag_ddv_f7bc:
+    .word  DECK_DEV_VIRUS_ZONE11_TAG      @ 0808f7bc 8c180200  Deck Dev Virus zone11 node tag = CID|(2<<16)
 
-@ Called exclusively by duel_field master FUN_08090218. Calls count_field_copies_of_card(card_id=0x1510): count>0 sets flag=1, else flag=0. Reads [gP1LifePoints+0x10d0] lsrs #2 ands #1 (bit2). If flag != stored bit2: calls enqueue_sprite_attr_for_card_slot to enqueue update. Returns 1=processed, 0=not queued. Constants: CARD_ID=0x1510, STATE_OFFSET=0x10d0.
+@ Called exclusively by duel_field master dispatch_equip_field_scan_sequence. Calls count_field_copies_of_card(card_id=0x1510): count>0 sets flag=1, else flag=0. Reads [gP1LifePoints+0x10d0] lsrs #2 ands #1 (bit2). If flag != stored bit2: calls enqueue_sprite_attr_for_card_slot to enqueue update. Returns 1=processed, 0=not queued. Constants: CARD_ID=CONVULSION_OF_NATURE_CID=0x1510, STATE_OFFSET=LP_ACTIVATION_LINK_FLAG_OFF=0x10d0.
 enqueue_sprite_by_field_copy_count:
     push {lr}                                @ 0808f7c0 00b5
-    ldr r0, DAT_0808f7e8                     @ 0808f7c2 0948
+    ldr r0, seg6_pool_cid_con_f7e8           @ 0808f7c2 0948
     bl count_field_copies_of_card            @ 0808f7c4 a2f7eaff
     movs r2,#0x0    @ 0808f7c8 0022
     cmp r0,#0x0                              @ 0808f7ca 0028
     ble LAB_0808f7d0                         @ 0808f7cc 00dd
     movs r2,#0x1    @ 0808f7ce 0122
 LAB_0808f7d0:
-    ldr r0, PTR_gP1LifePoints_0808f7ec       @ 0808f7d0 0648
-    ldr r1, DAT_0808f7f0                     @ 0808f7d2 0749
+    ldr r0, ptr_lp_f7ec                      @ 0808f7d0 0648
+    ldr r1, seg6_pool_lpflag_f7f0            @ 0808f7d2 0749
     adds r0,r0,r1    @ 0808f7d4 4018
     ldr r0,[r0,#0x0]                         @ 0808f7d6 0068
     lsrs r0,r0,#0x2    @ 0808f7d8 8008
@@ -22456,12 +22455,12 @@ LAB_0808f7d0:
     movs r0,#0x0    @ 0808f7e2 0020
     b LAB_0808f7fc                           @ 0808f7e4 0ae0
     .zero  0x2
-DAT_0808f7e8:
-    .word  0x00001510                     @ 0808f7e8 10150000
-PTR_gP1LifePoints_0808f7ec:
+seg6_pool_cid_con_f7e8:
+    .word  CONVULSION_OF_NATURE_CID       @ 0808f7e8 10150000  Convulsion of Nature CID; count_field_copies_of_card arg
+ptr_lp_f7ec:
     .word  gP1LifePoints                  @ 0808f7ec e0c40102
-DAT_0808f7f0:
-    .word  0x000010d0                     @ 0808f7f0 d0100000
+seg6_pool_lpflag_f7f0:
+    .word  LP_ACTIVATION_LINK_FLAG_OFF    @ 0808f7f0 d0100000
 LAB_0808f7f4:
     adds r0,r2,#0x0    @ 0808f7f4 101c
     bl enqueue_sprite_attr_for_card_slot     @ 0808f7f6 baf7d3fe
@@ -22477,13 +22476,13 @@ LAB_0808f7fc:
     cmp r0,#0x9                              @ 0808f80a 0928
     bhi switchD_0808f816__caseD_3            @ 0808f80c 2bd8
     lsls r0,r0,#0x2    @ 0808f80e 8000
-    ldr r1, DAT_0808f818                     @ 0808f810 0149
+    ldr r1, switchd_base_f818                @ 0808f810 0149
     adds r0,r0,r1    @ 0808f812 4018
     ldr r0,[r0,#0x0]                         @ 0808f814 0068
 switchD_0808f816__switchD:
     .hword 0x4687    @ 0808f816 8746
-DAT_0808f818:
-    .word  0x0808f81c                     @ 0808f818 1cf80808
+switchd_base_f818:
+    .word  0x0808f81c                     @ 0808f818 1cf80808  switch(bits[3:0]-2) 10-case table for enqueue_sprite_by_field_copy_count
 switchD_0808f816__switchdataD_0808f81c:
     .word  0x0808f844                     @ 0808f81c 44f80808
     .word  0x0808f866                     @ 0808f820 66f80808
@@ -22497,7 +22496,7 @@ switchD_0808f816__switchdataD_0808f81c:
     .word  0x0808f858                     @ 0808f840 58f80808
 switchD_0808f816__caseD_2:
     movs r1,#0x0    @ 0808f844 0021
-    ldr r0, DAT_0808f854                     @ 0808f846 0348
+    ldr r0, seg6_pool_cid_ron_f854           @ 0808f846 0348
     ldrh r2,[r2,#0x0]                        @ 0808f848 1288
     cmp r2,r0                                @ 0808f84a 8242
     bne LAB_0808f850                         @ 0808f84c 00d1
@@ -22505,8 +22504,8 @@ switchD_0808f816__caseD_2:
 LAB_0808f850:
     adds r0,r1,#0x0    @ 0808f850 081c
     b LAB_0808f868                           @ 0808f852 09e0
-DAT_0808f854:
-    .word  0x00001598                     @ 0808f854 98150000
+seg6_pool_cid_ron_f854:
+    .word  REAPER_ON_NIGHTMARE_CID        @ 0808f854 98150000
 switchD_0808f816__caseD_a:
     movs r0,#0x1    @ 0808f858 0120
     b LAB_0808f868                           @ 0808f85a 05e0

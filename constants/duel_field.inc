@@ -484,4 +484,10 @@
 .equ gEffectHandlerTable,       0x09e5a128  @ ROM effect handler dispatch table; 0x132 entries x 8B; binary search in find_effect_record_index_by_id; fn_ptr at [+4] via invoke_r3; C5 grep=0 (new); conf: high
 .equ gEquipCandidateScoreBase,  0x09e3f150  @ ROM equip candidate score table base; 5 words per player; scan_all_slots_for_max_equip_match inner scan; adjacent EQUIP_PAIR_ENTRY_TABLE_BASE+0x10; C5 grep=0 (new); conf: high
 .equ gEquipCandidateInitBase,   0x09e3f164  @ ROM equip candidate init template; 10 words copied to sp+4 work buf in scan_all_slots_for_max_equip_match; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-6 additions: equip chain node tag mask
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-6 [0x0808ea28..0x0808f7c0)
+@ C5 grep verified value -> 0 hits before adding
+@ =============================================================================
+.equ EQUIP_NODE_TAG_MASK,       0x000fffff  @ chain node [+0] low-20-bit tag mask; ands r1,r0 before comparing zone11 tag; scan_chain_nodes_for_equip_zone_sprite + scan_chain_nodes_for_equip_zone11_sprite 2 slots; C5 grep=0 (new); conf: high
 .equ SLOT_ACTIVE_CHECK_CODE,    0x0000104c  @ test_slot_has_active_card 3rd param (activation check code); scan_slots_activate_equip_by_effect_id + enqueue_equip_chain_sprites_for_zones; C5 grep=0 (new); conf: med

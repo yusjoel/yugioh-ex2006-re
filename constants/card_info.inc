@@ -1828,4 +1828,21 @@
 .equ LEVEL_LIMIT_AREA_A_CID,         0x0000197b  @ Level Limit - Area A (card-stats.s slot=0x197B); scan_all_slots_for_max_equip_match dispatch; C5 grep=0 (new); conf: high
 .equ KOTODAMA_CID,                   0x00001343  @ Kotodama (card-stats.s slot=0x1343); enqueue_equip_chain_sprites_for_zones test_slot_has_active_card key; C5 grep=0 (new); conf: high
 .equ MAGICAL_THORN_CID,              0x00001306  @ Magical Thorn (card-stats.s slot=0x1306); scan_field_slots_for_lp_zone_sprite_with_equip CARD_ID filter; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-6 additions: CID constants + CID_SHIFTED state masks + zone11 tags
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-6 [0x0808ea28..0x0808f7c0)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ THUNDER_NYAN_NYAN_CID,          0x000013a4  @ Thunder Nyan Nyan (pw=70797118; card-stats.s slot=0x13A4); scan_field_slots_for_zone_equip_bitmap_update 1 slot; C5 grep=0 (new); conf: high
+.equ FIRE_PRINCESS_CID,              0x0000144d  @ Fire Princess (pw=64752646; card-stats.s slot=0x144D); enqueue_active_card_shape_sprites_in_zone + scan_field_slots_for_chain_sprite_enqueue 2 slots; C5 grep=0 (new); conf: high
+.equ MYSTICAL_BEAST_SERKET_CID,      0x0000147a  @ Mystical Beast Serket (pw=89194033; card-stats.s slot=0x147A); scan_field_for_paired_equip_slot_bitmap_update 1 slot; C5 grep=0 (new); conf: high
+.equ CONVULSION_OF_NATURE_CID,       0x00001510  @ Convulsion of Nature (pw=62966332; card-stats.s slot=0x1510); enqueue_sprite_by_field_copy_count 1 slot; C5 grep=0 (new); conf: high
+.equ KOZAKY_CID,                     0x00001784  @ Kozaky (pw=99171160; card-stats.s slot=0x1784); scan_field_for_unpaired_equip_slot_update 1 slot; C5 grep=0 (new); conf: high
+.equ SOLEMN_WISHES_CID_SHIFTED,      0xa0280000  @ Solemn Wishes CID(0x1405)<<19; slot state filter after lsls [slot],#0x13; enqueue_zone_sprite_by_activation_flags + scan_field_slots_for_card_pair_sprite_update 2 slots; C5 grep=0 (new); conf: high
+.equ FIRE_PRINCESS_CID_SHIFTED,      0xa2680000  @ Fire Princess CID(0x144d)<<19; slot state CHAIN_NODE_MAGIC; scan_field_slots_for_chain_sprite_enqueue 1 slot; C5 grep=0 (new); conf: high
+.equ FATAL_ABACUS_CID_SHIFTED,       0xa5f80000  @ Fatal Abacus CID(0x14bf)<<19; slot state filter; scan_field_slots_for_attached_sprite_by_id + scan_field_slots_for_lp_change_sprite_update 2 slots; C5 grep=0 (new); conf: high
+.equ AMAZONESS_TIGER_CID_SHIFTED,    0xb0780000  @ Amazoness Tiger CID(0x160f)<<19; slot state filter; scan_field_for_equip_priority_slot_update 1 slot; C5 grep=0 (new); conf: high
+.equ SPELL_ZONE_TARGET_CID_PACKED,   0x13680000  @ SPELL_ZONE_TARGET_CARD_ID(0x1368) in high 16 bits; loaded+lsrs #0x10 to extract CID for enqueue arg; enqueue_paired_slot_sprite_attrs_for_player 1 slot; C5 grep=0 (new); conf: high
+.equ CRUSH_CARD_ZONE11_TAG,          0x0002123b  @ Crush Card zone11 chain node tag = CRUSH_CARD_CID|(2<<16); [node+0] AND EQUIP_NODE_TAG_MASK == CRUSH_CARD_ZONE11_TAG; scan_chain_nodes_for_equip_zone_sprite 1 slot; C5 grep=0 (new); conf: high
+.equ DECK_DEV_VIRUS_ZONE11_TAG,      0x0002188c  @ Deck Devastation Virus zone11 chain node tag = DECK_DEVASTATION_VIRUS_CID|(2<<16); scan_chain_nodes_for_equip_zone11_sprite 1 slot; C5 grep=0 (new); conf: high
 .equ SKULL_INVITATION_CID,           0x00001361  @ Skull Invitation (card-stats.s slot=0x1361); scan_field_slots_for_lp_zone_sprite_with_equip + scan_all_zone_slots_for_lp_change_indicator; C5 grep=0 (new); conf: high

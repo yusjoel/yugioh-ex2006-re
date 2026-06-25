@@ -85,7 +85,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4f | 0x808bb7c..0x808cabc | 25 | EQ=37/REF=53/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4g | 0x808cabc..0x808d7f4 | 20 | EQ=30/REF=42/PLATE=20 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 5  | 0x808d7f4..0x808e8fc | 18 | 107(EQ)+15(RENAME)+12(PLATE) | 0 inc | ✅ | (see §四) |
-| 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
+| 6  | 0x808e8fc..0x808f7c0 | 19 | 97(EQ=85/RENAME=12/PLATE=17) | 0 inc | ✅ | (see §四) |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
 | 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ⬜ | |
 | 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ⬜ | |
@@ -166,6 +166,23 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +23 rows (naming-proposals.csv)
 - **commit**: (pending)
+
+### 4.06 Seg-6 完成记录
+
+- **范围**: `[0x0808ea28, 0x0808f7c0)` -- 19 pre-existing named fn (equip field scan / sprite enqueue cluster, region C, 0 ROM_INCBIN)
+- **EQ**: 85 槽 (73 named REUSE + 12 NEW eq from raw/state-mask table: SPELL_ZONE_TARGET_CID_PACKED/SOLEMN_WISHES_CID_SHIFTED x2/FIRE_PRINCESS_CID_SHIFTED/AMAZONESS_TIGER_CID_SHIFTED/FATAL_ABACUS_CID_SHIFTED x2/SLOT_CARD_EMPTY x2/EQUIP_NODE_TAG_MASK x2/CRUSH_CARD_ZONE11_TAG/DECK_DEV_VIRUS_ZONE11_TAG)
+- **RENAME**: 12 槽 (7x PTR_gP1LifePoints_0808xxxx -> ptr_lp_* + 5x raw neg-offset/internal: slot_set_code_array_neg_off_eb64/equip_zone_to_slot_state_neg_off_ee6c/lp_block2_to_zone_chain_neg_off_f6d4/lp_block2_to_zone_chain_neg_off_f7b0/switchd_base_f818)
+- **REF**: 0
+- **PLATE**: 17 functions (C8 stale-FUN_ substitution; 13 unique FUN_ addresses: FUN_08044e30/FUN_08047218/FUN_08047f50/FUN_08048020/FUN_08048364/FUN_080486e4/FUN_08049014/FUN_080490b4/FUN_0804a2c8/FUN_0806c368/FUN_08090218/FUN_08099e0c/FUN_0809a1a4 -> current names)
+- **disasm**: 0
+- **carve**: 0
+- **新增 constants**: card_info.inc +12 (THUNDER_NYAN_NYAN_CID=0x13a4/FIRE_PRINCESS_CID=0x144d/MYSTICAL_BEAST_SERKET_CID=0x147a/CONVULSION_OF_NATURE_CID=0x1510/KOZAKY_CID=0x1784 + SOLEMN_WISHES_CID_SHIFTED=0xa0280000/FIRE_PRINCESS_CID_SHIFTED=0xa2680000/FATAL_ABACUS_CID_SHIFTED=0xa5f80000/AMAZONESS_TIGER_CID_SHIFTED=0xb0780000 + SPELL_ZONE_TARGET_CID_PACKED=0x13680000/CRUSH_CARD_ZONE11_TAG=0x0002123b/DECK_DEV_VIRUS_ZONE11_TAG=0x0002188c); duel_field.inc +1 (EQUIP_NODE_TAG_MASK=0x000fffff); C5 value-grep all 13 NEW -> 0 hits confirmed
+- **新增/改名函数**: 0 (no CSV sync needed)
+- **§5.1**: 0
+- **post-landing gates**: non-ASCII=0 / FUN_[0-9a-f]{8} in Seg-6=0 / DAT_0808[ef]=0 / PTR_gP1LifePoints_ residue=0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (0 new/renamed functions)
+- **commit**: (see git log)
 
 ### 4.05 Seg-5 完成记录
 
@@ -348,7 +365,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 
 - **Seg-5** `[0x808d7f4, 0x808e8fc)` ✅ -- 18 fn (dispatch_equip_zone_write_by_substate_range .. scan_all_zone_slots_for_lp_change_indicator)
   - EQ=107/RENAME=15/PLATE=12/NEW CID=7/NEW duel_field=4/0 disasm/0 carve/0 §5.1; byte-identical
-- **Seg-6** `[0x808e8fc, 0x808f7c0)` -- 19 fn (enqueue_paired_slot_sprite_attrs_for_player .. enqueue_sprite_by_field_copy_count)
+- **Seg-6** `[0x808e8fc, 0x808f7c0)` ✅ -- 19 fn (enqueue_paired_slot_sprite_attrs_for_player .. enqueue_sprite_by_field_copy_count)
+  - EQ=85/RENAME=12/PLATE=17/NEW card_info=12/NEW duel_field=1/0 disasm/0 carve/0 §5.1; byte-identical
 - **Seg-7** `[0x808f7c0, 0x8090a78)` -- 32 fn (scan_field_slots_for_equip_chain_node_bitmap_update .. scan_equip_chain_nodes_for_bitmap_update)
   - 多小 invoke_*/check_* effect-node 包装函数 (零槽); 重函数 dispatch_equip_field_scan_sequence (16 槽)
 - **Seg-8** `[0x8090a78, 0x8091888)` -- 3 fn (build_equip_candidate_score_table + invoke_ + write_equip_target_score_entry)
