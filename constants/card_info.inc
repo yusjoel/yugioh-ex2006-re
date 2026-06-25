@@ -1728,3 +1728,19 @@
 .equ SUPER_ROBOLADY_CID,               0x00001507  @ Super Robolady (pw=75923050; card-stats.s card_1074 slot=0x1507); scan_zone_super_robo_pair_substate_c; C5 grep=0 (new); conf: high
 .equ SUPER_ROBOYAROU_CID,              0x00001508  @ Super Roboyarou (pw=01412158; card-stats.s card_1075 slot=0x1508); scan_zone_super_robo_pair_substate_c; C5 grep=0 (new); conf: high
 .equ PYRAMID_TURTLE_CID,               0x0000152f  @ Pyramid Turtle (pw=77044671; card-stats.s card_1108 slot=0x152F); scan_zone_pyramid_turtle_substate_d; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-4c additions: equip zone scan callbacks [0x0808962c..0x0808a2ac)
+@ 11 NEW CID equates; C5 grep verified all 11 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ TOON_TABLE_OF_CONTENTS_CID,     0x00001562  @ Toon Table of Contents (pw=89997728; card-stats.s card_1138 slot=0x1562); scan_zone_toon_table_of_contents_substate_d; C5 grep=0 (new); conf: high
+.equ MACHINE_DUPLICATION_CID,        0x0000157a  @ Machine Duplication (pw=63995093; card-stats.s card_1154 slot=0x157A); scan_zone_machine_duplication_group_substate_d; C5 grep=0 (new); conf: high
+.equ GRAVEKEEPER_SPY_CID,            0x00001585  @ Gravekeeper's Spy (pw=24317029; card-stats.s card_1164 slot=0x1585); scan_zone_gravekeeper_spy_substate_d; C5 grep=0 (new); conf: high
+.equ AN_OWL_OF_LUCK_CID,             0x00001593  @ An Owl of Luck (pw=23927567; card-stats.s card_1175 slot=0x1593); scan_zone_owl_of_luck_terraforming_group_substate_d; C5 grep=0 (new); conf: high
+.equ TERRAFORMING_CID,               0x000015a1  @ Terraforming (pw=73628505; card-stats.s card_1189 slot=0x15A1); scan_zone_owl_of_luck_terraforming_group_substate_d; C5 grep=0 (new); conf: high
+.equ GOBLIN_ZOMBIE_CID,              0x000015b9  @ Goblin Zombie (pw=63665875; card-stats.s card_1210 slot=0x15B9); scan_zone_goblin_zombie_substate_d; C5 grep=0 (new); conf: high
+.equ FRONTLINE_BASE_CID,             0x000015e2  @ Frontline Base (pw=46181000; card-stats.s card_1235 slot=0x15E2); scan_zone_frontline_base_substate_b; C5 grep=0 (new); conf: high
+.equ TRIBUTE_DOLL_CID,               0x000015ed  @ Tribute Doll (pw=02903036; card-stats.s card_1243 slot=0x15ED); scan_zone_tribute_doll_substate_b; C5 grep=0 (new); conf: high
+.equ APPRENTICE_MAGICIAN_CID,        0x00001612  @ Apprentice Magician (pw=09156135; card-stats.s card_1271 slot=0x1612); scan_zone_apprentice_magician_substate_d; C5 grep=0 (new); conf: high
+.equ BONDING_H2O_CID,                0x0000195c  @ Bonding - H2O (pw=45898858; card-stats.s card_1962 slot=0x195C); scan_zone_magic_evolution_group_substate_deb; C5 grep=0 (new); conf: high
+.equ LEAGUE_UNIFORM_NOMENCLATURE_CID,0x00001978  @ The League of Uniform Nomenclature (pw=55008284; card-stats.s card_1989 slot=0x1978); scan_zone_machine_duplication_group_substate_d; C5 grep=0 (new); conf: high

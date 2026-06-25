@@ -79,7 +79,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | 793378c |
 | 4a | 0x8087d58..0x8088904 | 21   | 84+44=128 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4b | 0x8088904..0x808962c | 25   | EQ=36/REF=40/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 4c..4g | 0x808962c..0x808d7f4 | ~149 | 0 | (未开始, 拆子段) | ⬜ | |
+| 4c | 0x808962c..0x808a2ac | 23 | EQ=39/REF=36/PLATE=23 | 0 inc (全 disasm) | ✅ | (see §四) |
+| 4d..4g | 0x808a2ac..0x808d7f4 | ~126 | 0 | (未开始, 拆子段) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
@@ -144,6 +145,24 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +21 rows (all NEW functions added to naming-proposals.csv)
 - **commit**: (see below)
+
+### 4.04c Seg-4c 完成记录
+
+- **范围**: `[0x0808962c, 0x0808a2ac)` — 0xC80 = 3200 B; **23 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 39 槽 (PLAYER_BLOCK_STRIDE x23 / CARD_FIELD3_THRESHOLD_1500 x1 / zone_query_hand_tag_12a1 x4 / fn21 CID dispatch pool x11: KNIGHTS_TITLE_CID/BONDING_H2O_CID/DEDICATION_THROUGH_LIGHT_DARK_CID/PHOTON_GENERATOR_UNIT_CID/BUSTER_BLADER_CID/DARK_MAGICIAN_CID_0FC9/DARK_MAGICIAN_OF_CHAOS_CID/WATER_DRAGON_CID/CYBER_LASER_DRAGON_CID/NECROVALLEY_CID) + 1 RAW label (cid_167c_dark_magician_knight)
+- **REF**: 36 槽 (gP1LifePoints x19 ptr_lp_* / gP1SlotSetCodeArray x5 ptr_sca_* / gP1HandSlotArray x5 ptr_hsa_* / gP1FieldArrayCBase x5 ptr_fac_* / gP1ChainZoneArray x2 ptr_cza_*)
+- **FUNC_RENAME**: 23 (all newly created functions)
+- **PLATE**: 23 (all ASCII, all <=500 chars; max=475 chars fn09; fn21 plate corrected from 574->472 chars by reviewer)
+- **disasm**: 23 fn (clearListing + setTMode + 23 per-fn DisassembleCommand + createFunction; 76 pool DWords; 4 degenerate entries excluded: 0x0808985e/0x08089a58/0x08089e78/0x0808a28e; 0x0808a046=0x0000 padding excluded)
+- **carve**: 0
+- **新增 CID (card_info.inc)**: 11 NEW (TOON_TABLE_OF_CONTENTS_CID=0x1562 / MACHINE_DUPLICATION_CID=0x157a / GRAVEKEEPER_SPY_CID=0x1585 / AN_OWL_OF_LUCK_CID=0x1593 / TERRAFORMING_CID=0x15a1 / GOBLIN_ZOMBIE_CID=0x15b9 / FRONTLINE_BASE_CID=0x15e2 / TRIBUTE_DOLL_CID=0x15ed / APPRENTICE_MAGICIAN_CID=0x1612 / BONDING_H2O_CID=0x195c / LEAGUE_UNIFORM_NOMENCLATURE_CID=0x1978); 22 REUSE confirmed; C5 value-grep all 0 hits before adding
+- **1 group-handler function**: fn21 (6-CID magic evolution group: Skilled White/Dark Magician + Knight's Title + Dedication/Light+Dark + Bonding-H2O + Photon Generator Unit; partner CID dispatch + 3 loops substate d/e/b)
+- **4 degenerate entries excluded from createFunction**: 0x0808985e (BL mid-loop fn05) / 0x08089a58 (fall-through fn09) / 0x08089e78 (bitfield pair fn17) / 0x0808a28e (bcc backward fn23)
+- **review corrections applied**: fn21 plate 574->472 chars; fn08 addr 0x08089990 (header typo fixed); fn03 pw 04861205 (corrected)
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +23 rows (naming-proposals.csv)
+- **commit**: (pending)
 
 ### 4.04b Seg-4b 完成记录
 
@@ -226,7 +245,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - 子段边界 (强入口均分 ~7 组):
     - **Seg-4a** `[0x08087d58, 0x08088904)` 21 fn ✅ (21 NEW scan_zone_* + 26 CID equates + REF=36 + 21 PLATE; byte-identical)
     - **Seg-4b** `[0x08088904, 0x0808962c)` 25 fn ✅ (25 NEW scan_zone_* + 16 CID equates + REF=40 + 25 PLATE; byte-identical)
-    - **Seg-4c** `[0x0808962c, 0x0808a2ac)` ~27 fn
+    - **Seg-4c** `[0x0808962c, 0x0808a2ac)` 23 fn ✅ (23 NEW scan_zone_* + 11 CID equates + REF=36 + 23 PLATE; fn21 6-CID magic evolution group; byte-identical)
     - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` ~27 fn
     - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` ~27 fn
     - **Seg-4f** `[0x0808bb7c, 0x0808cabc)` ~27 fn
