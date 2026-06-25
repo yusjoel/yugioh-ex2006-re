@@ -1763,3 +1763,22 @@
 
 @ Seg-4d slot field mask: fn24 check_slot_card_eligible_by_card_id arg (strips bits 6..14)
 .equ slot_field_mask_ffff803f,            0xffff803f  @ slot word mask: clears bits 6..14; scan_zone_guardian_equip_group_substate_e fn24
+
+@ =============================================================================
+@ file 11 Seg-4e additions: equip zone scan callbacks [0x0808ad8c..0x0808bb7c)
+@ 11 NEW CID equates; C5 grep verified all 11 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ LIGHT_OF_JUDGMENT_CID,              0x00001764  @ Light of Judgment (pw=44595286; card-stats.s card_1549 slot=0x1764); scan_zone_archlord_zerato_light_group_substate_b; C5 grep=0 (new); conf: high
+.equ BECKONING_LIGHT_CID,               0x00001769  @ Beckoning Light (pw=16255442; card-stats.s card_1553 slot=0x1769); scan_zone_beckoning_light_substate_e; C5 grep=0 (new); conf: high
+.equ SPIRIT_CALLER_CID,                 0x00001795  @ Spirit Caller (pw=48659020; card-stats.s card_1581 slot=0x1795); scan_zone_spirit_caller_substate_e; C5 grep=0 (new); conf: high
+.equ SOUL_REVERSAL_CID,                 0x000017a2  @ Soul Reversal (pw=78864369; card-stats.s card_1593 slot=0x17A2); scan_zone_soul_reversal_substate_e; C5 grep=0 (new); conf: high
+.equ HOWLING_INSECT_CID,                0x000017e5  @ Howling Insect (pw=93107608; card-stats.s card_1650 slot=0x17E5); scan_zone_howling_insect_group_substate_bd; C5 grep=0 (new); conf: high
+.equ TWO_MAN_CELL_BATTLE_CID,           0x000017f8  @ Two-Man Cell Battle (pw=25578802; card-stats.s card_1669 slot=0x17F8); scan_zone_two_man_cell_battle_substate_b; C5 grep=0 (new); conf: high
+.equ MONSTER_REINCARNATION_CID,         0x00001845  @ Monster Reincarnation (pw=74848038; card-stats.s card_1737 slot=0x1845); scan_zone_monster_reincarnation_substate_e; C5 grep=0 (new); conf: high
+.equ LIGHTEN_THE_LOAD_CID,              0x00001847  @ Lighten the Load (pw=37231841; card-stats.s card_1739 slot=0x1847); scan_zone_lighten_the_load_substate_b; C5 grep=0 (new); conf: high
+.equ LIGHT_HEX_SEALED_FUSION_CID,       0x00001870  @ The Light - Hex-Sealed Fusion (pw=15717011; card-stats.s card_1777 slot=0x1870); scan_zone_hex_sealed_fusion_group_substate_c; C5 grep=0 (new); conf: high
+.equ DARK_HEX_SEALED_FUSION_CID,        0x00001871  @ The Dark - Hex-Sealed Fusion (pw=52101615; card-stats.s card_1778 slot=0x1871); scan_zone_hex_sealed_fusion_group_substate_c; C5 grep=0 (new); conf: high
+.equ EARTH_HEX_SEALED_FUSION_CID,       0x00001872  @ The Earth - Hex-Sealed Fusion (pw=88696724; card-stats.s card_1779 slot=0x1872); scan_zone_hex_sealed_fusion_group_substate_c; C5 grep=0 (new); conf: high
+
+@ Seg-4e raw sentinel: fn21 scan_zone_mokey_mokey_king_substate_e hand slot type check
+.equ sentinel_bc100000,                 0xbc100000  @ hand slot type sentinel (LSLS slot_word,#19 compare); scan_zone_mokey_mokey_king_substate_e fn21 pool 0x0808b8e4

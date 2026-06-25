@@ -81,7 +81,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4b | 0x8088904..0x808962c | 25   | EQ=36/REF=40/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4c | 0x808962c..0x808a2ac | 23 | EQ=39/REF=36/PLATE=23 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4d | 0x808a2ac..0x808ad8c | 24 | EQ=30/REF=34/PLATE=24 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 4e..4g | 0x808ad8c..0x808d7f4 | ~102 | 0 | (未开始, 拆子段) | ⬜ | |
+| 4e | 0x808ad8c..0x808bb7c | 25 | EQ=30/REF=46/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
+| 4f..4g | 0x808bb7c..0x808d7f4 | ~77 | 0 | (未开始, 拆子段) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
@@ -164,6 +165,23 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +23 rows (naming-proposals.csv)
 - **commit**: (pending)
+
+### 4.04e Seg-4e 完成记录
+
+- **范围**: `[0x0808ad8c, 0x0808bb7c)` — 0xDF0 = 3568 B; **25 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 30 槽 (PLAYER_BLOCK_STRIDE x25 / POT_OF_GREED_CID x1 REUSE / PARASITE_PARACIDE_CID x2 REUSE / CARD_FIELD3_THRESHOLD_1500 x1 REUSE / sentinel_bc100000 x1 raw sentinel)
+- **REF**: 46 槽 (gP1LifePoints x21 / gP1FieldArrayCBase x7 / gP1HandSlotArray x6 / gP1SlotSetCodeArray x7 / gP1ZoneHandCount x2 / gP1SlotCountBase x1 / gDuelFieldSlots x1 / gP1ChainZoneArray x1)
+- **FUNC_RENAME**: 25 (all newly created functions)
+- **PLATE**: 25 (all ASCII, all <=500 chars; max=466 chars fn25 hex-sealed fusion group)
+- **disasm**: 25 fn (clearListing + setTMode + 25 per-fn DisassembleCommand + createFunction; 76 pool DWords; 2 degenerate strong excluded: 0x0808b40e mid-body MOVS fn12 + 0x0808b95a mid-body LSRS fn23; 2 weak excluded: 0x0808b58a mid-prologue MOV fn16 + 0x0808b798 upper-half BL fn19)
+- **carve**: 0
+- **新增 CID (card_info.inc)**: 11 NEW (LIGHT_OF_JUDGMENT_CID=0x1764 / BECKONING_LIGHT_CID=0x1769 / SPIRIT_CALLER_CID=0x1795 / SOUL_REVERSAL_CID=0x17a2 / HOWLING_INSECT_CID=0x17e5 / TWO_MAN_CELL_BATTLE_CID=0x17f8 / MONSTER_REINCARNATION_CID=0x1845 / LIGHTEN_THE_LOAD_CID=0x1847 / LIGHT_HEX_SEALED_FUSION_CID=0x1870 / DARK_HEX_SEALED_FUSION_CID=0x1871 / EARTH_HEX_SEALED_FUSION_CID=0x1872) + sentinel_bc100000=0xbc100000 raw equ; 21 REUSE confirmed; C5 value-grep all 0 hits before adding
+- **4 excluded entries**: 2 degenerate strong (0x0808b40e mid-body fn12 / 0x0808b95a mid-body fn23) + 2 weak (0x0808b58a mid-prologue fn16 / 0x0808b798 upper-half BL fn19)
+- **group-handler functions**: fn03 (Archlord Zerato + Light of Judgment, 2 CID light-attr); fn14 (Howling Insect + Masked Dragon + UFOroid, 3 CID ATK<=1500+FLIP); fn25 (Hex-Sealed Fusion Light/Dark/Earth, 3 CID chain zone)
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +25 rows (naming-proposals.csv)
+- **commit**: (see below)
 
 ### 4.04d Seg-4d 完成记录
 
@@ -266,7 +284,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
     - **Seg-4b** `[0x08088904, 0x0808962c)` 25 fn ✅ (25 NEW scan_zone_* + 16 CID equates + REF=40 + 25 PLATE; byte-identical)
     - **Seg-4c** `[0x0808962c, 0x0808a2ac)` 23 fn ✅ (23 NEW scan_zone_* + 11 CID equates + REF=36 + 23 PLATE; fn21 6-CID magic evolution group; byte-identical)
     - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` 24 fn ✅ (24 NEW scan_zone_* + 11 NEW CID equates + REF=34 + 24 PLATE + 1 raw mask equ; 6 excluded entries (3 degenerate strong + 3 weak); byte-identical)
-    - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` ~27 fn
+    - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` 25 fn ✅ (25 NEW scan_zone_* + 11 NEW CID equates + REF=46 + 25 PLATE + 1 raw sentinel equ; 4 excluded entries (2 degenerate strong + 2 weak); byte-identical)
     - **Seg-4f** `[0x0808bb7c, 0x0808cabc)` ~27 fn
     - **Seg-4g** `[0x0808cabc, 0x0808d7f4)` ~23 fn
 
