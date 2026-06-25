@@ -76,7 +76,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 1  | 0x80850d8..0x8085d4c | 10 | ~100 | 2 inc (0x850f0/0x28, 0x85130/0x14c) | ✅ | 7d15bd6 |
 | 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | 281d133 |
 | 3a | 0x8086cdc..0x80872e4 | 4  | 46   | 0 inc | ✅ | 3689026 |
-| 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | (pending) |
+| 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | 793378c |
 | 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
@@ -141,7 +141,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **§5.1**: 0
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed
-- **commit**: (pending)
+- **commit**: `793378c`
 
 ### 4.03a Seg-3a 完成记录
 
