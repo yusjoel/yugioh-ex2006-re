@@ -74,7 +74,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80850d8..0x8085d4c | 10 | ~100 | 2 inc (0x850f0/0x28, 0x85130/0x14c) | ✅ | 7d15bd6 |
-| 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | (pending) |
+| 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | 281d133 |
 | 3  | 0x8086cdc..0x8087d58 | 19 | ~151 | 0 inc (heavy; 可拆 3a/3b) | ⬜ | |
 | 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
@@ -124,7 +124,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **§5.1**: 0
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed (no new/renamed functions)
-- **commit**: (pending)
+- **commit**: `281d133`
 
 ---
 
