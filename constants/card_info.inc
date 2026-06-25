@@ -1857,3 +1857,17 @@
 .equ SOUL_ABSORBING_BONE_TOWER_CID_SHIFTED, 0xba200000  @ SOUL_ABSORBING_BONE_TOWER_CID(0x1744) << 19; scan_slots_for_field_bit4_sprite_update; conf: high
 .equ THE_BLOCKMAN_CID_SHIFTED,          0xc0800000  @ THE_BLOCKMAN_CID(0x1810) << 19; scan_equip_set_slot_sprite_by_counter; conf: high
 .equ THEINEN_ACTIVATION_PACKED,         0x005017c9  @ THEINEN_THE_GREAT_SPHINX_CID(0x17c9)|0x00500000 flag bits; scan_card_placement_for_activation orrs r0,r1 @ 0x0808fd7c; conf: high
+
+@ =============================================================================
+@ file 11 Seg-8 additions: equip candidate score table CID + ATK score thresholds
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-8 [0x08090a78..0x08091888)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ KINETIC_SOLDIER_CID,         0x000013aa  @ Kinetic Soldier (pw=79853073; card-stats.s card_0827 slot=0x13AA); F11 Seg-8 BST node x2; C5 grep=0; conf: high
+.equ HUNTER_7_WEAPONS_CID,        0x000014cc  @ The Hunter with 7 Weapons (pw=01525329; card-stats.s card_1020 slot=0x14CC); F11 Seg-8 BST node x3; C5 grep=0; conf: high
+.equ AMAZONESS_SWORDS_WOMAN_CID,  0x000014a4  @ Amazoness Swords Woman (pw=94004268; card-stats.s card_0990 slot=0x14A4); F11 Seg-8 BST pivot; C5 grep=0; conf: high
+.equ STEAMROID_CID,               0x000018f2  @ Steamroid (pw=44729197; card-stats.s card_1876 slot=0x18F2); F11 Seg-8 BST node x2; C5 grep=0; conf: high
+.equ SKYSCRAPER_CID,              0x000018ff  @ Skyscraper (pw=63035430; card-stats.s card_1888 slot=0x18FF); F11 Seg-8 BST node x1; C5 grep=0; conf: high
+.equ DIMENSION_WALL_CID,          0x00001930  @ Dimension Wall (pw=67095270; card-stats.s card_1933 slot=0x1930); F11 Seg-8 check_value_in_slot_chain param; C5 grep=0; conf: high
+.equ EQUIP_ATK_SCORE_HI_2499,     0x000009c3  @ Equip ATK score gate 2499 (2500-1); cmp score,0x9c3; bgt => scan bitmap; F11 Seg-8 build+write fns x4; C5 grep=0; conf: high
+.equ EQUIP_ATK_SCORE_HI_2500,     0x000009c4  @ Equip ATK score gate 2500; cmp score,0x9c4; ble => skip; complement of 2499 gate; F11 Seg-8 x2; C5 grep=0; conf: high

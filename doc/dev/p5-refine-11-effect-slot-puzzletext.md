@@ -86,8 +86,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4g | 0x808cabc..0x808d7f4 | 20 | EQ=30/REF=42/PLATE=20 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 5  | 0x808d7f4..0x808e8fc | 18 | 107(EQ)+15(RENAME)+12(PLATE) | 0 inc | ✅ | (see §四) |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | 97(EQ=85/RENAME=12/PLATE=17) | 0 inc | ✅ | (see §四) |
-| 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
-| 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ⬜ | |
+| 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ✅ | (see §四) |
+| 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ✅ | (see §四) |
 | 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ⬜ | |
 | 10 | 0x8093598..0x80941c4 | 9  | ~118 | 0 inc (duel puzzle 文本: parse 68 槽 + render 14) | ⬜ | |
 
@@ -202,6 +202,33 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **post-landing gates**: non-ASCII in Seg-7=0 / FUN_[0-9a-f]{8} in Seg-7=0 / DAT_/PTR_gP1LifePoints_ in Seg-7=0 / ROM_INCBIN/.byte in stub range=0
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +2 rows (return_effect_node_result_0/2) + 1 rename (invoke_effect_node_handler_3arg) = 3 rows total
+- **commit**: (see below)
+
+### 4.08 Seg-8 完成记录
+
+- **范围**: `[0x08090a78, 0x08091888)` -- 3 pre-existing named fn (region C, 0 ROM_INCBIN)
+  - `build_equip_candidate_score_table` (0x08090a78, 0xc48 B, 数据密集 63 pool 槽)
+  - `invoke_build_equip_candidate_score_table` (0x080916c0)
+  - `write_equip_target_score_entry` (0x080916e4)
+- **EQ**: 52 槽 (36 REUSE + 16 NEW)
+  - NEW: KINETIC_SOLDIER_CID=0x000013aa / HUNTER_7_WEAPONS_CID=0x000014cc / AMAZONESS_SWORDS_WOMAN_CID=0x000014a4 / STEAMROID_CID=0x000018f2 / SKYSCRAPER_CID=0x000018ff / DIMENSION_WALL_CID=0x00001930 (card_info.inc +6)
+  - NEW: EQUIP_ATK_SCORE_HI_2499=0x000009c3 / EQUIP_ATK_SCORE_HI_2500=0x000009c4 (card_info.inc +2)
+  - REUSE: STEAMROID_CID x2 + KINETIC_SOLDIER_CID x2 + HUNTER_7_WEAPONS_CID x3 (at 0x08090cdc/0x08090e84/0x08091060) + AMAZONESS_SWORDS_WOMAN_CID x1 + SKYSCRAPER_CID x1 + DIMENSION_WALL_CID x1 + EQUIP_ATK_SCORE_HI_2499 x4 + EQUIP_ATK_SCORE_HI_2500 x2 + gEquipLpScoreBase x5 + gEquipCandidateScoreBase x4 + gEquipCandidateInitBase x2 + SLOT_ACTIVE_CHECK_CODE x5 + gEquipCandidateSlotA x2 + gEquipCandidateSlotB x2 + gP1LifePoints x7 + gEquipEffectZoneBase x2 + PLAYER_BLOCK_STRIDE x3 + gDuelFieldSlots x1
+- **REF**: 21 槽 (16 REUSE + 5 NEW)
+  - NEW: gEquipLpScoreBase=0x0201afe0 / gEquipCandidateSlotA=0x0201bc38 / gEquipCandidateSlotB=0x0201bc3c (ewram.inc +3 = 5 NEW total; 2 others from existing REUSE slots)
+  - 16 ptr_gP1LifePoints_ / ptr_gEquipEffectZoneBase / ptr_gEquipLpScoreBase / ptr_gEquipCandidateScoreBase / ptr_gEquipCandidateInitBase / ptr_gEquipCandidateSlotA / ptr_gEquipCandidateSlotB group
+- **RENAME**: 21 (all REF slot labels: DAT_ -> ptr_global_hexaddr with EOL)
+- **PLATE**: 3 ASCII rewrites
+  - `build_equip_candidate_score_table`: FUN_080afcb4->eval_equip_spell_placement_with_score / FUN_080b04a8->eval_fieldspell_equip_placement_full (417 chars)
+  - `invoke_build_equip_candidate_score_table`: FUN_08099314 kept (Seg-9+ unnamed, allowed per C8) (300 chars)
+  - `write_equip_target_score_entry`: factual correction "Viser Des check"->"DIMENSION_WALL_CID=0x1930" / FUN_08091888->eval_field_equip_activation_candidates (446 chars)
+- **disasm**: 0
+- **carve**: 0
+- **新增 constants**: card_info.inc +8 (6 CID + 2 score gates); ewram.inc +3 (gEquipLpScoreBase/gEquipCandidateSlotA/gEquipCandidateSlotB); C5 value-grep all 8 NEW -> 0 hits confirmed
+- **post-landing gates**: non-ASCII in Seg-8=0 / FUN_[0-9a-f]{8} in Seg-8 residue=FUN_08099314 only (Seg-9+, allowed per review C8) / DAT_/PTR_ in Seg-8=0
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (0 new/renamed functions)
 - **commit**: (see below)
 
 ### 4.05 Seg-5 完成记录
@@ -389,8 +416,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - EQ=85/RENAME=12/PLATE=17/NEW card_info=12/NEW duel_field=1/0 disasm/0 carve/0 §5.1; byte-identical
 - **Seg-7** `[0x808f7c0, 0x8090a78)` ✅ -- 32 fn (scan_field_slots_for_equip_chain_node_bitmap_update .. scan_equip_chain_nodes_for_bitmap_update)
   - EQ=109(11 NEW+REUSE)/RENAME=10/FUNC_RENAME=1/PLATE=36/disasm=2 stubs/NEW card_info=5/NEW duel_field=8/0 carve/0 §5.1; byte-identical
-- **Seg-8** `[0x8090a78, 0x8091888)` -- 3 fn (build_equip_candidate_score_table + invoke_ + write_equip_target_score_entry)
-  - build_equip_candidate_score_table (63 槽, 0xc48 B 数据密集)
+- **Seg-8** `[0x8090a78, 0x8091888)` ✅ -- 3 fn (build_equip_candidate_score_table + invoke_ + write_equip_target_score_entry)
+  - EQ=52(36R+16N)/REF=21(16R+5N)/RENAME=21/PLATE=3; NEW card_info=8/NEW ewram=3; byte-identical
 - **Seg-9** `[0x8091888, 0x8093598)` -- 20 fn (eval_field_equip_activation_candidates + card_display_op_0x31 族)
   - **eval_field_equip_activation_candidates (187 槽, 0x1afc B 怪兽), heavy, 执行时可拆 9a/9b**
 - **Seg-10** `[0x8093598, 0x80941c4)` -- 9 fn (clear_duel_puzzle_wram_regions .. render_duel_puzzle_text_to_sprite_queue)

@@ -548,3 +548,12 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ C5 grep 0x0201e4f0: 0 hits in constants/ before adding
 @ =============================================================================
 .equ gEquipEffectZoneBase,  0x0201e4f0  @ equip effect zone base; pool@fn20 0x0808d7a0+0x0808d7e0; STR r0,[r1] at 0x0808d74c clears it; scan_zone_group_handler_multi_card; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-8 additions: equip candidate score table + slot activation globals
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-8 [0x08090a78..0x08091888)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ gEquipLpScoreBase,    0x0201afe0  @ equip LP-score candidate work buffer (clear_region_8, 0x198 B); 9-word records stride 0xb4/player; 68 raw refs; C5 grep=0; conf: high
+.equ gEquipCandidateSlotA, 0x0201bc38  @ gEquipChainSlotRefs+0xa8; first candidate slot activation array; write_equip_target_score_entry; 2 raw refs; C5 grep=0; conf: high
+.equ gEquipCandidateSlotB, 0x0201bc3c  @ gEquipChainSlotRefs+0xac; second candidate slot array (parallel); 2 raw refs; C5 grep=0; conf: high

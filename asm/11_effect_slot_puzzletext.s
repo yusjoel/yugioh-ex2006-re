@@ -24985,7 +24985,7 @@ LAB_08090a6c:
     bx r0                                    @ 08090a74 0047
     .zero  0x2
 
-@ 被 FUN_080afcb4 (0x080afd4e) 和 FUN_080b04a8 (0x080b051c) 以 r1=1 调用 (indeg>=2). 大型装备激活候选评分器: 入口 r7=r0=player_side, r9=r1=mode_flag. 从 gDuelBattleState (0x0201bb90) 读取当前激活上下文, 计算两组候选格 (slot_a/slot_b) 各自基址. 外层循环 r6=[0..1] 覆盖双方: r6==r9 走 caseD_0 直接拷贝候选格 9-word (ldmia/stmia 3 组) 至输出缓冲; r6!=r9 走 eval_slot_score_entry_full 填写得分条目. 循环结束后清零 slot_b 的 3 个字段. Side effects: 向 gDuelBattleState 内部缓冲写入 6 组 9-word 评分条目 + 清零 slot_b[+0x10/+0x1c/+0x20]. Constants: gDuelBattleState=0x0201bb90, gDuelNodePool=0x0201d9c0, entry_size=0x38, player_stride=0x868, loop_bound=1.
+@ Called by eval_equip_spell_placement_with_score + eval_fieldspell_equip_placement_full (indeg>=2, r1=1). Entry: r7=player_side, r9=mode_flag. Reads gEquipChainSlotRefs (0x0201bb90) context; outer loop r6=[0..1]: r6==r9 copies 9-word candidate entry via ldmia/stmia x3; r6!=r9 calls eval_slot_score_entry_full. Zeroes slot_b[+0x10/+1c/+20]. Writes gEquipChainSlotRefs score table. entry_size=0x38, player_stride=0x868.
 build_equip_candidate_score_table:
     push {r4,r5,r6,r7,lr}                    @ 08090a78 f0b5
     .hword 0x4657    @ 08090a7a 5746
@@ -25074,7 +25074,7 @@ LAB_08090b08:
     ldr r2,[sp,#0xb4]                        @ 08090b16 2d9a
     muls r0,r2    @ 08090b18 5043
     adds r1,r1,r0    @ 08090b1a 0918
-    ldr r3, DAT_08090b34                     @ 08090b1c 054b
+    ldr r3, ptr_gEquipLpScoreBase_0b34       @ 08090b1c 054b
     adds r1,r1,r3    @ 08090b1e c918
     ldr r0,[sp,#0xb8]                        @ 08090b20 2e98
     adds r1,#0x18    @ 08090b22 1831
@@ -25086,8 +25086,8 @@ LAB_08090b08:
     stmia r0!,{r2,r3,r5}                     @ 08090b2e 2cc0
     b LAB_08090b42                           @ 08090b30 07e0
     .zero  0x2
-DAT_08090b34:
-    .word  0x0201afe0                     @ 08090b34 e0af0102
+ptr_gEquipLpScoreBase_0b34:
+    .word  gEquipLpScoreBase              @ 08090b34 e0af0102  gEquipLpScoreBase
 LAB_08090b38:
     ldr r0,[sp,#0xb4]                        @ 08090b38 2d98
     adds r1,r4,#0x0    @ 08090b3a 211c
@@ -25102,10 +25102,10 @@ LAB_08090b42:
     lsls r0,r4,#0x2    @ 08090b4c a000
     adds r0,r0,r4    @ 08090b4e 0019
     lsls r0,r0,#0x2    @ 08090b50 8000
-    ldr r1, DAT_08090cb0                     @ 08090b52 5749
+    ldr r1, seg8_pool_stride_0cb0            @ 08090b52 5749
     muls r1,r5    @ 08090b54 6943
     adds r0,r0,r1    @ 08090b56 4018
-    ldr r1, DAT_08090cb4                     @ 08090b58 5649
+    ldr r1, ptr_gDuelFieldSlots_0cb4         @ 08090b58 5649
     adds r0,r0,r1    @ 08090b5a 4018
     ldrh r1,[r0,#0x6]                        @ 08090b5c c188
     str r1,[r7,#0x8]                         @ 08090b5e b960
@@ -25148,7 +25148,7 @@ LAB_08090b42:
     adds r6,#0x1    @ 08090ba8 0136
     cmp r6,#0x1                              @ 08090baa 012e
     ble LAB_08090ae4                         @ 08090bac 9add
-    ldr r6, DAT_08090cb8                     @ 08090bae 424e
+    ldr r6, ptr_gEquipChainSlotRefs_0cb8     @ 08090bae 424e
     ldr r0,[r6,#0x8]                         @ 08090bb0 b068
     cmp r0,#0x0                              @ 08090bb2 0028
     beq LAB_08090bc0                         @ 08090bb4 04d0
@@ -25162,14 +25162,14 @@ LAB_08090bc0:
     movs r2,#0x0    @ 08090bc2 0022
     str r2,[sp,#0x74]                        @ 08090bc4 1d92
     ldr r1,[r6,#0x1c]                        @ 08090bc6 f169
-    ldr r2, DAT_08090cbc                     @ 08090bc8 3c4a
+    ldr r2, seg8_pool_cid_mw_0cbc            @ 08090bc8 3c4a
     .hword 0x4648    @ 08090bca 4846
     bl count_slot_chain_copies_of_card       @ 08090bcc 9ef714fb
     str r0,[sp,#0x5c]                        @ 08090bd0 1790
     movs r3,#0x1    @ 08090bd2 0123
     .hword 0x464d    @ 08090bd4 4d46
     subs r0,r3,r5    @ 08090bd6 581b
-    ldr r4, DAT_08090cc0                     @ 08090bd8 394c
+    ldr r4, seg8_pool_cid_ddr_0cc0           @ 08090bd8 394c
     movs r2,#0x1    @ 08090bda 0122
     rsbs r2,r2,#0    @ 08090bdc 5242
     adds r1,r4,#0x0    @ 08090bde 211c
@@ -25203,16 +25203,16 @@ LAB_08090bc0:
     cmp r0,#0x0                              @ 08090c1a 0028
     beq LAB_08090c2a                         @ 08090c1c 05d0
 LAB_08090c1e:
-    ldr r0, DAT_08090cc4                     @ 08090c1e 2948
+    ldr r0, seg8_pool_cid_wd_0cc4            @ 08090c1e 2948
     bl count_field_copies_of_card            @ 08090c20 a1f7bcfd
     cmp r0,#0x0                              @ 08090c24 0028
     beq LAB_08090c2a                         @ 08090c26 00d0
     movs r4,#0x1    @ 08090c28 0124
 LAB_08090c2a:
     str r4,[sp,#0x6c]                        @ 08090c2a 1b94
-    ldr r0, DAT_08090cb8                     @ 08090c2c 2248
+    ldr r0, ptr_gEquipChainSlotRefs_0cb8     @ 08090c2c 2248
     ldr r1,[r0,#0x1c]                        @ 08090c2e c169
-    ldr r2, DAT_08090cc8                     @ 08090c30 254a
+    ldr r2, seg8_pool_cid_cb_0cc8            @ 08090c30 254a
     .hword 0x4648    @ 08090c32 4846
     bl test_slot_has_active_card             @ 08090c34 a1f788fc
     cmp r0,#0x0                              @ 08090c38 0028
@@ -25230,15 +25230,15 @@ LAB_08090c50:
     movs r4,#0x1    @ 08090c50 0124
     .hword 0x464a    @ 08090c52 4a46
     ands r2,r4    @ 08090c54 2240
-    ldr r3, DAT_08090cb8                     @ 08090c56 184b
+    ldr r3, ptr_gEquipChainSlotRefs_0cb8     @ 08090c56 184b
     ldr r1,[r3,#0x1c]                        @ 08090c58 d969
     lsls r0,r1,#0x2    @ 08090c5a 8800
     adds r0,r0,r1    @ 08090c5c 4018
     lsls r0,r0,#0x2    @ 08090c5e 8000
-    ldr r1, DAT_08090cb0                     @ 08090c60 1349
+    ldr r1, seg8_pool_stride_0cb0            @ 08090c60 1349
     muls r2,r1    @ 08090c62 4a43
     adds r0,r0,r2    @ 08090c64 8018
-    ldr r1, DAT_08090cb4                     @ 08090c66 1349
+    ldr r1, ptr_gDuelFieldSlots_0cb4         @ 08090c66 1349
     adds r5,r0,r1    @ 08090c68 4518
     movs r6,#0x30    @ 08090c6a 3026
     rsbs r6,r6,#0    @ 08090c6c 7642
@@ -25262,12 +25262,12 @@ LAB_08090c50:
 LAB_08090c90:
     ldr r0,[sp,#0x54]                        @ 08090c90 1598
     ldr r1,[r0,#0x10]                        @ 08090c92 0169
-    ldr r0, DAT_08090ccc                     @ 08090c94 0d48
+    ldr r0, seg8_pool_cid_sr_0ccc            @ 08090c94 0d48
     cmp r1,r0                                @ 08090c96 8142
     beq LAB_08090d28                         @ 08090c98 46d0
     cmp r1,r0                                @ 08090c9a 8142
     bhi LAB_08090ce0                         @ 08090c9c 20d8
-    ldr r0, DAT_08090cd0                     @ 08090c9e 0c48
+    ldr r0, seg8_pool_cid_ks_0cd0            @ 08090c9e 0c48
     cmp r1,r0                                @ 08090ca0 8142
     beq LAB_08090d42                         @ 08090ca2 4ed0
     cmp r1,r0                                @ 08090ca4 8142
@@ -25276,53 +25276,53 @@ LAB_08090c90:
     cmp r1,r0                                @ 08090caa 8142
     beq LAB_08090d08                         @ 08090cac 2cd0
     b LAB_08090dd6                           @ 08090cae 92e0
-DAT_08090cb0:
-    .word  0x00000868                     @ 08090cb0 68080000
-DAT_08090cb4:
-    .word  0x0201c510                     @ 08090cb4 10c50102
-DAT_08090cb8:
-    .word  0x0201bb90                     @ 08090cb8 90bb0102
-DAT_08090cbc:
-    .word  0x00001381                     @ 08090cbc 81130000
-DAT_08090cc0:
-    .word  0x00001905                     @ 08090cc0 05190000
-DAT_08090cc4:
-    .word  0x00001951                     @ 08090cc4 51190000
-DAT_08090cc8:
-    .word  0x00001955                     @ 08090cc8 55190000
-DAT_08090ccc:
-    .word  0x000014d7                     @ 08090ccc d7140000
-DAT_08090cd0:
-    .word  0x000013aa                     @ 08090cd0 aa130000
+seg8_pool_stride_0cb0:
+    .word  PLAYER_BLOCK_STRIDE            @ 08090cb0 68080000
+ptr_gDuelFieldSlots_0cb4:
+    .word  gDuelFieldSlots                @ 08090cb4 10c50102  gDuelFieldSlots
+ptr_gEquipChainSlotRefs_0cb8:
+    .word  gEquipChainSlotRefs            @ 08090cb8 90bb0102  gEquipChainSlotRefs
+seg8_pool_cid_mw_0cbc:
+    .word  MIRROR_WALL_CID                @ 08090cbc 81130000
+seg8_pool_cid_ddr_0cc0:
+    .word  DARK_DREADROUTE_CID            @ 08090cc0 05190000
+seg8_pool_cid_wd_0cc4:
+    .word  WATER_DRAGON_CID               @ 08090cc4 51190000
+seg8_pool_cid_cb_0cc8:
+    .word  CYBER_BLADER_CID               @ 08090cc8 55190000
+seg8_pool_cid_sr_0ccc:
+    .word  SPIRIT_RYU_CID                 @ 08090ccc d7140000
+seg8_pool_cid_ks_0cd0:
+    .word  KINETIC_SOLDIER_CID            @ 08090cd0 aa130000
 LAB_08090cd4:
-    ldr r0, DAT_08090cdc                     @ 08090cd4 0148
+    ldr r0, seg8_pool_cid_h7w_0cdc           @ 08090cd4 0148
     cmp r1,r0                                @ 08090cd6 8142
     beq LAB_08090d64                         @ 08090cd8 44d0
     b LAB_08090dd6                           @ 08090cda 7ce0
-DAT_08090cdc:
-    .word  0x000014cc                     @ 08090cdc cc140000
+seg8_pool_cid_h7w_0cdc:
+    .word  HUNTER_7_WEAPONS_CID           @ 08090cdc cc140000
 LAB_08090ce0:
-    ldr r0, DAT_08090cf4                     @ 08090ce0 0448
+    ldr r0, seg8_pool_cid_str_0cf4           @ 08090ce0 0448
     cmp r1,r0                                @ 08090ce2 8142
     beq LAB_08090dc4                         @ 08090ce4 6ed0
     cmp r1,r0                                @ 08090ce6 8142
     bhi LAB_08090cfc                         @ 08090ce8 08d8
-    ldr r0, DAT_08090cf8                     @ 08090cea 0348
+    ldr r0, seg8_pool_cid_mk_0cf8            @ 08090cea 0348
     cmp r1,r0                                @ 08090cec 8142
     beq LAB_08090d86                         @ 08090cee 4ad0
     b LAB_08090dd6                           @ 08090cf0 71e0
     .zero  0x2
-DAT_08090cf4:
-    .word  0x000018f2                     @ 08090cf4 f2180000
-DAT_08090cf8:
-    .word  0x00001643                     @ 08090cf8 43160000
+seg8_pool_cid_str_0cf4:
+    .word  STEAMROID_CID                  @ 08090cf4 f2180000
+seg8_pool_cid_mk_0cf8:
+    .word  MIRAGE_KNIGHT_CID              @ 08090cf8 43160000
 LAB_08090cfc:
-    ldr r0, DAT_08090d04                     @ 08090cfc 0148
+    ldr r0, seg8_pool_cid_erb_0d04           @ 08090cfc 0148
     cmp r1,r0                                @ 08090cfe 8142
     beq LAB_08090da0                         @ 08090d00 4ed0
     b LAB_08090dd6                           @ 08090d02 68e0
-DAT_08090d04:
-    .word  0x00001956                     @ 08090d04 56190000
+seg8_pool_cid_erb_0d04:
+    .word  EHERO_RAMPART_BLASTER_CARD_ID  @ 08090d04 56190000
 LAB_08090d08:
     ldr r1,[sp,#0x4c]                        @ 08090d08 1399
     cmp r1,#0x0                              @ 08090d0a 0029
@@ -25334,12 +25334,12 @@ LAB_08090d08:
     lsls r0,r0,#0x3    @ 08090d16 c000
     cmp r1,r0                                @ 08090d18 8142
     ble LAB_08090dd6                         @ 08090d1a 5cdd
-    ldr r5, DAT_08090d24                     @ 08090d1c 014d
+    ldr r5, seg8_pool_lp3k_0d24              @ 08090d1c 014d
     adds r7,r7,r5    @ 08090d1e 7f19
     b LAB_08090dd6                           @ 08090d20 59e0
     .zero  0x2
-DAT_08090d24:
-    .word  0x00000bb8                     @ 08090d24 b80b0000
+seg8_pool_lp3k_0d24:
+    .word  LP_COST_3000                   @ 08090d24 b80b0000
 LAB_08090d28:
     ldr r6,[sp,#0x4c]                        @ 08090d28 139e
     cmp r6,#0x0                              @ 08090d2a 002e
@@ -25434,34 +25434,34 @@ LAB_08090dc4:
 LAB_08090dd4:
     adds r7,r7,r1    @ 08090dd4 7f18
 LAB_08090dd6:
-    ldr r4, DAT_08090e50                     @ 08090dd6 1e4c
+    ldr r4, seg8_pool_cid_brs_0e50           @ 08090dd6 1e4c
     .hword 0x4648    @ 08090dd8 4846
     movs r1,#0xb    @ 08090dda 0b21
     adds r2,r4,#0x0    @ 08090ddc 221c
     bl check_value_in_slot_chain             @ 08090dde 9ef757ff
     cmp r0,#0x0                              @ 08090de2 0028
     beq LAB_08090df8                         @ 08090de4 08d0
-    ldr r0, DAT_08090e54                     @ 08090de6 1b48
+    ldr r0, ptr_gEquipChainSlotRefs_0e54     @ 08090de6 1b48
     ldr r1,[r0,#0x1c]                        @ 08090de8 c169
     .hword 0x4648    @ 08090dea 4846
     adds r2,r4,#0x0    @ 08090dec 221c
     bl query_zone_chain_count_with_eligibility @ 08090dee 9ef7dbfa
-    ldr r1, DAT_08090e58                     @ 08090df2 1949
+    ldr r1, seg8_pool_lp15_0e58              @ 08090df2 1949
     muls r0,r1    @ 08090df4 4843
     adds r7,r7,r0    @ 08090df6 3f18
 LAB_08090df8:
     movs r2,#0x1    @ 08090df8 0122
     .hword 0x464b    @ 08090dfa 4b46
     ands r2,r3    @ 08090dfc 1a40
-    ldr r0, DAT_08090e54                     @ 08090dfe 1548
+    ldr r0, ptr_gEquipChainSlotRefs_0e54     @ 08090dfe 1548
     ldr r1,[r0,#0x1c]                        @ 08090e00 c169
     lsls r0,r1,#0x2    @ 08090e02 8800
     adds r0,r0,r1    @ 08090e04 4018
     lsls r0,r0,#0x2    @ 08090e06 8000
-    ldr r1, DAT_08090e5c                     @ 08090e08 1449
+    ldr r1, seg8_pool_stride_0e5c            @ 08090e08 1449
     muls r1,r2    @ 08090e0a 5143
     adds r0,r0,r1    @ 08090e0c 4018
-    ldr r2, DAT_08090e60                     @ 08090e0e 144a
+    ldr r2, ptr_gDuelFieldSlots_0e60         @ 08090e0e 144a
     adds r0,r0,r2    @ 08090e10 8018
     ldrh r1,[r0,#0xa]                        @ 08090e12 4189
     ldr r5,[sp,#0x5c]                        @ 08090e14 179d
@@ -25469,13 +25469,13 @@ LAB_08090df8:
     .hword 0x46a8    @ 08090e18 a846
     cmp r1,#0x0                              @ 08090e1a 0029
     beq LAB_08090ec2                         @ 08090e1c 51d0
-    ldr r5, DAT_08090e64                     @ 08090e1e 114d
+    ldr r5, seg8_pool_cid_ifl_0e64           @ 08090e1e 114d
     .hword 0x4650    @ 08090e20 5046
     add r0,r9                                @ 08090e22 4844
     lsls r0,r0,#0x2    @ 08090e24 8000
     ldr r3,[sp,#0x8c]                        @ 08090e26 239b
     adds r6,r3,r0    @ 08090e28 1e18
-    ldr r0, DAT_08090e68                     @ 08090e2a 0f48
+    ldr r0, seg8_pool_enbo_0e68              @ 08090e2a 0f48
     adds r0,r0,r2    @ 08090e2c 8018
     .hword 0x4684    @ 08090e2e 8446
     movs r4,#0xfa    @ 08090e30 fa24
@@ -25490,40 +25490,40 @@ LAB_08090e34:
     beq LAB_08090e9a                         @ 08090e40 2bd0
     cmp r1,r5                                @ 08090e42 a942
     bgt LAB_08090e70                         @ 08090e44 14dc
-    ldr r0, DAT_08090e6c                     @ 08090e46 0948
+    ldr r0, seg8_pool_cid_st_0e6c            @ 08090e46 0948
     cmp r1,r0                                @ 08090e48 8142
     beq LAB_08090e88                         @ 08090e4a 1dd0
     b LAB_08090ebc                           @ 08090e4c 36e0
     .zero  0x2
-DAT_08090e50:
-    .word  0x00001846                     @ 08090e50 46180000
-DAT_08090e54:
-    .word  0x0201bb90                     @ 08090e54 90bb0102
-DAT_08090e58:
-    .word  0x000005dc                     @ 08090e58 dc050000
-DAT_08090e5c:
-    .word  0x00000868                     @ 08090e5c 68080000
-DAT_08090e60:
-    .word  0x0201c510                     @ 08090e60 10c50102
-DAT_08090e64:
-    .word  0x000013a7                     @ 08090e64 a7130000
-DAT_08090e68:
-    .word  0x000014b0                     @ 08090e68 b0140000
-DAT_08090e6c:
-    .word  0x00001119                     @ 08090e6c 19110000
+seg8_pool_cid_brs_0e50:
+    .word  BALLISTA_OF_RAMPART_SMASHING_CID @ 08090e50 46180000
+ptr_gEquipChainSlotRefs_0e54:
+    .word  gEquipChainSlotRefs            @ 08090e54 90bb0102  gEquipChainSlotRefs
+seg8_pool_lp15_0e58:
+    .word  LP_COST_1500                   @ 08090e58 dc050000
+seg8_pool_stride_0e5c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08090e5c 68080000
+ptr_gDuelFieldSlots_0e60:
+    .word  gDuelFieldSlots                @ 08090e60 10c50102  gDuelFieldSlots
+seg8_pool_cid_ifl_0e64:
+    .word  INJECTION_FAIRY_LILY_CID       @ 08090e64 a7130000
+seg8_pool_enbo_0e68:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 08090e68 b0140000
+seg8_pool_cid_st_0e6c:
+    .word  SANGA_OF_THUNDER_CID           @ 08090e6c 19110000
 LAB_08090e70:
-    ldr r0, DAT_08090e80                     @ 08090e70 0348
+    ldr r0, seg8_pool_cid_ks_0e80            @ 08090e70 0348
     cmp r1,r0                                @ 08090e72 8142
     beq LAB_08090eac                         @ 08090e74 1ad0
-    ldr r0, DAT_08090e84                     @ 08090e76 0348
+    ldr r0, seg8_pool_cid_h7w_0e84           @ 08090e76 0348
     cmp r1,r0                                @ 08090e78 8142
     beq LAB_08090eb6                         @ 08090e7a 1cd0
     b LAB_08090ebc                           @ 08090e7c 1ee0
     .zero  0x2
-DAT_08090e80:
-    .word  0x000013aa                     @ 08090e80 aa130000
-DAT_08090e84:
-    .word  0x000014cc                     @ 08090e84 cc140000
+seg8_pool_cid_ks_0e80:
+    .word  KINETIC_SOLDIER_CID            @ 08090e80 aa130000
+seg8_pool_cid_h7w_0e84:
+    .word  HUNTER_7_WEAPONS_CID           @ 08090e84 cc140000
 LAB_08090e88:
     movs r0,#0xf    @ 08090e88 0f20
     ldrb r2,[r2,#0x2]                        @ 08090e8a 9278
@@ -25538,12 +25538,12 @@ LAB_08090e9a:
     ldrh r2,[r2,#0x4]                        @ 08090e9a 9288
     cmp r2,#0x1                              @ 08090e9c 012a
     bne LAB_08090ebc                         @ 08090e9e 0dd1
-    ldr r2, DAT_08090ea8                     @ 08090ea0 014a
+    ldr r2, seg8_pool_lp3k_0ea8              @ 08090ea0 014a
     adds r7,r7,r2    @ 08090ea2 bf18
     b LAB_08090ebc                           @ 08090ea4 0ae0
     .zero  0x2
-DAT_08090ea8:
-    .word  0x00000bb8                     @ 08090ea8 b80b0000
+seg8_pool_lp3k_0ea8:
+    .word  LP_COST_3000                   @ 08090ea8 b80b0000
 LAB_08090eac:
     adds r7,r7,r4    @ 08090eac 3f19
     ldr r0,[sp,#0x74]                        @ 08090eae 1d98
@@ -25559,7 +25559,7 @@ LAB_08090ebc:
     cmp r1,#0x0                              @ 08090ebe 0029
     bne LAB_08090e34                         @ 08090ec0 b8d1
 LAB_08090ec2:
-    ldr r2, DAT_08091040                     @ 08090ec2 5f4a
+    ldr r2, seg8_pool_cid_rt_1040            @ 08090ec2 5f4a
     movs r0,#0x0    @ 08090ec4 0020
     movs r1,#0xb    @ 08090ec6 0b21
     bl check_value_in_slot_chain             @ 08090ec8 9ef7e2fe
@@ -25622,7 +25622,7 @@ LAB_08090f16:
     ldr r5,[sp,#0x74]                        @ 08090f2c 1d9d
     adds r0,r0,r5    @ 08090f2e 4019
     str r0,[r1,#0x0]                         @ 08090f30 0860
-    ldr r0, DAT_08091044                     @ 08090f32 4448
+    ldr r0, ptr_gEquipChainSlotRefs_1044     @ 08090f32 4448
     .hword 0x4680    @ 08090f34 8046
     ldr r0,[r0,#0x8]                         @ 08090f36 8068
     cmp r0,#0x0                              @ 08090f38 0028
@@ -25632,7 +25632,7 @@ LAB_08090f3e:
     movs r7,#0x0    @ 08090f3e 0027
     movs r1,#0x0    @ 08090f40 0021
     str r1,[sp,#0x78]                        @ 08090f42 1e91
-    ldr r2, DAT_08091040                     @ 08090f44 3e4a
+    ldr r2, seg8_pool_cid_rt_1040            @ 08090f44 3e4a
     movs r0,#0x0    @ 08090f46 0020
     movs r1,#0xb    @ 08090f48 0b21
     bl check_value_in_slot_chain             @ 08090f4a 9ef7a1fe
@@ -25646,14 +25646,14 @@ LAB_08090f3e:
 LAB_08090f5c:
     .hword 0x4645    @ 08090f5c 4546
     ldr r1,[r5,#0x20]                        @ 08090f5e 296a
-    ldr r2, DAT_08091048                     @ 08090f60 394a
+    ldr r2, seg8_pool_cid_mw_1048            @ 08090f60 394a
     ldr r0,[sp,#0x50]                        @ 08090f62 1498
     bl count_slot_chain_copies_of_card       @ 08090f64 9ef748f9
     str r0,[sp,#0x60]                        @ 08090f68 1890
     movs r0,#0x1    @ 08090f6a 0120
     ldr r1,[sp,#0x50]                        @ 08090f6c 1499
     subs r0,r0,r1    @ 08090f6e 401a
-    ldr r4, DAT_0809104c                     @ 08090f70 364c
+    ldr r4, seg8_pool_cid_ddr_104c           @ 08090f70 364c
     movs r2,#0x1    @ 08090f72 0122
     rsbs r2,r2,#0    @ 08090f74 5242
     adds r1,r4,#0x0    @ 08090f76 211c
@@ -25683,16 +25683,16 @@ LAB_08090f5c:
     cmp r0,#0x0                              @ 08090faa 0028
     beq LAB_08090fba                         @ 08090fac 05d0
 LAB_08090fae:
-    ldr r0, DAT_08091050                     @ 08090fae 2848
+    ldr r0, seg8_pool_cid_wd_1050            @ 08090fae 2848
     bl count_field_copies_of_card            @ 08090fb0 a1f7f4fb
     cmp r0,#0x0                              @ 08090fb4 0028
     beq LAB_08090fba                         @ 08090fb6 00d0
     movs r4,#0x1    @ 08090fb8 0124
 LAB_08090fba:
     str r4,[sp,#0x70]                        @ 08090fba 1c94
-    ldr r0, DAT_08091044                     @ 08090fbc 2148
+    ldr r0, ptr_gEquipChainSlotRefs_1044     @ 08090fbc 2148
     ldr r1,[r0,#0x20]                        @ 08090fbe 016a
-    ldr r2, DAT_08091054                     @ 08090fc0 244a
+    ldr r2, seg8_pool_cid_cb_1054            @ 08090fc0 244a
     ldr r0,[sp,#0x50]                        @ 08090fc2 1498
     bl test_slot_has_active_card             @ 08090fc4 a1f7c0fa
     cmp r0,#0x0                              @ 08090fc8 0028
@@ -25710,17 +25710,17 @@ LAB_08090fe0:
     movs r3,#0x1    @ 08090fe0 0123
     ldr r2,[sp,#0x50]                        @ 08090fe2 149a
     ands r2,r3    @ 08090fe4 1a40
-    ldr r5, DAT_08091044                     @ 08090fe6 174d
+    ldr r5, ptr_gEquipChainSlotRefs_1044     @ 08090fe6 174d
     .hword 0x46a8    @ 08090fe8 a846
     ldr r4,[r5,#0x20]                        @ 08090fea 2c6a
     lsls r0,r4,#0x2    @ 08090fec a000
     adds r0,r0,r4    @ 08090fee 0019
     lsls r0,r0,#0x2    @ 08090ff0 8000
-    ldr r1, DAT_08091058                     @ 08090ff2 1949
+    ldr r1, seg8_pool_stride_1058            @ 08090ff2 1949
     adds r6,r2,#0x0    @ 08090ff4 161c
     muls r6,r1    @ 08090ff6 4e43
     adds r0,r0,r6    @ 08090ff8 8019
-    ldr r1, DAT_0809105c                     @ 08090ffa 1849
+    ldr r1, ptr_gDuelFieldSlots_105c         @ 08090ffa 1849
     adds r5,r0,r1    @ 08090ffc 4518
     movs r2,#0x30    @ 08090ffe 3022
     rsbs r2,r2,#0    @ 08091000 5242
@@ -25742,53 +25742,53 @@ LAB_08090fe0:
     bne LAB_08091024                         @ 08091020 00d1
     b LAB_08091126                           @ 08091022 80e0
 LAB_08091024:
-    ldr r0, DAT_08091060                     @ 08091024 0e48
+    ldr r0, seg8_pool_cid_h7w_1060           @ 08091024 0e48
     ldr r3,[sp,#0x58]                        @ 08091026 169b
     ldr r2,[r3,#0x10]                        @ 08091028 1a69
     cmp r2,r0                                @ 0809102a 8242
     beq LAB_080910d4                         @ 0809102c 52d0
     cmp r2,r0                                @ 0809102e 8242
     bhi LAB_08091068                         @ 08091030 1ad8
-    ldr r0, DAT_08091064                     @ 08091032 0c48
+    ldr r0, seg8_pool_cid_ifl_1064           @ 08091032 0c48
     cmp r2,r0                                @ 08091034 8242
     beq LAB_08091080                         @ 08091036 23d0
     adds r0,#0x3    @ 08091038 0330
     cmp r2,r0                                @ 0809103a 8242
     beq LAB_080910ac                         @ 0809103c 36d0
     b LAB_08091126                           @ 0809103e 72e0
-DAT_08091040:
-    .word  0x00001257                     @ 08091040 57120000
-DAT_08091044:
-    .word  0x0201bb90                     @ 08091044 90bb0102
-DAT_08091048:
-    .word  0x00001381                     @ 08091048 81130000
-DAT_0809104c:
-    .word  0x00001905                     @ 0809104c 05190000
-DAT_08091050:
-    .word  0x00001951                     @ 08091050 51190000
-DAT_08091054:
-    .word  0x00001955                     @ 08091054 55190000
-DAT_08091058:
-    .word  0x00000868                     @ 08091058 68080000
-DAT_0809105c:
-    .word  0x0201c510                     @ 0809105c 10c50102
-DAT_08091060:
-    .word  0x000014cc                     @ 08091060 cc140000
-DAT_08091064:
-    .word  0x000013a7                     @ 08091064 a7130000
+seg8_pool_cid_rt_1040:
+    .word  REVERSE_TRAP_CID               @ 08091040 57120000
+ptr_gEquipChainSlotRefs_1044:
+    .word  gEquipChainSlotRefs            @ 08091044 90bb0102  gEquipChainSlotRefs
+seg8_pool_cid_mw_1048:
+    .word  MIRROR_WALL_CID                @ 08091048 81130000
+seg8_pool_cid_ddr_104c:
+    .word  DARK_DREADROUTE_CID            @ 0809104c 05190000
+seg8_pool_cid_wd_1050:
+    .word  WATER_DRAGON_CID               @ 08091050 51190000
+seg8_pool_cid_cb_1054:
+    .word  CYBER_BLADER_CID               @ 08091054 55190000
+seg8_pool_stride_1058:
+    .word  PLAYER_BLOCK_STRIDE            @ 08091058 68080000
+ptr_gDuelFieldSlots_105c:
+    .word  gDuelFieldSlots                @ 0809105c 10c50102  gDuelFieldSlots
+seg8_pool_cid_h7w_1060:
+    .word  HUNTER_7_WEAPONS_CID           @ 08091060 cc140000
+seg8_pool_cid_ifl_1064:
+    .word  INJECTION_FAIRY_LILY_CID       @ 08091064 a7130000
 LAB_08091068:
-    ldr r0, DAT_08091078                     @ 08091068 0348
+    ldr r0, seg8_pool_cid_mk_1078            @ 08091068 0348
     cmp r2,r0                                @ 0809106a 8242
     beq LAB_08091104                         @ 0809106c 4ad0
-    ldr r0, DAT_0809107c                     @ 0809106e 0348
+    ldr r0, seg8_pool_cid_str_107c           @ 0809106e 0348
     cmp r2,r0                                @ 08091070 8242
     beq LAB_0809111c                         @ 08091072 53d0
     b LAB_08091126                           @ 08091074 57e0
     .zero  0x2
-DAT_08091078:
-    .word  0x00001643                     @ 08091078 43160000
-DAT_0809107c:
-    .word  0x000018f2                     @ 0809107c f2180000
+seg8_pool_cid_mk_1078:
+    .word  MIRAGE_KNIGHT_CID              @ 08091078 43160000
+seg8_pool_cid_str_107c:
+    .word  STEAMROID_CID                  @ 0809107c f2180000
 LAB_08091080:
     ldr r5,[sp,#0x4c]                        @ 08091080 139d
     cmp r5,#0x0                              @ 08091082 002d
@@ -25808,11 +25808,11 @@ LAB_08091094:
     cmp r0,#0x0                              @ 0809109e 0028
     beq LAB_08091126                         @ 080910a0 41d0
 LAB_080910a2:
-    ldr r2, DAT_080910a8                     @ 080910a2 014a
+    ldr r2, seg8_pool_lp3k_10a8              @ 080910a2 014a
     adds r7,r7,r2    @ 080910a4 bf18
     b LAB_08091126                           @ 080910a6 3ee0
-DAT_080910a8:
-    .word  0x00000bb8                     @ 080910a8 b80b0000
+seg8_pool_lp3k_10a8:
+    .word  LP_COST_3000                   @ 080910a8 b80b0000
 LAB_080910ac:
     ldr r3,[sp,#0x4c]                        @ 080910ac 139b
     cmp r3,#0x0                              @ 080910ae 002b
@@ -25847,7 +25847,7 @@ LAB_080910d4:
     cmp r1,r0                                @ 080910e4 8142
     beq LAB_080910f6                         @ 080910e6 06d0
 LAB_080910e8:
-    ldr r0, DAT_08091100                     @ 080910e8 0548
+    ldr r0, ptr_gEquipChainSlotRefs_1100     @ 080910e8 0548
     ldr r1,[r0,#0x20]                        @ 080910ea 016a
     ldr r0,[sp,#0x50]                        @ 080910ec 1498
     bl check_value_in_slot_chain             @ 080910ee 9ef7cffd
@@ -25859,8 +25859,8 @@ LAB_080910f6:
     adds r7,r7,r5    @ 080910fa 7f19
     b LAB_08091126                           @ 080910fc 13e0
     .zero  0x2
-DAT_08091100:
-    .word  0x0201bb90                     @ 08091100 90bb0102
+ptr_gEquipChainSlotRefs_1100:
+    .word  gEquipChainSlotRefs            @ 08091100 90bb0102  gEquipChainSlotRefs
 LAB_08091104:
     .hword 0x4646    @ 08091104 4646
     ldr r0,[r6,#0x8]                         @ 08091106 b068
@@ -25878,12 +25878,12 @@ LAB_0809111c:
     ldr r2,[sp,#0x4c]                        @ 0809111c 139a
     cmp r2,#0x0                              @ 0809111e 002a
     beq LAB_08091126                         @ 08091120 01d0
-    ldr r3, DAT_08091348                     @ 08091122 894b
+    ldr r3, seg8_pool_delta_1348             @ 08091122 894b
     adds r7,r7,r3    @ 08091124 ff18
 LAB_08091126:
-    ldr r0, DAT_0809134c                     @ 08091126 8948
+    ldr r0, ptr_gEquipChainSlotRefs_134c     @ 08091126 8948
     ldr r1,[r0,#0x20]                        @ 08091128 016a
-    ldr r2, DAT_08091350                     @ 0809112a 894a
+    ldr r2, seg8_pool_cid_cf_1350            @ 0809112a 894a
     ldr r0,[sp,#0x50]                        @ 0809112c 1498
     bl scan_equip_node_pool_for_card_score   @ 0809112e 9ef75fff
     adds r7,r7,r0    @ 08091132 3f18
@@ -25953,9 +25953,9 @@ LAB_0809117c:
     ldr r0,[r1,#0x0]                         @ 080911a4 0868
     adds r0,r0,r2    @ 080911a6 8018
     str r0,[r1,#0x0]                         @ 080911a8 0860
-    ldr r6, DAT_0809134c                     @ 080911aa 684e
+    ldr r6, ptr_gEquipChainSlotRefs_134c     @ 080911aa 684e
     ldr r1,[r6,#0x1c]                        @ 080911ac f169
-    ldr r2, DAT_08091354                     @ 080911ae 694a
+    ldr r2, seg8_pool_cid_mm_1354            @ 080911ae 694a
     .hword 0x4648    @ 080911b0 4846
     bl query_zone_chain_count_with_eligibility @ 080911b2 9ef7f9f8
     str r0,[sp,#0x80]                        @ 080911b6 2090
@@ -25966,7 +25966,7 @@ LAB_0809117c:
     bl check_card_id_is_normal_summon_type   @ 080911c0 b9f7d0ff
     cmp r0,#0x0                              @ 080911c4 0028
     beq LAB_080911e4                         @ 080911c6 0dd0
-    ldr r4, DAT_08091358                     @ 080911c8 634c
+    ldr r4, seg8_pool_cid_sky_1358           @ 080911c8 634c
     ldr r1,[r6,#0x1c]                        @ 080911ca f169
     .hword 0x4648    @ 080911cc 4846
     bl check_slot_card_effect_eligibility    @ 080911ce a5f76ff9
@@ -26024,10 +26024,10 @@ LAB_08091212:
     lsls r0,r1,#0x2    @ 08091230 8800
     adds r0,r0,r1    @ 08091232 4018
     lsls r0,r0,#0x2    @ 08091234 8000
-    ldr r1, DAT_0809135c                     @ 08091236 4949
+    ldr r1, seg8_pool_stride_135c            @ 08091236 4949
     muls r1,r2    @ 08091238 5143
     adds r0,r0,r1    @ 0809123a 4018
-    ldr r1, DAT_08091360                     @ 0809123c 4849
+    ldr r1, ptr_gDuelFieldSlots_1360         @ 0809123c 4849
     adds r0,r0,r1    @ 0809123e 4018
     ldrh r6,[r0,#0xa]                        @ 08091240 4689
     cmp r6,#0x0                              @ 08091242 002e
@@ -26035,7 +26035,7 @@ LAB_08091212:
     adds r7,r1,#0x0    @ 08091246 0f1c
 LAB_08091248:
     lsls r0,r6,#0x3    @ 08091248 f000
-    ldr r5, DAT_08091364                     @ 0809124a 464d
+    ldr r5, ptr_gEquipNodePool_1364          @ 0809124a 464d
     adds r1,r0,r5    @ 0809124c 4119
     ldrh r6,[r1,#0x6]                        @ 0809124e ce88
     movs r0,#0xf    @ 08091250 0f20
@@ -26048,7 +26048,7 @@ LAB_08091248:
     lsrs r4,r1,#0x8    @ 0809125e 0c0a
     adds r0,r5,#0x0    @ 08091260 281c
     adds r1,r4,#0x0    @ 08091262 211c
-    ldr r2, DAT_08091354                     @ 08091264 3b4a
+    ldr r2, seg8_pool_cid_mm_1354            @ 08091264 3b4a
     bl test_slot_has_active_card             @ 08091266 a1f76ff9
     cmp r0,#0x0                              @ 0809126a 0028
     beq LAB_08091296                         @ 0809126c 13d0
@@ -26057,7 +26057,7 @@ LAB_08091248:
     lsls r0,r4,#0x2    @ 08091272 a000
     adds r0,r0,r4    @ 08091274 0019
     lsls r0,r0,#0x2    @ 08091276 8000
-    ldr r1, DAT_0809135c                     @ 08091278 3849
+    ldr r1, seg8_pool_stride_135c            @ 08091278 3849
     muls r1,r2    @ 0809127a 5143
     adds r0,r0,r1    @ 0809127c 4018
     adds r0,r0,r7    @ 0809127e c019
@@ -26132,9 +26132,9 @@ LAB_080912e6:
     movs r0,#0x0    @ 080912fe 0020
     str r0,[sp,#0x84]                        @ 08091300 2190
 LAB_08091302:
-    ldr r4, DAT_0809134c                     @ 08091302 124c
+    ldr r4, ptr_gEquipChainSlotRefs_134c     @ 08091302 124c
     ldr r1,[r4,#0x20]                        @ 08091304 216a
-    ldr r5, DAT_08091368                     @ 08091306 184d
+    ldr r5, seg8_pool_cid_br_1368            @ 08091306 184d
     ldr r0,[sp,#0x50]                        @ 08091308 1498
     adds r2,r5,#0x0    @ 0809130a 2a1c
     bl count_equip_chain_default_flags       @ 0809130c 9ef742f8
@@ -26167,24 +26167,24 @@ LAB_0809133a:
     movs r3,#0x1    @ 08091340 0123
     bl scan_equip_chain_nodes_for_bitmap_update @ 08091342 fff75bfb
     b LAB_0809144c                           @ 08091346 81e0
-DAT_08091348:
-    .word  0xfffffe0c                     @ 08091348 0cfeffff
-DAT_0809134c:
-    .word  0x0201bb90                     @ 0809134c 90bb0102
-DAT_08091350:
-    .word  0x00001853                     @ 08091350 53180000
-DAT_08091354:
-    .word  0x00001238                     @ 08091354 38120000
-DAT_08091358:
-    .word  0x000018ff                     @ 08091358 ff180000
-DAT_0809135c:
-    .word  0x00000868                     @ 0809135c 68080000
-DAT_08091360:
-    .word  0x0201c510                     @ 08091360 10c50102
-DAT_08091364:
-    .word  0x0201d9c0                     @ 08091364 c0d90102
-DAT_08091368:
-    .word  0x0000159e                     @ 08091368 9e150000
+seg8_pool_delta_1348:
+    .word  LP_EQUIP_DELTA_NEG_500         @ 08091348 0cfeffff
+ptr_gEquipChainSlotRefs_134c:
+    .word  gEquipChainSlotRefs            @ 0809134c 90bb0102  gEquipChainSlotRefs
+seg8_pool_cid_cf_1350:
+    .word  COVERING_FIRE_CID              @ 08091350 53180000
+seg8_pool_cid_mm_1354:
+    .word  METALMORPH_CID                 @ 08091354 38120000
+seg8_pool_cid_sky_1358:
+    .word  SKYSCRAPER_CID                 @ 08091358 ff180000
+seg8_pool_stride_135c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809135c 68080000
+ptr_gDuelFieldSlots_1360:
+    .word  gDuelFieldSlots                @ 08091360 10c50102  gDuelFieldSlots
+ptr_gEquipNodePool_1364:
+    .word  gEquipNodePool                 @ 08091364 c0d90102  gEquipNodePool
+seg8_pool_cid_br_1368:
+    .word  BUSTER_RANCHER_CID             @ 08091368 9e150000
 LAB_0809136c:
     ldr r1,[sp,#0x54]                        @ 0809136c 1599
     ldr r0,[r1,#0x8]                         @ 0809136e 8868
@@ -26196,12 +26196,12 @@ LAB_0809136c:
     ldr r3,[sp,#0x90]                        @ 0809137a 249b
     adds r0,r3,r0    @ 0809137c 1818
     ldr r1,[r0,#0x0]                         @ 0809137e 0168
-    ldr r0, DAT_08091388                     @ 08091380 0148
+    ldr r0, seg8_pool_atk2499_1388           @ 08091380 0148
     cmp r1,r0                                @ 08091382 8142
     bgt LAB_0809139e                         @ 08091384 0bdc
     b LAB_0809144c                           @ 08091386 61e0
-DAT_08091388:
-    .word  0x000009c3                     @ 08091388 c3090000
+seg8_pool_atk2499_1388:
+    .word  EQUIP_ATK_SCORE_HI_2499        @ 08091388 c3090000
 LAB_0809138c:
     .hword 0x4650    @ 0809138c 5046
     add r0,r9                                @ 0809138e 4844
@@ -26209,7 +26209,7 @@ LAB_0809138c:
     ldr r5,[sp,#0x8c]                        @ 08091392 239d
     adds r0,r5,r0    @ 08091394 2818
     ldr r1,[r0,#0x0]                         @ 08091396 0168
-    ldr r0, DAT_080914ec                     @ 08091398 5448
+    ldr r0, seg8_pool_atk2499_14ec           @ 08091398 5448
     cmp r1,r0                                @ 0809139a 8142
     ble LAB_0809144c                         @ 0809139c 56dd
 LAB_0809139e:
@@ -26218,21 +26218,21 @@ LAB_0809139e:
     ldr r6,[sp,#0x48]                        @ 080913a2 129e
     cmp r6,#0x0                              @ 080913a4 002e
     beq LAB_080913b6                         @ 080913a6 06d0
-    ldr r0, DAT_080914f0                     @ 080913a8 5148
+    ldr r0, ptr_gEquipChainSlotRefs_14f0     @ 080913a8 5148
     ldr r1,[r0,#0x20]                        @ 080913aa 016a
-    ldr r2, DAT_080914f4                     @ 080913ac 514a
+    ldr r2, seg8_pool_cid_br_14f4            @ 080913ac 514a
     ldr r0,[sp,#0x50]                        @ 080913ae 1498
     movs r3,#0x0    @ 080913b0 0023
     bl scan_equip_chain_nodes_for_bitmap_update @ 080913b2 fff723fb
 LAB_080913b6:
-    ldr r0, DAT_080914f0                     @ 080913b6 4e48
+    ldr r0, ptr_gEquipChainSlotRefs_14f0     @ 080913b6 4e48
     ldr r1,[r0,#0x20]                        @ 080913b8 016a
-    ldr r2, DAT_080914f4                     @ 080913ba 4e4a
+    ldr r2, seg8_pool_cid_br_14f4            @ 080913ba 4e4a
     ldr r0,[sp,#0x50]                        @ 080913bc 1498
     bl query_zone_chain_count_with_eligibility @ 080913be 9df7f3ff
     cmp r0,#0x0                              @ 080913c2 0028
     beq LAB_0809144c                         @ 080913c4 42d0
-    ldr r3, DAT_080914f8                     @ 080913c6 4c4b
+    ldr r3, seg8_pool_atk2500_14f8           @ 080913c6 4c4b
     ldr r0,[sp,#0x9c]                        @ 080913c8 2798
     cmp r0,#0x0                              @ 080913ca 0028
     ble LAB_080913d8                         @ 080913cc 04dd
@@ -26363,9 +26363,9 @@ LAB_08091498:
     adds r1,r1,r2    @ 080914ac 8918
     str r1,[r0,#0x0]                         @ 080914ae 0160
 LAB_080914b0:
-    ldr r4, DAT_080914f0                     @ 080914b0 0f4c
+    ldr r4, ptr_gEquipChainSlotRefs_14f0     @ 080914b0 0f4c
     ldr r1,[r4,#0x1c]                        @ 080914b2 e169
-    ldr r5, DAT_080914f4                     @ 080914b4 0f4d
+    ldr r5, seg8_pool_cid_br_14f4            @ 080914b4 0f4d
     .hword 0x4648    @ 080914b6 4846
     adds r2,r5,#0x0    @ 080914b8 2a1c
     bl count_equip_chain_default_flags       @ 080914ba 9df76bff
@@ -26391,14 +26391,14 @@ LAB_080914b0:
     movs r3,#0x1    @ 080914e4 0123
     bl scan_equip_chain_nodes_for_bitmap_update @ 080914e6 fff789fa
     b LAB_080915a0                           @ 080914ea 59e0
-DAT_080914ec:
-    .word  0x000009c3                     @ 080914ec c3090000
-DAT_080914f0:
-    .word  0x0201bb90                     @ 080914f0 90bb0102
-DAT_080914f4:
-    .word  0x0000159e                     @ 080914f4 9e150000
-DAT_080914f8:
-    .word  0x000009c4                     @ 080914f8 c4090000
+seg8_pool_atk2499_14ec:
+    .word  EQUIP_ATK_SCORE_HI_2499        @ 080914ec c3090000
+ptr_gEquipChainSlotRefs_14f0:
+    .word  gEquipChainSlotRefs            @ 080914f0 90bb0102  gEquipChainSlotRefs
+seg8_pool_cid_br_14f4:
+    .word  BUSTER_RANCHER_CID             @ 080914f4 9e150000
+seg8_pool_atk2500_14f8:
+    .word  EQUIP_ATK_SCORE_HI_2500        @ 080914f8 c4090000
 LAB_080914fc:
     ldr r1,[sp,#0x58]                        @ 080914fc 1699
     ldr r0,[r1,#0x8]                         @ 080914fe 8868
@@ -26413,13 +26413,13 @@ LAB_080914fc:
     ldr r5,[sp,#0x90]                        @ 08091510 249d
     adds r0,r5,r0    @ 08091512 2818
     ldr r1,[r0,#0x0]                         @ 08091514 0168
-    ldr r0, DAT_08091520                     @ 08091516 0248
+    ldr r0, seg8_pool_atk2499_1520           @ 08091516 0248
     cmp r1,r0                                @ 08091518 8142
     bgt LAB_0809153c                         @ 0809151a 0fdc
     b LAB_080915a0                           @ 0809151c 40e0
     .zero  0x2
-DAT_08091520:
-    .word  0x000009c3                     @ 08091520 c3090000
+seg8_pool_atk2499_1520:
+    .word  EQUIP_ATK_SCORE_HI_2499        @ 08091520 c3090000
 LAB_08091524:
     movs r1,#0x1    @ 08091524 0121
     .hword 0x464e    @ 08091526 4e46
@@ -26430,7 +26430,7 @@ LAB_08091524:
     ldr r1,[sp,#0x8c]                        @ 08091530 2399
     adds r0,r1,r0    @ 08091532 0818
     ldr r1,[r0,#0x0]                         @ 08091534 0168
-    ldr r0, DAT_080916a4                     @ 08091536 5b48
+    ldr r0, seg8_pool_atk2499_16a4           @ 08091536 5b48
     cmp r1,r0                                @ 08091538 8142
     ble LAB_080915a0                         @ 0809153a 31dd
 LAB_0809153c:
@@ -26439,21 +26439,21 @@ LAB_0809153c:
     ldr r2,[sp,#0x48]                        @ 08091540 129a
     cmp r2,#0x0                              @ 08091542 002a
     beq LAB_08091554                         @ 08091544 06d0
-    ldr r0, DAT_080916a8                     @ 08091546 5848
+    ldr r0, ptr_gEquipChainSlotRefs_16a8     @ 08091546 5848
     ldr r1,[r0,#0x1c]                        @ 08091548 c169
-    ldr r2, DAT_080916ac                     @ 0809154a 584a
+    ldr r2, seg8_pool_cid_br_16ac            @ 0809154a 584a
     .hword 0x4648    @ 0809154c 4846
     movs r3,#0x0    @ 0809154e 0023
     bl scan_equip_chain_nodes_for_bitmap_update @ 08091550 fff754fa
 LAB_08091554:
-    ldr r0, DAT_080916a8                     @ 08091554 5448
+    ldr r0, ptr_gEquipChainSlotRefs_16a8     @ 08091554 5448
     ldr r1,[r0,#0x1c]                        @ 08091556 c169
-    ldr r2, DAT_080916ac                     @ 08091558 544a
+    ldr r2, seg8_pool_cid_br_16ac            @ 08091558 544a
     .hword 0x4648    @ 0809155a 4846
     bl query_zone_chain_count_with_eligibility @ 0809155c 9df724ff
     cmp r0,#0x0                              @ 08091560 0028
     beq LAB_080915a0                         @ 08091562 1dd0
-    ldr r3, DAT_080916b0                     @ 08091564 524b
+    ldr r3, seg8_pool_atk2500_16b0           @ 08091564 524b
     .hword 0x4640    @ 08091566 4046
     cmp r0,#0x0                              @ 08091568 0028
     ble LAB_08091576                         @ 0809156a 04dd
@@ -26494,20 +26494,20 @@ LAB_080915a0:
     ldr r6,[sp,#0x8c]                        @ 080915a6 239e
     adds r0,r6,r0    @ 080915a8 3018
     ldr r1,[r0,#0x0]                         @ 080915aa 0168
-    ldr r0, DAT_080916b4                     @ 080915ac 4148
+    ldr r0, seg8_pool_f5th_16b4              @ 080915ac 4148
     cmp r1,r0                                @ 080915ae 8142
     ble LAB_080915c6                         @ 080915b0 09dd
     ldr r0,[sp,#0x48]                        @ 080915b2 1298
     cmp r0,#0x0                              @ 080915b4 0028
     beq LAB_080915c6                         @ 080915b6 06d0
-    ldr r0, DAT_080916a8                     @ 080915b8 3b48
+    ldr r0, ptr_gEquipChainSlotRefs_16a8     @ 080915b8 3b48
     ldr r1,[r0,#0x1c]                        @ 080915ba c169
-    ldr r2, DAT_080916b8                     @ 080915bc 3e4a
+    ldr r2, seg8_pool_cid_hcw_16b8           @ 080915bc 3e4a
     .hword 0x4648    @ 080915be 4846
     movs r3,#0x1    @ 080915c0 0123
     bl scan_equip_chain_nodes_for_bitmap_update @ 080915c2 fff71bfa
 LAB_080915c6:
-    ldr r2, DAT_080916a8                     @ 080915c6 384a
+    ldr r2, ptr_gEquipChainSlotRefs_16a8     @ 080915c6 384a
     ldr r0,[r2,#0x8]                         @ 080915c8 9068
     cmp r0,#0x0                              @ 080915ca 0028
     bne LAB_080915f8                         @ 080915cc 14d1
@@ -26520,19 +26520,19 @@ LAB_080915c6:
     ldr r5,[sp,#0x8c]                        @ 080915da 239d
     adds r0,r5,r0    @ 080915dc 2818
     ldr r1,[r0,#0x0]                         @ 080915de 0168
-    ldr r0, DAT_080916b4                     @ 080915e0 3448
+    ldr r0, seg8_pool_f5th_16b4              @ 080915e0 3448
     cmp r1,r0                                @ 080915e2 8142
     ble LAB_080915f8                         @ 080915e4 08dd
     ldr r6,[sp,#0x48]                        @ 080915e6 129e
     cmp r6,#0x0                              @ 080915e8 002e
     beq LAB_080915f8                         @ 080915ea 05d0
     ldr r1,[r2,#0x20]                        @ 080915ec 116a
-    ldr r2, DAT_080916b8                     @ 080915ee 324a
+    ldr r2, seg8_pool_cid_hcw_16b8           @ 080915ee 324a
     ldr r0,[sp,#0x50]                        @ 080915f0 1498
     movs r3,#0x1    @ 080915f2 0123
     bl scan_equip_chain_nodes_for_bitmap_update @ 080915f4 fff702fa
 LAB_080915f8:
-    ldr r4, DAT_080916a8                     @ 080915f8 2b4c
+    ldr r4, ptr_gEquipChainSlotRefs_16a8     @ 080915f8 2b4c
     movs r0,#0x2c    @ 080915fa 2c20
     adds r0,r0,r4    @ 080915fc 0019
     .hword 0x4681    @ 080915fe 8146
@@ -26589,7 +26589,7 @@ LAB_08091650:
     ldr r1,[sp,#0x4c]                        @ 0809165a 1399
     cmp r1,#0x0                              @ 0809165c 0029
     bne LAB_0809167e                         @ 0809165e 0ed1
-    ldr r0, DAT_080916bc                     @ 08091660 1648
+    ldr r0, ptr_gDuelCardCtxBase_16bc        @ 08091660 1648
     .hword 0x4649    @ 08091662 4946
     ldr r1,[r1,#0x0]                         @ 08091664 0968
     .hword 0x468a    @ 08091666 8a46
@@ -26623,22 +26623,22 @@ LAB_0809167e:
     pop {r4,r5,r6,r7}                        @ 0809169e f0bc
     pop {r0}                                 @ 080916a0 01bc
     bx r0                                    @ 080916a2 0047
-DAT_080916a4:
-    .word  0x000009c3                     @ 080916a4 c3090000
-DAT_080916a8:
-    .word  0x0201bb90                     @ 080916a8 90bb0102
-DAT_080916ac:
-    .word  0x0000159e                     @ 080916ac 9e150000
-DAT_080916b0:
-    .word  0x000009c4                     @ 080916b0 c4090000
-DAT_080916b4:
-    .word  0x00000513                     @ 080916b4 13050000
-DAT_080916b8:
-    .word  0x0000150a                     @ 080916b8 0a150000
-DAT_080916bc:
-    .word  0x0201e2a0                     @ 080916bc a0e20102
+seg8_pool_atk2499_16a4:
+    .word  EQUIP_ATK_SCORE_HI_2499        @ 080916a4 c3090000
+ptr_gEquipChainSlotRefs_16a8:
+    .word  gEquipChainSlotRefs            @ 080916a8 90bb0102  gEquipChainSlotRefs
+seg8_pool_cid_br_16ac:
+    .word  BUSTER_RANCHER_CID             @ 080916ac 9e150000
+seg8_pool_atk2500_16b0:
+    .word  EQUIP_ATK_SCORE_HI_2500        @ 080916b0 c4090000
+seg8_pool_f5th_16b4:
+    .word  FIELD5_SCORE_THRESHOLD_1299    @ 080916b4 13050000
+seg8_pool_cid_hcw_16b8:
+    .word  HEART_OF_CLEAR_WATER_CID       @ 080916b8 0a150000
+ptr_gDuelCardCtxBase_16bc:
+    .word  gDuelCardCtxBase               @ 080916bc a0e20102  gDuelCardCtxBase
 
-@ 3-instruction thunk: calls build_equip_candidate_score_table with fixed r0=0, then pop {r0}; bx r0. No APCS params (r0 overwritten to 0 at entry). Wrapper for no-arg equip candidate score table build, called from tick_equip_zone_activation_display_state and FUN_08099314 (case_0 path) and 5 other callsites (7 total) at equip activation init phase. Params: none (r0 overwritten at entry). Returns r0=u32 pass-through from build_equip_candidate_score_table (0=success). Side effects: via build_equip_candidate_score_table writes gDuelBattleState score table fields.
+@ Thunk: sets r0=0, calls build_equip_candidate_score_table, returns via pop {r0}; bx r0. Called from tick_equip_zone_activation_display_state and FUN_08099314 (case_0 path) + 5 other callsites (7 total) at equip activation init. Returns pass-through from build_equip_candidate_score_table (0=success).
 invoke_build_equip_candidate_score_table:
     push {lr}                                @ 080916c0 00b5
     movs r1,#0x0    @ 080916c2 0021
@@ -26646,7 +26646,7 @@ invoke_build_equip_candidate_score_table:
     pop {r0}                                 @ 080916c8 01bc
     bx r0                                    @ 080916ca 0047
 
-@ 被 FUN_08091888 (duel field equip 评分主循环) 调用 (indeg=6), 在 equip 评分结构体中写入一条目标格子得分条目. 入口 r0=player_id [0..1], r1=ptr 指向 duel zone struct (base=0x0201bb90), r2=ptr 指向得分记录 (score_entry), r8=target_slot_or_idx (caller-set, 非 APCS). 函数体: 读取 0x0201bb90[+0x9c] (is_activated 标志); 以 r8 为索引计算 zone struct 内 [+0x2c+idx*4] / [+0xa0+idx*4] / [+0xa4+idx*4] 等多字段写入; 若 r1 (extra_ptr)==0 则写 [+0xa8]=(1-r2[0]), [+0xac]=5; 否则写 [+0xa8]=r1[0], [+0xac]=r1[4]. 接着遍历候选链调用 check_value_in_slot_chain (卡牌 0x1930 = Viser Des check), 若找到则写 [+0xac] = 5 或 chain result. 最后 eors 写 zone[+0x38+idx*4] (activation toggle 位). 副作用: 写入 gDuelBattleState (0x0201bb90) 多字段; 调用 check_value_in_slot_chain 只读. Constants: gDuelBattleState=0x0201bb90, CARD_VISER_DES=0x1930 [check], slot_stride=0x38, eq_base=0x14a4/0x1639.
+@ Called by eval_field_equip_activation_candidates (indeg=6). r0=player_id, r1=duel_zone_ptr, r2=score_entry_ptr, r8=target_slot_idx (non-APCS). Reads gEquipChainSlotRefs[+0x9c] (is_activated); writes [+0x2c+idx*4], [+0xa0+idx*4], [+0xa4+idx*4]. If r1==0: writes [+0xa8]=(1-r2[0]), [+0xac]=5; else r1[0]/r1[4]. Checks DIMENSION_WALL_CID=0x1930 via check_value_in_slot_chain; if found writes [+0xac]=5. Toggles zone[+0x38+idx*4] (activation toggle).
 write_equip_target_score_entry:
     push {r4,r5,r6,r7,lr}                    @ 080916cc f0b5
     .hword 0x4657    @ 080916ce 5746
@@ -26656,7 +26656,7 @@ write_equip_target_score_entry:
     sub sp,#0x8                              @ 080916d6 82b0
     .hword 0x4681    @ 080916d8 8146
     adds r4,r1,#0x0    @ 080916da 0c1c
-    ldr r1, DAT_08091730                     @ 080916dc 1449
+    ldr r1, ptr_gEquipChainSlotRefs_1730     @ 080916dc 1449
     adds r5,r1,#0x0    @ 080916de 0d1c
     adds r5,#0x9c    @ 080916e0 9c35
     ldr r0,[r5,#0x0]                         @ 080916e2 2868
@@ -26699,8 +26699,8 @@ LAB_080916ec:
     adds r0,r3,r0    @ 0809172a 1818
     movs r1,#0x5    @ 0809172c 0521
     b LAB_08091746                           @ 0809172e 0ae0
-DAT_08091730:
-    .word  0x0201bb90                     @ 08091730 90bb0102
+ptr_gEquipChainSlotRefs_1730:
+    .word  gEquipChainSlotRefs            @ 08091730 90bb0102  gEquipChainSlotRefs
 LAB_08091734:
     adds r0,r7,#0x0    @ 08091734 381c
     adds r0,#0xa8    @ 08091736 a830
@@ -26727,7 +26727,7 @@ LAB_08091758:
     bne LAB_08091802                         @ 0809175c 51d1
     ldr r1,[sp,#0x4]                         @ 0809175e 0199
     lsls r4,r1,#0x2    @ 08091760 8c00
-    ldr r2, DAT_080917cc                     @ 08091762 1a4a
+    ldr r2, ptr_gEquipCandidateSlotA_17cc    @ 08091762 1a4a
     adds r0,r4,r2    @ 08091764 a018
     adds r1,r7,#0x0    @ 08091766 391c
     adds r1,#0x2c    @ 08091768 2c31
@@ -26743,10 +26743,10 @@ LAB_08091758:
     adds r0,#0x3c    @ 0809177c 3c30
     adds r0,r5,r0    @ 0809177e 2818
     ldr r1,[r0,#0x0]                         @ 08091780 0168
-    ldr r0, DAT_080917d0                     @ 08091782 1348
+    ldr r0, seg8_pool_cid_asw_17d0           @ 08091782 1348
     cmp r1,r0                                @ 08091784 8142
     beq LAB_0809178e                         @ 08091786 02d0
-    ldr r0, DAT_080917d4                     @ 08091788 1248
+    ldr r0, seg8_pool_cid_tok_17d4           @ 08091788 1248
     cmp r1,r0                                @ 0809178a 8142
     bne LAB_08091802                         @ 0809178c 39d1
 LAB_0809178e:
@@ -26760,10 +26760,10 @@ LAB_0809178e:
     adds r1,r3,#0x0    @ 0809179c 191c
     .hword 0x4652    @ 0809179e 5246
     ands r1,r2    @ 080917a0 1140
-    ldr r2, DAT_080917d8                     @ 080917a2 0d4a
+    ldr r2, seg8_pool_stride_17d8            @ 080917a2 0d4a
     muls r1,r2    @ 080917a4 5143
     adds r0,r0,r1    @ 080917a6 4018
-    ldr r1, DAT_080917dc                     @ 080917a8 0c49
+    ldr r1, ptr_gDuelFieldSlotState_17dc     @ 080917a8 0c49
     adds r0,r0,r1    @ 080917aa 4018
     ldr r0,[r0,#0x0]                         @ 080917ac 0068
     lsrs r0,r0,#0x5    @ 080917ae 4009
@@ -26775,26 +26775,26 @@ LAB_0809178e:
     ldr r0,[r1,#0x0]                         @ 080917ba 0868
     cmp r0,r3                                @ 080917bc 9842
     beq LAB_080917e4                         @ 080917be 11d0
-    ldr r2, DAT_080917e0                     @ 080917c0 074a
+    ldr r2, ptr_gEquipCandidateSlotB_17e0    @ 080917c0 074a
     adds r1,r4,r2    @ 080917c2 a118
     .hword 0x464a    @ 080917c4 4a46
     ldr r0,[r2,#0x4]                         @ 080917c6 5068
     b LAB_080917ea                           @ 080917c8 0fe0
     .zero  0x2
-DAT_080917cc:
-    .word  0x0201bc38                     @ 080917cc 38bc0102
-DAT_080917d0:
-    .word  0x000014a4                     @ 080917d0 a4140000
-DAT_080917d4:
-    .word  0x00001639                     @ 080917d4 39160000
-DAT_080917d8:
-    .word  0x00000868                     @ 080917d8 68080000
-DAT_080917dc:
-    .word  0x0201c520                     @ 080917dc 20c50102
-DAT_080917e0:
-    .word  0x0201bc3c                     @ 080917e0 3cbc0102
+ptr_gEquipCandidateSlotA_17cc:
+    .word  gEquipCandidateSlotA           @ 080917cc 38bc0102  gEquipCandidateSlotA
+seg8_pool_cid_asw_17d0:
+    .word  AMAZONESS_SWORDS_WOMAN_CID     @ 080917d0 a4140000
+seg8_pool_cid_tok_17d4:
+    .word  TOKEN_1639_CID                 @ 080917d4 39160000
+seg8_pool_stride_17d8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080917d8 68080000
+ptr_gDuelFieldSlotState_17dc:
+    .word  gDuelFieldSlotState            @ 080917dc 20c50102  gDuelFieldSlotState
+ptr_gEquipCandidateSlotB_17e0:
+    .word  gEquipCandidateSlotB           @ 080917e0 3cbc0102  gEquipCandidateSlotB
 LAB_080917e4:
-    ldr r0, DAT_08091848                     @ 080917e4 1848
+    ldr r0, ptr_gEquipCandidateSlotB_1848    @ 080917e4 1848
     adds r1,r4,r0    @ 080917e6 2118
     movs r0,#0x5    @ 080917e8 0520
 LAB_080917ea:
@@ -26802,7 +26802,7 @@ LAB_080917ea:
     .hword 0x4661    @ 080917ec 6146
     add r1,r8                                @ 080917ee 4144
     lsls r1,r1,#0x2    @ 080917f0 8900
-    ldr r2, DAT_0809184c                     @ 080917f2 164a
+    ldr r2, ptr_gEquipCandidateSlotA_184c    @ 080917f2 164a
     adds r1,r1,r2    @ 080917f4 8918
     ldr r0,[r1,#0x0]                         @ 080917f6 0868
     .hword 0x4652    @ 080917f8 5246
@@ -26827,7 +26827,7 @@ LAB_08091802:
     adds r0,#0xa8    @ 0809181c a830
     adds r0,r6,r0    @ 0809181e 3018
     ldr r0,[r0,#0x0]                         @ 08091820 0068
-    ldr r2, DAT_08091850                     @ 08091822 0b4a
+    ldr r2, seg8_pool_cid_dw_1850            @ 08091822 0b4a
     movs r1,#0xb    @ 08091824 0b21
     bl check_value_in_slot_chain             @ 08091826 9ef733fa
     .hword 0x46a4    @ 0809182a a446
@@ -26845,12 +26845,12 @@ LAB_08091802:
     adds r0,r6,r0    @ 08091842 3018
     ldr r1,[r2,#0x4]                         @ 08091844 5168
     b LAB_0809185c                           @ 08091846 09e0
-DAT_08091848:
-    .word  0x0201bc3c                     @ 08091848 3cbc0102
-DAT_0809184c:
-    .word  0x0201bc38                     @ 0809184c 38bc0102
-DAT_08091850:
-    .word  0x00001930                     @ 08091850 30190000
+ptr_gEquipCandidateSlotB_1848:
+    .word  gEquipCandidateSlotB           @ 08091848 3cbc0102  gEquipCandidateSlotB
+ptr_gEquipCandidateSlotA_184c:
+    .word  gEquipCandidateSlotA           @ 0809184c 38bc0102  gEquipCandidateSlotA
+seg8_pool_cid_dw_1850:
+    .word  DIMENSION_WALL_CID             @ 08091850 30190000
 LAB_08091854:
     adds r0,r7,#0x0    @ 08091854 381c
     adds r0,#0xac    @ 08091856 ac30
@@ -26858,7 +26858,7 @@ LAB_08091854:
     movs r1,#0x5    @ 0809185a 0521
 LAB_0809185c:
     str r1,[r0,#0x0]                         @ 0809185c 0160
-    ldr r0, DAT_08091884                     @ 0809185e 0948
+    ldr r0, ptr_gEquipChainSlotRefs_1884     @ 0809185e 0948
     .hword 0x4661    @ 08091860 6146
     add r1,r8                                @ 08091862 4144
     lsls r1,r1,#0x2    @ 08091864 8900
@@ -26878,8 +26878,8 @@ LAB_08091872:
     pop {r0}                                 @ 0809187e 01bc
     bx r0                                    @ 08091880 0047
     .zero  0x2
-DAT_08091884:
-    .word  0x0201bb90                     @ 08091884 90bb0102
+ptr_gEquipChainSlotRefs_1884:
+    .word  gEquipChainSlotRefs            @ 08091884 90bb0102  gEquipChainSlotRefs
 
 @ 被 FUN_08090a78 (equip 激活主循环) 和 FUN_080afcb4 以 r0=0/r1=1 调用 (indeg>=2). 大型 duel field equip 激活评分器: 入口 r0=player_id, r1=mode_flag. 函数体读取 gDuelBattleState (0x0201bb90) 中当前 equip 激活上下文 (slot 信息, LP 状态, fieldspell 标志), 通过复杂 BST 分派确定目标卡牌 card_id 所属类别 (多个 cmp 分支对应不同 card_id 范围). 对每个匹配类别: 调用 check_slot_card_fieldspell_eligibility 确认场地魔法资格; 初始化两组候选格 (slot_a / slot_b) 的 score 字段为 0; 再以 mode_flag 区分路径, 调用 write_equip_target_score_entry (FUN_080916cc) 写入得分条目. 全部分支均以写 gDuelBattleState 多字段为副作用. 函数体超过 350 指令. Constants: gDuelBattleState=0x0201bb90, gP1LifePoints=0x0201c4e0, player_stride=0x868, slot_entry=20, 各 card_id BST 覆盖 0x14a4..0x19c9.
 eval_field_equip_activation_candidates:
