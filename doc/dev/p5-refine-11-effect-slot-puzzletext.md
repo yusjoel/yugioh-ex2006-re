@@ -75,7 +75,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80850d8..0x8085d4c | 10 | ~100 | 2 inc (0x850f0/0x28, 0x85130/0x14c) | ✅ | 7d15bd6 |
 | 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | 281d133 |
-| 3  | 0x8086cdc..0x8087d58 | 19 | ~151 | 0 inc (heavy; 可拆 3a/3b) | ⬜ | |
+| 3a | 0x8086cdc..0x80872e4 | 4  | 46   | 0 inc | ✅ | TBD |
+| 3b | 0x80872e4..0x8087d58 | 15 | ~105 | 0 inc | ⬜ | |
 | 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
@@ -126,6 +127,22 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: not needed (no new/renamed functions)
 - **commit**: `281d133`
 
+### 4.03a Seg-3a 完成记录
+
+- **范围**: `[0x08086cdc, 0x080872e4)` — 4 named fn (dispatch_equip_zone_activation_state / populate_equip_zone_entries_substate_d / populate_equip_zone_entries_substate_e / write_equip_zone_entries_substate_d_range)
+- **EQ**: 36 槽 (全 REUSE; gDuelPhaseFlags x3 / EQUIP_PHASE_FRAME_OFF x3 / gEquipEffectZoneTable x5 / PLAYER_BLOCK_STRIDE x9 / gDuelCardCtxBase x3 / gP1FieldArrayCBase x2 / LP_BANISHER_CTX_OFF x3 / ELIGIB_ANIM_STATE_OFF x1 / ELIGIB_SPRITE_CTRL_OFF x1 / SAMSARA_CID x1 / END_OF_WORLD_CID x1 / EARTH_CHANT_CID x1 / gP1SlotSetCodeArray x1 / CARD_FIELD3_THRESHOLD_1500 x1 / zone_query_hand_tag_12a1 x1)
+- **REF**: 4 槽 (switchdata_86d18 / scan_equip_zone11_fnptr_86e98 / eval_equip_score_fnptr_86fa0 / eval_equip_score_fnptr_86fb0)
+- **RENAME**: 6 槽 (PTR_gP1LifePoints_ x6 -> gp1lp_ptr_xxx snake_case, EOL=gP1LifePoints)
+- **PLATE**: 5 (1 CJK mojibake->ASCII rewrite dispatch_equip_zone_activation_state 497 chars + 2 misnomer fixes gDuelCardPool->gP1SlotSetCodeArray/gDuelCardPool_alt_base->gP1HandSlotArray + 2 stale FUN_ fixes FUN_080871a8/FUN_08086e90+FUN_08086fa6)
+- **disasm**: 0
+- **carve**: 0
+- **新增 constants**: 0 (全 REUSE)
+- **新增/改名函数**: 0
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed
+- **commit**: TBD
+
 ---
 
 ## 五、Seg 路线图 (地址序, 边界 = 函数结束处)
@@ -140,9 +157,10 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **Seg-2** `[0x8085d4c, 0x8086cdc)` ✅ -- 12 fn (dispatch_field_display_state_by_type .. check_neo_daedalus_equip_zone_eligible)
   - incbin: 0x861a0/0x27a -> R4 disasm 6 sub-case labels (equip_slot_case0..4+casea_body), NO createFunction
   - 重函数: dispatch_field_display_state_by_type (32 槽)
-- **Seg-3** `[0x8086cdc, 0x8087d58)` -- 19 fn (dispatch_equip_zone_activation_state .. scan_zone_opponent_field5_substate_e)
-  - 0 incbin; 重函数: dispatch_equip_zone_activation_state (37 槽) + write_equip_zone_entries_by_lv_card_id (49 槽)
-  - **heavy (~151 槽), 执行时可拆 3a/3b**
+- **Seg-3a** `[0x8086cdc, 0x80872e4)` ✅ -- 4 fn (dispatch_equip_zone_activation_state .. write_equip_zone_entries_substate_d_range)
+  - 0 incbin; EQ=36 REUSE / REF=4 / RENAME=6 / PLATE=5 (1 CJK+2 misnomer+2 stale FUN_)
+- **Seg-3b** `[0x80872e4, 0x8087d58)` ⬜ -- 15 fn (write_equip_zone_entries_by_lv_card_id .. scan_zone_opponent_field5_substate_e)
+  - 0 incbin; 重函数: write_equip_zone_entries_by_lv_card_id (49 槽)
 
 ### region B (0x8087d58..0x808d7f4, ~197 未命名 THUMB fn, 巨块)
 

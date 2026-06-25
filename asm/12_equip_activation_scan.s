@@ -5375,7 +5375,7 @@ DAT_08096a00:
 DAT_08096a04:
     .word  0x0201e2a0                     @ 08096a04 a0e20102
 
-@ Initializes P1 zone activation display state field group: writes gP1LifePoints+0x1d4c=9 (display_type=zone_activation), [+0x1d7c]=r0_in (zone_idx/card_param), [+0x1d58]=0 (clear counter), [+0x1d24]=0 (clear scan counter), [+0x1d64]=[0x0201e2a0+4] (copy activation phase timestamp). Called from FUN_08086e90/FUN_08086fa6 (card display field spell activation path) and FUN_08097bec-FUN_08098020 (equip state machine internal) (3 callsites). P1-fixed variant of init_zone_activation_display_fields (0x080969c4) which also writes P2 side. Params: r0=u32 zone_or_card_param -> written to gP1LifePoints+0x1d7c. Returns void (bx lr). Side effects: [gP1LifePoints+0x1d4c]:=9; [+0x1d7c]:=r0; [+0x1d58]:=0; [+0x1d24]:=0; [+0x1d64]:=[0x0201e2a0+4].
+@ Initializes P1 zone activation display state field group: writes gP1LifePoints+0x1d4c=9 (display_type=zone_activation), [+0x1d7c]=r0_in (zone_idx/card_param), [+0x1d58]=0 (clear counter), [+0x1d24]=0 (clear scan counter), [+0x1d64]=[0x0201e2a0+4] (copy activation phase timestamp). Called from dispatch_equip_zone_activation_state (caseD_80/caseD_7d) (card display field spell activation path) and FUN_08097bec-FUN_08098020 (equip state machine internal) (3 callsites). P1-fixed variant of init_zone_activation_display_fields (0x080969c4) which also writes P2 side. Params: r0=u32 zone_or_card_param -> written to gP1LifePoints+0x1d7c. Returns void (bx lr). Side effects: [gP1LifePoints+0x1d4c]:=9; [+0x1d7c]:=r0; [+0x1d58]:=0; [+0x1d24]:=0; [+0x1d64]:=[0x0201e2a0+4].
 init_zone_activation_display_state_p1_entry:
     ldr r2, PTR_gP1LifePoints_08096a34       @ 08096a08 0a4a
     ldr r1, DAT_08096a38                     @ 08096a0a 0b49
