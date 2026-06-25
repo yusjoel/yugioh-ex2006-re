@@ -536,3 +536,9 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ C5 grep verified: 0 hits each
 @ =============================================================================
 .equ EQUIP_SLOT_SUBSTATE_OFF, 0x0000058c  @ [gDuelPhaseFlags+0x58c] equip slot sub-state index [0..0xa]; dispatch_equip_slot_state_by_index jump dispatch bounds cmp r0,#0xa; 14 ROM refs; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-4a additions: equip zone scan base for GAP_CID_13ED simple loop
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-4a (0x08087d58..0x08088904)
+@ C5 grep 0x0201e278: 0 hits in constants/ before adding
+@ =============================================================================
+.equ gEquipZoneBase_1d98,  0x0201e278  @ gP1LifePoints+0x1d98; equip zone scan base for GAP_CID_13ED (0x13ed) simple loop; 1 ROM ref (@0x080885cc, fn16 scan_zone_cid_13ed_substate_b); C5 grep=0 (new); conf: high

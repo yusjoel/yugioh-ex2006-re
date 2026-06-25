@@ -1674,4 +1674,36 @@
 .equ MYSTICAL_SHINE_BALL_CID, 0x0000173d  @ Mystical Shine Ball (pw=39552864; card-stats.s card_1512 slot=0x173D); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
 .equ SPIRIT_OF_PHARAOH_CID,   0x00001788  @ Spirit of the Pharaoh (pw=25343280; card-stats.s card_1570 slot=0x1788); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
 .equ RELEASE_RESTRAINT_CID,   0x0000187e  @ Release Restraint (pw=75417459; card-stats.s card_1791 slot=0x187E); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-4a additions: equip zone scan callbacks [0x08087d58..0x08088904)
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-4a (21 new functions)
+@ C5 grep verified: all 21 values -> 0 hits in constants/ before adding
+@ =============================================================================
+@ --- raw CID pool values used in Seg-4a scan functions (equate names match Ghidra exports) ---
+.equ cid_1497_range_lo,         0x00001497  @ CID range lo for scan_zone_magical_hats_substate_d fn05 pool slot; upper end of target range; no card-stats.s slot at 0x1497; raw compare value
+.equ cid_1497_range_hi,         0x000017ae  @ CID range hi for scan_zone_magical_hats_substate_d fn05 pool slot; upper end of target range; no card-stats.s slot at 0x17ae; raw compare value
+.equ cid_15b7_kk_pair,          0x000015b7  @ King's Knight pair companion CID 0x15b7 (raw compare; no card-stats.s slot); fn09 scan_zone_summon_from_deck_group_b pool pair check value
+.equ cid_1121_la_jinn,          0x00001121  @ La Jinn the Mystical Genie of the Lamp (CID=0x1121); fn21 BST exclusion check in scan_zone_special_category_equip_group; C5 grep=0 (new); conf: high
+.equ cid_15d1_zombie_tiger,     0x000015d1  @ Zombie Tiger (CID=0x15d1); fn21 BST exclusion check in scan_zone_special_category_equip_group; C5 grep=0 (new); conf: high
+.equ cid_12f4,                  0x000012f4  @ unallocated slot (gap in 0x12f3..0x12f8 range); scan_zone_cid_12f4_substate_d; C5 grep=0 (new); conf: high
+.equ SOUL_RELEASE_CID,          0x000012f9  @ Soul Release (pw=05758500; card-stats.s card_0680 slot=0x12F9); scan_zone_soul_release_substate_e; C5 grep=0 (new); conf: high
+.equ LAST_WILL_CID,             0x00001315  @ Last Will (pw=85602018; card-stats.s card_0703 slot=0x1315); scan_zone_last_will_substate_d; C5 grep=0 (new); conf: high
+.equ PAINFUL_CHOICE_CID,        0x0000132f  @ Painful Choice (pw=74191942; card-stats.s card_0726 slot=0x132F); scan_zone_painful_choice_substate_d; C5 grep=0 (new); conf: high
+.equ UFO_TURTLE_CID,            0x00001335  @ UFO Turtle (pw=60806437; card-stats.s card_0732 slot=0x1335); scan_zone_summon_from_deck_group_a_substate_d (group fn07); C5 grep=0 (new); conf: high
+.equ SENJU_CID,                 0x00001334  @ Senju of the Thousand Hands (pw=23401839; card-stats.s card_0731 slot=0x1334); scan_zone_senju_substate_d; C5 grep=0 (new); conf: high
+.equ MOTHER_GRIZZLY_CID,        0x0000133e  @ Mother Grizzly (pw=57839750; card-stats.s card_0739 slot=0x133E); scan_zone_summon_from_deck_group_a_substate_d (group fn07); C5 grep=0 (new); conf: high
+.equ FLYING_KAMAKIRI_1_CID,     0x0000133f  @ Flying Kamakiri #1 (pw=84834865; card-stats.s card_0740 slot=0x133F); scan_zone_summon_from_deck_group_a_substate_d (group fn07); C5 grep=0 (new); conf: high
+.equ TROOP_DRAGON_CID,          0x000014dd  @ Troop Dragon (pw=55013285; card-stats.s card_1037 slot=0x14DD); scan_zone_summon_from_deck_group_b_substate_d (group fn09); C5 grep=0 (new); conf: high
+.equ KINGS_KNIGHT_CID,          0x000015b6  @ King's Knight (pw=64788463; card-stats.s card_1207 slot=0x15B6); scan_zone_summon_from_deck_group_b_substate_d (group fn09); C5 grep=0 (new); conf: high
+.equ HYENA_CID,                 0x00001867  @ Hyena (pw=22873798; card-stats.s card_1768 slot=0x1867); scan_zone_summon_from_deck_group_b_substate_d (group fn09); C5 grep=0 (new); conf: high
+.equ SONIC_BIRD_CID,            0x00001341  @ Sonic Bird (pw=57617178; card-stats.s card_0742 slot=0x1341); scan_zone_sonic_bird_substate_d; C5 grep=0 (new); conf: high
+.equ THE_SHALLOW_GRAVE_CID,     0x00001365  @ The Shallow Grave (pw=43434803; card-stats.s card_0772 slot=0x1365); scan_zone_graveyard_revival_group_substate_e (group fn12); C5 grep=0 (new); conf: high
+.equ THE_CREATOR_CID,           0x00001820  @ The Creator (pw=61505339; card-stats.s card_1701 slot=0x1820); scan_zone_graveyard_revival_group_substate_e (group fn12); C5 grep=0 (new); conf: high
+.equ SERPENTINE_PRINCESS_CID,   0x000013a1  @ Serpentine Princess (pw=71829750; card-stats.s card_0818 slot=0x13A1); scan_zone_serpentine_princess_substate_b; C5 grep=0 (new); conf: high
+.equ RETURN_OF_THE_DOOMED_CID,  0x000013f5  @ Return of the Doomed (pw=19827717; card-stats.s card_0866 slot=0x13F5); scan_zone_return_from_grave_group_substate_e (group fn17); C5 grep=0 (new); conf: high
+.equ cid_1449,                  0x00001449  @ unallocated slot (not in card-stats.s; gap between 0x1448 and 0x144b); scan_zone_return_from_grave_group_substate_e (group fn17); C5 grep=0 (new); conf: high
+.equ THE_FORGIVING_MAIDEN_CID,  0x00001457  @ The Forgiving Maiden (pw=84080938; card-stats.s card_0923 slot=0x1457); scan_zone_return_from_grave_group_substate_e (group fn17); C5 grep=0 (new); conf: high
+.equ RED_EYES_B_CHICK_CID,      0x000017dd  @ Red-Eyes B. Chick (pw=36262024; card-stats.s card_1643 slot=0x17DD); scan_zone_special_category_equip_group_substate_b (group fn21); C5 grep=0 (new); conf: high
+.equ THE_CREATOR_INCARNATE_CID, 0x00001821  @ The Creator Incarnate (pw=97093037; card-stats.s card_1702 slot=0x1821); scan_zone_special_category_equip_group_substate_b (group fn21); C5 grep=0 (new); conf: high
+.equ KAIBAMAN_CID,              0x0000189a  @ Kaibaman (pw=34627841; card-stats.s card_1812 slot=0x189A); scan_zone_special_category_equip_group_substate_b (group fn21); C5 grep=0 (new); conf: high
 .equ CYBER_BARRIER_DRAGON_CID,0x000019a8  @ Cyber Barrier Dragon (pw=68774379; card-stats.s card_2017 slot=0x19A8); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high

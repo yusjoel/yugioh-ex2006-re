@@ -77,7 +77,9 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | 281d133 |
 | 3a | 0x8086cdc..0x80872e4 | 4  | 46   | 0 inc | ✅ | 3689026 |
 | 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | 793378c |
-| 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
+| 4a | 0x8087d58..0x8088904 | 21   | 84+44=128 | 0 inc (全 disasm) | ✅ | (see §四) |
+| 4b | 0x8088904..0x808962c | ~27  | 0 (未开始) | ROM_INCBIN 0x88904/0x4ef0 | ⬜ | |
+| 4c..4g | 0x808962c..0x808d7f4 | ~149 | 0 | (未开始, 拆子段) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
@@ -126,6 +128,22 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed (no new/renamed functions)
 - **commit**: `281d133`
+
+### 4.04a Seg-4a 完成记录
+
+- **范围**: `[0x08087d58, 0x08088904)` — 0xBAC = 2988 B; **21 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 44 槽 (PLAYER_BLOCK_STRIDE x20 / KINGS_KNIGHT_CID x1 / POLYMERIZATION_CID x1 / cid_10e2 x1 / CONTRACT_WITH_EXODIA_CID / ANCIENT_LAMP_CID / VAMPIRE_ORCHIS_CID / RED_EYES_B_CHICK_CID / THE_CREATOR_INCARNATE_CID / DES_DENDLE_CID / EXODIA_NECROSS_CID / RED_EYES_B_DRAGON_CID / BLUE_EYES_WHITE_DRAGON_CID + raw equates cid_1497_range_lo/hi/cid_15b7_kk_pair/cid_1121_la_jinn/cid_15d1_zombie_tiger + CARD_STAT_LP_THRESHOLD_1500 x2 + zone_query_hand_tag_12a1 x5)
+- **REF**: 36 槽 (gP1LifePoints x18 ptr_lp_* / gP1SlotSetCodeArray x8 ptr_sca_* / gP1HandSlotArray x5 ptr_hsa_* / gP1FieldArrayCBase x2 ptr_fac_* / gP1SlotCountBase x2 ptr_scb_* / gEquipZoneBase_1d98 x1 ptr_ezb_*)
+- **FUNC_RENAME**: 21 (all newly created functions named at createFunction + re-confirmed by RefineF11Seg4aSlots)
+- **PLATE**: 21 (all ASCII, all <= 500 chars; all <= 427 chars)
+- **disasm**: 21 fn (clearListing + setTMode + per-fn DisassembleCommand + createFunction; 84 pool DWords; 6 degenerate entries excluded from createFunction)
+- **carve**: 0
+- **新增 CID (card_info.inc)**: 26 NEW (21 proposal + 5 additional raw equates for BST exclusion values: cid_1497_range_lo=0x1497/cid_1497_range_hi=0x17ae/cid_15b7_kk_pair=0x15b7/cid_1121_la_jinn=0x1121/cid_15d1_zombie_tiger=0x15d1); 27 REUSE confirmed
+- **新增 ewram**: 1 (gEquipZoneBase_1d98=0x0201e278 fn16 GAP_CID_13ED zone scan base)
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +21 rows (all NEW functions added to naming-proposals.csv)
+- **commit**: (see below)
 
 ### 4.03b Seg-3b 完成记录
 
@@ -181,9 +199,21 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 ### region B (0x8087d58..0x808d7f4, ~197 未命名 THUMB fn, 巨块)
 
 - **Seg-4** `[0x8087d58, 0x808d7f4)` -- ROM_INCBIN 0x87d58/0x5a9c (23,196 B) = 未反汇编 THUMB 代码区
-  - **拆 Seg-4a..4g** (~28-30 fn/子段, 地址序): 逐 fn R4 disasm + createFunction + 命名 + CSV row
-  - 入口: ~197 distinct THUMB+1 fn-ptr 目标 (引用来自全 ROM card effect handler dispatch table)
-  - 含 61 even-addr 引用 (jump-table 裸指针 / data ref, 据实判定)
+  - **拆 Seg-4a..4g** (~27 fn/子段, 地址序): 逐 fn R4 disasm + createFunction + 命名 + CSV row
+  - ref-scan 已定标: **197 distinct THUMB+1 fn-ptr 目标; 185 有 word-aligned dispatch-table 引用 = 强函数入口**
+    (其中 163 个首半字 = `0xb5xx` push{..,lr} 前导, 确证真函数); 12 个仅非对齐 THUMB+1 = 偶合 (disasm 时据实排除,
+    类比 Seg-1/2 degenerate entry: mid-BL 2nd halfword / 0x0000 pad / literal-pool word)。
+  - **命名范式 (file 06..10 fn_eligible/fn_activate 沿用)**: 每 fn 经 dispatch table entry 反查 CID
+    (entry 0x18B = `[CID, fn_activate+1, pad, fn_eligible+1, pad, pad]`, **fn_eligible 块 CID 在 fn_ptr-0xc**),
+    查 `data/card-stats.s` 得卡名 -> `fn_activate_<card>` / `fn_eligible_<card>` (+ 核 body activate vs eligible 语义); 未分配 CID -> `cid_<hex>`。
+  - 子段边界 (强入口均分 ~7 组):
+    - **Seg-4a** `[0x08087d58, 0x08088904)` 21 fn ✅ (21 NEW scan_zone_* + 26 CID equates + REF=36 + 21 PLATE; byte-identical)
+    - **Seg-4b** `[0x08088904, 0x0808962c)` ~27 fn
+    - **Seg-4c** `[0x0808962c, 0x0808a2ac)` ~27 fn
+    - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` ~27 fn
+    - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` ~27 fn
+    - **Seg-4f** `[0x0808bb7c, 0x0808cabc)` ~27 fn
+    - **Seg-4g** `[0x0808cabc, 0x0808d7f4)` ~23 fn
 
 ### region C (0x808d7f4..0x80941c4, 101 命名 fn, 710 槽, 0 incbin)
 
