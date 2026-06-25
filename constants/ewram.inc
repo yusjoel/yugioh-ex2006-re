@@ -542,3 +542,9 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ C5 grep 0x0201e278: 0 hits in constants/ before adding
 @ =============================================================================
 .equ gEquipZoneBase_1d98,  0x0201e278  @ gP1LifePoints+0x1d98; equip zone scan base for GAP_CID_13ED (0x13ed) simple loop; 1 ROM ref (@0x080885cc, fn16 scan_zone_cid_13ed_substate_b); C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-4g additions: equip zone scan group handler global
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-4g (0x0808cabc..0x0808d7f4)
+@ C5 grep 0x0201e4f0: 0 hits in constants/ before adding
+@ =============================================================================
+.equ gEquipEffectZoneBase,  0x0201e4f0  @ equip effect zone base; pool@fn20 0x0808d7a0+0x0808d7e0; STR r0,[r1] at 0x0808d74c clears it; scan_zone_group_handler_multi_card; C5 grep=0 (new); conf: high

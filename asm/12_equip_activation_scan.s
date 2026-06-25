@@ -6309,7 +6309,44 @@ DAT_080970c8:
     .word  0x00001d68                     @ 080970c8 681d0000
 DAT_080970cc:
     .word  0x00001d48                     @ 080970cc 481d0000
-    ROM_INCBIN 0x970d0, 0x44
+SUB_080970d0:
+    movs r0,#0x12    @ 080970d0 1220
+    bx lr                                    @ 080970d2 7047
+SUB_080970d4:
+    ldr r1, DWORD_080970e0                   @ 080970d4 0249
+    lsls r0,r0,#0x4    @ 080970d6 0001
+    adds r0,r0,r1    @ 080970d8 4018
+    ldr r0,[r0,#0x0]                         @ 080970da 0068
+    bx lr                                    @ 080970dc 7047
+    .zero  0x2
+DWORD_080970e0:
+    .word  0x09e47560                     @ 080970e0 6075e409
+SUB_080970e4:
+    ldr r1, DWORD_080970fc                   @ 080970e4 0549
+    lsls r0,r0,#0x4    @ 080970e6 0001
+    adds r1,#0xc    @ 080970e8 0c31
+    adds r0,r0,r1    @ 080970ea 4018
+    ldr r1,[r0,#0x0]                         @ 080970ec 0168
+    ldr r0, DWORD_08097100                   @ 080970ee 0448
+    eors r1,r0    @ 080970f0 4140
+    rsbs r0,r1,#0    @ 080970f2 4842
+    orrs r0,r1    @ 080970f4 0843
+    lsrs r0,r0,#0x1f    @ 080970f6 c00f
+    bx lr                                    @ 080970f8 7047
+    .zero  0x2
+DWORD_080970fc:
+    .word  0x09e47560                     @ 080970fc 6075e409
+DWORD_08097100:
+    .word  0x08097025                     @ 08097100 25700908
+SUB_08097104:
+    ldr r1, DAT_08097110                     @ 08097104 0249
+    lsls r0,r0,#0x4    @ 08097106 0001
+    adds r1,#0x4    @ 08097108 0431
+    adds r0,r0,r1    @ 0809710a 4018
+    ldr r0,[r0,#0x0]                         @ 0809710c 0068
+    bx lr                                    @ 0809710e 7047
+DAT_08097110:
+    .byte  0x60, 0x75, 0xe4, 0x09
 
 @ Scans ROM fixed card-type effect handler table (base 0x09e47560, up to 0x11=17 entries, stride 0x10 bytes), comparing entry[+0x0] with r1 (card_type); on hit reads function pointer at entry[+0x8+r3*0x10] and calls it via invoke_r2 with r5/r4/r6/r3 as 4 args. If no entry matches, returns 0. Entry r0=context_ptr (passed to invoke_r2 r0), r1=card_type (match key), r2=sub_param (passed to invoke_r2 r2). Symmetric with dispatch_to_effect_handler_by_card_type (0x08097150) but passes only 3 args (r5/r4/r6 no r3 sub_param channel), uses invoke_r2 while the other uses invoke_r3; both share table base 0x09e47560.
 @ 

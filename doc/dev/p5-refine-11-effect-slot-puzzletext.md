@@ -83,7 +83,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4d | 0x808a2ac..0x808ad8c | 24 | EQ=30/REF=34/PLATE=24 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4e | 0x808ad8c..0x808bb7c | 25 | EQ=30/REF=46/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4f | 0x808bb7c..0x808cabc | 25 | EQ=37/REF=53/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 4g | 0x808cabc..0x808d7f4 | ~23 | 0 | (未开始) | ⬜ | |
+| 4g | 0x808cabc..0x808d7f4 | 20 | EQ=30/REF=42/PLATE=20 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
@@ -166,6 +166,28 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +23 rows (naming-proposals.csv)
 - **commit**: (pending)
+
+### 4.04g Seg-4g 完成记录 (LAST giant-block sub-segment — Seg-4 COMPLETE)
+
+- **范围**: `[0x0808cabc, 0x0808d7f4)` — 0xD38 = 3384 B; **20 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 30 槽 (PLAYER_BLOCK_STRIDE x21 / NECROVALLEY_CID REUSE x1 / PARASITE_PARACIDE_CID REUSE x3 / CARD_FIELD3_THRESHOLD_1500 REUSE x1 / WINGED_KURIBOH_CID=0x18aa NEW x1 / SLOT_CARD_SET_CODE_MASK REUSE x1 / CARD_FIELD_STAT_CLEAR_UPPER4_MASK=0x0fffffff NEW x1 / slot_field_mask_ffff803f REUSE x1)
+- **REF**: 42 槽 (gP1LifePoints x17 / gP1HandSlotArray x7 / gP1SlotSetCodeArray x8 / gP1HandCountBase x3 / gP1FieldArrayCBase x4 / gDuelFieldSlots x1 / gEquipEffectZoneBase x2 / gP1SlotCountBase x1)
+- **FUNC_RENAME**: 20 (all newly created functions)
+- **PLATE**: 20 ASCII plates (all <= 500 chars; max 494: fn11 Inferno Reckless Summon 3-loop)
+- **carve**: 0 (no data tables in range)
+- **disasm**: 20 functions via DisassembleF11Seg4gBlocks.py; 72 pool DWords; degenerate excluded: 0x0808d20e (mid-body CMP r2,r1 fn12 offset+0x52) + 0x0808d21e (upper half pool word gP1LifePoints at 0x0808d21c fn12) + 0x0808d7de (align pad upper half SLOT_CARD_SET_CODE_MASK fn20); weak excluded: 0x0808d58c (mid-body CMP r1,r0 fn17 offset+0xf8); fixup script DisassembleF11Seg4gFixupPools.py (3 pool DWords for SUB_080970d4/e4 helper stubs in asm/12 disassembled as BL targets from fn20)
+- **NEW constants**: card_info.inc +5 CID (WINGED_KURIBOH_CID=0x18aa / SCARR_DARK_WORLD_CID=0x196a / GATEWAY_DARK_WORLD_CID=0x1973 / ARMED_CHANGER_CID=0x197c / NEXT_TO_BE_LOST_CID=0x19dc) + CARD_FIELD_STAT_CLEAR_UPPER4_MASK=0x0fffffff; ewram.inc +1 (gEquipEffectZoneBase=0x0201e4f0); 3 REUSE confirmed (MAGICAL_MALLET_CID/INFERNO_RECKLESS_SUMMON_CID/WHITE_HORNS_DRAGON_CID fn10/fn11/fn12 -- CID shift correction applied per reviewer fix #1/2)
+- **reviewer fixes applied**: #1 fn10/fn11/fn12 CID assignment shift corrected (fn10=0x198d Magical Mallet, fn11=0x198e Inferno Reckless Summon, fn12=0x1996 White Horns Dragon; all 3 REUSE); #2 fn10 name corrected to scan_zone_magical_mallet_substate_b / fn11 to scan_zone_inferno_reckless_summon_substate_d_e_b / fn12 to scan_zone_white_horns_dragon_substate_e
+- **multi-CID handlers**: fn18 (NEXT_TO_BE_LOST_CID=0x19dc + GENERATION_SHIFT_CID=0x19dd, 2 dispatch table entries); fn20 (CID=0xfffe group sentinel, variable substate r8=arg2, calls scan_card_type_effect_handler_table)
+- **§5.1**: 0 (all 20 fn referenced in dispatch table)
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +20 rows (naming-proposals.csv)
+- **commit**: (see git log)
+
+**Seg-4 SUMMARY (4a+4b+4c+4d+4e+4f+4g = 163 new functions, GIANT BLOCK FULLY ELIMINATED)**:
+- Total new functions: 21+25+23+24+25+25+20 = **163 hidden card-effect scan callbacks disassembled+named**
+- Total giant ROM_INCBIN 0x87d58/0x5a9c (23,196 B) = ZERO ROM_INCBIN remaining in [0x08087d58, 0x0808d7f4)
+- All 7 sub-segments byte-identical SHA1 9689337d throughout
 
 ### 4.04f Seg-4f 完成记录
 
@@ -303,7 +325,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
     - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` 24 fn ✅ (24 NEW scan_zone_* + 11 NEW CID equates + REF=34 + 24 PLATE + 1 raw mask equ; 6 excluded entries (3 degenerate strong + 3 weak); byte-identical)
     - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` 25 fn ✅ (25 NEW scan_zone_* + 11 NEW CID equates + REF=46 + 25 PLATE + 1 raw sentinel equ; 4 excluded entries (2 degenerate strong + 2 weak); byte-identical)
     - **Seg-4f** `[0x0808bb7c, 0x0808cabc)` 25 fn ✅ (25 NEW scan_zone_* + 10 NEW CID equates + 1 raw equ + REF=53 + 25 PLATE; fn07+fn08 Vampire Genesis + fn17+fn18 Summon Priest alt-entry pairs; fn21/fn22 dual-pool each; byte-identical)
-    - **Seg-4g** `[0x0808cabc, 0x0808d7f4)` ~23 fn
+    - **Seg-4g** `[0x0808cabc, 0x0808d7f4)` 20 fn ✅ (20 NEW scan_zone_* + 5 NEW CID + 2 NEW non-CID constants + REF=42 + 20 PLATE; fn10/fn11/fn12 CID corrected; fn20 group-sentinel; Seg-4 COMPLETE 163 fn total; byte-identical)
 
 ### region C (0x808d7f4..0x80941c4, 101 命名 fn, 710 槽, 0 incbin)
 

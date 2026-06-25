@@ -1798,5 +1798,18 @@
 .equ MIRACLE_FUSION_CID,                0x00001920  @ Miracle Fusion (pw=45906428; card-stats.s card_1917 slot=0x1920); scan_zone_miracle_fusion_substate_ce; C5 grep=0 (new); conf: high
 .equ WARRIOR_LADY_WASTELAND_CID,        0x00001939  @ Warrior Lady of the Wasteland (pw=05438492; card-stats.s card_1938 slot=0x1939); scan_zone_warrior_lady_wasteland_substate_d; C5 grep=0 (new); conf: high
 
+@ =============================================================================
+@ file 11 Seg-4g additions: equip zone scan callbacks [0x0808cabc..0x0808d7f4)
+@ 5 NEW CID equates + 1 NEW raw mask; C5 grep verified all values -> 0 hits before adding
+@ REUSE: MAGICAL_MALLET_CID(0x198d,line 842), INFERNO_RECKLESS_SUMMON_CID(0x198e,line 1613),
+@        WHITE_HORNS_DRAGON_CID(0x1996,line 553) -- fn10/fn11/fn12
+@ =============================================================================
+.equ WINGED_KURIBOH_CID,               0x000018aa  @ Winged Kuriboh (card-stats.s line 23636); scan_zone_flute_summoning_kuriboh_substate_d gate; C5 grep=0 (new); conf: high
+.equ SCARR_DARK_WORLD_CID,             0x0000196a  @ Scarr, Scout of Dark World (card-stats.s line 25703); scan_zone_scarr_dark_world_substate_d; C5 grep=0 (new); conf: high
+.equ GATEWAY_DARK_WORLD_CID,           0x00001973  @ Gateway to Dark World (card-stats.s line 25807); scan_zone_gateway_dark_world_substate_e; C5 grep=0 (new); conf: high
+.equ ARMED_CHANGER_CID,                0x0000197c  @ Armed Changer (card-stats.s line 25924); scan_zone_armed_changer_substate_e_b; C5 grep=0 (new); conf: high
+.equ NEXT_TO_BE_LOST_CID,              0x000019dc  @ Next to be Lost (card-stats.s line 26834); scan_zone_generation_shift_substate_d_c multi-CID; C5 grep=0 (new); conf: high
+.equ CARD_FIELD_STAT_CLEAR_UPPER4_MASK, 0x0fffffff  @ clear upper 4 bits of field3 stat word; consumed fn09 scan_zone_armed_changer_substate_e_b pool@0x0808d00c; C5 grep=0 (new); conf: high
+
 @ Seg-4f raw value: fn07+fn08 gDuelPhaseFlags relative negative offset
 .equ VAMPIRE_GENESIS_GDUELPF_NEG_OFF,   0xfffffef4  @ gDuelPhaseFlags relative negative offset -0x10c; scan_zone_vampire_genesis_substate_be fn07+fn08 pool 0x0808bf28; conf: med
