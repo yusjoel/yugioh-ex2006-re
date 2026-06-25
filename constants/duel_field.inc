@@ -475,3 +475,13 @@
 .equ check_equip_slot_eligible_by_cross_player_and_field6_zero_fn_ptr, 0x080554c5  @ THUMB+1 ptr to check_equip_slot_eligible_by_cross_player_and_field6_zero (fn@0x080554c4 push 30b5 confirmed asm/06:4532); tick_equip_activation_display_seq_b state=2 fn-ptr mode_b; C5 grep=0 (new); conf: high
 .equ check_equip_slot_eligible_by_same_side_and_prereqs_fn_ptr, 0x08054899  @ THUMB+1 ptr to check_equip_slot_eligible_by_same_side_and_prereqs (fn@0x08054898 push 30b5 confirmed asm/06:2545+asm/07:19152); tick_equip_activation_display_seq_c state=2 dispatch fn-ptr; C5 grep=0 (new); conf: high
 .equ check_equip_slot_target_not_blocked_fn_ptr, 0x08084a99  @ THUMB+1 ptr to check_equip_slot_target_not_blocked (fn@0x08084a98 push b570 confirmed byte-scan); BLK5 Ojama King sub-stubs pool@0x08084b60/bac/c10; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-5 additions: effect handler table + equip candidate tables
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-5 [0x0808d7f4..0x0808e8fc)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ gEffectHandlerTable,       0x09e5a128  @ ROM effect handler dispatch table; 0x132 entries x 8B; binary search in find_effect_record_index_by_id; fn_ptr at [+4] via invoke_r3; C5 grep=0 (new); conf: high
+.equ gEquipCandidateScoreBase,  0x09e3f150  @ ROM equip candidate score table base; 5 words per player; scan_all_slots_for_max_equip_match inner scan; adjacent EQUIP_PAIR_ENTRY_TABLE_BASE+0x10; C5 grep=0 (new); conf: high
+.equ gEquipCandidateInitBase,   0x09e3f164  @ ROM equip candidate init template; 10 words copied to sp+4 work buf in scan_all_slots_for_max_equip_match; C5 grep=0 (new); conf: high
+.equ SLOT_ACTIVE_CHECK_CODE,    0x0000104c  @ test_slot_has_active_card 3rd param (activation check code); scan_slots_activate_equip_by_effect_id + enqueue_equip_chain_sprites_for_zones; C5 grep=0 (new); conf: med

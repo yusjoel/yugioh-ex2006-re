@@ -1813,3 +1813,19 @@
 
 @ Seg-4f raw value: fn07+fn08 gDuelPhaseFlags relative negative offset
 .equ VAMPIRE_GENESIS_GDUELPF_NEG_OFF,   0xfffffef4  @ gDuelPhaseFlags relative negative offset -0x10c; scan_zone_vampire_genesis_substate_be fn07+fn08 pool 0x0808bf28; conf: med
+
+@ =============================================================================
+@ file 11 Seg-5 additions: equip field scan functions [0x0808d7f4..0x0808e8fc)
+@ 7 NEW CID equates; C5 grep verified all values -> 0 hits before adding
+@ REUSE: UMI_CARD_ID(0x10f4), INSECT_PRINCESS_CID(0x1704), DRAGON_CAPTURE_JAR_CID(0x10ef),
+@        CHAIN_ENERGY_CID(0x132c), MONSTER_REBORN_CID(0x12ea), cid_12fb(0x12fb),
+@        FORCED_REQUISITION_CID(0x1354), PUMPKING_CID(0x1009),
+@        CASTLE_OF_DARK_ILLUSIONS_CID(0x0ff9)
+@ =============================================================================
+.equ MAIDEN_OF_THE_AQUA_CID,         0x000013a2  @ Maiden of the Aqua (card-stats.s slot=0x13A2); dispatch_equip_pair_sprites_by_state check; C5 grep=0 (new); conf: high
+.equ FINAL_ATTACK_ORDERS_CID,        0x000015fb  @ Final Attack Orders (card-stats.s slot=0x15FB); scan_all_slots_for_max_equip_match dispatch; C5 grep=0 (new); conf: high
+.equ LEVEL_LIMIT_AREA_B_CID,         0x000017a6  @ Level Limit - Area B (card-stats.s slot=0x17A6); scan_all_slots_for_max_equip_match dispatch; C5 grep=0 (new); conf: high
+.equ LEVEL_LIMIT_AREA_A_CID,         0x0000197b  @ Level Limit - Area A (card-stats.s slot=0x197B); scan_all_slots_for_max_equip_match dispatch; C5 grep=0 (new); conf: high
+.equ KOTODAMA_CID,                   0x00001343  @ Kotodama (card-stats.s slot=0x1343); enqueue_equip_chain_sprites_for_zones test_slot_has_active_card key; C5 grep=0 (new); conf: high
+.equ MAGICAL_THORN_CID,              0x00001306  @ Magical Thorn (card-stats.s slot=0x1306); scan_field_slots_for_lp_zone_sprite_with_equip CARD_ID filter; C5 grep=0 (new); conf: high
+.equ SKULL_INVITATION_CID,           0x00001361  @ Skull Invitation (card-stats.s slot=0x1361); scan_field_slots_for_lp_zone_sprite_with_equip + scan_all_zone_slots_for_lp_change_indicator; C5 grep=0 (new); conf: high

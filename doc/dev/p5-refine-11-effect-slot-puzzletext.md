@@ -84,7 +84,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4e | 0x808ad8c..0x808bb7c | 25 | EQ=30/REF=46/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4f | 0x808bb7c..0x808cabc | 25 | EQ=37/REF=53/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4g | 0x808cabc..0x808d7f4 | 20 | EQ=30/REF=42/PLATE=20 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
+| 5  | 0x808d7f4..0x808e8fc | 18 | 107(EQ)+15(RENAME)+12(PLATE) | 0 inc | ✅ | (see §四) |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
 | 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ⬜ | |
@@ -166,6 +166,23 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: +23 rows (naming-proposals.csv)
 - **commit**: (pending)
+
+### 4.05 Seg-5 完成记录
+
+- **范围**: `[0x0808d7f4, 0x0808e8fc)` -- 18 pre-existing named fn (region C, 0 ROM_INCBIN)
+- **EQ**: 107 槽 (14x PTR_gP1LifePoints REUSE + 23x PLAYER_BLOCK_STRIDE REUSE + 13x gDuelFieldSlots REUSE + 5x gDuelFieldSlotState REUSE + 7x gEquipEffectZoneBase REUSE + 6x gEquipZoneCountTable REUSE + 8x misc EWRAM globals + 30x CID/ROM ptr EQ)
+- **RENAME**: 15 (14x PTR_gP1LifePoints_0808xxxx -> ptr_lp_* + 1x DAT_0808d8a8 -> switchd_base_d8a8 internal switchD table ptr)
+- **REF**: 0 (no REF slots; PTR_ handled via equate-based RENAME, consistent with Seg-3a/3b)
+- **PLATE**: 12 (C8 stale-FUN_ substitution: fn04/fn05/fn06/fn08/fn10/fn11/fn12/fn13/fn14/fn16/fn17/fn18)
+- **carve**: 0
+- **disasm**: 0
+- **新增 constants**: card_info.inc +7 CID (MAIDEN_OF_THE_AQUA_CID=0x13a2 / FINAL_ATTACK_ORDERS_CID=0x15fb / LEVEL_LIMIT_AREA_B_CID=0x17a6 / LEVEL_LIMIT_AREA_A_CID=0x197b / KOTODAMA_CID=0x1343 / MAGICAL_THORN_CID=0x1306 / SKULL_INVITATION_CID=0x1361); duel_field.inc +4 (gEffectHandlerTable=0x09e5a128 / gEquipCandidateScoreBase=0x09e3f150 / gEquipCandidateInitBase=0x09e3f164 / SLOT_ACTIVE_CHECK_CODE=0x0000104c); C5 value-grep all 11 NEW -> 0 hits confirmed
+- **raw DWORD 留 DAT_**: 5 slots (DAT_0808dc1c=0xfdc / DAT_0808e4d4=0x98300000 / DAT_0808e5b0=0xffffe358 / DAT_0808e834=0x3a200000 / DAT_0808e8f8=0x9b080000) -- no named constant, intentionally left as-is
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **post-landing gates**: non-ASCII=0 ✅ / FUN_[0-9a-f]{8}=0 ✅ / PTR_gP1LifePoints residue=0 ✅ / DAT_ residue=5 raw slots (intentional) ✅
+- **CSV sync**: not needed (0 new/renamed functions)
+- **commit**: (see git log)
 
 ### 4.04g Seg-4g 完成记录 (LAST giant-block sub-segment — Seg-4 COMPLETE)
 
@@ -329,8 +346,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 
 ### region C (0x808d7f4..0x80941c4, 101 命名 fn, 710 槽, 0 incbin)
 
-- **Seg-5** `[0x808d7f4, 0x808e8fc)` -- 18 fn (dispatch_equip_zone_write_by_substate_range .. scan_all_zone_slots_for_lp_change_indicator)
-  - 重函数: scan_all_slots_for_max_equip_match (24 槽)
+- **Seg-5** `[0x808d7f4, 0x808e8fc)` ✅ -- 18 fn (dispatch_equip_zone_write_by_substate_range .. scan_all_zone_slots_for_lp_change_indicator)
+  - EQ=107/RENAME=15/PLATE=12/NEW CID=7/NEW duel_field=4/0 disasm/0 carve/0 §5.1; byte-identical
 - **Seg-6** `[0x808e8fc, 0x808f7c0)` -- 19 fn (enqueue_paired_slot_sprite_attrs_for_player .. enqueue_sprite_by_field_copy_count)
 - **Seg-7** `[0x808f7c0, 0x8090a78)` -- 32 fn (scan_field_slots_for_equip_chain_node_bitmap_update .. scan_equip_chain_nodes_for_bitmap_update)
   - 多小 invoke_*/check_* effect-node 包装函数 (零槽); 重函数 dispatch_equip_field_scan_sequence (16 槽)
