@@ -1744,3 +1744,22 @@
 .equ APPRENTICE_MAGICIAN_CID,        0x00001612  @ Apprentice Magician (pw=09156135; card-stats.s card_1271 slot=0x1612); scan_zone_apprentice_magician_substate_d; C5 grep=0 (new); conf: high
 .equ BONDING_H2O_CID,                0x0000195c  @ Bonding - H2O (pw=45898858; card-stats.s card_1962 slot=0x195C); scan_zone_magic_evolution_group_substate_deb; C5 grep=0 (new); conf: high
 .equ LEAGUE_UNIFORM_NOMENCLATURE_CID,0x00001978  @ The League of Uniform Nomenclature (pw=55008284; card-stats.s card_1989 slot=0x1978); scan_zone_machine_duplication_group_substate_d; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-4d additions: equip zone scan callbacks [0x0808a2ac..0x0808ad8c)
+@ 11 NEW CID equates; C5 grep verified all 11 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ SENRI_EYE_CID,                       0x00001628  @ Senri Eye (pw=60391791; card-stats.s card_1291 slot=0x1628); scan_zone_senri_eye_dark_scorpion_group_substate_d; C5 grep=0 (new); conf: high
+.equ ARSENAL_ROBBER_CID,                  0x0000166b  @ Arsenal Robber (pw=55348096; card-stats.s card_1345 slot=0x166B); scan_zone_arsenal_robber_substate_d; C5 grep=0 (new); conf: high
+.equ CHAOSRIDER_GUSTAPH_CID,              0x000016c4  @ Chaosrider Gustaph (pw=47829960; card-stats.s card_1414 slot=0x16C4); scan_zone_chaosrider_gustaph_substate_e; C5 grep=0 (new); conf: high
+.equ DIMENSION_DISTORTION_CID,            0x000016d8  @ Dimension Distortion (pw=95194279; card-stats.s card_1433 slot=0x16D8); scan_zone_dimension_removal_group_substate_f; C5 grep=0 (new); conf: high
+.equ RETURN_FROM_DD_CID,                  0x000017be  @ Return from the Different Dimension (pw=27174286; card-stats.s card_1615 slot=0x17BE); scan_zone_dimension_removal_group_substate_f; C5 grep=0 (new); conf: high
+.equ DDM_DIFF_DIM_MASTER_CID,             0x0000191e  @ D.D.M. - Different Dimension Master (pw=82112775; card-stats.s card_1915 slot=0x191E); scan_zone_dimension_removal_group_substate_f; C5 grep=0 (new); conf: high
+.equ MANJU_TEN_THOUSAND_HANDS_CID,        0x0000170c  @ Manju of the Ten Thousand Hands (pw=95492061; card-stats.s card_1476 slot=0x170C); scan_zone_manju_of_ten_thousand_hands_substate_d; C5 grep=0 (new); conf: high
+.equ SALVAGE_CID,                         0x00001714  @ Salvage (pw=96947648; card-stats.s card_1484 slot=0x1714); scan_zone_salvage_substate_e; C5 grep=0 (new); conf: high
+.equ LADY_NINJA_YAE_CID,                  0x00001754  @ Lady Ninja Yae (pw=82005435; card-stats.s card_1535 slot=0x1754); scan_zone_abyss_soldier_lady_ninja_group_substate_b; C5 grep=0 (new); conf: high
+.equ ARSENAL_SUMMONER_CID,                0x00001647  @ Arsenal Summoner (pw=85489096; card-stats.s card_1312 slot=0x1647); scan_zone_arsenal_summoner_substate_d; C5 grep=0 (new); conf: high
+.equ CHOPMAN_THE_DESPERATE_OUTLAW_CID,    0x000016bc  @ Chopman the Desperate Outlaw (pw=40884383; card-stats.s card_1407 slot=0x16BC); scan_zone_guardian_equip_group_substate_e; C5 grep=0 (new); conf: high
+
+@ Seg-4d slot field mask: fn24 check_slot_card_eligible_by_card_id arg (strips bits 6..14)
+.equ slot_field_mask_ffff803f,            0xffff803f  @ slot word mask: clears bits 6..14; scan_zone_guardian_equip_group_substate_e fn24

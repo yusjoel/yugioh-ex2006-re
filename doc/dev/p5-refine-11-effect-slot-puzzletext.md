@@ -80,7 +80,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 4a | 0x8087d58..0x8088904 | 21   | 84+44=128 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4b | 0x8088904..0x808962c | 25   | EQ=36/REF=40/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4c | 0x808962c..0x808a2ac | 23 | EQ=39/REF=36/PLATE=23 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 4d..4g | 0x808a2ac..0x808d7f4 | ~126 | 0 | (未开始, 拆子段) | ⬜ | |
+| 4d | 0x808a2ac..0x808ad8c | 24 | EQ=30/REF=34/PLATE=24 | 0 inc (全 disasm) | ✅ | (see §四) |
+| 4e..4g | 0x808ad8c..0x808d7f4 | ~102 | 0 | (未开始, 拆子段) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ⬜ | |
@@ -164,6 +165,24 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: +23 rows (naming-proposals.csv)
 - **commit**: (pending)
 
+### 4.04d Seg-4d 完成记录
+
+- **范围**: `[0x0808a2ac, 0x0808ad8c)` — 0xAE0 = 2784 B; **24 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 30 槽 (PLAYER_BLOCK_STRIDE x25 / EMBLEM_OF_DRAGON_DESTROYER_CID x1 / BUSTER_BLADER_CID x1 / NECROVALLEY_CID x1 / CARD_FIELD3_THRESHOLD_1500 x1 / slot_field_mask_ffff803f x1 raw mask)
+- **REF**: 34 槽 (gP1LifePoints x22 ptr_lp_* / gP1FieldArrayCBase x3 ptr_fac_* / gP1HandSlotArray x5 ptr_hsa_* / gP1SlotSetCodeArray x2 ptr_sca_* / gP1AltHandSlotArray x1 ptr_aha_* / gP1HandCountBase x1 ptr_hcb_*)
+- **FUNC_RENAME**: 24 (all newly created functions)
+- **PLATE**: 24 (all ASCII, all <=500 chars; max=477 chars fn14 chaos envoy group)
+- **disasm**: 24 fn (clearListing + setTMode + 24 per-fn DisassembleCommand + createFunction; 64 pool DWords; 3 degenerate strong excluded: 0x0808a44c/0x0808a450 fn05 mid-loop + 0x0808a996 fn16 mid-body; 3 weak excluded: 0x0808a974/0x0808a9c2/0x0808ab2c; 0x0808ab92 alignment padding excluded)
+- **carve**: 0
+- **新增 CID (card_info.inc)**: 11 NEW (SENRI_EYE_CID=0x1628 / ARSENAL_ROBBER_CID=0x166b / CHAOSRIDER_GUSTAPH_CID=0x16c4 / DIMENSION_DISTORTION_CID=0x16d8 / RETURN_FROM_DD_CID=0x17be / DDM_DIFF_DIM_MASTER_CID=0x191e / MANJU_TEN_THOUSAND_HANDS_CID=0x170c / SALVAGE_CID=0x1714 / LADY_NINJA_YAE_CID=0x1754 / ARSENAL_SUMMONER_CID=0x1647 / CHOPMAN_THE_DESPERATE_OUTLAW_CID=0x16bc) + 1 raw mask (slot_field_mask_ffff803f=0xffff803f); 23 REUSE confirmed; C5 value-grep all 0 hits before adding
+- **6 excluded entries**: 3 degenerate strong (0x0808a44c mid-loop LDR fn05 / 0x0808a450 mid-loop MUL fn05 / 0x0808a996 mid-body MOVS fn16) + 3 weak (0x0808a974 pool literal / 0x0808a9c2 mid-code MOV / 0x0808ab2c fn19 epilogue bytes)
+- **group-handler functions**: fn17 (4-CID Dimension Removal group: Dimension Distortion + Fusion + Return from DD + D.D.M.); fn24 (3-CID Guardian equip group: Guardian Elma + Chopman + The Kick Man; local struct + memset + mask 0xffff803f)
+- **review correction applied**: fn20 pool addr 0x0808ab92->0x0808ab94 (C4 alignment fix applied to proposal and script)
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +24 rows (naming-proposals.csv)
+- **commit**: (see below)
+
 ### 4.04b Seg-4b 完成记录
 
 - **范围**: `[0x08088904, 0x0808962c)` — 0xD28 = 3368 B; **25 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
@@ -246,7 +265,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
     - **Seg-4a** `[0x08087d58, 0x08088904)` 21 fn ✅ (21 NEW scan_zone_* + 26 CID equates + REF=36 + 21 PLATE; byte-identical)
     - **Seg-4b** `[0x08088904, 0x0808962c)` 25 fn ✅ (25 NEW scan_zone_* + 16 CID equates + REF=40 + 25 PLATE; byte-identical)
     - **Seg-4c** `[0x0808962c, 0x0808a2ac)` 23 fn ✅ (23 NEW scan_zone_* + 11 CID equates + REF=36 + 23 PLATE; fn21 6-CID magic evolution group; byte-identical)
-    - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` ~27 fn
+    - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` 24 fn ✅ (24 NEW scan_zone_* + 11 NEW CID equates + REF=34 + 24 PLATE + 1 raw mask equ; 6 excluded entries (3 degenerate strong + 3 weak); byte-identical)
     - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` ~27 fn
     - **Seg-4f** `[0x0808bb7c, 0x0808cabc)` ~27 fn
     - **Seg-4g** `[0x0808cabc, 0x0808d7f4)` ~23 fn
