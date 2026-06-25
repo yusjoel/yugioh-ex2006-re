@@ -1707,3 +1707,24 @@
 .equ THE_CREATOR_INCARNATE_CID, 0x00001821  @ The Creator Incarnate (pw=97093037; card-stats.s card_1702 slot=0x1821); scan_zone_special_category_equip_group_substate_b (group fn21); C5 grep=0 (new); conf: high
 .equ KAIBAMAN_CID,              0x0000189a  @ Kaibaman (pw=34627841; card-stats.s card_1812 slot=0x189A); scan_zone_special_category_equip_group_substate_b (group fn21); C5 grep=0 (new); conf: high
 .equ CYBER_BARRIER_DRAGON_CID,0x000019a8  @ Cyber Barrier Dragon (pw=68774379; card-stats.s card_2017 slot=0x19A8); write_equip_zone_entries_by_lv_card_id LV-pair BST; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-4b additions: equip zone scan callbacks [0x08088904..0x0808962c)
+@ 16 NEW CID equates; C5 grep verified all 16 values -> 0 hits in constants/ before adding
+@ =============================================================================
+.equ KYCOO_THE_GHOST_DESTROYER_CID,    0x00001480  @ Kycoo the Ghost Destroyer (pw=88240808; card-stats.s card_0958 slot=0x1480); scan_zone_kycoo_dark_blade_group_substate_e; C5 grep=0 (new); conf: high
+.equ FOOLISH_BURIAL_CID,               0x00001474  @ Foolish Burial (pw=81439173; card-stats.s card_0948 slot=0x1474); scan_zone_foolish_burial_substate_d; C5 grep=0 (new); conf: high
+.equ INFERNAL_FLAME_EMPEROR_CID,       0x000018e0  @ Infernal Flame Emperor (pw=19847532; card-stats.s card_1870 slot=0x18E0); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ SPIRIT_OF_FLAMES_CID,             0x00001484  @ Spirit of Flames (pw=13522325; card-stats.s card_0962 slot=0x1484); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ GARUDA_THE_WIND_SPIRIT_CID,       0x00001487  @ Garuda the Wind Spirit (pw=12800777; card-stats.s card_0965 slot=0x1487); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ LEKUNGA_CID,                      0x000015bc  @ Lekunga (pw=62543393; card-stats.s card_1212 slot=0x15BC); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ FREED_THE_BRAVE_WANDERER_CID,     0x000016c0  @ Freed the Brave Wanderer (pw=16556849; card-stats.s card_1411 slot=0x16C0); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ GIGANTES_CID,                     0x000016c7  @ Gigantes (pw=47606319; card-stats.s card_1417 slot=0x16C7); scan_zone_removed_spirit_elemental_group_substate_e; C5 grep=0 (new); conf: high
+.equ SUPPLY_CID,                       0x0000148b  @ Supply (pw=44072894; card-stats.s card_0969 slot=0x148B); scan_zone_supply_substate_e; C5 grep=0 (new); conf: high
+.equ SKULL_LAIR_CID,                   0x00001490  @ Skull Lair (pw=06733059; card-stats.s card_0974 slot=0x1490); scan_zone_skull_lair_substate_e; C5 grep=0 (new); conf: high
+.equ REINFORCEMENT_OF_THE_ARMY_CID,    0x000014d0  @ Reinforcement of the Army (pw=32807846; card-stats.s card_1024 slot=0x14D0); scan_zone_warrior_search_group_substate_d; C5 grep=0 (new); conf: high
+.equ DES_FERAL_IMP_CID,                0x000014ef  @ Des Feral Imp (pw=81985784; card-stats.s card_1055 slot=0x14EF); scan_zone_des_feral_imp_substate_e; C5 grep=0 (new); conf: high
+.equ SILENT_FIEND_CID,                 0x000014f7  @ Silent Fiend (pw=42534368; card-stats.s card_1061 slot=0x14F7); scan_zone_silent_fiend_soul_res_group_substate_e; C5 grep=0 (new); conf: high
+.equ SUPER_ROBOLADY_CID,               0x00001507  @ Super Robolady (pw=75923050; card-stats.s card_1074 slot=0x1507); scan_zone_super_robo_pair_substate_c; C5 grep=0 (new); conf: high
+.equ SUPER_ROBOYAROU_CID,              0x00001508  @ Super Roboyarou (pw=01412158; card-stats.s card_1075 slot=0x1508); scan_zone_super_robo_pair_substate_c; C5 grep=0 (new); conf: high
+.equ PYRAMID_TURTLE_CID,               0x0000152f  @ Pyramid Turtle (pw=77044671; card-stats.s card_1108 slot=0x152F); scan_zone_pyramid_turtle_substate_d; C5 grep=0 (new); conf: high

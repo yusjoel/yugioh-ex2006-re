@@ -78,7 +78,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 3a | 0x8086cdc..0x80872e4 | 4  | 46   | 0 inc | ✅ | 3689026 |
 | 3b | 0x80872e4..0x8087d58 | 15 | 105  | 0 inc | ✅ | 793378c |
 | 4a | 0x8087d58..0x8088904 | 21   | 84+44=128 | 0 inc (全 disasm) | ✅ | (see §四) |
-| 4b | 0x8088904..0x808962c | ~27  | 0 (未开始) | ROM_INCBIN 0x88904/0x4ef0 | ⬜ | |
+| 4b | 0x8088904..0x808962c | 25   | EQ=36/REF=40/PLATE=25 | 0 inc (全 disasm) | ✅ | (see §四) |
 | 4c..4g | 0x808962c..0x808d7f4 | ~149 | 0 | (未开始, 拆子段) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
 | 6  | 0x808e8fc..0x808f7c0 | 19 | ~97  | 0 inc | ⬜ | |
@@ -145,6 +145,23 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: +21 rows (all NEW functions added to naming-proposals.csv)
 - **commit**: (see below)
 
+### 4.04b Seg-4b 完成记录
+
+- **范围**: `[0x08088904, 0x0808962c)` — 0xD28 = 3368 B; **25 NEW fn (equip zone scan callbacks, all dispatched from table 0x09e5a128)**
+- **EQ**: 36 槽 (PLAYER_BLOCK_STRIDE x27 / SUPER_ROBOLADY_CID x1 + SUPER_ROBOYAROU_CID x2 CID pool pairs / zone_query_hand_tag_12a1 x4 / LP_BAR_ANIM_STATE_OFF x1 / SPRITE_ROW_ENTRY_DATA_OFF x1)
+- **REF**: 40 槽 (gP1LifePoints x23 ptr_lp_* / gP1SlotSetCodeArray x6 ptr_sca_* / gP1HandSlotArray x4 ptr_hsa_* / gP1FieldArrayCBase x3 ptr_fac_* / gP1ChainZoneArray x1 / gP1AltHandSlotArray x1 / gP1SlotCountBase x1 / gDuelPhaseFlags x1)
+- **FUNC_RENAME**: 25 (all newly created functions named at createFunction + re-confirmed by RefineF11Seg4bSlots)
+- **PLATE**: 25 (all ASCII, all <= 500 chars; max = 489 chars fn08)
+- **disasm**: 25 fn (clearListing + setTMode + per-fn DisassembleCommand + createFunction; 79 pool DWords; 2 degenerate entries excluded: 0x0808939c mid-body bcs target of fn23 + 0x08089560 mid-prologue second-push of fn26; 1 weak entry excluded: 0x8088ef6 mid-loop fn11)
+- **carve**: 0
+- **新增 CID (card_info.inc)**: 16 NEW (KYCOO_THE_GHOST_DESTROYER_CID=0x1480 / FOOLISH_BURIAL_CID=0x1474 / INFERNAL_FLAME_EMPEROR_CID=0x18e0 / SPIRIT_OF_FLAMES_CID=0x1484 / GARUDA_THE_WIND_SPIRIT_CID=0x1487 / LEKUNGA_CID=0x15bc / FREED_THE_BRAVE_WANDERER_CID=0x16c0 / GIGANTES_CID=0x16c7 / SUPPLY_CID=0x148b / SKULL_LAIR_CID=0x1490 / REINFORCEMENT_OF_THE_ARMY_CID=0x14d0 / DES_FERAL_IMP_CID=0x14ef / SILENT_FIEND_CID=0x14f7 / SUPER_ROBOLADY_CID=0x1507 / SUPER_ROBOYAROU_CID=0x1508 / PYRAMID_TURTLE_CID=0x152f); 32 REUSE confirmed (C5 value-grep all 0 hits before adding)
+- **7 group-handler functions**: fn01 (Kycoo/Dark Blade), fn03 (Dark Necrofear/Megarock/Doom Dozer), fn08 (13-CID spirit/elemental/removed group), fn13 (cid_135b/Marauding Captain), fn19 (Silent Fiend/Soul Resurrection), fn21 (Super Robolady/Roboyarou pair), fn22 (Keldo/Disappear/Dimension Jar/D.D.Guide), fn23 (Last Turn), fn25 (Vampire Lord/Lady)
+- **3 excluded entries**: degenerate 0x0808939c (fn23 bcs target) + 0x08089560 (fn26 2nd push) + weak 0x8088ef6 (fn11 mid-loop)
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +25 rows (naming-proposals.csv)
+- **commit**: (see below)
+
 ### 4.03b Seg-3b 完成记录
 
 - **范围**: `[0x080872e4, 0x08087d58)` — 15 named fn (write_equip_zone_entries_by_lv_card_id .. scan_zone_opponent_field5_substate_e)
@@ -208,7 +225,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
     查 `data/card-stats.s` 得卡名 -> `fn_activate_<card>` / `fn_eligible_<card>` (+ 核 body activate vs eligible 语义); 未分配 CID -> `cid_<hex>`。
   - 子段边界 (强入口均分 ~7 组):
     - **Seg-4a** `[0x08087d58, 0x08088904)` 21 fn ✅ (21 NEW scan_zone_* + 26 CID equates + REF=36 + 21 PLATE; byte-identical)
-    - **Seg-4b** `[0x08088904, 0x0808962c)` ~27 fn
+    - **Seg-4b** `[0x08088904, 0x0808962c)` 25 fn ✅ (25 NEW scan_zone_* + 16 CID equates + REF=40 + 25 PLATE; byte-identical)
     - **Seg-4c** `[0x0808962c, 0x0808a2ac)` ~27 fn
     - **Seg-4d** `[0x0808a2ac, 0x0808ad8c)` ~27 fn
     - **Seg-4e** `[0x0808ad8c, 0x0808bb7c)` ~27 fn
