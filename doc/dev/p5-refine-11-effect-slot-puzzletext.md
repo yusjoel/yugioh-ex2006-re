@@ -88,7 +88,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 6  | 0x808e8fc..0x808f7c0 | 19 | 97(EQ=85/RENAME=12/PLATE=17) | 0 inc | ✅ | (see §四) |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ✅ | (see §四) |
 | 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ✅ | (see §四) |
-| 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ✅ | (see §四) |
+| 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ✅ | e585688 |
 | 10 | 0x8093598..0x80941c4 | 9  | ~118 | 0 inc (duel puzzle 文本: parse 68 槽 + render 14) | ⬜ | |
 
 **总计 (region A+C 已命名)**: 142 命名 fn / ~1052 DAT_/DWORD_/PTR_ 槽 / 4 ROM_INCBIN。
@@ -254,7 +254,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **post-landing gates**: non-ASCII in Seg-9=0 / FUN_residue=external-only plate refs (allowed per C8) / DAT_/DWORD_/PTR_ definitions=0 / all 191 slots symbolized
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed (0 new/renamed functions)
-- **commit**: (pending)
+- **commit**: `e585688`
 
 ### 4.05 Seg-5 完成记录
 
