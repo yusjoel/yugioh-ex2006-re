@@ -184,6 +184,26 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: not needed (0 new/renamed functions)
 - **commit**: (see git log)
 
+### 4.07 Seg-7 完成记录
+
+- **范围**: `[0x0808f7c0, 0x08090a78)` -- 30 pre-existing named fn + 2 NEW stub fn
+- **EQ**: 109 槽 (108 literal pool slots REUSE/NEW + 1 EFFECT_NODE_TABLE_TYPE1_COUNT slot @0x08090534)
+  - NEW: BERSERK_GORILLA_CID/FALLING_DOWN_CID_SHIFTED/SOUL_ABSORBING_BONE_TOWER_CID_SHIFTED/THE_BLOCKMAN_CID_SHIFTED/THEINEN_ACTIVATION_PACKED (card_info.inc +5)
+  - NEW: SPHINX_ACTIVATION_INIT_TEMPLATE/EFFECT_NODE_TABLE_TYPE0_BASE/EFFECT_NODE_TABLE_TYPE0_COUNT/EFFECT_NODE_TABLE_TYPE1_BASE/EFFECT_NODE_TABLE_TYPE1_COUNT/EFFECT_NODE_TABLE_TYPE2_BASE/EFFECT_NODE_TABLE_TYPE3_BASE/EQUIP_ZONE_COUNT_TABLE (duel_field.inc +8)
+  - C5 corrections: EQUIP_ZONE_COUNT_TABLE_OFF(0x1cb8) kept as offset for file08; new EQUIP_ZONE_COUNT_TABLE(0x0201e1c8) for abs-ptr Seg-7 slots; ANDRO_SPHINX_CID(0x17c7) corrected from erroneous SPHINX_TELEIA_CID
+- **REF**: 0
+- **RENAME**: 10 槽 (9x PTR_gP1LifePoints_0808xxxx -> ptr_lp_xxx / 1x DAT_0808f934 -> ptr_case_body_f934)
+- **FUNC_RENAME**: 1 (set_equip_activation_state_by_mode_alt -> invoke_effect_node_handler_3arg @0x080905e8; old name was wrong -- no equip state write, just effect-node 3-arg dispatch)
+- **PLATE**: 36 (33 C8 stale-FUN_ substitution + 2 CJK->ASCII rewrite for count_effect_node_activations_by_zone/scan_equip_chain_nodes_for_bitmap_update + 2 new stubs return_effect_node_result_0/2 + 1 find_card_effect_node_entry)
+- **disasm**: 2 callback stubs (return_effect_node_result_0 @ 0x080904ec: movs r0,#0;bx lr; return_effect_node_result_2 @ 0x080904f0: movs r0,#2;bx lr; clearListing+setTMode+2x DisassembleCommand+2x createFunction)
+- **carve**: 0
+- **§5.1**: 0
+- **新增 constants**: card_info.inc +5 CID; duel_field.inc +8 (see EQ above)
+- **post-landing gates**: non-ASCII in Seg-7=0 / FUN_[0-9a-f]{8} in Seg-7=0 / DAT_/PTR_gP1LifePoints_ in Seg-7=0 / ROM_INCBIN/.byte in stub range=0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: +2 rows (return_effect_node_result_0/2) + 1 rename (invoke_effect_node_handler_3arg) = 3 rows total
+- **commit**: (see below)
+
 ### 4.05 Seg-5 完成记录
 
 - **范围**: `[0x0808d7f4, 0x0808e8fc)` -- 18 pre-existing named fn (region C, 0 ROM_INCBIN)
@@ -367,8 +387,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - EQ=107/RENAME=15/PLATE=12/NEW CID=7/NEW duel_field=4/0 disasm/0 carve/0 §5.1; byte-identical
 - **Seg-6** `[0x808e8fc, 0x808f7c0)` ✅ -- 19 fn (enqueue_paired_slot_sprite_attrs_for_player .. enqueue_sprite_by_field_copy_count)
   - EQ=85/RENAME=12/PLATE=17/NEW card_info=12/NEW duel_field=1/0 disasm/0 carve/0 §5.1; byte-identical
-- **Seg-7** `[0x808f7c0, 0x8090a78)` -- 32 fn (scan_field_slots_for_equip_chain_node_bitmap_update .. scan_equip_chain_nodes_for_bitmap_update)
-  - 多小 invoke_*/check_* effect-node 包装函数 (零槽); 重函数 dispatch_equip_field_scan_sequence (16 槽)
+- **Seg-7** `[0x808f7c0, 0x8090a78)` ✅ -- 32 fn (scan_field_slots_for_equip_chain_node_bitmap_update .. scan_equip_chain_nodes_for_bitmap_update)
+  - EQ=109(11 NEW+REUSE)/RENAME=10/FUNC_RENAME=1/PLATE=36/disasm=2 stubs/NEW card_info=5/NEW duel_field=8/0 carve/0 §5.1; byte-identical
 - **Seg-8** `[0x8090a78, 0x8091888)` -- 3 fn (build_equip_candidate_score_table + invoke_ + write_equip_target_score_entry)
   - build_equip_candidate_score_table (63 槽, 0xc48 B 数据密集)
 - **Seg-9** `[0x8091888, 0x8093598)` -- 20 fn (eval_field_equip_activation_candidates + card_display_op_0x31 族)

@@ -3858,7 +3858,7 @@ invoke_effect_node_handler_with_zone_flag_guard:
     adds r0,r6,#0x0    @ 0805db36 301c
     adds r1,r7,#0x0    @ 0805db38 391c
     adds r2,r5,#0x0    @ 0805db3a 2a1c
-    bl set_equip_activation_state_by_mode_alt @ 0805db3c 32f054fd
+    bl invoke_effect_node_handler_3arg       @ 0805db3c 32f054fd
     movs r1,#0x0    @ 0805db40 0021
     str r1,[r4,#0x0]                         @ 0805db42 2160
     b LAB_0805db56                           @ 0805db44 07e0
@@ -15753,7 +15753,7 @@ LAB_0806221a:
     subs r1,r1,r0    @ 08062222 091a
     adds r0,r6,#0x0    @ 08062224 301c
     adds r2,r5,#0x0    @ 08062226 2a1c
-    bl set_equip_activation_state_by_mode_alt @ 08062228 2ef0def9
+    bl invoke_effect_node_handler_3arg       @ 08062228 2ef0def9
     cmp r0,#0x0                              @ 0806222c 0028
     bne LAB_08062210                         @ 0806222e efd1
     adds r5,#0x1    @ 08062230 0135
@@ -16974,7 +16974,7 @@ LAB_08062a36:
     adds r1,r6,#0x0    @ 08062a38 311c
     adds r2,r4,#0x0    @ 08062a3a 221c
     str r3,[sp,#0x0]                         @ 08062a3c 0093
-    bl set_equip_activation_state_by_mode_alt @ 08062a3e 2df0d3fd
+    bl invoke_effect_node_handler_3arg       @ 08062a3e 2df0d3fd
     ldr r3,[sp,#0x0]                         @ 08062a42 009b
     cmp r0,#0x0                              @ 08062a44 0028
     beq LAB_08062a6a                         @ 08062a46 10d0

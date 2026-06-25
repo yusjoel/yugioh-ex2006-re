@@ -2989,7 +2989,7 @@ invoke_serial_spell_effect_node_handler:
     ldrh r0,[r0,#0x0]                        @ 08054b86 0088
     strh r0,[r4,#0x0]                        @ 08054b88 2080
     adds r0,r4,#0x0    @ 08054b8a 201c
-    bl set_equip_activation_state_by_mode_alt @ 08054b8c 3bf02cfd
+    bl invoke_effect_node_handler_3arg       @ 08054b8c 3bf02cfd
     ldr r1, invoke_serial_spell_effect_node_handler_icid @ 08054b90 0249
     strh r1,[r4,#0x0]                        @ 08054b92 2180
     pop {r4}                                 @ 08054b94 10bc
@@ -10860,7 +10860,7 @@ dispatch_ep_state0_lp_display:
     lsls r2,r2,#0x1a    @ 08057d80 9206
     lsrs r2,r2,#0x1b    @ 08057d82 d20e
     adds r0,r4,#0x0    @ 08057d84 201c
-    bl set_equip_activation_state_by_mode_alt @ 08057d86 38f02ffc
+    bl invoke_effect_node_handler_3arg       @ 08057d86 38f02ffc
     cmp r0,#0x0                              @ 08057d8a 0028
     beq LAB_08057dd0                         @ 08057d8c 20d0
     ldr r1, DWORD_08057dc0                   @ 08057d8e 0c49
@@ -12351,7 +12351,7 @@ LAB_080586de:
     lsrs r0,r0,#0x1f    @ 080586e2 c00f
     ldrh r1,[r5,#0x0]                        @ 080586e4 2988
     ldr r2, tick_equip_tier_abcx_mode_fn_ptr @ 080586e6 024a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 080586e8 3ef0e2f9
+    bl set_equip_activation_state_by_mode_alt @ 080586e8 3ef0e2f9
     b LAB_080586d6                           @ 080586ec f3e7
     .zero  0x2
 tick_equip_tier_abcx_mode_fn_ptr:
@@ -14948,7 +14948,7 @@ LAB_0805979c:
     lsrs r0,r0,#0x1f    @ 080597a0 c00f
     ldr r2, dat_set_equip_mode_fn_ptr_a      @ 080597a2 034a
     movs r1,#0x1    @ 080597a4 0121
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 080597a6 3df083f9
+    bl set_equip_activation_state_by_mode_alt @ 080597a6 3df083f9
     ldr r0,[r7,#0x0]                         @ 080597aa 3868
     adds r0,#0x1    @ 080597ac 0130
     b LAB_08059804                           @ 080597ae 29e0
@@ -15225,7 +15225,7 @@ tick_equip_atk_zone_seq__case_set_mode_alt:
     lsrs r0,r0,#0x1f    @ 08059984 c00f
     ldr r2, dat_set_equip_mode_fn_ptr_b      @ 08059986 044a
     movs r1,#0x1    @ 08059988 0121
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 0805998a 3df091f8
+    bl set_equip_activation_state_by_mode_alt @ 0805998a 3df091f8
     ldr r1, tick_equip_atk_zone_state_base_e @ 0805998e 0349
     ldr r2, tick_equip_atk_zone_step_off_e   @ 08059990 034a
     adds r1,r1,r2    @ 08059992 8918

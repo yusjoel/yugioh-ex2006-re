@@ -1061,7 +1061,7 @@ LAB_080b5b14:
     ldr r2,[r4,#0x0]                         @ 080b5b14 2268
     .hword 0x4640    @ 080b5b16 4046
     adds r1,r7,#0x0    @ 080b5b18 391c
-    bl set_equip_activation_state_by_mode_alt @ 080b5b1a daf765fd
+    bl invoke_effect_node_handler_3arg       @ 080b5b1a daf765fd
     cmp r0,#0x0                              @ 080b5b1e 0028
     beq LAB_080b5b30                         @ 080b5b20 06d0
     ldr r2,[r4,#0x0]                         @ 080b5b22 2268
@@ -5688,7 +5688,7 @@ LAB_080b7a06:
     lsrs r1,r1,#0x1f    @ 080b7a0a c90f
     adds r0,r5,#0x0    @ 080b7a0c 281c
     adds r2,r4,#0x0    @ 080b7a0e 221c
-    bl set_equip_activation_state_by_mode_alt @ 080b7a10 d8f7eafd
+    bl invoke_effect_node_handler_3arg       @ 080b7a10 d8f7eafd
     cmp r0,#0x0                              @ 080b7a14 0028
     beq LAB_080b7a38                         @ 080b7a16 0fd0
     ldr r0,[r6,#0x0]                         @ 080b7a18 3068

@@ -1846,3 +1846,14 @@
 .equ CRUSH_CARD_ZONE11_TAG,          0x0002123b  @ Crush Card zone11 chain node tag = CRUSH_CARD_CID|(2<<16); [node+0] AND EQUIP_NODE_TAG_MASK == CRUSH_CARD_ZONE11_TAG; scan_chain_nodes_for_equip_zone_sprite 1 slot; C5 grep=0 (new); conf: high
 .equ DECK_DEV_VIRUS_ZONE11_TAG,      0x0002188c  @ Deck Devastation Virus zone11 chain node tag = DECK_DEVASTATION_VIRUS_CID|(2<<16); scan_chain_nodes_for_equip_zone11_sprite 1 slot; C5 grep=0 (new); conf: high
 .equ SKULL_INVITATION_CID,           0x00001361  @ Skull Invitation (card-stats.s slot=0x1361); scan_field_slots_for_lp_zone_sprite_with_equip + scan_all_zone_slots_for_lp_change_indicator; C5 grep=0 (new); conf: high
+
+@ =============================================================================
+@ file 11 Seg-7 additions: CID equates + shifted CID state masks + activation packed
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-7 [0x0808f7c0..0x08090a78)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ BERSERK_GORILLA_CID,               0x000016bf  @ card_1410 pw=39168895; scan_field_slots_for_archfiend_equip_bitmap_update; conf: high
+.equ FALLING_DOWN_CID_SHIFTED,          0xb4d00000  @ FALLING_DOWN_CID(0x169a) << 19; scan_field_slots_for_inactive_equip_bitmap_clear lsls #0x13 compare; conf: high
+.equ SOUL_ABSORBING_BONE_TOWER_CID_SHIFTED, 0xba200000  @ SOUL_ABSORBING_BONE_TOWER_CID(0x1744) << 19; scan_slots_for_field_bit4_sprite_update; conf: high
+.equ THE_BLOCKMAN_CID_SHIFTED,          0xc0800000  @ THE_BLOCKMAN_CID(0x1810) << 19; scan_equip_set_slot_sprite_by_counter; conf: high
+.equ THEINEN_ACTIVATION_PACKED,         0x005017c9  @ THEINEN_THE_GREAT_SPHINX_CID(0x17c9)|0x00500000 flag bits; scan_card_placement_for_activation orrs r0,r1 @ 0x0808fd7c; conf: high

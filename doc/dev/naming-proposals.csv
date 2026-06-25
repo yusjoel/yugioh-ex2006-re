@@ -2874,10 +2874,12 @@ address,name,proposed_name,score,tags
 0x0809007c,scan_equip_set_slot_sprite_by_counter,,,
 0x0809011c,scan_slots_for_equip_activation_by_field5,,,duel_field
 0x08090218,dispatch_equip_field_scan_sequence,,,duel_field
+0x080904ec,return_effect_node_result_0,,,
+0x080904f0,return_effect_node_result_2,,,
 0x080904f4,find_card_effect_node_entry,,,
 0x0809058c,check_card_has_activatable_effect_node,,,
 0x080905c0,invoke_effect_node_handler_2arg,,,
-0x080905e8,set_equip_activation_state_by_mode_alt,,,
+0x080905e8,invoke_effect_node_handler_3arg,,,
 0x08090624,invoke_effect_node_with_active_flag_3arg,,,
 0x0809066c,query_equip_zone_bitmap_with_effect_guard,,,
 0x08090690,query_equip_zone_bitmap_with_active_flag,,,

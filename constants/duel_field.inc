@@ -153,7 +153,8 @@
 .equ SLOT_FACE_STATUS_ARRAY_OFF, 0x000010b1 @ gDuelFieldSlots+0x10b1: equip_face_bits status byte array base (16 ROM refs; 2 slots)
 .equ FIELD_SPELL_CARD_REF_OFF,  0x00001390  @ card_id 0x1390 field-spell equip trigger guard (10 ROM refs; 1 slot)
 .equ DUEL_ACTIVE_PLAYER_OFF,    0x00001cb8  @ gP1LifePoints+0x1cb8: active turn player idx (15 ROM refs; 1 slot)
-.equ EQUIP_ZONE_COUNT_TABLE_OFF, 0x00001cb8 @ gDuelFieldSlots+0x1cb8=gEquipZoneCountTable(0x0201e1c8); domain distinct from DUEL_ACTIVE_PLAYER_OFF (base=gP1LifePoints); 1 Seg-7 slot; conf: high
+.equ EQUIP_ZONE_COUNT_TABLE_OFF, 0x00001cb8  @ gDuelFieldSlots+0x1cb8=gEquipZoneCountTable(0x0201e1c8); offset used in file 08 slots; conf: high
+.equ EQUIP_ZONE_COUNT_TABLE,     0x0201e1c8  @ gEquipZoneCountTable absolute addr; loaded as abs ptr in 9 Seg-7 literal pool slots; conf: high
 
 @ =============================================================================
 @ file 02 Seg-6 additions: equip slot active-state tag
@@ -491,3 +492,16 @@
 @ =============================================================================
 .equ EQUIP_NODE_TAG_MASK,       0x000fffff  @ chain node [+0] low-20-bit tag mask; ands r1,r0 before comparing zone11 tag; scan_chain_nodes_for_equip_zone_sprite + scan_chain_nodes_for_equip_zone11_sprite 2 slots; C5 grep=0 (new); conf: high
 .equ SLOT_ACTIVE_CHECK_CODE,    0x0000104c  @ test_slot_has_active_card 3rd param (activation check code); scan_slots_activate_equip_by_effect_id + enqueue_equip_chain_sprites_for_zones; C5 grep=0 (new); conf: med
+
+@ =============================================================================
+@ file 11 Seg-7 additions: Sphinx activation template + effect node BST tables
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-7 [0x0808f7c0..0x08090a78)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ SPHINX_ACTIVATION_INIT_TEMPLATE,   0x09e3f18c  @ 4-word init template; scan_card_placement_for_activation ldmia r0!,{r2,r3,r4} @ 0x0808fc84; raw=1 thumb=0 ROM refs; conf: high
+.equ EFFECT_NODE_TABLE_TYPE0_BASE,      0x09e3f19c  @ effect node BST table type=0; 0x2a3 entries x 0xc stride; find_card_effect_node_entry; raw=1 thumb=0; conf: high
+.equ EFFECT_NODE_TABLE_TYPE0_COUNT,     0x000002a3  @ entry count for EFFECT_NODE_TABLE_TYPE0_BASE; conf: high
+.equ EFFECT_NODE_TABLE_TYPE1_BASE,      0x09e430fc  @ effect node BST table type=1; 0x187 entries; conf: high
+.equ EFFECT_NODE_TABLE_TYPE1_COUNT,     0x00000187  @ entry count for EFFECT_NODE_TABLE_TYPE1_BASE; conf: high
+.equ EFFECT_NODE_TABLE_TYPE2_BASE,      0x09e455bc  @ effect node BST table type=2; 0x8e entries; conf: high
+.equ EFFECT_NODE_TABLE_TYPE3_BASE,      0x09e46324  @ effect node BST table type=3; 0xb7 entries; conf: high

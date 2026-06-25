@@ -5484,7 +5484,7 @@ DAT_08096aac:
 @ - gP1LifePoints=0x0201c4e0
 @ - ZONE_TYPE_OFFSET=0x1d4c (write 0xa=10, vs sibling write 8)
 @ - PARAM_OFFSET=0x1d7c; FLAG_A=0x1d58; FLAG_B=0x1d54; SLOT_ID=0x1d64
-set_equip_activation_state_by_mode_alt__08096ab0:
+set_equip_activation_state_by_mode_alt:
     push {r4,r5,lr}                          @ 08096ab0 30b5
     adds r3,r0,#0x0    @ 08096ab2 031c
     adds r4,r1,#0x0    @ 08096ab4 0c1c

@@ -17472,7 +17472,7 @@ check_effect_node_handler_for_slot:
     adds r4,r0,#0x0    @ 08081de6 041c
     adds r5,r1,#0x0    @ 08081de8 0d1c
     adds r6,r2,#0x0    @ 08081dea 161c
-    bl set_equip_activation_state_by_mode_alt @ 08081dec 0ef0fcfb
+    bl invoke_effect_node_handler_3arg       @ 08081dec 0ef0fcfb
     cmp r0,#0x0                              @ 08081df0 0028
     beq LAB_08081e06                         @ 08081df2 08d0
     adds r0,r4,#0x0    @ 08081df4 201c
@@ -17722,7 +17722,7 @@ LAB_08081fba:
     lsrs r0,r0,#0x1f    @ 08081fbe c00f
     ldrh r1,[r4,#0x0]                        @ 08081fc0 2188
     ldr r2, effect_node_handler_slot_check_ptr_c @ 08081fc2 054a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08081fc4 14f074fd
+    bl set_equip_activation_state_by_mode_alt @ 08081fc4 14f074fd
     ldr r1, tick_card_routing_phase_flags_fdc @ 08081fc8 0449
     movs r0,#0x96    @ 08081fca 9620
     lsls r0,r0,#0x3    @ 08081fcc c000
@@ -17876,7 +17876,7 @@ LAB_080820c6:
     subs r1,r5,r1    @ 080820e6 691a
     adds r0,r4,#0x0    @ 080820e8 201c
     adds r2,r6,#0x0    @ 080820ea 321c
-    bl set_equip_activation_state_by_mode_alt @ 080820ec 0ef07cfa
+    bl invoke_effect_node_handler_3arg       @ 080820ec 0ef07cfa
     cmp r0,#0x0                              @ 080820f0 0028
     beq LAB_08082104                         @ 080820f2 07d0
     ldrb r0,[r4,#0x2]                        @ 080820f4 a078
@@ -18718,7 +18718,7 @@ LAB_080826d4:
     adds r0,r6,#0x0    @ 080826d4 301c
     adds r1,r5,#0x0    @ 080826d6 291c
     adds r2,r4,#0x0    @ 080826d8 221c
-    bl set_equip_activation_state_by_mode_alt @ 080826da 0df085ff
+    bl invoke_effect_node_handler_3arg       @ 080826da 0df085ff
     cmp r0,#0x0                              @ 080826de 0028
     bne LAB_08082720                         @ 080826e0 1ed1
     adds r4,#0x1    @ 080826e2 0134
@@ -18818,7 +18818,7 @@ check_effect_slot_zone_field_by_type:
     adds r5,r0,#0x0    @ 08082772 051c
     adds r6,r1,#0x0    @ 08082774 0e1c
     adds r7,r2,#0x0    @ 08082776 171c
-    bl set_equip_activation_state_by_mode_alt @ 08082778 0df036ff
+    bl invoke_effect_node_handler_3arg       @ 08082778 0df036ff
     cmp r0,#0x0                              @ 0808277c 0028
     beq LAB_080827cc                         @ 0808277e 25d0
     ldrb r1,[r5,#0x6]                        @ 08082780 a979
@@ -21388,7 +21388,7 @@ check_effect_slot_zone_player_by_type:
     push {r4,r5,lr}                          @ 08083968 30b5
     adds r4,r0,#0x0    @ 0808396a 041c
     adds r5,r1,#0x0    @ 0808396c 0d1c
-    bl set_equip_activation_state_by_mode_alt @ 0808396e 0cf03bfe
+    bl invoke_effect_node_handler_3arg       @ 0808396e 0cf03bfe
     cmp r0,#0x0                              @ 08083972 0028
     bne LAB_0808397a                         @ 08083974 01d1
     movs r0,#0x0    @ 08083976 0020
@@ -21528,7 +21528,7 @@ LAB_08083a46:
     subs r1,r1,r0    @ 08083a52 091a
     adds r0,r5,#0x0    @ 08083a54 281c
     adds r2,r4,#0x0    @ 08083a56 221c
-    bl set_equip_activation_state_by_mode_alt @ 08083a58 0cf0c6fd
+    bl invoke_effect_node_handler_3arg       @ 08083a58 0cf0c6fd
     cmp r0,#0x0                              @ 08083a5c 0028
     beq LAB_08083a44                         @ 08083a5e f1d0
 LAB_08083a60:
@@ -21564,7 +21564,7 @@ LAB_08083a92:
     lsrs r1,r1,#0x1f    @ 08083a9a c90f
     adds r0,r5,#0x0    @ 08083a9c 281c
     adds r2,r4,#0x0    @ 08083a9e 221c
-    bl set_equip_activation_state_by_mode_alt @ 08083aa0 0cf0a2fd
+    bl invoke_effect_node_handler_3arg       @ 08083aa0 0cf0a2fd
     cmp r0,#0x0                              @ 08083aa4 0028
     beq LAB_08083a90                         @ 08083aa6 f3d0
 LAB_08083aa8:
@@ -21762,7 +21762,7 @@ LAB_08083bf6:
     lsrs r0,r0,#0x1f    @ 08083bfa c00f
     ldrh r1,[r6,#0x0]                        @ 08083bfc 3188
     ldr r2, check_equip_pair_fn_ptr_08083c18 @ 08083bfe 064a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08083c00 12f056ff
+    bl set_equip_activation_state_by_mode_alt @ 08083c00 12f056ff
     ldr r1, duel_phase_flags_08083c1c        @ 08083c04 0549
     movs r0,#0x96    @ 08083c06 9620
     lsls r0,r0,#0x3    @ 08083c08 c000
@@ -22292,7 +22292,7 @@ LAB_08083fac:
     lsrs r0,r0,#0x1f    @ 08083fb0 c00f
     ldrh r1,[r4,#0x0]                        @ 08083fb2 2188
     ldr r2, set_equip_act_mode_fn_ptr_08083fcc @ 08083fb4 054a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08083fb6 12f07bfd
+    bl set_equip_activation_state_by_mode_alt @ 08083fb6 12f07bfd
     ldr r1, duel_phase_flags_08083fd0        @ 08083fba 0549
     movs r2,#0x96    @ 08083fbc 9622
     lsls r2,r2,#0x3    @ 08083fbe d200
@@ -22399,7 +22399,7 @@ LAB_08084064:
     adds r0,r6,#0x0    @ 08084064 301c
     adds r1,r5,#0x0    @ 08084066 291c
     adds r2,r4,#0x0    @ 08084068 221c
-    bl set_equip_activation_state_by_mode_alt @ 0808406a 0cf0bdfa
+    bl invoke_effect_node_handler_3arg       @ 0808406a 0cf0bdfa
     cmp r0,#0x0                              @ 0808406e 0028
     bne LAB_08084120                         @ 08084070 56d1
     adds r4,#0x1    @ 08084072 0134
@@ -22619,7 +22619,7 @@ LAB_080841cc:
     adds r0,r5,#0x0    @ 080841cc 281c
     adds r1,r6,#0x0    @ 080841ce 311c
     adds r2,r4,#0x0    @ 080841d0 221c
-    bl set_equip_activation_state_by_mode_alt @ 080841d2 0cf009fa
+    bl invoke_effect_node_handler_3arg       @ 080841d2 0cf009fa
     cmp r0,#0x0                              @ 080841d6 0028
     beq LAB_080841f6                         @ 080841d8 0dd0
     ldrb r0,[r5,#0x2]                        @ 080841da a878
@@ -23952,7 +23952,7 @@ LAB_08084b64:
     lsrs r0,r0,#0x1f    @ 08084b74 c00f
     ldrh r1,[r6,#0x0]                        @ 08084b76 3188
     adds r2,r4,#0x0    @ 08084b78 221c
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08084b7a 11f099ff
+    bl set_equip_activation_state_by_mode_alt @ 08084b7a 11f099ff
     ldr r1, DWORD_08084b8c                   @ 08084b7e 0349
     movs r0,#0x96    @ 08084b80 9620
     lsls r0,r0,#0x3    @ 08084b82 c000
@@ -24545,7 +24545,7 @@ LAB_08084f80:
     adds r0,r6,#0x0    @ 08084f80 301c
     adds r1,r5,#0x0    @ 08084f82 291c
     adds r2,r4,#0x0    @ 08084f84 221c
-    bl set_equip_activation_state_by_mode_alt @ 08084f86 0bf02ffb
+    bl invoke_effect_node_handler_3arg       @ 08084f86 0bf02ffb
     cmp r0,#0x0                              @ 08084f8a 0028
     bne LAB_0808500a                         @ 08084f8c 3dd1
     adds r4,#0x1    @ 08084f8e 0134

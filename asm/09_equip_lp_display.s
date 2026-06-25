@@ -3422,7 +3422,7 @@ LAB_0806ffc6:
     lsrs r0,r0,#0x1f    @ 0806ffd8 c00f
     ldrh r1,[r7,#0x0]                        @ 0806ffda 3988
     ldr r2, check_equip_slot_eligible_by_side_and_type_query_ptr_ffec @ 0806ffdc 034a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 0806ffde 26f067fd
+    bl set_equip_activation_state_by_mode_alt @ 0806ffde 26f067fd
     movs r0,#0x7d    @ 0806ffe2 7d20
     b LAB_0807003e                           @ 0806ffe4 2be0
     .zero  0x2
@@ -16933,7 +16933,7 @@ magical_dim_sub_5dc4:
     lsrs r0,r0,#0x1f    @ 08075dd4 c00f
     ldr r2, DWORD_08075de4                   @ 08075dd6 034a
     movs r1,#0x1    @ 08075dd8 0121
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08075dda 20f069fe
+    bl set_equip_activation_state_by_mode_alt @ 08075dda 20f069fe
     movs r0,#0x7e    @ 08075dde 7e20
     b LAB_08075f6a                           @ 08075de0 c3e0
     .zero  0x2
@@ -17096,7 +17096,7 @@ magical_dim_sub_5f02:
     lsrs r0,r0,#0x1f    @ 08075f14 c00f
     ldrh r1,[r4,#0x0]                        @ 08075f16 2188
     ldr r2, DWORD_08075f28                   @ 08075f18 034a
-    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08075f1a 20f0c9fd
+    bl set_equip_activation_state_by_mode_alt @ 08075f1a 20f0c9fd
     movs r0,#0x78    @ 08075f1e 7820
     b LAB_08075f6a                           @ 08075f20 23e0
     .zero  0x2
