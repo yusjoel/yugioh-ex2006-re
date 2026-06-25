@@ -74,7 +74,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80850d8..0x8085d4c | 10 | ~100 | 2 inc (0x850f0/0x28, 0x85130/0x14c) | ✅ | 7d15bd6 |
-| 2  | 0x8085d4c..0x8086cdc | 12 | ~91  | 1 inc (0x861a0/0x27a) | ⬜ | |
+| 2  | 0x8085d4c..0x8086cdc | 12 | ~92  | 1 inc (0x861a0/0x27a) | ✅ | (pending) |
 | 3  | 0x8086cdc..0x8087d58 | 19 | ~151 | 0 inc (heavy; 可拆 3a/3b) | ⬜ | |
 | 4  | 0x8087d58..0x808d7f4 | ~197 | 0 (1 巨块) | **1 inc 0x87d58/0x5a9c = 未反汇编 THUMB 代码** (拆 4a..4g) | ⬜ | |
 | 5  | 0x808d7f4..0x808e8fc | 18 | ~105 | 0 inc | ⬜ | |
@@ -111,6 +111,21 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV rows**: +15 (14 proposal + store_slot_display_type_and_return_zero tail)
 - **commit**: `7d15bd6`
 
+### 4.02 Seg-2 完成记录
+
+- **范围**: `[0x08085d4c, 0x08086cdc)` — 12 pre-existing named fn; 0 new fn
+- **EQ**: 80 槽 (79 pool槽 + 1 disasm-block-internal @0x080863f8 ELIGIB_SPRITE_CTRL_OFF); gDuelPhaseFlags x14 / PLAYER_BLOCK_STRIDE x13 / gEquipEffectZoneTable x9 / gDuelFieldSlots x5 / gP1FieldArrayCBase x5 + 17 other offsets/globals
+- **REF**: 4 槽 (dispatch_field_switchdata_base_ptr / game_text_sep_ptr / equip_slot_state_jt_ptr_ptr / equip_slot_state_case0_base)
+- **RENAME**: 8 槽 (PTR_gP1LifePoints_ x8 -> gp1lp_ptr_xxx snake_case, with EOL)
+- **PLATE**: 12 (7 in-segment: dispatch_equip_slot_state_by_index/check_equip_target/find_equip_target/sum_zone_bonus/sum_chain/check_sorted_array/eval_zone_activation + 5 cross-file: asm/11 L18360 invoke_card_display_op_0x31_with_params + asm/12 L3441/3570/3694/3868)
+- **disasm**: 1 block 0x861a0/0x27a -> 6 sub-case labels (equip_slot_case0/1/2/3/4/casea_body) + 26 literal pool DWords; NO createFunction; pool fix @0x08086424/28/2c (RefineF11Seg2PoolFix)
+- **新增 constants**: card_info.inc +4 (CONTRACT_WITH_ABYSS_CID=0x1698 / EARTH_CHANT_CID=0x1716 / END_OF_WORLD_CID=0x19d9 / gEquipEffectZoneTable=0x09e5a0c4); ewram.inc +1 (EQUIP_SLOT_SUBSTATE_OFF=0x58c)
+- **carve**: 0
+- **§5.1**: 0
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (no new/renamed functions)
+- **commit**: (pending)
+
 ---
 
 ## 五、Seg 路线图 (地址序, 边界 = 函数结束处)
@@ -122,8 +137,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **Seg-1** `[0x80850d8, 0x8085d4c)` -- 10 fn (enqueue_effect_slot_attr_from_bb .. build_field_action_text_by_zone_type)
   - incbin: 0x850f0/0x28, 0x85130/0x14c (疑 fn-ptr / dispatch 表; ref-scan 待执行)
   - 重函数: scan_equip_target_slots_for_card (48 槽)
-- **Seg-2** `[0x8085d4c, 0x8086cdc)` -- 12 fn (dispatch_field_display_state_by_type .. check_neo_daedalus_equip_zone_eligible)
-  - incbin: 0x861a0/0x27a (疑 dispatch_equip_slot_state_by_index 跳转表)
+- **Seg-2** `[0x8085d4c, 0x8086cdc)` ✅ -- 12 fn (dispatch_field_display_state_by_type .. check_neo_daedalus_equip_zone_eligible)
+  - incbin: 0x861a0/0x27a -> R4 disasm 6 sub-case labels (equip_slot_case0..4+casea_body), NO createFunction
   - 重函数: dispatch_field_display_state_by_type (32 槽)
 - **Seg-3** `[0x8086cdc, 0x8087d58)` -- 19 fn (dispatch_equip_zone_activation_state .. scan_zone_opponent_field5_substate_e)
   - 0 incbin; 重函数: dispatch_equip_zone_activation_state (37 槽) + write_equip_zone_entries_by_lv_card_id (49 槽)

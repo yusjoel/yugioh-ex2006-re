@@ -3437,7 +3437,7 @@ DAT_08095ba0:
 DAT_08095ba4:
     .word  0x0201e2a0                     @ 08095ba4 a0e20102
 
-@ Initializes OAM sprite row entry for an equip card. Reads player_bit from [gP1LifePoints+0x1d68], base_slot_a from [+0x1d6c], slot_b from [+0x1d70]; slot_idx = slot_a + slot_b. If slot[+0x38]==0 (not yet rendered): calls enqueue_zone_card_sprite_attr_by_slot. Else: builds OAM attr0 word and calls init_card_sprite_row_entry_alt or init_card_sprite_row_entry (fallback). Clears [gP1LifePoints+0x1d54]=0 at end. r0=u32 context_extra (saved to r8 via .hword 0x4680=mov r8,r0). Returns void. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, slot_rendered_offset=0x38; gP1LifePoints offsets 0x1d44/0x1d48/0x1d54/0x1d68/0x1d6c/0x1d70. Callers: FUN_0804ce78, FUN_08085d4c (equip card display sequence).
+@ Initializes OAM sprite row entry for an equip card. Reads player_bit from [gP1LifePoints+0x1d68], base_slot_a from [+0x1d6c], slot_b from [+0x1d70]; slot_idx = slot_a + slot_b. If slot[+0x38]==0 (not yet rendered): calls enqueue_zone_card_sprite_attr_by_slot. Else: builds OAM attr0 word and calls init_card_sprite_row_entry_alt or init_card_sprite_row_entry (fallback). Clears [gP1LifePoints+0x1d54]=0 at end. r0=u32 context_extra (saved to r8 via .hword 0x4680=mov r8,r0). Returns void. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, slot_rendered_offset=0x38; gP1LifePoints offsets 0x1d44/0x1d48/0x1d54/0x1d68/0x1d6c/0x1d70. Callers: FUN_0804ce78, dispatch_field_display_state_by_type (equip card display sequence).
 init_equip_card_sprite_row_entry:
     push {r4,r5,r6,r7,lr}                    @ 08095ba8 f0b5
     .hword 0x4647    @ 08095baa 4746
@@ -3566,7 +3566,7 @@ DAT_08095c98:
 DAT_08095c9c:
     .word  0x00001d54                     @ 08095c9c 541d0000
 
-@ Gate function for LP bar animation. Reads gP1LifePoints+0x1d44; if equal to 0x0fee, calls dispatch_lp_bar_animation_step(r0=1, r1=0, r2=0) and jumps to shared tail LAB_08095d32. Otherwise (LAB_08095ccc): writes 1 to 0x0201b290+0x9a*8 (sprite buffer flag); reads [gP1LifePoints+0x1d68], calls render_field_card_copy_count; if r0!=0 calls init_card_sprite_row_entry_alt else init_card_sprite_row_entry; writes 0 to [gP1LifePoints+0x1d54] (pending flag clear). r0=u32 player_bit_field (bit0=player_id [0..1]). Returns void. Callers: FUN_0804ce78, FUN_08085d4c. Constants: trigger_sentinel=0x0fee, sprite_buf_flag_addr=0x0201b290+0x4d0.
+@ Gate function for LP bar animation. Reads gP1LifePoints+0x1d44; if equal to 0x0fee, calls dispatch_lp_bar_animation_step(r0=1, r1=0, r2=0) and jumps to shared tail LAB_08095d32. Otherwise (LAB_08095ccc): writes 1 to 0x0201b290+0x9a*8 (sprite buffer flag); reads [gP1LifePoints+0x1d68], calls render_field_card_copy_count; if r0!=0 calls init_card_sprite_row_entry_alt else init_card_sprite_row_entry; writes 0 to [gP1LifePoints+0x1d54] (pending flag clear). r0=u32 player_bit_field (bit0=player_id [0..1]). Returns void. Callers: FUN_0804ce78, dispatch_field_display_state_by_type. Constants: trigger_sentinel=0x0fee, sprite_buf_flag_addr=0x0201b290+0x4d0.
 trigger_lp_bar_animation_if_ready:
     push {r4,r5,r6,r7,lr}                    @ 08095ca0 f0b5
     adds r7,r0,#0x0    @ 08095ca2 071c
@@ -3690,7 +3690,7 @@ DAT_08095d7c:
 DAT_08095d80:
     .word  0x00001d54                     @ 08095d80 541d0000
 
-@ LP bar animation state machine single-frame dispatcher. Reads state word at gP1LifePoints+0x1d60 (offset 0xeb<<5) and dispatches: state=0: calls render_monster_slot_card_with_lp_bar, writes result to +0x1d74, advances state; state=1: sets state to 2, skips render; other: r3!=0 -> init_card_sprite_row_entry_alt, r1==0 -> init_card_sprite_row_entry. Clears pending flag at gP1LifePoints+0x1d54 on exit. r0=u32 anim_mode [0..2]; r1=u32 use_alt_entry [0..1]; r2=ptr row_entry_ptr. Returns void. Callers: FUN_0804ce78, FUN_08085d4c, trigger_lp_bar_animation_if_ready (r0=1,r1=0,r2=0). Constants: state_offset=0x1d60, result_offset=0x1d74, pending_flag_offset=0x1d54.
+@ LP bar animation state machine single-frame dispatcher. Reads state word at gP1LifePoints+0x1d60 (offset 0xeb<<5) and dispatches: state=0: calls render_monster_slot_card_with_lp_bar, writes result to +0x1d74, advances state; state=1: sets state to 2, skips render; other: r3!=0 -> init_card_sprite_row_entry_alt, r1==0 -> init_card_sprite_row_entry. Clears pending flag at gP1LifePoints+0x1d54 on exit. r0=u32 anim_mode [0..2]; r1=u32 use_alt_entry [0..1]; r2=ptr row_entry_ptr. Returns void. Callers: FUN_0804ce78, dispatch_field_display_state_by_type, trigger_lp_bar_animation_if_ready (r0=1,r1=0,r2=0). Constants: state_offset=0x1d60, result_offset=0x1d74, pending_flag_offset=0x1d54.
 dispatch_lp_bar_animation_step:
     push {r4,r5,r6,lr}                       @ 08095d84 70b5
     adds r3,r0,#0x0    @ 08095d86 031c
@@ -3864,7 +3864,7 @@ DAT_08095ebc:
 DAT_08095ec0:
     .word  0x00001d54                     @ 08095ec0 541d0000
 
-@ Reads [gP1LifePoints+0x1d60] (0xeb<<5) display state; dispatches 0/1/2: state==0: trigger_card_display_op31_if_not_active(r6, 0x114); state==1: init_effect_slot_display_context(r6, 6, r7) then state++; state==2: reads monster slot fields via get_monster_slot_entry_ptr x3, calls dispatch_to_effect_handler_by_card_type, clears [gP1LifePoints+0x1d54]=0. r1=u32 context_ptr (saved as r6); r2=u32 sub_param. Returns void. Side effects: [gP1LifePoints+0x1d60]+=1 (state 0/1); [gP1LifePoints+0x1d54]=0 (state 2). Caller: FUN_08085d4c (effect slot display update driver).
+@ Reads [gP1LifePoints+0x1d60] (0xeb<<5) display state; dispatches 0/1/2: state==0: trigger_card_display_op31_if_not_active(r6, 0x114); state==1: init_effect_slot_display_context(r6, 6, r7) then state++; state==2: reads monster slot fields via get_monster_slot_entry_ptr x3, calls dispatch_to_effect_handler_by_card_type, clears [gP1LifePoints+0x1d54]=0. r1=u32 context_ptr (saved as r6); r2=u32 sub_param. Returns void. Side effects: [gP1LifePoints+0x1d60]+=1 (state 0/1); [gP1LifePoints+0x1d54]=0 (state 2). Caller: dispatch_field_display_state_by_type (effect slot display update driver).
 dispatch_effect_slot_by_display_state:
     push {r4,r5,r6,r7,lr}                    @ 08095ec4 f0b5
     adds r6,r1,#0x0    @ 08095ec6 0e1c

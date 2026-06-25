@@ -1651,3 +1651,12 @@
 .equ DROP_OFF_CID,                  0x0000151c  @ Drop Off (pw=94531500; card-stats.s card_1091 slot=0x151C); scan_equip_target_slots_for_card caseD_19 pair; 16 ROM refs; C5 grep=0 (new); conf: high
 .equ ADHESION_TRAP_HOLE_CID,        0x000015f8  @ Adhesion Trap Hole (pw=62325062; card-stats.s card_1252 slot=0x15F8); scan_equip_target_slots_for_card caseD_6/7 final pivot; 9 ROM refs; C5 grep=0 (new); conf: high
 .equ DD_TRAP_HOLE_CID,              0x0000192e  @ D.D. Trap Hole (pw=05434080; card-stats.s card_1931 slot=0x192E); scan_equip_target_slots_for_card caseD_8/9 topmost pivot; 8 ROM refs; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-2 additions: equip eligibility card IDs + equip effect zone table
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-2 (0x08085d4c..0x08086cdc)
+@ C5 grep verified: all 4 values -> 0 hits in constants/card_info.inc before adding
+@ =============================================================================
+.equ CONTRACT_WITH_ABYSS_CID,      0x00001698  @ Contract with the Abyss (pw=69035382; card-stats.s L17957 card_1322 slot=0x1698); check_equip_target_slot_by_card_id identity check; C5 grep=0 (new); conf: high
+.equ EARTH_CHANT_CID,              0x00001716  @ Earth Chant (pw=59820352; card-stats.s L19335 card_1391 slot=0x1716); eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible score override set=1; C5 grep=0 (new); conf: high
+.equ END_OF_WORLD_CID,             0x000019d9  @ End of the World (pw=08198712; card-stats.s L26795 card_1989 slot=0x19D9); eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible score override; C5 grep=0 (new); conf: high
+.equ gEquipEffectZoneTable,        0x09e5a0c4  @ ROM base addr of equip effect zone table; array indexed by player_stride*player+zone_idx; lsls/adds/ldr pattern; 14 ROM refs; check_equip_target_slot_by_card_id / find_equip_target_in_effect_zones / eval_equip_slot_score_in_range / eval_equip_zone_activation_eligible / check_neo_daedalus_equip_zone_eligible; C5 grep=0 (new); conf: high

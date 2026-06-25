@@ -530,3 +530,9 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ LP_BAR_ROW_ACTIVE_OFF,   0x000004d0  @ [gDuelPhaseFlags+0x4d0] LP bar row active flag; 0x9a<<3=0x4d0; cmp r1,#0 skip-if-nonzero; adjacent LP_BAR_ANIM_STATE_OFF(0x4cc) and SPRITE_ROW_ENTRY_DATA_OFF(0x4d4); 8 ROM refs; C5 grep=0 (new); conf: high
 .equ LP_BAR_ROW_XCOORD_OFF,   0x000004d3  @ [gDuelPhaseFlags+count+0x4d3] per-row x-coord byte array; strb r4,[r0] writes x_coord; adjacent SPRITE_ROW_ENTRY_DATA_OFF(0x4d4); 22 ROM refs; C5 grep=0 (new); conf: high
 .equ FIELD_DISPLAY_TYPE_OFF,  0x0000057c  @ [gDuelPhaseFlags+0x57c] field display type code; build_sprite_row_from_zone_state + dispatch_field_display_state_by_type; 7 ROM refs; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-2 additions: equip slot sub-state index offset
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-2 (0x08085d4c..0x08086cdc)
+@ C5 grep verified: 0 hits each
+@ =============================================================================
+.equ EQUIP_SLOT_SUBSTATE_OFF, 0x0000058c  @ [gDuelPhaseFlags+0x58c] equip slot sub-state index [0..0xa]; dispatch_equip_slot_state_by_index jump dispatch bounds cmp r0,#0xa; 14 ROM refs; C5 grep=0 (new); conf: high
