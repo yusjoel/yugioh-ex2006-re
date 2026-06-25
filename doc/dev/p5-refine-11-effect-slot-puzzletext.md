@@ -88,7 +88,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 6  | 0x808e8fc..0x808f7c0 | 19 | 97(EQ=85/RENAME=12/PLATE=17) | 0 inc | ✅ | (see §四) |
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ✅ | (see §四) |
 | 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ✅ | (see §四) |
-| 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ⬜ | |
+| 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ✅ | (see §四) |
 | 10 | 0x8093598..0x80941c4 | 9  | ~118 | 0 inc (duel puzzle 文本: parse 68 槽 + render 14) | ⬜ | |
 
 **总计 (region A+C 已命名)**: 142 命名 fn / ~1052 DAT_/DWORD_/PTR_ 槽 / 4 ROM_INCBIN。
@@ -230,6 +230,31 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed (0 new/renamed functions)
 - **commit**: (see below)
+
+### 4.09 Seg-9 完成记录
+
+- **范围**: `[0x08091888, 0x08093598)` -- 18 pre-existing named fn (eval_field_equip_activation_candidates 187-pool BST monster + flush_field_spell_equip_slot_sprites + 16x invoke_card_display_op_0x31_* stubs)
+- **EQ**: 176 槽 (141 REUSE + 35 NEW CID)
+  - Group A: gEquipChainSlotRefs x30 + other EWRAM globals x10 (gDuelCardCtxBase/gDuelFieldSlots x4/gEquipNodePool/gDuelFieldSlotState/gEquipEffectZoneBase)
+  - Group B: PLAYER_BLOCK_STRIDE x8
+  - Group C: DARK_SCORPION_COMBO_CID/ROD_OF_THE_MINDS_EYE_CID(NEW)/UNION_ATTACK_CID + P1LP_BLOCK2_OFF x2 + FIELD5_SCORE_ACTIVATION_THRESHOLD x2 + EQUIP_CHAIN_SENTINEL x2 + EQUIP_ACTIVATION_CNT_CAP(NEW) + OAM_ATTR2_TILE_CLEAR + SLOT_CARD_SET_CODE_MASK + lp_block2 dup x2 + score_thresh dup
+  - Groups D-H: 35 NEW CID BST nodes across 4 passes (DARK_DRICERATOPS/MAD_SWORD_BEAST/SPEAR_DRAGON/ELEMENTAL_HERO_BLADEDGE/RANCER_DRAGONUTE/SABER_BEETLE/ENRAGED_BATTLE_OX/DRAGONS_RAGE/GAIA_THE_DRAGON_CHAMPION/SWIFT_GAIA_THE_FIERCE_KNIGHT/FAIRY_METEOR_CRUSH/PITCH_DARK_DRAGON/CROSS_COUNTER/FAULT_ZONE/DESTRUCTION_PUNCH/CONTINUOUS_DESTRUCTION_PUNCH/SPIRIT_BARRIER/BUBBLE_BLASTER/KISHIDO_SPIRIT/SHADOWKNIGHT_ARCHFIEND/PIRANHA_ARMY/ROD_OF_THE_MINDS_EYE/CHARM_OF_SHABTI/DARK_RULER_HA_DES/SWORD_OF_DRAGONS_SOUL/GYROID/ULTIMATE_OBEDIENT_FIEND/DARK_FLARE_KNIGHT/CASTLE_GATE/HARPIE_LADY_2/MONK_FIGHTER/MISTOBODY/ROCKET_WARRIOR/GETSU_FUHMA/RYU_KOKKI) card_info.inc +35
+- **REF**: 2 槽
+  - gEquipActivationSlotBase=0x0201bc2c -> ptr_equip_act_slot_base_1d98 (gEquipChainSlotRefs+0x9c; is_activated array; ewram.inc +1)
+  - gDuelFieldSlotState_ec=0x0201c5fc -> ptr_duel_field_state_ec_1da0 (gDuelFieldSlots+0xec; bits[23:22]; ewram.inc +1)
+- **RENAME**: 11 槽 (4 DWORD_08091f94/f98/f9c/fa0 -> ptr/cid labels + 7 PTR_gP1LifePoints_08091908/080921c4/080923f4/08092878/08092ab8/08092d10/08093194 -> ptr_lp_*)
+- **PLATE**: 2 (CJK->ASCII rewrites)
+  - flush_field_spell_equip_slot_sprites (0x080931de): 423 chars ASCII (cleared activation flag + OAM enqueue logic + TIME_WIZARD_CID chain check; eval_field_equip_activation_candidates named)
+  - invoke_card_display_op_0x31_sub1 (0x080933b4): 499 chars ASCII (3-instruction thunk, op=0x31/sub=0x1 fixed params)
+- **新增 constants**: card_info.inc +35 CID; ewram.inc +2 (gEquipActivationSlotBase/gDuelFieldSlotState_ec); duel_field.inc +1 (EQUIP_ACTIVATION_CNT_CAP=0xffff; domain distinct from score/LP/card-sentinel/OAM constants sharing value); total +38
+- **disasm**: 0
+- **carve**: 0
+- **§5.1**: 0
+- **C5 re-verification**: all 35 NEW CID values grep=0 in card_info.inc at landing; SANCTUARY_IN_THE_SKY_CID(0x175e) REUSE:1234; EMISSARY_OF_OASIS_CID(0x179d) REUSE:194 (no _THE_)
+- **post-landing gates**: non-ASCII in Seg-9=0 / FUN_residue=external-only plate refs (allowed per C8) / DAT_/DWORD_/PTR_ definitions=0 / all 191 slots symbolized
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (0 new/renamed functions)
+- **commit**: (pending)
 
 ### 4.05 Seg-5 完成记录
 
@@ -418,8 +443,8 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - EQ=109(11 NEW+REUSE)/RENAME=10/FUNC_RENAME=1/PLATE=36/disasm=2 stubs/NEW card_info=5/NEW duel_field=8/0 carve/0 §5.1; byte-identical
 - **Seg-8** `[0x8090a78, 0x8091888)` ✅ -- 3 fn (build_equip_candidate_score_table + invoke_ + write_equip_target_score_entry)
   - EQ=52(36R+16N)/REF=21(16R+5N)/RENAME=21/PLATE=3; NEW card_info=8/NEW ewram=3; byte-identical
-- **Seg-9** `[0x8091888, 0x8093598)` -- 20 fn (eval_field_equip_activation_candidates + card_display_op_0x31 族)
-  - **eval_field_equip_activation_candidates (187 槽, 0x1afc B 怪兽), heavy, 执行时可拆 9a/9b**
+- **Seg-9** `[0x8091888, 0x8093598)` ✅ -- 20 fn (eval_field_equip_activation_candidates + card_display_op_0x31 族)
+  - EQ=176(141R+35N)/REF=2/RENAME=11/PLATE=2; NEW card_info=35/NEW ewram=2/NEW duel_field=1; 191 slots; byte-identical
 - **Seg-10** `[0x8093598, 0x80941c4)` -- 9 fn (clear_duel_puzzle_wram_regions .. render_duel_puzzle_text_to_sprite_queue)
   - duel puzzle 文本: parse_duel_puzzle_text_token (68 槽) + render_duel_puzzle_text_to_sprite_queue (14 槽)
 

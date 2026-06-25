@@ -505,3 +505,10 @@
 .equ EFFECT_NODE_TABLE_TYPE1_COUNT,     0x00000187  @ entry count for EFFECT_NODE_TABLE_TYPE1_BASE; conf: high
 .equ EFFECT_NODE_TABLE_TYPE2_BASE,      0x09e455bc  @ effect node BST table type=2; 0x8e entries; conf: high
 .equ EFFECT_NODE_TABLE_TYPE3_BASE,      0x09e46324  @ effect node BST table type=3; 0xb7 entries; conf: high
+
+@ =============================================================================
+@ file 11 Seg-9 additions: equip activation count saturation cap
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-9 [0x08091888..0x08093598)
+@ C5 grep verified: 0 hits in constants/ (domain distinct from LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_SLOT_SCORE_CAP/SLOT_CARD_EMPTY/OAM_ATTR0_HIDDEN which all share value 0xffff)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_CNT_CAP, 0x0000ffff  @ gEquipChainSlotRefs+0x9c activation count saturation cap; flush_field_spell_equip_slot_sprites; domain distinct from score/LP/card-sentinel/OAM constants sharing 0xffff; C5 grep=0; conf: high

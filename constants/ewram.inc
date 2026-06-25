@@ -557,3 +557,11 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gEquipLpScoreBase,    0x0201afe0  @ equip LP-score candidate work buffer (clear_region_8, 0x198 B); 9-word records stride 0xb4/player; 68 raw refs; C5 grep=0; conf: high
 .equ gEquipCandidateSlotA, 0x0201bc38  @ gEquipChainSlotRefs+0xa8; first candidate slot activation array; write_equip_target_score_entry; 2 raw refs; C5 grep=0; conf: high
 .equ gEquipCandidateSlotB, 0x0201bc3c  @ gEquipChainSlotRefs+0xac; second candidate slot array (parallel); 2 raw refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 11 Seg-9 additions: equip activation slot base + duel field slot state
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-9 [0x08091888..0x08093598)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ gEquipActivationSlotBase, 0x0201bc2c  @ gEquipChainSlotRefs+0x9c; 2-entry is_activated array; stride 0x14; 2 raw ROM refs; eval_field_equip_activation_candidates; C5 grep=0; conf: high
+.equ gDuelFieldSlotState_ec,   0x0201c5fc  @ gDuelFieldSlots+0xec; word with 2-bit field at bits[23:22]; player*0x868 offset applied at runtime; 1 raw ROM ref; C5 grep=0; conf: med

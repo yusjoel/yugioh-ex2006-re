@@ -1871,3 +1871,44 @@
 .equ DIMENSION_WALL_CID,          0x00001930  @ Dimension Wall (pw=67095270; card-stats.s card_1933 slot=0x1930); F11 Seg-8 check_value_in_slot_chain param; C5 grep=0; conf: high
 .equ EQUIP_ATK_SCORE_HI_2499,     0x000009c3  @ Equip ATK score gate 2499 (2500-1); cmp score,0x9c3; bgt => scan bitmap; F11 Seg-8 build+write fns x4; C5 grep=0; conf: high
 .equ EQUIP_ATK_SCORE_HI_2500,     0x000009c4  @ Equip ATK score gate 2500; cmp score,0x9c4; ble => skip; complement of 2499 gate; F11 Seg-8 x2; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 11 Seg-9 additions: equip activation BST node CID equates
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-9 [0x08091888..0x08093598)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ DARK_DRICERATOPS_CID,               0x000016ff  @ Dark Driceratops; BST node eval_field_equip_activation_candidates; C5 grep=0; conf: high
+.equ MAD_SWORD_BEAST_CID,                0x00001416  @ Mad Sword Beast (card-stats.s card_3233); BST node; C5 grep=0; conf: high
+.equ SPEAR_DRAGON_CID,                   0x000014d6  @ Spear Dragon (card-stats.s card_3425); BST node; C5 grep=0; conf: high
+.equ ELEMENTAL_HERO_BLADEDGE_CID,        0x0000194d  @ Elemental Hero Bladedge; BST node; C5 grep=0; conf: high
+.equ RANCER_DRAGONUTE_CID,               0x00001991  @ Rancer Dragonute; BST node; C5 grep=0; conf: high
+.equ SABER_BEETLE_CID,                   0x000019c9  @ Saber Beetle; BST node eval_field_equip; C5 grep=0; conf: high
+.equ ENRAGED_BATTLE_OX_CID,              0x000016fc  @ Enraged Battle Ox (card-stats.s card_3975); BST node; C5 grep=0; conf: high
+.equ DRAGONS_RAGE_CID,                   0x000014e3  @ Dragon's Rage (card-stats.s card_3438); BST node; C5 grep=0; conf: high
+.equ GAIA_THE_DRAGON_CHAMPION_CID,       0x00000fcb  @ Gaia the Dragon Champion (card-stats.s card_2134); BST node; C5 grep=0; conf: high
+.equ SWIFT_GAIA_THE_FIERCE_KNIGHT_CID,   0x0000147b  @ Swift Gaia the Fierce Knight (card-stats.s card_3334); BST node; C5 grep=0; conf: high
+.equ FAIRY_METEOR_CRUSH_CID,             0x00001408  @ Fairy Meteor Crush (card-stats.s card_3233 area); BST node x2; C5 grep=0; conf: high
+.equ PITCH_DARK_DRAGON_CID,              0x000015ce  @ Pitch-Dark Dragon; BST node x2; C5 grep=0; conf: high
+.equ CROSS_COUNTER_CID,                  0x00001883  @ Cross Counter (card-stats.s card_4366); BST node x2; C5 grep=0; conf: high
+.equ FAULT_ZONE_CID,                     0x000019f2  @ Fault Zone; BST node; C5 grep=0; conf: high
+.equ DESTRUCTION_PUNCH_CID,              0x00001493  @ Destruction Punch (card-stats.s card_3358); BST node; C5 grep=0; conf: high
+.equ CONTINUOUS_DESTRUCTION_PUNCH_CID,   0x0000162e  @ Continuous Destruction Punch (card-stats.s card_3769); BST node; C5 grep=0; conf: high
+.equ SPIRIT_BARRIER_CID,                 0x000017fe  @ Spirit Barrier (card-stats.s card_4233); BST node; C5 grep=0; conf: high
+.equ BUBBLE_BLASTER_CID,                 0x00001989  @ Bubble Blaster; BST node x4 (2 passes); C5 grep=0; conf: high
+.equ KISHIDO_SPIRIT_CID,                 0x000015ec  @ Kishido Spirit (card-stats.s card_3703); BST node; C5 grep=0; conf: high
+.equ SHADOWKNIGHT_ARCHFIEND_CID,         0x0000168d  @ Shadowknight Archfiend (card-stats.s card_3864); BST node; C5 grep=0; conf: high
+.equ PIRANHA_ARMY_CID,                   0x00001750  @ Piranha Army (card-stats.s card_4059); BST node; C5 grep=0; conf: high
+.equ ROD_OF_THE_MINDS_EYE_CID,           0x00001663  @ Rod of the Mind's Eye; BST node eval_field + flush_field; C5 grep=0; conf: high
+.equ CHARM_OF_SHABTI_CID,                0x00001594  @ Charm of Shabti (card-stats.s card_3615); BST node; C5 grep=0; conf: high
+.equ DARK_RULER_HA_DES_CID,              0x000014b5  @ Dark Ruler Ha Des (card-stats.s card_3392); BST node; C5 grep=0; conf: high
+.equ SWORD_OF_DRAGONS_SOUL_CID,          0x00001392  @ Sword of Dragon's Soul (card-stats.s card_3101); BST node flush_field; C5 grep=0; conf: high
+.equ GYROID_CID,                         0x000018f1  @ Gyroid (card-stats.s card_4476); BST node + check_value_in_slot_chain trigger; C5 grep=0; conf: high
+.equ ULTIMATE_OBEDIENT_FIEND_CID,        0x00001622  @ Ultimate Obedient Fiend (card-stats.s card_3757); BST node x2; C5 grep=0; conf: high
+.equ DARK_FLARE_KNIGHT_CID,              0x00001642  @ Dark Flare Knight (card-stats.s card_3789); BST node x2; C5 grep=0; conf: high
+.equ CASTLE_GATE_CID,                    0x00001855  @ Castle Gate (card-stats.s card_4320); BST node x2; C5 grep=0; conf: high
+.equ HARPIE_LADY_2_CID,                  0x0000182b  @ Harpie Lady 2 (card-stats.s card_4187 area); BST node x2; C5 grep=0; conf: high
+.equ MONK_FIGHTER_CID,                   0x000018b8  @ Monk Fighter (card-stats.s card_4419); BST node x2; C5 grep=0; conf: high
+.equ MISTOBODY_CID,                      0x00001992  @ Mistobody; BST node x2; C5 grep=0; conf: med
+.equ ROCKET_WARRIOR_CID,                 0x000013cb  @ Rocket Warrior (card-stats.s card_3101 area); BST node x2; C5 grep=0; conf: high
+.equ GETSU_FUHMA_CID,                    0x0000170d  @ Getsu Fuhma (card-stats.s card_3992); BST node x2; C5 grep=0; conf: high
+.equ RYU_KOKKI_CID,                      0x0000170e  @ Ryu Kokki (card-stats.s card_3993); BST node x2; C5 grep=0; conf: high
