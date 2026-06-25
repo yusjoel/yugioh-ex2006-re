@@ -519,3 +519,14 @@
 gDuelPhaseFlags_criteria_count = 0x0201b830  @ gDuelPhaseFlags+0x5a0: equip criteria count for display loop; push_to_effect_slot_array + build_equip_criteria_for_target_slots; x2 slots; conf: high
 gDuelPhaseFlags_set_f_flag     = 0x0201b838  @ gDuelPhaseFlags+0x5a8: set-f category flag for equip criteria; build_equip_criteria_for_target_slots + push_to_effect_slot_array; x3 slots; conf: high
 gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base addr of equip criteria array block; build_equip_slot_criteria_from_card_range; x1 slot; conf: high
+
+@ =============================================================================
+@ file 11 Seg-1 additions: gDuelPhaseFlags slot display type / LP bar row fields
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-1 (0x080850d8..0x08085d4c)
+@ All are gDuelPhaseFlags(0x0201b290) + field offset; C5 grep verified: 0 hits each
+@ =============================================================================
+.equ SLOT_DISPLAY_TYPE_OFF,   0x000004b0  @ [gDuelPhaseFlags+0x4b0] slot display type selector; dispatch_equip_slot_display_by_type_scarr 0x96<<3=0x4b0; 6-way dispatch cmp r0,#5; 35 ROM refs; C5 grep=0 (new); conf: high
+.equ LP_BAR_ROW_COUNT_OFF,    0x000004c8  @ [gDuelPhaseFlags+0x4c8] LP bar row count word; submit_lp_bar_sprite_row_by_type 0x99<<3=0x4c8; incremented up to 0x20; 5 ROM refs; C5 grep=0 (new); conf: high
+.equ LP_BAR_ROW_ACTIVE_OFF,   0x000004d0  @ [gDuelPhaseFlags+0x4d0] LP bar row active flag; 0x9a<<3=0x4d0; cmp r1,#0 skip-if-nonzero; adjacent LP_BAR_ANIM_STATE_OFF(0x4cc) and SPRITE_ROW_ENTRY_DATA_OFF(0x4d4); 8 ROM refs; C5 grep=0 (new); conf: high
+.equ LP_BAR_ROW_XCOORD_OFF,   0x000004d3  @ [gDuelPhaseFlags+count+0x4d3] per-row x-coord byte array; strb r4,[r0] writes x_coord; adjacent SPRITE_ROW_ENTRY_DATA_OFF(0x4d4); 22 ROM refs; C5 grep=0 (new); conf: high
+.equ FIELD_DISPLAY_TYPE_OFF,  0x0000057c  @ [gDuelPhaseFlags+0x57c] field display type code; build_sprite_row_from_zone_state + dispatch_field_display_state_by_type; 7 ROM refs; C5 grep=0 (new); conf: high

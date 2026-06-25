@@ -1638,3 +1638,16 @@
 @ =============================================================================
 .equ MOBIUS_THE_FROST_MONARCH_CID,  0x000017e2  @ Mobius the Frost Monarch (pw=04929256; card-stats.s line 21426 card_1647 slot=0x17E2); fn_eligible stub BLK1@0x08084750; dispatch table 0x09e44cbc+0x00; C5 grep=0 (new); conf: high
 .equ HADE_HANE_CID,                 0x000017ec  @ Hade-Hane (pw=28357177; card-stats.s line 21556 card_1657 slot=0x17EC); fn_eligible stub BLK2@0x080848cc; dispatch table 0x09e44d04+0x00; distinct from Hane-Hane CID=0x11c3; C5 grep=0 (new); conf: high
+@ =============================================================================
+@ file 11 Seg-1 additions: equip eligibility switch CIDs
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-1 (0x080850d8..0x08085d4c)
+@ C5 grep verified: all 8 values -> 0 hits in constants/card_info.inc before adding
+@ =============================================================================
+.equ TRAGEDY_CID,                   0x000012d7  @ Tragedy (pw=35686187; card-stats.s line 8621 card_0662 slot=0x12D7); scan_equip_target_slots_for_card caseD_b lower bound; 10 ROM refs; C5 grep=0 (new); conf: high
+.equ REGULATION_OF_TRIBE_CID,       0x00001358  @ The Regulation of Tribe (pw=00000000; card-stats.s card_0761 slot=0x1358); scan_equip_target_slots_for_card caseD_3 lower bound; 11 ROM refs; C5 grep=0 (new); conf: high
+.equ TORRENTIAL_TRIBUTE_CID,        0x000013fa  @ Torrential Tribute (pw=53582587; card-stats.s card_0871 slot=0x13FA); scan_equip_target_slots_for_card caseD_6/7/8 pivot; 9 ROM refs; C5 grep=0 (new); conf: high
+.equ SHADOW_OF_EYES_CID,            0x0000140f  @ Shadow of Eyes (pw=58621589; card-stats.s card_0890 slot=0x140F); scan_equip_target_slots_for_card caseD_8/9 pivot; 8 ROM refs; C5 grep=0 (new); conf: high
+.equ EMERGENCY_PROVISIONS_CID,      0x000014e6  @ Emergency Provisions (pw=53413916; card-stats.s card_1046 slot=0x14E6); check_equip_target_card_id_eligible equip_card_id check; C5 grep=0 (new); conf: high
+.equ DROP_OFF_CID,                  0x0000151c  @ Drop Off (pw=94531500; card-stats.s card_1091 slot=0x151C); scan_equip_target_slots_for_card caseD_19 pair; 16 ROM refs; C5 grep=0 (new); conf: high
+.equ ADHESION_TRAP_HOLE_CID,        0x000015f8  @ Adhesion Trap Hole (pw=62325062; card-stats.s card_1252 slot=0x15F8); scan_equip_target_slots_for_card caseD_6/7 final pivot; 9 ROM refs; C5 grep=0 (new); conf: high
+.equ DD_TRAP_HOLE_CID,              0x0000192e  @ D.D. Trap Hole (pw=05434080; card-stats.s card_1931 slot=0x192E); scan_equip_target_slots_for_card caseD_8/9 topmost pivot; 8 ROM refs; C5 grep=0 (new); conf: high
