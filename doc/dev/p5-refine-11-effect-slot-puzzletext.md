@@ -284,6 +284,22 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: not needed (0 new/renamed functions)
 - **commit**: (see git log)
 
+### 4.11 Pool-symbolization remediation (file 11 final closure)
+
+- **scope**: 41 residual DAT_/DWORD_ auto-named labels across entire asm/11 file, created by disasm landings (Seg-2 switch-case bodies, Seg-4a..4g scan callbacks, Seg-5..6 field-scan fns) but never equated/labeled in per-segment passes.
+- **root cause**: per-segment C13 coverage check only counted slots present at proposal time; disasm-created pool labels (createDWord) appeared *after* the proposal was written and thus escaped the coverage gate.
+- **script**: `tools/ghidra-labeling/RefineF11PoolRemediation.py` (41 slots, 0 FAIL DRY + real)
+- **disposition breakdown**:
+  - EQ (27 slots): EQUIP_SLOT_SUBSTATE_OFF x9 / gDuelPhaseFlags x5 / gP1LifePoints x4 / PLAYER_BLOCK_STRIDE x6 / LP_BAR_ANIM_STATE_OFF x1 / ELIGIB_STATE_CTRL_OFF x2 / ELIGIB_ACT_TYPE_OFF x1 / ELIGIB_ACT_COUNT_OFF x1 / ELIGIB_ANIM_STATE_OFF x1 / CARD_FIELD3_THRESHOLD_1500 x1 / zone_query_hand_tag_12a1 x1
+  - RENAME (12 slots): game_text_sep_ptr_862b4 / slot_count_sca_neg_off (0xfffffdb0 = gP1SlotCountBase-gP1SlotSetCodeArray) / equip_zone_sca_off (0x1b38 = gEquipZoneBase_1d98-gP1SlotSetCodeArray) / effect_zone_p2_off (0xfdc = gDuelFieldSlotsEffectZoneBase-gDuelFieldSlots_p2_base) / magical_thorn_cid_shifted (0x98300000 = MAGICAL_THORN_CID<<19) / equip_zone_to_field_state_neg_off (0xffffe358 = gEquipZoneCountTable-gDuelFieldSlotState = -0x1ca8) / equip_sprite_attr_base_frq (0x3a200000) / skull_inv_cid_shifted (0x9b080000 = SKULL_INVITATION_CID<<19) + 4x ptr_lp_* gP1LifePoints via EQ (counted above)
+  - FNP (1 slot): ptr_check_effect_node_handler_for_slot (DAT_080851d0 = 0x08081de5 THUMB+1 fn-ptr)
+- **new constants**: 0 (all values already existed in constants/*.inc or received semantic RENAME labels)
+- **gate result**: `grep "^DAT_\|^DWORD_" asm/11_effect_slot_puzzletext.s` = 0 lines (target met)
+- **non-ASCII check**: 0 new CJK in EOL comments (all ASCII); pre-existing CJK plate comments untouched
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (no functions renamed; DAT_080851d0 is a data label not a function)
+- **commit**: (see below)
+
 **FILE 11 COMPLETE SUMMARY (11_effect_slot_puzzletext.s, all 10 segments):**
 - region A (Seg-1..3): 41 pre-existing named fn / 3 ROM_INCBIN eliminated / ~333 slots symbolized
 - region B (Seg-4, 4a..4g): **163 hidden card-effect scan callbacks newly disassembled+named** (giant ROM_INCBIN 0x87d58/0x5a9c=23,196B fully eliminated); CSV +163 rows
