@@ -30886,7 +30886,7 @@ invoke_card_display_op_0x31_sub13:
     bx r0                                    @ 08093594 0047
     .zero  0x2
 
-@ Plays UI sound effect for card confirm/OK action. Called by FUN_08094a28 (card/duel_field/prng scene dispatcher) and FUN_08094cd4 after card confirm/select operation. Body: push {lr}; movs r0,#0x31=49 (UI effect ID); bl play_ui_effect; pop {r1}; bx r1. Thin wrapper around play_ui_effect with fixed effect_id=0x31=49. Side effects: triggers sound effect ID 49 via play_ui_effect (indirect). Constants: CARD_OK_EFFECT_ID=0x31=49.
+@ Plays UI sound effect for card confirm/OK action. Called by process_card_play_ok_sequence (card/duel_field/prng scene dispatcher) and tick_equip_activation_main_sequence after card confirm/select operation. Body: push {lr}; movs r0,#0x31=49 (UI effect ID); bl play_ui_effect; pop {r1}; bx r1. Thin wrapper around play_ui_effect with fixed effect_id=0x31=49. Side effects: triggers sound effect ID 49 via play_ui_effect (indirect). Constants: CARD_OK_EFFECT_ID=0x31=49.
 play_card_ok_ui_effect:
     push {lr}                                @ 08093598 00b5
     movs r0,#0x31    @ 0809359a 3120
@@ -30894,56 +30894,42 @@ play_card_ok_ui_effect:
     pop {r1}                                 @ 080935a0 02bc
     bx r1                                    @ 080935a2 0847
 
-@ Clears all EWRAM/VRAM data regions used by the duel_puzzle scene, resetting display and state buffers before a new duel starts. Callers: FUN_08093660 (duel_puzzle init hub) and FUN_080937d4 (scene_duel_puzzle main handler). Calls zero_fill_by_halfword 9 times on distinct EWRAM regions. At the end checks [scene_ctx2+8/0xc]==2 (player 0 mode is versus); if so writes 1 to gP1LifePoints+0x1d08 to mark two-player versus mode active. Finally clears [0x0201e2a0+0x224] and [0x0201e2a0+0x228] to 0.
-@ 
-@ Constants:
-@ - gP1LifePoints=0x0201c4e0
-@ - scene_ctx2=0x0201e2a0
-@ - clear_region_1=0x0201c4e0 (0x1db8 halfwords)
-@ - clear_region_2=0x0201e4f0 (0xc2*8=0x610 halfwords)
-@ - clear_region_3=0x0201bcc0 (0x081c halfwords)
-@ - clear_region_4=0x0201e4d0 (0x18 halfwords)
-@ - clear_region_5=0x0201b290 (0x05d4 halfwords)
-@ - clear_region_6=0x0201bb90 (0x98*2=0x130 halfwords)
-@ - clear_region_7=0x0201b1b0 (0xd8 halfwords)
-@ - clear_region_8=0x0201afe0 (0xe6*2=0x1cc halfwords)
-@ - clear_region_9=0x0201b870 (0xc5*4=0x314 halfwords)
-@ - flag_offset=0x1d08 (written 1 when mode==2)
+@ Clear EWRAM/display regions for duel_puzzle scene. init_duel_puzzle_field_and_hand_display and init_duel_puzzle_scene_state call this first. zero_fill_by_halfword x9: gP1LifePoints(0x1db8 hw), gEquipEffectZoneBase(0xc2*8 hw), gDuelDisplaySeqState(0x81c hw), gEquipZoneRankState(0x18 hw), gDuelPhaseFlags(0x5d4 hw), gEquipChainSlotRefs(0x98*2 hw), gPuzzleCardAnimBuf(0xd8 hw), gEquipLpScoreBase(0xe6*2 hw), gSpriteAttrBuf(0xc5*4 hw). If [ctx+8]==2 sets gP1LP[0x1d08]:=1. Clears ctx[0x224/0x228]:=0.
 clear_duel_puzzle_wram_regions:
     push {r4,lr}                             @ 080935a4 10b5
-    ldr r4, PTR_gP1LifePoints_08093628       @ 080935a6 204c
-    ldr r1, DAT_0809362c                     @ 080935a8 2049
+    ldr r4, ptr_gP1LifePoints_3628           @ 080935a6 204c
+    ldr r1, puzzle_clear_half_count_1db8     @ 080935a8 2049
     adds r0,r4,#0x0    @ 080935aa 201c
     bl zero_fill_by_halfword                 @ 080935ac 61f062fc
-    ldr r0, DAT_08093630                     @ 080935b0 1f48
+    ldr r0, ptr_gEquipEffectZoneBase_3630    @ 080935b0 1f48
     movs r1,#0xc2    @ 080935b2 c221
     lsls r1,r1,#0x3    @ 080935b4 c900
     bl zero_fill_by_halfword                 @ 080935b6 61f05dfc
-    ldr r0, DAT_08093634                     @ 080935ba 1e48
-    ldr r1, DAT_08093638                     @ 080935bc 1e49
+    ldr r0, ptr_gDuelDisplaySeqState_3634    @ 080935ba 1e48
+    ldr r1, puzzle_clear_half_count_081c     @ 080935bc 1e49
     bl zero_fill_by_halfword                 @ 080935be 61f059fc
-    ldr r0, DAT_0809363c                     @ 080935c2 1e48
+    ldr r0, ptr_gEquipZoneRankState_363c     @ 080935c2 1e48
     movs r1,#0x18    @ 080935c4 1821
     bl zero_fill_by_halfword                 @ 080935c6 61f055fc
-    ldr r0, DAT_08093640                     @ 080935ca 1d48
-    ldr r1, DAT_08093644                     @ 080935cc 1d49
+    ldr r0, ptr_gDuelPhaseFlags_3640         @ 080935ca 1d48
+    ldr r1, puzzle_clear_half_count_05d4     @ 080935cc 1d49
     bl zero_fill_by_halfword                 @ 080935ce 61f051fc
-    ldr r0, DAT_08093648                     @ 080935d2 1d48
+    ldr r0, ptr_gEquipChainSlotRefs_3648     @ 080935d2 1d48
     movs r1,#0x98    @ 080935d4 9821
     lsls r1,r1,#0x1    @ 080935d6 4900
     bl zero_fill_by_halfword                 @ 080935d8 61f04cfc
-    ldr r0, DAT_0809364c                     @ 080935dc 1b48
+    ldr r0, gPuzzleCardAnimBuf_364c          @ 080935dc 1b48
     movs r1,#0xd8    @ 080935de d821
     bl zero_fill_by_halfword                 @ 080935e0 61f048fc
-    ldr r0, DAT_08093650                     @ 080935e4 1a48
+    ldr r0, ptr_gEquipLpScoreBase_3650       @ 080935e4 1a48
     movs r1,#0xe6    @ 080935e6 e621
     lsls r1,r1,#0x1    @ 080935e8 4900
     bl zero_fill_by_halfword                 @ 080935ea 61f043fc
-    ldr r0, DAT_08093654                     @ 080935ee 1948
+    ldr r0, ptr_gSpriteAttrBuf_3654          @ 080935ee 1948
     movs r1,#0xc5    @ 080935f0 c521
     lsls r1,r1,#0x2    @ 080935f2 8900
     bl zero_fill_by_halfword                 @ 080935f4 61f03efc
-    ldr r1, DAT_08093658                     @ 080935f8 1749
+    ldr r1, ptr_gDuelCardCtxBase_3658        @ 080935f8 1749
     ldr r0,[r1,#0x8]                         @ 080935fa 8868
     cmp r0,#0x2                              @ 080935fc 0228
     beq LAB_08093606                         @ 080935fe 02d0
@@ -30951,12 +30937,12 @@ clear_duel_puzzle_wram_regions:
     cmp r0,#0x2                              @ 08093602 0228
     bne LAB_0809360e                         @ 08093604 03d1
 LAB_08093606:
-    ldr r0, DAT_0809365c                     @ 08093606 1548
+    ldr r0, ptr_p1lp_block2_off_365c         @ 08093606 1548
     adds r1,r4,r0    @ 08093608 2118
     movs r0,#0x1    @ 0809360a 0120
     str r0,[r1,#0x0]                         @ 0809360c 0860
 LAB_0809360e:
-    ldr r2, DAT_08093658                     @ 0809360e 124a
+    ldr r2, ptr_gDuelCardCtxBase_3658        @ 0809360e 124a
     movs r1,#0x89    @ 08093610 8921
     lsls r1,r1,#0x2    @ 08093612 8900
     adds r0,r2,r1    @ 08093614 5018
@@ -30969,54 +30955,47 @@ LAB_0809360e:
     pop {r4}                                 @ 08093622 10bc
     pop {r0}                                 @ 08093624 01bc
     bx r0                                    @ 08093626 0047
-PTR_gP1LifePoints_08093628:
+ptr_gP1LifePoints_3628:
     .word  gP1LifePoints                  @ 08093628 e0c40102
-DAT_0809362c:
-    .word  0x00001db8                     @ 0809362c b81d0000
-DAT_08093630:
-    .word  0x0201e4f0                     @ 08093630 f0e40102
-DAT_08093634:
-    .word  0x0201bcc0                     @ 08093634 c0bc0102
-DAT_08093638:
-    .word  0x0000081c                     @ 08093638 1c080000
-DAT_0809363c:
-    .word  0x0201e4d0                     @ 0809363c d0e40102
-DAT_08093640:
-    .word  0x0201b290                     @ 08093640 90b20102
-DAT_08093644:
-    .word  0x000005d4                     @ 08093644 d4050000
-DAT_08093648:
-    .word  0x0201bb90                     @ 08093648 90bb0102
-DAT_0809364c:
-    .word  0x0201b1b0                     @ 0809364c b0b10102
-DAT_08093650:
-    .word  0x0201afe0                     @ 08093650 e0af0102
-DAT_08093654:
-    .word  0x0201b870                     @ 08093654 70b80102
-DAT_08093658:
-    .word  0x0201e2a0                     @ 08093658 a0e20102
-DAT_0809365c:
-    .word  0x00001d08                     @ 0809365c 081d0000
+puzzle_clear_half_count_1db8:
+    .word  PUZZLE_CLEAR_HALF_COUNT_1DB8   @ 0809362c b81d0000  PUZZLE_CLEAR_HALF_COUNT_1DB8
+ptr_gEquipEffectZoneBase_3630:
+    .word  gEquipEffectZoneBase           @ 08093630 f0e40102
+ptr_gDuelDisplaySeqState_3634:
+    .word  gDuelDisplaySeqState           @ 08093634 c0bc0102
+puzzle_clear_half_count_081c:
+    .word  PUZZLE_CLEAR_HALF_COUNT_081C   @ 08093638 1c080000  PUZZLE_CLEAR_HALF_COUNT_081C
+ptr_gEquipZoneRankState_363c:
+    .word  gEquipZoneRankState            @ 0809363c d0e40102
+ptr_gDuelPhaseFlags_3640:
+    .word  gDuelPhaseFlags                @ 08093640 90b20102
+puzzle_clear_half_count_05d4:
+    .word  PUZZLE_CLEAR_HALF_COUNT_05D4   @ 08093644 d4050000  PUZZLE_CLEAR_HALF_COUNT_05D4
+ptr_gEquipChainSlotRefs_3648:
+    .word  gEquipChainSlotRefs            @ 08093648 90bb0102
+gPuzzleCardAnimBuf_364c:
+    .word  gPuzzleCardAnimBuf             @ 0809364c b0b10102  gPuzzleCardAnimBuf
+ptr_gEquipLpScoreBase_3650:
+    .word  gEquipLpScoreBase              @ 08093650 e0af0102
+ptr_gSpriteAttrBuf_3654:
+    .word  gSpriteAttrBuf                 @ 08093654 70b80102
+ptr_gDuelCardCtxBase_3658:
+    .word  gDuelCardCtxBase               @ 08093658 a0e20102
+ptr_p1lp_block2_off_365c:
+    .word  P1LP_BLOCK2_OFF                @ 0809365c 081d0000
 
-@ Full field/hand OAM initialization hub on duel_puzzle entry. Called by run_campaign_step26_init_duel_puzzle_scene (0x0802752c) and two other duel_puzzle scene functions. Sequence: (1) clear_duel_puzzle_wram_regions clears all EWRAM regions; (2) set gP1LifePoints[0] and gP1LifePoints[0x868/4] to 0xfa*32=0x1f40 (initial LP); (3) call init_player_hand_display_slots(0, base) and (1, base+0x108) for both players; (4) call shuffle_player_hand_list twice for both players; (5) issue 6 dispatch_card_display_op calls (0xd/0x14, player, op_code) covering both field and hand areas; (6) if [scene_ctx2+8]==3 call poll_sprite_seq_until_done(0) to wait for sprite sequence.
-@ 
-@ Constants:
-@ - gP1LifePoints=0x0201c4e0
-@ - initial_LP=0xfa*32=0x1f40 (8000, initial life points)
-@ - player_area_stride=0x868/4 (word offset between p0 and p1 LP regions)
-@ - dispatch_op_hand=0xd (hand card display op)
-@ - dispatch_op_field=0x14 (field card display op)
+@ Full field/hand OAM init hub for duel_puzzle scene entry. Seq: (1) clear_duel_puzzle_wram_regions; (2) set gP1LifePoints[0]/[0x868] to 0x1f40 (8000 initial LP); (3) init_player_hand_display_slots x2 for both players; (4) shuffle_player_hand_list x2; (5) 6x dispatch_card_display_op(0xd/0x14); (6) if scene_ctx+8==3 poll_sprite_seq_until_done(0). Callers: run_campaign_step26_init_duel_puzzle_scene + 2 others.
 init_duel_puzzle_field_and_hand_display:
     push {r4,r5,r6,r7,lr}                    @ 08093660 f0b5
     bl clear_duel_puzzle_wram_regions        @ 08093662 fff79fff
-    ldr r6, DWORD_0809370c                   @ 08093666 294e
+    ldr r6, ptr_gP1LifePoints_370c           @ 08093666 294e
     movs r0,#0xfa    @ 08093668 fa20
     lsls r0,r0,#0x5    @ 0809366a 4001
     str r0,[r6,#0x0]                         @ 0809366c 3060
-    ldr r1, DWORD_08093710                   @ 0809366e 2849
+    ldr r1, ptr_player_block_stride_3710     @ 0809366e 2849
     adds r5,r6,r1    @ 08093670 7518
     str r0,[r5,#0x0]                         @ 08093672 2860
-    ldr r4, DWORD_08093714                   @ 08093674 274c
+    ldr r4, ptr_gCardFsDataBlock_3714        @ 08093674 274c
     movs r0,#0x0    @ 08093676 0020
     adds r1,r4,#0x0    @ 08093678 211c
     bl init_player_hand_display_slots        @ 0809367a 9ef789fa
@@ -31067,13 +31046,13 @@ init_duel_puzzle_field_and_hand_display:
     movs r2,#0xc    @ 080936e6 0c22
     movs r3,#0x0    @ 080936e8 0023
     bl dispatch_card_display_op              @ 080936ea 8bf7d7fa
-    ldr r1, DWORD_08093718                   @ 080936ee 0a49
+    ldr r1, ptr_p1lp_block2_off_1ce8_3718    @ 080936ee 0a49
     adds r5,r6,r1    @ 080936f0 7518
     ldr r2,[r4,#0x10]                        @ 080936f2 2269
     str r2,[r5,#0x0]                         @ 080936f4 2a60
-    ldr r0, DWORD_0809371c                   @ 080936f6 0948
+    ldr r0, ptr_p1lp_backup_dst_off_371c     @ 080936f6 0948
     adds r1,r6,r0    @ 080936f8 3118
-    ldr r0, DWORD_08093720                   @ 080936fa 0948
+    ldr r0, ptr_slot_card_empty_3720         @ 080936fa 0948
     str r0,[r1,#0x0]                         @ 080936fc 0860
     ldr r0,[r4,#0x8]                         @ 080936fe a068
     cmp r0,#0x3                              @ 08093700 0328
@@ -31081,20 +31060,20 @@ init_duel_puzzle_field_and_hand_display:
     movs r0,#0x0    @ 08093704 0020
     bl poll_sprite_seq_until_done            @ 08093706 01f083fa
     b LAB_0809376e                           @ 0809370a 30e0
-DWORD_0809370c:
+ptr_gP1LifePoints_370c:
     .word  gP1LifePoints                  @ 0809370c e0c40102
-DWORD_08093710:
-    .word  0x00000868                     @ 08093710 68080000
-DWORD_08093714:
-    .word  0x0201e2b4                     @ 08093714 b4e20102
-DWORD_08093718:
-    .word  0x00001ce8                     @ 08093718 e81c0000
-DWORD_0809371c:
-    .word  0x00001cf0                     @ 0809371c f01c0000
-DWORD_08093720:
-    .word  0x0000ffff                     @ 08093720 ffff0000
+ptr_player_block_stride_3710:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093710 68080000
+ptr_gCardFsDataBlock_3714:
+    .word  gCardFsDataBlock               @ 08093714 b4e20102
+ptr_p1lp_block2_off_1ce8_3718:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08093718 e81c0000
+ptr_p1lp_backup_dst_off_371c:
+    .word  P1LP_BACKUP_DST_OFF            @ 0809371c f01c0000
+ptr_slot_card_empty_3720:
+    .word  SLOT_CARD_EMPTY                @ 08093720 ffff0000
 LAB_08093724:
-    ldr r1, DWORD_08093778                   @ 08093724 1449
+    ldr r1, ptr_p1lp_block2_off_3778         @ 08093724 1449
     adds r0,r6,r1    @ 08093726 7018
     ldr r0,[r0,#0x0]                         @ 08093728 0068
     cmp r0,#0x0                              @ 0809372a 0028
@@ -31113,7 +31092,7 @@ LAB_08093736:
     movs r1,#0x54    @ 08093744 5421
     cmp r0,#0x0                              @ 08093746 0028
     beq LAB_0809374c                         @ 08093748 00d0
-    ldr r1, DWORD_0809377c                   @ 0809374a 0c49
+    ldr r1, ptr_oam_zone_upd_spr_p1_377c     @ 0809374a 0c49
 LAB_0809374c:
     adds r0,r1,#0x0    @ 0809374c 081c
     movs r1,#0x0    @ 0809374e 0021
@@ -31124,7 +31103,7 @@ LAB_0809374c:
     movs r1,#0x54    @ 0809375a 5421
     cmp r0,#0x1                              @ 0809375c 0128
     beq LAB_08093762                         @ 0809375e 00d0
-    ldr r1, DWORD_0809377c                   @ 08093760 0649
+    ldr r1, ptr_oam_zone_upd_spr_p1_377c     @ 08093760 0649
 LAB_08093762:
     adds r0,r1,#0x0    @ 08093762 081c
     movs r1,#0x0    @ 08093764 0021
@@ -31137,10 +31116,10 @@ LAB_0809376e:
     pop {r1}                                 @ 08093772 02bc
     bx r1                                    @ 08093774 0847
     .zero  0x2
-DWORD_08093778:
-    .word  0x00001d08                     @ 08093778 081d0000
-DWORD_0809377c:
-    .word  0x00008054                     @ 0809377c 54800000
+ptr_p1lp_block2_off_3778:
+    .word  P1LP_BLOCK2_OFF                @ 08093778 081d0000
+ptr_oam_zone_upd_spr_p1_377c:
+    .word  OAM_ZONE_UPDATE_SPRITE_P1      @ 0809377c 54800000
 
 @ duel_puzzle scene initialization step: calls init_duel_puzzle_field_and_hand_display to perform field display init; then writes 0 to gP1LifePoints+0x1cf0 (clear status flag) and 1 to gP1LifePoints+0x1d04 (set ready flag). Exit: pop {r1}; bx r1 (void return). indeg=0, no direct bl callers; likely called via function pointer table by scene state machine.
 @ 
@@ -31151,34 +31130,30 @@ DWORD_0809377c:
 init_duel_puzzle_field_display_and_flags:
     push {lr}                                @ 08093780 00b5
     bl init_duel_puzzle_field_and_hand_display @ 08093782 fff76dff
-    ldr r1, DWORD_0809379c                   @ 08093786 0549
-    ldr r0, DWORD_080937a0                   @ 08093788 0548
+    ldr r1, ptr_gP1LifePoints_379c           @ 08093786 0549
+    ldr r0, ptr_p1lp_backup_dst_off_37a0     @ 08093788 0548
     adds r2,r1,r0    @ 0809378a 0a18
     movs r0,#0x0    @ 0809378c 0020
     str r0,[r2,#0x0]                         @ 0809378e 1060
-    ldr r0, DWORD_080937a4                   @ 08093790 0448
+    ldr r0, puzzle_ready_flag_off            @ 08093790 0448
     adds r1,r1,r0    @ 08093792 0918
     movs r0,#0x1    @ 08093794 0120
     str r0,[r1,#0x0]                         @ 08093796 0860
     pop {r1}                                 @ 08093798 02bc
     bx r1                                    @ 0809379a 0847
-DWORD_0809379c:
+ptr_gP1LifePoints_379c:
     .word  gP1LifePoints                  @ 0809379c e0c40102
-DWORD_080937a0:
-    .word  0x00001cf0                     @ 080937a0 f01c0000
-DWORD_080937a4:
-    .word  0x00001d04                     @ 080937a4 041d0000
+ptr_p1lp_backup_dst_off_37a0:
+    .word  P1LP_BACKUP_DST_OFF            @ 080937a0 f01c0000
+puzzle_ready_flag_off:
+    .word  PUZZLE_READY_FLAG_OFF          @ 080937a4 041d0000  PUZZLE_READY_FLAG_OFF
 
-@ duel_puzzle scene initialization: calls init_duel_puzzle_field_and_hand_display; then reads gDuelBattleState[+0x10] as player_id, calls build_hand_zone_display_slots_shuffled(player_id, r5) for the local player's hand slots; then calls the same for the opponent (1-player_id). Both calls use same r1=r5 param, covering both sides' hand display slots. Returns fixed 1 (success). Caller clear_duel_puzzle_wram_regions invokes this function in the puzzle init path.
-@ 
-@ Constants:
-@ - gDuelBattleState=0x0201e2a0
-@ - PLAYER_ID_OFFSET=0x10
+@ Init duel_puzzle both-sides hand display. Calls init_duel_puzzle_field_and_hand_display, then build_hand_zone_display_slots_shuffled(player_id, r5) for local player (gDuelCardCtxBase[+0x10]) and opponent (1-player_id). Returns fixed 1. indeg=0, called via function pointer by scene state machine. r5=hand_ctx_param passed through to both build calls.
 init_duel_puzzle_hand_display_both_sides:
     push {r4,r5,lr}                          @ 080937a8 30b5
     adds r5,r0,#0x0    @ 080937aa 051c
     bl init_duel_puzzle_field_and_hand_display @ 080937ac fff758ff
-    ldr r4, DWORD_080937d0                   @ 080937b0 074c
+    ldr r4, ptr_gDuelCardCtxBase_37d0        @ 080937b0 074c
     ldr r0,[r4,#0x10]                        @ 080937b2 2069
     adds r1,r5,#0x0    @ 080937b4 291c
     bl build_hand_zone_display_slots_shuffled @ 080937b6 9ef7c5fa
@@ -31192,49 +31167,40 @@ init_duel_puzzle_hand_display_both_sides:
     pop {r1}                                 @ 080937ca 02bc
     bx r1                                    @ 080937cc 0847
     .zero  0x2
-DWORD_080937d0:
-    .word  0x0201e2a0                     @ 080937d0 a0e20102
+ptr_gDuelCardCtxBase_37d0:
+    .word  gDuelCardCtxBase               @ 080937d0 a0e20102
 
-@ Initialize the duel puzzle scene state. First calls clear_duel_puzzle_wram_regions to zero all EWRAM/VRAM data regions. Then writes several state words in the gP1LifePoints region: [+0x1d00]:=1 (puzzle mode active flag), [+0x1cec]:=9 (a counter/stage initial value), [+0x1cf0]:=0xffff (sentinel/invalid card id), [+0x1ce0]:=0 (clear), [+0x1ce8]:=0 (clear); and writes EWRAM [0x0201e2a0+0/4/8]:=0, [+0xc]:=1, [+0x10]:=0 to initialize the scene control struct. Finally passes r0 through to render_duel_puzzle_text_to_sprite_queue to render the puzzle text into the sprite queue. Returns a fixed 1 (init complete).
-@ 
-@ CALLEE-COLUMN GREP: grepping callee=0x080937d4 => 1 hit
-@ indeg=1, form(b). caller: addr 0x0801fec0 (tags: [duel_flow, vram]; role: duel scene switch dispatcher (large duel scene switch), calls this function inside the duel_puzzle scene case to do scene init; call site @ 0x0801ffb4).
-@ 
-@ Params: r0=scene_arg scene parameter/context (entry adds r4,r0,#0; passed through to render_duel_puzzle_text_to_sprite_queue)
-@ Returns: r0=int 1 (fixed value, init complete flag; caller decides the scene is ready by this)
-@ Side effects: [gP1LifePoints+0x1d00] := 1 (puzzle mode active flag); [gP1LifePoints+0x1cec] := 9 (stage/counter initial value); [gP1LifePoints+0x1cf0] := 0xffff (sentinel/invalid card id); [gP1LifePoints+0x1ce0] := 0; [gP1LifePoints+0x1ce8] := 0; [0x0201e2a0+0] := 0, [+4] := 0, [+8] := 0, [+0xc] := 1, [+0x10] := 0 (scene control struct init)
-@ Exit: pop {r4}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); single path @ 0809381a movs r0,#1 -> returns fixed 1 (init complete); no other exit
-@ Constants: gP1LifePoints=0x0201c4e0, MODE_FLAG_OFF=0x1d00 (0xe8<<5), CLEAR_OFF_A=0x1ce0 (0xe7<<5), STAGE_OFF=0x1cec=9, SENTINEL_OFF=0x1cf0:=0xffff, CLEAR_OFF_B=0x1ce8, SCENE_CTX=0x0201e2a0
+@ Init duel puzzle scene state. Calls clear_duel_puzzle_wram_regions, then writes gP1LifePoints: [+0x1d00]:=1 (puzzle_mode_active), [+0x1cec]:=9 (stage counter), [+0x1cf0]:=0xffff (LP sentinel), [+0x1ce0]:=0, [+0x1ce8]:=0. Also inits gDuelCardCtxBase[+0/4/8]:=0, [+0xc]:=1, [+0x10]:=0. Finally calls render_duel_puzzle_text_to_sprite_queue(r4). Returns fixed 1. indeg=1, caller: addr 0x0801fec0 (duel scene switch dispatcher).
 init_duel_puzzle_scene_state:
     push {r4,lr}                             @ 080937d4 10b5
     adds r4,r0,#0x0    @ 080937d6 041c
     bl clear_duel_puzzle_wram_regions        @ 080937d8 fff7e4fe
-    ldr r1, PTR_gP1LifePoints_08093824       @ 080937dc 1149
+    ldr r1, ptr_gP1LifePoints_3824           @ 080937dc 1149
     movs r2,#0xe8    @ 080937de e822
     lsls r2,r2,#0x5    @ 080937e0 5201
     adds r0,r1,r2    @ 080937e2 8818
     movs r2,#0x1    @ 080937e4 0122
     str r2,[r0,#0x0]                         @ 080937e6 0260
-    ldr r0, DAT_08093828                     @ 080937e8 0f48
+    ldr r0, ptr_gDuelCardCtxBase_3828        @ 080937e8 0f48
     movs r3,#0x0    @ 080937ea 0023
     str r3,[r0,#0x0]                         @ 080937ec 0360
     str r3,[r0,#0x4]                         @ 080937ee 4360
     str r3,[r0,#0x8]                         @ 080937f0 8360
     str r2,[r0,#0xc]                         @ 080937f2 c260
     str r3,[r0,#0x10]                        @ 080937f4 0361
-    ldr r0, DAT_0809382c                     @ 080937f6 0d48
+    ldr r0, ptr_p1lp_timer_off_382c          @ 080937f6 0d48
     adds r2,r1,r0    @ 080937f8 0a18
     movs r0,#0x9    @ 080937fa 0920
     str r0,[r2,#0x0]                         @ 080937fc 1060
-    ldr r0, DAT_08093830                     @ 080937fe 0c48
+    ldr r0, ptr_p1lp_backup_dst_off_3830     @ 080937fe 0c48
     adds r2,r1,r0    @ 08093800 0a18
-    ldr r0, DAT_08093834                     @ 08093802 0c48
+    ldr r0, ptr_slot_card_empty_3834         @ 08093802 0c48
     str r0,[r2,#0x0]                         @ 08093804 1060
     movs r2,#0xe7    @ 08093806 e722
     lsls r2,r2,#0x5    @ 08093808 5201
     adds r0,r1,r2    @ 0809380a 8818
     str r3,[r0,#0x0]                         @ 0809380c 0360
-    ldr r0, DAT_08093838                     @ 0809380e 0a48
+    ldr r0, ptr_p1lp_block2_off_1ce8_3838    @ 0809380e 0a48
     adds r1,r1,r0    @ 08093810 0918
     str r3,[r1,#0x0]                         @ 08093812 0b60
     adds r0,r4,#0x0    @ 08093814 201c
@@ -31244,18 +31210,18 @@ init_duel_puzzle_scene_state:
     pop {r1}                                 @ 0809381e 02bc
     bx r1                                    @ 08093820 0847
     .zero  0x2
-PTR_gP1LifePoints_08093824:
+ptr_gP1LifePoints_3824:
     .word  gP1LifePoints                  @ 08093824 e0c40102
-DAT_08093828:
-    .word  0x0201e2a0                     @ 08093828 a0e20102
-DAT_0809382c:
-    .word  0x00001cec                     @ 0809382c ec1c0000
-DAT_08093830:
-    .word  0x00001cf0                     @ 08093830 f01c0000
-DAT_08093834:
-    .word  0x0000ffff                     @ 08093834 ffff0000
-DAT_08093838:
-    .word  0x00001ce8                     @ 08093838 e81c0000
+ptr_gDuelCardCtxBase_3828:
+    .word  gDuelCardCtxBase               @ 08093828 a0e20102
+ptr_p1lp_timer_off_382c:
+    .word  P1LP_TIMER_OFF                 @ 0809382c ec1c0000
+ptr_p1lp_backup_dst_off_3830:
+    .word  P1LP_BACKUP_DST_OFF            @ 08093830 f01c0000
+ptr_slot_card_empty_3834:
+    .word  SLOT_CARD_EMPTY                @ 08093834 ffff0000
+ptr_p1lp_block2_off_1ce8_3838:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08093838 e81c0000
 
 @ Called by advance_duel_turn_by_prng_anim (0x08094dac). Two-instruction leaf function. Body: movs r0,#0x1; bx lr. No side effects. Purpose: return fixed value 1 as "condition true / sequence not done" sentinel flag. Caller checks cmp r0,#0 after bl to decide whether sequence should continue.
 @ 
@@ -31264,9 +31230,7 @@ return_one_leaf__0809383c:
     movs r0,#0x1    @ 0809383c 0120
     bx lr                                    @ 0809383e 7047
 
-@ Copy a text line to buffer byte-by-byte: r0=dst_buf, r1=max_len (internally subs r1,#1 used as upper bound), r2=src_ptr_ptr (pointer to source pointer). Reads bytes from *src_ptr_ptr until null (0) or max_len-1 reached; if byte is nonzero writes to dst_buf[offset] and increments offset; returns 0 on overflow. Stops on newline byte 0x0a. At end writes null terminator at dst_buf[offset], updates *src_ptr_ptr to next unread position, returns offset (actual bytes written). Called by FUN_08093fdc (duel_puzzle text renderer) in a loop to parse multi-line text.
-@ Side effects: [r0+0..offset-1]:=source bytes; [r0+offset]:=0; [r2]:=updated source pointer.
-@ Constants: NEWLINE=0x0a.
+@ Copy one text line to buf byte-by-byte. r0=dst_buf, r1=max_len-1 (loop bound), r2=src_ptr_ptr. Reads *src_ptr_ptr; stops at null or newline (0x0a) or overflow. Writes null terminator; updates *src_ptr_ptr to next byte. Returns bytes written, or 0 on overflow. Called by render_duel_puzzle_text_to_sprite_queue in text-parse loop. NEWLINE=0x0a.
 copy_text_line_to_buf:
     push {r4,r5,r6,lr}                       @ 08093840 70b5
     adds r5,r0,#0x0    @ 08093842 051c
@@ -31303,25 +31267,20 @@ LAB_08093874:
     bx r1                                    @ 08093878 0847
     .zero  0x2
 
-@ Called by duel puzzle text parser (switch case 0x48) after sscanf extracts LP value.
-@ r0=player_side (0/1, extracted via ands r0,#1), r1=lp_value to write.
-@ Writes r1 into gP1LifePoints[player*0x868+0x4 + count*4] slot, increments count.
-@ Also updates VRAM attr halfword bits[12:0] at gP1LifePoints+player*0x868+0x1080.
-@ Side effects: [gP1LifePoints+player*0x868+0x4+count*4] := r1; VRAM halfword bits[12:0] updated; count += 1.
-@ Constants: STRIDE=0x868, ENTRY_SIZE=4, BASE_OFFSET=0x4, MASK_LOW13=0x1fff, MASK_HIGH=0xffffe000.
+@ Write LP card display slot entry for duel puzzle. r0=player (0/1), r1=lp_value. Writes lp_value into gP1LifePoints[player*PLAYER_BLOCK_STRIDE+4+count*4] and increments slot count. Updates VRAM halfword bits[12:0] at [gP1LP+player*PLAYER_BLOCK_STRIDE+0x1080]. Called by parse_duel_puzzle_text_token H-subcase after sscanf extracts LP value. MASK_LOW13=SLOT_CARD_SET_CODE_MASK(0x1fff), MASK_HIGH=OAM_ATTR2_TILE_CLEAR(0xffffe000).
 write_lp_card_display_slot_entry:
     push {r4,r5,r6,r7,lr}                    @ 0809387c f0b5
-    ldr r6, PTR_gP1LifePoints_080938c4       @ 0809387e 114e
+    ldr r6, ptr_gP1LifePoints_38c4           @ 0809387e 114e
     movs r2,#0x1    @ 08093880 0122
     ands r0,r2    @ 08093882 1040
-    ldr r2, DAT_080938c8                     @ 08093884 104a
+    ldr r2, ptr_player_block_stride_38c8     @ 08093884 104a
     adds r3,r0,#0x0    @ 08093886 031c
     muls r3,r2    @ 08093888 5343
     adds r2,r6,#0x4    @ 0809388a 321d
     adds r3,r3,r2    @ 0809388c 9b18
-    ldr r2, DAT_080938cc                     @ 0809388e 0f4a
+    ldr r2, ptr_slot_set_code_mask_38cc      @ 0809388e 0f4a
     ands r1,r2    @ 08093890 1140
-    ldr r5, DAT_080938d0                     @ 08093892 0f4d
+    ldr r5, ptr_oam_attr2_tile_clear_38d0    @ 08093892 0f4d
     lsls r0,r0,#0xd    @ 08093894 4003
     ldr r2,[r3,#0x0]                         @ 08093896 1a68
     ldrb r7,[r3,#0x0]                        @ 08093898 1f78
@@ -31346,23 +31305,16 @@ write_lp_card_display_slot_entry:
     pop {r4,r5,r6,r7}                        @ 080938be f0bc
     pop {r1}                                 @ 080938c0 02bc
     bx r1                                    @ 080938c2 0847
-PTR_gP1LifePoints_080938c4:
+ptr_gP1LifePoints_38c4:
     .word  gP1LifePoints                  @ 080938c4 e0c40102
-DAT_080938c8:
-    .word  0x00000868                     @ 080938c8 68080000
-DAT_080938cc:
-    .word  0x00001fff                     @ 080938cc ff1f0000
-DAT_080938d0:
-    .word  0xffffe000                     @ 080938d0 00e0ffff
+ptr_player_block_stride_38c8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080938c8 68080000
+ptr_slot_set_code_mask_38cc:
+    .word  SLOT_CARD_SET_CODE_MASK        @ 080938cc ff1f0000
+ptr_oam_attr2_tile_clear_38d0:
+    .word  OAM_ATTR2_TILE_CLEAR           @ 080938d0 00e0ffff
 
-@ Core token handler for the duel_puzzle text script parser. Entry param r0 is current line buffer pointer (r5). Reads first byte then dispatches via multi-level cmp/switch: 0x43 ('C') -> card name init; 0x45 ('E') -> end marker (return 1); 0x50 ('P') -> checks "LifeP" prefix (8-byte strncmp) then uses sscanf to parse LP value and write to gP1LifePoints; 0x5b ('[') -> checks 5-byte prefix then returns 1; other -> default return 0. Under 'S' prefix ("Score" etc.) sub-table, dispatches via secondary switch to up to 18 state field write operations. Caller FUN_08093fa8 (duel_puzzle text renderer) calls this in a loop until return is non-zero or text ends.
-@ 
-@ Constants:
-@ - STRIDE=0x868 (gP1LifePoints player offset)
-@ - TOKEN_END=0x45 ('E')
-@ - TOKEN_CARD=0x43 ('C')
-@ - TOKEN_LP=0x50 ('P') ("LifeP..." prefix)
-@ - TOKEN_BRACKET=0x5b ('[')
+@ Duel puzzle text script token parser. r0=line_buf_ptr. Dispatches on first byte: 0x45(E)->[END]->return 1; 0x43(C)->CardIn init; 0x50(P)->PlayerLP LP parse via sscanf; 0x5b([)->return 1; 0x53(S)->Phase sub-table (18-entry switch for scene state fields at gP1LP+EQUIP_MAIN_PHASE_OFF). Returns 0=continue, 1=done. Called by render_duel_puzzle_text_to_sprite_queue in loop.
 parse_duel_puzzle_text_token:
     push {r4,r5,r6,lr}                       @ 080938d4 70b5
     sub sp,#0x44                             @ 080938d6 91b0
@@ -31386,7 +31338,7 @@ LAB_080938ee:
     beq LAB_080938f8                         @ 080938f4 00d0
     b switchD_08093a4c__default              @ 080938f6 4fe3
 LAB_080938f8:
-    ldr r1, DAT_0809390c                     @ 080938f8 0449
+    ldr r1, ptr_str_end_390c                 @ 080938f8 0449
     adds r0,r5,#0x0    @ 080938fa 281c
     movs r2,#0x5    @ 080938fc 0522
     bl strncmp                               @ 080938fe 7bf00ffc
@@ -31396,10 +31348,10 @@ LAB_080938f8:
 LAB_08093908:
     movs r0,#0x1    @ 08093908 0120
     b LAB_08093f9a                           @ 0809390a 46e3
-DAT_0809390c:
-    .word  0x09e47464                     @ 0809390c 6474e409
+ptr_str_end_390c:
+    .word  puzzle_token_str_end           @ 0809390c 6474e409
 LAB_08093910:
-    ldr r1, DAT_08093940                     @ 08093910 0b49
+    ldr r1, ptr_str_player_lp_3940           @ 08093910 0b49
     adds r0,r5,#0x0    @ 08093912 281c
     movs r2,#0x8    @ 08093914 0822
     bl strncmp                               @ 08093916 7bf003fc
@@ -31409,28 +31361,28 @@ LAB_08093910:
     subs r4,#0x30    @ 08093920 303c
     adds r0,r5,#0x0    @ 08093922 281c
     adds r0,#0xa    @ 08093924 0a30
-    ldr r1, DAT_08093944                     @ 08093926 0749
+    ldr r1, ptr_fmt_d_3944                   @ 08093926 0749
     .hword 0x466a    @ 08093928 6a46
     bl sscanf                                @ 0809392a 7bf03bfb
-    ldr r1, PTR_gP1LifePoints_08093948       @ 0809392e 0649
+    ldr r1, ptr_gP1LifePoints_3948           @ 0809392e 0649
     movs r0,#0x1    @ 08093930 0120
     ands r4,r0    @ 08093932 0440
-    ldr r0, DAT_0809394c                     @ 08093934 0548
+    ldr r0, ptr_player_block_stride_394c     @ 08093934 0548
     muls r0,r4    @ 08093936 6043
     adds r0,r0,r1    @ 08093938 4018
     ldr r1,[sp,#0x0]                         @ 0809393a 0099
     str r1,[r0,#0x0]                         @ 0809393c 0160
     b switchD_08093a4c__default              @ 0809393e 2be3
-DAT_08093940:
-    .word  0x09e4746c                     @ 08093940 6c74e409
-DAT_08093944:
-    .word  0x09e47478                     @ 08093944 7874e409
-PTR_gP1LifePoints_08093948:
+ptr_str_player_lp_3940:
+    .word  puzzle_token_str_player_lp     @ 08093940 6c74e409
+ptr_fmt_d_3944:
+    .word  puzzle_token_fmt_d             @ 08093944 7874e409
+ptr_gP1LifePoints_3948:
     .word  gP1LifePoints                  @ 08093948 e0c40102
-DAT_0809394c:
-    .word  0x00000868                     @ 0809394c 68080000
+ptr_player_block_stride_394c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809394c 68080000
 LAB_08093950:
-    ldr r1, DAT_08093974                     @ 08093950 0849
+    ldr r1, ptr_str_phase_3974               @ 08093950 0849
     adds r0,r5,#0x0    @ 08093952 281c
     movs r2,#0x5    @ 08093954 0522
     bl strncmp                               @ 08093956 7bf0e3fb
@@ -31445,16 +31397,16 @@ LAB_08093960:
     b switchD_08093a4c__default              @ 08093968 16e3
 LAB_0809396a:
     lsls r0,r0,#0x2    @ 0809396a 8000
-    ldr r1, DAT_08093978                     @ 0809396c 0249
+    ldr r1, switchD_08093972__switchdataD_0809397c @ 0809396c 0249
     adds r0,r0,r1    @ 0809396e 4018
     ldr r0,[r0,#0x0]                         @ 08093970 0068
 switchD_08093972__switchD:
     .hword 0x4687    @ 08093972 8746
-DAT_08093974:
-    .word  0x09e4747c                     @ 08093974 7c74e409
-DAT_08093978:
-    .word  0x0809397c                     @ 08093978 7c390908
+ptr_str_phase_3974:
+    .word  puzzle_token_str_phase         @ 08093974 7c74e409
 switchD_08093972__switchdataD_0809397c:
+    .word  0x0809397c                     @ 08093978 7c390908
+switchD_08093972__switchdataD_0809397c__0809397c:
     .word  0x08093a00                     @ 0809397c 003a0908
     .word  0x08093f98                     @ 08093980 983f0908
     .word  0x080939c4                     @ 08093984 c4390908
@@ -31474,62 +31426,62 @@ switchD_08093972__switchdataD_0809397c:
     .word  0x08093f98                     @ 080939bc 983f0908
     .word  0x080939d8                     @ 080939c0 d8390908
 switchD_08093972__caseD_44:
-    ldr r0, PTR_gP1LifePoints_080939d0       @ 080939c4 0248
-    ldr r1, DAT_080939d4                     @ 080939c6 0349
+    ldr r0, ptr_gP1LifePoints_39d0           @ 080939c4 0248
+    ldr r1, ptr_equip_main_phase_off_39d4    @ 080939c6 0349
     adds r0,r0,r1    @ 080939c8 4018
     movs r1,#0x1    @ 080939ca 0121
     str r1,[r0,#0x0]                         @ 080939cc 0160
     b switchD_08093a4c__default              @ 080939ce e3e2
-PTR_gP1LifePoints_080939d0:
+ptr_gP1LifePoints_39d0:
     .word  gP1LifePoints                  @ 080939d0 e0c40102
-DAT_080939d4:
-    .word  0x00001d18                     @ 080939d4 181d0000
+ptr_equip_main_phase_off_39d4:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 080939d4 181d0000
 switchD_08093972__caseD_53:
-    ldr r0, PTR_gP1LifePoints_080939e4       @ 080939d8 0248
-    ldr r2, DAT_080939e8                     @ 080939da 034a
+    ldr r0, ptr_gP1LifePoints_39e4           @ 080939d8 0248
+    ldr r2, ptr_equip_main_phase_off_39e8    @ 080939da 034a
     adds r0,r0,r2    @ 080939dc 8018
     movs r1,#0x2    @ 080939de 0221
     str r1,[r0,#0x0]                         @ 080939e0 0160
     b switchD_08093a4c__default              @ 080939e2 d9e2
-PTR_gP1LifePoints_080939e4:
+ptr_gP1LifePoints_39e4:
     .word  gP1LifePoints                  @ 080939e4 e0c40102
-DAT_080939e8:
-    .word  0x00001d18                     @ 080939e8 181d0000
+ptr_equip_main_phase_off_39e8:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 080939e8 181d0000
 switchD_08093972__caseD_4d:
-    ldr r0, PTR_gP1LifePoints_080939f8       @ 080939ec 0248
-    ldr r4, DAT_080939fc                     @ 080939ee 034c
+    ldr r0, ptr_gP1LifePoints_39f8           @ 080939ec 0248
+    ldr r4, ptr_equip_main_phase_off_39fc    @ 080939ee 034c
     adds r0,r0,r4    @ 080939f0 0019
     movs r1,#0x3    @ 080939f2 0321
     str r1,[r0,#0x0]                         @ 080939f4 0160
     b switchD_08093a4c__default              @ 080939f6 cfe2
-PTR_gP1LifePoints_080939f8:
+ptr_gP1LifePoints_39f8:
     .word  gP1LifePoints                  @ 080939f8 e0c40102
-DAT_080939fc:
-    .word  0x00001d18                     @ 080939fc 181d0000
+ptr_equip_main_phase_off_39fc:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 080939fc 181d0000
 switchD_08093972__caseD_42:
-    ldr r0, PTR_gP1LifePoints_08093a0c       @ 08093a00 0248
-    ldr r6, DAT_08093a10                     @ 08093a02 034e
+    ldr r0, ptr_gP1LifePoints_3a0c           @ 08093a00 0248
+    ldr r6, ptr_equip_main_phase_off_3a10    @ 08093a02 034e
     adds r0,r0,r6    @ 08093a04 8019
     movs r1,#0x4    @ 08093a06 0421
     str r1,[r0,#0x0]                         @ 08093a08 0160
     b switchD_08093a4c__default              @ 08093a0a c5e2
-PTR_gP1LifePoints_08093a0c:
+ptr_gP1LifePoints_3a0c:
     .word  gP1LifePoints                  @ 08093a0c e0c40102
-DAT_08093a10:
-    .word  0x00001d18                     @ 08093a10 181d0000
+ptr_equip_main_phase_off_3a10:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 08093a10 181d0000
 switchD_08093972__caseD_45:
-    ldr r0, PTR_gP1LifePoints_08093a20       @ 08093a14 0248
-    ldr r1, DAT_08093a24                     @ 08093a16 0349
+    ldr r0, ptr_gP1LifePoints_3a20           @ 08093a14 0248
+    ldr r1, ptr_equip_main_phase_off_3a24    @ 08093a16 0349
     adds r0,r0,r1    @ 08093a18 4018
     movs r1,#0x6    @ 08093a1a 0621
     str r1,[r0,#0x0]                         @ 08093a1c 0160
     b switchD_08093a4c__default              @ 08093a1e bbe2
-PTR_gP1LifePoints_08093a20:
+ptr_gP1LifePoints_3a20:
     .word  gP1LifePoints                  @ 08093a20 e0c40102
-DAT_08093a24:
-    .word  0x00001d18                     @ 08093a24 181d0000
+ptr_equip_main_phase_off_3a24:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 08093a24 181d0000
 LAB_08093a28:
-    ldr r1, DAT_08093a50                     @ 08093a28 0949
+    ldr r1, ptr_str_card_in_3a50             @ 08093a28 0949
     adds r0,r5,#0x0    @ 08093a2a 281c
     movs r2,#0x6    @ 08093a2c 0622
     bl strncmp                               @ 08093a2e 7bf077fb
@@ -31545,17 +31497,17 @@ LAB_08093a38:
     b switchD_08093a4c__default              @ 08093a42 a9e2
 LAB_08093a44:
     lsls r0,r0,#0x2    @ 08093a44 8000
-    ldr r1, DAT_08093a54                     @ 08093a46 0349
+    ldr r1, switchD_08093a4c__switchdataD_08093a58 @ 08093a46 0349
     adds r0,r0,r1    @ 08093a48 4018
     ldr r0,[r0,#0x0]                         @ 08093a4a 0068
 switchD_08093a4c__switchD:
     .hword 0x4687    @ 08093a4c 8746
     .zero  0x2
-DAT_08093a50:
-    .word  0x09e47484                     @ 08093a50 8474e409
-DAT_08093a54:
-    .word  0x08093a58                     @ 08093a54 583a0908
+ptr_str_card_in_3a50:
+    .word  puzzle_token_str_card_in       @ 08093a50 8474e409
 switchD_08093a4c__switchdataD_08093a58:
+    .word  0x08093a58                     @ 08093a54 583a0908
+switchD_08093a4c__switchdataD_08093a58__08093a58:
     .word  0x08093acc                     @ 08093a58 cc3a0908
     .word  0x08093b70                     @ 08093a5c 703b0908
     .word  0x08093b18                     @ 08093a60 183b0908
@@ -31571,16 +31523,16 @@ switchD_08093a4c__caseD_48:
 LAB_08093a78:
     adds r0,r5,#0x0    @ 08093a78 281c
     adds r0,#0xa    @ 08093a7a 0a30
-    ldr r1, DAT_08093ac0                     @ 08093a7c 1049
+    ldr r1, ptr_fmt_d_3ac0                   @ 08093a7c 1049
     add r2,sp,#0x4                           @ 08093a7e 01aa
     bl sscanf                                @ 08093a80 7bf090fa
     ldr r1,[sp,#0x4]                         @ 08093a84 0199
     adds r0,r4,#0x0    @ 08093a86 201c
     bl write_lp_card_display_slot_entry      @ 08093a88 fff7f8fe
-    ldr r5, PTR_gP1LifePoints_08093ac4       @ 08093a8c 0d4d
+    ldr r5, ptr_gP1LifePoints_3ac4           @ 08093a8c 0d4d
     movs r1,#0x1    @ 08093a8e 0121
     ands r4,r1    @ 08093a90 0c40
-    ldr r1, DAT_08093ac8                     @ 08093a92 0d49
+    ldr r1, ptr_player_block_stride_3ac8     @ 08093a92 0d49
     muls r4,r1    @ 08093a94 4c43
     adds r3,r5,#0x0    @ 08093a96 2b1c
     adds r3,#0x10    @ 08093a98 1033
@@ -31603,12 +31555,12 @@ LAB_08093a78:
     adds r0,#0x1    @ 08093aba 0130
     str r0,[r4,#0x0]                         @ 08093abc 2060
     b switchD_08093a4c__default              @ 08093abe 6be2
-DAT_08093ac0:
-    .word  0x09e47478                     @ 08093ac0 7874e409
-PTR_gP1LifePoints_08093ac4:
+ptr_fmt_d_3ac0:
+    .word  puzzle_token_fmt_d             @ 08093ac0 7874e409
+ptr_gP1LifePoints_3ac4:
     .word  gP1LifePoints                  @ 08093ac4 e0c40102
-DAT_08093ac8:
-    .word  0x00000868                     @ 08093ac8 68080000
+ptr_player_block_stride_3ac8:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093ac8 68080000
 switchD_08093a4c__caseD_44:
     ldrb r4,[r5,#0x4]                        @ 08093acc 2c79
     subs r4,#0x30    @ 08093ace 303c
@@ -31619,16 +31571,16 @@ switchD_08093a4c__caseD_44:
 LAB_08093ad8:
     adds r0,r5,#0x0    @ 08093ad8 281c
     adds r0,#0xa    @ 08093ada 0a30
-    ldr r1, DAT_08093b0c                     @ 08093adc 0b49
+    ldr r1, ptr_fmt_d_3b0c                   @ 08093adc 0b49
     add r2,sp,#0x8                           @ 08093ade 02aa
     bl sscanf                                @ 08093ae0 7bf060fa
     ldr r1,[sp,#0x8]                         @ 08093ae4 0299
     adds r0,r4,#0x0    @ 08093ae6 201c
     bl write_lp_card_display_slot_entry      @ 08093ae8 fff7c8fe
-    ldr r5, PTR_gP1LifePoints_08093b10       @ 08093aec 084d
+    ldr r5, ptr_gP1LifePoints_3b10           @ 08093aec 084d
     movs r1,#0x1    @ 08093aee 0121
     ands r4,r1    @ 08093af0 0c40
-    ldr r1, DAT_08093b14                     @ 08093af2 0849
+    ldr r1, ptr_player_block_stride_3b14     @ 08093af2 0849
     adds r2,r4,#0x0    @ 08093af4 221c
     muls r2,r1    @ 08093af6 4a43
     adds r3,r5,#0x0    @ 08093af8 2b1c
@@ -31641,12 +31593,12 @@ LAB_08093ad8:
     lsls r4,r4,#0x2    @ 08093b06 a400
     b LAB_08093b54                           @ 08093b08 24e0
     .zero  0x2
-DAT_08093b0c:
-    .word  0x09e47478                     @ 08093b0c 7874e409
-PTR_gP1LifePoints_08093b10:
+ptr_fmt_d_3b0c:
+    .word  puzzle_token_fmt_d             @ 08093b0c 7874e409
+ptr_gP1LifePoints_3b10:
     .word  gP1LifePoints                  @ 08093b10 e0c40102
-DAT_08093b14:
-    .word  0x00000868                     @ 08093b14 68080000
+ptr_player_block_stride_3b14:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093b14 68080000
 switchD_08093a4c__caseD_46:
     ldrb r4,[r5,#0x6]                        @ 08093b18 ac79
     subs r4,#0x30    @ 08093b1a 303c
@@ -31657,16 +31609,16 @@ switchD_08093a4c__caseD_46:
 LAB_08093b24:
     adds r0,r5,#0x0    @ 08093b24 281c
     adds r0,#0xc    @ 08093b26 0c30
-    ldr r1, DAT_08093b64                     @ 08093b28 0e49
+    ldr r1, ptr_fmt_d_3b64                   @ 08093b28 0e49
     add r2,sp,#0xc                           @ 08093b2a 03aa
     bl sscanf                                @ 08093b2c 7bf03afa
     ldr r1,[sp,#0xc]                         @ 08093b30 0399
     adds r0,r4,#0x0    @ 08093b32 201c
     bl write_lp_card_display_slot_entry      @ 08093b34 fff7a2fe
-    ldr r5, PTR_gP1LifePoints_08093b68       @ 08093b38 0b4d
+    ldr r5, ptr_gP1LifePoints_3b68           @ 08093b38 0b4d
     movs r1,#0x1    @ 08093b3a 0121
     ands r4,r1    @ 08093b3c 0c40
-    ldr r1, DAT_08093b6c                     @ 08093b3e 0b49
+    ldr r1, ptr_player_block_stride_3b6c     @ 08093b3e 0b49
     adds r2,r4,#0x0    @ 08093b40 221c
     muls r2,r1    @ 08093b42 4a43
     adds r3,r5,#0x0    @ 08093b44 2b1c
@@ -31686,12 +31638,12 @@ LAB_08093b54:
     str r0,[r3,#0x0]                         @ 08093b5e 1860
     b switchD_08093a4c__default              @ 08093b60 1ae2
     .zero  0x2
-DAT_08093b64:
-    .word  0x09e47478                     @ 08093b64 7874e409
-PTR_gP1LifePoints_08093b68:
+ptr_fmt_d_3b64:
+    .word  puzzle_token_fmt_d             @ 08093b64 7874e409
+ptr_gP1LifePoints_3b68:
     .word  gP1LifePoints                  @ 08093b68 e0c40102
-DAT_08093b6c:
-    .word  0x00000868                     @ 08093b6c 68080000
+ptr_player_block_stride_3b6c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093b6c 68080000
 switchD_08093a4c__caseD_45:
     ldrb r4,[r5,#0x7]                        @ 08093b70 ec79
     subs r4,#0x30    @ 08093b72 303c
@@ -31702,16 +31654,16 @@ switchD_08093a4c__caseD_45:
 LAB_08093b7c:
     adds r0,r5,#0x0    @ 08093b7c 281c
     adds r0,#0xd    @ 08093b7e 0d30
-    ldr r1, DAT_08093bac                     @ 08093b80 0a49
+    ldr r1, ptr_fmt_d_3bac                   @ 08093b80 0a49
     add r2,sp,#0x10                          @ 08093b82 04aa
     bl sscanf                                @ 08093b84 7bf00efa
     ldr r1,[sp,#0x10]                        @ 08093b88 0499
     adds r0,r4,#0x0    @ 08093b8a 201c
     bl write_lp_card_display_slot_entry      @ 08093b8c fff776fe
-    ldr r3, PTR_gP1LifePoints_08093bb0       @ 08093b90 074b
+    ldr r3, ptr_gP1LifePoints_3bb0           @ 08093b90 074b
     movs r1,#0x1    @ 08093b92 0121
     ands r4,r1    @ 08093b94 0c40
-    ldr r1, DAT_08093bb4                     @ 08093b96 0749
+    ldr r1, ptr_player_block_stride_3bb4     @ 08093b96 0749
     muls r4,r1    @ 08093b98 4c43
     adds r2,r3,#0x0    @ 08093b9a 1a1c
     adds r2,#0x1c    @ 08093b9c 1c32
@@ -31722,12 +31674,12 @@ LAB_08093b7c:
     movs r4,#0xba    @ 08093ba6 ba24
     lsls r4,r4,#0x3    @ 08093ba8 e400
     b LAB_08093bf8                           @ 08093baa 25e0
-DAT_08093bac:
-    .word  0x09e47478                     @ 08093bac 7874e409
-PTR_gP1LifePoints_08093bb0:
+ptr_fmt_d_3bac:
+    .word  puzzle_token_fmt_d             @ 08093bac 7874e409
+ptr_gP1LifePoints_3bb0:
     .word  gP1LifePoints                  @ 08093bb0 e0c40102
-DAT_08093bb4:
-    .word  0x00000868                     @ 08093bb4 68080000
+ptr_player_block_stride_3bb4:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093bb4 68080000
 switchD_08093a4c__caseD_47:
     ldrb r6,[r5,#0x1]                        @ 08093bb8 6e78
     cmp r6,#0x72                             @ 08093bba 722e
@@ -31741,16 +31693,16 @@ switchD_08093a4c__caseD_47:
 LAB_08093bca:
     adds r0,r5,#0x0    @ 08093bca 281c
     adds r0,#0xb    @ 08093bcc 0b30
-    ldr r1, DAT_08093c08                     @ 08093bce 0e49
+    ldr r1, ptr_fmt_d_3c08                   @ 08093bce 0e49
     add r2,sp,#0x14                          @ 08093bd0 05aa
     bl sscanf                                @ 08093bd2 7bf0e7f9
     ldr r1,[sp,#0x14]                        @ 08093bd6 0599
     adds r0,r4,#0x0    @ 08093bd8 201c
     bl write_lp_card_display_slot_entry      @ 08093bda fff74ffe
-    ldr r3, PTR_gP1LifePoints_08093c0c       @ 08093bde 0b4b
+    ldr r3, ptr_gP1LifePoints_3c0c           @ 08093bde 0b4b
     movs r1,#0x1    @ 08093be0 0121
     ands r4,r1    @ 08093be2 0c40
-    ldr r1, DAT_08093c10                     @ 08093be4 0a49
+    ldr r1, ptr_player_block_stride_3c10     @ 08093be4 0a49
     muls r4,r1    @ 08093be6 4c43
     adds r2,r3,#0x0    @ 08093be8 1a1c
     adds r2,#0x14    @ 08093bea 1432
@@ -31769,22 +31721,22 @@ LAB_08093bf8:
     str r0,[r2,#0x0]                         @ 08093c02 1060
     b switchD_08093a4c__default              @ 08093c04 c8e1
     .zero  0x2
-DAT_08093c08:
-    .word  0x09e47478                     @ 08093c08 7874e409
-PTR_gP1LifePoints_08093c0c:
+ptr_fmt_d_3c08:
+    .word  puzzle_token_fmt_d             @ 08093c08 7874e409
+ptr_gP1LifePoints_3c0c:
     .word  gP1LifePoints                  @ 08093c0c e0c40102
-DAT_08093c10:
-    .word  0x00000868                     @ 08093c10 68080000
+ptr_player_block_stride_3c10:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093c10 68080000
 LAB_08093c14:
     ldrb r4,[r5,#0x4]                        @ 08093c14 2c79
     subs r4,#0x30    @ 08093c16 303c
     adds r0,r5,#0x6    @ 08093c18 a81d
-    ldr r6, DAT_08093c64                     @ 08093c1a 124e
+    ldr r6, ptr_fmt_d_3c64                   @ 08093c1a 124e
     add r2,sp,#0x18                          @ 08093c1c 06aa
     adds r1,r6,#0x0    @ 08093c1e 311c
     bl sscanf                                @ 08093c20 7bf0c0f9
     adds r5,#0x9    @ 08093c24 0935
-    ldr r1, DAT_08093c68                     @ 08093c26 1049
+    ldr r1, ptr_str_eq_3c68                  @ 08093c26 1049
     adds r0,r5,#0x0    @ 08093c28 281c
     movs r2,#0x1    @ 08093c2a 0122
     bl strncmp                               @ 08093c2c 7bf078fa
@@ -31792,9 +31744,9 @@ LAB_08093c14:
     bne LAB_08093c7c                         @ 08093c32 23d1
     movs r0,#0x1    @ 08093c34 0120
     ands r4,r0    @ 08093c36 0440
-    ldr r0, DAT_08093c6c                     @ 08093c38 0c48
+    ldr r0, ptr_player_block_stride_3c6c     @ 08093c38 0c48
     muls r4,r0    @ 08093c3a 4443
-    ldr r0, DAT_08093c70                     @ 08093c3c 0c48
+    ldr r0, ptr_gDuelFieldSlots_3c70         @ 08093c3c 0c48
     adds r4,r4,r0    @ 08093c3e 2418
     ldr r1,[sp,#0x18]                        @ 08093c40 0699
     lsls r0,r1,#0x2    @ 08093c42 8800
@@ -31806,27 +31758,27 @@ LAB_08093c14:
     adds r1,r6,#0x0    @ 08093c4e 311c
     bl sscanf                                @ 08093c50 7bf0a8f9
     ldr r1,[sp,#0x1c]                        @ 08093c54 0799
-    ldr r6, DAT_08093c74                     @ 08093c56 074e
+    ldr r6, ptr_slot_set_code_mask_3c74      @ 08093c56 074e
     adds r0,r6,#0x0    @ 08093c58 301c
     ands r1,r0    @ 08093c5a 0140
-    ldr r0, DAT_08093c78                     @ 08093c5c 0648
+    ldr r0, ptr_oam_attr2_tile_clear_3c78    @ 08093c5c 0648
     ldrh r2,[r4,#0x0]                        @ 08093c5e 2288
     ands r0,r2    @ 08093c60 1040
     b LAB_08093dde                           @ 08093c62 bce0
-DAT_08093c64:
-    .word  0x09e47478                     @ 08093c64 7874e409
-DAT_08093c68:
-    .word  0x09e4748c                     @ 08093c68 8c74e409
-DAT_08093c6c:
-    .word  0x00000868                     @ 08093c6c 68080000
-DAT_08093c70:
-    .word  0x0201c510                     @ 08093c70 10c50102
-DAT_08093c74:
-    .word  0x00001fff                     @ 08093c74 ff1f0000
-DAT_08093c78:
-    .word  0xffffe000                     @ 08093c78 00e0ffff
+ptr_fmt_d_3c64:
+    .word  puzzle_token_fmt_d             @ 08093c64 7874e409
+ptr_str_eq_3c68:
+    .word  puzzle_token_str_eq            @ 08093c68 8c74e409
+ptr_player_block_stride_3c6c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093c6c 68080000
+ptr_gDuelFieldSlots_3c70:
+    .word  gDuelFieldSlots                @ 08093c70 10c50102
+ptr_slot_set_code_mask_3c74:
+    .word  SLOT_CARD_SET_CODE_MASK        @ 08093c74 ff1f0000
+ptr_oam_attr2_tile_clear_3c78:
+    .word  OAM_ATTR2_TILE_CLEAR           @ 08093c78 00e0ffff
 LAB_08093c7c:
-    ldr r1, DAT_08093cb0                     @ 08093c7c 0c49
+    ldr r1, ptr_str_face_3cb0                @ 08093c7c 0c49
     adds r0,r5,#0x0    @ 08093c7e 281c
     movs r2,#0x5    @ 08093c80 0522
     bl strncmp                               @ 08093c82 7bf04dfa
@@ -31834,9 +31786,9 @@ LAB_08093c7c:
     bne LAB_08093cbc                         @ 08093c88 18d1
     movs r0,#0x1    @ 08093c8a 0120
     ands r4,r0    @ 08093c8c 0440
-    ldr r0, DAT_08093cb4                     @ 08093c8e 0948
+    ldr r0, ptr_player_block_stride_3cb4     @ 08093c8e 0948
     muls r4,r0    @ 08093c90 4443
-    ldr r0, DAT_08093cb8                     @ 08093c92 0948
+    ldr r0, ptr_gDuelFieldSlots_3cb8         @ 08093c92 0948
     adds r4,r4,r0    @ 08093c94 2418
     ldr r1,[sp,#0x18]                        @ 08093c96 0699
     lsls r0,r1,#0x2    @ 08093c98 8800
@@ -31850,14 +31802,14 @@ LAB_08093c7c:
     ldr r0,[sp,#0x20]                        @ 08093caa 0898
     strh r0,[r4,#0x8]                        @ 08093cac 2081
     b switchD_08093a4c__default              @ 08093cae 73e1
-DAT_08093cb0:
-    .word  0x09e47490                     @ 08093cb0 9074e409
-DAT_08093cb4:
-    .word  0x00000868                     @ 08093cb4 68080000
-DAT_08093cb8:
-    .word  0x0201c510                     @ 08093cb8 10c50102
+ptr_str_face_3cb0:
+    .word  puzzle_token_str_face          @ 08093cb0 9074e409
+ptr_player_block_stride_3cb4:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093cb4 68080000
+ptr_gDuelFieldSlots_3cb8:
+    .word  gDuelFieldSlots                @ 08093cb8 10c50102
 LAB_08093cbc:
-    ldr r1, DAT_08093cf0                     @ 08093cbc 0c49
+    ldr r1, ptr_str_turn_3cf0                @ 08093cbc 0c49
     adds r0,r5,#0x0    @ 08093cbe 281c
     movs r2,#0x5    @ 08093cc0 0522
     bl strncmp                               @ 08093cc2 7bf02dfa
@@ -31865,9 +31817,9 @@ LAB_08093cbc:
     bne LAB_08093cfc                         @ 08093cc8 18d1
     movs r0,#0x1    @ 08093cca 0120
     ands r4,r0    @ 08093ccc 0440
-    ldr r0, DAT_08093cf4                     @ 08093cce 0948
+    ldr r0, ptr_player_block_stride_3cf4     @ 08093cce 0948
     muls r4,r0    @ 08093cd0 4443
-    ldr r0, DAT_08093cf8                     @ 08093cd2 0948
+    ldr r0, ptr_gDuelFieldSlots_3cf8         @ 08093cd2 0948
     adds r4,r4,r0    @ 08093cd4 2418
     ldr r1,[sp,#0x18]                        @ 08093cd6 0699
     lsls r0,r1,#0x2    @ 08093cd8 8800
@@ -31881,14 +31833,14 @@ LAB_08093cbc:
     ldr r0,[sp,#0x24]                        @ 08093cea 0998
     strh r0,[r4,#0x6]                        @ 08093cec e080
     b switchD_08093a4c__default              @ 08093cee 53e1
-DAT_08093cf0:
-    .word  0x09e47498                     @ 08093cf0 9874e409
-DAT_08093cf4:
-    .word  0x00000868                     @ 08093cf4 68080000
-DAT_08093cf8:
-    .word  0x0201c510                     @ 08093cf8 10c50102
+ptr_str_turn_3cf0:
+    .word  puzzle_token_str_turn          @ 08093cf0 9874e409
+ptr_player_block_stride_3cf4:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093cf4 68080000
+ptr_gDuelFieldSlots_3cf8:
+    .word  gDuelFieldSlots                @ 08093cf8 10c50102
 LAB_08093cfc:
-    ldr r1, DAT_08093d34                     @ 08093cfc 0d49
+    ldr r1, ptr_str_param_3d34               @ 08093cfc 0d49
     adds r0,r5,#0x0    @ 08093cfe 281c
     movs r2,#0x6    @ 08093d00 0622
     bl strncmp                               @ 08093d02 7bf00dfa
@@ -31898,9 +31850,9 @@ LAB_08093cfc:
 LAB_08093d0c:
     movs r0,#0x1    @ 08093d0c 0120
     ands r4,r0    @ 08093d0e 0440
-    ldr r0, DAT_08093d38                     @ 08093d10 0948
+    ldr r0, ptr_player_block_stride_3d38     @ 08093d10 0948
     muls r4,r0    @ 08093d12 4443
-    ldr r0, DAT_08093d3c                     @ 08093d14 0948
+    ldr r0, ptr_gDuelFieldSlots_3d3c         @ 08093d14 0948
     adds r4,r4,r0    @ 08093d16 2418
     ldr r1,[sp,#0x18]                        @ 08093d18 0699
     lsls r0,r1,#0x2    @ 08093d1a 8800
@@ -31915,14 +31867,14 @@ LAB_08093d0c:
     str r0,[r4,#0xc]                         @ 08093d2e e060
     b switchD_08093a4c__default              @ 08093d30 32e1
     .zero  0x2
-DAT_08093d34:
-    .word  0x09e474a0                     @ 08093d34 a074e409
-DAT_08093d38:
-    .word  0x00000868                     @ 08093d38 68080000
-DAT_08093d3c:
-    .word  0x0201c510                     @ 08093d3c 10c50102
+ptr_str_param_3d34:
+    .word  puzzle_token_str_param         @ 08093d34 a074e409
+ptr_player_block_stride_3d38:
+    .word  PLAYER_BLOCK_STRIDE            @ 08093d38 68080000
+ptr_gDuelFieldSlots_3d3c:
+    .word  gDuelFieldSlots                @ 08093d3c 10c50102
 LAB_08093d40:
-    ldr r1, DAT_08093da8                     @ 08093d40 1949
+    ldr r1, ptr_str_equip_act_3da8           @ 08093d40 1949
     adds r0,r5,#0x0    @ 08093d42 281c
     movs r2,#0x8    @ 08093d44 0822
     bl strncmp                               @ 08093d46 7bf0ebf9
@@ -31937,15 +31889,15 @@ LAB_08093d50:
     bne LAB_08093d5c                         @ 08093d58 00d1
     b switchD_08093a4c__default              @ 08093d5a 1de1
 LAB_08093d5c:
-    ldr r6, DAT_08093dac                     @ 08093d5c 134e
+    ldr r6, ptr_fmt_d_3dac                   @ 08093d5c 134e
     add r2,sp,#0x2c                          @ 08093d5e 0baa
     adds r1,r6,#0x0    @ 08093d60 311c
     bl sscanf                                @ 08093d62 7bf01ff9
     ldr r2,[sp,#0x2c]                        @ 08093d66 0b9a
     lsls r1,r2,#0x3    @ 08093d68 d100
-    ldr r0, DAT_08093db0                     @ 08093d6a 1148
+    ldr r0, gEquipNodePool_data_db0          @ 08093d6a 1148
     adds r4,r1,r0    @ 08093d6c 0c18
-    ldr r1, DAT_08093db4                     @ 08093d6e 1149
+    ldr r1, ptr_gEquipEffectZoneBase_3db4    @ 08093d6e 1149
     adds r2,#0x1    @ 08093d70 0132
     ldr r0,[r1,#0xc]                         @ 08093d72 c868
     cmp r2,r0                                @ 08093d74 8242
@@ -31954,7 +31906,7 @@ LAB_08093d5c:
 LAB_08093d7a:
     str r2,[r1,#0xc]                         @ 08093d7a ca60
     adds r5,#0xc    @ 08093d7c 0c35
-    ldr r1, DAT_08093db8                     @ 08093d7e 0e49
+    ldr r1, ptr_str_src_player_3db8          @ 08093d7e 0e49
     adds r0,r5,#0x0    @ 08093d80 281c
     movs r2,#0x9    @ 08093d82 0922
     bl strncmp                               @ 08093d84 7bf0ccf9
@@ -31973,18 +31925,18 @@ LAB_08093d7a:
     lsls r1,r1,#0x8    @ 08093da2 0902
     b LAB_08093dde                           @ 08093da4 1be0
     .zero  0x2
-DAT_08093da8:
-    .word  0x09e474a8                     @ 08093da8 a874e409
-DAT_08093dac:
-    .word  0x09e47478                     @ 08093dac 7874e409
-DAT_08093db0:
-    .word  0x0201d9c8                     @ 08093db0 c8d90102
-DAT_08093db4:
-    .word  0x0201e4f0                     @ 08093db4 f0e40102
-DAT_08093db8:
-    .word  0x09e474b4                     @ 08093db8 b474e409
+ptr_str_equip_act_3da8:
+    .word  puzzle_token_str_equip_act     @ 08093da8 a874e409
+ptr_fmt_d_3dac:
+    .word  puzzle_token_fmt_d             @ 08093dac 7874e409
+gEquipNodePool_data_db0:
+    .word  gEquipNodePool_data            @ 08093db0 c8d90102  gEquipNodePool_data
+ptr_gEquipEffectZoneBase_3db4:
+    .word  gEquipEffectZoneBase           @ 08093db4 f0e40102
+ptr_str_src_player_3db8:
+    .word  puzzle_token_str_src_player    @ 08093db8 b474e409
 LAB_08093dbc:
-    ldr r1, DAT_08093de4                     @ 08093dbc 0949
+    ldr r1, ptr_str_src_locate_3de4          @ 08093dbc 0949
     adds r0,r5,#0x0    @ 08093dbe 281c
     movs r2,#0x9    @ 08093dc0 0922
     bl strncmp                               @ 08093dc2 7bf0adf9
@@ -32003,10 +31955,10 @@ LAB_08093dde:
     orrs r0,r1    @ 08093dde 0843
     strh r0,[r4,#0x0]                        @ 08093de0 2080
     b switchD_08093a4c__default              @ 08093de2 d9e0
-DAT_08093de4:
-    .word  0x09e474c0                     @ 08093de4 c074e409
+ptr_str_src_locate_3de4:
+    .word  puzzle_token_str_src_locate    @ 08093de4 c074e409
 LAB_08093de8:
-    ldr r1, DAT_08093e08                     @ 08093de8 0749
+    ldr r1, ptr_str_src_card_id_3e08         @ 08093de8 0749
     adds r0,r5,#0x0    @ 08093dea 281c
     movs r2,#0x9    @ 08093dec 0922
     bl strncmp                               @ 08093dee 7bf097f9
@@ -32020,10 +31972,10 @@ LAB_08093de8:
     ldr r0,[sp,#0x38]                        @ 08093e02 0e98
     strh r0,[r4,#0x0]                        @ 08093e04 2080
     b switchD_08093a4c__default              @ 08093e06 c7e0
-DAT_08093e08:
-    .word  0x09e474cc                     @ 08093e08 cc74e409
+ptr_str_src_card_id_3e08:
+    .word  puzzle_token_str_src_card_id   @ 08093e08 cc74e409
 LAB_08093e0c:
-    ldr r1, DAT_08093e38                     @ 08093e0c 0a49
+    ldr r1, ptr_str_dst_player_3e38          @ 08093e0c 0a49
     adds r0,r5,#0x0    @ 08093e0e 281c
     movs r2,#0x9    @ 08093e10 0922
     bl strncmp                               @ 08093e12 7bf085f9
@@ -32043,10 +31995,10 @@ LAB_08093e0c:
     orrs r0,r1    @ 08093e32 0843
     strh r0,[r4,#0x4]                        @ 08093e34 a080
     b switchD_08093a4c__default              @ 08093e36 afe0
-DAT_08093e38:
-    .word  0x09e474d8                     @ 08093e38 d874e409
+ptr_str_dst_player_3e38:
+    .word  puzzle_token_str_dst_player    @ 08093e38 d874e409
 LAB_08093e3c:
-    ldr r1, DAT_08093e64                     @ 08093e3c 0949
+    ldr r1, ptr_str_dst_locate_3e64          @ 08093e3c 0949
     adds r0,r5,#0x0    @ 08093e3e 281c
     movs r2,#0x9    @ 08093e40 0922
     bl strncmp                               @ 08093e42 7bf06df9
@@ -32064,10 +32016,10 @@ LAB_08093e3c:
     orrs r0,r6    @ 08093e5e 3043
     strh r0,[r4,#0x4]                        @ 08093e60 a080
     b switchD_08093a4c__default              @ 08093e62 99e0
-DAT_08093e64:
-    .word  0x09e474e4                     @ 08093e64 e474e409
+ptr_str_dst_locate_3e64:
+    .word  puzzle_token_str_dst_locate    @ 08093e64 e474e409
 LAB_08093e68:
-    ldr r1, DAT_08093e94                     @ 08093e68 0a49
+    ldr r1, ptr_str_type_3e94                @ 08093e68 0a49
     adds r0,r5,#0x0    @ 08093e6a 281c
     movs r2,#0x4    @ 08093e6c 0422
     bl strncmp                               @ 08093e6e 7bf057f9
@@ -32076,7 +32028,7 @@ LAB_08093e68:
     b switchD_08093a4c__default              @ 08093e76 8fe0
 LAB_08093e78:
     adds r5,#0x5    @ 08093e78 0535
-    ldr r1, DAT_08093e98                     @ 08093e7a 0749
+    ldr r1, ptr_str_only_in_turn_3e98        @ 08093e7a 0749
     adds r0,r5,#0x0    @ 08093e7c 281c
     movs r2,#0xa    @ 08093e7e 0a22
     bl strncmp                               @ 08093e80 7bf04ef9
@@ -32088,12 +32040,12 @@ LAB_08093e78:
     ands r0,r1    @ 08093e8e 0840
     movs r1,#0x1    @ 08093e90 0121
     b LAB_08093f94                           @ 08093e92 7fe0
-DAT_08093e94:
-    .word  0x09e474f0                     @ 08093e94 f074e409
-DAT_08093e98:
-    .word  0x09e474f8                     @ 08093e98 f874e409
+ptr_str_type_3e94:
+    .word  puzzle_token_str_type          @ 08093e94 f074e409
+ptr_str_only_in_turn_3e98:
+    .word  puzzle_token_str_only_in_turn  @ 08093e98 f874e409
 LAB_08093e9c:
-    ldr r1, DAT_08093eb8                     @ 08093e9c 0649
+    ldr r1, ptr_str_only_face_turn_3eb8      @ 08093e9c 0649
     adds r0,r5,#0x0    @ 08093e9e 281c
     movs r2,#0xc    @ 08093ea0 0c22
     bl strncmp                               @ 08093ea2 7bf03df9
@@ -32106,10 +32058,10 @@ LAB_08093e9c:
     movs r1,#0x2    @ 08093eb2 0221
     b LAB_08093f94                           @ 08093eb4 6ee0
     .zero  0x2
-DAT_08093eb8:
-    .word  0x09e47504                     @ 08093eb8 0475e409
+ptr_str_only_face_turn_3eb8:
+    .word  puzzle_token_str_only_face_turn @ 08093eb8 0475e409
 LAB_08093ebc:
-    ldr r1, DAT_08093ed8                     @ 08093ebc 0649
+    ldr r1, ptr_str_only_face_3ed8           @ 08093ebc 0649
     adds r0,r5,#0x0    @ 08093ebe 281c
     movs r2,#0x8    @ 08093ec0 0822
     bl strncmp                               @ 08093ec2 7bf02df9
@@ -32122,10 +32074,10 @@ LAB_08093ebc:
     movs r1,#0x3    @ 08093ed2 0321
     b LAB_08093f94                           @ 08093ed4 5ee0
     .zero  0x2
-DAT_08093ed8:
-    .word  0x09e47514                     @ 08093ed8 1475e409
+ptr_str_only_face_3ed8:
+    .word  puzzle_token_str_only_face     @ 08093ed8 1475e409
 LAB_08093edc:
-    ldr r1, DAT_08093ef8                     @ 08093edc 0649
+    ldr r1, ptr_str_forever_3ef8             @ 08093edc 0649
     adds r0,r5,#0x0    @ 08093ede 281c
     movs r2,#0x7    @ 08093ee0 0722
     bl strncmp                               @ 08093ee2 7bf01df9
@@ -32138,10 +32090,10 @@ LAB_08093edc:
     movs r1,#0x5    @ 08093ef2 0521
     b LAB_08093f94                           @ 08093ef4 4ee0
     .zero  0x2
-DAT_08093ef8:
-    .word  0x09e47520                     @ 08093ef8 2075e409
+ptr_str_forever_3ef8:
+    .word  puzzle_token_str_forever       @ 08093ef8 2075e409
 LAB_08093efc:
-    ldr r1, DAT_08093f18                     @ 08093efc 0649
+    ldr r1, ptr_str_permanent_3f18           @ 08093efc 0649
     adds r0,r5,#0x0    @ 08093efe 281c
     movs r2,#0x9    @ 08093f00 0922
     bl strncmp                               @ 08093f02 7bf00df9
@@ -32154,10 +32106,10 @@ LAB_08093efc:
     movs r1,#0x6    @ 08093f12 0621
     b LAB_08093f94                           @ 08093f14 3ee0
     .zero  0x2
-DAT_08093f18:
-    .word  0x09e47528                     @ 08093f18 2875e409
+ptr_str_permanent_3f18:
+    .word  puzzle_token_str_permanent     @ 08093f18 2875e409
 LAB_08093f1c:
-    ldr r1, DAT_08093f38                     @ 08093f1c 0649
+    ldr r1, ptr_str_during_face_3f38         @ 08093f1c 0649
     adds r0,r5,#0x0    @ 08093f1e 281c
     movs r2,#0xa    @ 08093f20 0a22
     bl strncmp                               @ 08093f22 7bf0fdf8
@@ -32170,10 +32122,10 @@ LAB_08093f1c:
     movs r1,#0x7    @ 08093f32 0721
     b LAB_08093f94                           @ 08093f34 2ee0
     .zero  0x2
-DAT_08093f38:
-    .word  0x09e47534                     @ 08093f38 3475e409
+ptr_str_during_face_3f38:
+    .word  puzzle_token_str_during_face   @ 08093f38 3475e409
 LAB_08093f3c:
-    ldr r1, DAT_08093f58                     @ 08093f3c 0649
+    ldr r1, ptr_str_equipment_3f58           @ 08093f3c 0649
     adds r0,r5,#0x0    @ 08093f3e 281c
     movs r2,#0x9    @ 08093f40 0922
     bl strncmp                               @ 08093f42 7bf0edf8
@@ -32186,10 +32138,10 @@ LAB_08093f3c:
     movs r1,#0xa    @ 08093f52 0a21
     b LAB_08093f94                           @ 08093f54 1ee0
     .zero  0x2
-DAT_08093f58:
-    .word  0x09e47540                     @ 08093f58 4075e409
+ptr_str_equipment_3f58:
+    .word  puzzle_token_str_equipment     @ 08093f58 4075e409
 LAB_08093f5c:
-    ldr r1, DAT_08093f78                     @ 08093f5c 0649
+    ldr r1, ptr_str_union_3f78               @ 08093f5c 0649
     adds r0,r5,#0x0    @ 08093f5e 281c
     movs r2,#0x5    @ 08093f60 0522
     bl strncmp                               @ 08093f62 7bf0ddf8
@@ -32202,10 +32154,10 @@ LAB_08093f5c:
     movs r1,#0xb    @ 08093f72 0b21
     b LAB_08093f94                           @ 08093f74 0ee0
     .zero  0x2
-DAT_08093f78:
-    .word  0x09e4754c                     @ 08093f78 4c75e409
+ptr_str_union_3f78:
+    .word  puzzle_token_str_union         @ 08093f78 4c75e409
 LAB_08093f7c:
-    ldr r1, DAT_08093fa4                     @ 08093f7c 0949
+    ldr r1, ptr_str_captured_3fa4            @ 08093f7c 0949
     adds r0,r5,#0x0    @ 08093f7e 281c
     movs r2,#0x8    @ 08093f80 0822
     bl strncmp                               @ 08093f82 7bf0cdf8
@@ -32227,12 +32179,10 @@ LAB_08093f9a:
     pop {r1}                                 @ 08093f9e 02bc
     bx r1                                    @ 08093fa0 0847
     .zero  0x2
-DAT_08093fa4:
-    .word  0x09e47554                     @ 08093fa4 5475e409
+ptr_str_captured_3fa4:
+    .word  puzzle_token_str_captured      @ 08093fa4 5475e409
 
-@ Renders duel puzzle text data and pushes entries to sprite queue. Called by FUN_080937d4 (duel puzzle scene main handler) as the text rendering step after scene initialization.
-@ Loops calling copy_text_line_to_buf + parse_duel_puzzle_text_token to parse text lines; then calls enqueue_sprite_attr_record multiple times to push text sprites to queue, and calls dispatch_card_display_op to update card display state.
-@ Returns void (Pattern B: pop{r0};bx r0; return value discarded by caller at 0x0809381a movs r0,#0x1 overwrite).
+@ Render duel puzzle text to sprite queue. Called by init_duel_puzzle_scene_state. Inits gP1LP[0]/[0x868] to 0x1f40, gP1LP[4]:=1, gP1LP[PUZZLE_P2LP_SLOT_OFF]:=1. Loops: copy_text_line_to_buf + parse_duel_puzzle_text_token until done. Then iterates gEquipNodePool entries, calls enqueue_sprite_attr_record for each active LP sprite row, then 10x dispatch_card_display_op for field+hand ops. Returns void (Pattern B).
 render_duel_puzzle_text_to_sprite_queue:
     push {r4,r5,r6,r7,lr}                    @ 08093fa8 f0b5
     .hword 0x4657    @ 08093faa 5746
@@ -32242,16 +32192,16 @@ render_duel_puzzle_text_to_sprite_queue:
     sub sp,#0x104                            @ 08093fb2 c1b0
     add r1,sp,#0x100                         @ 08093fb4 40a9
     str r0,[r1,#0x0]                         @ 08093fb6 0860
-    ldr r1, PTR_gP1LifePoints_08094098       @ 08093fb8 3749
+    ldr r1, ptr_gP1LifePoints_4098           @ 08093fb8 3749
     movs r2,#0xfa    @ 08093fba fa22
     lsls r2,r2,#0x5    @ 08093fbc 5201
     str r2,[r1,#0x0]                         @ 08093fbe 0a60
-    ldr r3, DAT_0809409c                     @ 08093fc0 364b
+    ldr r3, ptr_player_block_stride_409c     @ 08093fc0 364b
     adds r0,r1,r3    @ 08093fc2 c818
     str r2,[r0,#0x0]                         @ 08093fc4 0260
     movs r0,#0x1    @ 08093fc6 0120
     str r0,[r1,#0x4]                         @ 08093fc8 4860
-    ldr r2, DAT_080940a0                     @ 08093fca 354a
+    ldr r2, puzzle_p2lp_slot_off             @ 08093fca 354a
     adds r1,r1,r2    @ 08093fcc 8918
     str r0,[r1,#0x0]                         @ 08093fce 0860
     movs r1,#0x0    @ 08093fd0 0021
@@ -32272,14 +32222,14 @@ LAB_08093fdc:
     cmp r0,#0x0                              @ 08093ff2 0028
     beq LAB_08093fdc                         @ 08093ff4 f2d0
 LAB_08093ff6:
-    ldr r1, PTR_gP1LifePoints_08094098       @ 08093ff6 2849
+    ldr r1, ptr_gP1LifePoints_4098           @ 08093ff6 2849
     ldr r0,[r1,#0x4]                         @ 08093ff8 4868
     subs r0,#0x1    @ 08093ffa 0138
     str r0,[r1,#0x8]                         @ 08093ffc 8860
     movs r3,#0x87    @ 08093ffe 8723
     lsls r3,r3,#0x4    @ 08094000 1b01
     adds r2,r1,r3    @ 08094002 ca18
-    ldr r0, DAT_080940a0                     @ 08094004 2648
+    ldr r0, puzzle_p2lp_slot_off             @ 08094004 2648
     adds r1,r1,r0    @ 08094006 0918
     ldr r0,[r1,#0x0]                         @ 08094008 0868
     subs r0,#0x1    @ 0809400a 0138
@@ -32295,17 +32245,17 @@ LAB_08094010:
     ands r6,r3    @ 0809401c 1e40
     .hword 0x4689    @ 0809401e 8946
 LAB_08094020:
-    ldr r0, DAT_0809409c                     @ 08094020 1e48
+    ldr r0, ptr_player_block_stride_409c     @ 08094020 1e48
     muls r0,r6    @ 08094022 7043
     add r0,r9                                @ 08094024 4844
-    ldr r1, DAT_080940a4                     @ 08094026 1f49
+    ldr r1, ptr_gDuelFieldSlots_40a4         @ 08094026 1f49
     adds r4,r0,r1    @ 08094028 4418
     ldr r0,[r4,#0x0]                         @ 0809402a 2068
     lsls r0,r0,#0x13    @ 0809402c c004
     lsrs r2,r0,#0x13    @ 0809402e c20c
     cmp r2,#0x0                              @ 08094030 002a
     beq LAB_08094080                         @ 08094032 25d0
-    ldr r1, DAT_080940a8                     @ 08094034 1c49
+    ldr r1, ptr_oam_attr2_tile_clear_40a8    @ 08094034 1c49
     adds r0,r1,#0x0    @ 08094036 081c
     ldrh r3,[r4,#0x0]                        @ 08094038 2388
     ands r0,r3    @ 0809403a 1840
@@ -32313,7 +32263,7 @@ LAB_08094020:
     movs r1,#0x73    @ 0809403e 7321
     cmp r7,#0x0                              @ 08094040 002f
     beq LAB_08094046                         @ 08094042 00d0
-    ldr r1, DAT_080940ac                     @ 08094044 1949
+    ldr r1, puzzle_lp_sprite_p2_attr         @ 08094044 1949
 LAB_08094046:
     .hword 0x4643    @ 08094046 4346
     lsls r0,r3,#0x18    @ 08094048 1806
@@ -32335,7 +32285,7 @@ LAB_08094046:
     movs r1,#0x3a    @ 0809406a 3a21
     cmp r7,#0x0                              @ 0809406c 002f
     beq LAB_08094072                         @ 0809406e 00d0
-    ldr r1, DAT_080940b0                     @ 08094070 0f49
+    ldr r1, ptr_oam_xy_split_spr_p2_40b0     @ 08094070 0f49
 LAB_08094072:
     lsls r2,r0,#0x10    @ 08094072 0204
     lsrs r2,r2,#0x10    @ 08094074 120c
@@ -32356,30 +32306,30 @@ LAB_08094080:
     ble LAB_08094010                         @ 08094092 bddd
     movs r7,#0x0    @ 08094094 0027
     b LAB_080940ec                           @ 08094096 29e0
-PTR_gP1LifePoints_08094098:
+ptr_gP1LifePoints_4098:
     .word  gP1LifePoints                  @ 08094098 e0c40102
-DAT_0809409c:
-    .word  0x00000868                     @ 0809409c 68080000
-DAT_080940a0:
-    .word  0x0000086c                     @ 080940a0 6c080000
-DAT_080940a4:
-    .word  0x0201c510                     @ 080940a4 10c50102
-DAT_080940a8:
-    .word  0xffffe000                     @ 080940a8 00e0ffff
-DAT_080940ac:
-    .word  0x00008073                     @ 080940ac 73800000
-DAT_080940b0:
-    .word  0x0000803a                     @ 080940b0 3a800000
+ptr_player_block_stride_409c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809409c 68080000
+puzzle_p2lp_slot_off:
+    .word  PUZZLE_P2LP_SLOT_OFF           @ 080940a0 6c080000  PUZZLE_P2LP_SLOT_OFF
+ptr_gDuelFieldSlots_40a4:
+    .word  gDuelFieldSlots                @ 080940a4 10c50102
+ptr_oam_attr2_tile_clear_40a8:
+    .word  OAM_ATTR2_TILE_CLEAR           @ 080940a8 00e0ffff
+puzzle_lp_sprite_p2_attr:
+    .word  PUZZLE_LP_SPRITE_P2_ATTR       @ 080940ac 73800000  PUZZLE_LP_SPRITE_P2_ATTR
+ptr_oam_xy_split_spr_p2_40b0:
+    .word  OAM_XY_SPLIT_SPRITE_P2         @ 080940b0 3a800000
 LAB_080940b4:
     lsls r0,r7,#0x3    @ 080940b4 f800
-    ldr r1, DAT_080941a8                     @ 080940b6 3c49
+    ldr r1, gEquipNodePool_data_1a8          @ 080940b6 3c49
     adds r4,r0,r1    @ 080940b8 4418
     ldrh r1,[r4,#0x4]                        @ 080940ba a188
     ldrb r0,[r4,#0x4]                        @ 080940bc 2079
     movs r3,#0x36    @ 080940be 3623
     cmp r0,#0x0                              @ 080940c0 0028
     beq LAB_080940c6                         @ 080940c2 00d0
-    ldr r3, DAT_080941ac                     @ 080940c4 394b
+    ldr r3, ptr_oam_sprite_pal_p1_41ac       @ 080940c4 394b
 LAB_080940c6:
     lsrs r1,r1,#0x8    @ 080940c6 090a
     ldrb r2,[r4,#0x2]                        @ 080940c8 a278
@@ -32400,21 +32350,21 @@ LAB_080940c6:
     strb r0,[r4,#0x2]                        @ 080940e8 a070
     adds r7,#0x1    @ 080940ea 0137
 LAB_080940ec:
-    ldr r0, DAT_080941b0                     @ 080940ec 3048
+    ldr r0, ptr_gEquipEffectZoneBase_41b0    @ 080940ec 3048
     ldr r0,[r0,#0xc]                         @ 080940ee c068
     cmp r7,r0                                @ 080940f0 8742
     bcc LAB_080940b4                         @ 080940f2 dfd3
-    ldr r0, DAT_080941b0                     @ 080940f4 2e48
+    ldr r0, ptr_gEquipEffectZoneBase_41b0    @ 080940f4 2e48
     movs r5,#0x0    @ 080940f6 0025
     str r5,[r0,#0xc]                         @ 080940f8 c560
-    ldr r4, PTR_gP1LifePoints_080941b4       @ 080940fa 2e4c
+    ldr r4, ptr_gP1LifePoints_41b4           @ 080940fa 2e4c
     ldrh r2,[r4,#0xc]                        @ 080940fc a289
     movs r0,#0x54    @ 080940fe 5420
     movs r1,#0x0    @ 08094100 0021
     movs r3,#0x0    @ 08094102 0023
     bl enqueue_sprite_attr_record            @ 08094104 a7f712fe
-    ldr r0, DAT_080941b8                     @ 08094108 2b48
-    ldr r2, DAT_080941bc                     @ 0809410a 2c4a
+    ldr r0, ptr_oam_zone_upd_spr_p1_41b8     @ 08094108 2b48
+    ldr r2, ptr_lp_p2_loop_ceil_off_41bc     @ 0809410a 2c4a
     adds r6,r4,r2    @ 0809410c a618
     ldrh r2,[r6,#0x0]                        @ 0809410e 3288
     movs r1,#0x0    @ 08094110 0021
@@ -32427,7 +32377,7 @@ LAB_080940ec:
     movs r1,#0x0    @ 08094120 0021
     movs r3,#0x0    @ 08094122 0023
     bl dispatch_card_display_op              @ 08094124 8af7bafd
-    ldr r3, DAT_080941c0                     @ 08094128 254b
+    ldr r3, ptr_player_block_stride_41c0     @ 08094128 254b
     adds r4,r4,r3    @ 0809412a e418
     ldr r2,[r4,#0x0]                         @ 0809412c 2268
     movs r0,#0xd    @ 0809412e 0d20
@@ -32482,18 +32432,18 @@ LAB_080940ec:
     pop {r4,r5,r6,r7}                        @ 080941a2 f0bc
     pop {r0}                                 @ 080941a4 01bc
     bx r0                                    @ 080941a6 0047
-DAT_080941a8:
-    .word  0x0201d9c8                     @ 080941a8 c8d90102
-DAT_080941ac:
-    .word  0x00008036                     @ 080941ac 36800000
-DAT_080941b0:
-    .word  0x0201e4f0                     @ 080941b0 f0e40102
-PTR_gP1LifePoints_080941b4:
+gEquipNodePool_data_1a8:
+    .word  gEquipNodePool_data            @ 080941a8 c8d90102  gEquipNodePool_data
+ptr_oam_sprite_pal_p1_41ac:
+    .word  OAM_SPRITE_PAL_P1              @ 080941ac 36800000
+ptr_gEquipEffectZoneBase_41b0:
+    .word  gEquipEffectZoneBase           @ 080941b0 f0e40102
+ptr_gP1LifePoints_41b4:
     .word  gP1LifePoints                  @ 080941b4 e0c40102
-DAT_080941b8:
-    .word  0x00008054                     @ 080941b8 54800000
-DAT_080941bc:
-    .word  0x00000874                     @ 080941bc 74080000
-DAT_080941c0:
-    .word  0x00000868                     @ 080941c0 68080000
+ptr_oam_zone_upd_spr_p1_41b8:
+    .word  OAM_ZONE_UPDATE_SPRITE_P1      @ 080941b8 54800000
+ptr_lp_p2_loop_ceil_off_41bc:
+    .word  LP_P2_LOOP_CEIL_OFF            @ 080941bc 74080000
+ptr_player_block_stride_41c0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080941c0 68080000
 

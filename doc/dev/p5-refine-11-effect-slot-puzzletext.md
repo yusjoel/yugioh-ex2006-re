@@ -89,12 +89,14 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 7  | 0x808f7c0..0x8090a78 | 32 | ~117 | 0 inc | ✅ | (see §四) |
 | 8  | 0x8090a78..0x8091888 | 3  | ~74  | 0 inc (build_equip_candidate_score_table 数据密集) | ✅ | (see §四) |
 | 9  | 0x8091888..0x8093598 | 20 | ~191 | 0 inc (eval_field 187 槽; 可拆 9a/9b) | ✅ | e585688 |
-| 10 | 0x8093598..0x80941c4 | 9  | ~118 | 0 inc (duel puzzle 文本: parse 68 槽 + render 14) | ⬜ | |
+| 10 | 0x8093598..0x80941c4 | 9  | ~118 | 0 inc (duel puzzle 文本: parse 68 槽 + render 14) | ✅ | (see §四) |
 
 **总计 (region A+C 已命名)**: 142 命名 fn / ~1052 DAT_/DWORD_/PTR_ 槽 / 4 ROM_INCBIN。
 **外加 Seg-4 巨块**: ~197 未命名 THUMB fn 待 disasm + 命名 (region B)。
 **重段提示**: **Seg-4 (巨块, ~197 fn) 为本文件压倒性工作量, 必拆 4a..4g**; Seg-9 (191 槽 eval_field 怪兽)
 和 Seg-3 (151 槽) 次重; Seg-8 (build 数据密集) 与 Seg-10 (puzzle text parse) 含大内嵌表。
+
+**FILE 11 FULLY COMPLETE (全 10 段 ✅)**: region A (Seg-1..3: 3a+3b, 41 fn) + region B (Seg-4: 4a..4g, 163 fn disasm) + region C (Seg-5..10, 101 fn) = 305 fn total (142 pre-existing named + 163 newly disassembled); all 118 Seg-10 slots symbolized; carve puzzle_token_strtab 248B; 4 ROM_INCBIN eliminated; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b throughout.
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 
@@ -255,6 +257,38 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
 - **CSV sync**: not needed (0 new/renamed functions)
 - **commit**: `e585688`
+
+### 4.10 Seg-10 完成记录 (FILE 11 LAST SEGMENT — FULLY COMPLETE)
+
+- **范围**: `[0x08093598, 0x080941c4)` -- 9 pre-existing named fn (play_card_ok_ui_effect / clear_duel_puzzle_wram_regions / init_duel_puzzle_field_and_hand_display / init_duel_puzzle_field_display_and_flags / init_duel_puzzle_hand_display_both_sides / init_duel_puzzle_scene_state / return_one_leaf__0809383c / copy_text_line_to_buf / write_lp_card_display_slot_entry / parse_duel_puzzle_text_token / render_duel_puzzle_text_to_sprite_queue)
+- **EQ**: 84 槽 (all REUSE from constants/*.inc; 8 NEW constant names added: PUZZLE_CLEAR_HALF_COUNT_1DB8=0x1db8/PUZZLE_CLEAR_HALF_COUNT_081C=0x81c/PUZZLE_CLEAR_HALF_COUNT_05D4=0x5d4/gPuzzleCardAnimBuf=0x0201b1b0/PUZZLE_READY_FLAG_OFF=0x1d04/PUZZLE_P2LP_SLOT_OFF=0x86c/PUZZLE_LP_SPRITE_P2_ATTR=0x8073/gEquipNodePool_data=0x0201d9c8)
+  - gP1LifePoints x17 / PLAYER_BLOCK_STRIDE x13 / gDuelFieldSlots x7 / gEquipEffectZoneBase x3 / OAM_ATTR2_TILE_CLEAR x3 / gDuelCardCtxBase x3 / SLOT_CARD_SET_CODE_MASK x2 / gEquipNodePool_data x2 + 33 others (offsets/OAM/LP/game constants)
+- **REF**: 32 槽 (25 unique string label targets + fmt_d shared x8; creates puzzle_token_str_* USER labels at ROM 0x09e47464..0x09e4755c + DATA refs from parse_duel_puzzle_text_token pool slots)
+- **RENAME**: 16 PTR_gP1LifePoints_* -> ptr_gP1LifePoints_XXXX + 2 CODE_PTR (switchD_ rename for jump-table entries DAT_08093978/3a54)
+- **PLATE**: 9 rewrites (all ASCII <=500 chars)
+  - play_card_ok_ui_effect (468c): 2 stale FUN_08094a28->process_card_play_ok_sequence/FUN_08094cd4->tick_equip_activation_main_sequence
+  - clear_duel_puzzle_wram_regions (497c): truncate over-1046-char plate + replace FUN_08093660/FUN_080937d4
+  - init_duel_puzzle_field_and_hand_display (409c): truncate over-665-char plate
+  - init_duel_puzzle_scene_state (424c): truncate over-611-char plate
+  - init_duel_puzzle_hand_display_both_sides (350c): factual plate error fix (was "clear_duel_puzzle_wram_regions calls this" — false; fn indeg=0, called via fn-ptr)
+  - copy_text_line_to_buf (343c): truncate over-560-char plate
+  - write_lp_card_display_slot_entry (427c): truncate over-521-char plate
+  - parse_duel_puzzle_text_token (370c): truncate over-630-char plate + fix stale FUN_08093fa8->render_duel_puzzle_text_to_sprite_queue
+  - render_duel_puzzle_text_to_sprite_queue (413c): truncate over-525-char plate + fix stale FUN_080937d4->init_duel_puzzle_scene_state
+- **carve**: 1 (puzzle_token_strtab: ROM 0x09e47464..0x09e4755c, 248 B, 25 .asciz/.ascii strings carved from incbin 0x1E3F1C4/0xAB48 into before/carve/after 0x82A0+0xF8+0x27B0=0xAB48)
+- **新增 constants**: ewram.inc +7 (PUZZLE_CLEAR_HALF_COUNT_1DB8/081C/05D4/gPuzzleCardAnimBuf/PUZZLE_READY_FLAG_OFF/PUZZLE_P2LP_SLOT_OFF/gEquipNodePool_data); oam_attr.inc +1 (PUZZLE_LP_SPRITE_P2_ATTR)
+- **disasm**: 0
+- **§5.1**: 0
+- **post-landing gates**: non-ASCII in Seg-10=0 / FUN_[0-9a-f]{8} in Seg-10=0 / DAT_/DWORD_/PTR_ defs in Seg-10=0 / puzzle_token_strtab 25 labels in rom.s confirmed / incbin split 0x82A0+0xF8+0x27B0=0xAB48 intact
+- **byte-identical**: SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b` ✅
+- **CSV sync**: not needed (0 new/renamed functions)
+- **commit**: (see git log)
+
+**FILE 11 COMPLETE SUMMARY (11_effect_slot_puzzletext.s, all 10 segments):**
+- region A (Seg-1..3): 41 pre-existing named fn / 3 ROM_INCBIN eliminated / ~333 slots symbolized
+- region B (Seg-4, 4a..4g): **163 hidden card-effect scan callbacks newly disassembled+named** (giant ROM_INCBIN 0x87d58/0x5a9c=23,196B fully eliminated); CSV +163 rows
+- region C (Seg-5..10): 101 pre-existing named fn / 0 ROM_INCBIN / ~719 slots symbolized / carve puzzle_token_strtab 248B
+- Total: 305 fn (142 pre-existing + 163 new); ~1170 DAT_/DWORD_/PTR_ slots symbolized; 4 ROM_INCBIN = 0; 1 data carve (puzzle_token_strtab); 8+1=9 new ewram/oam_attr constants
 
 ### 4.05 Seg-5 完成记录
 

@@ -1288,7 +1288,84 @@ zone_monster_field_bonus_dest_entry7:           @ GBA 0x09e3f104; offset +0x70 f
 	.hword  0xffff, 0xffff, 0xffff, 0xffff, 0x0fee, 0x0000, 0x4679, 0x0806
 	.hword  0x000d, 0x0805, 0xc395, 0x0805, 0x6559, 0x0805, 0x1c55, 0x0808
 	.hword  0x10d3, 0x0000, 0x4679, 0x0806, 0x000d, 0x0805, 0x0000, 0x0000
-	.incbin "roms/2343.gba", 0x1E3F1C4, 0xAB48  @ remainder [0x1e3f1c4..0x1e4a10b]
+	.incbin "roms/2343.gba", 0x1E3F1C4, 0x82A0  @ before string table [0x1e3f1c4..0x1e47464]
+
+puzzle_token_str_end:
+	.asciz "[END]"
+	.byte 0x00, 0x00                    @ pad (5+1NUL+2pad = 8B)
+puzzle_token_str_player_lp:
+	.asciz "PlayerLP"
+	.byte 0x00, 0x00, 0x00              @ pad (8+1NUL+3pad = 12B)
+puzzle_token_fmt_d:
+	.asciz "%d"
+	.byte 0x00                          @ pad (2+1NUL+1pad = 4B)
+puzzle_token_str_phase:
+	.asciz "Phase"
+	.byte 0x00, 0x00                    @ pad (5+1NUL+2pad = 8B)
+puzzle_token_str_card_in:
+	.asciz "CardIn"
+	.byte 0x00                          @ pad (6+1NUL+1pad = 8B)
+puzzle_token_str_eq:
+	.asciz "="
+	.byte 0x00, 0x00                    @ pad (1+1NUL+2pad = 4B)
+puzzle_token_str_face:
+	.asciz "_Face"
+	.byte 0x00, 0x00                    @ pad (5+1NUL+2pad = 8B)
+puzzle_token_str_turn:
+	.asciz "_Turn"
+	.byte 0x00, 0x00                    @ pad (5+1NUL+2pad = 8B)
+puzzle_token_str_param:
+	.asciz "_Param"
+	.byte 0x00                          @ pad (6+1NUL+1pad = 8B)
+puzzle_token_str_equip_act:
+	.asciz "EquipAct"
+	.byte 0x00, 0x00, 0x00             @ pad (8+1NUL+3pad = 12B)
+puzzle_token_str_src_player:
+	.asciz "SrcPlayer"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_src_locate:
+	.asciz "SrcLocate"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_src_card_id:
+	.asciz "SrcCardID"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_dst_player:
+	.asciz "DstPlayer"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_dst_locate:
+	.asciz "DstLocate"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_type:
+	.asciz "Type"
+	.byte 0x00, 0x00, 0x00             @ pad (4+1NUL+3pad = 8B)
+puzzle_token_str_only_in_turn:
+	.asciz "ONLYINTURN"
+	.byte 0x00                          @ pad (10+1NUL+1pad = 12B)
+puzzle_token_str_only_face_turn:
+	.asciz "ONLYFACETURN"
+	.byte 0x00, 0x00, 0x00             @ pad (12+1NUL+3pad = 16B)
+puzzle_token_str_only_face:
+	.asciz "ONLYFACE"
+	.byte 0x00, 0x00, 0x00             @ pad (8+1NUL+3pad = 12B)
+puzzle_token_str_forever:
+	.asciz "FOREVER"
+	                                    @ no pad (7+1NUL = 8B)
+puzzle_token_str_permanent:
+	.asciz "PERMANENT"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_during_face:
+	.asciz "DURINGFACE"
+	.byte 0x00                          @ pad (10+1NUL+1pad = 12B)
+puzzle_token_str_equipment:
+	.asciz "EQUIPMENT"
+	.byte 0x00, 0x00                    @ pad (9+1NUL+2pad = 12B)
+puzzle_token_str_union:
+	.asciz "UNION"
+	.byte 0x00, 0x00                    @ pad (5+1NUL+2pad = 8B)
+puzzle_token_str_captured:
+	.ascii "CAPTURED"                   @ 8B NO NUL (NUL at 0x09e4755c is in after-incbin)
+
+	.incbin "roms/2343.gba", 0x1E4755C, 0x27B0  @ after string table [0x1e4755c..0x1e49d0c]
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

@@ -565,3 +565,16 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ =============================================================================
 .equ gEquipActivationSlotBase, 0x0201bc2c  @ gEquipChainSlotRefs+0x9c; 2-entry is_activated array; stride 0x14; 2 raw ROM refs; eval_field_equip_activation_candidates; C5 grep=0; conf: high
 .equ gDuelFieldSlotState_ec,   0x0201c5fc  @ gDuelFieldSlots+0xec; word with 2-bit field at bits[23:22]; player*0x868 offset applied at runtime; 1 raw ROM ref; C5 grep=0; conf: med
+
+@ =============================================================================
+@ file 11 Seg-10 additions: duel puzzle scene state/clear fields (gP1LifePoints domain)
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-10 [0x08093598..0x080941c4)
+@ C5 grep verified all values -> 0 hits before adding
+@ =============================================================================
+.equ PUZZLE_CLEAR_HALF_COUNT_1DB8, 0x00001db8  @ zero_fill #1 count: 0x1db8 halfwords from gP1LifePoints; clear_duel_puzzle_wram_regions; 3 ROM refs; C5 grep=0; conf: high
+.equ PUZZLE_CLEAR_HALF_COUNT_081C, 0x0000081c  @ zero_fill #3 count: 0x81c halfwords from gDuelDisplaySeqState; 12 ROM refs; C5 grep=0; conf: high
+.equ PUZZLE_CLEAR_HALF_COUNT_05D4, 0x000005d4  @ zero_fill #5 count: 0x5d4 halfwords from gDuelPhaseFlags; 6 ROM refs; C5 grep=0; conf: high
+.equ gPuzzleCardAnimBuf,        0x0201b1b0  @ duel_puzzle card anim work buffer (zeroed by clear_duel_puzzle_wram_regions, 0xd8 halfwords); 6 raw ROM refs; C5 grep=0; conf: med
+.equ PUZZLE_READY_FLAG_OFF,     0x00001d04  @ [gP1LifePoints+0x1d04] puzzle ready flag; init_duel_puzzle_field_display_and_flags writes 1 here; 8 ROM refs; C5 grep=0; conf: high
+.equ PUZZLE_P2LP_SLOT_OFF,      0x0000086c  @ [gP1LifePoints+0x86c] = PLAYER_BLOCK_STRIDE(0x868)+4; P2 LP slot count word (set to 1 in render init); 3 ROM refs; C5 grep=0; conf: high
+.equ gEquipNodePool_data,       0x0201d9c8  @ gEquipNodePool(0x0201d9c0)+8 = pool entry[1] base; parse/render iterate from this addr with stride 8; 2 ROM refs; C5 grep=0; conf: high

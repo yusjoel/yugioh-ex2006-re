@@ -205,3 +205,10 @@
 .equ OAM_EQUIP_ZONE_SPRITE_P2_4A, 0x0000804a  @ P2 equip zone sprite OAM attr0 variant 0x4a (bit15+0x4a); build_equip_eligibility_state_for_category3_card; sibling of OAM_EQUIP_ZONE_SPRITE_P1=0x8033; 96 raw ROM refs; x1 slot; conf: high
 .equ OAM_EQUIP_ZONE_SPRITE_P2_4B, 0x0000804b  @ P2 equip zone sprite OAM attr0 variant 0x4b (bit15+0x4b); build_equip_eligibility_state_for_category3_card + check_equip_slot_eligible_with_criteria_and_prerequisites; 38 raw ROM refs; x3 slots; conf: high
 .equ OAM_EQUIP_ZONE_SPRITE_P2_4C, 0x0000804c  @ P2 equip zone sprite OAM attr0 variant 0x4c (bit15+0x4c); check_equip_slot_eligible_with_criteria_and_prerequisites; 7 raw ROM refs; x1 slot; conf: high
+
+@ =============================================================================
+@ file 11 Seg-10 additions: duel puzzle LP sprite OAM attr0 (P2 side)
+@ Source: asm/11_effect_slot_puzzletext.s, Seg-10 [0x08093598..0x080941c4)
+@ C5 grep 0x00008073: 0 exact .equ hits before adding
+@ =============================================================================
+.equ PUZZLE_LP_SPRITE_P2_ATTR,  0x00008073  @ OAM attr0 for duel puzzle LP sprite P2 side (Y=0x73=115, bit15 mode); render_duel_puzzle_text_to_sprite_queue uses when player_idx>0; 27 ROM refs; C5 grep=0; conf: high
