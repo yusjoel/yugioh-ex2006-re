@@ -512,3 +512,20 @@
 @ C5 grep verified: 0 hits in constants/ (domain distinct from LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_SLOT_SCORE_CAP/SLOT_CARD_EMPTY/OAM_ATTR0_HIDDEN which all share value 0xffff)
 @ =============================================================================
 .equ EQUIP_ACTIVATION_CNT_CAP, 0x0000ffff  @ gEquipChainSlotRefs+0x9c activation count saturation cap; flush_field_spell_equip_slot_sprites; domain distinct from score/LP/card-sentinel/OAM constants sharing 0xffff; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-1 additions: duel-phase sprite attr codes + LP timer uninit guard
+@ Source: asm/12_equip_activation_scan.s, Seg-1 [0x080941c4..0x08094f20)
+@ C5 grep verified: 0x800b/0x8023/0x8006/0x8007/0x8005 -> 0 hits before adding
+@   0x8008 has 1 hit (CARD_DESC_RENDER_PARAM in card_info.inc:60, jp-glyph-layer domain);
+@   this domain = sprite OAM attr queue -> domain-distinct new constant per C5 policy.
+@   0xffff has 5 hits (OAM_ATTR0_HIDDEN/SLOT_CARD_EMPTY/EQUIP_SLOT_SCORE_CAP/
+@   LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_ACTIVATION_CNT_CAP); LP timer guard domain distinct.
+@ =============================================================================
+.equ SPRITE_ATTR_DUEL_PHASE_P2,   0x0000800b  @ enqueue_duel_phase_sprite_by_side: P2-side duel phase sprite attr code (player_id!=0); companion P1 code = 0x000b; 2 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_DUEL_PHASE_P2_B, 0x00008023  @ init_duel_phase_display_flag_with_sprite: P2 attr type 0x8023; companion P1 = 0x0023; 6 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_SPELL_8006,      0x00008006  @ process_card_play_ok_sequence: spell phase enqueue_sprite_attr_record arg; 6 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_TRAP_8007,       0x00008007  @ process_card_play_ok_sequence: trap phase sprite attr; 5 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_MONSTER_8008,    0x00008008  @ process_card_play_ok_sequence: monster phase sprite attr; existing CARD_DESC_RENDER_PARAM=0x8008 (card_info.inc:60, jp-glyph-layer domain) is domain-distinct; 145 ROM refs; C5 domain-exception; conf: high
+.equ SPRITE_ATTR_ALT_8005,        0x00008005  @ process_card_play_ok_sequence: P2==0 fallback sprite attr; 5 ROM refs; C5 grep=0; conf: high
+.equ UNINIT_GUARD_FFFF,           0x0000ffff  @ enqueue_duel_phase_sprite_by_side: [gP1LifePoints+P1LP_BACKUP_DST_OFF(0x1cf0)]==0xffff guards against double-init; LP timer guard domain distinct from OAM/card-slot/score/row-mask/counter-cap constants at 0xffff; C5 5-hit domain-exception; conf: high

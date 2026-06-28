@@ -578,3 +578,14 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ PUZZLE_READY_FLAG_OFF,     0x00001d04  @ [gP1LifePoints+0x1d04] puzzle ready flag; init_duel_puzzle_field_display_and_flags writes 1 here; 8 ROM refs; C5 grep=0; conf: high
 .equ PUZZLE_P2LP_SLOT_OFF,      0x0000086c  @ [gP1LifePoints+0x86c] = PLAYER_BLOCK_STRIDE(0x868)+4; P2 LP slot count word (set to 1 in render init); 3 ROM refs; C5 grep=0; conf: high
 .equ gEquipNodePool_data,       0x0201d9c8  @ gEquipNodePool(0x0201d9c0)+8 = pool entry[1] base; parse/render iterate from this addr with stride 8; 2 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-1 additions: gP1LifePoints offsets / ROM table addrs / zone attr mask
+@ Source: asm/12_equip_activation_scan.s, Seg-1 [0x080941c4..0x08094f20)
+@ C5 grep verified: 0x1d1c/0x1d14/0xffffefff/0x9e5aac0/0x9e5aadc -> 0 hits before adding
+@ =============================================================================
+.equ CARD_PLAY_PHASE_CTR_OFF,   0x00001d1c  @ [gP1LifePoints+0x1d1c] play-ok phase counter; process_card_play_ok_sequence increments each step; tick_equip_activation_dispatch_hub clears to 0; 55 ROM refs; C5 grep=0; conf: high
+.equ DUEL_TURN_STATE_OFF,       0x00001d14  @ [gP1LifePoints+0x1d14] duel turn phase index; advance_duel_turn_by_prng_anim indexes DUEL_TURN_FN_TABLE_ROM; 13 ROM refs; C5 grep=0; conf: high
+.equ ZONE_SLOT_ATTR_BIT12_CLEAR_MASK, 0xffffefff  @ dispatch_effect_ctx_slot_by_zone_type: ands r6,r0 clears bit12 of zone attr accumulator; 537 ROM refs; C5 grep=0; conf: high
+.equ EQUIP_PHASE_FN_TABLE_ROM,  0x09e5aac0  @ ROM fn-ptr table for equip activation phase dispatch; THUMB+1 entries indexed by [gP1LifePoints+EQUIP_MAIN_PHASE_OFF]; 1 ROM ref; C5 grep=0; conf: high
+.equ DUEL_TURN_FN_TABLE_ROM,    0x09e5aadc  @ ROM fn-ptr table for duel turn phase dispatch; THUMB+1 entries indexed by [gP1LifePoints+DUEL_TURN_STATE_OFF]; 1 ROM ref; C5 grep=0; conf: high

@@ -66,6 +66,9 @@
 @ ROM 数据段 symbol（由 tools/ghidra-labeling/ExportRomLabelsToInc.py 从 Ghidra 导出）
 	.include "constants/rom_data.inc"
 
+@ PRNG LCG constants (advance_prng_state LCG multiplier/increment; asm/12 Seg-1)
+	.include "constants/prng.inc"
+
 @ file 08 THUMB fn-ptr +1 aliases -- GAS .equ for _cb_1 symbols
 @ (asm/08 literal pool slots reference these _1 names; function label + GAS auto-|1 for THUMB)
 	.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1
