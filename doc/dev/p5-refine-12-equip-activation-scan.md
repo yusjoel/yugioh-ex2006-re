@@ -73,7 +73,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------|------|--------|
-| 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | (pending) |
+| 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
 | 2  | 0x8094f20..0x8095ba8 | 13 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ⬜ |  |
 | 3  | 0x8095ba8..0x8096a4c | 14 | 116 | 0 inc | ⬜ |  |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ⬜ |  |
@@ -113,6 +113,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - Gate3: Seg-1 非 ASCII (除 L2 文件头) = 0 ✅
 - **CSV sync**: 不需要 (无新建/改名函数)
 - **§5.1**: Block1(0x9437c/0x1c) + Block3(0x94c3e/0x22) 两行登记
+- **commit**: 537cb5f
 
 ---
 
