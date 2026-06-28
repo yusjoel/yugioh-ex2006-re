@@ -3006,6 +3006,10 @@ address,name,proposed_name,score,tags
 0x08097048,apply_equip_activation_with_id_lookup_type_b,,,
 0x08097070,submit_equip_slot_sprite_with_ref_a,,,
 0x080970a0,submit_equip_slot_sprite_with_ref_b,,,
+0x080970d0,get_equip_handler_table_entry_count,,,
+0x080970d4,get_equip_handler_card_type,,,
+0x080970e4,check_equip_handler_uses_fixed_activation,,,
+0x08097104,get_equip_handler_table_entry_param,,,
 0x08097114,scan_card_type_effect_handler_table,,,
 0x08097150,dispatch_to_effect_handler_by_card_type,,,
 0x08097190,check_equip_effect_zone_preconditions,,,duel_field

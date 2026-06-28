@@ -212,3 +212,12 @@
 @ C5 grep 0x00008073: 0 exact .equ hits before adding
 @ =============================================================================
 .equ PUZZLE_LP_SPRITE_P2_ATTR,  0x00008073  @ OAM attr0 for duel puzzle LP sprite P2 side (Y=0x73=115, bit15 mode); render_duel_puzzle_text_to_sprite_queue uses when player_idx>0; 27 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-4 additions: equip zone sprite P2 OAM attr0 values
+@ Source: asm/12_equip_activation_scan.s, Seg-4 [0x08096a4c..0x08097828)
+@ enqueue_frozen_soul_zone_sprite_or_default: P2 path uses these as r0 arg to enqueue_sprite_attr_record
+@ Sibling of OAM_EQUIP_ZONE_SPRITE_P1=0x8033; C5 grep 0x8018/0x800f: 0 hits before adding
+@ =============================================================================
+.equ OAM_EQUIP_ZONE_SPRITE_P2_18, 0x00008018  @ equip zone sprite OAM attr0 P2 first sprite (bit15+0x18); enqueue_frozen_soul_zone_sprite_or_default P2 path first call: enqueue_sprite_attr_record(0x8018,1,0,0); sibling of OAM_EQUIP_ZONE_SPRITE_P2_0F=0x800f; 24 ROM refs; C5 grep=0; conf: high
+.equ OAM_EQUIP_ZONE_SPRITE_P2_0F, 0x0000800f  @ equip zone sprite OAM attr0 P2 second sprite (bit15+0xf); enqueue_frozen_soul_zone_sprite_or_default P2 path second call: enqueue_sprite_attr_record(0x800f,0,0,0); sibling of OAM_EQUIP_ZONE_SPRITE_P2_18=0x8018; 5 ROM refs; C5 grep=0; conf: high

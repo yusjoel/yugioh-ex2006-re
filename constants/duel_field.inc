@@ -557,3 +557,12 @@
 .equ SPRITE_LOW_HALF_MASK,       0x0000ffff  @ pack_sprite_row_attr_words: ands r1,r5 clears high 16 bits of sprite attr word; sprite attr low-halfword mask; 6 existing hits all domain-distinct (SLOT_CARD_EMPTY/LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_ACTIVATION_CNT_CAP/UNINIT_GUARD_FFFF/OAM_ATTR0_HIDDEN/EQUIP_SLOT_SCORE_CAP); domain-exception; 2 ROM refs; conf: high
 .equ SPRITE_ROW_BITS18_15_CLEAR_MASK, 0xfff87fff  @ dispatch_sprite_row_write_by_type caseD_2: ands r0,r3 clears bits[18:15] of sprite row word before ORing new direction field ((new_dir&0xf)<<15); 2 ROM refs; C5 grep=0; conf: high
 .equ SPRITE_ROW_DISPATCH_TABLE,  0x080953dc  @ dispatch_sprite_row_write_by_type: 30-entry switch table (2 case targets: 0x08095454/0x0809548e); DAT_080953d8 holds address; dispatch via 0x4687 mov pc,r7; 1 ROM ref; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-4 additions: equip chain cancel field + handler table ROM constants
+@ Source: asm/12_equip_activation_scan.s, Seg-4 [0x08096a4c..0x08097828)
+@ C5 grep verified: 0 hits each before adding
+@ =============================================================================
+.equ EQUIP_CHAIN_CANCEL_OFF,     0x00001d30  @ [gP1LifePoints+player*0x868+0x1d30] equip chain cancel/deactivation trigger field; enqueue_frozen_soul_zone_sprite_or_default writes 1 to [+0x1d30] on frozen_soul found path; adjacent to EQUIP_CHAIN_STEP_OFF(0x1d28)+8; 14 ROM refs; C5 grep=0; conf: high
+.equ EQUIP_ACTIVATION_HANDLER_TABLE, 0x09e47560  @ ROM equip activation handler dispatch table base; 18 entries x 0x10B stride; fields [+0x0]=card_type, [+0x4]=param, [+0x8]=fn_activate+1(THUMB), [+0xc]=fn_id_lookup+1(THUMB); scan_card_type_effect_handler_table + get_equip_handler_card_type/param; 5 ROM refs; C5 grep=0; conf: high
+.equ APPLY_EQUIP_ACT_ID_LOOKUP_TYPE_A_THUMB, 0x08097025  @ THUMB+1 fn-ptr to apply_equip_activation_with_id_lookup_type_a (fn@0x08097024 push{lr} confirmed); check_equip_handler_uses_fixed_activation: table[r0*0x10+0xc] compared vs this; eors/rsbs/orrs/lsrs#0x1f pattern = equals-0 test; returns 0 if handler==this (uses id_lookup), 1 otherwise (uses fixed/non-id-lookup); 6 ROM refs; C5 grep=0; conf: high

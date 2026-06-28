@@ -76,7 +76,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
 | 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | ee05202 |
-| 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ⬜ |  |
+| 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ✅ | TBD |
 | 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
 | 7  | 0x8099314..0x809a1a4 | 3  | 122 | 0 inc | ⬜ |  |
@@ -166,6 +166,31 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 
 ---
 
+### 4.04 Seg-4 完成记录 [0x08096a4c, 0x08097828)
+
+- **EQ**: 107 槽 (95 DAT_ + 14 DWORD_ → 104 in main script + 3 remediation = 107 unique slots)
+- **REF**: 2 槽 (0x08096b78 -> switchD_08096b6a__switchdataD_08096b7c + 0x08096bf4 -> switchD_08096bf2__switchdataD_08096bf8)
+- **RENAME**: 15 槽 (PTR_gP1LifePoints_* -> gp1lp_ptr_*)
+- **FUNC_RENAME**: 4 (SUB_080970d0->get_equip_handler_table_entry_count / SUB_080970d4->get_equip_handler_card_type / SUB_080970e4->check_equip_handler_uses_fixed_activation / SUB_08097104->get_equip_handler_table_entry_param; createFunction fallback used for all 4 stub fns)
+- **PLATE**: 15 操作 (4 full ASCII rewrites: dispatch_zone_activation_by_state/check_equip_effect_zone_preconditions/check_equip_zone_has_frozen_soul_or_great_long_nose/enqueue_frozen_soul_zone_sprite_or_default; 11 FUN_ substring replacements; all <=500 chars)
+- **ROM_INCBIN**: 0x96eec/0x34 §5.1 登记; orphan THUMB leaf; effective raw=0/thumb+1=0; ROM_INCBIN preserved
+- **Remediation**: 3 slots missed by main script (DWORD_08097110 equate + DAT_080972d0 P2LP_BLOCK2 + DAT_08097664 EARTHBOUND_INVITATION); added RefineF12Seg4Remediate.py
+- **新增常量**:
+  - duel_field.inc: EQUIP_CHAIN_CANCEL_OFF(0x1d30) / EQUIP_ACTIVATION_HANDLER_TABLE(0x09e47560) / APPLY_EQUIP_ACT_ID_LOOKUP_TYPE_A_THUMB(0x08097025)
+  - card_info.inc: FROZEN_SOUL_CID(0x16a1) / GREAT_LONG_NOSE_CID(0x1502) / DD_BORDERLINE_CID(0x16d4) / EARTHBOUND_INVITATION_CID(0x177a)
+  - oam_attr.inc: OAM_EQUIP_ZONE_SPRITE_P2_18(0x8018) / OAM_EQUIP_ZONE_SPRITE_P2_0F(0x800f)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Gates**:
+  - Gate1: DAT_/DWORD_/PTR_ 残留 Seg-4 范围 [0x08096a4c, 0x08097828) = 0 ✅
+  - Gate2: SUB_080970d0/d4/e4/8097104 残留 = 0 ✅
+  - Gate3: Seg-4 非 ASCII = 0 ✅
+  - Gate4: ROM_INCBIN 0x96eec/0x34 原样保留 ✅
+- **CSV sync**: 需要 (4 SUB_ 新函数加入 naming-proposals.csv; get_equip_handler_table_entry_count/card_type/uses_fixed/entry_param)
+- **§5.1**: 0x96eec(0x34) 一行登记
+- **commit**: TBD
+
+---
+
 ## 五、Seg 路线图 (地址序, 不回头不跳号)
 
 按 push-prologue 抽 144 函数入口, 按 slot 密度均分 10 段 (target ~118 槽/段, 边界=函数起点):
@@ -207,3 +232,4 @@ _(全 ROM 0 引用的块在此登记, 引用到时再处理)_
 | 0x9437c | 0x1c | 0x0809437c | 1 | read_slot_tile_index_by_slot_idx (orphan THUMB code; r0=slot_idx -> bits[4:0] of gEquipEffectZoneBase+0x410+slot*2; bx lr; pool gEquipEffectZoneBase=0x0201e4f0) | ref-scan raw=0/thumb+1=0; not fall-through (preceding fn get_activation_zone_card_type_field ends bx r1 at 0x0809437a); ROM_INCBIN preserved |
 | 0x94c3e | 0x22 | 0x08094c3e | 1 | reset_duel_turn_to_state2 (orphan THUMB code; writes 2 to [gP1LifePoints+0x1d14] and 0 to [gP1LifePoints+0x1d1c]; bx lr; first 2B=.zero align pad; entry @0x08094c40; pool gP1LifePoints=0x0201c4e0/DUEL_TURN_STATE_OFF=0x1d14/CARD_PLAY_PHASE_CTR_OFF=0x1d1c) | ref-scan raw=0/thumb+1=0; not fall-through (preceding fn poll_sprite_seq_until_done ends bx r0 at 0x08094c3c); ROM_INCBIN preserved |
 | 0x95b28 | 0x14 | 0x08095b28 | 2 | set_lp_display_state_active (orphan THUMB code; ldr r0,[pc,#8]=gP1LifePoints; ldr r1,[pc,#12]=LP_DISPLAY_STATE_OFF(0x1d0c); adds r0,r0,r1; movs r1,#1; str r1,[r0,#0]; bx lr; pool: gP1LifePoints=0x0201c4e0/0x1d0c) | ref-scan raw=0/thumb+1=0; not fall-through (preceding step_prng_anim_frame ends pop/pop/bx r1 at 0x08095b1c); ROM_INCBIN preserved |
+| 0x96eec | 0x34 | 0x08096eec | 4 | clear_activation_state_c_if_nonzero (orphan THUMB leaf; ldr gP1LifePoints; if [gP1LifePoints+ACTIVATION_STATE_C_OFF(0x1d4c)]==0 bx lr; else clear 0x1d4c=0, set ELIGIB_STATE_CTRL_OFF(0x1d54)=1, ELIGIB_ACT_TYPE_OFF(0x1d5c)=0xd; bx lr; pools: gP1LifePoints/0x1d4c/0x1d54/0x1d5c) | effective raw=0 (1 coincidental non-4-aligned hit at 0x8b16c2f)/thumb+1=0; not fall-through (zero_duel_lp_display_counters ends bx lr at 0x08096edc; gap=0x08096edd..0x08096eeb .zero align pad); ROM_INCBIN preserved |

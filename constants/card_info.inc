@@ -1920,3 +1920,13 @@
 @ C5 grep verified: 0 hits before adding
 @ =============================================================================
 .equ NEGATE_ATTACK_CID,          0x000012c4  @ Negate Attack (card-stats.s card_0648, slot=0x12C4, pw=14315573); update_card_display_index_by_type_rules: cmp r2,r0 when card_id==0x12c4 -> XOR player_side via [gP1LifePoints+0x1ce8]; special display index rule; 8 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-4 additions: equip zone activation guard card IDs
+@ Source: asm/12_equip_activation_scan.s, Seg-4 [0x08096a4c..0x08097828)
+@ C5 grep verified: 0 hits each before adding
+@ =============================================================================
+.equ FROZEN_SOUL_CID,            0x000016a1  @ Frozen Soul (pw=57069605; card-stats.s slot=0x16A1); check_equip_zone_has_frozen_soul_or_great_long_nose + enqueue_frozen_soul_zone_sprite_or_default; 8 ROM refs; C5 grep=0; conf: high
+.equ GREAT_LONG_NOSE_CID,        0x00001502  @ Great Long Nose (pw=02356994; card-stats.s slot=0x1502); check_equip_zone_has_frozen_soul_or_great_long_nose: check_slot_has_node_by_card_id(player,0xb,0x1502); 84 ROM refs; C5 grep=0; conf: high
+.equ DD_BORDERLINE_CID,          0x000016d4  @ D. D. Borderline (pw=60912752; card-stats.s slot=0x16D4); check_equip_effect_zone_preconditions: count_available_effect_zones(0/1,0x16d4,-1); 6 ROM refs; C5 grep=0; conf: high
+.equ EARTHBOUND_INVITATION_CID,  0x0000177a  @ Earthbound Spirit's Invitation (pw=65743242; card-stats.s slot=0x177A); check_equip_slot_activation_blocked_by_chain_ext: check_value_in_slot_chain(1-player,0xb,0x177a); 10 ROM refs; C5 grep=0; conf: high
