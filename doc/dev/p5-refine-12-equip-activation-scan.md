@@ -74,7 +74,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | Seg | 范围 | ~fn | ~slots | ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
-| 2  | 0x8094f20..0x8095ba8 | 13 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ⬜ |  |
+| 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | (pending) |
 | 3  | 0x8095ba8..0x8096a4c | 14 | 116 | 0 inc | ⬜ |  |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ⬜ |  |
 | 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
@@ -114,6 +114,31 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: 不需要 (无新建/改名函数)
 - **§5.1**: Block1(0x9437c/0x1c) + Block3(0x94c3e/0x22) 两行登记
 - **commit**: 537cb5f
+
+---
+
+### 4.02 Seg-2 完成记录 [0x08094f20, 0x08095ba8)
+
+- **EQ**: 103 槽 (99 DAT_ + 4 DWORD_ 非gP1LP，含 Block1 disasm 后新增 1 池槽 ELIGIB_CARD_ID_OFF@0x952ec)
+- **REF**: 2 槽 (0x08095248->equip_confirm_case_jump_table@0x0809524c + **Fix#2** 0x08095550->switchD_0809554c__switchdataD_08095554@0x08095554)
+- **RENAME**: 21 槽 (12 gp1lp_ptr_* 含 **Fix#1** 0x0809552c + 3 DWORD_gP1LP + 7 DWORD_off)
+- **PLATE**: 6 (6 stale FUN_ 全部替换，0 FAIL)
+- **Block1 disasm**: 0x08095274/0xc0, clearListing+setTMode+9 unique case DisassembleCommand + 2 sub-stubs (0x952d4/0x952f0); 6 pool createDWord; no createFunction; Post-check ROM_INCBIN/.byte == 0 ✅
+- **Block2**: §5.1 登记，ROM_INCBIN 原样保留，无 Ghidra 操作
+- **新增常量**:
+  - ewram.inc: LP_EQUIP_STATE_B_OFF(0x1d50) / LP_DISPLAY_STATE_OFF(0x1d0c) / LP_PLAYER_SIDE_CACHE_OFF(0x1d64) / LP_EQUIP_DISPLAY_FLAG_OFF(0x1d84) / LP_ACTIVATION_TYPE_ARRAY_BASE_OFF(0x10e1) / SPRITE_ROW_BUSY_BYTE_OFF(0x301) / SPRITE_ROW_ENTRY_30D_OFF(0x30d) / SPRITE_ROW_ENTRY_30E_OFF(0x30e) / SPRITE_ROW_ENTRY_30F_OFF(0x30f) / SPRITE_ATTR_BYTE_2FE_OFF(0x2fe) / SPRITE_ATTR_BYTE_2FF_OFF(0x2ff) / gSpriteAttrBufData(0x0201b872)
+  - duel_field.inc: SPRITE_HIGH_HALF_MASK(0xffff0000, domain-distinct EQUIP_CHAIN_SENTINEL) / SPRITE_LOW_HALF_MASK(0xffff, domain-distinct x6) / SPRITE_ROW_BITS18_15_CLEAR_MASK(0xfff87fff) / SPRITE_ROW_DISPATCH_TABLE(0x080953dc)
+  - card_info.inc: NEGATE_ATTACK_CID(0x12c4)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Gates**:
+  - Gate1: DAT_/DWORD_/PTR_ 残留 Seg-2 范围 [0x08094f20, 0x08095ba8) = 0 ✅
+  - Gate2: Block1 ROM_INCBIN/.byte [0x08095274, 0x08095334) = 0 ✅
+  - Gate3: Seg-2 非 ASCII = 0 ✅
+  - Gate4: Stale FUN_ 在 Seg-2 范围 = 0 ✅
+- **NEEDS_FIX 修复确认**: Fix#1 (PTR_gP1LifePoints_0809552c 补入 RENAME → gp1lp_ptr_9552c) ✅; Fix#2 (DAT_08095550 REF -> switchD dispatch table) ✅; Fix#3 (Block1 标题描述更正) ✅
+- **CSV sync**: 不需要 (无新建/改名函数)
+- **§5.1**: Block2(0x95b28/0x14) 一行登记
+- **commit**: (pending)
 
 ---
 
@@ -157,3 +182,4 @@ _(全 ROM 0 引用的块在此登记, 引用到时再处理)_
 |---------|------|-------|-----|----------|----------|
 | 0x9437c | 0x1c | 0x0809437c | 1 | read_slot_tile_index_by_slot_idx (orphan THUMB code; r0=slot_idx -> bits[4:0] of gEquipEffectZoneBase+0x410+slot*2; bx lr; pool gEquipEffectZoneBase=0x0201e4f0) | ref-scan raw=0/thumb+1=0; not fall-through (preceding fn get_activation_zone_card_type_field ends bx r1 at 0x0809437a); ROM_INCBIN preserved |
 | 0x94c3e | 0x22 | 0x08094c3e | 1 | reset_duel_turn_to_state2 (orphan THUMB code; writes 2 to [gP1LifePoints+0x1d14] and 0 to [gP1LifePoints+0x1d1c]; bx lr; first 2B=.zero align pad; entry @0x08094c40; pool gP1LifePoints=0x0201c4e0/DUEL_TURN_STATE_OFF=0x1d14/CARD_PLAY_PHASE_CTR_OFF=0x1d1c) | ref-scan raw=0/thumb+1=0; not fall-through (preceding fn poll_sprite_seq_until_done ends bx r0 at 0x08094c3c); ROM_INCBIN preserved |
+| 0x95b28 | 0x14 | 0x08095b28 | 2 | set_lp_display_state_active (orphan THUMB code; ldr r0,[pc,#8]=gP1LifePoints; ldr r1,[pc,#12]=LP_DISPLAY_STATE_OFF(0x1d0c); adds r0,r0,r1; movs r1,#1; str r1,[r0,#0]; bx lr; pool: gP1LifePoints=0x0201c4e0/0x1d0c) | ref-scan raw=0/thumb+1=0; not fall-through (preceding step_prng_anim_frame ends pop/pop/bx r1 at 0x08095b1c); ROM_INCBIN preserved |

@@ -1912,3 +1912,11 @@
 .equ ROCKET_WARRIOR_CID,                 0x000013cb  @ Rocket Warrior (card-stats.s card_3101 area); BST node x2; C5 grep=0; conf: high
 .equ GETSU_FUHMA_CID,                    0x0000170d  @ Getsu Fuhma (card-stats.s card_3992); BST node x2; C5 grep=0; conf: high
 .equ RYU_KOKKI_CID,                      0x0000170e  @ Ryu Kokki (card-stats.s card_3993); BST node x2; C5 grep=0; conf: high
+
+
+@ =============================================================================
+@ file 12 Seg-2 additions: card ID for display index rule
+@ Source: asm/12_equip_activation_scan.s, Seg-2 [0x08094f20..0x08095ba8)
+@ C5 grep verified: 0 hits before adding
+@ =============================================================================
+.equ NEGATE_ATTACK_CID,          0x000012c4  @ Negate Attack (card-stats.s card_0648, slot=0x12C4, pw=14315573); update_card_display_index_by_type_rules: cmp r2,r0 when card_id==0x12c4 -> XOR player_side via [gP1LifePoints+0x1ce8]; special display index rule; 8 ROM refs; C5 grep=0; conf: high

@@ -1946,7 +1946,7 @@ write_card_display_index_with_bit_offset:
     bx r0                                    @ 08094f54 0047
     .zero  0x2
 
-@ Called by FUN_0804154c (caseD_44). No caller-passed parameters; function itself calls
+@ Called by tick_spell_equip_zone_display_seq (caseD_44). No caller-passed parameters; function itself calls
 @ classify_spell_card_activation_type to get current card spell activation type. If result
 @ is nonzero (spell card has a defined activation type), calls
 @ write_card_display_index_with_bit_offset with index=0x1a / bit=1 to write the activation
@@ -1968,7 +1968,7 @@ LAB_08094f6a:
     bx r0                                    @ 08094f6c 0047
     .zero  0x2
 
-@ Applies field6/field9 type rules to update card display index array entries. r0=ptr card_entry (saved to r4); r1=s32 active_count (saved to r6; caller FUN_08095a18 passes [gP1LifePoints+0x310]; <=0 skips sub-condition checks). Checks card_side XOR flip_status vs current player_id [0x0201e2a0+4]; mismatch: skips all. If field6 (get_card_extended_stat_field9/field6) == 0x17 (23): calls write_card_display_index_entry(0x3a, 1); if [r0+0x3] AND 0x30 == 0, calls write_card_display_index_with_bit_offset(0x21, 1); checks field9: if field9==1 returns early. If field6 == 0x16 (22): similar path write_card_display_index_entry(0x39,1) + write_card_display_index_with_bit_offset(0x1f,1). Final: write_card_display_index_with_bit_offset(0x20 or 0x22, 1). Called only by FUN_080954e8. Returns void. Constants: player_id_ptr=0x0201e2a0, field6_type_23=0x17, field6_type_22=0x16, field9_threshold=1, index_A=0x3a, index_B=0x39, index_C=0x21, index_D=0x1f, index_E=0x20, index_F=0x22.
+@ Applies field6/field9 type rules to update card display index array entries. r0=ptr card_entry (saved to r4); r1=s32 active_count (saved to r6; caller FUN_08095a18 passes [gP1LifePoints+0x310]; <=0 skips sub-condition checks). Checks card_side XOR flip_status vs current player_id [0x0201e2a0+4]; mismatch: skips all. If field6 (get_card_extended_stat_field9/field6) == 0x17 (23): calls write_card_display_index_entry(0x3a, 1); if [r0+0x3] AND 0x30 == 0, calls write_card_display_index_with_bit_offset(0x21, 1); checks field9: if field9==1 returns early. If field6 == 0x16 (22): similar path write_card_display_index_entry(0x39,1) + write_card_display_index_with_bit_offset(0x1f,1). Final: write_card_display_index_with_bit_offset(0x20 or 0x22, 1). Called only by step_prng_anim_frame. Returns void. Constants: player_id_ptr=0x0201e2a0, field6_type_23=0x17, field6_type_22=0x16, field9_threshold=1, index_A=0x3a, index_B=0x39, index_C=0x21, index_D=0x1f, index_E=0x20, index_F=0x22.
 update_card_display_index_by_type_rules:
     push {r4,r5,r6,lr}                       @ 08094f70 70b5
     adds r4,r0,#0x0    @ 08094f72 041c
@@ -1980,7 +1980,7 @@ update_card_display_index_by_type_rules:
     lsls r1,r2,#0x19    @ 08094f7e 5106
     lsrs r1,r1,#0x1f    @ 08094f80 c90f
     eors r0,r1    @ 08094f82 4840
-    ldr r5, DAT_0809501c                     @ 08094f84 254d
+    ldr r5, gduecardctx_9501c                @ 08094f84 254d
     ldr r1,[r5,#0x4]                         @ 08094f86 6968
     cmp r0,r1                                @ 08094f88 8842
     bne LAB_08095074                         @ 08094f8a 73d1
@@ -2016,12 +2016,12 @@ update_card_display_index_by_type_rules:
     cmp r0,r2                                @ 08094fce 9042
     bne LAB_08095010                         @ 08094fd0 1ed1
 LAB_08094fd2:
-    ldr r0, DAT_08095020                     @ 08094fd2 1348
+    ldr r0, negate_atk_cid_95020             @ 08094fd2 1348
     ldrh r2,[r4,#0x0]                        @ 08094fd4 2288
     cmp r2,r0                                @ 08094fd6 8242
     bne LAB_08094ff0                         @ 08094fd8 0ad1
-    ldr r1, PTR_gP1LifePoints_08095024       @ 08094fda 1249
-    ldr r0, DAT_08095028                     @ 08094fdc 1248
+    ldr r1, gp1lp_ptr_95024                  @ 08094fda 1249
+    ldr r0, p1lp_blk2_95028                  @ 08094fdc 1248
     adds r1,r1,r0    @ 08094fde 0918
     ldrb r2,[r4,#0x2]                        @ 08094fe0 a278
     lsls r0,r2,#0x1f    @ 08094fe2 d007
@@ -2055,14 +2055,14 @@ LAB_08095010:
     bl write_card_display_index_with_bit_offset @ 08095014 fff792ff
     b LAB_08095074                           @ 08095018 2ce0
     .zero  0x2
-DAT_0809501c:
-    .word  0x0201e2a0                     @ 0809501c a0e20102
-DAT_08095020:
-    .word  0x000012c4                     @ 08095020 c4120000
-PTR_gP1LifePoints_08095024:
+gduecardctx_9501c:
+    .word  gDuelCardCtxBase               @ 0809501c a0e20102  update_card_display_index_by_type_rules: ldr r5,[r1,#4]=player_id check
+negate_atk_cid_95020:
+    .word  NEGATE_ATTACK_CID              @ 08095020 c4120000  update_card_display_index_by_type_rules: cmp r2,r0 when card_id==0x12c4 (Negate Attack) XOR player_side
+gp1lp_ptr_95024:
     .word  gP1LifePoints                  @ 08095024 e0c40102
-DAT_08095028:
-    .word  0x00001ce8                     @ 08095028 e81c0000
+p1lp_blk2_95028:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08095028 e81c0000  update_card_display_index_by_type_rules: [gP1LifePoints+0x1ce8] player_raw XOR for Negate Attack check
 LAB_0809502c:
     ldrh r0,[r4,#0x0]                        @ 0809502c 2088
     bl get_card_extended_stat_field6         @ 0809502e 59f0e3fe
@@ -2079,8 +2079,8 @@ LAB_0809502c:
     movs r0,#0x1f    @ 08095048 1f20
     movs r1,#0x1    @ 0809504a 0121
     bl write_card_display_index_with_bit_offset @ 0809504c fff776ff
-    ldr r2, PTR_gP1LifePoints_0809507c       @ 08095050 0a4a
-    ldr r0, DAT_08095080                     @ 08095052 0b48
+    ldr r2, gp1lp_ptr_9507c                  @ 08095050 0a4a
+    ldr r0, p1lp_blk2_95080                  @ 08095052 0b48
     adds r2,r2,r0    @ 08095054 1218
     ldr r0,[r5,#0x4]                         @ 08095056 6868
     movs r1,#0x1    @ 08095058 0121
@@ -2100,10 +2100,10 @@ LAB_08095074:
     pop {r0}                                 @ 08095076 01bc
     bx r0                                    @ 08095078 0047
     .zero  0x2
-PTR_gP1LifePoints_0809507c:
+gp1lp_ptr_9507c:
     .word  gP1LifePoints                  @ 0809507c e0c40102
-DAT_08095080:
-    .word  0x00001ce8                     @ 08095080 e81c0000
+p1lp_blk2_95080:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08095080 e81c0000  update_card_display_index_by_type_rules field6==0x16 path: player XOR check
 
 @ Scans both players monster zones, scores each slot and writes display indices via write_card_display_index_if_above_bit (0x08094f20). Phase 1: iterates gDuelEffectZones 5 slots (stride 0x14): reads slot field5 (bit 13..0); if non-zero: stmia into collect buf, r8++; get_slot_field5_score(player, idx) -> write_card_display_index_if_above_bit(0, score); check_slot_placement_blocked_by_field_effect -> r10++. Phase 2 (r8>=3): check_card_pair_allowed for each slot pair -> any >=2 pairs valid: write_card_display_index_entry(0x3b, 1). r8==5: write index=0x3c; r10==5: write index=0x3d. r0..r3: no APCS inputs. Returns void. Constants: gDuelSettings=0x0201e2a0, gDuelEffectZones=0x0201c510, player_stride=0x868.
 write_monster_zone_display_indices:
@@ -2117,7 +2117,7 @@ write_monster_zone_display_indices:
     .hword 0x4680    @ 08095092 8046
     .hword 0x4682    @ 08095094 8246
     movs r5,#0x0    @ 08095096 0025
-    ldr r7, DAT_08095188                     @ 08095098 3b4f
+    ldr r7, gduecardctx_95188                @ 08095098 3b4f
     movs r6,#0x1    @ 0809509a 0126
     movs r4,#0x0    @ 0809509c 0024
     .hword 0x46e9    @ 0809509e e946
@@ -2125,10 +2125,10 @@ LAB_080950a0:
     ldr r2,[r7,#0x4]                         @ 080950a0 7a68
     adds r0,r2,#0x0    @ 080950a2 101c
     ands r0,r6    @ 080950a4 3040
-    ldr r1, DAT_0809518c                     @ 080950a6 3949
+    ldr r1, player_stride_9518c              @ 080950a6 3949
     muls r0,r1    @ 080950a8 4843
     adds r0,r4,r0    @ 080950aa 2018
-    ldr r1, DAT_08095190                     @ 080950ac 3849
+    ldr r1, gduelfieldslots_95190            @ 080950ac 3849
     adds r0,r0,r1    @ 080950ae 4018
     ldr r0,[r0,#0x0]                         @ 080950b0 0068
     lsls r0,r0,#0x13    @ 080950b2 c004
@@ -2240,14 +2240,14 @@ LAB_08095176:
     pop {r0}                                 @ 08095182 01bc
     bx r0                                    @ 08095184 0047
     .zero  0x2
-DAT_08095188:
-    .word  0x0201e2a0                     @ 08095188 a0e20102
-DAT_0809518c:
-    .word  0x00000868                     @ 0809518c 68080000
-DAT_08095190:
-    .word  0x0201c510                     @ 08095190 10c50102
+gduecardctx_95188:
+    .word  gDuelCardCtxBase               @ 08095188 a0e20102  write_monster_zone_display_indices: ldr r2,[r7,#4]=player_id
+player_stride_9518c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809518c 68080000  write_monster_zone_display_indices: muls r0,r1 player offset
+gduelfieldslots_95190:
+    .word  gDuelFieldSlots                @ 08095190 10c50102  write_monster_zone_display_indices: ldr base for slot scan [+0]=slot_field5
 
-@ Iterates a 2x11 matrix (r5=[0..1], r4=[0..10]) calling invoke_r8 with each (r5, r4, 0) triple; accumulates count of non-zero results in r7. Entry saves old r8 (.hword 0x4647=mov r7,r8) then loads fn_predicate from r0 (.hword 0x4680=mov r8,r0). Outer loop r5 from 0 to 1 (2 passes), inner r4 from 0 to 10 (11 passes). Returns r7 = total count of non-zero predicate results. Caller FUN_080a2ad0 (card_ids scene, duel_field) in switchD case 0 loads predicate pointer into r0 before calling; checks if count > 0 for follow-up logic.
+@ Iterates a 2x11 matrix (r5=[0..1], r4=[0..10]) calling invoke_r8 with each (r5, r4, 0) triple; accumulates count of non-zero results in r7. Entry saves old r8 (.hword 0x4647=mov r7,r8) then loads fn_predicate from r0 (.hword 0x4680=mov r8,r0). Outer loop r5 from 0 to 1 (2 passes), inner r4 from 0 to 10 (11 passes). Returns r7 = total count of non-zero predicate results. Caller tick_equip_target_selection_display_seq (card_ids scene, duel_field) in switchD case 0 loads predicate pointer into r0 before calling; checks if count > 0 for follow-up logic.
 @ 
 @ Constants:
 @ - ROW_MAX=1 (r5 upper bound inclusive, 2 rows)
@@ -2304,13 +2304,13 @@ LAB_080951d8:
     movs r0,#0x1    @ 080951d8 0120
     b LAB_08095218                           @ 080951da 1de0
 LAB_080951dc:
-    ldr r2, DWORD_08095204                   @ 080951dc 094a
-    ldr r1, DWORD_08095208                   @ 080951de 0a49
+    ldr r2, gp1lp_ptr_95204                  @ 080951dc 094a
+    ldr r1, act_state_c_95208                @ 080951de 0a49
     adds r0,r2,r1    @ 080951e0 5018
     ldr r1,[r0,#0x0]                         @ 080951e2 0168
     cmp r1,#0x0                              @ 080951e4 0029
     beq LAB_08095210                         @ 080951e6 13d0
-    ldr r3, DWORD_0809520c                   @ 080951e8 084b
+    ldr r3, lp_equip_b_9520c                 @ 080951e8 084b
     adds r1,r2,r3    @ 080951ea d118
     ldr r0,[r1,#0x0]                         @ 080951ec 0868
     cmp r0,#0x0                              @ 080951ee 0028
@@ -2323,22 +2323,22 @@ LAB_080951dc:
     movs r3,#0x0    @ 080951fc 0023
     bl dispatch_card_display_op              @ 080951fe 89f74dfd
     b LAB_080951d8                           @ 08095202 e9e7
-DWORD_08095204:
+gp1lp_ptr_95204:
     .word  gP1LifePoints                  @ 08095204 e0c40102
-DWORD_08095208:
-    .word  0x00001d4c                     @ 08095208 4c1d0000
-DWORD_0809520c:
-    .word  0x00001d50                     @ 0809520c 501d0000
+act_state_c_95208:
+    .word  ACTIVATION_STATE_C_OFF         @ 08095208 4c1d0000  play_equip_ui_effect_3_with_state_gate: [gP1LifePoints+0x1d4c] equip slot status; ldr then cmp!=0
+lp_equip_b_9520c:
+    .word  LP_EQUIP_STATE_B_OFF           @ 0809520c 501d0000  play_equip_ui_effect_3_with_state_gate: [gP1LifePoints+0x1d50] secondary equip state; cmp==0 then set:=1
 LAB_08095210:
-    ldr r3, DWORD_0809521c                   @ 08095210 024b
+    ldr r3, lp_equip_b_9521c                 @ 08095210 024b
     adds r0,r2,r3    @ 08095212 d018
     str r1,[r0,#0x0]                         @ 08095214 0160
     movs r0,#0x0    @ 08095216 0020
 LAB_08095218:
     pop {r1}                                 @ 08095218 02bc
     bx r1                                    @ 0809521a 0847
-DWORD_0809521c:
-    .word  0x00001d50                     @ 0809521c 501d0000
+lp_equip_b_9521c:
+    .word  LP_EQUIP_STATE_B_OFF           @ 0809521c 501d0000  play_equip_ui_effect_3_with_state_gate LAB_08095210: str r1,[r0] r1=0 -> clear [+0x1d50]
 
 @ Equip confirm sub-step dispatcher, called by tick_equip_confirm_slot_by_step
 @ (0x08095348) after confirm slot is valid (indeg=1). Reads gP1LifePoints+0x1d5c
@@ -2350,8 +2350,8 @@ DWORD_0809521c:
 @ step_range=[1..10], switch_table=0x0809524c.
 dispatch_equip_confirm_phase_by_step:
     push {r4,lr}                             @ 08095220 10b5
-    ldr r1, DWORD_08095240                   @ 08095222 0749
-    ldr r2, DWORD_08095244                   @ 08095224 074a
+    ldr r1, gp1lp_ptr_95240                  @ 08095222 0749
+    ldr r2, eligib_act_type_95244            @ 08095224 074a
     adds r0,r1,r2    @ 08095226 8818
     ldr r0,[r0,#0x0]                         @ 08095228 0068
     subs r0,#0x1    @ 0809522a 0138
@@ -2361,41 +2361,138 @@ dispatch_equip_confirm_phase_by_step:
     b LAB_08095334                           @ 08095232 7fe0
 LAB_08095234:
     lsls r0,r0,#0x2    @ 08095234 8000
-    ldr r1, PTR_PTR_08095248                 @ 08095236 0449
+    ldr r1, eq_confirm_jumptbl_95248         @ 08095236 0449
     adds r0,r0,r1    @ 08095238 4018
     ldr r0,[r0,#0x0]                         @ 0809523a 0068
     .hword 0x4687    @ 0809523c 8746
     .zero  0x2
-DWORD_08095240:
+gp1lp_ptr_95240:
     .word  gP1LifePoints                  @ 08095240 e0c40102
-DWORD_08095244:
-    .word  0x00001d5c                     @ 08095244 5c1d0000
-PTR_PTR_08095248:
-    .word  0x0809524c                     @ 08095248 4c520908
-PTR_DAT_0809524c:
-    .word  0x0809530a                     @ 0809524c 0a530908
-    .word  0x0809529e                     @ 08095250 9e520908
-    .word  0x080952aa                     @ 08095254 aa520908
-    .word  0x08095292                     @ 08095258 92520908
-    .word  0x08095284                     @ 0809525c 84520908
-    .word  0x0809528a                     @ 08095260 8a520908
-    .word  0x0809528e                     @ 08095264 8e520908
-    .word  0x08095274                     @ 08095268 74520908
-    .word  0x08095274                     @ 0809526c 74520908
-    .word  0x08095304                     @ 08095270 04530908
-DAT_08095274:
-    ROM_INCBIN 0x95274, 0xc0
+eligib_act_type_95244:
+    .word  ELIGIB_ACT_TYPE_OFF            @ 08095244 5c1d0000  dispatch_equip_confirm_phase_by_step: [gP1LifePoints+0x1d5c] step value; subs#1; cmp#9; bls dispatch
+eq_confirm_jumptbl_95248:
+    .word  equip_confirm_case_jump_table  @ 08095248 4c520908  ptr to 10-entry raw-address jump table at 0x0809524c; dispatch via mov pc,r0 (0x4687)
+equip_confirm_case_jump_table:
+    .word  dispatch_case_0_init_lp2       @ 0809524c 0a530908
+    .word  dispatch_case_1_tickseq1       @ 08095250 9e520908
+    .word  dispatch_case_2_anim_cmp       @ 08095254 aa520908
+    .word  dispatch_case_3_tickseq1       @ 08095258 92520908
+    .word  dispatch_case_4_init_lp        @ 0809525c 84520908
+    .word  dispatch_case_5_tickseq0       @ 08095260 8a520908
+    .word  dispatch_case_6_tickseq0b      @ 08095264 8e520908
+    .word  dispatch_case_7_8_lp_anim      @ 08095268 74520908
+    .word  dispatch_case_7_8_lp_anim      @ 0809526c 74520908
+    .word  dispatch_case_9_lp_anim        @ 08095270 04530908
+dispatch_case_7_8_lp_anim:
+    ldr r1, DWORD_08095280                   @ 08095274 0249  -- case[7+8]: ldr+ldrh+bl apply_slot_equip_activation_if_lp_anim_phase; b epilogue
+    adds r0,r4,r1    @ 08095276 6018
+    ldrh r0,[r0,#0x0]                        @ 08095278 0088
+    bl apply_slot_equip_activation_if_lp_anim_phase @ 0809527a 00f0f9fd
+    b LAB_0809533c                           @ 0809527e 5de0
+DWORD_08095280:
+    .word  ELIGIB_ACT_TYPE_OFF            @ 08095280 5c1d0000
+dispatch_case_4_init_lp:
+    bl init_lp_bar_slot_entry_from_state     @ 08095284 00f05efd  -- case[4]: bl init_lp_bar_slot_entry_from_state; b epilogue
+    b LAB_0809533c                           @ 08095288 58e0
+dispatch_case_5_tickseq0:
+    movs r0,#0x0    @ 0809528a 0020  -- case[5]: movs r0,#0; b case[3]+1 (0x8095294) -- dispatch(1,0,1)
+    b LAB_08095294                           @ 0809528c 02e0
+dispatch_case_6_tickseq0b:
+    movs r0,#0x0    @ 0809528e 0020  -- case[6]: movs r0,#0; b shared_path 0x80952f2 -> dispatch(0,0,0)
+    b LAB_080952f2                           @ 08095290 2fe0
+dispatch_case_3_tickseq1:
+    movs r0,#0x1    @ 08095292 0120  -- case[3]+[6-fall]: movs r0,#1; movs r1,#0; movs r2,#1; bl tick_equip_target_selection_display_seq; b epilogue
+LAB_08095294:
+    movs r1,#0x0    @ 08095294 0021
+    movs r2,#0x1    @ 08095296 0122
+    bl apply_equip_entry_sprite_from_slot_context @ 08095298 10f04efe
+    b LAB_0809533c                           @ 0809529c 4ee0
+dispatch_case_1_tickseq1:
+    movs r0,#0x1    @ 0809529e 0120  -- case[1]: movs r0,#1; movs r1,#1; movs r2,#0; bl tick_equip_target_selection_display_seq; b epilogue
+    movs r1,#0x1    @ 080952a0 0121
+    movs r2,#0x0    @ 080952a2 0022
+    bl apply_equip_entry_sprite_from_slot_context @ 080952a4 10f048fe
+    b LAB_0809533c                           @ 080952a8 48e0
+dispatch_case_2_anim_cmp:
+    ldr r2, DWORD_080952cc                   @ 080952aa 084a  -- case[2]: ldr+adds+ldr cmp r2,#0xb; branches; bl dispatch_effect_slot_by_display_state; b epilogue
+    adds r0,r4,r2    @ 080952ac a018
+    ldr r2,[r0,#0x0]                         @ 080952ae 0268
+    cmp r2,#0xb                              @ 080952b0 0b2a
+    beq LAB_080952d4                         @ 080952b2 0fd0
+    cmp r2,#0xb                              @ 080952b4 0b2a
+    bcc LAB_080952fc                         @ 080952b6 21d3
+    cmp r2,#0xf                              @ 080952b8 0f2a
+    bhi LAB_080952fc                         @ 080952ba 1fd8
+    ldr r1, DWORD_080952d0                   @ 080952bc 0449
+    adds r0,r4,r1    @ 080952be 6018
+    ldr r1,[r0,#0x0]                         @ 080952c0 0168
+    movs r0,#0x0    @ 080952c2 0020
+    bl dispatch_effect_slot_by_display_state @ 080952c4 00f0fefd
+    b LAB_0809533c                           @ 080952c8 38e0
+    .zero  0x2
+DWORD_080952cc:
+    .word  ELIGIB_ANIM_STATE_OFF          @ 080952cc 6c1d0000
+DWORD_080952d0:
+    .word  ELIGIB_SPRITE_CTRL_OFF         @ 080952d0 681d0000
+LAB_080952d4:
+    ldr r2, eligib_card_id_952ec             @ 080952d4 054a
+    adds r0,r4,r2    @ 080952d6 a018
+    ldr r0,[r0,#0x0]                         @ 080952d8 0068
+    bl check_card_field5_is_nonzero          @ 080952da b5f735fd
+    cmp r0,#0x0                              @ 080952de 0028
+    beq LAB_080952f0                         @ 080952e0 06d0
+    movs r0,#0x0    @ 080952e2 0020
+    bl trigger_lp_bar_animation_if_ready     @ 080952e4 00f0dcfc
+    b LAB_0809533c                           @ 080952e8 28e0
+    .zero  0x2
+eligib_card_id_952ec:
+    .word  ELIGIB_CARD_ID_OFF             @ 080952ec 441d0000
+LAB_080952f0:
+    movs r0,#0x1    @ 080952f0 0120
+LAB_080952f2:
+    movs r1,#0x0    @ 080952f2 0021
+    movs r2,#0x0    @ 080952f4 0022
+    bl dispatch_lp_bar_animation_step        @ 080952f6 00f045fd
+    b LAB_0809533c                           @ 080952fa 1fe0
+LAB_080952fc:
+    .byte  0x00, 0x20, 0x00, 0xf0, 0x53, 0xfc, 0x1b, 0xe0
+dispatch_case_9_lp_anim:
+    bl tick_lp_bar_anim_step_display         @ 08095304 00f022fe  -- case[9]: bl tick_lp_bar_anim_step_display; b epilogue
+    b LAB_0809533c                           @ 08095308 18e0
+dispatch_case_0_init_lp2:
+    ldr r1, DWORD_08095328                   @ 0809530a 0749  -- case[0]: loads offsets 0x1d68/0x1d6c; bl init_lp_bar_slot_entry_from_state; ldr 0x1d54; b 0x8095338 store path
+    adds r0,r4,r1    @ 0809530c 6018
+    ldr r0,[r0,#0x0]                         @ 0809530e 0068
+    ldr r2, DWORD_0809532c                   @ 08095310 064a
+    adds r1,r4,r2    @ 08095312 a118
+    ldr r3,[r1,#0x0]                         @ 08095314 0b68
+    adds r1,r3,#0x0    @ 08095316 191c
+    subs r1,#0xb    @ 08095318 0b39
+    movs r2,#0x1    @ 0809531a 0122
+    rsbs r2,r2,#0    @ 0809531c 5242
+    bl init_effect_slot_display_context      @ 0809531e fef751ff
+    ldr r0, DWORD_08095330                   @ 08095322 0348
+    adds r1,r4,r0    @ 08095324 2118
+    b LAB_08095338                           @ 08095326 07e0
+DWORD_08095328:
+    .word  ELIGIB_SPRITE_CTRL_OFF         @ 08095328 681d0000
+DWORD_0809532c:
+    .word  ELIGIB_ANIM_STATE_OFF          @ 0809532c 6c1d0000
+DWORD_08095330:
+    .word  ELIGIB_STATE_CTRL_OFF          @ 08095330 541d0000
 LAB_08095334:
-    ldr r2, DWORD_08095344                   @ 08095334 034a
+    ldr r2, eligib_state_ctrl_95344          @ 08095334 034a
     adds r1,r1,r2    @ 08095336 8918
+LAB_08095338:
     movs r0,#0x0    @ 08095338 0020
     str r0,[r1,#0x0]                         @ 0809533a 0860
+LAB_0809533c:
     pop {r4}                                 @ 0809533c 10bc
     pop {r0}                                 @ 0809533e 01bc
     bx r0                                    @ 08095340 0047
     .zero  0x2
-DWORD_08095344:
-    .word  0x00001d54                     @ 08095344 541d0000
+eligib_state_ctrl_95344:
+    .word  ELIGIB_STATE_CTRL_OFF          @ 08095344 541d0000  dispatch_equip_confirm_phase_by_step LAB_08095334: str 0 to [+0x1d54] when step out of range
 
 @ Equip confirm slot checker and sub-step dispatcher, called by
 @ tick_equip_activation_main_sequence (0x08094cd4) after dispatch_equip_entry_slot_by_mode
@@ -2407,8 +2504,8 @@ DWORD_08095344:
 @ Constants: gP1LifePoints=0x0201c4e0, confirm_flag_offset=0x1d58, step_offset=0x1d54.
 tick_equip_confirm_slot_by_step:
     push {r4,r5,lr}                          @ 08095348 30b5
-    ldr r4, DWORD_0809535c                   @ 0809534a 044c
-    ldr r0, DWORD_08095360                   @ 0809534c 0448
+    ldr r4, gp1lp_ptr_9535c                  @ 0809534a 044c
+    ldr r0, eligib_act_cnt_95360             @ 0809534c 0448
     adds r5,r4,r0    @ 0809534e 2518
     ldr r0,[r5,#0x0]                         @ 08095350 2868
     cmp r0,#0x0                              @ 08095352 0028
@@ -2416,13 +2513,13 @@ tick_equip_confirm_slot_by_step:
     movs r0,#0x0    @ 08095356 0020
     b LAB_08095376                           @ 08095358 0de0
     .zero  0x2
-DWORD_0809535c:
+gp1lp_ptr_9535c:
     .word  gP1LifePoints                  @ 0809535c e0c40102
-DWORD_08095360:
-    .word  0x00001d58                     @ 08095360 581d0000
+eligib_act_cnt_95360:
+    .word  ELIGIB_ACT_COUNT_OFF           @ 08095360 581d0000  tick_equip_confirm_slot_by_step: [gP1LifePoints+0x1d58] confirm pending flag; cmp==0 -> return 0
 LAB_08095364:
     bl dispatch_equip_confirm_phase_by_step  @ 08095364 fff75cff
-    ldr r1, DWORD_0809537c                   @ 08095368 0449
+    ldr r1, eligib_state_ctrl_9537c          @ 08095368 0449
     adds r0,r4,r1    @ 0809536a 6018
     ldr r0,[r0,#0x0]                         @ 0809536c 0068
     cmp r0,#0x0                              @ 0809536e 0028
@@ -2434,8 +2531,8 @@ LAB_08095376:
     pop {r4,r5}                              @ 08095376 30bc
     pop {r1}                                 @ 08095378 02bc
     bx r1                                    @ 0809537a 0847
-DWORD_0809537c:
-    .word  0x00001d54                     @ 0809537c 541d0000
+eligib_state_ctrl_9537c:
+    .word  ELIGIB_STATE_CTRL_OFF          @ 0809537c 541d0000  tick_equip_confirm_slot_by_step: [gP1LifePoints+0x1d54] check after step; if==0 clears [+0x1d58]
 
 @ Packs four halfword fields (x_pos/y_pos/palette/flags) into two 32-bit sprite-row attribute words and submits them via submit_sprite_row_data with count=6. r0[15:0] | r1[15:0]<<16 forms first attr word; second attr word is built from sp[4] ANDed with DAT_080953bc, ORed with r2[15:0], ANDed with DAT_080953c0, ORed with r3[15:0]. Passes r1=-1 (full mask) and r2+2 (stride+2) to submit_sprite_row_data(base_ptr,-1,stride+2,6). Called by 5 card-display/duel-field callers as unified sprite row attribute merge entry. r0=u16 x_or_slot_word [0..0xffff]; r1=u16 y_or_attr_high [0..0xffff]; r2=u16 palette_or_stride [0..0xffff]; r3=u16 flags_or_tile [0..0xffff]; sp+4=u32 base_attr_word. Returns void (submit_sprite_row_data return transparent). Constants: submit count=6, stride=r2+2, AND masks DAT_080953bc/DAT_080953c0.
 pack_sprite_row_attr_words:
@@ -2445,9 +2542,9 @@ pack_sprite_row_attr_words:
     lsrs r0,r0,#0x10    @ 08095386 000c
     lsls r2,r2,#0x10    @ 08095388 1204
     lsrs r2,r2,#0x10    @ 0809538a 120c
-    ldr r4, DAT_080953bc                     @ 0809538c 0b4c
+    ldr r4, sprite_hi_mask_953bc             @ 0809538c 0b4c
     lsls r1,r1,#0x10    @ 0809538e 0904
-    ldr r5, DAT_080953c0                     @ 08095390 0b4d
+    ldr r5, sprite_lo_mask_953c0             @ 08095390 0b4d
     orrs r1,r0    @ 08095392 0143
     str r1,[sp,#0x0]                         @ 08095394 0091
     ldr r1,[sp,#0x4]                         @ 08095396 0199
@@ -2468,26 +2565,26 @@ pack_sprite_row_attr_words:
     pop {r1}                                 @ 080953b6 02bc
     bx r1                                    @ 080953b8 0847
     .zero  0x2
-DAT_080953bc:
-    .word  0xffff0000                     @ 080953bc 0000ffff
-DAT_080953c0:
-    .word  0x0000ffff                     @ 080953c0 ffff0000
+sprite_hi_mask_953bc:
+    .word  SPRITE_HIGH_HALF_MASK          @ 080953bc 0000ffff  pack_sprite_row_attr_words: ands r1,r4 clears low 16 bits of sprite attr word before OR y-coord
+sprite_lo_mask_953c0:
+    .word  SPRITE_LOW_HALF_MASK           @ 080953c0 ffff0000  pack_sprite_row_attr_words: ands r1,r5 clears high 16 bits of sprite attr word
 
-@ Dispatches sprite row write request to appropriate path by sprite type code. Called by submit_sprite_row_data (0x08095498) and FUN_080954e8 (duel_field/font_jp). r0=sprite_type_raw [2..0x1f]; r1=direction [0..1] (saved as r2=type); r2=channel_or_mode (0 -> special branch). subs r0,#2 -> base offset; cmp #0x1d bhi -> default bx lr; lsls #2; ldr switch_table; computed-goto via 0x4687=mov pc,r7. Switch table 0x080953dc: 30 entries, two case targets. case 0x08095454: r2!=0 -> r10+r2*0xc0*4; lsls r3,#0xd; asrs #0x1c bits[18:15] inc/dec by direction; ands #0xf; lsls #0xf; ands+orrs r0,r3; str to 0x0201b870+channel*0x300. Side effects: str [0x0201b870+channel*0x300+offset] bits[18:15] modified. Constants: sprite_table_base=0x0201b870, channel_stride=0x300, switch_table=0x080953dc, entry_count=30.
+@ Dispatches sprite row write request to appropriate path by sprite type code. Called by submit_sprite_row_data (0x08095498) and step_prng_anim_frame (duel_field/font_jp). r0=sprite_type_raw [2..0x1f]; r1=direction [0..1] (saved as r2=type); r2=channel_or_mode (0 -> special branch). subs r0,#2 -> base offset; cmp #0x1d bhi -> default bx lr; lsls #2; ldr switch_table; computed-goto via 0x4687=mov pc,r7. Switch table 0x080953dc: 30 entries, two case targets. case 0x08095454: r2!=0 -> r10+r2*0xc0*4; lsls r3,#0xd; asrs #0x1c bits[18:15] inc/dec by direction; ands #0xf; lsls #0xf; ands+orrs r0,r3; str to 0x0201b870+channel*0x300. Side effects: str [0x0201b870+channel*0x300+offset] bits[18:15] modified. Constants: sprite_table_base=0x0201b870, channel_stride=0x300, switch_table=0x080953dc, entry_count=30.
 dispatch_sprite_row_write_by_type:
     adds r2,r1,#0x0    @ 080953c4 0a1c
     subs r0,#0x2    @ 080953c6 0238
     cmp r0,#0x1d                             @ 080953c8 1d28
     bhi switchD_080953d4__caseD_4            @ 080953ca 60d8
     lsls r0,r0,#0x2    @ 080953cc 8000
-    ldr r1, DAT_080953d8                     @ 080953ce 0249
+    ldr r1, sprite_row_tbl_953d8             @ 080953ce 0249
     adds r0,r0,r1    @ 080953d0 4018
     ldr r0,[r0,#0x0]                         @ 080953d2 0068
 switchD_080953d4__switchD:
     .hword 0x4687    @ 080953d4 8746
     .zero  0x2
-DAT_080953d8:
-    .word  0x080953dc                     @ 080953d8 dc530908
+sprite_row_tbl_953d8:
+    .word  SPRITE_ROW_DISPATCH_TABLE      @ 080953d8 dc530908  dispatch_sprite_row_write_by_type: 30-entry switch table (2 targets: 0x08095454/0x0809548e)
 switchD_080953d4__switchdataD_080953dc:
     .word  0x08095454                     @ 080953dc 54540908
     .word  0x08095454                     @ 080953e0 54540908
@@ -2522,7 +2619,7 @@ switchD_080953d4__switchdataD_080953dc:
 switchD_080953d4__caseD_2:
     cmp r2,#0x0                              @ 08095454 002a
     beq LAB_08095470                         @ 08095456 0bd0
-    ldr r2, DAT_0809546c                     @ 08095458 044a
+    ldr r2, gsprattrb_9546c                  @ 08095458 044a
     movs r0,#0xc0    @ 0809545a c020
     lsls r0,r0,#0x2    @ 0809545c 8000
     adds r2,r2,r0    @ 0809545e 1218
@@ -2532,10 +2629,10 @@ switchD_080953d4__caseD_2:
     adds r1,#0x1    @ 08095466 0131
     b LAB_08095480                           @ 08095468 0ae0
     .zero  0x2
-DAT_0809546c:
-    .word  0x0201b870                     @ 0809546c 70b80102
+gsprattrb_9546c:
+    .word  gSpriteAttrBuf                 @ 0809546c 70b80102  dispatch_sprite_row_write_by_type caseD_2 r2!=0: adds r2,r2,r0 r0=0xc0<<2=0x300 stride
 LAB_08095470:
-    ldr r2, DAT_08095490                     @ 08095470 074a
+    ldr r2, gsprattrb_95490                  @ 08095470 074a
     movs r0,#0xc0    @ 08095472 c020
     lsls r0,r0,#0x2    @ 08095474 8000
     adds r2,r2,r0    @ 08095476 1218
@@ -2547,16 +2644,16 @@ LAB_08095480:
     movs r0,#0xf    @ 08095480 0f20
     ands r1,r0    @ 08095482 0140
     lsls r1,r1,#0xf    @ 08095484 c903
-    ldr r0, DAT_08095494                     @ 08095486 0348
+    ldr r0, sprite_bits1815_mask_95494       @ 08095486 0348
     ands r0,r3    @ 08095488 1840
     orrs r0,r1    @ 0809548a 0843
     str r0,[r2,#0x0]                         @ 0809548c 1060
 switchD_080953d4__caseD_4:
     bx lr                                    @ 0809548e 7047
-DAT_08095490:
-    .word  0x0201b870                     @ 08095490 70b80102
-DAT_08095494:
-    .word  0xfff87fff                     @ 08095494 ff7ff8ff
+gsprattrb_95490:
+    .word  gSpriteAttrBuf                 @ 08095490 70b80102  dispatch_sprite_row_write_by_type caseD_2 r2==0 path LAB_08095470
+sprite_bits1815_mask_95494:
+    .word  SPRITE_ROW_BITS18_15_CLEAR_MASK @ 08095494 ff7ff8ff  dispatch_sprite_row_write_by_type: ands r0,r3 clears bits[18:15] before ORing new direction bits
 
 @ Assembles sprite row data into 256-byte stack buffer then submits to write pipeline. Called by indeg=14 scene dispatchers (card_data/duel_field/font_jp etc). r0=sprite_id (u16 zero-extend, stored to sp[0]); r1=row_offset (s16, -1 skips header); r2=src_data_ptr (u16* source); r3=halfword_count (0 skips copy). sub sp,#0x100 allocates 256-byte frame. If r1!=-1: strh row_offset -> sp[2]; r5=2, else r5=1. If r3>0: copy_bytes_by_halfword(sp+r5*2, src, r3); r5 += ceil(r3/2). Then: bl dispatch_sprite_row_write_by_type(sprite_id, 1); bl write_sprite_row_to_vram_buffer(sp, r5*2). Side effects: sp[0]=sprite_id; sp[2]=row_offset (conditional); sp[r5*2..] from src_data_ptr; indirect: dispatch_sprite_row_write_by_type + write_sprite_row_to_vram_buffer effects. Constants: SKIP_OFFSET=-1, stack_buf_size=0x100=256.
 submit_sprite_row_data:
@@ -2600,10 +2697,10 @@ LAB_080954d0:
     pop {r1}                                 @ 080954e4 02bc
     bx r1                                    @ 080954e6 0847
 
-@ Per-frame prng animation step. When busy_flag (base 0x0201b870 + 0x300) bit0==0, calls dequeue_prng_anim_entry to advance one queue entry. If dequeue returns non-zero: calls read_prng_entry_flag_clear to clear slot flag, then queries get_lp_display_state_word; if 0 jumps to switch case 0, otherwise loads gP1LifePoints+0x1d0c LP data and dispatches. Indeg=1 (game loop hub FUN_08094dac). No APCS input (entry: ldr r4,DAT then base+0x300). Returns void (b switchD jumps to case handler at exit). Constants: base=0x0201b870, busy_flag_offset=0x300 (0xc0<<2), bit0=busy_bit.
+@ Per-frame prng animation step. When busy_flag (base 0x0201b870 + 0x300) bit0==0, calls dequeue_prng_anim_entry to advance one queue entry. If dequeue returns non-zero: calls read_prng_entry_flag_clear to clear slot flag, then queries get_lp_display_state_word; if 0 jumps to switch case 0, otherwise loads gP1LifePoints+0x1d0c LP data and dispatches. Indeg=1 (game loop hub advance_duel_turn_by_prng_anim). No APCS input (entry: ldr r4,DAT then base+0x300). Returns void (b switchD jumps to case handler at exit). Constants: base=0x0201b870, busy_flag_offset=0x300 (0xc0<<2), bit0=busy_bit.
 step_prng_anim_frame:
     push {r4,r5,r6,lr}                       @ 080954e8 70b5
-    ldr r4, DAT_08095528                     @ 080954ea 0f4c
+    ldr r4, gsprattrb_95528                  @ 080954ea 0f4c
     movs r1,#0xc0    @ 080954ec c021
     lsls r1,r1,#0x2    @ 080954ee 8900
     adds r0,r4,r1    @ 080954f0 6018
@@ -2628,17 +2725,17 @@ LAB_080954fe:
     bne LAB_0809551e                         @ 0809551a 00d1
     b switchD_0809554c__caseD_0              @ 0809551c 87e0
 LAB_0809551e:
-    ldr r0, PTR_gP1LifePoints_0809552c       @ 0809551e 0348
-    ldr r2, DAT_08095530                     @ 08095520 034a
+    ldr r0, gp1lp_ptr_9552c                  @ 0809551e 0348
+    ldr r2, lp_disp_state_95530              @ 08095520 034a
     adds r0,r0,r2    @ 08095522 8018
     b LAB_08095b12                           @ 08095524 f5e2
     .zero  0x2
-DAT_08095528:
-    .word  0x0201b870                     @ 08095528 70b80102
-PTR_gP1LifePoints_0809552c:
+gsprattrb_95528:
+    .word  gSpriteAttrBuf                 @ 08095528 70b80102  step_prng_anim_frame: base for busy_flag [+0xc0*4=0x300]
+gp1lp_ptr_9552c:
     .word  gP1LifePoints                  @ 0809552c e0c40102
-DAT_08095530:
-    .word  0x00001d0c                     @ 08095530 0c1d0000
+lp_disp_state_95530:
+    .word  LP_DISPLAY_STATE_OFF           @ 08095530 0c1d0000  step_prng_anim_frame: [gP1LifePoints+0x1d0c] LP display state control; ldr then b LAB_08095b12
 LAB_08095534:
     ldrh r0,[r4,#0x0]                        @ 08095534 2088
     movs r1,#0x0    @ 08095536 0021
@@ -2649,14 +2746,14 @@ LAB_08095534:
     b switchD_0809554c__caseD_4              @ 08095542 dde2
 LAB_08095544:
     lsls r0,r0,#0x2    @ 08095544 8000
-    ldr r1, DAT_08095550                     @ 08095546 0249
+    ldr r1, sprite_row_tbl2_95550            @ 08095546 0249
     adds r0,r0,r1    @ 08095548 4018
     ldr r0,[r0,#0x0]                         @ 0809554a 0068
 switchD_0809554c__switchD:
     .hword 0x4687    @ 0809554c 8746
     .zero  0x2
-DAT_08095550:
-    .word  0x08095554                     @ 08095550 54550908
+sprite_row_tbl2_95550:
+    .word  0x08095554                     @ 08095550 54550908  step_prng_anim_frame second switchD: 30-entry dispatch table base at 0x08095554; ldr r1,[DAT_08095550]; adds r0,r0,r1; ldr r0,[r0]; mov pc,r0
 switchD_0809554c__switchdataD_08095554:
     .word  0x0809562e                     @ 08095554 2e560908
     .word  0x08095af0                     @ 08095558 f05a0908
@@ -2691,7 +2788,7 @@ switchD_0809554c__switchdataD_08095554:
     .word  0x08095880                     @ 080955cc 80580908
     .word  0x080958ac                     @ 080955d0 ac580908
 switchD_0809554c__caseD_2:
-    ldr r1, DAT_08095608                     @ 080955d4 0c49
+    ldr r1, gsprattrb_95608                  @ 080955d4 0c49
     movs r3,#0xc0    @ 080955d6 c023
     lsls r3,r3,#0x2    @ 080955d8 9b00
     adds r1,r1,r3    @ 080955da c918
@@ -2704,7 +2801,7 @@ switchD_0809554c__caseD_2:
     movs r2,#0x0    @ 080955e8 0022
     movs r3,#0x0    @ 080955ea 0023
     bl pack_sprite_row_attr_words            @ 080955ec fff7c8fe
-    ldr r1, DAT_0809560c                     @ 080955f0 0649
+    ldr r1, gduecardctx_9560c                @ 080955f0 0649
     ldr r0,[r1,#0x4]                         @ 080955f2 4868
     lsls r0,r0,#0x2    @ 080955f4 8000
     adds r1,#0x8    @ 080955f6 0831
@@ -2715,22 +2812,22 @@ switchD_0809554c__caseD_2:
     bl invoke_card_display_op_0x31           @ 08095600 fdf7acff
     b switchD_0809554c__caseD_0              @ 08095604 13e0
     .zero  0x2
-DAT_08095608:
-    .word  0x0201b870                     @ 08095608 70b80102
-DAT_0809560c:
-    .word  0x0201e2a0                     @ 0809560c a0e20102
+gsprattrb_95608:
+    .word  gSpriteAttrBuf                 @ 08095608 70b80102  step_prng_anim_frame caseD_2: [gSpriteAttrBuf+0x300] busy byte ORed with 1
+gduecardctx_9560c:
+    .word  gDuelCardCtxBase               @ 0809560c a0e20102  step_prng_anim_frame caseD_2: [+4]=player_id for slot index lookup
 switchD_0809554c__caseD_3:
-    ldr r1, DAT_0809561c                     @ 08095610 0249
+    ldr r1, gsprattrb_9561c                  @ 08095610 0249
     movs r0,#0xc0    @ 08095612 c020
     lsls r0,r0,#0x2    @ 08095614 8000
     adds r1,r1,r0    @ 08095616 0918
     movs r0,#0x1    @ 08095618 0120
     b LAB_08095ae2                           @ 0809561a 62e2
-DAT_0809561c:
-    .word  0x0201b870                     @ 0809561c 70b80102
+gsprattrb_9561c:
+    .word  gSpriteAttrBuf                 @ 0809561c 70b80102  step_prng_anim_frame caseD_3: adds base+0xc0*4 then ORs bit0
 switchD_0809554c__caseD_15:
-    ldr r0, DAT_08095634                     @ 08095620 0448
-    ldr r1, DAT_08095638                     @ 08095622 0549
+    ldr r0, gequipzonerank_95634             @ 08095620 0448
+    ldr r1, gsprattrb_p2_95638               @ 08095622 0549
     movs r2,#0x18    @ 08095624 1822
     bl copy_bytes_by_halfword                @ 08095626 5ff03dfc
     bl reset_sprite_attr_record_flags        @ 0809562a 16f0b1fa
@@ -2738,19 +2835,19 @@ switchD_0809554c__caseD_0:
     movs r0,#0x1    @ 0809562e 0120
     b LAB_08095b18                           @ 08095630 72e2
     .zero  0x2
-DAT_08095634:
-    .word  0x0201e4d0                     @ 08095634 d0e40102
-DAT_08095638:
-    .word  0x0201b872                     @ 08095638 72b80102
+gequipzonerank_95634:
+    .word  gEquipZoneRankState            @ 08095634 d0e40102  step_prng_anim_frame caseD_15: bl copy_bytes_by_halfword(gEquipZoneRankState, gSpriteAttrBuf+2, 0x18)
+gsprattrb_p2_95638:
+    .word  gSpriteAttrBufData             @ 08095638 72b80102  step_prng_anim_frame caseD_15: dst = gSpriteAttrBuf+2 for copy_bytes_by_halfword 0x18
 switchD_0809554c__caseD_16:
-    ldr r0, DAT_08095644                     @ 0809563c 0148
-    ldr r1, DAT_08095648                     @ 0809563e 0249
+    ldr r0, gequipzonerank_95644             @ 0809563c 0148
+    ldr r1, gsprattrb_p2_95648               @ 0809563e 0249
     b LAB_080959b2                           @ 08095640 b7e1
     .zero  0x2
-DAT_08095644:
-    .word  0x0201e4d0                     @ 08095644 d0e40102
-DAT_08095648:
-    .word  0x0201b872                     @ 08095648 72b80102
+gequipzonerank_95644:
+    .word  gEquipZoneRankState            @ 08095644 d0e40102  step_prng_anim_frame caseD_16 LAB_080959b2: same copy src
+gsprattrb_p2_95648:
+    .word  gSpriteAttrBufData             @ 08095648 72b80102  step_prng_anim_frame caseD_16: same copy dst LAB_080959b2
 switchD_0809554c__caseD_17:
     ldr r1, DAT_0809565c                     @ 0809564c 0349
     movs r3,#0xc0    @ 0809564e c023
@@ -2763,7 +2860,7 @@ switchD_0809554c__caseD_17:
 DAT_0809565c:
     .word  0x0201b870                     @ 0809565c 70b80102
 switchD_0809554c__caseD_9:
-    ldr r2, DAT_08095674                     @ 08095660 044a
+    ldr r2, gsprattrb_95674                  @ 08095660 044a
     ldrh r0,[r2,#0x2]                        @ 08095662 5088
     ldrh r3,[r2,#0x6]                        @ 08095664 d388
     lsls r1,r3,#0x10    @ 08095666 1904
@@ -2772,10 +2869,10 @@ switchD_0809554c__caseD_9:
     bl submit_lp_bar_sprite_row_by_type      @ 0809566c eff758fe
     b switchD_0809554c__caseD_0              @ 08095670 dde7
     .zero  0x2
-DAT_08095674:
-    .word  0x0201b870                     @ 08095674 70b80102
+gsprattrb_95674:
+    .word  gSpriteAttrBuf                 @ 08095674 70b80102  step_prng_anim_frame caseD_9: ldrh r0[2]/r3[6]/r2[4] sprite row fields
 switchD_0809554c__caseD_a:
-    ldr r0, DAT_0809568c                     @ 08095678 0448
+    ldr r0, gsprattrb_9568c                  @ 08095678 0448
     ldrh r0,[r0,#0x2]                        @ 0809567a 4088
     cmp r0,#0x1                              @ 0809567c 0128
     beq LAB_08095696                         @ 0809567e 0ad0
@@ -2785,8 +2882,8 @@ switchD_0809554c__caseD_a:
     beq LAB_080956a2                         @ 08095686 0cd0
     b switchD_0809554c__caseD_0              @ 08095688 d1e7
     .zero  0x2
-DAT_0809568c:
-    .word  0x0201b870                     @ 0809568c 70b80102
+gsprattrb_9568c:
+    .word  gSpriteAttrBuf                 @ 0809568c 70b80102  step_prng_anim_frame caseD_a: ldrh r0,[r0,#2] sprite type field
 LAB_08095690:
     cmp r0,#0x2                              @ 08095690 0228
     beq LAB_0809569c                         @ 08095692 03d0
@@ -2801,18 +2898,18 @@ LAB_080956a2:
     bl decrement_lp_bar_display_counter      @ 080956a2 b5f7e5f8
     b switchD_0809554c__caseD_0              @ 080956a6 c2e7
 switchD_0809554c__caseD_c:
-    ldr r1, DAT_08095708                     @ 080956a8 1749
-    ldr r5, DAT_0809570c                     @ 080956aa 184d
+    ldr r1, gphaseflag_95708                 @ 080956a8 1749
+    ldr r5, effect_cnt_9570c                 @ 080956aa 184d
     adds r0,r1,r5    @ 080956ac 4819
     movs r2,#0x0    @ 080956ae 0022
     str r2,[r0,#0x0]                         @ 080956b0 0260
-    ldr r3, DAT_08095710                     @ 080956b2 174b
+    ldr r3, equip_substate_95710             @ 080956b2 174b
     adds r0,r1,r3    @ 080956b4 c818
     str r2,[r0,#0x0]                         @ 080956b6 0260
     subs r5,#0x4    @ 080956b8 043d
     adds r1,r1,r5    @ 080956ba 4919
     str r2,[r1,#0x0]                         @ 080956bc 0a60
-    ldr r1, DAT_08095714                     @ 080956be 1549
+    ldr r1, gsprattrb_95714                  @ 080956be 1549
     movs r0,#0xc0    @ 080956c0 c020
     lsls r0,r0,#0x2    @ 080956c2 8000
     adds r1,r1,r0    @ 080956c4 0918
@@ -2821,19 +2918,19 @@ switchD_0809554c__caseD_c:
     orrs r0,r2    @ 080956ca 1043
     strb r0,[r1,#0x0]                        @ 080956cc 0870
 switchD_0809554c__caseD_b:
-    ldr r2, DAT_08095718                     @ 080956ce 124a
+    ldr r2, gsprattrb_p2_95718               @ 080956ce 124a
     ldrh r4,[r2,#0x0]                        @ 080956d0 1488
     adds r2,#0x2    @ 080956d2 0232
-    ldr r1, DAT_08095708                     @ 080956d4 0c49
-    ldr r3, DAT_0809571c                     @ 080956d6 114b
+    ldr r1, gphaseflag_95708                 @ 080956d4 0c49
+    ldr r3, lp_bar_anim_9571c                @ 080956d6 114b
     adds r0,r1,r3    @ 080956d8 c818
     str r4,[r0,#0x0]                         @ 080956da 0460
     movs r3,#0x0    @ 080956dc 0023
     cmp r3,r4                                @ 080956de a342
     bge switchD_0809554c__caseD_0            @ 080956e0 a5da
-    ldr r5, DAT_08095720                     @ 080956e2 0f4d
+    ldr r5, sprite_row_data_95720            @ 080956e2 0f4d
     adds r6,r1,r5    @ 080956e4 4e19
-    ldr r0, DAT_08095724                     @ 080956e6 0f48
+    ldr r0, chain_node_arr_95724             @ 080956e6 0f48
     adds r5,r1,r0    @ 080956e8 0d18
 LAB_080956ea:
     adds r1,r3,r6    @ 080956ea 9919
@@ -2851,24 +2948,24 @@ LAB_080956ea:
     blt LAB_080956ea                         @ 08095702 f2db
     b switchD_0809554c__caseD_0              @ 08095704 93e7
     .zero  0x2
-DAT_08095708:
-    .word  0x0201b290                     @ 08095708 90b20102
-DAT_0809570c:
-    .word  0x00000594                     @ 0809570c 94050000
-DAT_08095710:
-    .word  0x0000058c                     @ 08095710 8c050000
-DAT_08095714:
-    .word  0x0201b870                     @ 08095714 70b80102
-DAT_08095718:
-    .word  0x0201b872                     @ 08095718 72b80102
-DAT_0809571c:
-    .word  0x000004cc                     @ 0809571c cc040000
-DAT_08095720:
-    .word  0x000004d4                     @ 08095720 d4040000
-DAT_08095724:
-    .word  0x000004f4                     @ 08095724 f4040000
+gphaseflag_95708:
+    .word  gDuelPhaseFlags                @ 08095708 90b20102  step_prng_anim_frame caseD_c: clears [+0x594] [+0x58c] [+0x590]; ORs 0x10 into [gSpriteAttrBuf+0x300]
+effect_cnt_9570c:
+    .word  EFFECT_ENTRY_COUNT_OFF         @ 0809570c 94050000  step_prng_anim_frame caseD_c: [gDuelPhaseFlags+0x594]:=0
+equip_substate_95710:
+    .word  EQUIP_SLOT_SUBSTATE_OFF        @ 08095710 8c050000  step_prng_anim_frame caseD_c: [gDuelPhaseFlags+0x58c]:=0
+gsprattrb_95714:
+    .word  gSpriteAttrBuf                 @ 08095714 70b80102  step_prng_anim_frame caseD_c: ORs 0x10 into [gSpriteAttrBuf+0x300]
+gsprattrb_p2_95718:
+    .word  gSpriteAttrBufData             @ 08095718 72b80102  step_prng_anim_frame caseD_b: ldrh r4,[r2,#0] source halfword
+lp_bar_anim_9571c:
+    .word  LP_BAR_ANIM_STATE_OFF          @ 0809571c cc040000  step_prng_anim_frame caseD_b+c: [gDuelPhaseFlags+0x4cc] str r4
+sprite_row_data_95720:
+    .word  SPRITE_ROW_ENTRY_DATA_OFF      @ 08095720 d4040000  step_prng_anim_frame caseD_b: [gDuelPhaseFlags+0x4d4] byte array base
+chain_node_arr_95724:
+    .word  CHAIN_NODE_CARD_ARR_OFF        @ 08095724 f4040000  step_prng_anim_frame caseD_b: [gDuelPhaseFlags+0x4f4] card ptr array
 switchD_0809554c__caseD_d:
-    ldr r1, DAT_08095738                     @ 08095728 0349
+    ldr r1, gsprattrb_95738                  @ 08095728 0349
     movs r2,#0xc0    @ 0809572a c022
     lsls r2,r2,#0x2    @ 0809572c 9200
     adds r1,r1,r2    @ 0809572e 8918
@@ -2876,14 +2973,14 @@ switchD_0809554c__caseD_d:
     ldrb r3,[r1,#0x0]                        @ 08095732 0b78
     orrs r0,r3    @ 08095734 1843
     b LAB_08095ae6                           @ 08095736 d6e1
-DAT_08095738:
-    .word  0x0201b870                     @ 08095738 70b80102
+gsprattrb_95738:
+    .word  gSpriteAttrBuf                 @ 08095738 70b80102  step_prng_anim_frame caseD_d: ORs 0x20 into [gSpriteAttrBuf+0x300]
 switchD_0809554c__caseD_e:
-    ldr r4, DAT_08095770                     @ 0809573c 0c4c
-    ldr r1, PTR_gP1LifePoints_08095774       @ 0809573e 0d49
-    ldr r5, DAT_08095778                     @ 08095740 0d4d
+    ldr r4, gsprattrb_p2_95770               @ 0809573c 0c4c
+    ldr r1, gp1lp_ptr_95774                  @ 0809573e 0d49
+    ldr r5, lp_playerside_9578               @ 08095740 0d4d
     adds r1,r1,r5    @ 08095742 4919
-    ldr r0, DAT_0809577c                     @ 08095744 0d48
+    ldr r0, gduecardctx_9577c                @ 08095744 0d48
     ldr r0,[r0,#0x4]                         @ 08095746 4068
     movs r5,#0x1    @ 08095748 0125
     eors r0,r5    @ 0809574a 6840
@@ -2893,61 +2990,61 @@ switchD_0809554c__caseD_e:
     ldrh r2,[r4,#0x4]                        @ 08095752 a288
     movs r3,#0x3    @ 08095754 0323
     bl init_duel_zone_target_slot_refs       @ 08095756 01f05dfb
-    ldr r0, DAT_08095780                     @ 0809575a 0948
-    ldr r1, DAT_08095784                     @ 0809575c 0949
+    ldr r0, gphaseflag_95780                 @ 0809575a 0948
+    ldr r1, gprng_disp_flag_95784            @ 0809575c 0949
     adds r0,r0,r1    @ 0809575e 4018
     str r5,[r0,#0x0]                         @ 08095760 0560
-    ldr r2, DAT_08095788                     @ 08095762 094a
+    ldr r2, sprite_byte_2fe_95788            @ 08095762 094a
     adds r4,r4,r2    @ 08095764 a418
     movs r0,#0x20    @ 08095766 2020
     ldrb r3,[r4,#0x0]                        @ 08095768 2378
     orrs r0,r3    @ 0809576a 1843
     b LAB_08095978                           @ 0809576c 04e1
     .zero  0x2
-DAT_08095770:
-    .word  0x0201b872                     @ 08095770 72b80102
-PTR_gP1LifePoints_08095774:
+gsprattrb_p2_95770:
+    .word  gSpriteAttrBufData             @ 08095770 72b80102  step_prng_anim_frame caseD_e: ldrh r0[0]/r1[2]/r2[4] entry fields; r4=gSpriteAttrBuf+2
+gp1lp_ptr_95774:
     .word  gP1LifePoints                  @ 08095774 e0c40102
-DAT_08095778:
-    .word  0x00001d64                     @ 08095778 641d0000
-DAT_0809577c:
-    .word  0x0201e2a0                     @ 0809577c a0e20102
-DAT_08095780:
-    .word  0x0201b290                     @ 08095780 90b20102
-DAT_08095784:
-    .word  0x00000584                     @ 08095784 84050000
-DAT_08095788:
-    .word  0x000002fe                     @ 08095788 fe020000
+lp_playerside_9578:
+    .word  LP_PLAYER_SIDE_CACHE_OFF       @ 08095778 641d0000  step_prng_anim_frame caseD_e: [gP1LifePoints+0x1d64]:=[gDuelCardCtxBase+4] XOR 1; player_side cache
+gduecardctx_9577c:
+    .word  gDuelCardCtxBase               @ 0809577c a0e20102  step_prng_anim_frame caseD_e: ldr r0,[r0,#4]=current_player_id for XOR
+gphaseflag_95780:
+    .word  gDuelPhaseFlags                @ 08095780 90b20102  step_prng_anim_frame caseD_e: [+GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF=0x584] := 1
+gprng_disp_flag_95784:
+    .word  GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF @ 08095784 84050000  step_prng_anim_frame caseD_e: str 1 -> [gDuelPhaseFlags+0x584] display-ready
+sprite_byte_2fe_95788:
+    .word  SPRITE_ATTR_BYTE_2FE_OFF       @ 08095788 fe020000  step_prng_anim_frame caseD_e/11: adds r4,r4,r2 r4=gSpriteAttrBuf+2 r2=0x2fe -> byte at +0x300
 switchD_0809554c__caseD_12:
-    ldr r1, DAT_080957a0                     @ 0809578c 0449
+    ldr r1, gsprattrb_957a0                  @ 0809578c 0449
     ldrh r5,[r1,#0x2]                        @ 0809578e 4d88
     lsls r0,r5,#0x1    @ 08095790 6800
     adds r0,r0,r5    @ 08095792 4019
     lsls r0,r0,#0x3    @ 08095794 c000
-    ldr r2, DAT_080957a4                     @ 08095796 034a
+    ldr r2, geffectentry_957a4               @ 08095796 034a
     adds r0,r0,r2    @ 08095798 8018
     adds r1,#0x4    @ 0809579a 0431
     b LAB_080959b2                           @ 0809579c 09e1
     .zero  0x2
-DAT_080957a0:
-    .word  0x0201b870                     @ 080957a0 70b80102
-DAT_080957a4:
-    .word  0x0201b590                     @ 080957a4 90b50102
+gsprattrb_957a0:
+    .word  gSpriteAttrBuf                 @ 080957a0 70b80102  step_prng_anim_frame caseD_12: ldrh r5,[r1,#2]; lsls r0,r5,#1; adds; lsls,#3 -> sprite offset
+geffectentry_957a4:
+    .word  gEffectEntryArray              @ 080957a4 90b50102  step_prng_anim_frame caseD_12: adds r0,r0,r2 r2=gEffectEntryArray -> base+entry_offset
 switchD_0809554c__caseD_13:
-    ldr r0, DAT_080957b4                     @ 080957a8 0248
-    ldr r1, DAT_080957b8                     @ 080957aa 0349
+    ldr r0, gphaseflag_957b4                 @ 080957a8 0248
+    ldr r1, effect_cnt_957b8                 @ 080957aa 0349
     adds r0,r0,r1    @ 080957ac 4018
-    ldr r1, DAT_080957bc                     @ 080957ae 0349
+    ldr r1, gsprattrb_957bc                  @ 080957ae 0349
     ldrh r1,[r1,#0x2]                        @ 080957b0 4988
     b LAB_08095898                           @ 080957b2 71e0
-DAT_080957b4:
-    .word  0x0201b290                     @ 080957b4 90b20102
-DAT_080957b8:
-    .word  0x00000594                     @ 080957b8 94050000
-DAT_080957bc:
-    .word  0x0201b870                     @ 080957bc 70b80102
+gphaseflag_957b4:
+    .word  gDuelPhaseFlags                @ 080957b4 90b20102  step_prng_anim_frame caseD_13: adds r0,r1 r1=0x594 -> gDuelPhaseFlags+EFFECT_ENTRY_COUNT_OFF
+effect_cnt_957b8:
+    .word  EFFECT_ENTRY_COUNT_OFF         @ 080957b8 94050000  step_prng_anim_frame caseD_13: [gDuelPhaseFlags+0x594]=effect entry count
+gsprattrb_957bc:
+    .word  gSpriteAttrBuf                 @ 080957bc 70b80102  step_prng_anim_frame caseD_13: ldrh r1,[r1,#2]
 switchD_0809554c__caseD_14:
-    ldr r4, DAT_080957dc                     @ 080957c0 064c
+    ldr r4, gsprattrb_957dc                  @ 080957c0 064c
     ldrh r0,[r4,#0x2]                        @ 080957c2 6088
     ldrh r2,[r4,#0x6]                        @ 080957c4 e288
     lsls r1,r2,#0x10    @ 080957c6 1104
@@ -2960,16 +3057,16 @@ switchD_0809554c__caseD_14:
     orrs r3,r4    @ 080957d4 2343
     bl submit_slot_card_sprite_row_entry     @ 080957d6 b6f7c9ff
     b switchD_0809554c__caseD_0              @ 080957da 28e7
-DAT_080957dc:
-    .word  0x0201b870                     @ 080957dc 70b80102
+gsprattrb_957dc:
+    .word  gSpriteAttrBuf                 @ 080957dc 70b80102  step_prng_anim_frame caseD_14: ldrh fields for submit_slot_card_sprite_row_entry
 switchD_0809554c__caseD_f:
-    ldr r1, DAT_08095810                     @ 080957e0 0b49
-    ldr r0, DAT_08095814                     @ 080957e2 0c48
+    ldr r1, gphaseflag_95810                 @ 080957e0 0b49
+    ldr r0, effect_cnt_95814                 @ 080957e2 0c48
     adds r3,r1,r0    @ 080957e4 0b18
-    ldr r2, DAT_08095818                     @ 080957e6 0c4a
+    ldr r2, gsprattrb_95818                  @ 080957e6 0c4a
     ldrh r0,[r2,#0x2]                        @ 080957e8 5088
     str r0,[r3,#0x0]                         @ 080957ea 1860
-    ldr r5, DAT_0809581c                     @ 080957ec 0b4d
+    ldr r5, equip_substate_9581c             @ 080957ec 0b4d
     adds r3,r1,r5    @ 080957ee 4b19
     movs r0,#0x0    @ 080957f0 0020
     str r0,[r3,#0x0]                         @ 080957f2 1860
@@ -2987,29 +3084,29 @@ switchD_0809554c__caseD_f:
     strb r0,[r2,#0x0]                        @ 0809580a 1070
     b switchD_0809554c__caseD_0              @ 0809580c 0fe7
     .zero  0x2
-DAT_08095810:
-    .word  0x0201b290                     @ 08095810 90b20102
-DAT_08095814:
-    .word  0x00000594                     @ 08095814 94050000
-DAT_08095818:
-    .word  0x0201b870                     @ 08095818 70b80102
-DAT_0809581c:
-    .word  0x0000058c                     @ 0809581c 8c050000
+gphaseflag_95810:
+    .word  gDuelPhaseFlags                @ 08095810 90b20102  step_prng_anim_frame caseD_f: ldr+adds -> [gDuelPhaseFlags+0x594]=sprite_id from gSpriteAttrBuf
+effect_cnt_95814:
+    .word  EFFECT_ENTRY_COUNT_OFF         @ 08095814 94050000  step_prng_anim_frame caseD_f
+gsprattrb_95818:
+    .word  gSpriteAttrBuf                 @ 08095818 70b80102  step_prng_anim_frame caseD_f: ldrh r0,[r2,#2] source sprite_id
+equip_substate_9581c:
+    .word  EQUIP_SLOT_SUBSTATE_OFF        @ 0809581c 8c050000  step_prng_anim_frame caseD_f: [gDuelPhaseFlags+0x58c]:=0
 switchD_0809554c__caseD_10:
-    ldr r1, DAT_0809582c                     @ 08095820 0249
+    ldr r1, gsprattrb_9582c                  @ 08095820 0249
     movs r5,#0xc0    @ 08095822 c025
     lsls r5,r5,#0x2    @ 08095824 ad00
     adds r1,r1,r5    @ 08095826 4919
     movs r0,#0x20    @ 08095828 2020
     b LAB_08095ae2                           @ 0809582a 5ae1
-DAT_0809582c:
-    .word  0x0201b870                     @ 0809582c 70b80102
+gsprattrb_9582c:
+    .word  gSpriteAttrBuf                 @ 0809582c 70b80102  step_prng_anim_frame caseD_10: adds r1,r1,r5 r5=0x300; ORs 0x20
 switchD_0809554c__caseD_11:
-    ldr r4, DAT_08095864                     @ 08095830 0c4c
-    ldr r1, PTR_gP1LifePoints_08095868       @ 08095832 0d49
-    ldr r3, DAT_0809586c                     @ 08095834 0d4b
+    ldr r4, gsprattrb_p2_95864               @ 08095830 0c4c
+    ldr r1, gp1lp_ptr_95868                  @ 08095832 0d49
+    ldr r3, lp_playerside_9586c              @ 08095834 0d4b
     adds r1,r1,r3    @ 08095836 c918
-    ldr r0, DAT_08095870                     @ 08095838 0d48
+    ldr r0, gduecardctx_95870                @ 08095838 0d48
     ldr r0,[r0,#0x4]                         @ 0809583a 4068
     movs r5,#0x1    @ 0809583c 0125
     eors r0,r5    @ 0809583e 6840
@@ -3019,74 +3116,74 @@ switchD_0809554c__caseD_11:
     ldrh r2,[r4,#0x4]                        @ 08095846 a288
     movs r3,#0x3    @ 08095848 0323
     bl init_duel_zone_target_slot_refs       @ 0809584a 01f0e3fa
-    ldr r0, DAT_08095874                     @ 0809584e 0948
-    ldr r1, DAT_08095878                     @ 08095850 0949
+    ldr r0, gphaseflag_95874                 @ 0809584e 0948
+    ldr r1, gprng_disp_flag_95878            @ 08095850 0949
     adds r0,r0,r1    @ 08095852 4018
     str r5,[r0,#0x0]                         @ 08095854 0560
-    ldr r2, DAT_0809587c                     @ 08095856 094a
+    ldr r2, sprite_byte_2fe_9587c            @ 08095856 094a
     adds r4,r4,r2    @ 08095858 a418
     movs r0,#0x20    @ 0809585a 2020
     ldrb r3,[r4,#0x0]                        @ 0809585c 2378
     orrs r0,r3    @ 0809585e 1843
     b LAB_08095978                           @ 08095860 8ae0
     .zero  0x2
-DAT_08095864:
-    .word  0x0201b872                     @ 08095864 72b80102
-PTR_gP1LifePoints_08095868:
+gsprattrb_p2_95864:
+    .word  gSpriteAttrBufData             @ 08095864 72b80102  step_prng_anim_frame caseD_11: ldrh r0[0]/r1[2]/r2[4] entry; init_duel_zone_target_slot_refs args
+gp1lp_ptr_95868:
     .word  gP1LifePoints                  @ 08095868 e0c40102
-DAT_0809586c:
-    .word  0x00001d64                     @ 0809586c 641d0000
-DAT_08095870:
-    .word  0x0201e2a0                     @ 08095870 a0e20102
-DAT_08095874:
-    .word  0x0201b290                     @ 08095874 90b20102
-DAT_08095878:
-    .word  0x00000584                     @ 08095878 84050000
-DAT_0809587c:
-    .word  0x000002fe                     @ 0809587c fe020000
+lp_playerside_9586c:
+    .word  LP_PLAYER_SIDE_CACHE_OFF       @ 0809586c 641d0000  step_prng_anim_frame caseD_11: [+0x1d64]:=[gDuelCardCtxBase+4] XOR 1 (same pattern as caseD_e)
+gduecardctx_95870:
+    .word  gDuelCardCtxBase               @ 08095870 a0e20102  step_prng_anim_frame caseD_11: [+4] player_id XOR
+gphaseflag_95874:
+    .word  gDuelPhaseFlags                @ 08095874 90b20102  step_prng_anim_frame caseD_11: [+0x584]:=1
+gprng_disp_flag_95878:
+    .word  GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF @ 08095878 84050000  step_prng_anim_frame caseD_11: [gDuelPhaseFlags+0x584]:=1
+sprite_byte_2fe_9587c:
+    .word  SPRITE_ATTR_BYTE_2FE_OFF       @ 0809587c fe020000  step_prng_anim_frame caseD_11: adds r4,r4,r2 r2=0x2fe -> byte at gSpriteAttrBuf+2+0x2fe
 switchD_0809554c__caseD_1e:
-    ldr r0, DAT_0809589c                     @ 08095880 0648
+    ldr r0, gduecardctx_9589c                @ 08095880 0648
     ldr r0,[r0,#0x4]                         @ 08095882 4068
-    ldr r2, DAT_080958a0                     @ 08095884 064a
+    ldr r2, gsprattrb_958a0                  @ 08095884 064a
     ldrh r1,[r2,#0x2]                        @ 08095886 5188
     adds r2,#0x4    @ 08095888 0432
     movs r3,#0x8    @ 0809588a 0823
     bl setup_lp_display_row_with_data        @ 0809588c 0cf0d4f8
-    ldr r0, PTR_gP1LifePoints_080958a4       @ 08095890 0448
-    ldr r5, DAT_080958a8                     @ 08095892 054d
+    ldr r0, gp1lp_ptr_958a4                  @ 08095890 0448
+    ldr r5, lp_equip_disp_958a8              @ 08095892 054d
     adds r0,r0,r5    @ 08095894 4019
     movs r1,#0x1    @ 08095896 0121
 LAB_08095898:
     str r1,[r0,#0x0]                         @ 08095898 0160
     b switchD_0809554c__caseD_0              @ 0809589a c8e6
-DAT_0809589c:
-    .word  0x0201e2a0                     @ 0809589c a0e20102
-DAT_080958a0:
-    .word  0x0201b870                     @ 080958a0 70b80102
-PTR_gP1LifePoints_080958a4:
+gduecardctx_9589c:
+    .word  gDuelCardCtxBase               @ 0809589c a0e20102  step_prng_anim_frame caseD_1e: [+4]=player_id arg to setup_lp_display_row_with_data
+gsprattrb_958a0:
+    .word  gSpriteAttrBuf                 @ 080958a0 70b80102  step_prng_anim_frame caseD_1e: ldrh r1,[r2,#2]; adds r2,#4 source for setup_lp_display_row_with_data
+gp1lp_ptr_958a4:
     .word  gP1LifePoints                  @ 080958a4 e0c40102
-DAT_080958a8:
-    .word  0x00001d84                     @ 080958a8 841d0000
+lp_equip_disp_958a8:
+    .word  LP_EQUIP_DISPLAY_FLAG_OFF      @ 080958a8 841d0000  step_prng_anim_frame caseD_1e: str 1 to [gP1LifePoints+0x1d84] after setup_lp_display_row_with_data
 switchD_0809554c__caseD_1f:
-    ldr r0, DAT_080958c4                     @ 080958ac 0548
-    ldr r4, DAT_080958c8                     @ 080958ae 064c
+    ldr r0, gequipchain_958c4                @ 080958ac 0548
+    ldr r4, gsprattrb_p2_958c8               @ 080958ae 064c
     adds r1,r4,#0x0    @ 080958b0 211c
     movs r2,#0x10    @ 080958b2 1022
     bl copy_bytes_by_halfword                @ 080958b4 5ff0f6fa
-    ldr r0, DAT_080958cc                     @ 080958b8 0448
+    ldr r0, sprite_byte_2ff_958cc            @ 080958b8 0448
     adds r4,r4,r0    @ 080958ba 2418
     movs r0,#0x2    @ 080958bc 0220
     ldrb r1,[r4,#0x0]                        @ 080958be 2178
     orrs r0,r1    @ 080958c0 0843
     b LAB_08095978                           @ 080958c2 59e0
-DAT_080958c4:
-    .word  0x0201e288                     @ 080958c4 88e20102
-DAT_080958c8:
-    .word  0x0201b872                     @ 080958c8 72b80102
-DAT_080958cc:
-    .word  0x000002ff                     @ 080958cc ff020000
+gequipchain_958c4:
+    .word  gEquipChainEntryBase           @ 080958c4 88e20102  step_prng_anim_frame caseD_1f: bl copy_bytes_by_halfword(gEquipChainEntryBase, gSpriteAttrBuf+2, 0x10)
+gsprattrb_p2_958c8:
+    .word  gSpriteAttrBufData             @ 080958c8 72b80102  step_prng_anim_frame caseD_1f: dst for copy_bytes_by_halfword(gEquipChainEntryBase, gSpriteAttrBuf+2, 0x10)
+sprite_byte_2ff_958cc:
+    .word  SPRITE_ATTR_BYTE_2FF_OFF       @ 080958cc ff020000  step_prng_anim_frame caseD_1f: adds r4,r4,r0 r0=0x2ff -> byte at gSpriteAttrBuf+2+0x2ff
 switchD_0809554c__caseD_1c:
-    ldr r4, DAT_08095904                     @ 080958d0 0c4c
+    ldr r4, gsprattrb_95904                  @ 080958d0 0c4c
     movs r2,#0xc4    @ 080958d2 c422
     lsls r2,r2,#0x2    @ 080958d4 9200
     adds r0,r4,r2    @ 080958d6 a018
@@ -3095,40 +3192,40 @@ switchD_0809554c__caseD_1c:
     lsls r0,r1,#0x1    @ 080958dc 4800
     adds r0,r0,r1    @ 080958de 4018
     lsls r0,r0,#0x3    @ 080958e0 c000
-    ldr r1, DAT_08095908                     @ 080958e2 0949
+    ldr r1, geffectentry_95908               @ 080958e2 0949
     adds r0,r0,r1    @ 080958e4 4018
     adds r1,r4,#0x4    @ 080958e6 211d
     movs r2,#0x18    @ 080958e8 1822
     bl copy_bytes_by_halfword                @ 080958ea 5ff0dbfa
-    ldr r3, DAT_0809590c                     @ 080958ee 074b
+    ldr r3, sprite_entry_30d_9590c           @ 080958ee 074b
     adds r1,r4,r3    @ 080958f0 e118
     movs r0,#0x0    @ 080958f2 0020
     strb r0,[r1,#0x0]                        @ 080958f4 0870
-    ldr r5, DAT_08095910                     @ 080958f6 064d
+    ldr r5, sprite_busy_95910                @ 080958f6 064d
     adds r4,r4,r5    @ 080958f8 6419
     movs r0,#0x10    @ 080958fa 1020
     ldrb r1,[r4,#0x0]                        @ 080958fc 2178
     orrs r0,r1    @ 080958fe 0843
     b LAB_08095978                           @ 08095900 3ae0
     .zero  0x2
-DAT_08095904:
-    .word  0x0201b870                     @ 08095904 70b80102
-DAT_08095908:
-    .word  0x0201b590                     @ 08095908 90b50102
-DAT_0809590c:
-    .word  0x0000030d                     @ 0809590c 0d030000
-DAT_08095910:
-    .word  0x00000301                     @ 08095910 01030000
+gsprattrb_95904:
+    .word  gSpriteAttrBuf                 @ 08095904 70b80102  step_prng_anim_frame caseD_1c: base [+2] ldrh as sprite_id; [+0xc4*4] store; [+0x301] OR 0x10
+geffectentry_95908:
+    .word  gEffectEntryArray              @ 08095908 90b50102  step_prng_anim_frame caseD_1c: adds r0,r0,r1 -> gEffectEntryArray+sprite_id*24
+sprite_entry_30d_9590c:
+    .word  SPRITE_ROW_ENTRY_30D_OFF       @ 0809590c 0d030000  step_prng_anim_frame caseD_1c: strb r0,[r1,#0] -> [gSpriteAttrBuf+0x30d]:=0 (clear byte)
+sprite_busy_95910:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 08095910 01030000  step_prng_anim_frame caseD_1c: adds r4,r4,r5; ldrb r1,[r4,#0]; ORs 0x10 -> [gSpriteAttrBuf+0x301]
 switchD_0809554c__caseD_1d:
-    ldr r1, DAT_08095938                     @ 08095914 0849
-    ldr r3, DAT_0809593c                     @ 08095916 094b
+    ldr r1, gsprattrb_95938                  @ 08095914 0849
+    ldr r3, sprite_busy_9593c                @ 08095916 094b
     adds r2,r1,r3    @ 08095918 ca18
     movs r0,#0x20    @ 0809591a 2020
     ldrb r5,[r2,#0x0]                        @ 0809591c 1578
     orrs r0,r5    @ 0809591e 2843
     strb r0,[r2,#0x0]                        @ 08095920 1070
-    ldr r3, DAT_08095940                     @ 08095922 074b
-    ldr r2, DAT_08095944                     @ 08095924 074a
+    ldr r3, gphaseflag_95940                 @ 08095922 074b
+    ldr r2, sprite_anim_ctl_95944            @ 08095924 074a
     adds r0,r3,r2    @ 08095926 9818
     ldr r2,[r0,#0x0]                         @ 08095928 0268
     lsls r0,r2,#0x1    @ 0809592a 5000
@@ -3138,16 +3235,16 @@ switchD_0809554c__caseD_1d:
     lsls r5,r5,#0x2    @ 08095932 ad00
     adds r3,r3,r5    @ 08095934 5b19
     b LAB_080959ae                           @ 08095936 3ae0
-DAT_08095938:
-    .word  0x0201b870                     @ 08095938 70b80102
-DAT_0809593c:
-    .word  0x00000301                     @ 0809593c 01030000
-DAT_08095940:
-    .word  0x0201b290                     @ 08095940 90b20102
-DAT_08095944:
-    .word  0x00000494                     @ 08095944 94040000
+gsprattrb_95938:
+    .word  gSpriteAttrBuf                 @ 08095938 70b80102  step_prng_anim_frame caseD_1d: adds r2,r1,r3 r3=0x301 -> [+0x301] ORed 0x20
+sprite_busy_9593c:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 0809593c 01030000  step_prng_anim_frame caseD_1d: [gSpriteAttrBuf+0x301] ORed 0x20
+gphaseflag_95940:
+    .word  gDuelPhaseFlags                @ 08095940 90b20102  step_prng_anim_frame caseD_1d: [+0x494]=count*24+gEffectEntryArray
+sprite_anim_ctl_95944:
+    .word  SPRITE_ROW_ANIM_CTL_OFF        @ 08095944 94040000  step_prng_anim_frame caseD_1d: [gDuelPhaseFlags+0x494] sprite type index
 switchD_0809554c__caseD_1a:
-    ldr r4, DAT_0809597c                     @ 08095948 0c4c
+    ldr r4, gsprattrb_9597c                  @ 08095948 0c4c
     movs r1,#0xc4    @ 0809594a c421
     lsls r1,r1,#0x2    @ 0809594c 8900
     adds r0,r4,r1    @ 0809594e 6018
@@ -3156,16 +3253,16 @@ switchD_0809554c__caseD_1a:
     lsls r0,r1,#0x1    @ 08095954 4800
     adds r0,r0,r1    @ 08095956 4018
     lsls r0,r0,#0x3    @ 08095958 c000
-    ldr r1, DAT_08095980                     @ 0809595a 0949
+    ldr r1, geffectentry_95980               @ 0809595a 0949
     adds r0,r0,r1    @ 0809595c 4018
     adds r1,r4,#0x4    @ 0809595e 211d
     movs r2,#0x18    @ 08095960 1822
     bl copy_bytes_by_halfword                @ 08095962 5ff09ffa
-    ldr r2, DAT_08095984                     @ 08095966 074a
+    ldr r2, sprite_entry_30e_95984           @ 08095966 074a
     adds r1,r4,r2    @ 08095968 a118
     movs r0,#0x0    @ 0809596a 0020
     strb r0,[r1,#0x0]                        @ 0809596c 0870
-    ldr r3, DAT_08095988                     @ 0809596e 064b
+    ldr r3, sprite_busy_95988                @ 0809596e 064b
     adds r4,r4,r3    @ 08095970 e418
     movs r0,#0x4    @ 08095972 0420
     ldrb r5,[r4,#0x0]                        @ 08095974 2578
@@ -3173,24 +3270,24 @@ switchD_0809554c__caseD_1a:
 LAB_08095978:
     strb r0,[r4,#0x0]                        @ 08095978 2070
     b switchD_0809554c__caseD_0              @ 0809597a 58e6
-DAT_0809597c:
-    .word  0x0201b870                     @ 0809597c 70b80102
-DAT_08095980:
-    .word  0x0201b590                     @ 08095980 90b50102
-DAT_08095984:
-    .word  0x0000030e                     @ 08095984 0e030000
-DAT_08095988:
-    .word  0x00000301                     @ 08095988 01030000
+gsprattrb_9597c:
+    .word  gSpriteAttrBuf                 @ 0809597c 70b80102  step_prng_anim_frame caseD_1a: [+2] ldrh; [+0xc4*4]=sprite_id; copy to gEffectEntryArray; [+0x30e] strb 0
+geffectentry_95980:
+    .word  gEffectEntryArray              @ 08095980 90b50102  step_prng_anim_frame caseD_1a: effect entry base
+sprite_entry_30e_95984:
+    .word  SPRITE_ROW_ENTRY_30E_OFF       @ 08095984 0e030000  step_prng_anim_frame caseD_1a: strb 0 -> [gSpriteAttrBuf+0x30e] clear
+sprite_busy_95988:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 08095988 01030000  step_prng_anim_frame caseD_1a: [gSpriteAttrBuf+0x301] ORed 0x4
 switchD_0809554c__caseD_1b:
-    ldr r1, DAT_080959bc                     @ 0809598c 0b49
-    ldr r0, DAT_080959c0                     @ 0809598e 0c48
+    ldr r1, gsprattrb_959bc                  @ 0809598c 0b49
+    ldr r0, sprite_busy_959c0                @ 0809598e 0c48
     adds r2,r1,r0    @ 08095990 0a18
     movs r0,#0x8    @ 08095992 0820
     ldrb r3,[r2,#0x0]                        @ 08095994 1378
     orrs r0,r3    @ 08095996 1843
     strb r0,[r2,#0x0]                        @ 08095998 1070
-    ldr r3, DAT_080959c4                     @ 0809599a 0a4b
-    ldr r5, DAT_080959c8                     @ 0809599c 0a4d
+    ldr r3, gphaseflag_959c4                 @ 0809599a 0a4b
+    ldr r5, sprite_anim_ctl_959c8            @ 0809599c 0a4d
     adds r0,r3,r5    @ 0809599e 5819
     ldr r2,[r0,#0x0]                         @ 080959a0 0268
     lsls r0,r2,#0x1    @ 080959a2 5000
@@ -3208,16 +3305,16 @@ LAB_080959b4:
     bl copy_bytes_by_halfword                @ 080959b4 5ff076fa
     b switchD_0809554c__caseD_0              @ 080959b8 39e6
     .zero  0x2
-DAT_080959bc:
-    .word  0x0201b870                     @ 080959bc 70b80102
-DAT_080959c0:
-    .word  0x00000301                     @ 080959c0 01030000
-DAT_080959c4:
-    .word  0x0201b290                     @ 080959c4 90b20102
-DAT_080959c8:
-    .word  0x00000494                     @ 080959c8 94040000
+gsprattrb_959bc:
+    .word  gSpriteAttrBuf                 @ 080959bc 70b80102  step_prng_anim_frame caseD_1b: [+0x301] ORed 0x8; [gDuelPhaseFlags+0x494] stride
+sprite_busy_959c0:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 080959c0 01030000  step_prng_anim_frame caseD_1b: [gSpriteAttrBuf+0x301] ORed 0x8
+gphaseflag_959c4:
+    .word  gDuelPhaseFlags                @ 080959c4 90b20102  step_prng_anim_frame caseD_1b
+sprite_anim_ctl_959c8:
+    .word  SPRITE_ROW_ANIM_CTL_OFF        @ 080959c8 94040000  step_prng_anim_frame caseD_1b: [gDuelPhaseFlags+0x494] stride
 switchD_0809554c__caseD_18:
-    ldr r1, DAT_08095a38                     @ 080959cc 1a49
+    ldr r1, gsprattrb_95a38                  @ 080959cc 1a49
     movs r3,#0xc4    @ 080959ce c423
     lsls r3,r3,#0x2    @ 080959d0 9b00
     adds r5,r1,r3    @ 080959d2 cd18
@@ -3226,7 +3323,7 @@ switchD_0809554c__caseD_18:
     lsls r0,r2,#0x1    @ 080959d8 5000
     adds r0,r0,r2    @ 080959da 8018
     lsls r0,r0,#0x3    @ 080959dc c000
-    ldr r2, DAT_08095a3c                     @ 080959de 174a
+    ldr r2, geffectentry_95a3c               @ 080959de 174a
     adds r4,r0,r2    @ 080959e0 8418
     adds r1,#0x4    @ 080959e2 0431
     adds r0,r4,#0x0    @ 080959e4 201c
@@ -3241,13 +3338,13 @@ switchD_0809554c__caseD_18:
     bl check_card_field5_is_nonzero          @ 080959f8 b5f7a6f9
     cmp r0,#0x0                              @ 080959fc 0028
     bne LAB_08095a18                         @ 080959fe 0bd1
-    ldr r0, PTR_gP1LifePoints_08095a40       @ 08095a00 0f48
+    ldr r0, gp1lp_ptr_95a40                  @ 08095a00 0f48
     ldrh r2,[r4,#0x4]                        @ 08095a02 a288
     lsls r1,r2,#0x11    @ 08095a04 5104
     lsrs r1,r1,#0x17    @ 08095a06 c90d
     lsls r1,r1,#0x2    @ 08095a08 8900
     adds r1,r1,r0    @ 08095a0a 0918
-    ldr r3, DAT_08095a44                     @ 08095a0c 0d4b
+    ldr r3, lp_act_type_base_95a44           @ 08095a0c 0d4b
     adds r1,r1,r3    @ 08095a0e c918
     movs r0,#0x80    @ 08095a10 8020
     ldrb r2,[r1,#0x0]                        @ 08095a12 0a78
@@ -3268,33 +3365,33 @@ LAB_08095a20:
     movs r3,#0x0    @ 08095a30 0023
     bl pack_sprite_row_attr_words            @ 08095a32 fff7a5fc
     b switchD_0809554c__caseD_0              @ 08095a36 fae5
-DAT_08095a38:
-    .word  0x0201b870                     @ 08095a38 70b80102
-DAT_08095a3c:
-    .word  0x0201b590                     @ 08095a3c 90b50102
-PTR_gP1LifePoints_08095a40:
+gsprattrb_95a38:
+    .word  gSpriteAttrBuf                 @ 08095a38 70b80102  step_prng_anim_frame caseD_18: entry fields; [+0xc4*4]=sprite_id; copy to gEffectEntryArray+stride
+geffectentry_95a3c:
+    .word  gEffectEntryArray              @ 08095a3c 90b50102  step_prng_anim_frame caseD_18
+gp1lp_ptr_95a40:
     .word  gP1LifePoints                  @ 08095a40 e0c40102
-DAT_08095a44:
-    .word  0x000010e1                     @ 08095a44 e1100000
+lp_act_type_base_95a44:
+    .word  LP_ACTIVATION_TYPE_ARRAY_BASE_OFF @ 08095a44 e1100000  step_prng_anim_frame caseD_18: r1=gP1LifePoints+field_slot*4+0x10e1 ORs bit7; per-slot activation type byte
 LAB_08095a48:
-    ldr r1, DAT_08095a5c                     @ 08095a48 0449
-    ldr r3, DAT_08095a60                     @ 08095a4a 054b
+    ldr r1, gsprattrb_95a5c                  @ 08095a48 0449
+    ldr r3, sprite_entry_30f_95a60           @ 08095a4a 054b
     adds r2,r1,r3    @ 08095a4c ca18
     movs r0,#0x0    @ 08095a4e 0020
     strb r0,[r2,#0x0]                        @ 08095a50 1070
-    ldr r5, DAT_08095a64                     @ 08095a52 044d
+    ldr r5, sprite_busy_95a64                @ 08095a52 044d
     adds r1,r1,r5    @ 08095a54 4919
     movs r0,#0x40    @ 08095a56 4020
     b LAB_08095ae2                           @ 08095a58 43e0
     .zero  0x2
-DAT_08095a5c:
-    .word  0x0201b870                     @ 08095a5c 70b80102
-DAT_08095a60:
-    .word  0x0000030f                     @ 08095a60 0f030000
-DAT_08095a64:
-    .word  0x00000301                     @ 08095a64 01030000
+gsprattrb_95a5c:
+    .word  gSpriteAttrBuf                 @ 08095a5c 70b80102  step_prng_anim_frame LAB_08095a48: [+0x30f]:=0; [+0x301] ORed 0x40
+sprite_entry_30f_95a60:
+    .word  SPRITE_ROW_ENTRY_30F_OFF       @ 08095a60 0f030000  step_prng_anim_frame LAB_08095a48: [gSpriteAttrBuf+0x30f]:=0 clear
+sprite_busy_95a64:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 08095a64 01030000  step_prng_anim_frame LAB_08095a48: [gSpriteAttrBuf+0x301] ORed 0x40
 switchD_0809554c__caseD_19:
-    ldr r2, DAT_08095a9c                     @ 08095a68 0c4a
+    ldr r2, gphaseflag_95a9c                 @ 08095a68 0c4a
     movs r3,#0x94    @ 08095a6a 9423
     lsls r3,r3,#0x3    @ 08095a6c db00
     adds r1,r2,r3    @ 08095a6e d118
@@ -3318,13 +3415,13 @@ LAB_08095a7a:
     lsls r3,r3,#0x2    @ 08095a90 9b00
     adds r1,r2,r3    @ 08095a92 d118
     adds r0,r0,r1    @ 08095a94 4018
-    ldr r1, DAT_08095aa0                     @ 08095a96 0249
+    ldr r1, gsprattrb_p2_95aa0               @ 08095a96 0249
     movs r2,#0x30    @ 08095a98 3022
     b LAB_080959b4                           @ 08095a9a 8be7
-DAT_08095a9c:
-    .word  0x0201b290                     @ 08095a9c 90b20102
-DAT_08095aa0:
-    .word  0x0201b872                     @ 08095aa0 72b80102
+gphaseflag_95a9c:
+    .word  gDuelPhaseFlags                @ 08095a9c 90b20102  step_prng_anim_frame caseD_19: [+0x94*8=0x4a0]:=0 clear state; [+0x90*8=0x480] count check
+gsprattrb_p2_95aa0:
+    .word  gSpriteAttrBufData             @ 08095aa0 72b80102  step_prng_anim_frame caseD_19: copy dst for copy_bytes_by_halfword 0x30 bytes
 LAB_08095aa4:
     ldrh r5,[r1,#0x0]                        @ 08095aa4 0d88
     lsls r0,r5,#0x1    @ 08095aa6 6800
@@ -3334,25 +3431,25 @@ LAB_08095aa4:
     lsls r3,r3,#0x2    @ 08095aae 9b00
     adds r1,r2,r3    @ 08095ab0 d118
     adds r0,r0,r1    @ 08095ab2 4018
-    ldr r1, DAT_08095ac0                     @ 08095ab4 0249
+    ldr r1, gsprattrb_p2_95ac0               @ 08095ab4 0249
     movs r2,#0x18    @ 08095ab6 1822
     bl copy_bytes_by_halfword                @ 08095ab8 5ff0f4f9
     b switchD_0809554c__caseD_0              @ 08095abc b7e5
     .zero  0x2
-DAT_08095ac0:
-    .word  0x0201b872                     @ 08095ac0 72b80102
+gsprattrb_p2_95ac0:
+    .word  gSpriteAttrBufData             @ 08095ac0 72b80102  step_prng_anim_frame LAB_08095aa4: copy_bytes_by_halfword(gEffectEntryArray+idx*24, gSpriteAttrBuf+2, 0x18)
 switchD_0809554c__caseD_7:
-    ldr r3, DAT_08095ad4                     @ 08095ac4 034b
+    ldr r3, gsprattrb_95ad4                  @ 08095ac4 034b
     ldrh r0,[r3,#0x2]                        @ 08095ac6 5888
     ldrh r1,[r3,#0x4]                        @ 08095ac8 9988
     ldrh r2,[r3,#0x6]                        @ 08095aca da88
     ldrh r3,[r3,#0x8]                        @ 08095acc 1b89
     bl write_sprite_attr_record_entry        @ 08095ace a6f789f9
     b switchD_0809554c__caseD_0              @ 08095ad2 ace5
-DAT_08095ad4:
-    .word  0x0201b870                     @ 08095ad4 70b80102
+gsprattrb_95ad4:
+    .word  gSpriteAttrBuf                 @ 08095ad4 70b80102  step_prng_anim_frame caseD_7: ldrh r0[2]/r1[4]/r2[6]/r3[8] -> write_sprite_attr_record_entry args
 switchD_0809554c__caseD_8:
-    ldr r1, DAT_08095aec                     @ 08095ad8 0449
+    ldr r1, gsprattrb_95aec                  @ 08095ad8 0449
     movs r5,#0xc0    @ 08095ada c025
     lsls r5,r5,#0x2    @ 08095adc ad00
     adds r1,r1,r5    @ 08095ade 4919
@@ -3364,25 +3461,25 @@ LAB_08095ae6:
     strb r0,[r1,#0x0]                        @ 08095ae6 0870
     b switchD_0809554c__caseD_0              @ 08095ae8 a1e5
     .zero  0x2
-DAT_08095aec:
-    .word  0x0201b870                     @ 08095aec 70b80102
+gsprattrb_95aec:
+    .word  gSpriteAttrBuf                 @ 08095aec 70b80102  step_prng_anim_frame caseD_8: adds r1,r1,r5 r5=0x300; ORs 0x8 into [+0x300]
 switchD_0809554c__caseD_1:
-    ldr r0, PTR_gP1LifePoints_08095af8       @ 08095af0 0148
-    ldr r3, DAT_08095afc                     @ 08095af2 024b
+    ldr r0, gp1lp_ptr_95af8                  @ 08095af0 0148
+    ldr r3, lp_disp_state_95afc              @ 08095af2 024b
     adds r0,r0,r3    @ 08095af4 c018
     b LAB_08095b12                           @ 08095af6 0ce0
-PTR_gP1LifePoints_08095af8:
+gp1lp_ptr_95af8:
     .word  gP1LifePoints                  @ 08095af8 e0c40102
-DAT_08095afc:
-    .word  0x00001d0c                     @ 08095afc 0c1d0000
+lp_disp_state_95afc:
+    .word  LP_DISPLAY_STATE_OFF           @ 08095afc 0c1d0000  step_prng_anim_frame caseD_1: ldr r3=[0x1d0c]; adds r0,r0,r3; b LAB_08095b12 -> writes 1
 switchD_0809554c__caseD_4:
     movs r0,#0x1    @ 08095b00 0120
     movs r1,#0x0    @ 08095b02 0021
     movs r2,#0x0    @ 08095b04 0022
     movs r3,#0x0    @ 08095b06 0023
     bl pack_sprite_row_attr_words            @ 08095b08 fff73afc
-    ldr r0, PTR_gP1LifePoints_08095b20       @ 08095b0c 0448
-    ldr r5, DAT_08095b24                     @ 08095b0e 054d
+    ldr r0, gp1lp_ptr_95b20                  @ 08095b0c 0448
+    ldr r5, lp_disp_state_95b24              @ 08095b0e 054d
     adds r0,r0,r5    @ 08095b10 4019
 LAB_08095b12:
     movs r1,#0x1    @ 08095b12 0121
@@ -3393,30 +3490,30 @@ LAB_08095b18:
     pop {r1}                                 @ 08095b1a 02bc
     bx r1                                    @ 08095b1c 0847
     .zero  0x2
-PTR_gP1LifePoints_08095b20:
+gp1lp_ptr_95b20:
     .word  gP1LifePoints                  @ 08095b20 e0c40102
-DAT_08095b24:
-    .word  0x00001d0c                     @ 08095b24 0c1d0000
+lp_disp_state_95b24:
+    .word  LP_DISPLAY_STATE_OFF           @ 08095b24 0c1d0000  step_prng_anim_frame caseD_4: after pack_sprite_row_attr_words, [gP1LifePoints+0x1d0c]:=1
     ROM_INCBIN 0x95b28, 0x14
 
-@ Reads and returns the 32-bit LP display state control word from gP1LifePoints+0x1d0c. No APCS input (entry overwrites r0). 4-instruction leaf: ldr gP1LifePoints, ldr 0x1d0c offset, adds, ldr [r0], bx lr. Non-zero return enables LP display update in caller FUN_080954e8; zero means no update needed this frame. No side effects. Constants: gP1LifePoints=0x0201c4e0, state_offset=0x1d0c.
+@ Reads and returns the 32-bit LP display state control word from gP1LifePoints+0x1d0c. No APCS input (entry overwrites r0). 4-instruction leaf: ldr gP1LifePoints, ldr 0x1d0c offset, adds, ldr [r0], bx lr. Non-zero return enables LP display update in caller step_prng_anim_frame; zero means no update needed this frame. No side effects. Constants: gP1LifePoints=0x0201c4e0, state_offset=0x1d0c.
 get_lp_display_state_word:
-    ldr r0, PTR_gP1LifePoints_08095b48       @ 08095b3c 0248
-    ldr r1, DAT_08095b4c                     @ 08095b3e 0349
+    ldr r0, gp1lp_ptr_95b48                  @ 08095b3c 0248
+    ldr r1, lp_disp_state_95b4c              @ 08095b3e 0349
     adds r0,r0,r1    @ 08095b40 4018
     ldr r0,[r0,#0x0]                         @ 08095b42 0068
     bx lr                                    @ 08095b44 7047
     .zero  0x2
-PTR_gP1LifePoints_08095b48:
+gp1lp_ptr_95b48:
     .word  gP1LifePoints                  @ 08095b48 e0c40102
-DAT_08095b4c:
-    .word  0x00001d0c                     @ 08095b4c 0c1d0000
+lp_disp_state_95b4c:
+    .word  LP_DISPLAY_STATE_OFF           @ 08095b4c 0c1d0000  get_lp_display_state_word: ldr r0,[r0+r1] returns [gP1LifePoints+0x1d0c]
 
 @ Check whether the player_side condition flag is set for a given slot. Reads gDuelFieldSlots[player_side][slot_idx] condition byte and tests a specific bit. r0: player_side [0..1]; r1: slot_idx [0..9]. Returns 1 if condition bit set, 0 otherwise. Pure read-only. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes.
 check_player_side_condition:
     push {r4,r5,lr}                          @ 08095b50 30b5
     movs r5,#0x0    @ 08095b52 0025
-    ldr r0, DAT_08095b94                     @ 08095b54 0f48
+    ldr r0, gsprattrb_95b94                  @ 08095b54 0f48
     movs r1,#0xc0    @ 08095b56 c021
     lsls r1,r1,#0x2    @ 08095b58 8900
     adds r0,r0,r1    @ 08095b5a 4018
@@ -3424,15 +3521,15 @@ check_player_side_condition:
     lsls r0,r0,#0xd    @ 08095b5e 4003
     asrs r3,r0,#0x1c    @ 08095b60 0317
     movs r4,#0x0    @ 08095b62 0024
-    ldr r2, PTR_gP1LifePoints_08095b98       @ 08095b64 0c4a
-    ldr r1, DAT_08095b9c                     @ 08095b66 0d49
+    ldr r2, gp1lp_ptr_95b98                  @ 08095b64 0c4a
+    ldr r1, p1lp_blk2_95b9c                  @ 08095b66 0d49
     adds r0,r2,r1    @ 08095b68 5018
     ldr r0,[r0,#0x0]                         @ 08095b6a 0068
     cmp r0,#0x0                              @ 08095b6c 0028
     beq LAB_08095b84                         @ 08095b6e 09d0
-    ldr r0, DAT_08095ba0                     @ 08095b70 0b48
+    ldr r0, p1lp_blk2_95ba0                  @ 08095b70 0b48
     adds r2,r2,r0    @ 08095b72 1218
-    ldr r0, DAT_08095ba4                     @ 08095b74 0b48
+    ldr r0, gduecardctx_95ba4                @ 08095b74 0b48
     ldr r0,[r0,#0x4]                         @ 08095b76 4068
     movs r1,#0x1    @ 08095b78 0121
     eors r0,r1    @ 08095b7a 4840
@@ -3450,16 +3547,16 @@ LAB_08095b8c:
     pop {r4,r5}                              @ 08095b8e 30bc
     pop {r1}                                 @ 08095b90 02bc
     bx r1                                    @ 08095b92 0847
-DAT_08095b94:
-    .word  0x0201b870                     @ 08095b94 70b80102
-PTR_gP1LifePoints_08095b98:
+gsprattrb_95b94:
+    .word  gSpriteAttrBuf                 @ 08095b94 70b80102  check_player_side_condition: [+0xc0*4=0x300] ldr r0; lsls#0xd; asrs r3,r0,#0x1c -> bits[18:15]
+gp1lp_ptr_95b98:
     .word  gP1LifePoints                  @ 08095b98 e0c40102
-DAT_08095b9c:
-    .word  0x00001d08                     @ 08095b9c 081d0000
-DAT_08095ba0:
-    .word  0x00001ce8                     @ 08095ba0 e81c0000
-DAT_08095ba4:
-    .word  0x0201e2a0                     @ 08095ba4 a0e20102
+p1lp_blk2_95b9c:
+    .word  P1LP_BLOCK2_OFF                @ 08095b9c 081d0000  check_player_side_condition: [gP1LifePoints+0x1d08] flag check
+p1lp_blk2_95ba0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08095ba0 e81c0000  check_player_side_condition: [gP1LifePoints+0x1ce8] player_id XOR check
+gduecardctx_95ba4:
+    .word  gDuelCardCtxBase               @ 08095ba4 a0e20102  check_player_side_condition: [+4]=player_id for XOR
 
 @ Initializes OAM sprite row entry for an equip card. Reads player_bit from [gP1LifePoints+0x1d68], base_slot_a from [+0x1d6c], slot_b from [+0x1d70]; slot_idx = slot_a + slot_b. If slot[+0x38]==0 (not yet rendered): calls enqueue_zone_card_sprite_attr_by_slot. Else: builds OAM attr0 word and calls init_card_sprite_row_entry_alt or init_card_sprite_row_entry (fallback). Clears [gP1LifePoints+0x1d54]=0 at end. r0=u32 context_extra (saved to r8 via .hword 0x4680=mov r8,r0). Returns void. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, slot_rendered_offset=0x38; gP1LifePoints offsets 0x1d44/0x1d48/0x1d54/0x1d68/0x1d6c/0x1d70. Callers: FUN_0804ce78, dispatch_field_display_state_by_type (equip card display sequence).
 init_equip_card_sprite_row_entry:

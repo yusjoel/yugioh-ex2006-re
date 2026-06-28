@@ -529,3 +529,15 @@
 .equ SPRITE_ATTR_MONSTER_8008,    0x00008008  @ process_card_play_ok_sequence: monster phase sprite attr; existing CARD_DESC_RENDER_PARAM=0x8008 (card_info.inc:60, jp-glyph-layer domain) is domain-distinct; 145 ROM refs; C5 domain-exception; conf: high
 .equ SPRITE_ATTR_ALT_8005,        0x00008005  @ process_card_play_ok_sequence: P2==0 fallback sprite attr; 5 ROM refs; C5 grep=0; conf: high
 .equ UNINIT_GUARD_FFFF,           0x0000ffff  @ enqueue_duel_phase_sprite_by_side: [gP1LifePoints+P1LP_BACKUP_DST_OFF(0x1cf0)]==0xffff guards against double-init; LP timer guard domain distinct from OAM/card-slot/score/row-mask/counter-cap constants at 0xffff; C5 5-hit domain-exception; conf: high
+
+
+@ =============================================================================
+@ file 12 Seg-2 additions: sprite attr row packing masks + dispatch table address
+@ Source: asm/12_equip_activation_scan.s, Seg-2 [0x08094f20..0x08095ba8)
+@ C5 grep verified: SPRITE_HIGH_HALF_MASK 1 hit (EQUIP_CHAIN_SENTINEL) domain-distinct;
+@   SPRITE_LOW_HALF_MASK 6 hits all domain-distinct; SPRITE_ROW_BITS18_15_CLEAR_MASK/SPRITE_ROW_DISPATCH_TABLE 0 hits
+@ =============================================================================
+.equ SPRITE_HIGH_HALF_MASK,      0xffff0000  @ pack_sprite_row_attr_words: ands r1,r4 clears low 16 bits of sprite attr word before ORing y-coord (packing domain); domain-distinct from EQUIP_CHAIN_SENTINEL=0xffff0000 (list terminator for gEquipChainSlotRefs); 2 ROM refs; conf: high
+.equ SPRITE_LOW_HALF_MASK,       0x0000ffff  @ pack_sprite_row_attr_words: ands r1,r5 clears high 16 bits of sprite attr word; sprite attr low-halfword mask; 6 existing hits all domain-distinct (SLOT_CARD_EMPTY/LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_ACTIVATION_CNT_CAP/UNINIT_GUARD_FFFF/OAM_ATTR0_HIDDEN/EQUIP_SLOT_SCORE_CAP); domain-exception; 2 ROM refs; conf: high
+.equ SPRITE_ROW_BITS18_15_CLEAR_MASK, 0xfff87fff  @ dispatch_sprite_row_write_by_type caseD_2: ands r0,r3 clears bits[18:15] of sprite row word before ORing new direction field ((new_dir&0xf)<<15); 2 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ROW_DISPATCH_TABLE,  0x080953dc  @ dispatch_sprite_row_write_by_type: 30-entry switch table (2 case targets: 0x08095454/0x0809548e); DAT_080953d8 holds address; dispatch via 0x4687 mov pc,r7; 1 ROM ref; C5 grep=0; conf: high

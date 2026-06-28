@@ -589,3 +589,24 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ ZONE_SLOT_ATTR_BIT12_CLEAR_MASK, 0xffffefff  @ dispatch_effect_ctx_slot_by_zone_type: ands r6,r0 clears bit12 of zone attr accumulator; 537 ROM refs; C5 grep=0; conf: high
 .equ EQUIP_PHASE_FN_TABLE_ROM,  0x09e5aac0  @ ROM fn-ptr table for equip activation phase dispatch; THUMB+1 entries indexed by [gP1LifePoints+EQUIP_MAIN_PHASE_OFF]; 1 ROM ref; C5 grep=0; conf: high
 .equ DUEL_TURN_FN_TABLE_ROM,    0x09e5aadc  @ ROM fn-ptr table for duel turn phase dispatch; THUMB+1 entries indexed by [gP1LifePoints+DUEL_TURN_STATE_OFF]; 1 ROM ref; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-2 additions: gP1LifePoints offsets + gSpriteAttrBuf offsets + global alias
+@ Source: asm/12_equip_activation_scan.s, Seg-2 [0x08094f20..0x08095ba8)
+@ C5 grep verified all values -> 0 hits before adding (except domain-distinct as noted)
+@ =============================================================================
+@ gP1LifePoints-relative offsets
+.equ LP_EQUIP_STATE_B_OFF,           0x00001d50  @ [gP1LifePoints+0x1d50] secondary equip slot state flag; play_equip_ui_effect_3_with_state_gate: if==0 set:=1 then dispatch_card_display_op(3,0,0,0); if nonzero check busy; adjacent ACTIVATION_STATE_C_OFF(+0x1d4c)+4 and ELIGIB_STATE_CTRL_OFF(+0x1d54)+4; 7 ROM refs; C5 grep=0; conf: high
+.equ LP_DISPLAY_STATE_OFF,           0x00001d0c  @ [gP1LifePoints+0x1d0c] LP display state control word; step_prng_anim_frame b LAB_08095b12 path writes 1; get_lp_display_state_word returns it; caseD_1/4 also write 1; 7 ROM refs; C5 grep=0; conf: high
+.equ LP_PLAYER_SIDE_CACHE_OFF,       0x00001d64  @ [gP1LifePoints+0x1d64] player_side cache for LP display; caseD_e/caseD_11: [+0x1d64]:=[gDuelCardCtxBase+4] XOR 1 (inverted player_id); plate init_zone_activation_display_fields confirms; 25 ROM refs; C5 grep=0; conf: high
+.equ LP_EQUIP_DISPLAY_FLAG_OFF,      0x00001d84  @ [gP1LifePoints+0x1d84] equip LP display active flag; caseD_1e: str 1 after setup_lp_display_row_with_data; 7 ROM refs; C5 grep=0; conf: high
+.equ LP_ACTIVATION_TYPE_ARRAY_BASE_OFF, 0x000010e1  @ [gP1LifePoints+0x10e1] per-slot activation type byte array base; caseD_18: r1=gP1LifePoints+field_slot*4+0x10e1 ORs bit7; plate fill_slot_activation_state_array: type_field_offset=0x10e1; 9 ROM refs; C5 grep=0; conf: high
+@ gSpriteAttrBuf-relative byte offsets
+.equ SPRITE_ROW_BUSY_BYTE_OFF,       0x00000301  @ gSpriteAttrBuf+0x301 primary busy/status byte; ORed with bits 0x4/8/10/20/40 in caseD_1a/1b/1c/1d/LAB_a48; 157 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ROW_ENTRY_30D_OFF,       0x0000030d  @ gSpriteAttrBuf+0x30d control byte cleared to 0 in caseD_1c before activating effect entry; adjacent cluster; 28 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ROW_ENTRY_30E_OFF,       0x0000030e  @ gSpriteAttrBuf+0x30e control byte cleared to 0 in caseD_1a; adjacent to 30d; 19 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ROW_ENTRY_30F_OFF,       0x0000030f  @ gSpriteAttrBuf+0x30f control byte cleared to 0 in LAB_08095a48 (caseD_18 path); adjacent cluster at 30d/30e/30f; 18 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_BYTE_2FE_OFF,       0x000002fe  @ offset from gSpriteAttrBufData(gSpriteAttrBuf+2) to reach gSpriteAttrBuf+0x300; caseD_e/11: adds r4,r4,r2 r2=0x2fe -> byte at gSpriteAttrBuf+2+0x2fe; ORed with direction bits; 98 ROM refs; C5 grep=0; conf: high
+.equ SPRITE_ATTR_BYTE_2FF_OFF,       0x000002ff  @ offset from gSpriteAttrBufData to gSpriteAttrBuf+0x301; caseD_1f: adds r4,r4,r0 r0=0x2ff ORs control bits; 198 ROM refs; C5 grep=0; conf: high
+@ gSpriteAttrBuf+2 global alias
+.equ gSpriteAttrBufData,             0x0201b872  @ gSpriteAttrBuf+2; halfword start of sprite attribute data fields (after 2-byte type header); consistently used as copy_bytes_by_halfword dst alongside gEquipZoneRankState/gEquipChainEntryBase; 8 ROM refs; C5 grep=0; conf: high
