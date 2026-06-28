@@ -75,7 +75,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
-| 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | (pending) |
+| 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | ee05202 |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ⬜ |  |
 | 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
@@ -162,7 +162,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - Gate4: 精简板 char count <= 500 (494/448) ✅
 - **CSV sync**: 不需要 (无新建/改名函数)
 - **§5.1**: 本段无 ROM_INCBIN, 无新增登记
-- **commit**: (pending)
+- **commit**: ee05202
 
 ---
 
