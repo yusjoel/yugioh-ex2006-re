@@ -18043,11 +18043,11 @@ scan_zone_group_handler_multi_card:
     b LAB_0808d740                           @ 0808d71a 11e0
 LAB_0808d71c:
     adds r0,r5,#0x0    @ 0808d71c 281c
-    bl SUB_08097104                          @ 0808d71e 09f0f1fc
+    bl get_equip_handler_table_entry_param   @ 0808d71e 09f0f1fc
     cmp r8,r0                                @ 0808d722 8045
     bne LAB_0808d73e                         @ 0808d724 0bd1
     adds r0,r5,#0x0    @ 0808d726 281c
-    bl SUB_080970d4                          @ 0808d728 09f0d4fc
+    bl get_equip_handler_card_type           @ 0808d728 09f0d4fc
     adds r1,r0,#0x0    @ 0808d72c 011c
     adds r0,r7,#0x0    @ 0808d72e 381c
     bl scan_card_type_effect_handler_table   @ 0808d730 09f0f0fc
@@ -18059,7 +18059,7 @@ LAB_0808d71c:
 LAB_0808d73e:
     adds r5,#0x1    @ 0808d73e 0135
 LAB_0808d740:
-    bl SUB_080970d0                          @ 0808d740 09f0c6fc
+    bl get_equip_handler_table_entry_count   @ 0808d740 09f0c6fc
     cmp r5,r0                                @ 0808d744 8542
     blt LAB_0808d71c                         @ 0808d746 e9db
     ldr r1, scan_zone_group_handler_multi_card_pool_zonebas_a @ 0808d748 1549
@@ -18073,10 +18073,10 @@ LAB_0808d750:
     .hword 0x466a    @ 0808d756 6a46
     adds r4,r2,r0    @ 0808d758 1418
     ldr r0,[r4,#0x0]                         @ 0808d75a 2068
-    bl SUB_080970d4                          @ 0808d75c 09f0bafc
+    bl get_equip_handler_card_type           @ 0808d75c 09f0bafc
     adds r6,r0,#0x0    @ 0808d760 061c
     ldr r0,[r4,#0x0]                         @ 0808d762 2068
-    bl SUB_080970e4                          @ 0808d764 09f0befc
+    bl check_equip_handler_uses_fixed_activation @ 0808d764 09f0befc
     adds r4,r0,#0x0    @ 0808d768 041c
     cmp r4,#0x0                              @ 0808d76a 002c
     beq LAB_0808d7a4                         @ 0808d76c 1ad0

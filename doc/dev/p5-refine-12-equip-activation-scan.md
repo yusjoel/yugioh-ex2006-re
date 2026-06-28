@@ -77,7 +77,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
 | 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | ee05202 |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ✅ | aa2ff4e |
-| 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
+| 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ✅ | (pending) |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
 | 7  | 0x8099314..0x809a1a4 | 3  | 122 | 0 inc | ⬜ |  |
 | 8  | 0x809a1a4..0x809b178 | 1  | 128 | 0 inc (eval_equip_slot_pair_eligibility 巨型单函数) | ⬜ |  |
@@ -188,6 +188,29 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: 需要 (4 SUB_ 新函数加入 naming-proposals.csv; get_equip_handler_table_entry_count/card_type/uses_fixed/entry_param)
 - **§5.1**: 0x96eec(0x34) 一行登记
 - **commit**: aa2ff4e
+
+---
+
+### 4.05 Seg-5 完成记录 [0x08097828, 0x080984d0)
+
+- **EQ**: 115 槽 (含 Fix#1 补入 DAT_080979bc → eqchain_act_79bc = EQUIP_CHAIN_ACTIVE_OFF)
+- **REF**: 6 槽 (2 switchD 表基址 slot_label 全小写 Fix#2 + 4 THUMB fn-ptr)
+- **RENAME**: 31 槽 (PTR_gP1LifePoints_* -> gp1lp_ptr_*)
+- **FUNC_RENAME**: 0
+- **PLATE**: 5 操作 (3 full rewrites + 2 trims; 全 ASCII <=500 chars; FUN_0809be70 -> advance_equip_display_phase_via_table 替换)
+- **carve**: 0 / **disasm**: 0 / **§5.1**: 0 (Seg-5 无 ROM_INCBIN)
+- **新增常量**:
+  - oam_attr.inc: OAM_EQUIP_SPRITE_P2_15(0x8015)
+  - card_info.inc: JIRAI_GUMO_CID(0x1115) / PATRICIAN_OF_DARKNESS_CID(0x139c)
+- **NEEDS_FIX 修复确认**: Fix#1 (DAT_080979bc 补入 Group A → eqchain_act_79bc) ✅; Fix#2 (switchdataD_97860/c68 → switchdata_ptr_97860/c68 全小写) ✅
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Gates**:
+  - Gate1: DAT_/DWORD_/PTR_ 残留 Seg-5 范围 [0x08097828, 0x080984d0) = 0 ✅
+  - Gate2: Seg-5 非 ASCII (L7435..9119) = 0 ✅
+  - Gate3: switchdata_ptr_97860/c68 (全小写) 各 2 命中, stale uppercase D = 0 ✅
+  - Gate4: eqchain_act_79bc = 2 命中, stale DAT_080979bc = 0 ✅
+- **CSV sync**: 不需要 (0 新建/改名函数)
+- **commit**: (pending)
 
 ---
 

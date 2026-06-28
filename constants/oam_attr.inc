@@ -221,3 +221,12 @@
 @ =============================================================================
 .equ OAM_EQUIP_ZONE_SPRITE_P2_18, 0x00008018  @ equip zone sprite OAM attr0 P2 first sprite (bit15+0x18); enqueue_frozen_soul_zone_sprite_or_default P2 path first call: enqueue_sprite_attr_record(0x8018,1,0,0); sibling of OAM_EQUIP_ZONE_SPRITE_P2_0F=0x800f; 24 ROM refs; C5 grep=0; conf: high
 .equ OAM_EQUIP_ZONE_SPRITE_P2_0F, 0x0000800f  @ equip zone sprite OAM attr0 P2 second sprite (bit15+0xf); enqueue_frozen_soul_zone_sprite_or_default P2 path second call: enqueue_sprite_attr_record(0x800f,0,0,0); sibling of OAM_EQUIP_ZONE_SPRITE_P2_18=0x8018; 5 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-5 additions: equip activation sprite P2 OAM attr0
+@ Source: asm/12_equip_activation_scan.s, Seg-5 [0x08097828..0x080984d0)
+@ dispatch_equip_activation_state_by_substate caseD_0: P1 inline 0x15, P2 ldr pool=0x8015
+@ Sibling of OAM_SPRITE_CODE_P1_ACTIVATION(0x8019)/OAM_EQUIP_SPRITE_P2_1A(0x801a)/OAM_EQUIP_SPRITE_TILE_P2_1B(0x801b)
+@ C5 grep 0x00008015: 0 exact .equ hits before adding
+@ =============================================================================
+.equ OAM_EQUIP_SPRITE_P2_15,  0x00008015  @ equip activation sprite OAM attr0 P2 (bit15+0x15); dispatch_equip_activation_state_by_substate caseD_0 P2 path: enqueue_sprite_attr_record(0x8015,0,0,0); P1 uses inline 0x15; bit15=P2 flag; sibling of OAM_SPRITE_CODE_P1_ACTIVATION(0x8019); 1 pool slot in Seg-5; C5 grep=0; conf: high

@@ -1930,3 +1930,11 @@
 .equ GREAT_LONG_NOSE_CID,        0x00001502  @ Great Long Nose (pw=02356994; card-stats.s slot=0x1502); check_equip_zone_has_frozen_soul_or_great_long_nose: check_slot_has_node_by_card_id(player,0xb,0x1502); 84 ROM refs; C5 grep=0; conf: high
 .equ DD_BORDERLINE_CID,          0x000016d4  @ D. D. Borderline (pw=60912752; card-stats.s slot=0x16D4); check_equip_effect_zone_preconditions: count_available_effect_zones(0/1,0x16d4,-1); 6 ROM refs; C5 grep=0; conf: high
 .equ EARTHBOUND_INVITATION_CID,  0x0000177a  @ Earthbound Spirit's Invitation (pw=65743242; card-stats.s slot=0x177A); check_equip_slot_activation_blocked_by_chain_ext: check_value_in_slot_chain(1-player,0xb,0x177a); 10 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-5 additions: card IDs for equip activation display state machine
+@ Source: asm/12_equip_activation_scan.s, Seg-5 [0x08097828..0x080984d0)
+@ C5 grep verified: 0 hits before adding each
+@ =============================================================================
+.equ JIRAI_GUMO_CID,             0x00001115  @ Jirai Gumo (pw=94773007; card-stats.s card_0325 slot=0x1115); tick_activation_display_state_machine state-0: cmp card_id,JIRAI_GUMO_CID -> Toon sprite dispatch branch (alongside TOON range 0x127f..0x12a5); 1 pool slot in Seg-5; C5 grep=0; conf: high
+.equ PATRICIAN_OF_DARKNESS_CID,  0x0000139c  @ Patrician of Darkness (pw=19153634; card-stats.s card_0813 slot=0x139C); dispatch_equip_slot_display_state_by_phase caseD_1/3/a: count_available_effect_zones(1-player,0x139c,-1) as zone_code CID filter; 3 pool slots in Seg-5; C5 grep=0; conf: high
