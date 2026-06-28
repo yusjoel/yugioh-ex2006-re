@@ -537,6 +537,22 @@
 @ C5 grep verified: SPRITE_HIGH_HALF_MASK 1 hit (EQUIP_CHAIN_SENTINEL) domain-distinct;
 @   SPRITE_LOW_HALF_MASK 6 hits all domain-distinct; SPRITE_ROW_BITS18_15_CLEAR_MASK/SPRITE_ROW_DISPATCH_TABLE 0 hits
 @ =============================================================================
+@ =============================================================================
+@ file 12 Seg-3 additions: zone phase / activation entry struct fields
+@ Source: asm/12_equip_activation_scan.s, Seg-3 [0x08095ba8..0x08096a4c)
+@ C5 grep verified: ZONE_PHASE_STATUS_OFF/ZONE_EVAL_PHASE_CODE_OFF/ACTIVATION_ENTRY_PTR_OFF = 0 hits;
+@   ACTIVATION_ENTRY_CLR_BITS_11_6 1 hit OAM domain-distinct;
+@   ACTIVATION_ENTRY_CLR_BITS_14_6 2 hits (slot_field_scan/scrollbar) domain-distinct;
+@ =============================================================================
+@ gDuelFieldSlots-relative offsets
+.equ ZONE_EVAL_PHASE_CODE_OFF,   0x00001bd4  @ [gDuelFieldSlots+0x1bd4] zone_phase_code; values 2/3/4 -> three dispatch paths (field-spell/equip/pass) in eval_spell_activation_flags_by_zone; 3 ROM refs; C5 grep=0; conf: high
+.equ ZONE_PHASE_STATUS_OFF,      0x00001c58  @ [gDuelFieldSlots+0x1c58] zone phase status code; written 0x10/0x17/5/0xc/0xf/6 by eval_spell_activation_flags_by_zone (different zone_phase paths); read by Seg-4+ callers; 8 ROM refs; C5 grep=0; conf: high
+@ Activation entry struct bitmask constants (equip activation entry [+2]/[+4] halfword fields)
+.equ ACTIVATION_ENTRY_CLR_BITS_11_6, 0xfffff03f  @ ands mask clearing bits[11:6] of activation entry halfword at struct+2; setup_equip_slot_activation_entry / _alt; domain = equip activation entry struct (distinct from OAM_ATTR2_CLR_BITS_11_6); 14 ROM refs; conf: high
+.equ ACTIVATION_ENTRY_CLR_BITS_14_6, 0xffff803f  @ ands mask clearing bits[14:6] of activation entry halfword at struct+4; setup_equip_slot_activation_entry / _alt; domain = equip activation entry struct (distinct from SCROLLBAR_CLEAR_BITS_14_6 and slot_field_mask_ffff803f); 37 ROM refs; conf: high
+@ gP1LifePoints-relative offset
+.equ ACTIVATION_ENTRY_PTR_OFF,   0x00001d7c  @ [gP1LifePoints+0x1d7c] zone_eval_fn callback pointer; write_card_display_ctx_fields writes 0; init_zone_activation_display_fields stores zone_eval_fn; init_zone_activation_display_state_p1_entry stores zone_or_card_param; 9 ROM refs; C5 grep=0; conf: high
+
 .equ SPRITE_HIGH_HALF_MASK,      0xffff0000  @ pack_sprite_row_attr_words: ands r1,r4 clears low 16 bits of sprite attr word before ORing y-coord (packing domain); domain-distinct from EQUIP_CHAIN_SENTINEL=0xffff0000 (list terminator for gEquipChainSlotRefs); 2 ROM refs; conf: high
 .equ SPRITE_LOW_HALF_MASK,       0x0000ffff  @ pack_sprite_row_attr_words: ands r1,r5 clears high 16 bits of sprite attr word; sprite attr low-halfword mask; 6 existing hits all domain-distinct (SLOT_CARD_EMPTY/LP_ROW_TYPE8_ALL_SLOTS_MASK/EQUIP_ACTIVATION_CNT_CAP/UNINIT_GUARD_FFFF/OAM_ATTR0_HIDDEN/EQUIP_SLOT_SCORE_CAP); domain-exception; 2 ROM refs; conf: high
 .equ SPRITE_ROW_BITS18_15_CLEAR_MASK, 0xfff87fff  @ dispatch_sprite_row_write_by_type caseD_2: ands r0,r3 clears bits[18:15] of sprite row word before ORing new direction field ((new_dir&0xf)<<15); 2 ROM refs; C5 grep=0; conf: high

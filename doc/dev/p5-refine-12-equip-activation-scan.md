@@ -75,7 +75,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 |-----|------|-----|--------|-----------|------|--------|
 | 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
-| 3  | 0x8095ba8..0x8096a4c | 14 | 116 | 0 inc | ⬜ |  |
+| 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | (pending) |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ⬜ |  |
 | 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
@@ -139,6 +139,30 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 - **CSV sync**: 不需要 (无新建/改名函数)
 - **§5.1**: Block2(0x95b28/0x14) 一行登记
 - **commit**: aa46235
+
+---
+
+### 4.03 Seg-3 完成记录 [0x08095ba8, 0x08096a4c)
+
+- **EQ**: 116 槽 (全部 DAT_ 槽; 8 新常量首现)
+- **REF**: 0
+- **RENAME**: 28 槽 (PTR_gP1LifePoints_* -> gp1lp_ptr_*)
+- **PLATE**: 8 操作 (4 CJK 全重写 + 4 substring FUN_ 替换)
+  - 4 full rewrites: setup_equip_slot_activation_entry / _alt / eval_zone_activation_flags_by_type / dispatch_zone_effect_by_slot
+  - 4 substring: FUN_0804ce78 x3 (L3561/3690/3814) + FUN_08097bec/FUN_08098020 x1 (L5499)
+- **新增常量**:
+  - duel_field.inc: ZONE_EVAL_PHASE_CODE_OFF(0x1bd4) / ZONE_PHASE_STATUS_OFF(0x1c58) / ACTIVATION_ENTRY_CLR_BITS_11_6(0xfffff03f) / ACTIVATION_ENTRY_CLR_BITS_14_6(0xffff803f) / ACTIVATION_ENTRY_PTR_OFF(0x1d7c)
+  - ewram.inc: LP_ANIM_RESULT_OFF(0x1d74) / LP_ANIM_TRIGGER_SENTINEL(0x0fee, domain-distinct COCOON_OF_EVOLUTION_CID) / EFFECT_ID_GENERIC_WILDCARD(0x0000fffe)
+- **NEEDS_FIX 修复确认**: Fix#1 (L3561 FUN_0804ce78 补入 PLATE substring -> dispatch_card_eligibility_state_machine) ✅; Fix#2 (两板精简: 0x0809650c=494 chars/0x0809678c=448 chars, both <=500, pure ASCII) ✅
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- **Gates**:
+  - Gate1: DAT_/DWORD_/PTR_ 残留 Seg-3 范围 [0x08095ba8, 0x08096a4c) = 0 ✅
+  - Gate2: Seg-3 非 ASCII = 0 ✅
+  - Gate3: Stale FUN_[0-9a-f]{8} in Seg-3 = 0 ✅
+  - Gate4: 精简板 char count <= 500 (494/448) ✅
+- **CSV sync**: 不需要 (无新建/改名函数)
+- **§5.1**: 本段无 ROM_INCBIN, 无新增登记
+- **commit**: (pending)
 
 ---
 

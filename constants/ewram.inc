@@ -596,6 +596,18 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ C5 grep verified all values -> 0 hits before adding (except domain-distinct as noted)
 @ =============================================================================
 @ gP1LifePoints-relative offsets
+@ =============================================================================
+@ file 12 Seg-3 additions: LP animation / effect ID fields
+@ Source: asm/12_equip_activation_scan.s, Seg-3 [0x08095ba8..0x08096a4c)
+@ C5 grep verified: LP_ANIM_RESULT_OFF/ACTIVATION_ENTRY_PTR_OFF = 0 hits;
+@   LP_ANIM_TRIGGER_SENTINEL 1 hit (COCOON_OF_EVOLUTION_CID, card data domain, distinct);
+@   EFFECT_ID_GENERIC_WILDCARD 0 exact hits (other hits are 0xfffe0000/0xfffe0007, high-byte masks)
+@ =============================================================================
+@ gP1LifePoints-relative offsets
+.equ LP_ANIM_RESULT_OFF,         0x00001d74  @ [gP1LifePoints+0x1d74] LP bar animation result store; dispatch_lp_bar_animation_step state=0: stores render_monster_slot_card_with_lp_bar result; state=2: reads as OAM slot index source; 5 ROM refs; C5 grep=0; conf: high
+.equ LP_ANIM_TRIGGER_SENTINEL,   0x00000fee  @ trigger_lp_bar_animation_if_ready: [gP1LifePoints+ELIGIB_CARD_ID_OFF(0x1d44)]==0x0fee gates dispatch_lp_bar_animation_step; sentinel distinct from Cocoon of Evolution CID (LP animation gate vs card data domain); 14 ROM refs; C5 1 hit COCOON_OF_EVOLUTION_CID (domain-distinct); conf: high
+.equ EFFECT_ID_GENERIC_WILDCARD, 0x0000fffe  @ dispatch_zone_effect_by_slot: passed as effect_id r1 to dispatch_effect_handler_by_card_id for generic/wildcard effect match; dispatch_effect_slot_by_display_state: r2=0xfffe sub-param; distinct from GAME_STR_RAW_ID_MASK=0xfffe0000 (high-word mask); 1484 ROM refs; C5 0 exact hits; conf: high
+
 .equ LP_EQUIP_STATE_B_OFF,           0x00001d50  @ [gP1LifePoints+0x1d50] secondary equip slot state flag; play_equip_ui_effect_3_with_state_gate: if==0 set:=1 then dispatch_card_display_op(3,0,0,0); if nonzero check busy; adjacent ACTIVATION_STATE_C_OFF(+0x1d4c)+4 and ELIGIB_STATE_CTRL_OFF(+0x1d54)+4; 7 ROM refs; C5 grep=0; conf: high
 .equ LP_DISPLAY_STATE_OFF,           0x00001d0c  @ [gP1LifePoints+0x1d0c] LP display state control word; step_prng_anim_frame b LAB_08095b12 path writes 1; get_lp_display_state_word returns it; caseD_1/4 also write 1; 7 ROM refs; C5 grep=0; conf: high
 .equ LP_PLAYER_SIDE_CACHE_OFF,       0x00001d64  @ [gP1LifePoints+0x1d64] player_side cache for LP display; caseD_e/caseD_11: [+0x1d64]:=[gDuelCardCtxBase+4] XOR 1 (inverted player_id); plate init_zone_activation_display_fields confirms; 25 ROM refs; C5 grep=0; conf: high
