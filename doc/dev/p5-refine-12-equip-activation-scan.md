@@ -76,7 +76,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 1  | 0x80941c4..0x8094f20 | 19 | 113 | 3 inc (0x9437c/0x1c, 0x943e8/0x12, 0x94c3e/0x22) | ✅ | 537cb5f |
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
 | 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | ee05202 |
-| 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ✅ | TBD |
+| 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ✅ | aa2ff4e |
 | 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ⬜ |  |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
 | 7  | 0x8099314..0x809a1a4 | 3  | 122 | 0 inc | ⬜ |  |
@@ -187,7 +187,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - Gate4: ROM_INCBIN 0x96eec/0x34 原样保留 ✅
 - **CSV sync**: 需要 (4 SUB_ 新函数加入 naming-proposals.csv; get_equip_handler_table_entry_count/card_type/uses_fixed/entry_param)
 - **§5.1**: 0x96eec(0x34) 一行登记
-- **commit**: TBD
+- **commit**: aa2ff4e
 
 ---
 
