@@ -77,7 +77,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
 | 2  | 0x8094f20..0x8095ba8 | 15 | 109 | 2 inc (0x95274/0xc0, 0x95b28/0x14) | ✅ | aa46235 |
 | 3  | 0x8095ba8..0x8096a4c | 18 | 116 | 0 inc | ✅ | ee05202 |
 | 4  | 0x8096a4c..0x8097828 | 24 | 109 | 1 inc (0x96eec/0x34) | ✅ | aa2ff4e |
-| 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ✅ | (pending) |
+| 5  | 0x8097828..0x80984d0 | 5  | 118 | 0 inc | ✅ | f594243 |
 | 6  | 0x80984d0..0x8099314 | 3  | 118 | 0 inc | ⬜ |  |
 | 7  | 0x8099314..0x809a1a4 | 3  | 122 | 0 inc | ⬜ |  |
 | 8  | 0x809a1a4..0x809b178 | 1  | 128 | 0 inc (eval_equip_slot_pair_eligibility 巨型单函数) | ⬜ |  |
@@ -210,7 +210,7 @@ duel_field.inc / oam_attr.inc / gfx_resource.inc / g2d_tags.inc / equip_lp_delta
   - Gate3: switchdata_ptr_97860/c68 (全小写) 各 2 命中, stale uppercase D = 0 ✅
   - Gate4: eqchain_act_79bc = 2 命中, stale DAT_080979bc = 0 ✅
 - **CSV sync**: 不需要 (0 新建/改名函数)
-- **commit**: (pending)
+- **commit**: f594243
 
 ---
 
