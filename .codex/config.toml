@@ -1,0 +1,15 @@
+[mcp_servers.gdb]
+command = "node"
+args = ['D:\Software\gdb-mcp\dist\index.js']
+
+[mcp_servers.mgba]
+command = "uvx"
+args = [
+    "--reinstall",
+    "--from",
+    'D:\Software\mgba-live-mcp',
+    "mgba-live-mcp",
+]
+
+[mcp_servers.mgba.env]
+PATH = 'D:\Software\mGBA-build-latest-win64;C:\Program Files\Git\cmd;C:\Program Files\Common Files\Oracle\Java\javapath;d:\devkitPro\devkitARM\arm-none-eabi\bin;d:\devkitPro\msys2\usr\bin;d:\Program Files\ImageMagick;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\TortoiseSVN\bin;D:\Program Files\PowerShell\7\;D:\Program Files\Python\Python313\Scripts\;D:\Program Files\Python\Python313\;C:\Users\yushj\AppData\Local\Programs\Python\Launcher\;C:\Users\yushj\.local\bin;d:\Software\node\;C:\Users\yushj\AppData\Local\Microsoft\WindowsApps;D:\Program Files\Microsoft VS Code\bin;C:\Users\yushj\.dotnet\tools'
