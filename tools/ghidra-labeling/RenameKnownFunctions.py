@@ -8460,6 +8460,11 @@ RENAMES = [
         "Result is 'flag_is_clear' boolean. Leaf; called by FUN_080954e8 (prng tagged). "
         "No side effects (read-only). "
         "Constants: gPrng_offset=0x1c0 (0xe0<<1), entry_offset=0x584, flag_bit=0x1."),
+    ('FUN_0809f89c', 'get_maintenance_lp_cost_by_icid', 'r0=internal CID. Return the periodic LP maintenance cost, or0 when unmatched. Mappings are Messenger100, Imperial Order700, Mirror Wall2000, Mask of Brutality1000, Fairy Box500, token1639=1000, Vilepawn500, Shadowknight900, Darkbishop500, Desrook500, Infernalqueen500, Terrorking800, and Skull Archfiend500. Pure lookup.'),
+    ('FUN_0809f9cc', 'run_equip_activation_display_phase_by_state_code', 'No APCS inputs. Allocate0x298 bytes, read player and equip-display phase from gP1LifePoints, and drive the large phase tree. Paths run the 4-entry phase-1 callbacks, resume the 54-entry phase-3 callbacks by cursor, scan slots, render maintenance LP values, initialize validation callbacks, or dispatch special equip sprites. Return0 while work remains and1 when complete through the shared frame epilogue.'),
+    ('FUN_0809fb16', 'return_zero_from_equip_activation_display_phase', 'Entry sets r0=0 and calls release_equip_activation_display_phase_frame. Ghidra body also owns pools at0x0809fb1c/20 and the parent phase fragment at0x0809fb24..80, reached from the parent branch at0x0809fa32. That fragment runs four phase-1 callbacks, then resumes one of 54 phase-3 callbacks by cursor. Preserve the discontiguous parent-flow ownership.'),
+    ('FUN_080a06a4', 'return_one_from_equip_activation_display_phase', 'Shared parent return entry. Set r0=1 and fall through to release_equip_activation_display_phase_frame. Returns1 after the common frame release. Five explicit incoming jumps are preserved.'),
+    ('FUN_080a06a6', 'release_equip_activation_display_phase_frame', 'Shared epilogue for run_equip_activation_display_phase_by_state_code. Preserve incoming r0, add0x298 to sp, restore r8-r10 and r4-r7, then return through the saved link register. The explicit incoming call is from return_zero; return_one reaches it by fallthrough.'),
     ("FUN_080a1968", "commit_lp_display_row_to_sprite",
         "Initialises LP display state fields then submits one LP bar sprite row. "
         "No APCS input (entry overwrites r2 with PTR_gP1LifePoints). "
@@ -10756,29 +10761,8 @@ RENAMES = [
         "both perform opponent-side inversion before delegating to e9e0. "
         "Returns r0=u32 pass-through. "
         "Constants: CARD_ID=0x1355, PLAYER_INVERT=1-r0."),
-    ("FUN_0809f158", "scan_monster_zone_chain_for_equip_activation",
-        "Called by FUN_0809f1fc (card_id=0x1181) and FUN_0809f20c (card_id=0x19cb). "
-        "r0=player_packed [0..1]; r1=card_type_id [0..0x1fff] "
-        "(.hword 0x4688=mov r8,r1 saves to r8). "
-        "First: calls check_value_in_slot_chain(player, zone=0xb, card_type_id); "
-        "if found in chain: returns 1. "
-        "Else: reads [gP1LifePoints+(player&1)*0x868+0x14] active monster slot count; "
-        "if 0: returns 1. Loops slot 0..count-1: reads gDuelFieldSlots (0x0201c8f8) "
-        "slot state word, extracts bits[18:0], compares card_type_id; "
-        "if match and lsls r0,r1,#0xa >= 0: builds OAM attr "
-        "(DAT_0809f1d8=0x044e0000 | card_bits | player_bit), "
-        "calls apply_equip_activation_with_id_lookup; returns 0 on success. "
-        "Returns r0=u32 hit_flag (0=activated, 1=chain duplicate or no match). "
-        "Constants: SLOT_ZONE=0xb, gDuelFieldSlots_base=0x0201c8f8, "
-        "player_stride=0x868, OAM_FLAG=0x044e0000."),
-    ("FUN_0809f20c", "scan_monster_zone_chain_for_equip_activation_treeborn_frog",
-        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
-        "4-instruction thin wrapper stub: "
-        "r0=player_id [0..1] (pass-through); fixed r1=0x19cb. "
-        "Calls scan_monster_zone_chain_for_equip_activation (FUN_0809f158). "
-        "Returns r0=u32 pass-through. "
-        "Sibling with FUN_0809f1fc (card_id=0x1181). "
-        "Constants: CARD_ID=0x19cb."),
+    ('FUN_0809f158', 'scan_player_card_array_for_equip_activation_by_cid', 'r0=player, r1=internal CID. Return 1 if zone-11 chain already contains the CID. Scan the player 4-byte card array at gP1HandSlotArray, count LP+0x14, stride 0x868; require matching low13 CID and clear bit21. Pack 0x044e0000, player and CID, and call activation with decoded flags. Return 0 on a nonzero helper result; return 1 when all entries fail. Does not use the shared scan cursor.'),
+    ('FUN_0809f20c', 'scan_player_card_array_for_equip_activation_treeborn_frog', 'r0=player. Call scan_player_card_array_for_equip_activation_by_cid(player, CID 0x19cb) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.'),
     ("FUN_0809f21c", "scan_equip_zone_for_special_summon_activation_return_zombie",
         "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
         "r0=player_id [0..1]. "
@@ -10902,18 +10886,7 @@ RENAMES = [
         "Returns 0=activated at least once, 1=no entity found in either pass. "
         "Side effects: equip activation state; OAM sprite buffer. "
         "Constants: CARD_ID=0x18bc (D.D. Survivor), OAM_SELF=0x004f18bc, OAM_OPP=0x014f18bc, ZONE=0xb."),
-    ("FUN_0809ec34", "scan_monster_slots_for_equip_activation_marie_the_fallen_one",
-        "Scans monster slots for Marie the Fallen One (card_id=0x1459) equip activation. "
-        "r0=player_id [0..1] (callee-save mov r7,r0). "
-        "First checks [gP1LifePoints+0x1d24] counter: if != 0 returns 1 immediately. "
-        "Else reads [gP1LifePoints+player*0x868+0x14] monster slot count; "
-        "loops slot 0..count-1: reads slot node from gP1LifePoints offset 0x418 area, "
-        "checks masked card_id (bits[18:0] AND 0x201fff == 0x1459=Marie); "
-        "if match: builds OAM attr = card_bits | OAM_FLAG(0x044e0000) | player_bit (lsls 0x1f), "
-        "calls apply_equip_activation_with_id_lookup; increments [gP1LifePoints+0x1d24]; returns 0. "
-        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state. "
-        "Constants: CARD_ID=0x1459 (Marie the Fallen One), CARD_MASK=0x201fff, "
-        "OAM_FLAG=0x044e0000, counter_offset=0x1d24, player_stride=0x868."),
+    ('FUN_0809ec34', 'scan_player_card_array_for_equip_activation_marie_the_fallen_one', 'r0=player. If LP+0x1d24 is nonzero, return 1. Otherwise scan the player 4-byte card-word array at gP1HandSlotArray with count LP+0x14 and stride 0x868. Match (word & 0x00201fff)==MARIE_THE_FALLEN_ONE_CID, pack each match with 0x044e0000 and player bit, and call activation with decoded flags. Ignore each result. Increment the shared cursor and return 0 even if no entry matched.'),
     ("FUN_0809d438", "scan_equip_slot_for_twin_headed_behemoth_activation",
         "Scans equip slots for Twin-Headed Behemoth (card_id=0x13a6) activation. "
         "r0=player_id [0..1] (callee-save mov r7,r0; r8=0x13a6 loaded internally). "
@@ -10987,27 +10960,8 @@ RENAMES = [
         "Returns r0=u32 pass-through (0=activated, 1=done/no match). "
         "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
         "Constants: CARD_ID=0x19d0 (Malice Ascendant), PLAYER_INVERT=1-r0."),
-    ("FUN_0809d7ec", "scan_equip_chain_list_for_sprite_by_card_and_zone",
-        "Scans equip chain list for sprite submission, matched by card_id and zone_col. "
-        "r0=player_id [0..1], r1=card_type_id [0..0x1fff], r2=zone_col [0..N]. "
-        "First calls check_value_in_slot_chain(player, zone=0xb, card_id); if absent returns 1. "
-        "Reads [gP1LifePoints+player*0x868+0xa] hword = chain_count; if 0 returns 1. "
-        "Traverses chain nodes from gDuelFieldSlots=0x0201d9c0+player*0x868 (node_size=8, [node+6]=next): "
-        "ldrh[node+0] vs card_type_id; ldrb[node+2]&0xf vs zone_col. "
-        "On match: builds OAM attr base=0x3b (P1) or 0x803b (P2); "
-        "lsrs r3,byte[node+2],#5 = distance_offset; "
-        "calls enqueue_sprite_attr_record(OAM_base, node_xy, 1). "
-        "Returns r0=always 1 (no r0=0 path). "
-        "Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record. "
-        "Constants: chain_base=0x0201d9c0, player_stride=0x868, chain_count_offset=0xa, "
-        "OAM_P1=0x3b, OAM_P2=0x803b, node_size=8."),
-    ("FUN_0809d86c", "scan_equip_chain_list_for_sprite_crush_card",
-        "4-instruction thin wrapper for scan_equip_chain_list_for_sprite_by_card_and_zone, Crush Card variant. "
-        "r0=player_id [0..1] (pass-through); fixed r1=0x123b (Crush Card), r2=3 (zone_col). "
-        "Tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone (FUN_0809d7ec). "
-        "Returns r0=u32 always 1 (pass-through). "
-        "Side effects: OAM sprite attr buffer via callee -> enqueue_sprite_attr_record. "
-        "Constants: CARD_ID=0x123b (Crush Card), zone_col=3."),
+    ('FUN_0809d7ec', 'enqueue_equip_chain_counter_sprites_by_card', 'r0=player, r1=CID, r2=counter_base. Require CID in chain slot11. Follow the head at gDuelFieldSpellZoneBase+(player&1)*PLAYER_BLOCK_STRIDE+0xa through 8-byte gEquipNodePool nodes, using next=u16[node+6]. Match u16[node]==CID and (byte[node+2]&15)==1. Submit type0x3b/0x803b with (CID&0xffff,1,(counter_base-(byte[node+2]>>5))&0xffff) for every match. r2 is not a zone filter. Always return1.'),
+    ('FUN_0809d86c', 'scan_equip_chain_list_for_sprite_crush_card', 'r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,CRUSH_CARD_CID,3). The third argument is a counter base; the callee fixes the node-type filter to1. Return the callee result, always1. Sprite submissions occur for matching chain nodes.'),
     ("FUN_0809f86c", "scan_monster_zone_for_equip_activation_reserved_icid_b",
         "4-instruction thin wrapper stub for reserved internal card_id 0x11ea equip activation. "
         "icid=0x11ea has no public name in cards-ids-array (between Abyss Flower=0x11e9 and Takuhee=0x11eb). "
@@ -11084,11 +11038,7 @@ RENAMES = [
         "Fixes r1=0x1409 then tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
         "Side effects: via scan_all_zone_slots_for_equip_chain_sprite_update on hit."),
 
-    ("FUN_0809d880", "scan_equip_chain_list_for_sprite_deck_devastation_virus",
-        "Equip chain sprite scan case stub for Deck Devastation Virus (internal_card_id=0x188c, cid=1803). "
-        "Called by duel_field main dispatch hub (FUN_0809d984). "
-        "Fixes r1=0x188c, r2=3 (zone=3) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. "
-        "Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit."),
+    ('FUN_0809d880', 'scan_equip_chain_list_for_sprite_deck_devastation_virus', 'r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,DECK_DEVASTATION_VIRUS_CID,3). The third argument is a counter base, not a zone index. Return the callee result, always1. Matching chain nodes enqueue counter sprites.'),
 
     ("FUN_0809f88c", "scan_monster_zone_for_equip_activation_reserved_icid_c",
         "Equip activation scan case stub for reserved internal_card_id=0x1147 (cid=0xFFFF, no valid card). "
@@ -11103,11 +11053,7 @@ RENAMES = [
         "Fixes r1=0x1337 then tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
         "Side effects: via scan_all_zone_slots_for_equip_chain_sprite_update on hit."),
 
-    ("FUN_0809d894", "scan_equip_chain_list_for_sprite_pikeru_second_sight",
-        "Equip chain sprite scan case stub for Pikeru's Second Sight (internal_card_id=0x18d5, cid=1861). "
-        "Called by duel_field main dispatch hub (FUN_0809d984). "
-        "Fixes r1=0x18d5, r2=2 (zone=2) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. "
-        "Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit."),
+    ('FUN_0809d894', 'scan_equip_chain_list_for_sprite_pikeru_second_sight', 'r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,PIKERU_SECOND_SIGHT_CID,2). The third argument is a counter base, not a zone index. Return the callee result, always1. Matching chain nodes enqueue counter sprites.'),
 
     ("FUN_0809cea0", "scan_all_zone_slots_for_equip_chain_sprite_wild_natures_release",
         "Continuous-equip sprite refresh case stub for Wild Nature's Release (internal_card_id=0x16ce, cid=1424). "
@@ -11648,16 +11594,7 @@ RENAMES = [
         "4 instructions: push/ldr/bl/pop+bx. "
         "Symmetric to Princess Curran(0x0809ed30)/Princess Pikeru(0x0809ed00)/Ebon Magician Curran(0x0809ed10). "
         "Constants: CARD_ID=0x1637=Bowganian."),
-    ("FUN_0809ed50", "scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend",
-        "Infernalqueen Archfiend (0x1690) all-monster-zone-slot equip activation scan. "
-        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. "
-        "Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; "
-        "test_slot_has_active_card(side, col, 0x1690); on hit build OAM attr "
-        "(0x84<<0x13 prefix + player_bit + col_encoded); "
-        "apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. "
-        "Structurally identical to scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare(0x0809f744). "
-        "Constants: CARD_ID=0x1690=Infernalqueen Archfiend, COUNTER_OFFSET=0x1d24, "
-        "SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13."),
+    ('FUN_0809ed50', 'scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend', 'r0=player. Resume ten monster slots with LP+0x1d24 cursor: side=(cursor/5)^player, slot=cursor%5. For active Infernalqueen Archfiend, pack the actual entry CID, side and slot, then call activation with decoded flags. Ignore its result; advance cursor and return 0 after the first match. Other entries advance and continue. Return 1 after cursor 9.'),
     ("FUN_0809f348", "scan_monster_zone_slots_for_equip_activation_mucus_yolk",
         "Mucus Yolk (0x13b2) monster zone slot equip activation scan with dual chain filter. "
         "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 5 monster zone slots. "
@@ -11673,16 +11610,7 @@ RENAMES = [
         "tail-calls scan_monster_zone_for_equip_activation_by_card(1-player_id, 0x1485). "
         "Player invert at entry distinguishes this from symmetric stubs without inversion. "
         "Constants: CARD_ID=0x1485=Aqua Spirit, PLAYER_INVERT=1-r0."),
-    ("FUN_0809f744", "scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare",
-        "Mirage of Nightmare (0x1539) all-monster-zone-slot equip activation scan. "
-        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. "
-        "Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; "
-        "test_slot_has_active_card(side, col, 0x1539); on hit build OAM attr "
-        "(0x84<<0x13=0x4200000 prefix + player_bit + col_encoded); "
-        "apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. "
-        "Structurally identical to scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend(0x0809ed50). "
-        "Constants: CARD_ID=0x1539=Mirage of Nightmare, COUNTER_OFFSET=0x1d24, "
-        "SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13=0x4200000."),
+    ('FUN_0809f744', 'scan_all_spell_trap_zone_slots_for_equip_activation_mirage_of_nightmare', 'r0=player. Resume cursor 0..9 at gP1LifePoints+EQUIP_ACTIVATION_SCAN_CURSOR_OFF. Decode side=player^(cursor/5) and spell/trap slot=cursor%5+5. On an active Mirage of Nightmare, pack the slot entry and call apply_equip_activation_with_id_lookup, advance the cursor, and return0. Misses advance and continue; exhaustion returns1.'),
     ("FUN_0802fbf4", "count_chain_nodes_by_card_id_and_type",
         "Chain node counter: counts nodes in chain head r0 with card_id==r1 AND type_lo4==r2. "
         "r4=hit counter init 0. Per node: lsls r0,r0,#0x3 -> address=0x0201d9c0+index*8; "
@@ -11733,13 +11661,7 @@ RENAMES = [
         "建立 OAM attr (0xa2<<0x14 prefix), 从槽数据提取 face_down/orientation bits, 调用 apply_equip_activation_with_id_lookup. "
         "命中返回 0, 未命中返回 1. Side effects: equip activation state via apply_equip_activation_with_id_lookup. "
         "Constants: CARD_ID=0x150e (Spiritual Energy Settle Machine), OAM_PREFIX=0xa2<<0x14."),
-    ("FUN_0809c978", "scan_monster_zone_for_equip_activation_dd_scout_plane",
-        "由 duel_field 主调度枢纽 FUN_0809d984 调用, 遍历两侧玩家怪兽区槽以检查并激活 D.D. Scout Plane (card_id=0x16be) 的装备效果. "
-        "入口 r0=player_id 保存至 r10 (0x4682=mov r10,r0), r1 保存至 r9 (0x4681=mov r9,r1). "
-        "外层循环 r3=0..1: 从 0x0201c4fc+r3 读取槽数 r5, 内层循环对每个槽调用 get_zone_card_attribute_by_type(player, type=0xf, slot); "
-        "对 [slot+0] 数据 ands 0x00301fff 比较 0x16be; 匹配时建立 OAM attr (0x0a4f0000 prefix), 调用 apply_equip_activation_with_id_lookup. "
-        "命中返回 0, 全程未命中返回 1. Side effects: equip activation state. "
-        "Constants: CARD_ID=0x16be (D.D. Scout Plane), MASK=0x00301fff, OAM_PREFIX=0x0a4f0000, outer_base=0x0201c4fc."),
+    ('FUN_0809c978', 'scan_zone_f_for_equip_activation_dd_scout_plane', 'r0=starting_player, saved in r9. For each side, scan zone-f word entries backward from [gP1AltHandCountBase+side*0x868]-1, using gP1AltHandSlotArray. Require (word&DD_SCOUT_PLANE_SLOT_MATCH_MASK)==DD_SCOUT_PLANE_CID and get_zone_card_attribute_by_type(side,0xf,index)!=0. Pack TYPE5_ZONE_F_BASE with CID/player and decoded entity; return 0 on successful activation. Failed candidates continue; return 1 after both lists. No monster-field scan or shared cursor.'),
     ("FUN_0809c77c", "scan_all_monster_zone_slots_for_equip_activation_dd_guide",
         "由 duel_field 主调度枢纽 FUN_0809d984 调用. 4 条指令 thin wrapper: "
         "固定 r1 = 0xce<<5 = 0x19c0 (D.D. Guide card_id), "
@@ -11844,16 +11766,7 @@ RENAMES = [
         "Side effects: via callee on hit. Constants: CARD_ID=0x14b2 (Nightmare Wheel)."),
 
     # --- campaign-56 batch #56 (2026-05-15) ---
-    ("FUN_0809c7ac", "scan_hand_slot_for_equip_activation_by_card_type",
-        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
-        "读取 [gP1LifePoints+0x1d24] 计数器 (<=9 继续); counter/5 求商 (xor player_bit), "
-        "counter%5 求余 r3; 手牌槽地址 gP1LifePoints + player*0x868 + r3*0x14 + 0x30; "
-        "读槽数据低 13 位 card_type_id, 加 (-0x17d2) 后 cmp #8 -> 9-entry switch. "
-        "命中: slot[+0x8]!=0 跳过; 否则构建 OAM attr (0xa2<<0x14) 调用 apply_equip_activation_with_id_lookup; "
-        "命中递增 [gP1LifePoints+0x1cf4] 子计数器返回 0. 未命中: counter+1 重循环直至 >9 返回 1. "
-        "Side effects: equip activation state; [gP1LifePoints+0x1cf4] counter. "
-        "Constants: COUNTER_OFFSET=0x1d24, CARD_TYPE_BASE=0x17d2, SLOT_STRIDE=0x14, "
-        "player_stride=0x868, OAM_PREFIX=0xa2<<0x14."),
+    ('FUN_0809c7ac', 'scan_monster_zone_slots_for_equip_activation_by_cid_table', 'Input registers unused. Resume shared cursor 0..9; side=current_player^(cursor/5), monster slot=cursor%5. Switch on CID-0x17d2; accept indices 0,1,5,6,8 only, and require slot+8 halfword nonzero. Build type5/mode1 packed activation input from the slot and call activation; advance cursor and return 0 regardless of its result. Other slots advance and continue; cursor>9 returns 1. Field base+0x1cf4 and LP base+0x1d24 address the same cursor.'),
     ("FUN_0809d1ac", "scan_spell_trap_zone_for_equip_activation_first_sarcophagus",
         "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
         "5 条指令 thin wrapper: r0 -> r1 (player_id), r0=1-r1 (opponent player-invert), "
@@ -11932,24 +11845,8 @@ RENAMES = [
         "tail-call scan_trap_zone_for_equip_activation_by_card. "
         "与 Snatch Steal (0x0809efb8) / Brain Jacker (0x0809efd0) 构成对手侧 sibling 簇. "
         "Side effects: via callee on hit. Constants: CARD_ID=0x169a (Falling Down), PLAYER_INVERT=1-r0."),
-    ("FUN_0809d5f4", "scan_hand_equip_slot_for_activation_with_name_display",
-        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
-        "入口 r0=player_id -> r7; 读 [gP1LifePoints+0x1d24] 计数器, >4 提前退出. "
-        "按计数器索引取 ROM 槽描述符表 (0x09e47688); 构建 packed_attr = (0xa5<<0x14) | ldrh[slot_desc+0]; "
-        "调用 apply_equip_activation_via_packed_attr; 激活成功且 [0x0201e2a0+player*4+8]==1 时: "
-        "card_name_lookup_by_internal_id + format_game_text_with_text_arg(0xfa) + invoke_card_display_op_0x31_sub1 显示卡名; "
-        "计数器 +5 步进返回 0; 失败则 counter+1 直至 >4. "
-        "Side effects: equip activation state; 卡名 VRAM; [gP1LifePoints+0x1d24] counter. "
-        "Constants: COUNTER_OFFSET=0x1d24, ROM_SLOT_TABLE=0x09e47688, OAM_BASE=0xa5<<0x14, "
-        "gCardNameState=0x0201e2a0, COUNTER_STEP=5."),
-    ("FUN_0809f1fc", "scan_monster_zone_chain_for_equip_activation_sinister_serpent",
-        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
-        "4 条指令 thin wrapper: r0=player_id 透传, "
-        "r1=DAT_0809f208=0x1181 (Sinister Serpent card_id), "
-        "tail-call scan_monster_zone_chain_for_equip_activation. "
-        "与 scan_monster_zone_chain_for_equip_activation_treeborn_frog (0x0809f20c, card_id=0x19cb) "
-        "构成同族 sibling 对. "
-        "Side effects: via callee on hit. Constants: CARD_ID=0x1181 (Sinister Serpent)."),
+    ('FUN_0809d5f4', 'scan_equip_activation_candidates_with_name_display', 'r0=player_side. Cursor 0..4 tests five ROM CID/prompt-flag records with packed type5 activation. On success, show text0xfa with card name only if display context!=1 and record flag!=0; otherwise set gEquipLpActivBitmap=1. Add5 to cursor and return0. Cursor>=5 resumes record(cursor-5): the bitmap flag selects activation retry, else enqueue its chain sprite and increment cursor. Subtract5 and return whether cursor>4. Initial misses advance; exhaustion returns1.'),
+    ('FUN_0809f1fc', 'scan_player_card_array_for_equip_activation_sinister_serpent', 'r0=player. Call scan_player_card_array_for_equip_activation_by_cid(player, CID 0x1181) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.'),
     ("FUN_0809d984", "run_equip_activation_phase_by_counter",
         "由 equip 激活主循环驱动器 (0x08094c60) 调用. "
         "以 [gP1LifePoints+0x1d1c] 作为阶段计数器 (0..0x14=21 阶), "
@@ -13121,15 +13018,7 @@ RENAMES = [
         "Side effects: [gDuelBattleState+field.slot0+0x30]:=slot_idx (cond); "
         "[gDuelBattleState+field.slot1+0x30]:=1 (cond); [gP1LifePoints+0x1d2c]:=[+0x1d2c]+1."),
 
-    ("FUN_0809e5e0", "scan_equip_zone_for_toon_card_activation",
-        "Scans player equip zone 5 slots [0..4] for card_id=0x1954 (Toon World variant) "
-        "with [slot+0x8]!=0 (linked target). Synthesizes OAM attr (bits[28:21]=slot_y, 0xc0<<15 shape, "
-        "player_side bit[31], card_id low 13 bits) and calls apply_equip_activation_via_packed_attr. "
-        "Returns 0 (found/activated), 1 (none found). "
-        "Called from dispatch_equip_activation_state_by_substate case_3 and case_2 paths (2 callsites). "
-        "Params: r0=u32 player_side [0..1] -> bit[31] in OAM attr. "
-        "Returns r0=u32 not_found (0=activated, 1=no match). "
-        "Side effects: via apply_equip_activation_via_packed_attr (cond)."),
+    ('FUN_0809e5e0', 'scan_field_slots_for_vwxyz_dragon_catapult_cannon_activation', 'r0=player. Scan five 20-byte entries at gDuelFieldSlots+(player&1)*PLAYER_BLOCK_STRIDE. Require low13 CID=VWXYZ_DRAGON_CATAPULT_CANNON_CID and u16[slot+8]!=0. Call apply_equip_activation_via_packed_attr with (slot_index<<16)|0x600000|(player<<31)|CID, the packed entry flags, and0. Return0 only when that call returns nonzero; otherwise continue scanning and return1 after all five fail.'),
 
     ("FUN_0809e6a4", "find_equip_slot_idx_with_entity_id_zero",
         "Scans player equip zone 5 slots [0..4] for first get_node_entity_id_in_slot(player,slot,0x151e)==0. "
@@ -13193,7 +13082,7 @@ RENAMES = [
         "case_1: check_activation_phase_counter_is_six + find_equip_slot_idx_with_entity_id_one + "
         "find_equip_slot_idx_with_entity_id_zero + eval_slot_activation_eligibility_full; "
         "case_2: check_equip_slot_activation_blocked_by_chain + eval_equip_monster_zone_score; "
-        "case_3: eval_slot_activation_guard_full / scan_equip_zone_for_toon_card_activation / "
+        "case_3: eval_slot_activation_guard_full / scan_field_slots_for_vwxyz_dragon_catapult_cannon_activation / "
         "invoke_card_display_op_0x31_sub4 paths; "
         "case_4: 4/5 value paths writing [+0x1d28/0x1d2c/0x1d30]. default: return 0. "
         "Params: r0=u32 player_side [0..1]. "

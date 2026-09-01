@@ -18664,21 +18664,7 @@ scrollbar_clr_bits14_6_18436:
 oam_attr2_clr_bits11_6_18438:
     .word  OAM_ATTR2_CLR_BITS_11_6        @ 0805b1ec 3ff0ffff
 
-@ @ Equip activation record constructor: allocates 24-byte stack record, memset 0,
-@ @ unpacks 8 bit fields from r0 packed_attr to record offsets:
-@ @ sign bit -> [+2] bit0; bits[24..23] -> [+3] bits[6..7];
-@ @ bits[20..18] -> [+3] bits[5..4]; bits[15..11] -> [+2] bits[2..7];
-@ @ bits[31..26] -> [+2..3].
-@ @ r1 (u16 entity_id, 9 bits) lsls #6 -> [+4] mask 0xffff803f.
-@ @ r2 -> sp[0x14] (callee 4th arg). Then bl apply_card_equip_activation.
-@ @ r0=u32 card_attr_packed; r1=u16 entity_id [0..0xffff]; r2=u32 extra_payload.
-@ @ Returns u32 (decided by apply_card_equip_activation).
-@ @ Direct callee of apply_equip_activation_with_id_lookup when r1!=0;
-@ @ also called by apply_equip_activation_with_fixed_type_a /
-@ @ apply_equip_activation_via_deck_slot_lookup /
-@ @ run_equip_spell_display_state_machine /
-@ @ scan_hand_equip_slot_for_activation_with_name_display.
-@ @ Constants: BUF_SIZE=0x18, ENTITY_SHIFT=6, ATTR_MASK=0xffff803f.
+@ r0=packed attributes, r1=entity reference, r2=payload. Zero a 0x18-byte stack record; store CID bits15:0 at +0. Map player bit31 to +2 bit0, slot bits20:16 to +2 bits5:1, type bits30:25 to +2 halfword bits11:6, mode bits22:21 to +3 bits5:4, and bit24 to +3 bit6. Store entity low9 at +4 bits14:6 and payload at +0x14. Return apply_card_equip_activation(record,0). Used by scan_equip_activation_candidates_with_name_display.
 apply_equip_activation_via_packed_attr:
     push {r4,r5,r6,lr}                       @ 0805b1f0 70b5
     sub sp,#0x18                             @ 0805b1f2 86b0

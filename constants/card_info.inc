@@ -1938,3 +1938,143 @@
 @ =============================================================================
 .equ JIRAI_GUMO_CID,             0x00001115  @ Jirai Gumo (pw=94773007; card-stats.s card_0325 slot=0x1115); tick_activation_display_state_machine state-0: cmp card_id,JIRAI_GUMO_CID -> Toon sprite dispatch branch (alongside TOON range 0x127f..0x12a5); 1 pool slot in Seg-5; C5 grep=0; conf: high
 .equ PATRICIAN_OF_DARKNESS_CID,  0x0000139c  @ Patrician of Darkness (pw=19153634; card-stats.s card_0813 slot=0x139C); dispatch_equip_slot_display_state_by_phase caseD_1/3/a: count_available_effect_zones(1-player,0x139c,-1) as zone_code CID filter; 3 pool slots in Seg-5; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-6 additions: activation display phases and card predicates
+@ Source: doc/dev/refine/F12-Seg-6.proposal.md (review PASS)
+@ =============================================================================
+.equ INSECT_SOLDIERS_OF_THE_SKY_CID, 0x00001184  @ Insect Soldiers of the Sky; slot CID; card-stats.s card_0403; pw=07019529.
+.equ BIG_SHIELD_GARDNA_CID, 0x0000129c  @ Big Shield Gardna; slot CID; card-stats.s card_0618; pw=65240384.
+.equ LUMINOUS_SOLDIER_CID, 0x00001397  @ Luminous Soldier; slot CID; card-stats.s card_0808; pw=57482479.
+.equ FAIRY_BOX_CID, 0x000013f9  @ Fairy Box; slot CID; card-stats.s card_0870; pw=21598948.
+.equ THE_DARK_DOOR_CID, 0x00001469  @ The Dark Door; slot CID; card-stats.s card_0940; pw=30606547.
+.equ CATS_EAR_TRIBE_CID, 0x00001621  @ Cat's Ear Tribe; slot CID; card-stats.s card_1285; pw=95841282.
+.equ DISC_FIGHTER_CID, 0x00001752  @ Disc Fighter; slot CID; card-stats.s card_1533; pw=19612721.
+.equ PENUMBRAL_SOLDIER_LADY_CID, 0x000017ed  @ Penumbral Soldier Lady; slot CID; card-stats.s card_1658; pw=64751286.
+.equ SASUKE_SAMURAI_4_CID, 0x00001829  @ Sasuke Samurai #4; slot CID; card-stats.s card_1709; pw=64538655.
+.equ ANCIENT_GEAR_SOLDIER_CID, 0x000018ad  @ Ancient Gear Soldier; slot CID; card-stats.s card_1821; pw=56094445.
+.equ DRILLROID_CID, 0x000018f3  @ Drillroid; slot CID; card-stats.s card_1877; pw=71218746.
+.equ GOBLIN_ELITE_ATTACK_FORCE_CID, 0x00001912  @ Goblin Elite Attack Force; slot CID; card-stats.s card_1903; pw=85306040.
+.equ PREPARE_TO_STRIKE_BACK_CID, 0x00001931  @ Prepare to Strike Back; slot CID; card-stats.s card_1934; pw=04483989.
+.equ ETOILE_CYBER_CID, 0x00001952  @ Etoile Cyber; slot CID; card-stats.s card_1953; pw=11460577.
+.equ NANOBREAKER_CID, 0x00001963  @ Nanobreaker; slot CID; card-stats.s card_1969; pw=70948327.
+.equ MIRROR_WALL_CID_SHIFTED, 0x9c080000  @ MIRROR_WALL_CID << 19; compare against field slot word shifted left by 19.
+
+@ =============================================================================
+@ file 12 Seg-7 additions: equip field, slot, and spell display phases
+@ Source: doc/dev/refine/F12-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ cid_112f, 0x0000112f  @ Unassigned internal card ID 0x112f; cards-ids-array.s maps to 0xffff.
+.equ cid_1130, 0x00001130  @ Unassigned internal card ID 0x1130; cards-ids-array.s maps to 0xffff.
+.equ cid_1135, 0x00001135  @ Unassigned internal card ID 0x1135; cards-ids-array.s maps to 0xffff.
+.equ cid_1208, 0x00001208  @ Unassigned internal card ID 0x1208; cards-ids-array.s maps to 0xffff.
+.equ WALL_OF_ILLUSION_CID, 0x00001310  @ Wall of Illusion; slot CID; card-stats.s card_0698; pw=13945283.
+.equ TIMEATER_CID, 0x000013b1  @ Timeater; slot CID; card-stats.s card_0831; pw=44913552.
+.equ KELBEK_CID, 0x000014f1  @ Kelbek; slot CID; card-stats.s card_1057; pw=54878498.
+.equ AFTER_THE_STRUGGLE_CID, 0x00001512  @ After the Struggle; slot CID; card-stats.s card_1085; pw=25345186.
+.equ DD_CRAZY_BEAST_CID, 0x000015d9  @ D.D. Crazy Beast; slot CID; card-stats.s card_1228; pw=48148828.
+.equ DD_WARRIOR_LADY_CID, 0x00001657  @ D.D. Warrior Lady; slot CID; card-stats.s card_1327; pw=07572887.
+.equ DD_ASSAILANT_CID, 0x0000172c  @ D. D. Assailant; slot CID; card-stats.s card_1503; pw=70074904.
+.equ ELEMENT_DOOM_CID, 0x00001861  @ Element Doom; slot CID; card-stats.s card_1762; pw=23118924.
+.equ HOLY_KNIGHT_ISHZARK_CID, 0x000018e6  @ Holy Knight Ishzark; slot CID; card-stats.s card_1871; pw=57902462.
+.equ RUIN_QUEEN_OF_OBLIVION_CID, 0x000019d4  @ Ruin, Queen of Oblivion; slot CID; card-stats.s card_2055; pw=46427957.
+
+@ =============================================================================
+@ file 12 Seg-8 additions: paired equip eligibility display
+@ Source: doc/dev/refine/F12-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ SWORD_HUNTER_CID, 0x000012a6  @ Sword Hunter; slot CID; card-stats.s card_0630; pw=51345461.
+.equ equip_pair_cid_13b0, 0x000013b0  @ Unassigned internal card ID 0x13b0; cards-ids-array.s maps to 0xffff.
+.equ RIGRAS_LEEVER_CID, 0x000013b4  @ Rigras Leever; slot CID; card-stats.s card_0834; pw=39180960.
+.equ GIANT_AXE_MUMMY_CID, 0x0000152c  @ Giant Axe Mummy; slot CID; card-stats.s card_1106; pw=78266168.
+.equ WINGED_SAGE_FALCOS_CID, 0x00001592  @ Winged Sage Falcos; slot CID; card-stats.s card_1174; pw=87523462.
+.equ THOUSAND_NEEDLES_CID, 0x00001658  @ Thousand Needles; slot CID; card-stats.s card_1328; pw=33977496.
+.equ DES_KANGAROO_CID, 0x000016b7  @ Des Kangaroo; slot CID; card-stats.s card_1403; pw=78613627.
+.equ NEEDLE_BURROWER_CID, 0x0000174b  @ Needle Burrower; slot CID; card-stats.s card_1526; pw=98162242.
+.equ ABSORBING_KID_FROM_THE_SKY_CID, 0x00001792  @ Absorbing Kid from the Sky; slot CID; card-stats.s card_1578; pw=49771608.
+
+@ =============================================================================
+@ file 12 Seg-9 additions: equip display state and phase dispatch
+@ Source: doc/dev/refine/F12-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ GOBLIN_ATTACK_FORCE_CID, 0x00001419  @ Goblin Attack Force; slot CID; card-stats.s card_0900; pw=78658564.
+.equ RECKLESS_GREED_CID, 0x00001548  @ Reckless Greed; slot CID; card-stats.s card_1131; pw=37576645.
+.equ AXE_DRAGONUTE_CID, 0x00001993  @ Axe Dragonute; slot CID; card-stats.s card_2010; pw=84914462.
+.equ RED_MOON_BABY_ACTIVATION_PACKED, 0x00501415  @ Red-Moon Baby CID | 0x00500000; packed activation input before player bit31.
+.equ HELPOEMER_ACTIVATION_PACKED, 0x004e1571  @ Helpoemer CID | 0x004e0000; packed activation input before player bit31.
+.equ MAHARAGHI_ACTIVATION_PACKED, 0x025014fd  @ Maharaghi CID | 0x02500000; packed activation input before player bit31.
+.equ MAGICAL_BLAST_ACTIVATION_PACKED, 0x004e1984  @ Magical Blast CID | 0x004e0000; packed activation input before player bit31.
+.equ FAIRY_BOX_CID_SHIFTED, 0x9fc80000  @ FAIRY_BOX_CID << 19, truncated to u32; equality test after shifting a slot word.
+.equ MAGICAL_BLAST_CID_SHIFTED, 0xcc200000  @ MAGICAL_BLAST_CID << 19, truncated to u32; equality test after shifting a slot word.
+
+@ =============================================================================
+@ file 12 Seg-10 additions: equip activation scans and candidate tables
+@ Source: doc/dev/refine/F12-Seg-10.proposal.md (review PASS)
+@ =============================================================================
+.equ WICKED_WORM_BEAST_CID, 0x00000fbd  @ The Wicked Worm Beast; slot CID; card-stats.s card_0025; pw=06285791.
+.equ LITTLE_WINGUARD_CID, 0x000012a3  @ Little-Winguard; slot CID; card-stats.s card_0627; pw=90790253.
+.equ ECTOPLASMER_CID, 0x000012dc  @ Ectoplasmer; slot CID; card-stats.s card_0663; pw=97342942.
+.equ TWIN_HEADED_BEHEMOTH_CID, 0x000013a6  @ Twin-Headed Behemoth; slot CID; card-stats.s card_0823; pw=43586926.
+.equ INFINITE_DISMISSAL_CID, 0x000013f8  @ Infinite Dismissal; slot CID; card-stats.s card_0869; pw=54109233.
+.equ INTERDIMENSIONAL_MATTER_TRANSPORTER_CID, 0x000015b8  @ Interdimensional Matter Transporter; slot CID; card-stats.s card_1209; pw=36261276.
+.equ LABYRINTH_OF_NIGHTMARE_CID, 0x000017b6  @ Labyrinth of Nightmare; slot CID; card-stats.s card_1610; pw=66526672.
+.equ EQUIP_ACTIVATION_TYPE5_ZONE_E_BASE, 0x0a4e0000  @ Packed activation base: type5, mode2, zone/slot14; caller adds CID and player bit31.
+.equ EQUIP_ACTIVATION_TYPE5_ZONE_F_BASE, 0x0a4f0000  @ Packed activation base: type5, mode2, zone/slot15; caller adds CID and player bit31.
+.equ INTERDIMENSIONAL_TRANSPORTER_ACTIVATION_PACKED, 0x0a5015b8  @ Interdimensional Matter Transporter CID | 0x0a500000; caller adds player bit31.
+.equ STRIKE_NINJA_ACTIVATION_PACKED, 0x0a4f16b9  @ Strike Ninja CID | 0x0a4f0000; caller adds player bit31.
+.equ DD_SURVIVOR_PACKED_OTHER_SIDE, 0x014f18bc  @ D.D. Survivor packed base when entity side differs from scanned side; add type5 and entity side bit31.
+.equ DD_SURVIVOR_PACKED_SAME_SIDE, 0x004f18bc  @ D.D. Survivor packed base when entity side equals scanned side; add type5 and entity side bit31.
+.equ RETURN_OF_THE_DOOMED_ACTIVATION_PACKED, 0x0a5013f5  @ Return of the Doomed CID | 0x0a500000; caller adds player bit31.
+.equ SUPER_REJUVENATION_ACTIVATION_PACKED, 0x0a5014e2  @ Super Rejuvenation CID | 0x0a500000; caller adds player bit31.
+.equ TWIN_HEADED_BEHEMOTH_ACTIVATION_PACKED, 0x0a4e13a6  @ Twin-Headed Behemoth CID | 0x0a4e0000; caller adds player bit31.
+
+@ F13-Seg-1: reviewed literal values and RAM timer address.
+@ CID passed to check_value_in_slot_chain(player,11,CID).
+.equ GAMBLE_CID, 0x00001356
+@ CID passed to count_field_copies_of_card; nonzero count bypasses the hand-limit row update.
+.equ INFINITE_CARDS_CID, 0x00001401
+@ CID passed to check_value_in_slot_chain(player,11,CID); a hit raises the hand limit to7.
+.equ HIEROGLYPH_LITHOGRAPH_CID, 0x0000159f
+
+@ =============================================================================
+@ file 13 Seg-2 additions: equip activation subphase dispatcher and card-array scans
+@ Source: doc/dev/refine/F13-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ SINISTER_SERPENT_CID, 0x00001181  @ Internal CID for Sinister Serpent.
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_1338, 0x00001338  @ Unmapped internal CID 0x1338; inverse table is 0xffff and all 5170 stat records exclude it.
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_1367, 0x00001367  @ Unmapped internal CID 0x1367; inverse table is 0xffff and all 5170 stat records exclude it.
+.equ KISEITAI_CID, 0x00001370  @ Internal CID for Kiseitai.
+.equ MASK_OF_THE_ACCURSED_CID, 0x000013f3  @ Internal CID for Mask of the Accursed.
+.equ BURNING_LAND_CID, 0x00001406  @ Internal CID for Burning Land.
+.equ DIMENSIONHOLE_CID, 0x0000140c  @ Internal CID for Dimensionhole.
+.equ SPIRIT_OF_THE_BREEZE_CID, 0x00001450  @ Internal CID for Spirit of the Breeze.
+.equ DANCING_FAIRY_CID, 0x00001451  @ Internal CID for Dancing Fairy.
+.equ CURE_MERMAID_CID, 0x00001454  @ Internal CID for Cure Mermaid.
+.equ GRAVEROBBERS_RETRIBUTION_CID, 0x00001491  @ Internal CID for Graverobber's Retribution.
+.equ BLIND_DESTRUCTION_CID, 0x00001494  @ Internal CID for Blind Destruction.
+.equ NEEDLE_WALL_CID, 0x00001545  @ Internal CID for Needle Wall.
+.equ AMAZONESS_BLOWPIPER_CID, 0x0000160e  @ Internal CID for Amazoness Blowpiper.
+.equ BOWGANIAN_CID, 0x00001637  @ Internal CID for Bowganian.
+.equ ARMED_DRAGON_LV3_CID, 0x000017d9  @ Internal CID for Armed Dragon LV3.
+.equ CURSE_OF_VAMPIRE_CID, 0x0000188f  @ Internal CID for Curse of Vampire.
+
+@ =============================================================================
+@ file 13 Seg-3 additions: equip activation display phase and callback tables
+@ Source: doc/dev/refine/F13-Seg-3.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_1147, 0x00001147  @ Unmapped internal CID; inverse table entry is 0xffff and no card-stat record exists.
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_11EA, 0x000011ea  @ Unmapped internal CID; inverse table entry is 0xffff and no card-stat record exists.
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_1282, 0x00001282  @ Unmapped internal CID; inverse table entry is 0xffff and no card-stat record exists.
+.equ EQUIP_ACTIVATION_UNMAPPED_CID_144A, 0x0000144a  @ Unmapped internal CID; inverse table entry is 0xffff and no card-stat record exists.
+.equ LIGHTFORCE_SWORD_CID, 0x000012c8  @ Lightforce Sword; logical CID 650, password 49587034.
+.equ MASK_OF_BRUTALITY_CID, 0x000013f4  @ Mask of Brutality; logical CID 865, password 82432018.
+.equ MIRAGE_OF_NIGHTMARE_CID, 0x00001539  @ Mirage of Nightmare; logical CID 1118, password 41482598.
+.equ ARMOR_EXE_CID, 0x0000161b  @ Armor Exe; logical CID 1279, password 07180418.
+.equ LIGHTFORCE_SWORD_CHAIN_NODE_TAG, 0x000112c8  @ Low-20-bit equip-chain node tag combining prefix 1 and LIGHTFORCE_SWORD_CID.
+
+@ =============================================================================
+@ file 13 Seg-4 additions: equip reroll display card checks
+@ Source: doc/dev/refine/F13-Seg-4.proposal.md (review PASS)
+@ =============================================================================
+.equ SECOND_COIN_TOSS_CID, 0x0000150f  @ Internal CID for Second Coin Toss.
+.equ DICE_RE_ROLL_CID, 0x000016a5  @ Internal CID for Dice Re-Roll.

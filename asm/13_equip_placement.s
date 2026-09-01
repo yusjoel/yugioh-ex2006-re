@@ -1,11 +1,11 @@
 @ ==== 13_equip_placement.s ====
 @ 装备 zone 扫描 + LP 行显示 + 放置动作按阶段派发
 .thumb
-@ Last Turn (0x151e) equip zone activation scanner. r0=player_id([0..1]). Loads card_id=0x151e into r5. Calls check_value_in_slot_chain(player, zone=0xb, card_id=0x151e). On hit calls count_occupied_monster_zones(player); if non-zero checks count_occupied_monster_zones(1-player)==0 (Last Turn requires opponent monster zone empty). Both conditions met: calls enqueue_equip_zone_sprite_by_side(player, card_id) and enqueue_sprite_attr_type11(player, card_id, mode=5, 0). Returns 0 (hit+conditions met) or 1 (no hit/conditions fail). Constants: CARD_ID=0x151e=Last Turn, ZONE=0xb, OAM_TYPE11_MODE=5.
+@ r0=player. Require LAST_TURN_CID in chain slot11, at least one occupied monster slot for this player, and none for 1-player. On success enqueue the card sprite and type11(player,CID,5,0), then return0. Return1 when any gate fails.
 scan_equip_zone_for_last_turn_activation:
     push {r4,r5,lr}                          @ 0809d718 30b5
     adds r4,r0,#0x0    @ 0809d71a 041c
-    ldr r5, DAT_0809d758                     @ 0809d71c 0e4d
+    ldr r5, last_turn_cid_9d758              @ 0809d71c 0e4d
     movs r1,#0xb    @ 0809d71e 0b21
     adds r2,r5,#0x0    @ 0809d720 2a1c
     bl check_value_in_slot_chain             @ 0809d722 92f7b5fa
@@ -30,8 +30,8 @@ scan_equip_zone_for_last_turn_activation:
     bl enqueue_sprite_attr_type11            @ 0809d750 acf798fe
     movs r0,#0x0    @ 0809d754 0020
     b LAB_0809d75e                           @ 0809d756 02e0
-DAT_0809d758:
-    .word  0x0000151e                     @ 0809d758 1e150000
+last_turn_cid_9d758:
+    .word  LAST_TURN_CID                  @ 0809d758 1e150000  CID for the Last Turn chain-membership or entity-value lookup.
 LAB_0809d75c:
     movs r0,#0x1    @ 0809d75c 0120
 LAB_0809d75e:
@@ -39,11 +39,11 @@ LAB_0809d75e:
     pop {r1}                                 @ 0809d760 02bc
     bx r1                                    @ 0809d762 0847
 
-@ Last Turn (0x151e) equip zone sprite display update function. r0=player_id([0..1]). Calls check_value_in_slot_chain(player_id, zone=0xb, card_id=0x151e); if not in chain returns 1 (no hit). On hit: calls enqueue_equip_zone_sprite_by_side(player_id, 0x151e) and enqueue_sprite_attr_type11(player_id, 0x151e, mode=5, 0); returns 0. Sprite-only; no count_occupied_monster_zones double-check unlike scan_equip_zone_for_last_turn_activation(0x0809d718). Constants: CARD_ID=0x151e=Last Turn, ZONE=0xb, OAM_TYPE11_MODE=5.
+@ r0=player. Test LAST_TURN_CID in chain slot11. If absent return1. Otherwise enqueue the equip-zone card sprite and type11(player,CID,5,0), then return0. This path does not test either player's occupied monster count.
 scan_equip_zone_for_last_turn_sprite:
     push {r4,r5,lr}                          @ 0809d764 30b5
     adds r4,r0,#0x0    @ 0809d766 041c
-    ldr r5, DAT_0809d77c                     @ 0809d768 044d
+    ldr r5, last_turn_cid_9d77c              @ 0809d768 044d
     movs r1,#0xb    @ 0809d76a 0b21
     adds r2,r5,#0x0    @ 0809d76c 2a1c
     bl check_value_in_slot_chain             @ 0809d76e 92f78ffa
@@ -52,8 +52,8 @@ scan_equip_zone_for_last_turn_sprite:
     movs r0,#0x1    @ 0809d776 0120
     b LAB_0809d796                           @ 0809d778 0de0
     .zero  0x2
-DAT_0809d77c:
-    .word  0x0000151e                     @ 0809d77c 1e150000
+last_turn_cid_9d77c:
+    .word  LAST_TURN_CID                  @ 0809d77c 1e150000  CID for the Last Turn chain-membership or entity-value lookup.
 LAB_0809d780:
     adds r0,r4,#0x0    @ 0809d780 201c
     adds r1,r5,#0x0    @ 0809d782 291c
@@ -69,11 +69,11 @@ LAB_0809d796:
     pop {r1}                                 @ 0809d798 02bc
     bx r1                                    @ 0809d79a 0847
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 调用, 检查装备链中是否存在 Power Bond (card_id=0x18fe), 若存在则提交精灵入队和 LP 变化指示器. 入口 r0=player_id (->r5). 先加载 DAT_0809d7b4=0x18fe. 调用 check_value_in_slot_chain(r5, zone=0xb, 0x18fe); 若链中不含该卡返回 1. 命中后: 调用 get_node_entity_id_in_slot(r5, 0xb, 0x18fe) 取实体 r4; 调用 enqueue_equip_zone_sprite_by_side(r5, 0x18fe) 入队装备区精灵; 调用 submit_lp_change_indicator_with_chain_check(r5, r4, 0=delta_type, 0x18fe) 提交 LP 变化指示器; 调用 enqueue_equip_slot_sprite_attr(r5, 0xb, 0x18fe, 0). 返回 0. Side effects: OAM sprite buffer; LP change indicator buffer. Constants: CARD_ID=0x18fe (Power Bond), ZONE=0xb.
+@ r0=player. If POWER_BOND_CID is absent from chain slot11, return1. Otherwise read its entity value, enqueue the card sprite, submit the LP indicator as (player,entity,0,CID), and enqueue the equip-slot sprite as (player,11,CID,0). Return0 after these submissions.
 scan_equip_chain_for_power_bond_sprite_and_lp_indicator:
     push {r4,r5,r6,lr}                       @ 0809d79c 70b5
     adds r5,r0,#0x0    @ 0809d79e 051c
-    ldr r6, DAT_0809d7b4                     @ 0809d7a0 044e
+    ldr r6, power_bond_cid_9d7b4             @ 0809d7a0 044e
     movs r1,#0xb    @ 0809d7a2 0b21
     adds r2,r6,#0x0    @ 0809d7a4 321c
     bl check_value_in_slot_chain             @ 0809d7a6 92f773fa
@@ -82,8 +82,8 @@ scan_equip_chain_for_power_bond_sprite_and_lp_indicator:
     movs r0,#0x1    @ 0809d7ae 0120
     b LAB_0809d7e6                           @ 0809d7b0 19e0
     .zero  0x2
-DAT_0809d7b4:
-    .word  0x000018fe                     @ 0809d7b4 fe180000
+power_bond_cid_9d7b4:
+    .word  POWER_BOND_CID                 @ 0809d7b4 fe180000  CID for chain slot11 membership, entity lookup and sprite/LP-indicator submissions.
 LAB_0809d7b8:
     adds r0,r5,#0x0    @ 0809d7b8 281c
     movs r1,#0xb    @ 0809d7ba 0b21
@@ -109,8 +109,8 @@ LAB_0809d7e6:
     pop {r1}                                 @ 0809d7e8 02bc
     bx r1                                    @ 0809d7ea 0847
 
-@ Scans equip chain list for sprite submission, matched by card_id and zone_col. r0=player_id [0..1], r1=card_type_id [0..0x1fff], r2=zone_col [0..N]. First calls check_value_in_slot_chain(player, zone=0xb, card_id); if absent returns 1. Reads [gP1LifePoints+player*0x868+0xa] hword = chain_count; if 0 returns 1. Traverses chain nodes from gDuelFieldSlots=0x0201d9c0+player*0x868 (node_size=8, [node+6]=next): ldrh[node+0] vs card_type_id; ldrb[node+2]&0xf vs zone_col. On match: builds OAM attr base=0x3b (P1) or 0x803b (P2); lsrs r3,byte[node+2],#5 = distance_offset; calls enqueue_sprite_attr_record(OAM_base, node_xy, 1). Returns r0=always 1 (no r0=0 path). Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record. Constants: chain_base=0x0201d9c0, player_stride=0x868, chain_count_offset=0xa, OAM_P1=0x3b, OAM_P2=0x803b, node_size=8.
-scan_equip_chain_list_for_sprite_by_card_and_zone:
+@ r0=player, r1=CID, r2=counter_base. Require CID in chain slot11. Follow the head at gDuelFieldSpellZoneBase+(player&1)*PLAYER_BLOCK_STRIDE+0xa through 8-byte gEquipNodePool nodes, using next=u16[node+6]. Match u16[node]==CID and (byte[node+2]&15)==1. Submit type0x3b/0x803b with (CID&0xffff,1,(counter_base-(byte[node+2]>>5))&0xffff) for every match. r2 is not a zone filter. Always return1.
+enqueue_equip_chain_counter_sprites_by_card:
     push {r4,r5,r6,r7,lr}                    @ 0809d7ec f0b5
     .hword 0x4647    @ 0809d7ee 4746
     push {r7}                                @ 0809d7f0 80b4
@@ -124,9 +124,9 @@ scan_equip_chain_list_for_sprite_by_card_and_zone:
     beq LAB_0809d850                         @ 0809d802 25d0
     movs r0,#0x1    @ 0809d804 0120
     ands r0,r6    @ 0809d806 3040
-    ldr r1, DAT_0809d85c                     @ 0809d808 1449
+    ldr r1, player_stride_9d85c              @ 0809d808 1449
     muls r0,r1    @ 0809d80a 4843
-    ldr r1, DAT_0809d860                     @ 0809d80c 1449
+    ldr r1, chain_slot11_base_9d860          @ 0809d80c 1449
     adds r0,r0,r1    @ 0809d80e 4018
     ldrh r1,[r0,#0xa]                        @ 0809d810 4189
     cmp r1,#0x0                              @ 0809d812 0029
@@ -134,7 +134,7 @@ scan_equip_chain_list_for_sprite_by_card_and_zone:
     lsls r7,r5,#0x10    @ 0809d816 2f04
 LAB_0809d818:
     lsls r1,r1,#0x3    @ 0809d818 c900
-    ldr r0, DAT_0809d864                     @ 0809d81a 1248
+    ldr r0, chain_nodes_base_9d864           @ 0809d81a 1248
     adds r1,r1,r0    @ 0809d81c 0918
     ldrh r4,[r1,#0x6]                        @ 0809d81e cc88
     ldrb r3,[r1,#0x2]                        @ 0809d820 8b78
@@ -148,7 +148,7 @@ LAB_0809d818:
     movs r0,#0x3b    @ 0809d830 3b20
     cmp r6,#0x0                              @ 0809d832 002e
     beq LAB_0809d838                         @ 0809d834 00d0
-    ldr r0, DAT_0809d868                     @ 0809d836 0c48
+    ldr r0, sprite_counter_p2_9d868          @ 0809d836 0c48
 LAB_0809d838:
     lsrs r3,r3,#0x5    @ 0809d838 5b09
     .hword 0x4641    @ 0809d83a 4146
@@ -169,59 +169,59 @@ LAB_0809d850:
     pop {r4,r5,r6,r7}                        @ 0809d856 f0bc
     pop {r1}                                 @ 0809d858 02bc
     bx r1                                    @ 0809d85a 0847
-DAT_0809d85c:
-    .word  0x00000868                     @ 0809d85c 68080000
-DAT_0809d860:
-    .word  0x0201c5ec                     @ 0809d860 ecc50102
-DAT_0809d864:
-    .word  0x0201d9c0                     @ 0809d864 c0d90102
-DAT_0809d868:
-    .word  0x0000803b                     @ 0809d868 3b800000
+player_stride_9d85c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809d85c 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+chain_slot11_base_9d860:
+    .word  gDuelFieldSpellZoneBase        @ 0809d860 ecc50102  Chain slot11 base, gDuelFieldSlots+11*20; read u16[base+(player&1)*stride+0xa] as the node-head index.
+chain_nodes_base_9d864:
+    .word  gEquipNodePool                 @ 0809d864 c0d90102  Global 8-byte node pool indexed by chain-head/next indices; no player stride is added to this base.
+sprite_counter_p2_9d868:
+    .word  OAM_EQUIP_SET_SLOT_P2          @ 0809d868 3b800000  Nonzero-player counter-sprite selector; the zero-player branch uses0x3b.
 
-@ 4-instruction thin wrapper for scan_equip_chain_list_for_sprite_by_card_and_zone, Crush Card variant. r0=player_id [0..1] (pass-through); fixed r1=0x123b (Crush Card), r2=3 (zone_col). Tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone (FUN_0809d7ec). Returns r0=u32 always 1 (pass-through). Side effects: OAM sprite attr buffer via callee -> enqueue_sprite_attr_record. Constants: CARD_ID=0x123b (Crush Card), zone_col=3.
+@ r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,CRUSH_CARD_CID,3). The third argument is a counter base; the callee fixes the node-type filter to1. Return the callee result, always1. Sprite submissions occur for matching chain nodes.
 scan_equip_chain_list_for_sprite_crush_card:
     push {lr}                                @ 0809d86c 00b5
-    ldr r1, DAT_0809d87c                     @ 0809d86e 0349
+    ldr r1, crush_card_cid_9d87c             @ 0809d86e 0349
     movs r2,#0x3    @ 0809d870 0322
-    bl scan_equip_chain_list_for_sprite_by_card_and_zone @ 0809d872 fff7bbff
+    bl enqueue_equip_chain_counter_sprites_by_card @ 0809d872 fff7bbff
     pop {r1}                                 @ 0809d876 02bc
     bx r1                                    @ 0809d878 0847
     .zero  0x2
-DAT_0809d87c:
-    .word  0x0000123b                     @ 0809d87c 3b120000
+crush_card_cid_9d87c:
+    .word  CRUSH_CARD_CID                 @ 0809d87c 3b120000  CID argument for the chain counter-sprite wrapper.
 
-@ Equip chain sprite scan case stub for Deck Devastation Virus (internal_card_id=0x188c, cid=1803). Called by duel_field main dispatch hub (FUN_0809d984). Fixes r1=0x188c, r2=3 (zone=3) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit.
+@ r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,DECK_DEVASTATION_VIRUS_CID,3). The third argument is a counter base, not a zone index. Return the callee result, always1. Matching chain nodes enqueue counter sprites.
 scan_equip_chain_list_for_sprite_deck_devastation_virus:
     push {lr}                                @ 0809d880 00b5
-    ldr r1, DAT_0809d890                     @ 0809d882 0349
+    ldr r1, deck_devastation_cid_9d890       @ 0809d882 0349
     movs r2,#0x3    @ 0809d884 0322
-    bl scan_equip_chain_list_for_sprite_by_card_and_zone @ 0809d886 fff7b1ff
+    bl enqueue_equip_chain_counter_sprites_by_card @ 0809d886 fff7b1ff
     pop {r1}                                 @ 0809d88a 02bc
     bx r1                                    @ 0809d88c 0847
     .zero  0x2
-DAT_0809d890:
-    .word  0x0000188c                     @ 0809d890 8c180000
+deck_devastation_cid_9d890:
+    .word  DECK_DEVASTATION_VIRUS_CID     @ 0809d890 8c180000  CID argument for the chain counter-sprite wrapper.
 
-@ Equip chain sprite scan case stub for Pikeru's Second Sight (internal_card_id=0x18d5, cid=1861). Called by duel_field main dispatch hub (FUN_0809d984). Fixes r1=0x18d5, r2=2 (zone=2) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit.
+@ r0=player. Call enqueue_equip_chain_counter_sprites_by_card(player,PIKERU_SECOND_SIGHT_CID,2). The third argument is a counter base, not a zone index. Return the callee result, always1. Matching chain nodes enqueue counter sprites.
 scan_equip_chain_list_for_sprite_pikeru_second_sight:
     push {lr}                                @ 0809d894 00b5
-    ldr r1, DAT_0809d8a4                     @ 0809d896 0349
+    ldr r1, pikeru_second_sight_cid_9d8a4    @ 0809d896 0349
     movs r2,#0x2    @ 0809d898 0222
-    bl scan_equip_chain_list_for_sprite_by_card_and_zone @ 0809d89a fff7a7ff
+    bl enqueue_equip_chain_counter_sprites_by_card @ 0809d89a fff7a7ff
     pop {r1}                                 @ 0809d89e 02bc
     bx r1                                    @ 0809d8a0 0847
     .zero  0x2
-DAT_0809d8a4:
-    .word  0x000018d5                     @ 0809d8a4 d5180000
+pikeru_second_sight_cid_9d8a4:
+    .word  PIKERU_SECOND_SIGHT_CID        @ 0809d8a4 d5180000  CID argument for the chain counter-sprite wrapper.
 
-@ Renders Final Countdown (internal_card_id=0x169c, cid=1384) progress sprites for both players. Loops r6=1 to 0 (both sides), alternates player via eors. zone=0xb; calls get_node_entity_id_in_slot to fetch node entity ID; computes tile offset r4=node_count-entity_id+1; calls enqueue_sprite_attr_record (OAM P1=0x3b / P2=0x803b); if r4 > 0x13: calls enqueue_sprite_attr_type11 for overflow marker. Constants: CARD_ID=0x169c, ZONE=0xb, EWRAM_NODE_BASE=0x0201e1cc, OAM_P1=0x3b, OAM_P2=0x803b, TYPE11_THRESHOLD=0x13.
+@ r0=starting player. Visit that player and player^1. For a nonnegative FINAL_COUNTDOWN_CID entity value in chain slot11, compute count=word[gP1LpTimer]-entity+1. Enqueue type0x3b/0x803b with (CID,1,count&0xffff). If signed count>19, also enqueue type11(player,CID,1,1). Always return1 after both sides. The timer is gP1LifePoints+P1LP_TIMER_OFF.
 scan_equip_zone_for_final_countdown_sprite:
     push {r4,r5,r6,r7,lr}                    @ 0809d8a8 f0b5
     .hword 0x4647    @ 0809d8aa 4746
     push {r7}                                @ 0809d8ac 80b4
     adds r5,r0,#0x0    @ 0809d8ae 051c
-    ldr r7, DAT_0809d908                     @ 0809d8b0 154f
-    ldr r0, DAT_0809d90c                     @ 0809d8b2 1648
+    ldr r7, final_countdown_cid_9d908        @ 0809d8b0 154f
+    ldr r0, lp_timer_base_9d90c              @ 0809d8b2 1648
     .hword 0x4680    @ 0809d8b4 8046
     movs r6,#0x1    @ 0809d8b6 0126
 LAB_0809d8b8:
@@ -238,7 +238,7 @@ LAB_0809d8b8:
     movs r0,#0x3b    @ 0809d8ce 3b20
     cmp r5,#0x0                              @ 0809d8d0 002d
     beq LAB_0809d8d6                         @ 0809d8d2 00d0
-    ldr r0, DAT_0809d910                     @ 0809d8d4 0e48
+    ldr r0, sprite_counter_p2_9d910          @ 0809d8d4 0e48
 LAB_0809d8d6:
     lsls r3,r4,#0x10    @ 0809d8d6 2304
     lsrs r3,r3,#0x10    @ 0809d8d8 1b0c
@@ -264,23 +264,23 @@ LAB_0809d8f2:
     pop {r1}                                 @ 0809d902 02bc
     bx r1                                    @ 0809d904 0847
     .zero  0x2
-DAT_0809d908:
-    .word  0x0000169c                     @ 0809d908 9c160000
-DAT_0809d90c:
-    .word  0x0201e1cc                     @ 0809d90c cce10102
-DAT_0809d910:
-    .word  0x0000803b                     @ 0809d910 3b800000
+final_countdown_cid_9d908:
+    .word  FINAL_COUNTDOWN_CID            @ 0809d908 9c160000  CID for chain slot11 entity lookup and progress-sprite arguments.
+lp_timer_base_9d90c:
+    .word  gP1LpTimer                     @ 0809d90c cce10102  Absolute u32 timer address, equal to gP1LifePoints+P1LP_TIMER_OFF; used for Final Countdown progress.
+sprite_counter_p2_9d910:
+    .word  OAM_EQUIP_SET_SLOT_P2          @ 0809d910 3b800000  Nonzero-player counter-sprite selector; the zero-player branch uses0x3b.
 
-@ Infinite Cards (0x1401) + Hieroglyph Lithograph (0x159f) equip zone LP display row update. r0=player_id([0..1]). Calls count_field_copies_of_card(0x1401); if not on field continues. Calls check_value_in_slot_chain(player, zone=0xb, 0x159f); if hit changes threshold 6->7. Calls count_available_effect_zones(1-player, 0xc000, -1); if >0 changes threshold to 5. Reads gP1LifePoints+player*0x868+0xc (LP value); if LP>threshold calls set_lp_display_row_if_nonzero(player, LP-threshold). Constants: CARD_ID_INFINITE_CARDS=0x1401, CARD_ID_HIEROGLYPH=0x159f, ZONE=0xb, THRESHOLD_DEFAULT=6, THRESHOLD_WITH_HIEROGLYPH=7, THRESHOLD_WITH_EFFECTS=5, LP_STRUCT_OFFSET=0xc, SLOT_STRIDE=0x868.
+@ r0=player. Return1 if count_field_copies_of_card(INFINITE_CARDS_CID) is nonzero. Otherwise limit=6, raised to7 by HIEROGLYPH_LITHOGRAPH_CID in chain slot11 and overridden to5 by available Enervating Mist(0x1800) zones for 1-player. Read count at gP1ZoneHandCount+(player&1)*PLAYER_BLOCK_STRIDE. If unsigned count>limit, submit set_lp_display_row_if_nonzero(player,count-limit) and return0; else return1.
 scan_equip_zone_for_infinite_cards_lp_display_update:
     push {r4,r5,r6,lr}                       @ 0809d914 70b5
     adds r4,r0,#0x0    @ 0809d916 041c
-    ldr r0, DAT_0809d96c                     @ 0809d918 1448
+    ldr r0, infinite_cards_cid_9d96c         @ 0809d918 1448
     bl count_field_copies_of_card            @ 0809d91a 94f73fff
     cmp r0,#0x0                              @ 0809d91e 0028
     bne LAB_0809d97c                         @ 0809d920 2cd1
     movs r5,#0x6    @ 0809d922 0625
-    ldr r2, DAT_0809d970                     @ 0809d924 124a
+    ldr r2, hieroglyph_cid_9d970             @ 0809d924 124a
     adds r0,r4,#0x0    @ 0809d926 201c
     movs r1,#0xb    @ 0809d928 0b21
     bl check_value_in_slot_chain             @ 0809d92a 92f7b1f9
@@ -299,10 +299,10 @@ LAB_0809d934:
     beq LAB_0809d94a                         @ 0809d946 00d0
     movs r5,#0x5    @ 0809d948 0525
 LAB_0809d94a:
-    ldr r2, PTR_gP1LifePoints_0809d974       @ 0809d94a 0a4a
+    ldr r2, gp1lp_base_9d974                 @ 0809d94a 0a4a
     adds r0,r4,#0x0    @ 0809d94c 201c
     ands r0,r6    @ 0809d94e 3040
-    ldr r1, DAT_0809d978                     @ 0809d950 0949
+    ldr r1, player_stride_9d978              @ 0809d950 0949
     muls r0,r1    @ 0809d952 4843
     adds r2,#0xc    @ 0809d954 0c32
     adds r0,r0,r2    @ 0809d956 8018
@@ -315,14 +315,14 @@ LAB_0809d94a:
     movs r0,#0x0    @ 0809d966 0020
     b LAB_0809d97e                           @ 0809d968 09e0
     .zero  0x2
-DAT_0809d96c:
-    .word  0x00001401                     @ 0809d96c 01140000
-DAT_0809d970:
-    .word  0x0000159f                     @ 0809d970 9f150000
-PTR_gP1LifePoints_0809d974:
-    .word  gP1LifePoints                  @ 0809d974 e0c40102
-DAT_0809d978:
-    .word  0x00000868                     @ 0809d978 68080000
+infinite_cards_cid_9d96c:
+    .word  INFINITE_CARDS_CID             @ 0809d96c 01140000  CID passed to count_field_copies_of_card; nonzero count bypasses the hand-limit row update.
+hieroglyph_cid_9d970:
+    .word  HIEROGLYPH_LITHOGRAPH_CID      @ 0809d970 9f150000  CID passed to check_value_in_slot_chain(player,11,CID); a hit raises the hand limit to7.
+gp1lp_base_9d974:
+    .word  gP1LifePoints                  @ 0809d974 e0c40102  Player-state base; read the hand-count word at base+(player&1)*PLAYER_BLOCK_STRIDE+0xc.
+player_stride_9d978:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809d978 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
 LAB_0809d97c:
     movs r0,#0x1    @ 0809d97c 0120
 LAB_0809d97e:
@@ -330,7 +330,7 @@ LAB_0809d97e:
     pop {r1}                                 @ 0809d980 02bc
     bx r1                                    @ 0809d982 0847
 
-@ 由 equip 激活主循环驱动器 (0x08094c60) 调用. 以 [gP1LifePoints+0x1d1c] 作为阶段计数器 (0..0x14=21 阶), 通过跳转表 (0x0809da00, 21 entries) 路由到各子阶段处理程序. 入口先检查 Last Turn 扫描条件 ([player_data+0x11c] bit23) 并调用 scan_equip_zone_for_last_turn_activation. case 0: enqueue_sprite_attr_record + 清零子计数器; case 1: submit_lp_bar_sprite_row_by_type; case 3/4: 扫描 equip chain 槽 0..9 by icid 0x0fee/0x150e; case 5: 双 player 全场 find_equip_chain_pair + check_equip_eligibility; case 6: find_equip_chain_node_min_count_by_pred; case 7: card_name 显示 / LP row / equip bitmap; case a/b/c/0x14: 扫描 ROM 卡牌列表 (0x09e476b0/0x09e47738/0x09e4779c). 返回 0=继续 / 1=阶段完毕. Side effects: [gP1LifePoints+0x1d1c] phase_counter; [gP1LifePoints+0x1d24] sub-counter; OAM buffer; equip bitmap. Constants: PHASE_MAX=0x14, player_stride=0x868, sub_counter_offset=0x1d24, phase_offset=0x1d1c, player_data_offset=0x1ce8, ICID_A=0x0fee, ICID_B=0x150e, ROM_LIST_A=0x09e476b0, ROM_LIST_B=0x09e47738, ROM_LIST_C=0x09e4779c.
+@ No inputs. Read player at gP1LifePoints+0x1ce8, bit23 at base+(player&1)*0x868+0x11c, and phase at+0x1d1c. For nonzero phase, a successful Last Turn scan returns0. Phase0..20 selects21 even MOV-pc targets; default/unused phases return1. Active paths update phase/cursors, submit sprites and test slots. Phase11/20 resume34/4 callback tables; phase12 restarts25 callbacks each tick. A callback returning0 yields0. All paths restore the shared0x120-byte frame.
 run_equip_activation_phase_by_counter:
     push {r4,r5,r6,r7,lr}                    @ 0809d984 f0b5
     .hword 0x4657    @ 0809d986 5746
@@ -338,14 +338,14 @@ run_equip_activation_phase_by_counter:
     .hword 0x4645    @ 0809d98a 4546
     push {r5,r6,r7}                          @ 0809d98c e0b4
     sub sp,#0x120                            @ 0809d98e c8b0
-    ldr r2, PTR_gP1LifePoints_0809d9cc       @ 0809d990 0e4a
-    ldr r1, DAT_0809d9d0                     @ 0809d992 0f49
+    ldr r2, gp1lp_base_9d9cc                 @ 0809d990 0e4a
+    ldr r1, player_off_9d9d0                 @ 0809d992 0f49
     adds r0,r2,r1    @ 0809d994 5018
     ldr r0,[r0,#0x0]                         @ 0809d996 0068
     str r0,[sp,#0x104]                       @ 0809d998 4190
     movs r3,#0x1    @ 0809d99a 0123
     ands r0,r3    @ 0809d99c 1840
-    ldr r1, DAT_0809d9d4                     @ 0809d99e 0d49
+    ldr r1, player_stride_9d9d4              @ 0809d99e 0d49
     muls r0,r1    @ 0809d9a0 4843
     movs r4,#0x8e    @ 0809d9a2 8e24
     lsls r4,r4,#0x1    @ 0809d9a4 6400
@@ -355,7 +355,7 @@ run_equip_activation_phase_by_counter:
     lsrs r0,r0,#0x17    @ 0809d9ac c00d
     ands r0,r3    @ 0809d9ae 1840
     str r0,[sp,#0x108]                       @ 0809d9b0 4290
-    ldr r0, DAT_0809d9d8                     @ 0809d9b2 0948
+    ldr r0, phase_off_9d9d8                  @ 0809d9b2 0948
     adds r2,r2,r0    @ 0809d9b4 1218
     ldr r0,[r2,#0x0]                         @ 0809d9b6 1068
     cmp r0,#0x0                              @ 0809d9b8 0028
@@ -368,17 +368,17 @@ LAB_0809d9c6:
     movs r0,#0x0    @ 0809d9c6 0020
     b LAB_0809e066                           @ 0809d9c8 4de3
     .zero  0x2
-PTR_gP1LifePoints_0809d9cc:
-    .word  gP1LifePoints                  @ 0809d9cc e0c40102
-DAT_0809d9d0:
-    .word  0x00001ce8                     @ 0809d9d0 e81c0000
-DAT_0809d9d4:
-    .word  0x00000868                     @ 0809d9d4 68080000
-DAT_0809d9d8:
-    .word  0x00001d1c                     @ 0809d9d8 1c1d0000
+gp1lp_base_9d9cc:
+    .word  gP1LifePoints                  @ 0809d9cc e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+player_off_9d9d0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809d9d0 e81c0000  Byte offset from gP1LifePoints to the player word used by this dispatcher.
+player_stride_9d9d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809d9d4 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+phase_off_9d9d8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809d9d8 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809d9dc:
-    ldr r1, PTR_gP1LifePoints_0809d9f4       @ 0809d9dc 0549
-    ldr r2, DAT_0809d9f8                     @ 0809d9de 064a
+    ldr r1, gp1lp_base_9d9f4                 @ 0809d9dc 0549
+    ldr r2, phase_off_9d9f8                  @ 0809d9de 064a
     adds r0,r1,r2    @ 0809d9e0 8818
     ldr r0,[r0,#0x0]                         @ 0809d9e2 0068
     cmp r0,#0x14                             @ 0809d9e4 1428
@@ -386,17 +386,17 @@ LAB_0809d9dc:
     b switchD_0809d9f2__caseD_8              @ 0809d9e8 3ce3
 LAB_0809d9ea:
     lsls r0,r0,#0x2    @ 0809d9ea 8000
-    ldr r1, PTR_switchdataD_0809da00_0809d9fc @ 0809d9ec 0349
+    ldr r1, activation_phase_switch_9d9fc    @ 0809d9ec 0349
     adds r0,r0,r1    @ 0809d9ee 4018
     ldr r0,[r0,#0x0]                         @ 0809d9f0 0068
 switchD_0809d9f2__switchD:
     .hword 0x4687    @ 0809d9f2 8746
-PTR_gP1LifePoints_0809d9f4:
-    .word  gP1LifePoints                  @ 0809d9f4 e0c40102
-DAT_0809d9f8:
-    .word  0x00001d1c                     @ 0809d9f8 1c1d0000
-PTR_switchdataD_0809da00_0809d9fc:
-    .word  0x0809da00                     @ 0809d9fc 00da0908
+gp1lp_base_9d9f4:
+    .word  gP1LifePoints                  @ 0809d9f4 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9d9f8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809d9f8 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+activation_phase_switch_9d9fc:
+    .word  switchD_0809d9f2__switchdataD_0809da00 @ 0809d9fc 00da0908  21 even-address phase0..20 targets, dispatched by MOV pc,r0 while retaining Thumb state.
 switchD_0809d9f2__switchdataD_0809da00:
     .word  0x0809da54                     @ 0809da00 54da0908
     .word  0x0809da9c                     @ 0809da04 9cda0908
@@ -427,15 +427,15 @@ switchD_0809d9f2__caseD_0:
     ldr r4,[sp,#0x104]                       @ 0809da5c 419c
     cmp r4,#0x0                              @ 0809da5e 002c
     beq LAB_0809da64                         @ 0809da60 00d0
-    ldr r0, DAT_0809da8c                     @ 0809da62 0a48
+    ldr r0, sprite_p2_11_9da8c               @ 0809da62 0a48
 LAB_0809da64:
     movs r1,#0x0    @ 0809da64 0021
     movs r2,#0x0    @ 0809da66 0022
     movs r3,#0x0    @ 0809da68 0023
     bl enqueue_sprite_attr_record            @ 0809da6a 9ef75ff9
 LAB_0809da6e:
-    ldr r1, PTR_gP1LifePoints_0809da90       @ 0809da6e 0849
-    ldr r0, DAT_0809da94                     @ 0809da70 0848
+    ldr r1, gp1lp_base_9da90                 @ 0809da6e 0849
+    ldr r0, phase_off_9da94                  @ 0809da70 0848
     adds r2,r1,r0    @ 0809da72 0a18
     ldr r0,[r2,#0x0]                         @ 0809da74 1068
     adds r0,#0x1    @ 0809da76 0130
@@ -445,18 +445,18 @@ LAB_0809da6e:
     adds r0,r1,r2    @ 0809da7e 8818
     movs r2,#0x0    @ 0809da80 0022
     str r2,[r0,#0x0]                         @ 0809da82 0260
-    ldr r3, DAT_0809da98                     @ 0809da84 044b
+    ldr r3, scan_cursor_off_9da98            @ 0809da84 044b
     adds r1,r1,r3    @ 0809da86 c918
     str r2,[r1,#0x0]                         @ 0809da88 0a60
     b LAB_0809d9c6                           @ 0809da8a 9ce7
-DAT_0809da8c:
-    .word  0x00008011                     @ 0809da8c 11800000
-PTR_gP1LifePoints_0809da90:
-    .word  gP1LifePoints                  @ 0809da90 e0c40102
-DAT_0809da94:
-    .word  0x00001d1c                     @ 0809da94 1c1d0000
-DAT_0809da98:
-    .word  0x00001d24                     @ 0809da98 241d0000
+sprite_p2_11_9da8c:
+    .word  OAM_EQUIP_SPRITE_P2_11         @ 0809da8c 11800000  Nonzero-player sprite selector; the zero-player branch uses0x11. Argument0 of enqueue_sprite_attr_record.
+gp1lp_base_9da90:
+    .word  gP1LifePoints                  @ 0809da90 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9da94:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809da94 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+scan_cursor_off_9da98:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809da98 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
 switchD_0809d9f2__caseD_1:
     ldr r4,[sp,#0x108]                       @ 0809da9c 429c
     cmp r4,#0x0                              @ 0809da9e 002c
@@ -465,20 +465,20 @@ switchD_0809d9f2__caseD_1:
     movs r1,#0x0    @ 0809daa4 0021
     bl submit_lp_bar_sprite_row_by_type      @ 0809daa6 e7f73bfc
 LAB_0809daaa:
-    ldr r1, PTR_gP1LifePoints_0809dab8       @ 0809daaa 0349
-    ldr r0, DAT_0809dabc                     @ 0809daac 0348
+    ldr r1, gp1lp_base_9dab8                 @ 0809daaa 0349
+    ldr r0, phase_off_9dabc                  @ 0809daac 0348
     adds r1,r1,r0    @ 0809daae 0918
     ldr r0,[r1,#0x0]                         @ 0809dab0 0868
     adds r0,#0x1    @ 0809dab2 0130
     b LAB_0809deda                           @ 0809dab4 11e2
     .zero  0x2
-PTR_gP1LifePoints_0809dab8:
-    .word  gP1LifePoints                  @ 0809dab8 e0c40102
-DAT_0809dabc:
-    .word  0x00001d1c                     @ 0809dabc 1c1d0000
+gp1lp_base_9dab8:
+    .word  gP1LifePoints                  @ 0809dab8 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9dabc:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809dabc 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809d9f2__caseD_2:
-    ldr r2, PTR_gP1LifePoints_0809db3c       @ 0809dac0 1e4a
-    ldr r3, DAT_0809db40                     @ 0809dac2 1f4b
+    ldr r2, gp1lp_base_9db3c                 @ 0809dac0 1e4a
+    ldr r3, phase_off_9db40                  @ 0809dac2 1f4b
     adds r1,r2,r3    @ 0809dac4 d118
     ldr r0,[r1,#0x0]                         @ 0809dac6 0868
     adds r0,#0x1    @ 0809dac8 0130
@@ -492,8 +492,8 @@ switchD_0809d9f2__caseD_2:
     adds r0,r2,r3    @ 0809dad8 d018
     str r1,[r0,#0x0]                         @ 0809dada 0160
 switchD_0809d9f2__caseD_3:
-    ldr r4, PTR_gP1LifePoints_0809db3c       @ 0809dadc 174c
-    ldr r0, DAT_0809db44                     @ 0809dade 1948
+    ldr r4, gp1lp_base_9db3c                 @ 0809dadc 174c
+    ldr r0, scan_cursor_off_9db44            @ 0809dade 1948
     adds r1,r4,r0    @ 0809dae0 2118
     ldr r0,[r1,#0x0]                         @ 0809dae2 0868
     cmp r0,#0x9                              @ 0809dae4 0928
@@ -506,7 +506,7 @@ LAB_0809daea:
     .hword 0x4689    @ 0809daf0 8946
     ldr r0,[sp,#0x104]                       @ 0809daf2 4198
     ands r0,r1    @ 0809daf4 0840
-    ldr r1, DAT_0809db48                     @ 0809daf6 1449
+    ldr r1, player_stride_9db48              @ 0809daf6 1449
     adds r2,r0,#0x0    @ 0809daf8 021c
     muls r2,r1    @ 0809dafa 4a43
     .hword 0x4690    @ 0809dafc 9046
@@ -536,26 +536,26 @@ LAB_0809db24:
     bne LAB_0809db2c                         @ 0809db28 00d1
     b LAB_0809dc2a                           @ 0809db2a 7ee0
 LAB_0809db2c:
-    ldr r0, DAT_0809db4c                     @ 0809db2c 0748
+    ldr r0, cocoon_cid_9db4c                 @ 0809db2c 0748
     cmp r3,r0                                @ 0809db2e 8342
     beq LAB_0809db54                         @ 0809db30 10d0
-    ldr r0, DAT_0809db50                     @ 0809db32 0748
+    ldr r0, spiritual_energy_cid_9db50       @ 0809db32 0748
     cmp r3,r0                                @ 0809db34 8342
     beq LAB_0809db74                         @ 0809db36 1dd0
     b LAB_0809dc2a                           @ 0809db38 77e0
     .zero  0x2
-PTR_gP1LifePoints_0809db3c:
-    .word  gP1LifePoints                  @ 0809db3c e0c40102
-DAT_0809db40:
-    .word  0x00001d1c                     @ 0809db40 1c1d0000
-DAT_0809db44:
-    .word  0x00001d24                     @ 0809db44 241d0000
-DAT_0809db48:
-    .word  0x00000868                     @ 0809db48 68080000
-DAT_0809db4c:
-    .word  0x00000fee                     @ 0809db4c ee0f0000
-DAT_0809db50:
-    .word  0x0000150e                     @ 0809db50 0e150000
+gp1lp_base_9db3c:
+    .word  gP1LifePoints                  @ 0809db3c e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9db40:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809db40 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+scan_cursor_off_9db44:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809db44 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
+player_stride_9db48:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809db48 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+cocoon_cid_9db4c:
+    .word  COCOON_OF_EVOLUTION_CID        @ 0809db4c ee0f0000  Compare with the low13 CID bits of a field-slot word; not the same-valued animation sentinel.
+spiritual_energy_cid_9db50:
+    .word  SPIRITUAL_ENERGY_SETTLE_CID    @ 0809db50 0e150000  CID comparison selecting the multi-step display path for field slots5..9.
 LAB_0809db54:
     cmp r1,#0x4                              @ 0809db54 0429
     bls LAB_0809dc2a                         @ 0809db56 68d9
@@ -606,7 +606,7 @@ LAB_0809dba8:
     ldr r1,[r0,#0x0]                         @ 0809dbae 0168
     cmp r1,#0x0                              @ 0809dbb0 0029
     beq LAB_0809dbe8                         @ 0809dbb2 19d0
-    ldr r0, DAT_0809dbcc                     @ 0809dbb4 0548
+    ldr r0, duel_card_ctx_base_9dbcc         @ 0809dbb4 0548
     ldr r2,[sp,#0x104]                       @ 0809dbb6 419a
     lsls r1,r2,#0x2    @ 0809dbb8 9100
     adds r0,#0x8    @ 0809dbba 0830
@@ -618,8 +618,8 @@ LAB_0809dba8:
     lsls r3,r3,#0x5    @ 0809dbc6 5b01
     adds r0,r6,r3    @ 0809dbc8 f018
     b LAB_0809dbee                           @ 0809dbca 10e0
-DAT_0809dbcc:
-    .word  0x0201e2a0                     @ 0809dbcc a0e20102
+duel_card_ctx_base_9dbcc:
+    .word  gDuelCardCtxBase               @ 0809dbcc a0e20102  Duel card context base; reads word[base+8+4*player] to select the display/AI route.
 LAB_0809dbd0:
     adds r0,r3,#0x0    @ 0809dbd0 181c
     bl card_name_lookup_by_internal_id       @ 0809dbd2 51f013f8
@@ -676,19 +676,19 @@ LAB_0809dc2a:
     bhi LAB_0809dc36                         @ 0809dc32 00d8
     b LAB_0809db06                           @ 0809dc34 67e7
 LAB_0809dc36:
-    ldr r4, PTR_gP1LifePoints_0809dc98       @ 0809dc36 184c
-    ldr r0, DAT_0809dc9c                     @ 0809dc38 1848
+    ldr r4, gp1lp_base_9dc98                 @ 0809dc36 184c
+    ldr r0, phase_off_9dc9c                  @ 0809dc38 1848
     adds r1,r4,r0    @ 0809dc3a 2118
     ldr r0,[r1,#0x0]                         @ 0809dc3c 0868
     adds r0,#0x1    @ 0809dc3e 0130
     str r0,[r1,#0x0]                         @ 0809dc40 0860
-    ldr r2, DAT_0809dca0                     @ 0809dc42 174a
+    ldr r2, scan_cursor_off_9dca0            @ 0809dc42 174a
     adds r1,r4,r2    @ 0809dc44 a118
     movs r0,#0x5    @ 0809dc46 0520
     str r0,[r1,#0x0]                         @ 0809dc48 0860
 switchD_0809d9f2__caseD_4:
-    ldr r3, PTR_gP1LifePoints_0809dc98       @ 0809dc4a 134b
-    ldr r4, DAT_0809dca0                     @ 0809dc4c 144c
+    ldr r3, gp1lp_base_9dc98                 @ 0809dc4a 134b
+    ldr r4, scan_cursor_off_9dca0            @ 0809dc4c 144c
     adds r1,r3,r4    @ 0809dc4e 1919
     ldr r0,[r1,#0x0]                         @ 0809dc50 0868
     cmp r0,#0x9                              @ 0809dc52 0928
@@ -699,14 +699,14 @@ switchD_0809d9f2__caseD_4:
     subs r5,r0,r1    @ 0809dc5c 451a
     adds r3,r5,#0x0    @ 0809dc5e 2b1c
     ands r3,r0    @ 0809dc60 0340
-    ldr r7, PTR_gP1LifePoints_0809dc98       @ 0809dc62 0d4f
+    ldr r7, gp1lp_base_9dc98                 @ 0809dc62 0d4f
     adds r7,#0x30    @ 0809dc64 3037
 LAB_0809dc66:
     ldr r4,[r6,#0x0]                         @ 0809dc66 3468
     lsls r0,r4,#0x2    @ 0809dc68 a000
     adds r0,r0,r4    @ 0809dc6a 0019
     lsls r0,r0,#0x2    @ 0809dc6c 8000
-    ldr r1, DAT_0809dca4                     @ 0809dc6e 0d49
+    ldr r1, player_stride_9dca4              @ 0809dc6e 0d49
     muls r1,r3    @ 0809dc70 5943
     adds r0,r0,r1    @ 0809dc72 4018
     adds r2,r0,r7    @ 0809dc74 c219
@@ -718,7 +718,7 @@ LAB_0809dc66:
     ldrh r0,[r2,#0x8]                        @ 0809dc80 1089
     cmp r0,#0x0                              @ 0809dc82 0028
     beq LAB_0809dd08                         @ 0809dc84 40d0
-    ldr r0, DAT_0809dca8                     @ 0809dc86 0848
+    ldr r0, swords_cid_9dca8                 @ 0809dc86 0848
     cmp r1,r0                                @ 0809dc88 8142
     beq LAB_0809dcac                         @ 0809dc8a 0fd0
     movs r0,#0xa0    @ 0809dc8c a020
@@ -727,16 +727,16 @@ LAB_0809dc66:
     beq LAB_0809dcda                         @ 0809dc92 22d0
     b LAB_0809dd08                           @ 0809dc94 38e0
     .zero  0x2
-PTR_gP1LifePoints_0809dc98:
-    .word  gP1LifePoints                  @ 0809dc98 e0c40102
-DAT_0809dc9c:
-    .word  0x00001d1c                     @ 0809dc9c 1c1d0000
-DAT_0809dca0:
-    .word  0x00001d24                     @ 0809dca0 241d0000
-DAT_0809dca4:
-    .word  0x00000868                     @ 0809dca4 68080000
-DAT_0809dca8:
-    .word  0x00001102                     @ 0809dca8 02110000
+gp1lp_base_9dc98:
+    .word  gP1LifePoints                  @ 0809dc98 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9dc9c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809dc9c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+scan_cursor_off_9dca0:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809dca0 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
+player_stride_9dca4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809dca4 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+swords_cid_9dca8:
+    .word  SWORDS_OF_REVEALING_LIGHT_CID  @ 0809dca8 02110000  CID comparison in the opposite-player slot5..9 scan.
 LAB_0809dcac:
     adds r0,r5,#0x0    @ 0809dcac 281c
     adds r1,r4,#0x0    @ 0809dcae 211c
@@ -790,17 +790,17 @@ LAB_0809dd08:
     cmp r0,#0x9                              @ 0809dd0e 0928
     bls LAB_0809dc66                         @ 0809dd10 a9d9
 LAB_0809dd12:
-    ldr r4, PTR_gP1LifePoints_0809dd20       @ 0809dd12 034c
-    ldr r0, DAT_0809dd24                     @ 0809dd14 0348
+    ldr r4, gp1lp_base_9dd20                 @ 0809dd12 034c
+    ldr r0, phase_off_9dd24                  @ 0809dd14 0348
     adds r1,r4,r0    @ 0809dd16 2118
     ldr r0,[r1,#0x0]                         @ 0809dd18 0868
     adds r0,#0x1    @ 0809dd1a 0130
     b LAB_0809deda                           @ 0809dd1c dde0
     .zero  0x2
-PTR_gP1LifePoints_0809dd20:
-    .word  gP1LifePoints                  @ 0809dd20 e0c40102
-DAT_0809dd24:
-    .word  0x00001d1c                     @ 0809dd24 1c1d0000
+gp1lp_base_9dd20:
+    .word  gP1LifePoints                  @ 0809dd20 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9dd24:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809dd24 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809d9f2__caseD_5:
     movs r4,#0x0    @ 0809dd28 0024
 LAB_0809dd2a:
@@ -823,18 +823,18 @@ LAB_0809dd2a:
     orrs r2,r0    @ 0809dd4a 0243
     str r2,[sp,#0x114]                       @ 0809dd4c 4592
 LAB_0809dd4e:
-    ldr r0, DAT_0809dee0                     @ 0809dd4e 6448
+    ldr r0, player_stride_9dee0              @ 0809dd4e 6448
     ldr r3,[sp,#0x10c]                       @ 0809dd50 439b
     muls r0,r3    @ 0809dd52 5843
     ldr r1,[sp,#0x11c]                       @ 0809dd54 4799
     adds r4,r1,r0    @ 0809dd56 0c18
-    ldr r2, DAT_0809dee4                     @ 0809dd58 624a
+    ldr r2, field_slots_base_9dee4           @ 0809dd58 624a
     adds r5,r4,r2    @ 0809dd5a a518
     ldr r0,[r5,#0x0]                         @ 0809dd5c 2868
     lsls r0,r0,#0x13    @ 0809dd5e c004
     lsrs r0,r0,#0x13    @ 0809dd60 c00c
     .hword 0x4680    @ 0809dd62 8046
-    ldr r0, DAT_0809dee8                     @ 0809dd64 6048
+    ldr r0, ekibyo_cid_9dee8                 @ 0809dd64 6048
     cmp r8,r0                                @ 0809dd66 8045
     bne LAB_0809de1a                         @ 0809dd68 57d1
     ldrh r0,[r5,#0x8]                        @ 0809dd6a 2889
@@ -858,7 +858,7 @@ LAB_0809dd4e:
     ldr r0,[sp,#0x108]                       @ 0809dd92 4298
     cmp r0,#0x0                              @ 0809dd94 0028
     bne LAB_0809de1a                         @ 0809dd96 40d1
-    ldr r1, DAT_0809deec                     @ 0809dd98 5449
+    ldr r1, field_slot_state_base_9deec      @ 0809dd98 5449
     adds r0,r4,r1    @ 0809dd9a 6018
     ldr r0,[r0,#0x0]                         @ 0809dd9c 0068
     lsrs r0,r0,#0x5    @ 0809dd9e 4009
@@ -884,7 +884,7 @@ LAB_0809dd4e:
     adds r0,r6,#0x0    @ 0809ddc8 301c
     .hword 0x4649    @ 0809ddca 4946
     bl enqueue_sprite_attr_for_zone_card_id_lookup @ 0809ddcc aaf752fc
-    ldr r7, DAT_0809def0                     @ 0809ddd0 474f
+    ldr r7, low13_clear_mask_9def0           @ 0809ddd0 474f
     adds r0,r7,#0x0    @ 0809ddd2 381c
     ldrh r1,[r5,#0x0]                        @ 0809ddd4 2988
     ands r0,r1    @ 0809ddd6 0840
@@ -933,19 +933,19 @@ LAB_0809de1a:
     bgt LAB_0809de32                         @ 0809de2e 00dc
     b LAB_0809dd2a                           @ 0809de30 7be7
 LAB_0809de32:
-    ldr r1, PTR_gP1LifePoints_0809def4       @ 0809de32 3049
-    ldr r3, DAT_0809def8                     @ 0809de34 304b
+    ldr r1, gp1lp_base_9def4                 @ 0809de32 3049
+    ldr r3, phase_off_9def8                  @ 0809de34 304b
     adds r2,r1,r3    @ 0809de36 ca18
     ldr r0,[r2,#0x0]                         @ 0809de38 1068
     adds r0,#0x1    @ 0809de3a 0130
     str r0,[r2,#0x0]                         @ 0809de3c 1060
-    ldr r4, DAT_0809defc                     @ 0809de3e 2f4c
+    ldr r4, scan_cursor_off_9defc            @ 0809de3e 2f4c
     adds r2,r1,r4    @ 0809de40 0a19
     movs r0,#0x0    @ 0809de42 0020
     str r0,[r2,#0x0]                         @ 0809de44 1060
 switchD_0809d9f2__caseD_6:
-    ldr r0, PTR_gP1LifePoints_0809def4       @ 0809de46 2b48
-    ldr r2, DAT_0809defc                     @ 0809de48 2c4a
+    ldr r0, gp1lp_base_9def4                 @ 0809de46 2b48
+    ldr r2, scan_cursor_off_9defc            @ 0809de48 2c4a
     adds r1,r0,r2    @ 0809de4a 8118
     ldr r0,[r1,#0x0]                         @ 0809de4c 0868
     cmp r0,#0x4                              @ 0809de4e 0428
@@ -954,10 +954,10 @@ switchD_0809d9f2__caseD_6:
     movs r0,#0x1    @ 0809de54 0120
     ldr r3,[sp,#0x104]                       @ 0809de56 419b
     ands r0,r3    @ 0809de58 1840
-    ldr r4, PTR_gP1LifePoints_0809def4       @ 0809de5a 264c
+    ldr r4, gp1lp_base_9def4                 @ 0809de5a 264c
     adds r4,#0x30    @ 0809de5c 3034
     .hword 0x46a0    @ 0809de5e a046
-    ldr r1, DAT_0809dee0                     @ 0809de60 1f49
+    ldr r1, player_stride_9dee0              @ 0809de60 1f49
     adds r7,r0,#0x0    @ 0809de62 071c
     muls r7,r1    @ 0809de64 4f43
 LAB_0809de66:
@@ -981,7 +981,7 @@ LAB_0809de66:
     ldr r1,[sp,#0x104]                       @ 0809de8a 4199
     cmp r1,#0x0                              @ 0809de8c 0029
     beq LAB_0809de92                         @ 0809de8e 00d0
-    ldr r0, DAT_0809df00                     @ 0809de90 1b48
+    ldr r0, sprite_p2_46_9df00               @ 0809de90 1b48
 LAB_0809de92:
     lsls r1,r5,#0x10    @ 0809de92 2904
     lsrs r1,r1,#0x10    @ 0809de94 090c
@@ -1003,13 +1003,13 @@ LAB_0809deae:
     cmp r0,#0x4                              @ 0809deb4 0428
     bls LAB_0809de66                         @ 0809deb6 d6d9
 LAB_0809deb8:
-    ldr r3, PTR_gP1LifePoints_0809def4       @ 0809deb8 0e4b
-    ldr r4, DAT_0809def8                     @ 0809deba 0f4c
+    ldr r3, gp1lp_base_9def4                 @ 0809deb8 0e4b
+    ldr r4, phase_off_9def8                  @ 0809deba 0f4c
     adds r1,r3,r4    @ 0809debc 1919
     ldr r0,[r1,#0x0]                         @ 0809debe 0868
     adds r0,#0x1    @ 0809dec0 0130
     str r0,[r1,#0x0]                         @ 0809dec2 0860
-    ldr r0, DAT_0809defc                     @ 0809dec4 0d48
+    ldr r0, scan_cursor_off_9defc            @ 0809dec4 0d48
     adds r1,r3,r0    @ 0809dec6 1918
     movs r0,#0x0    @ 0809dec8 0020
     str r0,[r1,#0x0]                         @ 0809deca 0860
@@ -1017,41 +1017,41 @@ switchD_0809d9f2__caseD_7:
     ldr r1,[sp,#0x108]                       @ 0809decc 4299
     cmp r1,#0x0                              @ 0809dece 0029
     beq LAB_0809df04                         @ 0809ded0 18d0
-    ldr r2, PTR_gP1LifePoints_0809def4       @ 0809ded2 084a
-    ldr r3, DAT_0809def8                     @ 0809ded4 084b
+    ldr r2, gp1lp_base_9def4                 @ 0809ded2 084a
+    ldr r3, phase_off_9def8                  @ 0809ded4 084b
     adds r1,r2,r3    @ 0809ded6 d118
     movs r0,#0x14    @ 0809ded8 1420
 LAB_0809deda:
     str r0,[r1,#0x0]                         @ 0809deda 0860
     b LAB_0809d9c6                           @ 0809dedc 73e5
     .zero  0x2
-DAT_0809dee0:
-    .word  0x00000868                     @ 0809dee0 68080000
-DAT_0809dee4:
-    .word  0x0201c510                     @ 0809dee4 10c50102
-DAT_0809dee8:
-    .word  0x0000149d                     @ 0809dee8 9d140000
-DAT_0809deec:
-    .word  0x0201c520                     @ 0809deec 20c50102
-DAT_0809def0:
-    .word  0xffffe000                     @ 0809def0 00e0ffff
-PTR_gP1LifePoints_0809def4:
-    .word  gP1LifePoints                  @ 0809def4 e0c40102
-DAT_0809def8:
-    .word  0x00001d1c                     @ 0809def8 1c1d0000
-DAT_0809defc:
-    .word  0x00001d24                     @ 0809defc 241d0000
-DAT_0809df00:
-    .word  0x00008046                     @ 0809df00 46800000
+player_stride_9dee0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809dee0 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+field_slots_base_9dee4:
+    .word  gDuelFieldSlots                @ 0809dee4 10c50102  Field-slot array base; consumers add (player&1)*PLAYER_BLOCK_STRIDE and 20*slot_index.
+ekibyo_cid_9dee8:
+    .word  EKIBYO_DRAKMORD_CID            @ 0809dee8 9d140000  CID matched in field slots5..9 before pair lookup and eligibility checks.
+field_slot_state_base_9deec:
+    .word  gDuelFieldSlotState            @ 0809deec 20c50102  Field-slot state-word base, gDuelFieldSlots+0x10; consumer tests bit5 with the same player/slot displacement.
+low13_clear_mask_9def0:
+    .word  OAM_ATTR2_TILE_CLEAR           @ 0809def0 00e0ffff  AND mask clearing low13 CID bits of a slot halfword before the eligibility call; the saved CID is restored afterward.
+gp1lp_base_9def4:
+    .word  gP1LifePoints                  @ 0809def4 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9def8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809def8 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+scan_cursor_off_9defc:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809defc 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
+sprite_p2_46_9df00:
+    .word  OAM_EQUIP_SPRITE_P2_46         @ 0809df00 46800000  Nonzero-player sprite selector; the zero-player branch uses0x46.
 LAB_0809df04:
-    ldr r4, PTR_gP1LifePoints_0809df80       @ 0809df04 1e4c
-    ldr r0, DAT_0809df84                     @ 0809df06 1f48
+    ldr r4, gp1lp_base_9df80                 @ 0809df04 1e4c
+    ldr r0, phase_off_9df84                  @ 0809df06 1f48
     adds r1,r4,r0    @ 0809df08 2118
     movs r0,#0xa    @ 0809df0a 0a20
     str r0,[r1,#0x0]                         @ 0809df0c 0860
 switchD_0809d9f2__caseD_a:
-    ldr r2, PTR_gP1LifePoints_0809df80       @ 0809df0e 1c4a
-    ldr r3, DAT_0809df84                     @ 0809df10 1c4b
+    ldr r2, gp1lp_base_9df80                 @ 0809df0e 1c4a
+    ldr r3, phase_off_9df84                  @ 0809df10 1c4b
     adds r1,r2,r3    @ 0809df12 d118
     ldr r0,[r1,#0x0]                         @ 0809df14 0868
     adds r0,#0x1    @ 0809df16 0130
@@ -1065,17 +1065,17 @@ switchD_0809d9f2__caseD_a:
     adds r0,r2,r3    @ 0809df26 d018
     str r1,[r0,#0x0]                         @ 0809df28 0160
 switchD_0809d9f2__caseD_b:
-    ldr r4, PTR_gP1LifePoints_0809df80       @ 0809df2a 154c
+    ldr r4, gp1lp_base_9df80                 @ 0809df2a 154c
     movs r0,#0xe9    @ 0809df2c e920
     lsls r0,r0,#0x5    @ 0809df2e 4001
     adds r1,r4,r0    @ 0809df30 2118
     ldr r0,[r1,#0x0]                         @ 0809df32 0868
     cmp r0,#0x21                             @ 0809df34 2128
     bhi LAB_0809df64                         @ 0809df36 15d8
-    ldr r6, DAT_0809df88                     @ 0809df38 134e
+    ldr r6, phase11_callbacks_9df88          @ 0809df38 134e
     adds r4,r1,#0x0    @ 0809df3a 0c1c
-    ldr r1, PTR_gP1LifePoints_0809df80       @ 0809df3c 1049
-    ldr r2, DAT_0809df8c                     @ 0809df3e 134a
+    ldr r1, gp1lp_base_9df80                 @ 0809df3c 1049
+    ldr r2, scan_cursor_off_9df8c            @ 0809df3e 134a
     adds r5,r1,r2    @ 0809df40 8d18
 LAB_0809df42:
     ldr r0,[r4,#0x0]                         @ 0809df42 2068
@@ -1096,8 +1096,8 @@ LAB_0809df56:
     cmp r0,#0x21                             @ 0809df60 2128
     bls LAB_0809df42                         @ 0809df62 eed9
 LAB_0809df64:
-    ldr r3, PTR_gP1LifePoints_0809df80       @ 0809df64 064b
-    ldr r4, DAT_0809df84                     @ 0809df66 074c
+    ldr r3, gp1lp_base_9df80                 @ 0809df64 064b
+    ldr r4, phase_off_9df84                  @ 0809df66 074c
     adds r1,r3,r4    @ 0809df68 1919
     ldr r0,[r1,#0x0]                         @ 0809df6a 0868
     adds r0,#0x1    @ 0809df6c 0130
@@ -1107,26 +1107,26 @@ LAB_0809df64:
     adds r0,r3,r1    @ 0809df74 5818
     movs r1,#0x0    @ 0809df76 0021
     str r1,[r0,#0x0]                         @ 0809df78 0160
-    ldr r2, DAT_0809df8c                     @ 0809df7a 044a
+    ldr r2, scan_cursor_off_9df8c            @ 0809df7a 044a
     adds r0,r3,r2    @ 0809df7c 9818
     b LAB_0809e03a                           @ 0809df7e 5ce0
-PTR_gP1LifePoints_0809df80:
-    .word  gP1LifePoints                  @ 0809df80 e0c40102
-DAT_0809df84:
-    .word  0x00001d1c                     @ 0809df84 1c1d0000
-DAT_0809df88:
-    .word  0x09e476b0                     @ 0809df88 b076e409
-DAT_0809df8c:
-    .word  0x00001d24                     @ 0809df8c 241d0000
+gp1lp_base_9df80:
+    .word  gP1LifePoints                  @ 0809df80 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9df84:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809df84 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+phase11_callbacks_9df88:
+    .word  equip_activation_phase11_callbacks @ 0809df88 b076e409  34 Thumb callbacks, indexed by the persistent phase11 cursor; a callback returning0 yields for this tick.
+scan_cursor_off_9df8c:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809df8c 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
 switchD_0809d9f2__caseD_c:
-    ldr r3, PTR_gP1LifePoints_0809dfd8       @ 0809df90 114b
-    ldr r4, DAT_0809dfdc                     @ 0809df92 124c
+    ldr r3, gp1lp_base_9dfd8                 @ 0809df90 114b
+    ldr r4, scan_cursor_off_9dfdc            @ 0809df92 124c
     adds r1,r3,r4    @ 0809df94 1919
     movs r0,#0x0    @ 0809df96 0020
     str r0,[r1,#0x0]                         @ 0809df98 0860
     movs r4,#0x0    @ 0809df9a 0024
     adds r7,r1,#0x0    @ 0809df9c 0f1c
-    ldr r5, DAT_0809dfe0                     @ 0809df9e 104d
+    ldr r5, phase12_callbacks_9dfe0          @ 0809df9e 104d
     movs r6,#0x0    @ 0809dfa0 0026
 LAB_0809dfa2:
     ldr r1,[r5,#0x0]                         @ 0809dfa2 2968
@@ -1141,12 +1141,12 @@ LAB_0809dfb0:
     adds r4,#0x1    @ 0809dfb4 0134
     cmp r4,#0x18                             @ 0809dfb6 182c
     bls LAB_0809dfa2                         @ 0809dfb8 f3d9
-    ldr r0, PTR_gP1LifePoints_0809dfd8       @ 0809dfba 0748
-    ldr r2, DAT_0809dfe4                     @ 0809dfbc 094a
+    ldr r0, gp1lp_base_9dfd8                 @ 0809dfba 0748
+    ldr r2, phase_off_9dfe4                  @ 0809dfbc 094a
     adds r1,r0,r2    @ 0809dfbe 8118
     movs r0,#0x14    @ 0809dfc0 1420
     str r0,[r1,#0x0]                         @ 0809dfc2 0860
-    ldr r3, PTR_gP1LifePoints_0809dfd8       @ 0809dfc4 044b
+    ldr r3, gp1lp_base_9dfd8                 @ 0809dfc4 044b
     movs r4,#0xe9    @ 0809dfc6 e924
     lsls r4,r4,#0x5    @ 0809dfc8 6401
     adds r0,r3,r4    @ 0809dfca 1819
@@ -1156,25 +1156,25 @@ LAB_0809dfb0:
     adds r0,r3,r2    @ 0809dfd2 9818
     b LAB_0809e03a                           @ 0809dfd4 31e0
     .zero  0x2
-PTR_gP1LifePoints_0809dfd8:
-    .word  gP1LifePoints                  @ 0809dfd8 e0c40102
-DAT_0809dfdc:
-    .word  0x00001d24                     @ 0809dfdc 241d0000
-DAT_0809dfe0:
-    .word  0x09e47738                     @ 0809dfe0 3877e409
-DAT_0809dfe4:
-    .word  0x00001d1c                     @ 0809dfe4 1c1d0000
+gp1lp_base_9dfd8:
+    .word  gP1LifePoints                  @ 0809dfd8 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+scan_cursor_off_9dfdc:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809dfdc 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
+phase12_callbacks_9dfe0:
+    .word  equip_activation_phase12_callbacks @ 0809dfe0 3877e409  25 Thumb callbacks; phase12 restarts the local table index at0 on each tick and yields on callback result0.
+phase_off_9dfe4:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809dfe4 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809d9f2__caseD_14:
-    ldr r3, PTR_gP1LifePoints_0809e040       @ 0809dfe8 154b
+    ldr r3, gp1lp_base_9e040                 @ 0809dfe8 154b
     movs r4,#0xe9    @ 0809dfea e924
     lsls r4,r4,#0x5    @ 0809dfec 6401
     adds r1,r3,r4    @ 0809dfee 1919
     ldr r0,[r1,#0x0]                         @ 0809dff0 0868
     cmp r0,#0x3                              @ 0809dff2 0328
     bhi LAB_0809e020                         @ 0809dff4 14d8
-    ldr r6, DAT_0809e044                     @ 0809dff6 134e
+    ldr r6, phase20_callbacks_9e044          @ 0809dff6 134e
     adds r4,r1,#0x0    @ 0809dff8 0c1c
-    ldr r0, DAT_0809e048                     @ 0809dffa 1348
+    ldr r0, scan_cursor_off_9e048            @ 0809dffa 1348
     adds r5,r3,r0    @ 0809dffc 1d18
 LAB_0809dffe:
     ldr r0,[r4,#0x0]                         @ 0809dffe 2068
@@ -1195,8 +1195,8 @@ LAB_0809e012:
     cmp r0,#0x3                              @ 0809e01c 0328
     bls LAB_0809dffe                         @ 0809e01e eed9
 LAB_0809e020:
-    ldr r2, PTR_gP1LifePoints_0809e040       @ 0809e020 074a
-    ldr r3, DAT_0809e04c                     @ 0809e022 0a4b
+    ldr r2, gp1lp_base_9e040                 @ 0809e020 074a
+    ldr r3, phase_off_9e04c                  @ 0809e022 0a4b
     adds r1,r2,r3    @ 0809e024 d118
     ldr r0,[r1,#0x0]                         @ 0809e026 0868
     adds r0,#0x1    @ 0809e028 0130
@@ -1212,14 +1212,14 @@ LAB_0809e03a:
     str r1,[r0,#0x0]                         @ 0809e03a 0160
     b LAB_0809d9c6                           @ 0809e03c c3e4
     .zero  0x2
-PTR_gP1LifePoints_0809e040:
-    .word  gP1LifePoints                  @ 0809e040 e0c40102
-DAT_0809e044:
-    .word  0x09e4779c                     @ 0809e044 9c77e409
-DAT_0809e048:
-    .word  0x00001d24                     @ 0809e048 241d0000
-DAT_0809e04c:
-    .word  0x00001d1c                     @ 0809e04c 1c1d0000
+gp1lp_base_9e040:
+    .word  gP1LifePoints                  @ 0809e040 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase20_callbacks_9e044:
+    .word  equip_activation_phase20_callbacks @ 0809e044 9c77e409  4 Thumb callbacks, indexed by the persistent phase20 cursor; a callback returning0 yields for this tick.
+scan_cursor_off_9e048:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809e048 241d0000  Byte offset from gP1LifePoints to the u32 slot/callback scan cursor.
+phase_off_9e04c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e04c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e050:
     ldr r0,[sp,#0x104]                       @ 0809e050 4198
     adds r1,r5,#0x0    @ 0809e052 291c
@@ -1244,15 +1244,14 @@ LAB_0809e066:
     bx r1                                    @ 0809e074 0847
     .zero  0x2
 
-@ Called exclusively by FUN_08094c60 (depth=5, indeg=1). push {r4,r5,r6,lr}; reads gP1LifePoints+0x1ce8 -> player_raw (r4=player_id bit0..); reads gP1LifePoints+0x1d1c -> r0=display_state_code [0..2+]. Three-way dispatch: case 0 -> per r4 (player_id) selects attr_type (0x8002 or 0x2, movs r0,#0x2/ldr DAT=0x8002), calls enqueue_sprite_attr_record(attr_type, 0, 0, 0); checks [0x0201e2a0+r4*4+8] if ==1 then calls zero_fill_by_halfword(0x0201afe0, len=0xe6*2=0x1cc); [gP1LifePoints+0x1d1c]+1 advance state; return 0. case 1 -> check_value_in_slot_chain(r4, 0xb, 0x1356) if present set_player_state_bit_with_sprite_update(r4, 0x17, 1); reads [gP1LifePoints+0x1d04]; compares [gP1LifePoints+0x1cec] vs [gP1LifePoints+0x1cf0]+1 -> enqueue_sprite_attr_record(0xb or 0x800b, 1, 0, 0); also compares [gP1LifePoints+0x1cf0]+4 -> enqueue_sprite_attr_record(0xb or 0x800b, 2, 0, 0). case >=2 -> return 1.
-@ Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, display_state_offset=0x1d1c, player_id_offset=0x1ce8, icid=0x1356 (slot chain check), bit_flag_offset=0x17, ATTR_TYPE_A=0x8002, ATTR_TYPE_B=0x2, ZERO_FILL_BASE=0x0201afe0, ZERO_FILL_LEN=0xe6*2, ROM_TABLE=0x0201e2a0.
+@ No inputs. Read player at gP1LifePoints+0x1ce8 and CARD_PLAY_PHASE_CTR_OFF. Phase0 enqueues type2/0x8002, clears0x1cc bytes at gEquipLpScoreBase if the player context word is1, advances phase and returns0. Phase1 tests GAMBLE_CID in chain slot11 and sets player flag0x17 on a hit. It submits timer notices at backup+1 when the +0x1d04 gate is0, and at backup+4 unconditionally. Phase1 and all other phases return1.
 dispatch_field_spell_phase_by_display_state:
     push {r4,r5,r6,lr}                       @ 0809e078 70b5
-    ldr r5, PTR_gP1LifePoints_0809e094       @ 0809e07a 064d
-    ldr r1, DAT_0809e098                     @ 0809e07c 0649
+    ldr r5, gp1lp_base_9e094                 @ 0809e07a 064d
+    ldr r1, player_off_9e098                 @ 0809e07c 0649
     adds r0,r5,r1    @ 0809e07e 6818
     ldr r4,[r0,#0x0]                         @ 0809e080 0468
-    ldr r2, DAT_0809e09c                     @ 0809e082 064a
+    ldr r2, phase_off_9e09c                  @ 0809e082 064a
     adds r6,r5,r2    @ 0809e084 ae18
     ldr r0,[r6,#0x0]                         @ 0809e086 3068
     cmp r0,#0x0                              @ 0809e088 0028
@@ -1261,30 +1260,30 @@ dispatch_field_spell_phase_by_display_state:
     beq LAB_0809e0e0                         @ 0809e08e 27d0
     b LAB_0809e14c                           @ 0809e090 5ce0
     .zero  0x2
-PTR_gP1LifePoints_0809e094:
-    .word  gP1LifePoints                  @ 0809e094 e0c40102
-DAT_0809e098:
-    .word  0x00001ce8                     @ 0809e098 e81c0000
-DAT_0809e09c:
-    .word  0x00001d1c                     @ 0809e09c 1c1d0000
+gp1lp_base_9e094:
+    .word  gP1LifePoints                  @ 0809e094 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+player_off_9e098:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809e098 e81c0000  Byte offset from gP1LifePoints to the player word used by this dispatcher.
+phase_off_9e09c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e09c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e0a0:
     movs r0,#0x2    @ 0809e0a0 0220
     cmp r4,#0x0                              @ 0809e0a2 002c
     beq LAB_0809e0a8                         @ 0809e0a4 00d0
-    ldr r0, DAT_0809e0d4                     @ 0809e0a6 0b48
+    ldr r0, sprite_p2_02_9e0d4               @ 0809e0a6 0b48
 LAB_0809e0a8:
     movs r1,#0x0    @ 0809e0a8 0021
     movs r2,#0x0    @ 0809e0aa 0022
     movs r3,#0x0    @ 0809e0ac 0023
     bl enqueue_sprite_attr_record            @ 0809e0ae 9df73dfe
-    ldr r0, DAT_0809e0d8                     @ 0809e0b2 0948
+    ldr r0, duel_card_ctx_base_9e0d8         @ 0809e0b2 0948
     lsls r1,r4,#0x2    @ 0809e0b4 a100
     adds r0,#0x8    @ 0809e0b6 0830
     adds r1,r1,r0    @ 0809e0b8 0918
     ldr r0,[r1,#0x0]                         @ 0809e0ba 0868
     cmp r0,#0x1                              @ 0809e0bc 0128
     bne LAB_0809e0ca                         @ 0809e0be 04d1
-    ldr r0, DAT_0809e0dc                     @ 0809e0c0 0648
+    ldr r0, lp_score_base_9e0dc              @ 0809e0c0 0648
     movs r1,#0xe6    @ 0809e0c2 e621
     lsls r1,r1,#0x1    @ 0809e0c4 4900
     bl zero_fill_by_halfword                 @ 0809e0c6 56f0d5fe
@@ -1294,14 +1293,14 @@ LAB_0809e0ca:
     str r0,[r6,#0x0]                         @ 0809e0ce 3060
     movs r0,#0x0    @ 0809e0d0 0020
     b LAB_0809e14e                           @ 0809e0d2 3ce0
-DAT_0809e0d4:
-    .word  0x00008002                     @ 0809e0d4 02800000
-DAT_0809e0d8:
-    .word  0x0201e2a0                     @ 0809e0d8 a0e20102
-DAT_0809e0dc:
-    .word  0x0201afe0                     @ 0809e0dc e0af0102
+sprite_p2_02_9e0d4:
+    .word  OAM_EQUIP_SPRITE_P2_02         @ 0809e0d4 02800000  Nonzero-player sprite selector; the zero-player branch uses2. Argument0 of enqueue_sprite_attr_record.
+duel_card_ctx_base_9e0d8:
+    .word  gDuelCardCtxBase               @ 0809e0d8 a0e20102  Duel card context base; reads word[base+8+4*player] to select the display/AI route.
+lp_score_base_9e0dc:
+    .word  gEquipLpScoreBase              @ 0809e0dc e0af0102  Base of the 0x1cc-byte zero-fill when the selected player context word equals1.
 LAB_0809e0e0:
-    ldr r2, DAT_0809e154                     @ 0809e0e0 1c4a
+    ldr r2, gamble_cid_9e154                 @ 0809e0e0 1c4a
     adds r0,r4,#0x0    @ 0809e0e2 201c
     movs r1,#0xb    @ 0809e0e4 0b21
     bl check_value_in_slot_chain             @ 0809e0e6 91f7d3fd
@@ -1312,12 +1311,12 @@ LAB_0809e0e0:
     movs r2,#0x1    @ 0809e0f2 0122
     bl set_player_state_bit_with_sprite_update @ 0809e0f4 acf710fc
 LAB_0809e0f8:
-    ldr r1, DAT_0809e158                     @ 0809e0f8 1749
+    ldr r1, timer_notice_gate_off_9e158      @ 0809e0f8 1749
     adds r0,r5,r1    @ 0809e0fa 6818
     ldr r0,[r0,#0x0]                         @ 0809e0fc 0068
     cmp r0,#0x0                              @ 0809e0fe 0028
     bne LAB_0809e126                         @ 0809e100 11d1
-    ldr r2, DAT_0809e15c                     @ 0809e102 164a
+    ldr r2, timer_off_9e15c                  @ 0809e102 164a
     adds r1,r5,r2    @ 0809e104 a918
     adds r2,#0x4    @ 0809e106 0432
     adds r0,r5,r2    @ 0809e108 a818
@@ -1329,15 +1328,15 @@ LAB_0809e0f8:
     movs r0,#0xb    @ 0809e114 0b20
     cmp r4,#0x0                              @ 0809e116 002c
     beq LAB_0809e11c                         @ 0809e118 00d0
-    ldr r0, DAT_0809e160                     @ 0809e11a 1148
+    ldr r0, sprite_phase_p2_9e160            @ 0809e11a 1148
 LAB_0809e11c:
     movs r1,#0x1    @ 0809e11c 0121
     movs r2,#0x0    @ 0809e11e 0022
     movs r3,#0x0    @ 0809e120 0023
     bl enqueue_sprite_attr_record            @ 0809e122 9df703fe
 LAB_0809e126:
-    ldr r0, PTR_gP1LifePoints_0809e164       @ 0809e126 0f48
-    ldr r2, DAT_0809e15c                     @ 0809e128 0c4a
+    ldr r0, gp1lp_base_9e164                 @ 0809e126 0f48
+    ldr r2, timer_off_9e15c                  @ 0809e128 0c4a
     adds r1,r0,r2    @ 0809e12a 8118
     adds r2,#0x4    @ 0809e12c 0432
     adds r0,r0,r2    @ 0809e12e 8018
@@ -1349,7 +1348,7 @@ LAB_0809e126:
     movs r0,#0xb    @ 0809e13a 0b20
     cmp r4,#0x0                              @ 0809e13c 002c
     beq LAB_0809e142                         @ 0809e13e 00d0
-    ldr r0, DAT_0809e160                     @ 0809e140 0748
+    ldr r0, sprite_phase_p2_9e160            @ 0809e140 0748
 LAB_0809e142:
     movs r1,#0x2    @ 0809e142 0221
     movs r2,#0x0    @ 0809e144 0022
@@ -1361,28 +1360,28 @@ LAB_0809e14e:
     pop {r4,r5,r6}                           @ 0809e14e 70bc
     pop {r1}                                 @ 0809e150 02bc
     bx r1                                    @ 0809e152 0847
-DAT_0809e154:
-    .word  0x00001356                     @ 0809e154 56130000
-DAT_0809e158:
-    .word  0x00001d04                     @ 0809e158 041d0000
-DAT_0809e15c:
-    .word  0x00001cec                     @ 0809e15c ec1c0000
-DAT_0809e160:
-    .word  0x0000800b                     @ 0809e160 0b800000
-PTR_gP1LifePoints_0809e164:
-    .word  gP1LifePoints                  @ 0809e164 e0c40102
+gamble_cid_9e154:
+    .word  GAMBLE_CID                     @ 0809e154 56130000  CID passed to check_value_in_slot_chain(player,11,CID).
+timer_notice_gate_off_9e158:
+    .word  PUZZLE_READY_FLAG_OFF          @ 0809e158 041d0000  Byte offset from gP1LifePoints; a nonzero word suppresses only the backup+1 timer notice.
+timer_off_9e15c:
+    .word  P1LP_TIMER_OFF                 @ 0809e15c ec1c0000  Byte offset from gP1LifePoints to the u32 timer; offset+4 addresses its backup field.
+sprite_phase_p2_9e160:
+    .word  SPRITE_ATTR_DUEL_PHASE_P2      @ 0809e160 0b800000  Nonzero-player timer-notice sprite selector; the zero-player branch uses0xb.
+gp1lp_base_9e164:
+    .word  gP1LifePoints                  @ 0809e164 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
 
-@ Indirectly called by 0x08094c60 (duel_field top-level driver, indeg=1) via function pointer table at 0x09e5aac0. No APCS parameters; player_id read from gP1LifePoints+0x1ce8 -> r5. Calls check_value_in_slot_chain(player_id, slot=0xb, icid=0x13b1) to detect target field card node; reads gP1LifePoints+0x011c action-available bit23 (-> r6) and current phase state gP1LifePoints+0x1d1c (max 0x1e). Dispatches on phase [0..0x1e] via 30-way switch: case 1 checks state_id==1 then calls tick_duel_field_ai_state_machine; case 2 checks activation condition then calls tick_duel_field_ai_state_machine; case 3 handles effect-lock state writes. Writes result to gP1LifePoints+0x1d1c to advance phase. Returns: r0=u32 bool (0=phase still waiting, 1=phase advance complete). Side effects: [gP1LifePoints+0x1d1c] written (phase state); indirect writes via tick_duel_field_ai_state_machine. Constants: phase_table=0x09e5aac0 (function pointer table, this function is one entry), slot_chain_slot=0xb, slot_chain_icid=0x13b1 (5041, field card icid), phase_field_offset=0x1d1c, action_avail_bit=23, phase_max=0x1e (30 cases), phase_done_val=0x1e.
+@ No inputs. Read player, its flag bit23, TIMEATER_CID chain membership and CARD_PLAY_PHASE_CTR_OFF. Dispatch phase0..30 through31 even MOV-pc targets; unused/default entries return0. Routes display selection, AI progress and equip gates, updating phase and control/cancel fields. Phase30 scans five field slots for VWXYZ_DRAGON_CATAPULT_CANNON_CID in field phases2/4. Return1 on the flag/cancel exit or completed final path; pending work and ordinary phase changes return0.
 tick_duel_field_spell_activation_state:
     push {r4,r5,r6,r7,lr}                    @ 0809e168 f0b5
-    ldr r4, PTR_gP1LifePoints_0809e1ac       @ 0809e16a 104c
-    ldr r1, DAT_0809e1b0                     @ 0809e16c 1049
+    ldr r4, gp1lp_base_9e1ac                 @ 0809e16a 104c
+    ldr r1, player_off_9e1b0                 @ 0809e16c 1049
     adds r0,r4,r1    @ 0809e16e 6018
     ldr r5,[r0,#0x0]                         @ 0809e170 0568
     movs r2,#0x1    @ 0809e172 0122
     adds r0,r5,#0x0    @ 0809e174 281c
     ands r0,r2    @ 0809e176 1040
-    ldr r1, DAT_0809e1b4                     @ 0809e178 0e49
+    ldr r1, player_stride_9e1b4              @ 0809e178 0e49
     muls r0,r1    @ 0809e17a 4843
     movs r3,#0x8e    @ 0809e17c 8e23
     lsls r3,r3,#0x1    @ 0809e17e 5b00
@@ -1391,12 +1390,12 @@ tick_duel_field_spell_activation_state:
     ldr r0,[r0,#0x0]                         @ 0809e184 0068
     lsrs r6,r0,#0x17    @ 0809e186 c60d
     ands r6,r2    @ 0809e188 1640
-    ldr r2, DAT_0809e1b8                     @ 0809e18a 0b4a
+    ldr r2, timeater_cid_9e1b8               @ 0809e18a 0b4a
     adds r0,r5,#0x0    @ 0809e18c 281c
     movs r1,#0xb    @ 0809e18e 0b21
     bl check_value_in_slot_chain             @ 0809e190 91f77efd
     adds r7,r0,#0x0    @ 0809e194 071c
-    ldr r0, DAT_0809e1bc                     @ 0809e196 0948
+    ldr r0, phase_off_9e1bc                  @ 0809e196 0948
     adds r4,r4,r0    @ 0809e198 2418
     ldr r0,[r4,#0x0]                         @ 0809e19a 2068
     cmp r0,#0x1e                             @ 0809e19c 1e28
@@ -1404,23 +1403,23 @@ tick_duel_field_spell_activation_state:
     b switchD_0809e1aa__caseD_4              @ 0809e1a0 1ae2
 LAB_0809e1a2:
     lsls r0,r0,#0x2    @ 0809e1a2 8000
-    ldr r1, PTR_switchdataD_0809e1c4_0809e1c0 @ 0809e1a4 0649
+    ldr r1, field_phase_switch_9e1c0         @ 0809e1a4 0649
     adds r0,r0,r1    @ 0809e1a6 4018
     ldr r0,[r0,#0x0]                         @ 0809e1a8 0068
 switchD_0809e1aa__switchD:
     .hword 0x4687    @ 0809e1aa 8746
-PTR_gP1LifePoints_0809e1ac:
-    .word  gP1LifePoints                  @ 0809e1ac e0c40102
-DAT_0809e1b0:
-    .word  0x00001ce8                     @ 0809e1b0 e81c0000
-DAT_0809e1b4:
-    .word  0x00000868                     @ 0809e1b4 68080000
-DAT_0809e1b8:
-    .word  0x000013b1                     @ 0809e1b8 b1130000
-DAT_0809e1bc:
-    .word  0x00001d1c                     @ 0809e1bc 1c1d0000
-PTR_switchdataD_0809e1c4_0809e1c0:
-    .word  0x0809e1c4                     @ 0809e1c0 c4e10908
+gp1lp_base_9e1ac:
+    .word  gP1LifePoints                  @ 0809e1ac e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+player_off_9e1b0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809e1b0 e81c0000  Byte offset from gP1LifePoints to the player word used by this dispatcher.
+player_stride_9e1b4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e1b4 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+timeater_cid_9e1b8:
+    .word  TIMEATER_CID                   @ 0809e1b8 b1130000  CID passed to check_value_in_slot_chain(player,11,CID); saves its result as a phase gate.
+phase_off_9e1bc:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e1bc 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+field_phase_switch_9e1c0:
+    .word  switchD_0809e1aa__switchdataD_0809e1c4 @ 0809e1c0 c4e10908  31 even-address phase0..30 targets, dispatched by MOV pc,r0 while retaining Thumb state.
 switchD_0809e1aa__switchdataD_0809e1c4:
     .word  0x0809e240                     @ 0809e1c4 40e20908
     .word  0x0809e29c                     @ 0809e1c8 9ce20908
@@ -1454,8 +1453,8 @@ switchD_0809e1aa__switchdataD_0809e1c4:
     .word  0x0809e5d8                     @ 0809e238 d8e50908
     .word  0x0809e550                     @ 0809e23c 50e50908
 switchD_0809e1aa__caseD_0:
-    ldr r4, PTR_gP1LifePoints_0809e260       @ 0809e240 074c
-    ldr r2, DAT_0809e264                     @ 0809e242 084a
+    ldr r4, gp1lp_base_9e260                 @ 0809e240 074c
+    ldr r2, chain_cancel_off_9e264           @ 0809e242 084a
     adds r1,r4,r2    @ 0809e244 a118
     movs r0,#0x0    @ 0809e246 0020
     str r0,[r1,#0x0]                         @ 0809e248 0860
@@ -1465,47 +1464,47 @@ switchD_0809e1aa__caseD_0:
 LAB_0809e250:
     cmp r7,#0x0                              @ 0809e250 002f
     beq LAB_0809e26c                         @ 0809e252 0bd0
-    ldr r3, DAT_0809e268                     @ 0809e254 044b
+    ldr r3, phase_off_9e268                  @ 0809e254 044b
     adds r1,r4,r3    @ 0809e256 e118
     movs r0,#0xa    @ 0809e258 0a20
 LAB_0809e25a:
     str r0,[r1,#0x0]                         @ 0809e25a 0860
     b switchD_0809e1aa__caseD_4              @ 0809e25c bce1
     .zero  0x2
-PTR_gP1LifePoints_0809e260:
-    .word  gP1LifePoints                  @ 0809e260 e0c40102
-DAT_0809e264:
-    .word  0x00001d30                     @ 0809e264 301d0000
-DAT_0809e268:
-    .word  0x00001d1c                     @ 0809e268 1c1d0000
+gp1lp_base_9e260:
+    .word  gP1LifePoints                  @ 0809e260 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+chain_cancel_off_9e264:
+    .word  EQUIP_CHAIN_CANCEL_OFF         @ 0809e264 301d0000  Byte offset from gP1LifePoints to the chain-cancel word cleared or tested by these phases.
+phase_off_9e268:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e268 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e26c:
     movs r0,#0xe    @ 0809e26c 0e20
     cmp r5,#0x0                              @ 0809e26e 002d
     beq LAB_0809e274                         @ 0809e270 00d0
-    ldr r0, DAT_0809e290                     @ 0809e272 0748
+    ldr r0, sprite_p2_0e_9e290               @ 0809e272 0748
 LAB_0809e274:
     movs r1,#0x0    @ 0809e274 0021
     movs r2,#0x0    @ 0809e276 0022
     movs r3,#0x0    @ 0809e278 0023
     bl enqueue_sprite_attr_record            @ 0809e27a 9df757fd
-    ldr r1, DAT_0809e294                     @ 0809e27e 0549
+    ldr r1, eligib_state_off_9e294           @ 0809e27e 0549
     adds r0,r4,r1    @ 0809e280 6018
     str r7,[r0,#0x0]                         @ 0809e282 0760
-    ldr r2, DAT_0809e298                     @ 0809e284 044a
+    ldr r2, phase_off_9e298                  @ 0809e284 044a
     adds r1,r4,r2    @ 0809e286 a118
 LAB_0809e288:
     ldr r0,[r1,#0x0]                         @ 0809e288 0868
     adds r0,#0x1    @ 0809e28a 0130
     b LAB_0809e25a                           @ 0809e28c e5e7
     .zero  0x2
-DAT_0809e290:
-    .word  0x0000800e                     @ 0809e290 0e800000
-DAT_0809e294:
-    .word  0x00001d54                     @ 0809e294 541d0000
-DAT_0809e298:
-    .word  0x00001d1c                     @ 0809e298 1c1d0000
+sprite_p2_0e_9e290:
+    .word  OAM_EQUIP_SPRITE_P2_0E         @ 0809e290 0e800000  Nonzero-player sprite selector; the zero-player branch uses0xe. Argument0 of enqueue_sprite_attr_record.
+eligib_state_off_9e294:
+    .word  ELIGIB_STATE_CTRL_OFF          @ 0809e294 541d0000  Byte offset from gP1LifePoints to the eligibility state-control word.
+phase_off_9e298:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e298 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_1:
-    ldr r4, PTR_gP1LifePoints_0809e2e0       @ 0809e29c 104c
+    ldr r4, gp1lp_base_9e2e0                 @ 0809e29c 104c
     movs r3,#0xe8    @ 0809e29e e823
     lsls r3,r3,#0x5    @ 0809e2a0 5b01
     adds r0,r4,r3    @ 0809e2a2 e018
@@ -1516,13 +1515,13 @@ switchD_0809e1aa__caseD_1:
     movs r1,#0x5    @ 0809e2ac 0521
     bl trigger_card_display_op31_if_not_active @ 0809e2ae f5f76ff8
 LAB_0809e2b2:
-    ldr r0, DAT_0809e2e4                     @ 0809e2b2 0c48
+    ldr r0, phase_off_9e2e4                  @ 0809e2b2 0c48
     adds r1,r4,r0    @ 0809e2b4 2118
     ldr r0,[r1,#0x0]                         @ 0809e2b6 0868
     adds r0,#0x1    @ 0809e2b8 0130
     str r0,[r1,#0x0]                         @ 0809e2ba 0860
 switchD_0809e1aa__caseD_2:
-    ldr r0, DAT_0809e2e8                     @ 0809e2bc 0a48
+    ldr r0, duel_card_ctx_base_9e2e8         @ 0809e2bc 0a48
     lsls r1,r5,#0x2    @ 0809e2be a900
     adds r0,#0x8    @ 0809e2c0 0830
     adds r1,r1,r0    @ 0809e2c2 0918
@@ -1534,57 +1533,57 @@ switchD_0809e1aa__caseD_2:
     bne LAB_0809e2d4                         @ 0809e2d0 00d1
     b switchD_0809e1aa__caseD_4              @ 0809e2d2 81e1
 LAB_0809e2d4:
-    ldr r0, PTR_gP1LifePoints_0809e2e0       @ 0809e2d4 0248
-    ldr r1, DAT_0809e2e4                     @ 0809e2d6 0349
+    ldr r0, gp1lp_base_9e2e0                 @ 0809e2d4 0248
+    ldr r1, phase_off_9e2e4                  @ 0809e2d6 0349
     adds r0,r0,r1    @ 0809e2d8 4018
     movs r1,#0x1e    @ 0809e2da 1e21
     str r1,[r0,#0x0]                         @ 0809e2dc 0160
     b switchD_0809e1aa__caseD_4              @ 0809e2de 7be1
-PTR_gP1LifePoints_0809e2e0:
-    .word  gP1LifePoints                  @ 0809e2e0 e0c40102
-DAT_0809e2e4:
-    .word  0x00001d1c                     @ 0809e2e4 1c1d0000
-DAT_0809e2e8:
-    .word  0x0201e2a0                     @ 0809e2e8 a0e20102
+gp1lp_base_9e2e0:
+    .word  gP1LifePoints                  @ 0809e2e0 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e2e4:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e2e4 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
+duel_card_ctx_base_9e2e8:
+    .word  gDuelCardCtxBase               @ 0809e2e8 a0e20102  Duel card context base; reads word[base+8+4*player] to select the display/AI route.
 LAB_0809e2ec:
     movs r0,#0x2    @ 0809e2ec 0220
     bl write_card_display_ctx_fields         @ 0809e2ee f8f74bfb
-    ldr r1, PTR_gP1LifePoints_0809e2fc       @ 0809e2f2 0249
-    ldr r2, DAT_0809e300                     @ 0809e2f4 024a
+    ldr r1, gp1lp_base_9e2fc                 @ 0809e2f2 0249
+    ldr r2, phase_off_9e300                  @ 0809e2f4 024a
     adds r1,r1,r2    @ 0809e2f6 8918
     b LAB_0809e288                           @ 0809e2f8 c6e7
     .zero  0x2
-PTR_gP1LifePoints_0809e2fc:
-    .word  gP1LifePoints                  @ 0809e2fc e0c40102
-DAT_0809e300:
-    .word  0x00001d1c                     @ 0809e300 1c1d0000
+gp1lp_base_9e2fc:
+    .word  gP1LifePoints                  @ 0809e2fc e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e300:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e300 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_3:
-    ldr r6, PTR_gP1LifePoints_0809e324       @ 0809e304 074e
-    ldr r3, DAT_0809e328                     @ 0809e306 084b
+    ldr r6, gp1lp_base_9e324                 @ 0809e304 074e
+    ldr r3, eligib_state_off_9e328           @ 0809e306 084b
     adds r0,r6,r3    @ 0809e308 f018
     ldr r4,[r0,#0x0]                         @ 0809e30a 0468
     cmp r4,#0x0                              @ 0809e30c 002c
     beq LAB_0809e334                         @ 0809e30e 11d0
-    ldr r0, DAT_0809e32c                     @ 0809e310 0648
+    ldr r0, eligib_count_off_9e32c           @ 0809e310 0648
     adds r1,r6,r0    @ 0809e312 3118
     movs r0,#0x1    @ 0809e314 0120
     str r0,[r1,#0x0]                         @ 0809e316 0860
-    ldr r2, DAT_0809e330                     @ 0809e318 054a
+    ldr r2, phase_off_9e330                  @ 0809e318 054a
     adds r1,r6,r2    @ 0809e31a b118
     ldr r0,[r1,#0x0]                         @ 0809e31c 0868
     subs r0,#0x1    @ 0809e31e 0138
     b LAB_0809e25a                           @ 0809e320 9be7
     .zero  0x2
-PTR_gP1LifePoints_0809e324:
-    .word  gP1LifePoints                  @ 0809e324 e0c40102
-DAT_0809e328:
-    .word  0x00001d54                     @ 0809e328 541d0000
-DAT_0809e32c:
-    .word  0x00001d58                     @ 0809e32c 581d0000
-DAT_0809e330:
-    .word  0x00001d1c                     @ 0809e330 1c1d0000
+gp1lp_base_9e324:
+    .word  gP1LifePoints                  @ 0809e324 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+eligib_state_off_9e328:
+    .word  ELIGIB_STATE_CTRL_OFF          @ 0809e328 541d0000  Byte offset from gP1LifePoints to the eligibility state-control word.
+eligib_count_off_9e32c:
+    .word  ELIGIB_ACT_COUNT_OFF           @ 0809e32c 581d0000  Byte offset from gP1LifePoints; phase3 writes1 to the eligibility activation-count word.
+phase_off_9e330:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e330 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e334:
-    ldr r3, DAT_0809e348                     @ 0809e334 044b
+    ldr r3, eligib_type_off_9e348            @ 0809e334 044b
     adds r0,r6,r3    @ 0809e336 f018
     ldr r0,[r0,#0x0]                         @ 0809e338 0068
     subs r0,#0xd    @ 0809e33a 0d38
@@ -1594,46 +1593,46 @@ LAB_0809e334:
     beq LAB_0809e378                         @ 0809e342 19d0
     b LAB_0809e390                           @ 0809e344 24e0
     .zero  0x2
-DAT_0809e348:
-    .word  0x00001d5c                     @ 0809e348 5c1d0000
+eligib_type_off_9e348:
+    .word  ELIGIB_ACT_TYPE_OFF            @ 0809e348 5c1d0000  Byte offset from gP1LifePoints; phase3 compares activation type against16 and18.
 LAB_0809e34c:
     adds r0,r5,#0x0    @ 0809e34c 281c
     bl check_equip_effect_zone_preconditions @ 0809e34e f8f71fff
     cmp r0,#0x0                              @ 0809e352 0028
     beq LAB_0809e390                         @ 0809e354 1cd0
-    ldr r1, DAT_0809e36c                     @ 0809e356 0549
+    ldr r1, chain_cancel_off_9e36c           @ 0809e356 0549
     adds r0,r6,r1    @ 0809e358 7018
     str r4,[r0,#0x0]                         @ 0809e35a 0460
-    ldr r2, DAT_0809e370                     @ 0809e35c 044a
+    ldr r2, chain_step_off_9e370             @ 0809e35c 044a
     adds r0,r6,r2    @ 0809e35e b018
     str r4,[r0,#0x0]                         @ 0809e360 0460
-    ldr r3, DAT_0809e374                     @ 0809e362 044b
+    ldr r3, phase_off_9e374                  @ 0809e362 044b
     adds r1,r6,r3    @ 0809e364 f118
     movs r0,#0x15    @ 0809e366 1520
     b LAB_0809e25a                           @ 0809e368 77e7
     .zero  0x2
-DAT_0809e36c:
-    .word  0x00001d30                     @ 0809e36c 301d0000
-DAT_0809e370:
-    .word  0x00001d28                     @ 0809e370 281d0000
-DAT_0809e374:
-    .word  0x00001d1c                     @ 0809e374 1c1d0000
+chain_cancel_off_9e36c:
+    .word  EQUIP_CHAIN_CANCEL_OFF         @ 0809e36c 301d0000  Byte offset from gP1LifePoints to the chain-cancel word cleared or tested by these phases.
+chain_step_off_9e370:
+    .word  EQUIP_CHAIN_STEP_OFF           @ 0809e370 281d0000  Byte offset from gP1LifePoints; this path clears the chain-step word before advancing phase.
+phase_off_9e374:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e374 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e378:
     adds r0,r5,#0x0    @ 0809e378 281c
     bl check_equip_slot_activation_blocked_by_chain @ 0809e37a f8f77dff
     cmp r0,#0x0                              @ 0809e37e 0028
     beq LAB_0809e390                         @ 0809e380 06d0
-    ldr r0, DAT_0809e38c                     @ 0809e382 0248
+    ldr r0, phase_off_9e38c                  @ 0809e382 0248
     adds r1,r6,r0    @ 0809e384 3118
 LAB_0809e386:
     movs r0,#0x1e    @ 0809e386 1e20
     b LAB_0809e25a                           @ 0809e388 67e7
     .zero  0x2
-DAT_0809e38c:
-    .word  0x00001d1c                     @ 0809e38c 1c1d0000
+phase_off_9e38c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e38c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e390:
-    ldr r0, PTR_gP1LifePoints_0809e3ac       @ 0809e390 0648
-    ldr r1, DAT_0809e3b0                     @ 0809e392 0749
+    ldr r0, gp1lp_base_9e3ac                 @ 0809e390 0648
+    ldr r1, field_phase_off_9e3b0            @ 0809e392 0749
     adds r0,r0,r1    @ 0809e394 4018
     ldr r0,[r0,#0x0]                         @ 0809e396 0068
     movs r6,#0x1    @ 0809e398 0126
@@ -1645,10 +1644,10 @@ LAB_0809e390:
     movs r4,#0x8    @ 0809e3a6 0824
     orrs r4,r6    @ 0809e3a8 3443
     b LAB_0809e3b6                           @ 0809e3aa 04e0
-PTR_gP1LifePoints_0809e3ac:
-    .word  gP1LifePoints                  @ 0809e3ac e0c40102
-DAT_0809e3b0:
-    .word  0x00001cf4                     @ 0809e3b0 f41c0000
+gp1lp_base_9e3ac:
+    .word  gP1LifePoints                  @ 0809e3ac e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+field_phase_off_9e3b0:
+    .word  P2LP_BLOCK2_OFF_1CF4           @ 0809e3b0 f41c0000  Byte offset from gP1LifePoints; this consumer reads the field-phase word, not a gDuelFieldSlots-relative cursor.
 LAB_0809e3b4:
     adds r4,r6,#0x0    @ 0809e3b4 341c
 LAB_0809e3b6:
@@ -1663,19 +1662,19 @@ LAB_0809e3c6:
     adds r0,r4,#0x0    @ 0809e3c6 201c
 LAB_0809e3c8:
     bl invoke_card_display_op_0x31_sub4      @ 0809e3c8 f5f758f8
-    ldr r0, PTR_gP1LifePoints_0809e3d8       @ 0809e3cc 0248
-    ldr r2, DAT_0809e3dc                     @ 0809e3ce 034a
+    ldr r0, gp1lp_base_9e3d8                 @ 0809e3cc 0248
+    ldr r2, phase_off_9e3dc                  @ 0809e3ce 034a
     adds r0,r0,r2    @ 0809e3d0 8018
 LAB_0809e3d2:
     movs r1,#0x14    @ 0809e3d2 1421
     str r1,[r0,#0x0]                         @ 0809e3d4 0160
     b switchD_0809e1aa__caseD_4              @ 0809e3d6 ffe0
-PTR_gP1LifePoints_0809e3d8:
-    .word  gP1LifePoints                  @ 0809e3d8 e0c40102
-DAT_0809e3dc:
-    .word  0x00001d1c                     @ 0809e3dc 1c1d0000
+gp1lp_base_9e3d8:
+    .word  gP1LifePoints                  @ 0809e3d8 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e3dc:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e3dc 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_a:
-    ldr r0, DAT_0809e404                     @ 0809e3e0 0848
+    ldr r0, duel_card_ctx_base_9e404         @ 0809e3e0 0848
     lsls r1,r5,#0x2    @ 0809e3e2 a900
     adds r0,#0x8    @ 0809e3e4 0830
     adds r1,r1,r0    @ 0809e3e6 0918
@@ -1686,46 +1685,46 @@ switchD_0809e1aa__caseD_a:
     bl check_equip_effect_zone_preconditions @ 0809e3f0 f8f7cefe
     cmp r0,#0x0                              @ 0809e3f4 0028
     beq LAB_0809e40c                         @ 0809e3f6 09d0
-    ldr r2, PTR_gP1LifePoints_0809e408       @ 0809e3f8 034a
+    ldr r2, gp1lp_base_9e408                 @ 0809e3f8 034a
     movs r3,#0xea    @ 0809e3fa ea23
     lsls r3,r3,#0x5    @ 0809e3fc 5b01
     adds r1,r2,r3    @ 0809e3fe d118
     movs r0,#0x3    @ 0809e400 0320
     b LAB_0809e416                           @ 0809e402 08e0
-DAT_0809e404:
-    .word  0x0201e2a0                     @ 0809e404 a0e20102
-PTR_gP1LifePoints_0809e408:
-    .word  gP1LifePoints                  @ 0809e408 e0c40102
+duel_card_ctx_base_9e404:
+    .word  gDuelCardCtxBase               @ 0809e404 a0e20102  Duel card context base; reads word[base+8+4*player] to select the display/AI route.
+gp1lp_base_9e408:
+    .word  gP1LifePoints                  @ 0809e408 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
 LAB_0809e40c:
-    ldr r2, PTR_gP1LifePoints_0809e420       @ 0809e40c 044a
+    ldr r2, gp1lp_base_9e420                 @ 0809e40c 044a
     movs r0,#0xea    @ 0809e40e ea20
     lsls r0,r0,#0x5    @ 0809e410 4001
     adds r1,r2,r0    @ 0809e412 1118
     movs r0,#0x5    @ 0809e414 0520
 LAB_0809e416:
     str r0,[r1,#0x0]                         @ 0809e416 0860
-    ldr r3, DAT_0809e424                     @ 0809e418 024b
+    ldr r3, phase_off_9e424                  @ 0809e418 024b
     adds r1,r2,r3    @ 0809e41a d118
     movs r0,#0x14    @ 0809e41c 1420
     b LAB_0809e25a                           @ 0809e41e 1ce7
-PTR_gP1LifePoints_0809e420:
-    .word  gP1LifePoints                  @ 0809e420 e0c40102
-DAT_0809e424:
-    .word  0x00001d1c                     @ 0809e424 1c1d0000
+gp1lp_base_9e420:
+    .word  gP1LifePoints                  @ 0809e420 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e424:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e424 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e428:
-    ldr r1, DAT_0809e438                     @ 0809e428 0349
+    ldr r1, display_op31_param_9e438         @ 0809e428 0349
     adds r0,r5,#0x0    @ 0809e42a 281c
     bl trigger_card_display_op31_if_not_active @ 0809e42c f4f7b0ff
-    ldr r1, PTR_gP1LifePoints_0809e43c       @ 0809e430 0249
-    ldr r0, DAT_0809e440                     @ 0809e432 0348
+    ldr r1, gp1lp_base_9e43c                 @ 0809e430 0249
+    ldr r0, phase_off_9e440                  @ 0809e432 0348
     adds r1,r1,r0    @ 0809e434 0918
     b LAB_0809e288                           @ 0809e436 27e7
-DAT_0809e438:
-    .word  0x00000135                     @ 0809e438 35010000
-PTR_gP1LifePoints_0809e43c:
-    .word  gP1LifePoints                  @ 0809e43c e0c40102
-DAT_0809e440:
-    .word  0x00001d1c                     @ 0809e440 1c1d0000
+display_op31_param_9e438:
+    .word  CARD_DISPLAY_OP31_PARAM_0135   @ 0809e438 35010000  Display op0x31 parameter, forwarded from r1 by trigger_card_display_op31_if_not_active.
+gp1lp_base_9e43c:
+    .word  gP1LifePoints                  @ 0809e43c e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e440:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e440 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_b:
     adds r0,r5,#0x0    @ 0809e444 281c
     bl check_equip_zone_has_frozen_soul_or_great_long_nose @ 0809e446 f8f7fdfe
@@ -1750,17 +1749,17 @@ LAB_0809e46c:
     adds r0,r4,#0x0    @ 0809e46c 201c
 LAB_0809e46e:
     bl invoke_card_display_op_0x31_sub4      @ 0809e46e f5f705f8
-    ldr r0, PTR_gP1LifePoints_0809e47c       @ 0809e472 0248
-    ldr r1, DAT_0809e480                     @ 0809e474 0249
+    ldr r0, gp1lp_base_9e47c                 @ 0809e472 0248
+    ldr r1, phase_off_9e480                  @ 0809e474 0249
     adds r0,r0,r1    @ 0809e476 4018
     b LAB_0809e3d2                           @ 0809e478 abe7
     .zero  0x2
-PTR_gP1LifePoints_0809e47c:
-    .word  gP1LifePoints                  @ 0809e47c e0c40102
-DAT_0809e480:
-    .word  0x00001d1c                     @ 0809e480 1c1d0000
+gp1lp_base_9e47c:
+    .word  gP1LifePoints                  @ 0809e47c e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e480:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e480 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_14:
-    ldr r4, PTR_gP1LifePoints_0809e498       @ 0809e484 044c
+    ldr r4, gp1lp_base_9e498                 @ 0809e484 044c
     movs r2,#0xea    @ 0809e486 ea22
     lsls r2,r2,#0x5    @ 0809e488 5201
     adds r0,r4,r2    @ 0809e48a a018
@@ -1770,49 +1769,49 @@ switchD_0809e1aa__caseD_14:
     cmp r0,#0x5                              @ 0809e492 0528
     beq LAB_0809e4c4                         @ 0809e494 16d0
     b LAB_0809e4d0                           @ 0809e496 1be0
-PTR_gP1LifePoints_0809e498:
-    .word  gP1LifePoints                  @ 0809e498 e0c40102
+gp1lp_base_9e498:
+    .word  gP1LifePoints                  @ 0809e498 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
 LAB_0809e49c:
     adds r0,r5,#0x0    @ 0809e49c 281c
     bl check_equip_effect_zone_preconditions @ 0809e49e f8f777fe
     cmp r0,#0x0                              @ 0809e4a2 0028
     beq LAB_0809e4d0                         @ 0809e4a4 14d0
-    ldr r3, DAT_0809e4bc                     @ 0809e4a6 054b
+    ldr r3, chain_cancel_off_9e4bc           @ 0809e4a6 054b
     adds r0,r4,r3    @ 0809e4a8 e018
     movs r1,#0x0    @ 0809e4aa 0021
     str r1,[r0,#0x0]                         @ 0809e4ac 0160
-    ldr r2, DAT_0809e4c0                     @ 0809e4ae 044a
+    ldr r2, chain_step_off_9e4c0             @ 0809e4ae 044a
     adds r0,r4,r2    @ 0809e4b0 a018
     str r1,[r0,#0x0]                         @ 0809e4b2 0160
     subs r3,#0x14    @ 0809e4b4 143b
     adds r1,r4,r3    @ 0809e4b6 e118
     b LAB_0809e288                           @ 0809e4b8 e6e6
     .zero  0x2
-DAT_0809e4bc:
-    .word  0x00001d30                     @ 0809e4bc 301d0000
-DAT_0809e4c0:
-    .word  0x00001d28                     @ 0809e4c0 281d0000
+chain_cancel_off_9e4bc:
+    .word  EQUIP_CHAIN_CANCEL_OFF         @ 0809e4bc 301d0000  Byte offset from gP1LifePoints to the chain-cancel word cleared or tested by these phases.
+chain_step_off_9e4c0:
+    .word  EQUIP_CHAIN_STEP_OFF           @ 0809e4c0 281d0000  Byte offset from gP1LifePoints; this path clears the chain-step word before advancing phase.
 LAB_0809e4c4:
-    ldr r0, DAT_0809e4cc                     @ 0809e4c4 0148
+    ldr r0, phase_off_9e4cc                  @ 0809e4c4 0148
     adds r1,r4,r0    @ 0809e4c6 2118
     b LAB_0809e386                           @ 0809e4c8 5de7
     .zero  0x2
-DAT_0809e4cc:
-    .word  0x00001d1c                     @ 0809e4cc 1c1d0000
+phase_off_9e4cc:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e4cc 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 LAB_0809e4d0:
-    ldr r0, PTR_gP1LifePoints_0809e4dc       @ 0809e4d0 0248
-    ldr r1, DAT_0809e4e0                     @ 0809e4d2 0349
+    ldr r0, gp1lp_base_9e4dc                 @ 0809e4d0 0248
+    ldr r1, phase_off_9e4e0                  @ 0809e4d2 0349
     adds r0,r0,r1    @ 0809e4d4 4018
     movs r1,#0x2    @ 0809e4d6 0221
     str r1,[r0,#0x0]                         @ 0809e4d8 0160
     b switchD_0809e1aa__caseD_4              @ 0809e4da 7de0
-PTR_gP1LifePoints_0809e4dc:
-    .word  gP1LifePoints                  @ 0809e4dc e0c40102
-DAT_0809e4e0:
-    .word  0x00001d1c                     @ 0809e4e0 1c1d0000
+gp1lp_base_9e4dc:
+    .word  gP1LifePoints                  @ 0809e4dc e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+phase_off_9e4e0:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e4e0 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_15:
-    ldr r0, PTR_gP1LifePoints_0809e504       @ 0809e4e4 0748
-    ldr r2, DAT_0809e508                     @ 0809e4e6 084a
+    ldr r0, gp1lp_base_9e504                 @ 0809e4e4 0748
+    ldr r2, field_phase_off_9e508            @ 0809e4e6 084a
     adds r0,r0,r2    @ 0809e4e8 8018
     ldr r0,[r0,#0x0]                         @ 0809e4ea 0068
     cmp r0,#0x2                              @ 0809e4ec 0228
@@ -1824,23 +1823,23 @@ LAB_0809e4f4:
     movs r1,#0x0    @ 0809e4f6 0021
     bl submit_lp_bar_sprite_row_by_type      @ 0809e4f8 e6f712ff
 LAB_0809e4fc:
-    ldr r1, PTR_gP1LifePoints_0809e504       @ 0809e4fc 0149
-    ldr r3, DAT_0809e50c                     @ 0809e4fe 034b
+    ldr r1, gp1lp_base_9e504                 @ 0809e4fc 0149
+    ldr r3, phase_off_9e50c                  @ 0809e4fe 034b
     adds r1,r1,r3    @ 0809e500 c918
     b LAB_0809e288                           @ 0809e502 c1e6
-PTR_gP1LifePoints_0809e504:
-    .word  gP1LifePoints                  @ 0809e504 e0c40102
-DAT_0809e508:
-    .word  0x00001cf4                     @ 0809e508 f41c0000
-DAT_0809e50c:
-    .word  0x00001d1c                     @ 0809e50c 1c1d0000
+gp1lp_base_9e504:
+    .word  gP1LifePoints                  @ 0809e504 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+field_phase_off_9e508:
+    .word  P2LP_BLOCK2_OFF_1CF4           @ 0809e508 f41c0000  Byte offset from gP1LifePoints; this consumer reads the field-phase word, not a gDuelFieldSlots-relative cursor.
+phase_off_9e50c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e50c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_16:
     adds r0,r5,#0x0    @ 0809e510 281c
     bl advance_equip_display_phase_via_table @ 0809e512 fdf7adfc
     cmp r0,#0x0                              @ 0809e516 0028
     beq switchD_0809e1aa__caseD_4            @ 0809e518 5ed0
-    ldr r4, PTR_gP1LifePoints_0809e540       @ 0809e51a 094c
-    ldr r1, DAT_0809e544                     @ 0809e51c 0949
+    ldr r4, gp1lp_base_9e540                 @ 0809e51a 094c
+    ldr r1, chain_cancel_off_9e544           @ 0809e51c 0949
     adds r0,r4,r1    @ 0809e51e 6018
     ldr r0,[r0,#0x0]                         @ 0809e520 0068
     cmp r0,#0x0                              @ 0809e522 0028
@@ -1848,27 +1847,27 @@ switchD_0809e1aa__caseD_16:
     movs r0,#0x10    @ 0809e526 1020
     cmp r5,#0x0                              @ 0809e528 002d
     beq LAB_0809e52e                         @ 0809e52a 00d0
-    ldr r0, DAT_0809e548                     @ 0809e52c 0648
+    ldr r0, sprite_p2_10_9e548               @ 0809e52c 0648
 LAB_0809e52e:
     movs r1,#0x0    @ 0809e52e 0021
     movs r2,#0x0    @ 0809e530 0022
     movs r3,#0x0    @ 0809e532 0023
     bl enqueue_sprite_attr_record            @ 0809e534 9df7fafb
-    ldr r2, DAT_0809e54c                     @ 0809e538 044a
+    ldr r2, phase_off_9e54c                  @ 0809e538 044a
     adds r1,r4,r2    @ 0809e53a a118
     movs r0,#0x2    @ 0809e53c 0220
     b LAB_0809e25a                           @ 0809e53e 8ce6
-PTR_gP1LifePoints_0809e540:
-    .word  gP1LifePoints                  @ 0809e540 e0c40102
-DAT_0809e544:
-    .word  0x00001d30                     @ 0809e544 301d0000
-DAT_0809e548:
-    .word  0x00008010                     @ 0809e548 10800000
-DAT_0809e54c:
-    .word  0x00001d1c                     @ 0809e54c 1c1d0000
+gp1lp_base_9e540:
+    .word  gP1LifePoints                  @ 0809e540 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+chain_cancel_off_9e544:
+    .word  EQUIP_CHAIN_CANCEL_OFF         @ 0809e544 301d0000  Byte offset from gP1LifePoints to the chain-cancel word cleared or tested by these phases.
+sprite_p2_10_9e548:
+    .word  OAM_EQUIP_SPRITE_P2_10         @ 0809e548 10800000  Nonzero-player sprite selector; the zero-player branch uses0x10. Argument0 of enqueue_sprite_attr_record.
+phase_off_9e54c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809e54c 1c1d0000  Byte offset from gP1LifePoints to the dispatcher phase word.
 switchD_0809e1aa__caseD_1e:
-    ldr r0, PTR_gP1LifePoints_0809e5c4       @ 0809e550 1c48
-    ldr r3, DAT_0809e5c8                     @ 0809e552 1d4b
+    ldr r0, gp1lp_base_9e5c4                 @ 0809e550 1c48
+    ldr r3, field_phase_off_9e5c8            @ 0809e552 1d4b
     adds r0,r0,r3    @ 0809e554 c018
     ldr r0,[r0,#0x0]                         @ 0809e556 0068
     cmp r0,#0x2                              @ 0809e558 0228
@@ -1881,17 +1880,17 @@ LAB_0809e560:
     ands r1,r5    @ 0809e564 2940
     lsls r7,r5,#0x1f    @ 0809e566 ef07
     movs r5,#0x0    @ 0809e568 0025
-    ldr r0, DAT_0809e5cc                     @ 0809e56a 1848
+    ldr r0, player_stride_9e5cc              @ 0809e56a 1848
     adds r6,r1,#0x0    @ 0809e56c 0e1c
     muls r6,r0    @ 0809e56e 4643
 LAB_0809e570:
     adds r1,r5,r6    @ 0809e570 a919
-    ldr r0, DAT_0809e5d0                     @ 0809e572 1748
+    ldr r0, field_slots_base_9e5d0           @ 0809e572 1748
     adds r1,r1,r0    @ 0809e574 0918
     ldr r3,[r1,#0x0]                         @ 0809e576 0b68
     lsls r0,r3,#0x13    @ 0809e578 d804
     lsrs r2,r0,#0x13    @ 0809e57a c20c
-    ldr r0, DAT_0809e5d4                     @ 0809e57c 1548
+    ldr r0, vwxyz_cid_9e5d4                  @ 0809e57c 1548
     cmp r2,r0                                @ 0809e57e 8242
     bne LAB_0809e5b0                         @ 0809e580 16d1
     ldrh r0,[r1,#0x8]                        @ 0809e582 0889
@@ -1927,16 +1926,16 @@ LAB_0809e5b0:
 LAB_0809e5c0:
     movs r0,#0x1    @ 0809e5c0 0120
     b LAB_0809e5da                           @ 0809e5c2 0ae0
-PTR_gP1LifePoints_0809e5c4:
-    .word  gP1LifePoints                  @ 0809e5c4 e0c40102
-DAT_0809e5c8:
-    .word  0x00001cf4                     @ 0809e5c8 f41c0000
-DAT_0809e5cc:
-    .word  0x00000868                     @ 0809e5cc 68080000
-DAT_0809e5d0:
-    .word  0x0201c510                     @ 0809e5d0 10c50102
-DAT_0809e5d4:
-    .word  0x00001954                     @ 0809e5d4 54190000
+gp1lp_base_9e5c4:
+    .word  gP1LifePoints                  @ 0809e5c4 e0c40102  gP1LifePoints base; preserve the existing DATA reference and use the offsets loaded by this path.
+field_phase_off_9e5c8:
+    .word  P2LP_BLOCK2_OFF_1CF4           @ 0809e5c8 f41c0000  Byte offset from gP1LifePoints; this consumer reads the field-phase word, not a gDuelFieldSlots-relative cursor.
+player_stride_9e5cc:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e5cc 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+field_slots_base_9e5d0:
+    .word  gDuelFieldSlots                @ 0809e5d0 10c50102  Field-slot array base; consumers add (player&1)*PLAYER_BLOCK_STRIDE and 20*slot_index.
+vwxyz_cid_9e5d4:
+    .word  VWXYZ_DRAGON_CATAPULT_CANNON_CID @ 0809e5d4 54190000  Compare with low13 CID bits of five field-slot words; this CID names VWXYZ-Dragon Catapult Cannon.
 switchD_0809e1aa__caseD_4:
     movs r0,#0x0    @ 0809e5d8 0020
 LAB_0809e5da:
@@ -1944,25 +1943,25 @@ LAB_0809e5da:
     pop {r1}                                 @ 0809e5dc 02bc
     bx r1                                    @ 0809e5de 0847
 
-@ Scans player equip zone 5 slots [0..4] for card_id=0x1954 (Toon World variant) with [slot+0x8]!=0 (linked target). Synthesizes OAM attr (bits[28:21]=slot_y, 0xc0<<15 shape, player_side bit[31], card_id low 13 bits) and calls apply_equip_activation_via_packed_attr. Returns 0 (found/activated), 1 (none found). Called from dispatch_equip_activation_state_by_substate case_3 and case_2 paths (2 callsites). Params: r0=u32 player_side [0..1] -> bit[31] in OAM attr. Returns r0=u32 not_found (0=activated, 1=no match). Side effects: via apply_equip_activation_via_packed_attr (cond).
-scan_equip_zone_for_toon_card_activation:
+@ r0=player. Scan five 20-byte entries at gDuelFieldSlots+(player&1)*PLAYER_BLOCK_STRIDE. Require low13 CID=VWXYZ_DRAGON_CATAPULT_CANNON_CID and u16[slot+8]!=0. Call apply_equip_activation_via_packed_attr with (slot_index<<16)|0x600000|(player<<31)|CID, the packed entry flags, and0. Return0 only when that call returns nonzero; otherwise continue scanning and return1 after all five fail.
+scan_field_slots_for_vwxyz_dragon_catapult_cannon_activation:
     push {r4,r5,r6,r7,lr}                    @ 0809e5e0 f0b5
     movs r4,#0x0    @ 0809e5e2 0024
     movs r1,#0x1    @ 0809e5e4 0121
     ands r1,r0    @ 0809e5e6 0140
     lsls r7,r0,#0x1f    @ 0809e5e8 c707
     movs r5,#0x0    @ 0809e5ea 0025
-    ldr r0, DAT_0809e638                     @ 0809e5ec 1248
+    ldr r0, player_stride_9e638              @ 0809e5ec 1248
     adds r6,r1,#0x0    @ 0809e5ee 0e1c
     muls r6,r0    @ 0809e5f0 4643
 LAB_0809e5f2:
     adds r1,r5,r6    @ 0809e5f2 a919
-    ldr r0, DAT_0809e63c                     @ 0809e5f4 1148
+    ldr r0, field_slots_base_9e63c           @ 0809e5f4 1148
     adds r1,r1,r0    @ 0809e5f6 0918
     ldr r3,[r1,#0x0]                         @ 0809e5f8 0b68
     lsls r0,r3,#0x13    @ 0809e5fa d804
     lsrs r2,r0,#0x13    @ 0809e5fc c20c
-    ldr r0, DAT_0809e640                     @ 0809e5fe 1048
+    ldr r0, vwxyz_cid_9e640                  @ 0809e5fe 1048
     cmp r2,r0                                @ 0809e600 8242
     bne LAB_0809e644                         @ 0809e602 1fd1
     ldrh r0,[r1,#0x8]                        @ 0809e604 0889
@@ -1990,12 +1989,12 @@ LAB_0809e5f2:
     movs r0,#0x0    @ 0809e632 0020
     b LAB_0809e64e                           @ 0809e634 0be0
     .zero  0x2
-DAT_0809e638:
-    .word  0x00000868                     @ 0809e638 68080000
-DAT_0809e63c:
-    .word  0x0201c510                     @ 0809e63c 10c50102
-DAT_0809e640:
-    .word  0x00001954                     @ 0809e640 54190000
+player_stride_9e638:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e638 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+field_slots_base_9e63c:
+    .word  gDuelFieldSlots                @ 0809e63c 10c50102  Field-slot array base; consumers add (player&1)*PLAYER_BLOCK_STRIDE and 20*slot_index.
+vwxyz_cid_9e640:
+    .word  VWXYZ_DRAGON_CATAPULT_CANNON_CID @ 0809e640 54190000  Compare with low13 CID bits of five field-slot words; this CID names VWXYZ-Dragon Catapult Cannon.
 LAB_0809e644:
     adds r5,#0x14    @ 0809e644 1435
     adds r4,#0x1    @ 0809e646 0134
@@ -2007,18 +2006,18 @@ LAB_0809e64e:
     pop {r1}                                 @ 0809e650 02bc
     bx r1                                    @ 0809e652 0847
 
-@ Scans player equip zone 5 slots [0..4] for first get_node_entity_id_in_slot(player,slot,0x151e)==1. r0=player_side &1 * 0x868 gives gDuelFieldSlots player offset. Each iteration: lsls#0x13+cmp checks slot occupied (bit9 nonzero), then calls get_node_entity_id_in_slot. Returns slot_idx [0..4] if found, rsbs -1 if not found. Called from dispatch_equip_activation_state_by_substate case_1 to locate first activated target slot. Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, entity_type=0x151e, SLOT_MAX=4. Params: r0=u32 player_side [0..1]. Returns r0=s32 slot_idx ([0..4] found, -1 not found). Side effects: none.
+@ r0=player. Scan slot indices0..4 at gDuelFieldSlots+(player&1)*PLAYER_BLOCK_STRIDE with stride20. Skip entries whose low13 CID bits are0. Return the first index where get_node_entity_id_in_slot(player,index,LAST_TURN_CID)==1. Return-1 when no entry matches. The input is a player value, not a slot pointer.
 find_equip_slot_idx_with_entity_id_one:
     push {r4,r5,r6,lr}                       @ 0809e654 70b5
     adds r6,r0,#0x0    @ 0809e656 061c
     movs r5,#0x0    @ 0809e658 0025
     movs r0,#0x1    @ 0809e65a 0120
     ands r0,r6    @ 0809e65c 3040
-    ldr r1, DAT_0809e684                     @ 0809e65e 0949
+    ldr r1, player_stride_9e684              @ 0809e65e 0949
     adds r4,r0,#0x0    @ 0809e660 041c
     muls r4,r1    @ 0809e662 4c43
 LAB_0809e664:
-    ldr r0, DAT_0809e688                     @ 0809e664 0848
+    ldr r0, field_slots_base_9e688           @ 0809e664 0848
     adds r0,r4,r0    @ 0809e666 2018
     ldr r0,[r0,#0x0]                         @ 0809e668 0068
     lsls r0,r0,#0x13    @ 0809e66a c004
@@ -2026,19 +2025,19 @@ LAB_0809e664:
     beq LAB_0809e690                         @ 0809e66e 0fd0
     adds r0,r6,#0x0    @ 0809e670 301c
     adds r1,r5,#0x0    @ 0809e672 291c
-    ldr r2, DAT_0809e68c                     @ 0809e674 054a
+    ldr r2, last_turn_cid_9e68c              @ 0809e674 054a
     bl get_node_entity_id_in_slot            @ 0809e676 91f7f3fb
     cmp r0,#0x1                              @ 0809e67a 0128
     bne LAB_0809e690                         @ 0809e67c 08d1
     adds r0,r5,#0x0    @ 0809e67e 281c
     b LAB_0809e69c                           @ 0809e680 0ce0
     .zero  0x2
-DAT_0809e684:
-    .word  0x00000868                     @ 0809e684 68080000
-DAT_0809e688:
-    .word  0x0201c510                     @ 0809e688 10c50102
-DAT_0809e68c:
-    .word  0x0000151e                     @ 0809e68c 1e150000
+player_stride_9e684:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e684 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+field_slots_base_9e688:
+    .word  gDuelFieldSlots                @ 0809e688 10c50102  Field-slot array base; consumers add (player&1)*PLAYER_BLOCK_STRIDE and 20*slot_index.
+last_turn_cid_9e68c:
+    .word  LAST_TURN_CID                  @ 0809e68c 1e150000  CID for the Last Turn chain-membership or entity-value lookup.
 LAB_0809e690:
     adds r4,#0x14    @ 0809e690 1434
     adds r5,#0x1    @ 0809e692 0135
@@ -2052,18 +2051,18 @@ LAB_0809e69c:
     bx r1                                    @ 0809e6a0 0847
     .zero  0x2
 
-@ Scans player equip zone 5 slots [0..4] for first get_node_entity_id_in_slot(player,slot,0x151e)==0. Symmetric sibling of find_equip_slot_idx_with_entity_id_one; only difference is cmp r0,#0 vs cmp r0,#1. r0=player_side &1 * 0x868 gives player offset into gDuelFieldSlots. Returns slot_idx [0..4] if found, -1 if not found. Called from dispatch_equip_activation_state_by_substate case_1 path to locate first empty target slot. Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, entity_type=0x151e, SLOT_MAX=4. Params: r0=u32 player_side [0..1]. Returns r0=s32 slot_idx ([0..4] found, -1 not found). Side effects: none.
+@ r0=player. Scan slot indices0..4 at gDuelFieldSlots+(player&1)*PLAYER_BLOCK_STRIDE with stride20. Skip entries whose low13 CID bits are0. Return the first index where get_node_entity_id_in_slot(player,index,LAST_TURN_CID)==0. Return-1 when no entry matches. A missing node returns-1 from the lookup and does not satisfy the zero test.
 find_equip_slot_idx_with_entity_id_zero:
     push {r4,r5,r6,lr}                       @ 0809e6a4 70b5
     adds r6,r0,#0x0    @ 0809e6a6 061c
     movs r5,#0x0    @ 0809e6a8 0025
     movs r0,#0x1    @ 0809e6aa 0120
     ands r0,r6    @ 0809e6ac 3040
-    ldr r1, DAT_0809e6d4                     @ 0809e6ae 0949
+    ldr r1, player_stride_9e6d4              @ 0809e6ae 0949
     adds r4,r0,#0x0    @ 0809e6b0 041c
     muls r4,r1    @ 0809e6b2 4c43
 LAB_0809e6b4:
-    ldr r0, DAT_0809e6d8                     @ 0809e6b4 0848
+    ldr r0, field_slots_base_9e6d8           @ 0809e6b4 0848
     adds r0,r4,r0    @ 0809e6b6 2018
     ldr r0,[r0,#0x0]                         @ 0809e6b8 0068
     lsls r0,r0,#0x13    @ 0809e6ba c004
@@ -2071,19 +2070,19 @@ LAB_0809e6b4:
     beq LAB_0809e6e0                         @ 0809e6be 0fd0
     adds r0,r6,#0x0    @ 0809e6c0 301c
     adds r1,r5,#0x0    @ 0809e6c2 291c
-    ldr r2, DAT_0809e6dc                     @ 0809e6c4 054a
+    ldr r2, last_turn_cid_9e6dc              @ 0809e6c4 054a
     bl get_node_entity_id_in_slot            @ 0809e6c6 91f7cbfb
     cmp r0,#0x0                              @ 0809e6ca 0028
     bne LAB_0809e6e0                         @ 0809e6cc 08d1
     adds r0,r5,#0x0    @ 0809e6ce 281c
     b LAB_0809e6ec                           @ 0809e6d0 0ce0
     .zero  0x2
-DAT_0809e6d4:
-    .word  0x00000868                     @ 0809e6d4 68080000
-DAT_0809e6d8:
-    .word  0x0201c510                     @ 0809e6d8 10c50102
-DAT_0809e6dc:
-    .word  0x0000151e                     @ 0809e6dc 1e150000
+player_stride_9e6d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e6d4 68080000  Byte stride of player blocks; the consumer multiplies it by player&1.
+field_slots_base_9e6d8:
+    .word  gDuelFieldSlots                @ 0809e6d8 10c50102  Field-slot array base; consumers add (player&1)*PLAYER_BLOCK_STRIDE and 20*slot_index.
+last_turn_cid_9e6dc:
+    .word  LAST_TURN_CID                  @ 0809e6dc 1e150000  CID for the Last Turn chain-membership or entity-value lookup.
 LAB_0809e6e0:
     adds r4,#0x14    @ 0809e6e0 1434
     adds r5,#0x1    @ 0809e6e2 0135
@@ -2097,18 +2096,17 @@ LAB_0809e6ec:
     bx r1                                    @ 0809e6f0 0847
     .zero  0x2
 
-@ Called by FUN_08094c60 (depth=5, indeg=1) after check_value_in_slot_chain passes (caller uses beq to skip, this function only executes when slot chain check passes). Prologue: push {r4,r5,r6,r7,lr}; .hword 0x4647=mov r7,r0 callee-save; push {r7}; sub sp,#4. Reads gP1LifePoints+0x1ce8 -> player_raw; reads gP1LifePoints+0x1d34 -> r1=subphase_counter [0..7]. If subphase_counter > 7 jumps to LAB_0809e8f4 (return 1). Otherwise uses subphase_counter*4 to index PTR_DAT_0809e72c (8-entry switch table, pointing to 0x0809e74c..0x0809e8b0 case code), dispatches via .hword 0x4687=mov pc,r8. Each case handles one equip activation subphase step. Exit LAB_0809e8f4: movs r0,#1 -> r0=1 (all subphases done); pop/bx lr. Returns: 1=subphase_counter > 7 (all subphases complete); 0=intermediate subphase state via paths other than LAB_0809e8f4.
-@ Constants: gP1LifePoints=0x0201c4e0, player_id_offset=0x1ce8, subphase_offset=0x1d34, switch_table=0x0809e72c, subphase_range=[0..7], SUBPHASE_MAX=7.
+@ No arguments. Dispatch LP+0x1d34 subphase 0..7 through eight even Thumb targets using MOV pc,r0. Player comes from LP+0x1ce8. Cases share this frame and return path: save phase, gate Last Turn, set display context, set sprite data, validate slots, set chain state, advance display, submit final sprite. Returns 1 for subphase >7 or case-4 rejection; otherwise 0. Case-1 rejection sets subphase=8; case 6 waits for a nonzero helper result. No independent case functions.
 dispatch_equip_activation_state_by_subphase:
     push {r4,r5,r6,r7,lr}                    @ 0809e6f4 f0b5
     .hword 0x4647    @ 0809e6f6 4746
     push {r7}                                @ 0809e6f8 80b4
     sub sp,#0x4                              @ 0809e6fa 81b0
-    ldr r0, DWORD_0809e71c                   @ 0809e6fc 0748
-    ldr r2, DWORD_0809e720                   @ 0809e6fe 084a
+    ldr r0, equip_scan_lp_base_9e71c         @ 0809e6fc 0748
+    ldr r2, equip_scan_player_offset_9e720   @ 0809e6fe 084a
     adds r1,r0,r2    @ 0809e700 8118
     ldr r4,[r1,#0x0]                         @ 0809e702 0c68
-    ldr r3, DWORD_0809e724                   @ 0809e704 074b
+    ldr r3, equip_scan_subphase_offset_9e724 @ 0809e704 074b
     adds r1,r0,r3    @ 0809e706 c118
     ldr r1,[r1,#0x0]                         @ 0809e708 0968
     adds r2,r0,#0x0    @ 0809e70a 021c
@@ -2117,31 +2115,251 @@ dispatch_equip_activation_state_by_subphase:
     b LAB_0809e8f4                           @ 0809e710 f0e0
 LAB_0809e712:
     lsls r0,r1,#0x2    @ 0809e712 8800
-    ldr r1, PTR_PTR_0809e728                 @ 0809e714 0449
+    ldr r1, equip_scan_subphase_table_9e728  @ 0809e714 0449
     adds r0,r0,r1    @ 0809e716 4018
     ldr r0,[r0,#0x0]                         @ 0809e718 0068
     .hword 0x4687    @ 0809e71a 8746
-DWORD_0809e71c:
-    .word  gP1LifePoints                  @ 0809e71c e0c40102
-DWORD_0809e720:
-    .word  0x00001ce8                     @ 0809e720 e81c0000
-DWORD_0809e724:
-    .word  0x00001d34                     @ 0809e724 341d0000
-PTR_PTR_0809e728:
-    .word  0x0809e72c                     @ 0809e728 2ce70908
-PTR_DAT_0809e72c:
-    .word  0x0809e74c                     @ 0809e72c 4ce70908
-    .word  0x0809e76c                     @ 0809e730 6ce70908
-    .word  0x0809e7c4                     @ 0809e734 c4e70908
-    .word  0x0809e7d8                     @ 0809e738 d8e70908
-    .word  0x0809e800                     @ 0809e73c 00e80908
-    .word  0x0809e850                     @ 0809e740 50e80908
-    .word  0x0809e894                     @ 0809e744 94e80908
-    .word  0x0809e8b0                     @ 0809e748 b0e80908
-DAT_0809e74c:
-    ROM_INCBIN 0x9e74c, 0x1a8
+equip_scan_lp_base_9e71c:
+    .word  gP1LifePoints                  @ 0809e71c e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_player_offset_9e720:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809e720 e81c0000  Byte offset from gP1LifePoints; player offset.
+equip_scan_subphase_offset_9e724:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e724 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_scan_subphase_table_9e728:
+    .word  equip_activation_subphase_targets @ 0809e728 2ce70908  Base/target equip_activation_subphase_targets; preserve the stored address and all unrelated references.
+equip_activation_subphase_targets:
+    .word  equip_activation_subphase_case0 @ 0809e72c 4ce70908  Base/target equip_activation_subphase_case0; preserve the stored address and all unrelated references.
+equip_activation_subphase_case1_ptr:
+    .word  equip_activation_subphase_case1 @ 0809e730 6ce70908  Base/target equip_activation_subphase_case1; preserve the stored address and all unrelated references.
+equip_activation_subphase_case2_ptr:
+    .word  equip_activation_subphase_case2 @ 0809e734 c4e70908  Base/target equip_activation_subphase_case2; preserve the stored address and all unrelated references.
+equip_activation_subphase_case3_ptr:
+    .word  equip_activation_subphase_case3 @ 0809e738 d8e70908  Base/target equip_activation_subphase_case3; preserve the stored address and all unrelated references.
+equip_activation_subphase_case4_ptr:
+    .word  equip_activation_subphase_case4 @ 0809e73c 00e80908  Base/target equip_activation_subphase_case4; preserve the stored address and all unrelated references.
+equip_activation_subphase_case5_ptr:
+    .word  equip_activation_subphase_case5 @ 0809e740 50e80908  Base/target equip_activation_subphase_case5; preserve the stored address and all unrelated references.
+equip_activation_subphase_case6_ptr:
+    .word  equip_activation_subphase_case6 @ 0809e744 94e80908  Base/target equip_activation_subphase_case6; preserve the stored address and all unrelated references.
+equip_activation_subphase_case7_ptr:
+    .word  equip_activation_subphase_case7 @ 0809e748 b0e80908  Base/target equip_activation_subphase_case7; preserve the stored address and all unrelated references.
+equip_activation_subphase_case0:
+    ldr r0, equip_scan_saved_phase_offset_9e760 @ 0809e74c 0448  -- Case 0: copy LP+0x1cf4 to LP+0x1cf8, increment subphase, return 0.
+    adds r1,r2,r0    @ 0809e74e 1118
+    ldr r3, equip_scan_phase_offset_9e764    @ 0809e750 044b
+    adds r0,r2,r3    @ 0809e752 d018
+    ldr r0,[r0,#0x0]                         @ 0809e754 0068
+    str r0,[r1,#0x0]                         @ 0809e756 0860
+    ldr r0, equip_scan_subphase_offset_9e768 @ 0809e758 0348
+    adds r1,r2,r0    @ 0809e75a 1118
+    b LAB_0809e8de                           @ 0809e75c bfe0
+    .zero  0x2
+equip_scan_saved_phase_offset_9e760:
+    .word  EQUIP_ACTIVATION_SAVED_PHASE_OFF @ 0809e760 f81c0000  Byte offset from gP1LifePoints; saved phase offset.
+equip_scan_phase_offset_9e764:
+    .word  P2LP_BLOCK2_OFF_1CF4           @ 0809e764 f41c0000  Byte offset from gP1LifePoints; phase offset.
+equip_scan_subphase_offset_9e768:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e768 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case1:
+    adds r0,r4,#0x0    @ 0809e76c 201c  -- Case 1: require available slot, group placement and Last Turn effect gates; failure sets subphase 8, success emits op31 and advances.
+    bl count_available_monster_slots         @ 0809e76e 94f723ff
+    cmp r0,#0x0                              @ 0809e772 0028
+    beq LAB_0809e7b0                         @ 0809e774 1cd0
+    adds r0,r4,#0x0    @ 0809e776 201c
+    bl check_field_spell_neo_daedalus_group_placeable @ 0809e778 9df700fa
+    cmp r0,#0x0                              @ 0809e77c 0028
+    beq LAB_0809e7b0                         @ 0809e77e 17d0
+    ldr r1, equip_scan_cid_9e7a0             @ 0809e780 0749
+    adds r0,r4,#0x0    @ 0809e782 201c
+    movs r2,#0x0    @ 0809e784 0022
+    bl dispatch_effect_handler_by_card_id    @ 0809e786 eff793f9
+    cmp r0,#0x0                              @ 0809e78a 0028
+    beq LAB_0809e7b0                         @ 0809e78c 10d0
+    ldr r1, equip_scan_display_op31_subtype_9e7a4 @ 0809e78e 0549
+    adds r0,r4,#0x0    @ 0809e790 201c
+    bl trigger_card_display_op31_if_not_active @ 0809e792 f4f7fdfd
+    ldr r1, equip_scan_lp_base_9e7a8         @ 0809e796 0449
+    ldr r2, equip_scan_subphase_offset_9e7ac @ 0809e798 044a
+    adds r1,r1,r2    @ 0809e79a 8918
+    b LAB_0809e8de                           @ 0809e79c 9fe0
+    .zero  0x2
+equip_scan_cid_9e7a0:
+    .word  LAST_TURN_CID                  @ 0809e7a0 1e150000  Internal CID 0x151e; see verified card mapping.
+equip_scan_display_op31_subtype_9e7a4:
+    .word  CARD_DISPLAY_OP31_LP_BAR_SUB   @ 0809e7a4 1d010000  Value for display op31 subtype.
+equip_scan_lp_base_9e7a8:
+    .word  gP1LifePoints                  @ 0809e7a8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e7ac:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e7ac 341d0000  Byte offset from gP1LifePoints; subphase offset.
+LAB_0809e7b0:
+    ldr r0, equip_scan_lp_base_9e7bc         @ 0809e7b0 0248
+    ldr r3, equip_scan_subphase_offset_9e7c0 @ 0809e7b2 034b
+    adds r0,r0,r3    @ 0809e7b4 c018
+    movs r1,#0x8    @ 0809e7b6 0821
+    str r1,[r0,#0x0]                         @ 0809e7b8 0160
+    b LAB_0809e8e4                           @ 0809e7ba 93e0
+equip_scan_lp_base_9e7bc:
+    .word  gP1LifePoints                  @ 0809e7bc e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e7c0:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e7c0 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case2:
+    ldr r2, equip_scan_cid_9e7d4             @ 0809e7c4 034a  -- Case 2: initialize player display context with zone 6, Last Turn CID and zero flags, then advance.
+    adds r0,r4,#0x0    @ 0809e7c6 201c
+    movs r1,#0x6    @ 0809e7c8 0621
+    movs r3,#0x0    @ 0809e7ca 0023
+    bl init_effect_slot_display_context      @ 0809e7cc f5f7fafc
+    b LAB_0809e8d8                           @ 0809e7d0 82e0
+    .zero  0x2
+equip_scan_cid_9e7d4:
+    .word  LAST_TURN_CID                  @ 0809e7d4 1e150000  Internal CID 0x151e; see verified card mapping.
+equip_activation_subphase_case3:
+    bl get_monster_slot_entry_ptr            @ 0809e7d8 f5f780fd  -- Case 3: submit monster-entry pointer with flags 1, mode 0 and stack extra Last Turn CID in high16, then advance.
+    adds r1,r0,#0x0    @ 0809e7dc 011c
+    ldr r0, equip_scan_last_turn_extra_9e7f4 @ 0809e7de 0548
+    str r0,[sp,#0x0]                         @ 0809e7e0 0090
+    adds r0,r4,#0x0    @ 0809e7e2 201c
+    movs r2,#0x1    @ 0809e7e4 0122
+    movs r3,#0x0    @ 0809e7e6 0023
+    bl setup_equip_oam_entry_with_sprite_attr @ 0809e7e8 0df0bafa
+    ldr r1, equip_scan_lp_base_9e7f8         @ 0809e7ec 0249
+    ldr r2, equip_scan_subphase_offset_9e7fc @ 0809e7ee 034a
+    adds r1,r1,r2    @ 0809e7f0 8918
+    b LAB_0809e8de                           @ 0809e7f2 74e0
+equip_scan_last_turn_extra_9e7f4:
+    .word  LAST_TURN_SETUP_EXTRA_WORD     @ 0809e7f4 00001e15  Value for last turn extra.
+equip_scan_lp_base_9e7f8:
+    .word  gP1LifePoints                  @ 0809e7f8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e7fc:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e7fc 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case4:
+    adds r0,r4,#0x0    @ 0809e800 201c  -- Case 4: require own entity-1 and opponent entity-0 slots plus both activation checks; reject with 1 or advance with 0.
+    bl find_equip_slot_idx_with_entity_id_one @ 0809e802 fff727ff
+    adds r5,r0,#0x0    @ 0809e806 051c
+    movs r3,#0x1    @ 0809e808 0123
+    .hword 0x4698    @ 0809e80a 9846
+    subs r7,r3,r4    @ 0809e80c 1f1b
+    adds r0,r7,#0x0    @ 0809e80e 381c
+    bl find_equip_slot_idx_with_entity_id_zero @ 0809e810 fff748ff
+    adds r6,r0,#0x0    @ 0809e814 061c
+    cmp r5,#0x0                              @ 0809e816 002d
+    blt LAB_0809e8f4                         @ 0809e818 6cdb
+    cmp r6,#0x0                              @ 0809e81a 002e
+    blt LAB_0809e8f4                         @ 0809e81c 6adb
+    adds r0,r4,#0x0    @ 0809e81e 201c
+    adds r1,r5,#0x0    @ 0809e820 291c
+    movs r2,#0x1    @ 0809e822 0122
+    bl check_slot_card_activatable           @ 0809e824 96f7c4f8
+    cmp r0,#0x0                              @ 0809e828 0028
+    beq LAB_0809e8f4                         @ 0809e82a 63d0
+    .hword 0x4640    @ 0809e82c 4046
+    str r0,[sp,#0x0]                         @ 0809e82e 0090
+    adds r0,r4,#0x0    @ 0809e830 201c
+    adds r1,r5,#0x0    @ 0809e832 291c
+    adds r2,r7,#0x0    @ 0809e834 3a1c
+    adds r3,r6,#0x0    @ 0809e836 331c
+    bl eval_slot_activation_eligibility_full @ 0809e838 96f73afd
+    cmp r0,#0x0                              @ 0809e83c 0028
+    beq LAB_0809e8f4                         @ 0809e83e 59d0
+    ldr r1, equip_scan_lp_base_9e848         @ 0809e840 0149
+    ldr r2, equip_scan_subphase_offset_9e84c @ 0809e842 024a
+    adds r1,r1,r2    @ 0809e844 8918
+    b LAB_0809e8de                           @ 0809e846 4ae0
+equip_scan_lp_base_9e848:
+    .word  gP1LifePoints                  @ 0809e848 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e84c:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e84c 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case5:
+    ldr r3, equip_scan_saved_phase_offset_9e86c @ 0809e850 064b  -- Case 5: write chain step 1 iff saved phase equals 3, else 0; clear chain active word and advance.
+    adds r0,r2,r3    @ 0809e852 d018
+    ldr r0,[r0,#0x0]                         @ 0809e854 0068
+    cmp r0,#0x3                              @ 0809e856 0328
+    bne LAB_0809e874                         @ 0809e858 0cd1
+    ldr r0, equip_scan_chain_step_offset_9e870 @ 0809e85a 0548
+    adds r1,r2,r0    @ 0809e85c 1118
+    movs r0,#0x1    @ 0809e85e 0120
+    str r0,[r1,#0x0]                         @ 0809e860 0860
+    adds r3,#0x34    @ 0809e862 3433
+    adds r1,r2,r3    @ 0809e864 d118
+    movs r0,#0x0    @ 0809e866 0020
+    str r0,[r1,#0x0]                         @ 0809e868 0860
+    b LAB_0809e882                           @ 0809e86a 0ae0
+equip_scan_saved_phase_offset_9e86c:
+    .word  EQUIP_ACTIVATION_SAVED_PHASE_OFF @ 0809e86c f81c0000  Byte offset from gP1LifePoints; saved phase offset.
+equip_scan_chain_step_offset_9e870:
+    .word  EQUIP_CHAIN_STEP_OFF           @ 0809e870 281d0000  Byte offset from gP1LifePoints; chain step offset.
+LAB_0809e874:
+    ldr r1, equip_scan_chain_step_offset_9e888 @ 0809e874 0449
+    adds r0,r2,r1    @ 0809e876 5018
+    movs r1,#0x0    @ 0809e878 0021
+    str r1,[r0,#0x0]                         @ 0809e87a 0160
+    ldr r3, equip_scan_chain_active_offset_9e88c @ 0809e87c 034b
+    adds r0,r2,r3    @ 0809e87e d018
+    str r1,[r0,#0x0]                         @ 0809e880 0160
+LAB_0809e882:
+    ldr r0, equip_scan_subphase_offset_9e890 @ 0809e882 0348
+    adds r1,r2,r0    @ 0809e884 1118
+    b LAB_0809e8de                           @ 0809e886 2ae0
+equip_scan_chain_step_offset_9e888:
+    .word  EQUIP_CHAIN_STEP_OFF           @ 0809e888 281d0000  Byte offset from gP1LifePoints; chain step offset.
+equip_scan_chain_active_offset_9e88c:
+    .word  EQUIP_CHAIN_ACTIVE_OFF         @ 0809e88c 2c1d0000  Byte offset from gP1LifePoints; chain active offset.
+equip_scan_subphase_offset_9e890:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e890 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case6:
+    adds r0,r4,#0x0    @ 0809e894 201c  -- Case 6: wait until display advance returns nonzero; then increment subphase. Return 0 in both paths.
+    bl advance_equip_display_phase_via_table @ 0809e896 fdf7ebfa
+    cmp r0,#0x0                              @ 0809e89a 0028
+    beq LAB_0809e8e4                         @ 0809e89c 22d0
+    ldr r1, equip_scan_lp_base_9e8a8         @ 0809e89e 0249
+    ldr r2, equip_scan_subphase_offset_9e8ac @ 0809e8a0 024a
+    adds r1,r1,r2    @ 0809e8a2 8918
+    b LAB_0809e8de                           @ 0809e8a4 1be0
+    .zero  0x2
+equip_scan_lp_base_9e8a8:
+    .word  gP1LifePoints                  @ 0809e8a8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e8ac:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e8ac 341d0000  Byte offset from gP1LifePoints; subphase offset.
+equip_activation_subphase_case7:
+    ldr r0, equip_scan_lp_base_9e8e8         @ 0809e8b0 0d48  -- Case 7: unless saved phase is 3, enqueue type saved_phase+12 with player side bit; increment subphase and return 0.
+    ldr r3, equip_scan_saved_phase_offset_9e8ec @ 0809e8b2 0e4b
+    adds r0,r0,r3    @ 0809e8b4 c018
+    ldr r0,[r0,#0x0]                         @ 0809e8b6 0068
+    cmp r0,#0x3                              @ 0809e8b8 0328
+    beq LAB_0809e8d8                         @ 0809e8ba 0dd0
+    adds r1,r0,#0x0    @ 0809e8bc 011c
+    adds r1,#0xc    @ 0809e8be 0c31
+    cmp r4,#0x0                              @ 0809e8c0 002c
+    beq LAB_0809e8ca                         @ 0809e8c2 02d0
+    movs r0,#0x80    @ 0809e8c4 8020
+    lsls r0,r0,#0x8    @ 0809e8c6 0002
+    orrs r1,r0    @ 0809e8c8 0143
+LAB_0809e8ca:
+    lsls r0,r1,#0x10    @ 0809e8ca 0804
+    lsrs r0,r0,#0x10    @ 0809e8cc 000c
+    movs r1,#0x0    @ 0809e8ce 0021
+    movs r2,#0x0    @ 0809e8d0 0022
+    movs r3,#0x0    @ 0809e8d2 0023
+    bl enqueue_sprite_attr_record            @ 0809e8d4 9df72afa
+LAB_0809e8d8:
+    ldr r1, equip_scan_lp_base_9e8e8         @ 0809e8d8 0349
+    ldr r0, equip_scan_subphase_offset_9e8f0 @ 0809e8da 0548
+    adds r1,r1,r0    @ 0809e8dc 0918
+LAB_0809e8de:
+    ldr r0,[r1,#0x0]                         @ 0809e8de 0868
+    adds r0,#0x1    @ 0809e8e0 0130
+    str r0,[r1,#0x0]                         @ 0809e8e2 0860
+LAB_0809e8e4:
+    movs r0,#0x0    @ 0809e8e4 0020
+    b LAB_0809e8f6                           @ 0809e8e6 06e0
+equip_scan_lp_base_9e8e8:
+    .word  gP1LifePoints                  @ 0809e8e8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_saved_phase_offset_9e8ec:
+    .word  EQUIP_ACTIVATION_SAVED_PHASE_OFF @ 0809e8ec f81c0000  Byte offset from gP1LifePoints; saved phase offset.
+equip_scan_subphase_offset_9e8f0:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e8f0 341d0000  Byte offset from gP1LifePoints; subphase offset.
 LAB_0809e8f4:
     movs r0,#0x1    @ 0809e8f4 0120
+LAB_0809e8f6:
     add sp,#0x4                              @ 0809e8f6 01b0
     pop {r3}                                 @ 0809e8f8 08bc
     .hword 0x4698    @ 0809e8fa 9846
@@ -2150,11 +2368,11 @@ LAB_0809e8f4:
     bx r1                                    @ 0809e900 0847
     .zero  0x2
 
-@ Reads gP1LifePoints+0x1d34 (equip activation phase counter). Returns 1 if==6, else 0. No APCS params (entry movs r1,#0 overwrites r1; function does not read r0/r1/r2/r3 at entry). Called from dispatch_equip_activation_state_by_substate case_1 (0x080978a8) to gate phase completion. Constants: gP1LifePoints=0x0201c4e0, phase_counter_offset=0x1d34, PHASE_COMPLETE=6. Params: none. Returns r0=u32 is_six (1=counter==6, 0=otherwise). Side effects: none (pure read/compare).
+@ No arguments. Return 1 exactly when the u32 activation subphase at gP1LifePoints+0x1d34 equals 6, else 0. Read-only leaf; no stack frame.
 check_activation_phase_counter_is_six:
     movs r1,#0x0    @ 0809e904 0021
-    ldr r0, PTR_gP1LifePoints_0809e918       @ 0809e906 0448
-    ldr r2, DAT_0809e91c                     @ 0809e908 044a
+    ldr r0, equip_scan_lp_base_9e918         @ 0809e906 0448
+    ldr r2, equip_scan_subphase_offset_9e91c @ 0809e908 044a
     adds r0,r0,r2    @ 0809e90a 8018
     ldr r0,[r0,#0x0]                         @ 0809e90c 0068
     cmp r0,#0x6                              @ 0809e90e 0628
@@ -2163,12 +2381,12 @@ check_activation_phase_counter_is_six:
 LAB_0809e914:
     adds r0,r1,#0x0    @ 0809e914 081c
     bx lr                                    @ 0809e916 7047
-PTR_gP1LifePoints_0809e918:
-    .word  gP1LifePoints                  @ 0809e918 e0c40102
-DAT_0809e91c:
-    .word  0x00001d34                     @ 0809e91c 341d0000
+equip_scan_lp_base_9e918:
+    .word  gP1LifePoints                  @ 0809e918 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_subphase_offset_9e91c:
+    .word  EQUIP_ACTIVATION_SUBPHASE_OFF  @ 0809e91c 341d0000  Byte offset from gP1LifePoints; subphase offset.
 
-@ Called by ~20 callers (C_util_high, duel_field). r0=player_id [0..1]; r1=card_type_id [0..0x1fff] (fixed by each stub caller). Uses [gP1LifePoints+0x1d24] as monster-zone slot counter upper bound; if counter > 4: returns 1 immediately. Loops slot 0..counter: calls test_slot_has_active_card(player,slot,card_type_id); if active: builds OAM attr (bits[28:21]->y, 0x84<<0x13 shape mask, 0xffff low mask), calls apply_equip_activation_with_id_lookup; increments counter +1; if counter > 4: returns 1. Returns r0=u32 done_flag (0=processed current iteration, 1=counter exceeded 4). Side effects: [gP1LifePoints+0x1d24] := counter+1 (accumulates across frames). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, counter_offset=0x1d24, MASK_16=0xffff, SLOT_MAX=4.
+@ r0=player, r1=internal CID. Resume monster slots 0..4 using the u32 cursor at LP+0x1d24. For each active CID match, build player/slot/CID packed attributes and pass decoded entry flags to apply_equip_activation_with_id_lookup. A nonzero helper result advances the cursor once and returns 0; zero continues scanning. Every rejected slot also advances. Return 1 on exhaustion.
 scan_monster_zone_for_equip_activation_by_card:
     push {r4,r5,r6,r7,lr}                    @ 0809e920 f0b5
     .hword 0x464f    @ 0809e922 4f46
@@ -2177,8 +2395,8 @@ scan_monster_zone_for_equip_activation_by_card:
     sub sp,#0x4                              @ 0809e928 81b0
     adds r7,r0,#0x0    @ 0809e92a 071c
     adds r6,r1,#0x0    @ 0809e92c 0e1c
-    ldr r3, PTR_gP1LifePoints_0809e9b0       @ 0809e92e 204b
-    ldr r0, DAT_0809e9b4                     @ 0809e930 2048
+    ldr r3, equip_scan_lp_base_9e9b0         @ 0809e92e 204b
+    ldr r0, equip_scan_cursor_offset_9e9b4   @ 0809e930 2048
     adds r1,r3,r0    @ 0809e932 1918
     ldr r0,[r1,#0x0]                         @ 0809e934 0868
     cmp r0,#0x4                              @ 0809e936 0428
@@ -2210,13 +2428,13 @@ LAB_0809e94a:
     orrs r0,r1    @ 0809e96a 0843
     .hword 0x4649    @ 0809e96c 4946
     orrs r0,r1    @ 0809e96e 0843
-    ldr r1, DAT_0809e9b8                     @ 0809e970 1149
+    ldr r1, equip_scan_cid_mask_9e9b8        @ 0809e970 1149
     ands r1,r6    @ 0809e972 3140
     orrs r0,r1    @ 0809e974 0843
     lsls r1,r4,#0x2    @ 0809e976 a100
     adds r1,r1,r4    @ 0809e978 0919
     lsls r1,r1,#0x2    @ 0809e97a 8900
-    ldr r2, DAT_0809e9bc                     @ 0809e97c 0f4a
+    ldr r2, equip_scan_player_stride_9e9bc   @ 0809e97c 0f4a
     .hword 0x4644    @ 0809e97e 4446
     muls r4,r2    @ 0809e980 5443
     adds r2,r4,#0x0    @ 0809e982 221c
@@ -2241,19 +2459,19 @@ LAB_0809e94a:
     movs r0,#0x0    @ 0809e9aa 0020
     b LAB_0809e9ce                           @ 0809e9ac 0fe0
     .zero  0x2
-PTR_gP1LifePoints_0809e9b0:
-    .word  gP1LifePoints                  @ 0809e9b0 e0c40102
-DAT_0809e9b4:
-    .word  0x00001d24                     @ 0809e9b4 241d0000
-DAT_0809e9b8:
-    .word  0x0000ffff                     @ 0809e9b8 ffff0000
-DAT_0809e9bc:
-    .word  0x00000868                     @ 0809e9bc 68080000
+equip_scan_lp_base_9e9b0:
+    .word  gP1LifePoints                  @ 0809e9b0 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9e9b4:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809e9b4 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_mask_9e9b8:
+    .word  EQUIP_ACTIVATION_CID_U16_MASK  @ 0809e9b8 ffff0000  Value for cid mask.
+equip_scan_player_stride_9e9bc:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809e9bc 68080000  Value for player stride.
 LAB_0809e9c0:
     ldr r0,[r5,#0x0]                         @ 0809e9c0 2868
     adds r0,#0x1    @ 0809e9c2 0130
     str r0,[r5,#0x0]                         @ 0809e9c4 2860
-    ldr r3, PTR_gP1LifePoints_0809e9dc       @ 0809e9c6 054b
+    ldr r3, equip_scan_lp_base_9e9dc         @ 0809e9c6 054b
     cmp r0,#0x4                              @ 0809e9c8 0428
     bls LAB_0809e94a                         @ 0809e9ca bed9
 LAB_0809e9cc:
@@ -2266,10 +2484,10 @@ LAB_0809e9ce:
     pop {r4,r5,r6,r7}                        @ 0809e9d6 f0bc
     pop {r1}                                 @ 0809e9d8 02bc
     bx r1                                    @ 0809e9da 0847
-PTR_gP1LifePoints_0809e9dc:
-    .word  gP1LifePoints                  @ 0809e9dc e0c40102
+equip_scan_lp_base_9e9dc:
+    .word  gP1LifePoints                  @ 0809e9dc e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
 
-@ Called by ~17 callers (D_shared_mid, duel_field). r0=player_id [0..1]; r1=card_type_id [0..0x1fff] (fixed by each stub caller). Symmetric sibling of scan_monster_zone_for_equip_activation_by_card; difference: slot_idx = counter_val + 5 (LAB_0809ea0a: adds r4,r0,#5), covering trap/magic zone slots 5..9. Uses [gP1LifePoints+0x1d24] counter; if > 4: returns 1. Per iteration: calls test_slot_has_active_card(player,slot+5,card_type_id); if active: calls apply_equip_activation_with_id_lookup; increments counter. Returns r0=u32 done_flag (0=processed, 1=counter > 4). Side effects: [gP1LifePoints+0x1d24] := counter+1. Constants: counter_offset=0x1d24, SLOT_OFFSET=5, SLOT_MAX=4, player_stride=0x868.
+@ r0=player, r1=internal CID. Resume five spell/trap slots cursor+5 using LP+0x1d24 cursor 0..4. For active CID matches, pack player/slot/CID and decoded entry flags for apply_equip_activation_with_id_lookup. A nonzero helper result advances cursor and returns 0; zero continues scanning. Rejected slots also advance. Return 1 on exhaustion.
 scan_trap_zone_for_equip_activation_by_card:
     push {r4,r5,r6,r7,lr}                    @ 0809e9e0 f0b5
     .hword 0x464f    @ 0809e9e2 4f46
@@ -2278,8 +2496,8 @@ scan_trap_zone_for_equip_activation_by_card:
     sub sp,#0x4                              @ 0809e9e8 81b0
     adds r7,r0,#0x0    @ 0809e9ea 071c
     adds r6,r1,#0x0    @ 0809e9ec 0e1c
-    ldr r3, PTR_gP1LifePoints_0809ea70       @ 0809e9ee 204b
-    ldr r0, DAT_0809ea74                     @ 0809e9f0 2048
+    ldr r3, equip_scan_lp_base_9ea70         @ 0809e9ee 204b
+    ldr r0, equip_scan_cursor_offset_9ea74   @ 0809e9f0 2048
     adds r1,r3,r0    @ 0809e9f2 1918
     ldr r0,[r1,#0x0]                         @ 0809e9f4 0868
     cmp r0,#0x4                              @ 0809e9f6 0428
@@ -2312,13 +2530,13 @@ LAB_0809ea0a:
     orrs r0,r1    @ 0809ea2c 0843
     .hword 0x4649    @ 0809ea2e 4946
     orrs r0,r1    @ 0809ea30 0843
-    ldr r1, DAT_0809ea78                     @ 0809ea32 1149
+    ldr r1, equip_scan_cid_mask_9ea78        @ 0809ea32 1149
     ands r1,r6    @ 0809ea34 3140
     orrs r0,r1    @ 0809ea36 0843
     lsls r1,r4,#0x2    @ 0809ea38 a100
     adds r1,r1,r4    @ 0809ea3a 0919
     lsls r1,r1,#0x2    @ 0809ea3c 8900
-    ldr r2, DAT_0809ea7c                     @ 0809ea3e 0f4a
+    ldr r2, equip_scan_player_stride_9ea7c   @ 0809ea3e 0f4a
     .hword 0x4644    @ 0809ea40 4446
     muls r4,r2    @ 0809ea42 5443
     adds r2,r4,#0x0    @ 0809ea44 221c
@@ -2342,19 +2560,19 @@ LAB_0809ea0a:
     str r0,[r5,#0x0]                         @ 0809ea6a 2860
     movs r0,#0x0    @ 0809ea6c 0020
     b LAB_0809ea8e                           @ 0809ea6e 0ee0
-PTR_gP1LifePoints_0809ea70:
-    .word  gP1LifePoints                  @ 0809ea70 e0c40102
-DAT_0809ea74:
-    .word  0x00001d24                     @ 0809ea74 241d0000
-DAT_0809ea78:
-    .word  0x0000ffff                     @ 0809ea78 ffff0000
-DAT_0809ea7c:
-    .word  0x00000868                     @ 0809ea7c 68080000
+equip_scan_lp_base_9ea70:
+    .word  gP1LifePoints                  @ 0809ea70 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9ea74:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ea74 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_mask_9ea78:
+    .word  EQUIP_ACTIVATION_CID_U16_MASK  @ 0809ea78 ffff0000  Value for cid mask.
+equip_scan_player_stride_9ea7c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ea7c 68080000  Value for player stride.
 LAB_0809ea80:
     ldr r0,[r5,#0x0]                         @ 0809ea80 2868
     adds r0,#0x1    @ 0809ea82 0130
     str r0,[r5,#0x0]                         @ 0809ea84 2860
-    ldr r3, PTR_gP1LifePoints_0809ea9c       @ 0809ea86 054b
+    ldr r3, equip_scan_lp_base_9ea9c         @ 0809ea86 054b
     cmp r0,#0x4                              @ 0809ea88 0428
     bls LAB_0809ea0a                         @ 0809ea8a bed9
 LAB_0809ea8c:
@@ -2367,71 +2585,71 @@ LAB_0809ea8e:
     pop {r4,r5,r6,r7}                        @ 0809ea96 f0bc
     pop {r1}                                 @ 0809ea98 02bc
     bx r1                                    @ 0809ea9a 0847
-PTR_gP1LifePoints_0809ea9c:
-    .word  gP1LifePoints                  @ 0809ea9c e0c40102
+equip_scan_lp_base_9ea9c:
+    .word  gP1LifePoints                  @ 0809ea9c e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
 
-@ Equip activation scan case stub for Jam Breeding Machine (internal_card_id=0x13ff, cid=874). Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. Fixes r1=0x13ff then tail-calls scan_trap_zone_for_equip_activation_by_card. Side effects: via scan_trap_zone_for_equip_activation_by_card on hit.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x13ff) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_jam_breeding_machine:
     push {lr}                                @ 0809eaa0 00b5
-    ldr r1, DAT_0809eaac                     @ 0809eaa2 0249
+    ldr r1, equip_scan_cid_9eaac             @ 0809eaa2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809eaa4 fff79cff
     pop {r1}                                 @ 0809eaa8 02bc
     bx r1                                    @ 0809eaaa 0847
-DAT_0809eaac:
-    .word  0x000013ff                     @ 0809eaac ff130000
+equip_scan_cid_9eaac:
+    .word  JAM_BREEDING_MACHINE_CID       @ 0809eaac ff130000  Internal CID 0x13ff; see verified card mapping.
 
-@ Equip activation scan case stub for Blind Destruction (internal_card_id=0x1494, cid=978). Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. Fixes r1=0x1494 then tail-calls scan_trap_zone_for_equip_activation_by_card. Side effects: via scan_trap_zone_for_equip_activation_by_card on hit.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x1494) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_blind_destruction:
     push {lr}                                @ 0809eab0 00b5
-    ldr r1, DAT_0809eabc                     @ 0809eab2 0249
+    ldr r1, equip_scan_cid_9eabc             @ 0809eab2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809eab4 fff794ff
     pop {r1}                                 @ 0809eab8 02bc
     bx r1                                    @ 0809eaba 0847
-DAT_0809eabc:
-    .word  0x00001494                     @ 0809eabc 94140000
+equip_scan_cid_9eabc:
+    .word  BLIND_DESTRUCTION_CID          @ 0809eabc 94140000  Internal CID 0x1494; see verified card mapping.
 
-@ Equip activation scan case stub for Ominous Fortunetelling (internal_card_id=0x1519, cid=1089). Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. Fixes r1=0x1519 then tail-calls scan_trap_zone_for_equip_activation_by_card. Side effects: via scan_trap_zone_for_equip_activation_by_card on hit.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x1519) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_ominous_fortunetelling:
     push {lr}                                @ 0809eac0 00b5
-    ldr r1, DAT_0809eacc                     @ 0809eac2 0249
+    ldr r1, equip_scan_cid_9eacc             @ 0809eac2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809eac4 fff78cff
     pop {r1}                                 @ 0809eac8 02bc
     bx r1                                    @ 0809eaca 0847
-DAT_0809eacc:
-    .word  0x00001519                     @ 0809eacc 19150000
+equip_scan_cid_9eacc:
+    .word  OMINOUS_FORTUNETELLING_CID     @ 0809eacc 19150000  Internal CID 0x1519; see verified card mapping.
 
-@ Trap-zone equip activation case stub for Needle Wall (internal_card_id=0x1545, cid=1129). 3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1545, tail-calls scan_trap_zone_for_equip_activation_by_card. Symmetric to scan_trap_zone_for_equip_activation_dangerous_machine_type6 (0x0809eae0). Called by duel_field main dispatch hub. Constants: CARD_ID=0x1545 (Needle Wall).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x1545) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_needle_wall:
     push {lr}                                @ 0809ead0 00b5
-    ldr r1, DAT_0809eadc                     @ 0809ead2 0249
+    ldr r1, equip_scan_cid_9eadc             @ 0809ead2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809ead4 fff784ff
     pop {r1}                                 @ 0809ead8 02bc
     bx r1                                    @ 0809eada 0847
-DAT_0809eadc:
-    .word  0x00001545                     @ 0809eadc 45150000
+equip_scan_cid_9eadc:
+    .word  NEEDLE_WALL_CID                @ 0809eadc 45150000  Internal CID 0x1545; see verified card mapping.
 
-@ Trap-zone equip activation case stub for Dangerous Machine TYPE-6 (internal_card_id=0x1738, cid=1507). 3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1738, tail-calls scan_trap_zone_for_equip_activation_by_card. Symmetric to scan_trap_zone_for_equip_activation_needle_wall (0x0809ead0). Called by duel_field main dispatch hub. Constants: CARD_ID=0x1738 (Dangerous Machine TYPE-6).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x1738) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_dangerous_machine_type6:
     push {lr}                                @ 0809eae0 00b5
-    ldr r1, DAT_0809eaec                     @ 0809eae2 0249
+    ldr r1, equip_scan_cid_9eaec             @ 0809eae2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809eae4 fff77cff
     pop {r1}                                 @ 0809eae8 02bc
     bx r1                                    @ 0809eaea 0847
-DAT_0809eaec:
-    .word  0x00001738                     @ 0809eaec 38170000
+equip_scan_cid_9eaec:
+    .word  DANGEROUS_MACHINE_TYPE6_CID    @ 0809eaec 38170000  Internal CID 0x1738; see verified card mapping.
 
-@ Scans zone 11 for Dimensionhole (internal_card_id=0x140c, cid=887) node and processes equip activation. r0=player_side; loads r5=0x140c (Dimensionhole). Calls get_node_entity_id_in_slot(r0=player, zone=0xb, card=0x140c). If valid entity_id (>=0): builds r0=(player<<31)|0x0450140c, calls apply_equip_activation_with_id_lookup; if not activated: calls enqueue_equip_slot_sprite_attr(player, zone=0xb, 0x140c, 0). If no node: returns 1. Constants: CARD_ID=0x140c (Dimensionhole), ZONE=0xb, COMBINED_ICID=0x0450140c.
+@ r0=player. Query zone 11 for Dimensionhole. Missing entity returns 1. Otherwise call apply_equip_activation_with_id_lookup with player bit OR 0x0450140c and zero entity/payload. If it returns zero, enqueue the zone-11 Dimensionhole sprite. Return 0 whenever the entity query succeeded, independent of activation result.
 scan_equip_zone_for_dimensionhole:
     push {r4,r5,lr}                          @ 0809eaf0 30b5
     adds r4,r0,#0x0    @ 0809eaf2 041c
-    ldr r5, DAT_0809eb24                     @ 0809eaf4 0b4d
+    ldr r5, equip_scan_cid_9eb24             @ 0809eaf4 0b4d
     movs r1,#0xb    @ 0809eaf6 0b21
     adds r2,r5,#0x0    @ 0809eaf8 2a1c
     bl get_node_entity_id_in_slot            @ 0809eafa 91f7b1f9
     cmp r0,#0x0                              @ 0809eafe 0028
     blt LAB_0809eb2c                         @ 0809eb00 14db
     lsls r0,r4,#0x1f    @ 0809eb02 e007
-    ldr r1, DAT_0809eb28                     @ 0809eb04 0849
+    ldr r1, equip_scan_dimensionhole_attr_9eb28 @ 0809eb04 0849
     orrs r0,r1    @ 0809eb06 0843
     movs r1,#0x0    @ 0809eb08 0021
     movs r2,#0x0    @ 0809eb0a 0022
@@ -2446,10 +2664,10 @@ scan_equip_zone_for_dimensionhole:
 LAB_0809eb20:
     movs r0,#0x0    @ 0809eb20 0020
     b LAB_0809eb2e                           @ 0809eb22 04e0
-DAT_0809eb24:
-    .word  0x0000140c                     @ 0809eb24 0c140000
-DAT_0809eb28:
-    .word  0x0450140c                     @ 0809eb28 0c145004
+equip_scan_cid_9eb24:
+    .word  DIMENSIONHOLE_CID              @ 0809eb24 0c140000  Internal CID 0x140c; see verified card mapping.
+equip_scan_dimensionhole_attr_9eb28:
+    .word  DIMENSIONHOLE_PACKED_ACTIVATION_ATTR @ 0809eb28 0c145004  Value for dimensionhole attr.
 LAB_0809eb2c:
     movs r0,#0x1    @ 0809eb2c 0120
 LAB_0809eb2e:
@@ -2457,35 +2675,35 @@ LAB_0809eb2e:
     pop {r1}                                 @ 0809eb30 02bc
     bx r1                                    @ 0809eb32 0847
 
-@ Reserved internal_card_id=0x11cf equip activation scan thin wrapper, sibling 'f'. r0=player_id([0..1]). Loads card_id=0x11cf into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x11cf). 4 instructions: push/ldr/bl/pop+bx. Symmetric to scan_monster_zone_slots_for_equip_activation_reserved_icid_d(0x0809caa4), same card_id but different scan path. Constants: CARD_ID=0x11cf=reserved/unused.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x11cf) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_reserved_icid_f:
     push {lr}                                @ 0809eb34 00b5
-    ldr r1, DAT_0809eb40                     @ 0809eb36 0249
+    ldr r1, equip_scan_cid_9eb40             @ 0809eb36 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809eb38 fff7f2fe
     pop {r1}                                 @ 0809eb3c 02bc
     bx r1                                    @ 0809eb3e 0847
-DAT_0809eb40:
-    .word  0x000011cf                     @ 0809eb40 cf110000
+equip_scan_cid_9eb40:
+    .word  get_card_lp_cost_by_id_cid_11cf @ 0809eb40 cf110000  Internal CID 0x11cf; see verified card mapping.
 
-@ Lava Golem (0x1578) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x1578 into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1578). 4 instructions: push/ldr/bl/pop+bx. Symmetric to reserved_icid_f(0x0809eb34)/Princess Curran(0x0809ed30)/Bowganian(0x0809ed40) stubs. Constants: CARD_ID=0x1578=Lava Golem.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1578) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_lava_golem:
     push {lr}                                @ 0809eb44 00b5
-    ldr r1, DAT_0809eb50                     @ 0809eb46 0249
+    ldr r1, equip_scan_cid_9eb50             @ 0809eb46 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809eb48 fff7eafe
     pop {r1}                                 @ 0809eb4c 02bc
     bx r1                                    @ 0809eb4e 0847
-DAT_0809eb50:
-    .word  0x00001578                     @ 0809eb50 78150000
+equip_scan_cid_9eb50:
+    .word  LAVA_GOLEM_CID                 @ 0809eb50 78150000  Internal CID 0x1578; see verified card mapping.
 
-@ Reserved internal_card_id=0x1338 monster zone equip activation scan, sibling 'g'. r0=player_id([0..1]). Scans 5 equip zone slots using gP1LifePoints+0x1d24 counter. Each slot: test_slot_has_active_card(player_bit, slot_idx, 0x1338); on hit: count_occupied_monster_zones(player_id)==1 gate; if met: enqueue_sprite_attr_for_zone_card_id_lookup; if slot[+6]==0: invoke_equip_activation_with_zero_flag; set_field_slot_bit_with_sprite_update(player, slot, bit=0x15, val=1). Returns 1 if no activation. Constants: CARD_ID=0x1338=reserved/unused, COUNTER_OFFSET=0x1d24, EQUIP_BASE_OFFSET=0x30, SLOT_COUNT=5, SET_BIT=0x15.
+@ r0=player. Resume monster slots 0..4 via LP+0x1d24. Require active CID 0x1338 and exactly one occupied monster slot. Enqueue entry flags; if entry+6 is zero, invoke activation with zero arguments. Set slot field bit 0x15, advance cursor and return 0. Other slots advance without emission; exhaustion returns 1. CID 0x1338 has no card mapping.
 scan_monster_zone_slots_for_equip_activation_reserved_icid_g:
     push {r4,r5,r6,r7,lr}                    @ 0809eb54 f0b5
     .hword 0x4647    @ 0809eb56 4746
     push {r7}                                @ 0809eb58 80b4
     sub sp,#0x4                              @ 0809eb5a 81b0
     adds r6,r0,#0x0    @ 0809eb5c 061c
-    ldr r2, PTR_gP1LifePoints_0809ebdc       @ 0809eb5e 1f4a
-    ldr r0, DAT_0809ebe0                     @ 0809eb60 1f48
+    ldr r2, equip_scan_lp_base_9ebdc         @ 0809eb5e 1f4a
+    ldr r0, equip_scan_cursor_offset_9ebe0   @ 0809eb60 1f48
     adds r1,r2,r0    @ 0809eb62 1118
     ldr r0,[r1,#0x0]                         @ 0809eb64 0868
     cmp r0,#0x4                              @ 0809eb66 0428
@@ -2497,7 +2715,7 @@ LAB_0809eb70:
     ldr r5,[r7,#0x0]                         @ 0809eb70 3d68
     adds r0,r6,#0x0    @ 0809eb72 301c
     adds r1,r5,#0x0    @ 0809eb74 291c
-    ldr r2, DAT_0809ebe4                     @ 0809eb76 1b4a
+    ldr r2, equip_scan_cid_9ebe4             @ 0809eb76 1b4a
     bl test_slot_has_active_card             @ 0809eb78 93f7e6fc
     cmp r0,#0x0                              @ 0809eb7c 0028
     beq LAB_0809ebec                         @ 0809eb7e 35d0
@@ -2510,7 +2728,7 @@ LAB_0809eb70:
     lsls r4,r5,#0x2    @ 0809eb8e ac00
     adds r4,r4,r5    @ 0809eb90 6419
     lsls r4,r4,#0x2    @ 0809eb92 a400
-    ldr r0, DAT_0809ebe8                     @ 0809eb94 1448
+    ldr r0, equip_scan_player_stride_9ebe8   @ 0809eb94 1448
     muls r0,r1    @ 0809eb96 4843
     adds r4,r4,r0    @ 0809eb98 2418
     add r4,r8                                @ 0809eb9a 4444
@@ -2544,14 +2762,14 @@ LAB_0809ebc6:
     str r0,[r7,#0x0]                         @ 0809ebd6 3860
     movs r0,#0x0    @ 0809ebd8 0020
     b LAB_0809ebf8                           @ 0809ebda 0de0
-PTR_gP1LifePoints_0809ebdc:
-    .word  gP1LifePoints                  @ 0809ebdc e0c40102
-DAT_0809ebe0:
-    .word  0x00001d24                     @ 0809ebe0 241d0000
-DAT_0809ebe4:
-    .word  0x00001338                     @ 0809ebe4 38130000
-DAT_0809ebe8:
-    .word  0x00000868                     @ 0809ebe8 68080000
+equip_scan_lp_base_9ebdc:
+    .word  gP1LifePoints                  @ 0809ebdc e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9ebe0:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ebe0 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_9ebe4:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_1338 @ 0809ebe4 38130000  Internal CID 0x1338; see verified card mapping.
+equip_scan_player_stride_9ebe8:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ebe8 68080000  Value for player stride.
 LAB_0809ebec:
     ldr r0,[r7,#0x0]                         @ 0809ebec 3868
     adds r0,#0x1    @ 0809ebee 0130
@@ -2568,59 +2786,59 @@ LAB_0809ebf8:
     pop {r1}                                 @ 0809ec00 02bc
     bx r1                                    @ 0809ec02 0847
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 4-instruction thin wrapper stub: r0=player_id [0..1] (pass-through); fixed r1=0x1450. Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 pass-through (0=processed, 1=counter > 4). Sibling pair with FUN_0809ec14 (card_id=0x1451). Constants: CARD_ID=0x1450.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1450) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_spirit_of_the_breeze:
     push {lr}                                @ 0809ec04 00b5
-    ldr r1, DAT_0809ec10                     @ 0809ec06 0249
+    ldr r1, equip_scan_cid_9ec10             @ 0809ec06 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ec08 fff78afe
     pop {r1}                                 @ 0809ec0c 02bc
     bx r1                                    @ 0809ec0e 0847
-DAT_0809ec10:
-    .word  0x00001450                     @ 0809ec10 50140000
+equip_scan_cid_9ec10:
+    .word  SPIRIT_OF_THE_BREEZE_CID       @ 0809ec10 50140000  Internal CID 0x1450; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 4-instruction thin wrapper stub: r0=player_id [0..1] (pass-through); fixed r1=0x1451. Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 pass-through (0=processed, 1=counter > 4). Sequential sibling with FUN_0809ec04 (card_id=0x1450, addr diff=0x10). Constants: CARD_ID=0x1451.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1451) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_dancing_fairy:
     push {lr}                                @ 0809ec14 00b5
-    ldr r1, DAT_0809ec20                     @ 0809ec16 0249
+    ldr r1, equip_scan_cid_9ec20             @ 0809ec16 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ec18 fff782fe
     pop {r1}                                 @ 0809ec1c 02bc
     bx r1                                    @ 0809ec1e 0847
-DAT_0809ec20:
-    .word  0x00001451                     @ 0809ec20 51140000
+equip_scan_cid_9ec20:
+    .word  DANCING_FAIRY_CID              @ 0809ec20 51140000  Internal CID 0x1451; see verified card mapping.
 
-@ 4-instruction thin wrapper stub for Cure Mermaid (card_id=0x1454) equip activation. r0=player_id [0..1] (pass-through); fixed r1=0x1454. Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 done_flag (0=activated, 1=counter overflow or no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x1454 (Cure Mermaid).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1454) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_cure_mermaid:
     push {lr}                                @ 0809ec24 00b5
-    ldr r1, DAT_0809ec30                     @ 0809ec26 0249
+    ldr r1, equip_scan_cid_9ec30             @ 0809ec26 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ec28 fff77afe
     pop {r1}                                 @ 0809ec2c 02bc
     bx r1                                    @ 0809ec2e 0847
-DAT_0809ec30:
-    .word  0x00001454                     @ 0809ec30 54140000
+equip_scan_cid_9ec30:
+    .word  CURE_MERMAID_CID               @ 0809ec30 54140000  Internal CID 0x1454; see verified card mapping.
 
-@ Scans monster slots for Marie the Fallen One (card_id=0x1459) equip activation. r0=player_id [0..1] (callee-save mov r7,r0). First checks [gP1LifePoints+0x1d24] counter: if != 0 returns 1 immediately. Else reads [gP1LifePoints+player*0x868+0x14] monster slot count; loops slot 0..count-1: reads slot node from gP1LifePoints offset 0x418 area, checks masked card_id (bits[18:0] AND 0x201fff == 0x1459=Marie); if match: builds OAM attr = card_bits | OAM_FLAG(0x044e0000) | player_bit (lsls 0x1f), calls apply_equip_activation_with_id_lookup; increments [gP1LifePoints+0x1d24]; returns 0. Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state. Constants: CARD_ID=0x1459 (Marie the Fallen One), CARD_MASK=0x201fff, OAM_FLAG=0x044e0000, counter_offset=0x1d24, player_stride=0x868.
-scan_monster_slots_for_equip_activation_marie_the_fallen_one:
+@ r0=player. If LP+0x1d24 is nonzero, return 1. Otherwise scan the player 4-byte card-word array at gP1HandSlotArray with count LP+0x14 and stride 0x868. Match (word & 0x00201fff)==MARIE_THE_FALLEN_ONE_CID, pack each match with 0x044e0000 and player bit, and call activation with decoded flags. Ignore each result. Increment the shared cursor and return 0 even if no entry matched.
+scan_player_card_array_for_equip_activation_marie_the_fallen_one:
     push {r4,r5,r6,r7,lr}                    @ 0809ec34 f0b5
     .hword 0x4647    @ 0809ec36 4746
     push {r7}                                @ 0809ec38 80b4
     adds r5,r0,#0x0    @ 0809ec3a 051c
-    ldr r3, PTR_gP1LifePoints_0809ec4c       @ 0809ec3c 034b
-    ldr r1, DAT_0809ec50                     @ 0809ec3e 0449
+    ldr r3, equip_scan_lp_base_9ec4c         @ 0809ec3c 034b
+    ldr r1, equip_scan_cursor_offset_9ec50   @ 0809ec3e 0449
     adds r0,r3,r1    @ 0809ec40 5818
     ldr r0,[r0,#0x0]                         @ 0809ec42 0068
     cmp r0,#0x0                              @ 0809ec44 0028
     beq LAB_0809ec54                         @ 0809ec46 05d0
     movs r0,#0x1    @ 0809ec48 0120
     b LAB_0809ecbe                           @ 0809ec4a 38e0
-PTR_gP1LifePoints_0809ec4c:
-    .word  gP1LifePoints                  @ 0809ec4c e0c40102
-DAT_0809ec50:
-    .word  0x00001d24                     @ 0809ec50 241d0000
+equip_scan_lp_base_9ec4c:
+    .word  gP1LifePoints                  @ 0809ec4c e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9ec50:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ec50 241d0000  Byte offset from gP1LifePoints; cursor offset.
 LAB_0809ec54:
     movs r4,#0x0    @ 0809ec54 0024
     movs r0,#0x1    @ 0809ec56 0120
     ands r0,r5    @ 0809ec58 2840
-    ldr r1, DAT_0809ecc8                     @ 0809ec5a 1b49
+    ldr r1, equip_scan_player_stride_9ecc8   @ 0809ec5a 1b49
     muls r1,r0    @ 0809ec5c 4143
     adds r0,r3,#0x0    @ 0809ec5e 181c
     adds r0,#0x14    @ 0809ec60 1430
@@ -2641,14 +2859,14 @@ LAB_0809ec78:
     lsls r1,r4,#0x2    @ 0809ec7c a100
     adds r0,r0,r1    @ 0809ec7e 4018
     ldr r3,[r0,#0x0]                         @ 0809ec80 0368
-    ldr r0, DAT_0809eccc                     @ 0809ec82 1248
+    ldr r0, equip_scan_cid_bit21_mask_9eccc  @ 0809ec82 1248
     ands r0,r3    @ 0809ec84 1840
-    ldr r1, DAT_0809ecd0                     @ 0809ec86 1249
+    ldr r1, equip_scan_cid_9ecd0             @ 0809ec86 1249
     cmp r0,r1                                @ 0809ec88 8842
     bne LAB_0809eca8                         @ 0809ec8a 0dd1
     lsls r0,r3,#0x13    @ 0809ec8c d804
     lsrs r0,r0,#0x13    @ 0809ec8e c00c
-    ldr r1, DAT_0809ecd4                     @ 0809ec90 1049
+    ldr r1, equip_scan_array_attr_prefix_9ecd4 @ 0809ec90 1049
     orrs r0,r1    @ 0809ec92 0843
     orrs r0,r5    @ 0809ec94 2843
     lsls r2,r3,#0x2    @ 0809ec96 9a00
@@ -2665,8 +2883,8 @@ LAB_0809eca8:
     cmp r4,r0                                @ 0809ecac 8442
     bcc LAB_0809ec78                         @ 0809ecae e3d3
 LAB_0809ecb0:
-    ldr r1, PTR_gP1LifePoints_0809ecd8       @ 0809ecb0 0949
-    ldr r0, DAT_0809ecdc                     @ 0809ecb2 0a48
+    ldr r1, equip_scan_lp_base_9ecd8         @ 0809ecb0 0949
+    ldr r0, equip_scan_cursor_offset_9ecdc   @ 0809ecb2 0a48
     adds r1,r1,r0    @ 0809ecb4 0918
     ldr r0,[r1,#0x0]                         @ 0809ecb6 0868
     adds r0,#0x1    @ 0809ecb8 0130
@@ -2678,20 +2896,20 @@ LAB_0809ecbe:
     pop {r4,r5,r6,r7}                        @ 0809ecc2 f0bc
     pop {r1}                                 @ 0809ecc4 02bc
     bx r1                                    @ 0809ecc6 0847
-DAT_0809ecc8:
-    .word  0x00000868                     @ 0809ecc8 68080000
-DAT_0809eccc:
-    .word  0x00201fff                     @ 0809eccc ff1f2000
-DAT_0809ecd0:
-    .word  0x00001459                     @ 0809ecd0 59140000
-DAT_0809ecd4:
-    .word  0x044e0000                     @ 0809ecd4 00004e04
-PTR_gP1LifePoints_0809ecd8:
-    .word  gP1LifePoints                  @ 0809ecd8 e0c40102
-DAT_0809ecdc:
-    .word  0x00001d24                     @ 0809ecdc 241d0000
+equip_scan_player_stride_9ecc8:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ecc8 68080000  Value for player stride.
+equip_scan_cid_bit21_mask_9eccc:
+    .word  CARD_WORD_CID_AND_BIT21_MASK   @ 0809eccc ff1f2000  Value for cid bit21 mask.
+equip_scan_cid_9ecd0:
+    .word  MARIE_THE_FALLEN_ONE_CID       @ 0809ecd0 59140000  Internal CID 0x1459; see verified card mapping.
+equip_scan_array_attr_prefix_9ecd4:
+    .word  EQUIP_ACTIVATION_CARD_ARRAY_ATTR_PREFIX @ 0809ecd4 00004e04  Value for array attr prefix.
+equip_scan_lp_base_9ecd8:
+    .word  gP1LifePoints                  @ 0809ecd8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9ecdc:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ecdc 241d0000  Byte offset from gP1LifePoints; cursor offset.
 
-@ Trap-zone equip activation case stub for Life Absorbing Machine (internal_card_id=0x14c0, cid=1011). 4-instruction thin wrapper: passes r0=player_id, builds r1=0xa6<<5=0x14c0, tail-calls scan_trap_zone_for_equip_activation_by_card. Adjacent to scan_trap_zone_for_equip_activation_senri_eye (0x0809ecf0). Called by duel_field main dispatch hub. Constants: CARD_ID=0x14c0 (Life Absorbing Machine, built as 0xa6<<5).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x14c0) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_life_absorbing_machine:
     push {lr}                                @ 0809ece0 00b5
     movs r1,#0xa6    @ 0809ece2 a621
@@ -2701,67 +2919,67 @@ scan_trap_zone_for_equip_activation_life_absorbing_machine:
     bx r1                                    @ 0809ecec 0847
     .zero  0x2
 
-@ Trap-zone equip activation case stub for Senri Eye (internal_card_id=0x1628, cid=1291). 3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1628, tail-calls scan_trap_zone_for_equip_activation_by_card. Adjacent to scan_trap_zone_for_equip_activation_life_absorbing_machine (0x0809ece0). Called by duel_field main dispatch hub. Constants: CARD_ID=0x1628 (Senri Eye).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x1628) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_senri_eye:
     push {lr}                                @ 0809ecf0 00b5
-    ldr r1, DAT_0809ecfc                     @ 0809ecf2 0249
+    ldr r1, equip_scan_cid_9ecfc             @ 0809ecf2 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809ecf4 fff774fe
     pop {r1}                                 @ 0809ecf8 02bc
     bx r1                                    @ 0809ecfa 0847
-DAT_0809ecfc:
-    .word  0x00001628                     @ 0809ecfc 28160000
+equip_scan_cid_9ecfc:
+    .word  SENRI_EYE_CID                  @ 0809ecfc 28160000  Internal CID 0x1628; see verified card mapping.
 
-@ White Magician Pikeru (0x1757) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x1757 into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1757). Symmetric to 0x0809ed10 (Ebon Magician Curran) and 0x0809ed20 (Princess Pikeru). Constants: CARD_ID=0x1757=White Magician Pikeru.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1757) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_white_magician_pikeru:
     push {lr}                                @ 0809ed00 00b5
-    ldr r1, DAT_0809ed0c                     @ 0809ed02 0249
+    ldr r1, equip_scan_cid_9ed0c             @ 0809ed02 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ed04 fff70cfe
     pop {r1}                                 @ 0809ed08 02bc
     bx r1                                    @ 0809ed0a 0847
-DAT_0809ed0c:
-    .word  0x00001757                     @ 0809ed0c 57170000
+equip_scan_cid_9ed0c:
+    .word  WHITE_MAGICIAN_PIKERU_CID      @ 0809ed0c 57170000  Internal CID 0x1757; see verified card mapping.
 
-@ Ebon Magician Curran (0x191d) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x191d into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x191d). Symmetric to 0x0809ed00 (White Magician Pikeru) and 0x0809ed20 (Princess Pikeru). Constants: CARD_ID=0x191d=Ebon Magician Curran.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x191d) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_ebon_magician_curran:
     push {lr}                                @ 0809ed10 00b5
-    ldr r1, DAT_0809ed1c                     @ 0809ed12 0249
+    ldr r1, equip_scan_cid_9ed1c             @ 0809ed12 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ed14 fff704fe
     pop {r1}                                 @ 0809ed18 02bc
     bx r1                                    @ 0809ed1a 0847
-DAT_0809ed1c:
-    .word  0x0000191d                     @ 0809ed1c 1d190000
+equip_scan_cid_9ed1c:
+    .word  EBON_MAGICIAN_CURRAN_CID       @ 0809ed1c 1d190000  Internal CID 0x191d; see verified card mapping.
 
-@ Princess Pikeru (0x19cd) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x19cd into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x19cd). Symmetric to 0x0809ed00 (White Magician Pikeru) and 0x0809ed10 (Ebon Magician Curran). Three form LP recovery monster sprite cluster. Constants: CARD_ID=0x19cd=Princess Pikeru.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x19cd) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_princess_pikeru:
     push {lr}                                @ 0809ed20 00b5
-    ldr r1, DAT_0809ed2c                     @ 0809ed22 0249
+    ldr r1, equip_scan_cid_9ed2c             @ 0809ed22 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ed24 fff7fcfd
     pop {r1}                                 @ 0809ed28 02bc
     bx r1                                    @ 0809ed2a 0847
-DAT_0809ed2c:
-    .word  0x000019cd                     @ 0809ed2c cd190000
+equip_scan_cid_9ed2c:
+    .word  PRINCESS_PIKERU_CID            @ 0809ed2c cd190000  Internal CID 0x19cd; see verified card mapping.
 
-@ Princess Curran (0x19ce) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x19ce into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x19ce). 4 instructions: push/ldr/bl/pop+bx. Adjacent to Princess Pikeru(0x0809ed00)/Ebon Magician Curran(0x0809ed10)/Bowganian(0x0809ed40). Constants: CARD_ID=0x19ce=Princess Curran.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x19ce) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_princess_curran:
     push {lr}                                @ 0809ed30 00b5
-    ldr r1, DAT_0809ed3c                     @ 0809ed32 0249
+    ldr r1, equip_scan_cid_9ed3c             @ 0809ed32 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ed34 fff7f4fd
     pop {r1}                                 @ 0809ed38 02bc
     bx r1                                    @ 0809ed3a 0847
-DAT_0809ed3c:
-    .word  0x000019ce                     @ 0809ed3c ce190000
+equip_scan_cid_9ed3c:
+    .word  PRINCESS_CURRAN_CID            @ 0809ed3c ce190000  Internal CID 0x19ce; see verified card mapping.
 
-@ Bowganian (0x1637) monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x1637 into r1, tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1637). 4 instructions: push/ldr/bl/pop+bx. Symmetric to Princess Curran(0x0809ed30)/Princess Pikeru(0x0809ed00)/Ebon Magician Curran(0x0809ed10). Constants: CARD_ID=0x1637=Bowganian.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1637) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_bowganian:
     push {lr}                                @ 0809ed40 00b5
-    ldr r1, DAT_0809ed4c                     @ 0809ed42 0249
+    ldr r1, equip_scan_cid_9ed4c             @ 0809ed42 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809ed44 fff7ecfd
     pop {r1}                                 @ 0809ed48 02bc
     bx r1                                    @ 0809ed4a 0847
-DAT_0809ed4c:
-    .word  0x00001637                     @ 0809ed4c 37160000
+equip_scan_cid_9ed4c:
+    .word  BOWGANIAN_CID                  @ 0809ed4c 37160000  Internal CID 0x1637; see verified card mapping.
 
-@ Infernalqueen Archfiend (0x1690) all-monster-zone-slot equip activation scan. r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; test_slot_has_active_card(side, col, 0x1690); on hit build OAM attr (0x84<<0x13 prefix + player_bit + col_encoded); apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. Structurally identical to scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare(0x0809f744). Constants: CARD_ID=0x1690=Infernalqueen Archfiend, COUNTER_OFFSET=0x1d24, SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13.
+@ r0=player. Resume ten monster slots with LP+0x1d24 cursor: side=(cursor/5)^player, slot=cursor%5. For active Infernalqueen Archfiend, pack the actual entry CID, side and slot, then call activation with decoded flags. Ignore its result; advance cursor and return 0 after the first match. Other entries advance and continue. Return 1 after cursor 9.
 scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend:
     push {r4,r5,r6,r7,lr}                    @ 0809ed50 f0b5
     .hword 0x4657    @ 0809ed52 5746
@@ -2769,8 +2987,8 @@ scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend:
     .hword 0x4645    @ 0809ed56 4546
     push {r5,r6,r7}                          @ 0809ed58 e0b4
     .hword 0x4681    @ 0809ed5a 8146
-    ldr r1, PTR_gP1LifePoints_0809ede8       @ 0809ed5c 2249
-    ldr r0, DAT_0809edec                     @ 0809ed5e 2348
+    ldr r1, equip_scan_lp_base_9ede8         @ 0809ed5c 2249
+    ldr r0, equip_scan_cursor_offset_9edec   @ 0809ed5e 2348
     adds r4,r1,r0    @ 0809ed60 0c18
     ldr r0,[r4,#0x0]                         @ 0809ed62 2068
     cmp r0,#0x9                              @ 0809ed64 0928
@@ -2796,7 +3014,7 @@ LAB_0809ed6e:
     lsls r0,r4,#0x2    @ 0809ed8e a000
     adds r0,r0,r4    @ 0809ed90 0019
     lsls r0,r0,#0x2    @ 0809ed92 8000
-    ldr r1, DAT_0809edf0                     @ 0809ed94 1649
+    ldr r1, equip_scan_player_stride_9edf0   @ 0809ed94 1649
     muls r1,r2    @ 0809ed96 5143
     adds r0,r0,r1    @ 0809ed98 4018
     .hword 0x4651    @ 0809ed9a 5146
@@ -2806,7 +3024,7 @@ LAB_0809ed6e:
     lsrs r7,r0,#0x13    @ 0809eda2 c70c
     adds r0,r5,#0x0    @ 0809eda4 281c
     adds r1,r4,#0x0    @ 0809eda6 211c
-    ldr r2, DAT_0809edf4                     @ 0809eda8 124a
+    ldr r2, equip_scan_cid_9edf4             @ 0809eda8 124a
     bl test_slot_has_active_card             @ 0809edaa 93f7cdfb
     cmp r0,#0x0                              @ 0809edae 0028
     beq LAB_0809edf8                         @ 0809edb0 22d0
@@ -2836,14 +3054,14 @@ LAB_0809ed6e:
     movs r0,#0x0    @ 0809ede2 0020
     b LAB_0809ee06                           @ 0809ede4 0fe0
     .zero  0x2
-PTR_gP1LifePoints_0809ede8:
-    .word  gP1LifePoints                  @ 0809ede8 e0c40102
-DAT_0809edec:
-    .word  0x00001d24                     @ 0809edec 241d0000
-DAT_0809edf0:
-    .word  0x00000868                     @ 0809edf0 68080000
-DAT_0809edf4:
-    .word  0x00001690                     @ 0809edf4 90160000
+equip_scan_lp_base_9ede8:
+    .word  gP1LifePoints                  @ 0809ede8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9edec:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809edec 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_player_stride_9edf0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809edf0 68080000  Value for player stride.
+equip_scan_cid_9edf4:
+    .word  INFERNALQUEEN_ARCHFIEND_CID    @ 0809edf4 90160000  Internal CID 0x1690; see verified card mapping.
 LAB_0809edf8:
     .hword 0x4641    @ 0809edf8 4146
     ldr r0,[r1,#0x0]                         @ 0809edfa 0868
@@ -2862,7 +3080,7 @@ LAB_0809ee06:
     pop {r1}                                 @ 0809ee10 02bc
     bx r1                                    @ 0809ee12 0847
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). r0=player_id [0..1]. Reads [gP1LifePoints+0x1d24] counter; if 0: initializes to 5; if > 9: returns 1. Per-frame slot processing (one slot per call): calls test_slot_has_active_card(player, counter_val, card_type_id=0x1491); if active: calls count_zone_slots_with_card_field5(opponent, 0x1491) -> r7; if r7 > 0: calls enqueue_sprite_attr_for_zone_card_id_lookup, then submit_lp_change_indicator_with_chain_check(player, slot, r7*100, side_flag); increments counter +1; returns 0. Returns 1 when all slots scanned or no match. Side effects: [gP1LifePoints+0x1d24] := counter+1; OAM and LP indicator buffers written. Constants: CARD_ID=0x1491, counter_offset=0x1d24, SLOT_INIT=5, SLOT_MAX=9, player_stride=0x868, gDuelFieldSlots=0x0201c510, lp_scale=100.
+@ r0=player. Start LP+0x1d24 at 5 when zero and scan spell/trap slots through 9. Require active Graverobber's Retribution and nonzero count_zone_slots_with_card_field5(1-player). Enqueue entry flags, then the opponent LP indicator with amount=count*100, mode=1 and this CID. Advance cursor and return 0 on emission; rejected slots advance. Exhaustion returns 1.
 scan_all_zone_slots_for_equip_lp_indicator_graverobbers_retribution:
     push {r4,r5,r6,r7,lr}                    @ 0809ee14 f0b5
     .hword 0x4657    @ 0809ee16 5746
@@ -2870,8 +3088,8 @@ scan_all_zone_slots_for_equip_lp_indicator_graverobbers_retribution:
     .hword 0x4645    @ 0809ee1a 4546
     push {r5,r6,r7}                          @ 0809ee1c e0b4
     adds r6,r0,#0x0    @ 0809ee1e 061c
-    ldr r2, PTR_gP1LifePoints_0809eea8       @ 0809ee20 214a
-    ldr r0, DAT_0809eeac                     @ 0809ee22 2248
+    ldr r2, equip_scan_lp_base_9eea8         @ 0809ee20 214a
+    ldr r0, equip_scan_cursor_offset_9eeac   @ 0809ee22 2248
     adds r1,r2,r0    @ 0809ee24 1118
     ldr r0,[r1,#0x0]                         @ 0809ee26 0868
     cmp r0,#0x0                              @ 0809ee28 0028
@@ -2883,7 +3101,7 @@ LAB_0809ee30:
     cmp r0,#0x9                              @ 0809ee32 0928
     bhi LAB_0809eec8                         @ 0809ee34 48d8
     .hword 0x4689    @ 0809ee36 8946
-    ldr r1, DAT_0809eeb0                     @ 0809ee38 1d49
+    ldr r1, equip_scan_cid_9eeb0             @ 0809ee38 1d49
     .hword 0x468a    @ 0809ee3a 8a46
 LAB_0809ee3c:
     .hword 0x4648    @ 0809ee3c 4846
@@ -2907,10 +3125,10 @@ LAB_0809ee3c:
     lsls r0,r4,#0x2    @ 0809ee64 a000
     adds r0,r0,r4    @ 0809ee66 0019
     lsls r0,r0,#0x2    @ 0809ee68 8000
-    ldr r1, DAT_0809eeb4                     @ 0809ee6a 1249
+    ldr r1, equip_scan_player_stride_9eeb4   @ 0809ee6a 1249
     muls r1,r2    @ 0809ee6c 5143
     adds r0,r0,r1    @ 0809ee6e 4018
-    ldr r1, DAT_0809eeb8                     @ 0809ee70 1149
+    ldr r1, equip_scan_field_base_9eeb8      @ 0809ee70 1149
     adds r0,r0,r1    @ 0809ee72 4018
     ldr r0,[r0,#0x0]                         @ 0809ee74 0068
     lsls r2,r0,#0x2    @ 0809ee76 8200
@@ -2936,16 +3154,16 @@ LAB_0809ee3c:
     movs r0,#0x0    @ 0809eea2 0020
     b LAB_0809eeca                           @ 0809eea4 11e0
     .zero  0x2
-PTR_gP1LifePoints_0809eea8:
-    .word  gP1LifePoints                  @ 0809eea8 e0c40102
-DAT_0809eeac:
-    .word  0x00001d24                     @ 0809eeac 241d0000
-DAT_0809eeb0:
-    .word  0x00001491                     @ 0809eeb0 91140000
-DAT_0809eeb4:
-    .word  0x00000868                     @ 0809eeb4 68080000
-DAT_0809eeb8:
-    .word  0x0201c510                     @ 0809eeb8 10c50102
+equip_scan_lp_base_9eea8:
+    .word  gP1LifePoints                  @ 0809eea8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9eeac:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809eeac 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_9eeb0:
+    .word  GRAVEROBBERS_RETRIBUTION_CID   @ 0809eeb0 91140000  Internal CID 0x1491; see verified card mapping.
+equip_scan_player_stride_9eeb4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809eeb4 68080000  Value for player stride.
+equip_scan_field_base_9eeb8:
+    .word  gDuelFieldSlots                @ 0809eeb8 10c50102  Base/target gDuelFieldSlots; preserve the stored address and all unrelated references.
 LAB_0809eebc:
     .hword 0x4649    @ 0809eebc 4946
     ldr r0,[r1,#0x0]                         @ 0809eebe 0868
@@ -2964,14 +3182,14 @@ LAB_0809eeca:
     pop {r1}                                 @ 0809eed4 02bc
     bx r1                                    @ 0809eed6 0847
 
-@ Burning Land (internal_card_id=0x1406, cid=881) full-zone LP loss indicator scan. r0=player_id; reads counter from gP1LifePoints+0x1d24 (<=9, 10 iterations). Each iteration: side=counter/5 XOR player_id (alternates both players), slot=counter%5+5 (spell/trap zone 5..9). Calls test_slot_has_active_card(side, slot, 0x1406); on hit: decodes card data word, calls enqueue_sprite_attr_for_zone_card_id_lookup to update sprite; then calls submit_lp_change_indicator_with_chain_check with r1=0x1f4=500 (LP drain) and r3=0x1406. Increments counter; returns 0 on first hit. Constants: CARD_ID=0x1406 (Burning Land), LP_DRAIN=500 (0x1f4=0xfa<<1), SLOT_OFFSET=5, MAX_ITER=9, COUNTER_OFFSET=0x1d24.
+@ r0=player. Resume ten spell/trap slots: side=(cursor/5)^player, slot=cursor%5+5, cursor at LP+0x1d24. On active Burning Land, enqueue entry flags and an LP indicator for the input player, amount 500, mode=(side!=player), CID Burning Land. Advance cursor and return 0; rejected entries advance. Return 1 after cursor 9.
 scan_all_zone_slots_for_lp_indicator_burning_land:
     push {r4,r5,r6,r7,lr}                    @ 0809eed8 f0b5
     .hword 0x4647    @ 0809eeda 4746
     push {r7}                                @ 0809eedc 80b4
     adds r7,r0,#0x0    @ 0809eede 071c
-    ldr r1, PTR_gP1LifePoints_0809ef60       @ 0809eee0 1f49
-    ldr r0, DAT_0809ef64                     @ 0809eee2 2048
+    ldr r1, equip_scan_lp_base_9ef60         @ 0809eee0 1f49
+    ldr r0, equip_scan_cursor_offset_9ef64   @ 0809eee2 2048
     adds r4,r1,r0    @ 0809eee4 0c18
     ldr r0,[r4,#0x0]                         @ 0809eee6 2068
     cmp r0,#0x9                              @ 0809eee8 0928
@@ -2992,7 +3210,7 @@ LAB_0809eef2:
     adds r4,r0,#0x5    @ 0809ef08 441d
     adds r0,r5,#0x0    @ 0809ef0a 281c
     adds r1,r4,#0x0    @ 0809ef0c 211c
-    ldr r2, DAT_0809ef68                     @ 0809ef0e 164a
+    ldr r2, equip_scan_cid_9ef68             @ 0809ef0e 164a
     bl test_slot_has_active_card             @ 0809ef10 93f71afb
     cmp r0,#0x0                              @ 0809ef14 0028
     beq LAB_0809ef70                         @ 0809ef16 2bd0
@@ -3001,7 +3219,7 @@ LAB_0809eef2:
     lsls r0,r4,#0x2    @ 0809ef1c a000
     adds r0,r0,r4    @ 0809ef1e 0019
     lsls r0,r0,#0x2    @ 0809ef20 8000
-    ldr r1, DAT_0809ef6c                     @ 0809ef22 1249
+    ldr r1, equip_scan_player_stride_9ef6c   @ 0809ef22 1249
     muls r1,r2    @ 0809ef24 5143
     adds r0,r0,r1    @ 0809ef26 4018
     add r0,r8                                @ 0809ef28 4044
@@ -3023,21 +3241,21 @@ LAB_0809eef2:
     adds r0,r7,#0x0    @ 0809ef4a 381c
     movs r1,#0xfa    @ 0809ef4c fa21
     lsls r1,r1,#0x1    @ 0809ef4e 4900
-    ldr r3, DAT_0809ef68                     @ 0809ef50 054b
+    ldr r3, equip_scan_cid_9ef68             @ 0809ef50 054b
     bl submit_lp_change_indicator_with_chain_check @ 0809ef52 a9f743fc
     ldr r0,[r6,#0x0]                         @ 0809ef56 3068
     adds r0,#0x1    @ 0809ef58 0130
     str r0,[r6,#0x0]                         @ 0809ef5a 3060
     movs r0,#0x0    @ 0809ef5c 0020
     b LAB_0809ef7c                           @ 0809ef5e 0de0
-PTR_gP1LifePoints_0809ef60:
-    .word  gP1LifePoints                  @ 0809ef60 e0c40102
-DAT_0809ef64:
-    .word  0x00001d24                     @ 0809ef64 241d0000
-DAT_0809ef68:
-    .word  0x00001406                     @ 0809ef68 06140000
-DAT_0809ef6c:
-    .word  0x00000868                     @ 0809ef6c 68080000
+equip_scan_lp_base_9ef60:
+    .word  gP1LifePoints                  @ 0809ef60 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9ef64:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ef64 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_9ef68:
+    .word  BURNING_LAND_CID               @ 0809ef68 06140000  Internal CID 0x1406; see verified card mapping.
+equip_scan_player_stride_9ef6c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ef6c 68080000  Value for player stride.
 LAB_0809ef70:
     ldr r0,[r6,#0x0]                         @ 0809ef70 3068
     adds r0,#0x1    @ 0809ef72 0130
@@ -3054,149 +3272,149 @@ LAB_0809ef7c:
     bx r1                                    @ 0809ef84 0847
     .zero  0x2
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x13f0 (Mask of Dispel card_id), tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x13f0). 与 0x0809ef98 (Mask of the Accursed) 及 0x0809efa8 (Nightmare Wheel) 构成同族 sibling 簇. Side effects: via scan_trap_zone_for_equip_activation_by_card on hit. Constants: CARD_ID=0x13f0 (Mask of Dispel).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x13f0) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_mask_of_dispel:
     push {lr}                                @ 0809ef88 00b5
-    ldr r1, DAT_0809ef94                     @ 0809ef8a 0249
+    ldr r1, equip_scan_cid_9ef94             @ 0809ef8a 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809ef8c fff728fd
     pop {r1}                                 @ 0809ef90 02bc
     bx r1                                    @ 0809ef92 0847
-DAT_0809ef94:
-    .word  0x000013f0                     @ 0809ef94 f0130000
+equip_scan_cid_9ef94:
+    .word  MASK_OF_DISPEL_CID             @ 0809ef94 f0130000  Internal CID 0x13f0; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x13f3 (Mask of the Accursed card_id), tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x13f3). 与 0x0809ef88 (Mask of Dispel) 及 0x0809efa8 (Nightmare Wheel) 构成同族 sibling 簇; Mask of Dispel/Accursed 相邻 card_id (0x13f0/0x13f3). Side effects: via callee on hit. Constants: CARD_ID=0x13f3 (Mask of the Accursed).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x13f3) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_mask_of_accursed:
     push {lr}                                @ 0809ef98 00b5
-    ldr r1, DAT_0809efa4                     @ 0809ef9a 0249
+    ldr r1, equip_scan_cid_9efa4             @ 0809ef9a 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809ef9c fff720fd
     pop {r1}                                 @ 0809efa0 02bc
     bx r1                                    @ 0809efa2 0847
-DAT_0809efa4:
-    .word  0x000013f3                     @ 0809efa4 f3130000
+equip_scan_cid_9efa4:
+    .word  MASK_OF_THE_ACCURSED_CID       @ 0809efa4 f3130000  Internal CID 0x13f3; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x14b2 (Nightmare Wheel card_id), tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x14b2). 与 0x0809ef88 (Mask of Dispel) 及 0x0809ef98 (Mask of the Accursed) 构成同族 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x14b2 (Nightmare Wheel).
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(player, CID 0x14b2) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_nightmare_wheel:
     push {lr}                                @ 0809efa8 00b5
-    ldr r1, DAT_0809efb4                     @ 0809efaa 0249
+    ldr r1, equip_scan_cid_9efb4             @ 0809efaa 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809efac fff718fd
     pop {r1}                                 @ 0809efb0 02bc
     bx r1                                    @ 0809efb2 0847
-DAT_0809efb4:
-    .word  0x000014b2                     @ 0809efb4 b2140000
+equip_scan_cid_9efb4:
+    .word  NIGHTMARE_WHEEL_CID            @ 0809efb4 b2140000  Internal CID 0x14b2; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), r1=DAT_0809efcc=0x1322 (Snatch Steal card_id), tail-call scan_trap_zone_for_equip_activation_by_card. Snatch Steal 装备于对手怪兽, 故扫描对手陷阱区. 与 Brain Jacker (0x0809efd0) / Falling Down (0x0809efe8) 构成对手侧 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x1322 (Snatch Steal), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x1322) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_snatch_steal:
     push {lr}                                @ 0809efb8 00b5
     adds r1,r0,#0x0    @ 0809efba 011c
     movs r0,#0x1    @ 0809efbc 0120
     subs r0,r0,r1    @ 0809efbe 401a
-    ldr r1, DAT_0809efcc                     @ 0809efc0 0249
+    ldr r1, equip_scan_cid_9efcc             @ 0809efc0 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809efc2 fff70dfd
     pop {r1}                                 @ 0809efc6 02bc
     bx r1                                    @ 0809efc8 0847
     .zero  0x2
-DAT_0809efcc:
-    .word  0x00001322                     @ 0809efcc 22130000
+equip_scan_cid_9efcc:
+    .word  SNATCH_STEAL_CID               @ 0809efcc 22130000  Internal CID 0x1322; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), r1=DAT_0809efe4=0x1877 (Brain Jacker card_id), tail-call scan_trap_zone_for_equip_activation_by_card. 与 Snatch Steal (0x0809efb8) / Falling Down (0x0809efe8) 构成对手侧 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x1877 (Brain Jacker), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x1877) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_brain_jacker:
     push {lr}                                @ 0809efd0 00b5
     adds r1,r0,#0x0    @ 0809efd2 011c
     movs r0,#0x1    @ 0809efd4 0120
     subs r0,r0,r1    @ 0809efd6 401a
-    ldr r1, DAT_0809efe4                     @ 0809efd8 0249
+    ldr r1, equip_scan_cid_9efe4             @ 0809efd8 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809efda fff701fd
     pop {r1}                                 @ 0809efde 02bc
     bx r1                                    @ 0809efe0 0847
     .zero  0x2
-DAT_0809efe4:
-    .word  0x00001877                     @ 0809efe4 77180000
+equip_scan_cid_9efe4:
+    .word  BRAIN_JACKER_CID               @ 0809efe4 77180000  Internal CID 0x1877; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), r1=DAT_0809effc=0x169a (Falling Down card_id), tail-call scan_trap_zone_for_equip_activation_by_card. 与 Snatch Steal (0x0809efb8) / Brain Jacker (0x0809efd0) 构成对手侧 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x169a (Falling Down), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x169a) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_falling_down:
     push {lr}                                @ 0809efe8 00b5
     adds r1,r0,#0x0    @ 0809efea 011c
     movs r0,#0x1    @ 0809efec 0120
     subs r0,r0,r1    @ 0809efee 401a
-    ldr r1, DAT_0809effc                     @ 0809eff0 0249
+    ldr r1, equip_scan_cid_9effc             @ 0809eff0 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809eff2 fff7f5fc
     pop {r1}                                 @ 0809eff6 02bc
     bx r1                                    @ 0809eff8 0847
     .zero  0x2
-DAT_0809effc:
-    .word  0x0000169a                     @ 0809effc 9a160000
+equip_scan_cid_9effc:
+    .word  FALLING_DOWN_CID               @ 0809effc 9a160000  Internal CID 0x169a; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 5-instruction thin wrapper stub: inverts player_id (r0 := 1 - r0), fixes r1=0x137b, tail-calls scan_trap_zone_for_equip_activation_by_card (FUN_0809e9e0). The inversion makes the scan target the opponent trap zone. Returns r0=u32 pass-through (0=processed, 1=counter full). Sibling with FUN_0809f018 (card_id=0x1355); both use opponent-side inversion. Constants: CARD_ID=0x137b, PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x137b) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_the_eye_of_truth:
     push {lr}                                @ 0809f000 00b5
     adds r1,r0,#0x0    @ 0809f002 011c
     movs r0,#0x1    @ 0809f004 0120
     subs r0,r0,r1    @ 0809f006 401a
-    ldr r1, DAT_0809f014                     @ 0809f008 0249
+    ldr r1, equip_scan_cid_9f014             @ 0809f008 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809f00a fff7e9fc
     pop {r1}                                 @ 0809f00e 02bc
     bx r1                                    @ 0809f010 0847
     .zero  0x2
-DAT_0809f014:
-    .word  0x0000137b                     @ 0809f014 7b130000
+equip_scan_cid_9f014:
+    .word  EYE_OF_TRUTH_CID               @ 0809f014 7b130000  Internal CID 0x137b; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 5-instruction thin wrapper stub: inverts player_id (r0 := 1 - r0), fixes r1=0x1355, tail-calls scan_trap_zone_for_equip_activation_by_card (FUN_0809e9e0). Structurally symmetric sibling of FUN_0809f000 (card_id=0x137b); both perform opponent-side inversion before delegating to e9e0. Returns r0=u32 pass-through. Constants: CARD_ID=0x1355, PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x1355) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_minor_goblin_official:
     push {lr}                                @ 0809f018 00b5
     adds r1,r0,#0x0    @ 0809f01a 011c
     movs r0,#0x1    @ 0809f01c 0120
     subs r0,r0,r1    @ 0809f01e 401a
-    ldr r1, DAT_0809f02c                     @ 0809f020 0249
+    ldr r1, equip_scan_cid_9f02c             @ 0809f020 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809f022 fff7ddfc
     pop {r1}                                 @ 0809f026 02bc
     bx r1                                    @ 0809f028 0847
     .zero  0x2
-DAT_0809f02c:
-    .word  0x00001355                     @ 0809f02c 55130000
+equip_scan_cid_9f02c:
+    .word  MINOR_GOBLIN_OFFICIAL_CID      @ 0809f02c 55130000  Internal CID 0x1355; see verified card mapping.
 
-@ 5-instruction thin wrapper stub for Blast Sphere (card_id=0x1286) equip activation, with player-invert. Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x1286, tail-calls scan_trap_zone_for_equip_activation_by_card. Structurally symmetric sibling of scan_trap_zone_for_equip_activation_the_eye_of_truth / _minor_goblin_official. Returns r0=u32 pass-through (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x1286 (Blast Sphere), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x1286) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_blast_sphere:
     push {lr}                                @ 0809f030 00b5
     adds r1,r0,#0x0    @ 0809f032 011c
     movs r0,#0x1    @ 0809f034 0120
     subs r0,r0,r1    @ 0809f036 401a
-    ldr r1, DAT_0809f044                     @ 0809f038 0249
+    ldr r1, equip_scan_cid_9f044             @ 0809f038 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809f03a fff7d1fc
     pop {r1}                                 @ 0809f03e 02bc
     bx r1                                    @ 0809f040 0847
     .zero  0x2
-DAT_0809f044:
-    .word  0x00001286                     @ 0809f044 86120000
+equip_scan_cid_9f044:
+    .word  BLAST_SPHERE_CID               @ 0809f044 86120000  Internal CID 0x1286; see verified card mapping.
 
-@ 5-instruction thin wrapper stub for Adhesive Explosive (card_id=0x19bd) equip activation, with player-invert. Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x19bd, tail-calls scan_trap_zone_for_equip_activation_by_card. Structurally symmetric sibling of scan_trap_zone_for_equip_activation_blast_sphere (card_id=0x1286). Returns r0=u32 pass-through (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x19bd (Adhesive Explosive), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_trap_zone_for_equip_activation_by_card(1-player, CID 0x19bd) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_trap_zone_for_equip_activation_adhesive_explosive:
     push {lr}                                @ 0809f048 00b5
     adds r1,r0,#0x0    @ 0809f04a 011c
     movs r0,#0x1    @ 0809f04c 0120
     subs r0,r0,r1    @ 0809f04e 401a
-    ldr r1, DAT_0809f05c                     @ 0809f050 0249
+    ldr r1, equip_scan_cid_9f05c             @ 0809f050 0249
     bl scan_trap_zone_for_equip_activation_by_card @ 0809f052 fff7c5fc
     pop {r1}                                 @ 0809f056 02bc
     bx r1                                    @ 0809f058 0847
     .zero  0x2
-DAT_0809f05c:
-    .word  0x000019bd                     @ 0809f05c bd190000
+equip_scan_cid_9f05c:
+    .word  ADHESIVE_EXPLOSIVE_CID         @ 0809f05c bd190000  Internal CID 0x19bd; see verified card mapping.
 
-@ 5-instruction thin wrapper stub for Malice Ascendant (card_id=0x19d0) equip activation, with player-invert. Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x19d0, tail-calls scan_monster_zone_for_equip_activation_by_card. Player inversion reflects that this card's equip effect targets opponent's monsters. Returns r0=u32 pass-through (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x19d0 (Malice Ascendant), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(1-player, CID 0x19d0) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_malice_ascendant:
     push {lr}                                @ 0809f060 00b5
     adds r1,r0,#0x0    @ 0809f062 011c
     movs r0,#0x1    @ 0809f064 0120
     subs r0,r0,r1    @ 0809f066 401a
-    ldr r1, DAT_0809f074                     @ 0809f068 0249
+    ldr r1, equip_scan_cid_9f074             @ 0809f068 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f06a fff759fc
     pop {r1}                                 @ 0809f06e 02bc
     bx r1                                    @ 0809f070 0847
     .zero  0x2
-DAT_0809f074:
-    .word  0x000019d0                     @ 0809f074 d0190000
+equip_scan_cid_9f074:
+    .word  MALICE_ASCENDANT_CID           @ 0809f074 d0190000  Internal CID 0x19d0; see verified card mapping.
 
-@ Scans trap zone slots for Kiseitai (card_id=0x1370) equip chain sprite submission. r0=player_id [0..1] (callee-save .hword 0x4657=mov r7,r0). Checks [gP1LifePoints+0x1d24] counter: if > 4 returns 1. Sets opponent=1-player; inner loop counter_val in [0..4]: slot = counter_val + 5 (trap zone offset); calls test_slot_has_active_card(opponent, slot, 0x1370=Kiseitai); if active: calls find_equip_chain_pair_across_field(opponent, slot, player, counter_val); if chain_pair != 0xffff: extracts slot_a (low byte) and slot_b (high byte); calls find_equip_chain_node_by_slot_pair(slot_a, slot_b, player, counter_val); if node_count == 0xa: reads gDuelFieldSlots_B[player][counter_val] card data, calls enqueue_sprite_attr_for_zone_card_id_lookup(player, counter_val, xy); calls get_slot_field5_score(slot_a, slot_b) + submit_effect_zone_lp_and_shape_sprites; increments [gP1LifePoints+0x1d24]; returns 0. Side effects: OAM sprite buffer; LP/shape sprite; [gP1LifePoints+0x1d24] counter. Constants: CARD_ID=0x1370 (Kiseitai), SLOT_OFFSET=5, SLOT_MAX=4, chain_sentinel=0xffff, node_count_threshold=0xa, counter_offset=0x1d24.
+@ r0=player. Scan opponent slots cursor+5 for cursor 0..4 at LP+0x1d24. Require active Kiseitai, a non-0xffff equip pair, and pair lookup result 0xa. Enqueue opponent slot flags and submit opponent LP/shape sprites with (get_slot_field5_score(pair)+1)>>1. Advance cursor and return 0 on emission. Rejected slots advance; exhaustion returns 1.
 scan_trap_slots_for_kiseitai_equip_chain_sprite:
     push {r4,r5,r6,r7,lr}                    @ 0809f078 f0b5
     .hword 0x4657    @ 0809f07a 5746
@@ -3204,8 +3422,8 @@ scan_trap_slots_for_kiseitai_equip_chain_sprite:
     .hword 0x4645    @ 0809f07e 4546
     push {r5,r6,r7}                          @ 0809f080 e0b4
     adds r2,r0,#0x0    @ 0809f082 021c
-    ldr r3, PTR_gP1LifePoints_0809f128       @ 0809f084 284b
-    ldr r0, DAT_0809f12c                     @ 0809f086 2948
+    ldr r3, equip_scan_lp_base_9f128         @ 0809f084 284b
+    ldr r0, equip_scan_cursor_offset_9f12c   @ 0809f086 2948
     adds r1,r3,r0    @ 0809f088 1918
     ldr r0,[r1,#0x0]                         @ 0809f08a 0868
     cmp r0,#0x4                              @ 0809f08c 0428
@@ -3225,7 +3443,7 @@ LAB_0809f0a2:
     adds r4,r0,#0x5    @ 0809f0a6 441d
     adds r0,r5,#0x0    @ 0809f0a8 281c
     adds r1,r4,#0x0    @ 0809f0aa 211c
-    ldr r2, DAT_0809f130                     @ 0809f0ac 204a
+    ldr r2, equip_scan_cid_9f130             @ 0809f0ac 204a
     bl test_slot_has_active_card             @ 0809f0ae 93f74bfa
     cmp r0,#0x0                              @ 0809f0b2 0028
     beq LAB_0809f13c                         @ 0809f0b4 42d0
@@ -3237,7 +3455,7 @@ LAB_0809f0a2:
     lsls r1,r0,#0x18    @ 0809f0c2 0106
     lsrs r7,r1,#0x18    @ 0809f0c4 0f0e
     lsrs r6,r0,#0x8    @ 0809f0c6 060a
-    ldr r1, DAT_0809f134                     @ 0809f0c8 1a49
+    ldr r1, equip_scan_chain_pair_missing_f134 @ 0809f0c8 1a49
     cmp r0,r1                                @ 0809f0ca 8842
     beq LAB_0809f13c                         @ 0809f0cc 36d0
     adds r0,r7,#0x0    @ 0809f0ce 381c
@@ -3250,7 +3468,7 @@ LAB_0809f0a2:
     lsls r0,r4,#0x2    @ 0809f0de a000
     adds r0,r0,r4    @ 0809f0e0 0019
     lsls r0,r0,#0x2    @ 0809f0e2 8000
-    ldr r1, DAT_0809f138                     @ 0809f0e4 1449
+    ldr r1, equip_scan_player_stride_9f138   @ 0809f0e4 1449
     .hword 0x464a    @ 0809f0e6 4a46
     muls r2,r1    @ 0809f0e8 4a43
     adds r1,r2,#0x0    @ 0809f0ea 111c
@@ -3281,16 +3499,16 @@ LAB_0809f0a2:
     movs r0,#0x0    @ 0809f122 0020
     b LAB_0809f14a                           @ 0809f124 11e0
     .zero  0x2
-PTR_gP1LifePoints_0809f128:
-    .word  gP1LifePoints                  @ 0809f128 e0c40102
-DAT_0809f12c:
-    .word  0x00001d24                     @ 0809f12c 241d0000
-DAT_0809f130:
-    .word  0x00001370                     @ 0809f130 70130000
-DAT_0809f134:
-    .word  0x0000ffff                     @ 0809f134 ffff0000
-DAT_0809f138:
-    .word  0x00000868                     @ 0809f138 68080000
+equip_scan_lp_base_9f128:
+    .word  gP1LifePoints                  @ 0809f128 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9f12c:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f12c 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_9f130:
+    .word  KISEITAI_CID                   @ 0809f130 70130000  Internal CID 0x1370; see verified card mapping.
+equip_scan_chain_pair_missing_f134:
+    .word  EQUIP_CHAIN_PAIR_MISSING       @ 0809f134 ffff0000  Value for cid mask.
+equip_scan_player_stride_9f138:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f138 68080000  Value for player stride.
 LAB_0809f13c:
     .hword 0x4642    @ 0809f13c 4246
     ldr r0,[r2,#0x0]                         @ 0809f13e 1068
@@ -3309,8 +3527,8 @@ LAB_0809f14a:
     pop {r1}                                 @ 0809f154 02bc
     bx r1                                    @ 0809f156 0847
 
-@ Called by FUN_0809f1fc (card_id=0x1181) and FUN_0809f20c (card_id=0x19cb). r0=player_packed [0..1]; r1=card_type_id [0..0x1fff] (.hword 0x4688=mov r8,r1 saves to r8). First: calls check_value_in_slot_chain(player, zone=0xb, card_type_id); if found in chain: returns 1. Else: reads [gP1LifePoints+(player&1)*0x868+0x14] active monster slot count; if 0: returns 1. Loops slot 0..count-1: reads gDuelFieldSlots (0x0201c8f8) slot state word, extracts bits[18:0], compares card_type_id; if match and lsls r0,r1,#0xa >= 0: builds OAM attr (DAT_0809f1d8=0x044e0000 | card_bits | player_bit), calls apply_equip_activation_with_id_lookup; returns 0 on success. Returns r0=u32 hit_flag (0=activated, 1=chain duplicate or no match). Constants: SLOT_ZONE=0xb, gDuelFieldSlots_base=0x0201c8f8, player_stride=0x868, OAM_FLAG=0x044e0000.
-scan_monster_zone_chain_for_equip_activation:
+@ r0=player, r1=internal CID. Return 1 if zone-11 chain already contains the CID. Scan the player 4-byte card array at gP1HandSlotArray, count LP+0x14, stride 0x868; require matching low13 CID and clear bit21. Pack 0x044e0000, player and CID, and call activation with decoded flags. Return 0 on a nonzero helper result; return 1 when all entries fail. Does not use the shared scan cursor.
+scan_player_card_array_for_equip_activation_by_cid:
     push {r4,r5,r6,r7,lr}                    @ 0809f158 f0b5
     .hword 0x4647    @ 0809f15a 4746
     push {r7}                                @ 0809f15c 80b4
@@ -3322,10 +3540,10 @@ scan_monster_zone_chain_for_equip_activation:
     cmp r0,#0x0                              @ 0809f16a 0028
     bne LAB_0809f1ec                         @ 0809f16c 3ed1
     movs r5,#0x0    @ 0809f16e 0025
-    ldr r0, PTR_gP1LifePoints_0809f1cc       @ 0809f170 1648
+    ldr r0, equip_scan_lp_base_9f1cc         @ 0809f170 1648
     movs r2,#0x1    @ 0809f172 0122
     ands r2,r4    @ 0809f174 2240
-    ldr r3, DAT_0809f1d0                     @ 0809f176 164b
+    ldr r3, equip_scan_player_stride_9f1d0   @ 0809f176 164b
     adds r1,r2,#0x0    @ 0809f178 111c
     muls r1,r3    @ 0809f17a 5943
     adds r7,r0,#0x0    @ 0809f17c 071c
@@ -3339,7 +3557,7 @@ scan_monster_zone_chain_for_equip_activation:
 LAB_0809f18c:
     adds r1,r6,#0x0    @ 0809f18c 311c
     muls r1,r3    @ 0809f18e 5943
-    ldr r0, DAT_0809f1d4                     @ 0809f190 1048
+    ldr r0, equip_scan_card_array_base_9f1d4 @ 0809f190 1048
     adds r1,r1,r0    @ 0809f192 0918
     lsls r0,r5,#0x2    @ 0809f194 a800
     adds r1,r1,r0    @ 0809f196 0918
@@ -3351,7 +3569,7 @@ LAB_0809f18c:
     lsls r0,r1,#0xa    @ 0809f1a2 8802
     cmp r0,#0x0                              @ 0809f1a4 0028
     blt LAB_0809f1dc                         @ 0809f1a6 19db
-    ldr r0, DAT_0809f1d8                     @ 0809f1a8 0b48
+    ldr r0, equip_scan_array_attr_prefix_9f1d8 @ 0809f1a8 0b48
     orrs r2,r0    @ 0809f1aa 0243
     orrs r2,r4    @ 0809f1ac 2243
     lsls r0,r1,#0x2    @ 0809f1ae 8800
@@ -3368,17 +3586,17 @@ LAB_0809f18c:
     movs r0,#0x0    @ 0809f1c6 0020
     b LAB_0809f1ee                           @ 0809f1c8 11e0
     .zero  0x2
-PTR_gP1LifePoints_0809f1cc:
-    .word  gP1LifePoints                  @ 0809f1cc e0c40102
-DAT_0809f1d0:
-    .word  0x00000868                     @ 0809f1d0 68080000
-DAT_0809f1d4:
-    .word  0x0201c8f8                     @ 0809f1d4 f8c80102
-DAT_0809f1d8:
-    .word  0x044e0000                     @ 0809f1d8 00004e04
+equip_scan_lp_base_9f1cc:
+    .word  gP1LifePoints                  @ 0809f1cc e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_player_stride_9f1d0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f1d0 68080000  Value for player stride.
+equip_scan_card_array_base_9f1d4:
+    .word  gP1HandSlotArray               @ 0809f1d4 f8c80102  Base/target gP1HandSlotArray; preserve the stored address and all unrelated references.
+equip_scan_array_attr_prefix_9f1d8:
+    .word  EQUIP_ACTIVATION_CARD_ARRAY_ATTR_PREFIX @ 0809f1d8 00004e04  Value for array attr prefix.
 LAB_0809f1dc:
     adds r5,#0x1    @ 0809f1dc 0135
-    ldr r3, DAT_0809f1f8                     @ 0809f1de 064b
+    ldr r3, equip_scan_player_stride_9f1f8   @ 0809f1de 064b
     adds r0,r6,#0x0    @ 0809f1e0 301c
     muls r0,r3    @ 0809f1e2 5843
     adds r0,r0,r7    @ 0809f1e4 c019
@@ -3393,30 +3611,30 @@ LAB_0809f1ee:
     pop {r4,r5,r6,r7}                        @ 0809f1f2 f0bc
     pop {r1}                                 @ 0809f1f4 02bc
     bx r1                                    @ 0809f1f6 0847
-DAT_0809f1f8:
-    .word  0x00000868                     @ 0809f1f8 68080000
+equip_scan_player_stride_9f1f8:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f1f8 68080000  Value for player stride.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 4 条指令 thin wrapper: r0=player_id 透传, r1=DAT_0809f208=0x1181 (Sinister Serpent card_id), tail-call scan_monster_zone_chain_for_equip_activation. 与 scan_monster_zone_chain_for_equip_activation_treeborn_frog (0x0809f20c, card_id=0x19cb) 构成同族 sibling 对. Side effects: via callee on hit. Constants: CARD_ID=0x1181 (Sinister Serpent).
-scan_monster_zone_chain_for_equip_activation_sinister_serpent:
+@ r0=player. Call scan_player_card_array_for_equip_activation_by_cid(player, CID 0x1181) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
+scan_player_card_array_for_equip_activation_sinister_serpent:
     push {lr}                                @ 0809f1fc 00b5
-    ldr r1, DAT_0809f208                     @ 0809f1fe 0249
-    bl scan_monster_zone_chain_for_equip_activation @ 0809f200 fff7aaff
+    ldr r1, equip_scan_cid_9f208             @ 0809f1fe 0249
+    bl scan_player_card_array_for_equip_activation_by_cid @ 0809f200 fff7aaff
     pop {r1}                                 @ 0809f204 02bc
     bx r1                                    @ 0809f206 0847
-DAT_0809f208:
-    .word  0x00001181                     @ 0809f208 81110000
+equip_scan_cid_9f208:
+    .word  SINISTER_SERPENT_CID           @ 0809f208 81110000  Internal CID 0x1181; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 4-instruction thin wrapper stub: r0=player_id [0..1] (pass-through); fixed r1=0x19cb. Calls scan_monster_zone_chain_for_equip_activation (FUN_0809f158). Returns r0=u32 pass-through. Sibling with FUN_0809f1fc (card_id=0x1181). Constants: CARD_ID=0x19cb.
-scan_monster_zone_chain_for_equip_activation_treeborn_frog:
+@ r0=player. Call scan_player_card_array_for_equip_activation_by_cid(player, CID 0x19cb) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
+scan_player_card_array_for_equip_activation_treeborn_frog:
     push {lr}                                @ 0809f20c 00b5
-    ldr r1, DAT_0809f218                     @ 0809f20e 0249
-    bl scan_monster_zone_chain_for_equip_activation @ 0809f210 fff7a2ff
+    ldr r1, equip_scan_cid_9f218             @ 0809f20e 0249
+    bl scan_player_card_array_for_equip_activation_by_cid @ 0809f210 fff7a2ff
     pop {r1}                                 @ 0809f214 02bc
     bx r1                                    @ 0809f216 0847
-DAT_0809f218:
-    .word  0x000019cb                     @ 0809f218 cb190000
+equip_scan_cid_9f218:
+    .word  TREEBORN_FROG_CID              @ 0809f218 cb190000  Internal CID 0x19cb; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). r0=player_id [0..1]. Reads [gP1LifePoints+(player&1)*0x868+0x14] slot count; if 0: returns 1. Loops slot 0..count-1: reads gDuelFieldSlots_equip (0x0201c8f8+player*0x868+slot*4), ANDs 0x201fff to extract card_id field, compares 0x1775; skips mismatch. If match: calls memset(sp+buf, 0, 0x18) to init local slot struct; builds OAM attr (multi-field strh/ldrb/strb); calls check_card_special_summon_eligible_full; if eligible: calls apply_equip_activation_with_id_lookup; returns 0. Returns r0=u32 hit_flag (0=activated, 1=no match or not eligible). Side effects: local sp buffer [sp+0..sp+0x17] zeroed; equip activation state written via apply_equip_activation_with_id_lookup. Constants: CARD_ID_FILTER=0x1775, gDuelFieldSlots_equip=0x0201c8f8, player_stride=0x868, SLOT_COUNT_OFFSET=0x14, MASK_CARD_ID=0x201fff, OAM_FLAG=0x044e0000, memset_size=0x18.
+@ r0=player. Scan the player 4-byte card-word array, count LP+0x14, stride 0x868. Match Return Zombie with bit21 clear. Build a zeroed 0x18-byte local entry, set CID/player/decoded flags and the eligibility fields. Only check_card_special_summon_eligible_full(entry)==0 proceeds to packed activation with prefix 0x044e0000. Return 0 on a nonzero activation result; continue otherwise. Return 1 on exhaustion.
 scan_equip_zone_for_special_summon_activation_return_zombie:
     push {r4,r5,r6,r7,lr}                    @ 0809f21c f0b5
     .hword 0x4657    @ 0809f21e 5746
@@ -3426,10 +3644,10 @@ scan_equip_zone_for_special_summon_activation_return_zombie:
     sub sp,#0x18                             @ 0809f226 86b0
     adds r4,r0,#0x0    @ 0809f228 041c
     movs r7,#0x0    @ 0809f22a 0027
-    ldr r0, PTR_gP1LifePoints_0809f2f8       @ 0809f22c 3248
+    ldr r0, equip_scan_lp_base_9f2f8         @ 0809f22c 3248
     movs r2,#0x1    @ 0809f22e 0122
     ands r2,r4    @ 0809f230 2240
-    ldr r3, DAT_0809f2fc                     @ 0809f232 324b
+    ldr r3, equip_scan_player_stride_9f2fc   @ 0809f232 324b
     adds r1,r2,#0x0    @ 0809f234 111c
     muls r1,r3    @ 0809f236 5943
     adds r0,#0x14    @ 0809f238 1430
@@ -3445,14 +3663,14 @@ scan_equip_zone_for_special_summon_activation_return_zombie:
 LAB_0809f24c:
     .hword 0x4641    @ 0809f24c 4146
     muls r1,r3    @ 0809f24e 5943
-    ldr r0, DAT_0809f300                     @ 0809f250 2b48
+    ldr r0, equip_scan_card_array_base_9f300 @ 0809f250 2b48
     adds r1,r1,r0    @ 0809f252 0918
     lsls r0,r7,#0x2    @ 0809f254 b800
     adds r6,r1,r0    @ 0809f256 0e18
     ldr r4,[r6,#0x0]                         @ 0809f258 3468
-    ldr r0, DAT_0809f304                     @ 0809f25a 2a48
+    ldr r0, equip_scan_cid_bit21_mask_9f304  @ 0809f25a 2a48
     ands r4,r0    @ 0809f25c 0440
-    ldr r0, DAT_0809f308                     @ 0809f25e 2a48
+    ldr r0, equip_scan_cid_9f308             @ 0809f25e 2a48
     cmp r4,r0                                @ 0809f260 8442
     bne LAB_0809f318                         @ 0809f262 59d1
     .hword 0x4668    @ 0809f264 6846
@@ -3483,7 +3701,7 @@ LAB_0809f24c:
     orrs r2,r0    @ 0809f298 0243
     strb r2,[r5,#0x2]                        @ 0809f29a aa70
     ldrh r1,[r5,#0x2]                        @ 0809f29c 6988
-    ldr r2, DAT_0809f30c                     @ 0809f29e 1b4a
+    ldr r2, equip_scan_clear_bits_11_6_9f30c @ 0809f29e 1b4a
     adds r0,r2,#0x0    @ 0809f2a0 101c
     ands r1,r0    @ 0809f2a2 0140
     movs r0,#0x80    @ 0809f2a4 8020
@@ -3497,7 +3715,7 @@ LAB_0809f24c:
     lsrs r0,r0,#0x1f    @ 0809f2b4 c00f
     orrs r1,r0    @ 0809f2b6 0143
     lsls r1,r1,#0x6    @ 0809f2b8 8901
-    ldr r3, DAT_0809f310                     @ 0809f2ba 154b
+    ldr r3, equip_scan_clear_bits_14_6_9f310 @ 0809f2ba 154b
     adds r0,r3,#0x0    @ 0809f2bc 181c
     ldrh r2,[r5,#0x4]                        @ 0809f2be aa88
     ands r0,r2    @ 0809f2c0 1040
@@ -3510,7 +3728,7 @@ LAB_0809f24c:
     ldr r1,[r6,#0x0]                         @ 0809f2d0 3168
     lsls r0,r1,#0x13    @ 0809f2d2 c804
     lsrs r0,r0,#0x13    @ 0809f2d4 c00c
-    ldr r2, DAT_0809f314                     @ 0809f2d6 0f4a
+    ldr r2, equip_scan_array_attr_prefix_9f314 @ 0809f2d6 0f4a
     orrs r0,r2    @ 0809f2d8 1043
     .hword 0x464b    @ 0809f2da 4b46
     orrs r0,r3    @ 0809f2dc 1843
@@ -3526,26 +3744,26 @@ LAB_0809f24c:
     beq LAB_0809f318                         @ 0809f2f2 11d0
     movs r0,#0x0    @ 0809f2f4 0020
     b LAB_0809f32e                           @ 0809f2f6 1ae0
-PTR_gP1LifePoints_0809f2f8:
-    .word  gP1LifePoints                  @ 0809f2f8 e0c40102
-DAT_0809f2fc:
-    .word  0x00000868                     @ 0809f2fc 68080000
-DAT_0809f300:
-    .word  0x0201c8f8                     @ 0809f300 f8c80102
-DAT_0809f304:
-    .word  0x00201fff                     @ 0809f304 ff1f2000
-DAT_0809f308:
-    .word  0x00001775                     @ 0809f308 75170000
-DAT_0809f30c:
-    .word  0xfffff03f                     @ 0809f30c 3ff0ffff
-DAT_0809f310:
-    .word  0xffff803f                     @ 0809f310 3f80ffff
-DAT_0809f314:
-    .word  0x044e0000                     @ 0809f314 00004e04
+equip_scan_lp_base_9f2f8:
+    .word  gP1LifePoints                  @ 0809f2f8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_player_stride_9f2fc:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f2fc 68080000  Value for player stride.
+equip_scan_card_array_base_9f300:
+    .word  gP1HandSlotArray               @ 0809f300 f8c80102  Base/target gP1HandSlotArray; preserve the stored address and all unrelated references.
+equip_scan_cid_bit21_mask_9f304:
+    .word  CARD_WORD_CID_AND_BIT21_MASK   @ 0809f304 ff1f2000  Value for cid bit21 mask.
+equip_scan_cid_9f308:
+    .word  RETURN_ZOMBIE_CID              @ 0809f308 75170000  Internal CID 0x1775; see verified card mapping.
+equip_scan_clear_bits_11_6_9f30c:
+    .word  ACTIVATION_ENTRY_CLR_BITS_11_6 @ 0809f30c 3ff0ffff  Value for clear bits 11 6.
+equip_scan_clear_bits_14_6_9f310:
+    .word  ACTIVATION_ENTRY_CLR_BITS_14_6 @ 0809f310 3f80ffff  Value for clear bits 14 6.
+equip_scan_array_attr_prefix_9f314:
+    .word  EQUIP_ACTIVATION_CARD_ARRAY_ATTR_PREFIX @ 0809f314 00004e04  Value for array attr prefix.
 LAB_0809f318:
     adds r7,#0x1    @ 0809f318 0137
-    ldr r0, PTR_gP1LifePoints_0809f340       @ 0809f31a 0948
-    ldr r3, DAT_0809f344                     @ 0809f31c 094b
+    ldr r0, equip_scan_lp_base_9f340         @ 0809f31a 0948
+    ldr r3, equip_scan_player_stride_9f344   @ 0809f31c 094b
     .hword 0x4641    @ 0809f31e 4146
     muls r1,r3    @ 0809f320 5943
     adds r0,#0x14    @ 0809f322 1430
@@ -3565,12 +3783,12 @@ LAB_0809f32e:
     pop {r1}                                 @ 0809f33a 02bc
     bx r1                                    @ 0809f33c 0847
     .zero  0x2
-PTR_gP1LifePoints_0809f340:
-    .word  gP1LifePoints                  @ 0809f340 e0c40102
-DAT_0809f344:
-    .word  0x00000868                     @ 0809f344 68080000
+equip_scan_lp_base_9f340:
+    .word  gP1LifePoints                  @ 0809f340 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_player_stride_9f344:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f344 68080000  Value for player stride.
 
-@ Mucus Yolk (0x13b2) monster zone slot equip activation scan with dual chain filter. r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 5 monster zone slots. Each slot: test_slot_has_active_card(player_bit, slot_idx, 0x13b2); on hit: check_node_in_slot_chain(player_bit, slot_idx, 0x13b2, type=2) second gate; both pass: read OAM attr, call enqueue_sprite_attr_for_zone_card_id_lookup and enqueue_sprite_attr_with_mode(mode=3). Counter++; return 1 if no hit. Constants: CARD_ID=0x13b2=Mucus Yolk, COUNTER_OFFSET=0x1d24, SLOT_COUNT=5, SLOT_STRIDE=0x868, CHAIN_TYPE=2, SPRITE_MODE=3.
+@ r0=player. Resume monster slots 0..4 with cursor at LP+0x1d24. Require active Mucus Yolk and a nonzero check_node_in_slot_chain(player,slot,CID,2). Enqueue entry flags and enqueue_sprite_attr_with_mode(player,slot,actual_entry_CID,3,1). Advance cursor and return 0 on emission; rejected slots advance. Return 1 on exhaustion.
 scan_monster_zone_slots_for_equip_activation_mucus_yolk:
     push {r4,r5,r6,r7,lr}                    @ 0809f348 f0b5
     .hword 0x4657    @ 0809f34a 5746
@@ -3579,8 +3797,8 @@ scan_monster_zone_slots_for_equip_activation_mucus_yolk:
     push {r5,r6,r7}                          @ 0809f350 e0b4
     sub sp,#0x4                              @ 0809f352 81b0
     adds r6,r0,#0x0    @ 0809f354 061c
-    ldr r2, PTR_gP1LifePoints_0809f3d8       @ 0809f356 204a
-    ldr r0, DAT_0809f3dc                     @ 0809f358 2048
+    ldr r2, equip_scan_lp_base_9f3d8         @ 0809f356 204a
+    ldr r0, equip_scan_cursor_offset_9f3dc   @ 0809f358 2048
     adds r1,r2,r0    @ 0809f35a 1118
     ldr r0,[r1,#0x0]                         @ 0809f35c 0868
     cmp r0,#0x4                              @ 0809f35e 0428
@@ -3596,10 +3814,10 @@ LAB_0809f36c:
     lsls r0,r4,#0x2    @ 0809f370 a000
     adds r0,r0,r4    @ 0809f372 0019
     lsls r0,r0,#0x2    @ 0809f374 8000
-    ldr r1, DAT_0809f3e0                     @ 0809f376 1a49
+    ldr r1, equip_scan_player_stride_9f3e0   @ 0809f376 1a49
     muls r1,r7    @ 0809f378 7943
     adds r0,r0,r1    @ 0809f37a 4018
-    ldr r1, DAT_0809f3e4                     @ 0809f37c 1949
+    ldr r1, equip_scan_field_base_9f3e4      @ 0809f37c 1949
     adds r5,r0,r1    @ 0809f37e 4518
     ldr r0,[r5,#0x0]                         @ 0809f380 2868
     lsls r0,r0,#0x13    @ 0809f382 c004
@@ -3607,13 +3825,13 @@ LAB_0809f36c:
     .hword 0x4681    @ 0809f386 8146
     adds r0,r6,#0x0    @ 0809f388 301c
     adds r1,r4,#0x0    @ 0809f38a 211c
-    ldr r2, DAT_0809f3e8                     @ 0809f38c 164a
+    ldr r2, equip_scan_cid_9f3e8             @ 0809f38c 164a
     bl test_slot_has_active_card             @ 0809f38e 93f7dbf8
     cmp r0,#0x0                              @ 0809f392 0028
     beq LAB_0809f3ec                         @ 0809f394 2ad0
     adds r0,r6,#0x0    @ 0809f396 301c
     adds r1,r4,#0x0    @ 0809f398 211c
-    ldr r2, DAT_0809f3e8                     @ 0809f39a 134a
+    ldr r2, equip_scan_cid_9f3e8             @ 0809f39a 134a
     movs r3,#0x2    @ 0809f39c 0223
     bl check_node_in_slot_chain              @ 0809f39e 90f70ffd
     cmp r0,#0x0                              @ 0809f3a2 0028
@@ -3641,16 +3859,16 @@ LAB_0809f36c:
     str r0,[r1,#0x0]                         @ 0809f3d2 0860
     movs r0,#0x0    @ 0809f3d4 0020
     b LAB_0809f3fa                           @ 0809f3d6 10e0
-PTR_gP1LifePoints_0809f3d8:
-    .word  gP1LifePoints                  @ 0809f3d8 e0c40102
-DAT_0809f3dc:
-    .word  0x00001d24                     @ 0809f3dc 241d0000
-DAT_0809f3e0:
-    .word  0x00000868                     @ 0809f3e0 68080000
-DAT_0809f3e4:
-    .word  0x0201c510                     @ 0809f3e4 10c50102
-DAT_0809f3e8:
-    .word  0x000013b2                     @ 0809f3e8 b2130000
+equip_scan_lp_base_9f3d8:
+    .word  gP1LifePoints                  @ 0809f3d8 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9f3dc:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f3dc 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_player_stride_9f3e0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f3e0 68080000  Value for player stride.
+equip_scan_field_base_9f3e4:
+    .word  gDuelFieldSlots                @ 0809f3e4 10c50102  Base/target gDuelFieldSlots; preserve the stored address and all unrelated references.
+equip_scan_cid_9f3e8:
+    .word  MUCUS_YOLK_CID                 @ 0809f3e8 b2130000  Internal CID 0x13b2; see verified card mapping.
 LAB_0809f3ec:
     .hword 0x4641    @ 0809f3ec 4146
     ldr r0,[r1,#0x0]                         @ 0809f3ee 0868
@@ -3671,37 +3889,37 @@ LAB_0809f3fa:
     bx r1                                    @ 0809f408 0847
     .zero  0x2
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 4-instruction thin wrapper stub: r0=player_id [0..1] (pass-through); fixed r1=0x154d. Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 pass-through (0=processed, 1=counter > 4). Sibling with FUN_0809f41c (card_id=0x1645, addr diff=0x10). Constants: CARD_ID=0x154d.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x154d) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_legendary_fiend:
     push {lr}                                @ 0809f40c 00b5
-    ldr r1, DAT_0809f418                     @ 0809f40e 0249
+    ldr r1, equip_scan_cid_9f418             @ 0809f40e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f410 fff786fa
     pop {r1}                                 @ 0809f414 02bc
     bx r1                                    @ 0809f416 0847
-DAT_0809f418:
-    .word  0x0000154d                     @ 0809f418 4d150000
+equip_scan_cid_9f418:
+    .word  LEGENDARY_FIEND_CID            @ 0809f418 4d150000  Internal CID 0x154d; see verified card mapping.
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). 4-instruction thin wrapper stub: r0=player_id [0..1] (pass-through); fixed r1=0x1645. Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 pass-through (0=processed, 1=counter > 4). Card ID 0x1645 same as scan_field_for_extra_deck_equip_slot_update (B-type fusion field card). Sibling with FUN_0809f40c (card_id=0x154d, addr diff=0x10). Constants: CARD_ID=0x1645.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1645) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_exodia_necross:
     push {lr}                                @ 0809f41c 00b5
-    ldr r1, DAT_0809f428                     @ 0809f41e 0249
+    ldr r1, equip_scan_cid_9f428             @ 0809f41e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f420 fff77efa
     pop {r1}                                 @ 0809f424 02bc
     bx r1                                    @ 0809f426 0847
-DAT_0809f428:
-    .word  0x00001645                     @ 0809f428 45160000
+equip_scan_cid_9f428:
+    .word  EXODIA_NECROSS_CID             @ 0809f428 45160000  Internal CID 0x1645; see verified card mapping.
 
-@ 4-instruction thin wrapper stub for Amazoness Blowpiper (card_id=0x160e) equip activation. r0=player_id [0..1] (pass-through); fixed r1=0x160e. Tail-calls scan_monster_zone_for_equip_activation_by_card. Returns r0=u32 done_flag (0=activated, 1=counter overflow or no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x160e (Amazoness Blowpiper).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x160e) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_amazoness_blowpiper:
     push {lr}                                @ 0809f42c 00b5
-    ldr r1, DAT_0809f438                     @ 0809f42e 0249
+    ldr r1, equip_scan_cid_9f438             @ 0809f42e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f430 fff776fa
     pop {r1}                                 @ 0809f434 02bc
     bx r1                                    @ 0809f436 0847
-DAT_0809f438:
-    .word  0x0000160e                     @ 0809f438 0e160000
+equip_scan_cid_9f438:
+    .word  AMAZONESS_BLOWPIPER_CID        @ 0809f438 0e160000  Internal CID 0x160e; see verified card mapping.
 
-@ 4-instruction thin wrapper stub for The Agent of Wisdom - Mercury (card_id=0x1740) equip activation. r0=player_id [0..1] (pass-through); computes r1=0xba<<5=0x1740 via movs+lsls. Tail-calls scan_monster_zone_for_equip_activation_by_card. Returns r0=u32 done_flag (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x1740 (The Agent of Wisdom - Mercury, 0xba*0x20).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(player, CID 0x1740) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_agent_of_wisdom_mercury:
     push {lr}                                @ 0809f43c 00b5
     movs r1,#0xba    @ 0809f43e ba21
@@ -3711,12 +3929,12 @@ scan_monster_zone_for_equip_activation_agent_of_wisdom_mercury:
     bx r1                                    @ 0809f448 0847
     .zero  0x2
 
-@ Scans field slots for LV-series monster equip activation. r0=player_id [0..1] (callee-save mov r7,r0). Checks [gP1LifePoints+0x1d24] counter: if > 4 returns 1. Reads gDuelFieldSlots[player][counter_val] slot word (0x0201c510); extracts card_type_id (bits[18:0]); compares against LV-card set BST: 0x1812=Silent Swordsman LV3, 0x17d9=Armed Dragon LV3, 0x1817=Silent Magician LV4, 0x1822=Ultimate Insect LV3, 0x185e=Ultimate Insect LV5 (and siblings). On match: checks gDuelFieldSlots_A[player][slot][0x8] hword (equip count) != 0; if nonzero: builds OAM attr, calls apply_equip_activation_with_id_lookup; increments [gDuelFieldSlots+0x1cf4] counter; returns 0. Side effects: [gDuelFieldSlots_base+0x1cf4] incremented; equip activation state. Constants: LV_CARD_SET={0x1812,0x17d9,0x1817,0x1822,...}, counter_offset=0x1d24, write_counter_offset=0x1cf4, equip_count_offset=0x8.
+@ r0=player. Resume monster slots 0..4 with cursor at LP+0x1d24. Match CID in {0x1812,0x17d5,0x17d1,0x17d9,0x1817,0x1814,0x1822,0x185e} and require nonzero entry+8. Pack entry CID/player/slot and call activation with decoded flags, ignoring its result. Increment the same cursor via gDuelFieldSlots+0x1cf4 and return 0. Rejected entries advance; exhaustion returns 1.
 scan_field_slots_for_lv_monster_equip_activation:
     push {r4,r5,r6,r7,lr}                    @ 0809f44c f0b5
     adds r7,r0,#0x0    @ 0809f44e 071c
-    ldr r3, PTR_gP1LifePoints_0809f494       @ 0809f450 104b
-    ldr r0, DAT_0809f498                     @ 0809f452 1148
+    ldr r3, equip_scan_lp_base_9f494         @ 0809f450 104b
+    ldr r0, equip_scan_cursor_offset_9f498   @ 0809f452 1148
     adds r2,r3,r0    @ 0809f454 1a18
     ldr r0,[r2,#0x0]                         @ 0809f456 1068
     cmp r0,#0x4                              @ 0809f458 0428
@@ -3726,7 +3944,7 @@ scan_field_slots_for_lv_monster_equip_activation:
     adds r3,#0x30    @ 0809f460 3033
     .hword 0x469c    @ 0809f462 9c46
     adds r6,r2,#0x0    @ 0809f464 161c
-    ldr r0, DAT_0809f49c                     @ 0809f466 0d48
+    ldr r0, equip_scan_player_stride_9f49c   @ 0809f466 0d48
     muls r1,r0    @ 0809f468 4143
 LAB_0809f46a:
     ldr r2,[r6,#0x0]                         @ 0809f46a 3268
@@ -3738,7 +3956,7 @@ LAB_0809f46a:
     ldr r0,[r0,#0x0]                         @ 0809f476 0068
     lsls r0,r0,#0x13    @ 0809f478 c004
     lsrs r3,r0,#0x13    @ 0809f47a c30c
-    ldr r0, DAT_0809f4a0                     @ 0809f47c 0848
+    ldr r0, equip_scan_cid_9f4a0             @ 0809f47c 0848
     cmp r3,r0                                @ 0809f47e 8342
     beq LAB_0809f4d0                         @ 0809f480 26d0
     cmp r3,r0                                @ 0809f482 8342
@@ -3750,21 +3968,21 @@ LAB_0809f46a:
     bgt LAB_0809f4a4                         @ 0809f48e 09dc
     subs r0,#0x4    @ 0809f490 0438
     b LAB_0809f4b8                           @ 0809f492 11e0
-PTR_gP1LifePoints_0809f494:
-    .word  gP1LifePoints                  @ 0809f494 e0c40102
-DAT_0809f498:
-    .word  0x00001d24                     @ 0809f498 241d0000
-DAT_0809f49c:
-    .word  0x00000868                     @ 0809f49c 68080000
-DAT_0809f4a0:
-    .word  0x00001812                     @ 0809f4a0 12180000
+equip_scan_lp_base_9f494:
+    .word  gP1LifePoints                  @ 0809f494 e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9f498:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f498 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_player_stride_9f49c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f49c 68080000  Value for player stride.
+equip_scan_cid_9f4a0:
+    .word  SILENT_SWORDSMAN_LV3_CID       @ 0809f4a0 12180000  Internal CID 0x1812; see verified card mapping.
 LAB_0809f4a4:
-    ldr r0, DAT_0809f4a8                     @ 0809f4a4 0048
+    ldr r0, equip_scan_cid_9f4a8             @ 0809f4a4 0048
     b LAB_0809f4b8                           @ 0809f4a6 07e0
-DAT_0809f4a8:
-    .word  0x000017d9                     @ 0809f4a8 d9170000
+equip_scan_cid_9f4a8:
+    .word  ARMED_DRAGON_LV3_CID           @ 0809f4a8 d9170000  Internal CID 0x17d9; see verified card mapping.
 LAB_0809f4ac:
-    ldr r0, DAT_0809f4c0                     @ 0809f4ac 0448
+    ldr r0, equip_scan_cid_9f4c0             @ 0809f4ac 0448
     cmp r3,r0                                @ 0809f4ae 8342
     beq LAB_0809f4d0                         @ 0809f4b0 0ed0
     cmp r3,r0                                @ 0809f4b2 8342
@@ -3775,10 +3993,10 @@ LAB_0809f4b8:
     beq LAB_0809f4d0                         @ 0809f4ba 09d0
     b LAB_0809f524                           @ 0809f4bc 32e0
     .zero  0x2
-DAT_0809f4c0:
-    .word  0x00001817                     @ 0809f4c0 17180000
+equip_scan_cid_9f4c0:
+    .word  SILENT_MAGICIAN_LV4_CID        @ 0809f4c0 17180000  Internal CID 0x1817; see verified card mapping.
 LAB_0809f4c4:
-    ldr r0, DAT_0809f518                     @ 0809f4c4 1448
+    ldr r0, equip_scan_cid_9f518             @ 0809f4c4 1448
     cmp r3,r0                                @ 0809f4c6 8342
     beq LAB_0809f4d0                         @ 0809f4c8 02d0
     adds r0,#0x3c    @ 0809f4ca 3c30
@@ -3789,7 +4007,7 @@ LAB_0809f4d0:
     adds r0,r0,r2    @ 0809f4d2 8018
     lsls r0,r0,#0x2    @ 0809f4d4 8000
     adds r0,r0,r1    @ 0809f4d6 4018
-    ldr r5, DAT_0809f51c                     @ 0809f4d8 104d
+    ldr r5, equip_scan_field_base_9f51c      @ 0809f4d8 104d
     adds r4,r0,r5    @ 0809f4da 4419
     ldrh r0,[r4,#0x8]                        @ 0809f4dc 2089
     cmp r0,#0x0                              @ 0809f4de 0028
@@ -3813,19 +4031,19 @@ LAB_0809f4d0:
     orrs r1,r2    @ 0809f502 1143
     movs r2,#0x0    @ 0809f504 0022
     bl apply_equip_activation_with_id_lookup @ 0809f506 adf703fa
-    ldr r0, DAT_0809f520                     @ 0809f50a 0548
+    ldr r0, equip_scan_cursor_from_field_offset_f520 @ 0809f50a 0548
     adds r1,r5,r0    @ 0809f50c 2918
     ldr r0,[r1,#0x0]                         @ 0809f50e 0868
     adds r0,#0x1    @ 0809f510 0130
     str r0,[r1,#0x0]                         @ 0809f512 0860
     movs r0,#0x0    @ 0809f514 0020
     b LAB_0809f530                           @ 0809f516 0be0
-DAT_0809f518:
-    .word  0x00001822                     @ 0809f518 22180000
-DAT_0809f51c:
-    .word  0x0201c510                     @ 0809f51c 10c50102
-DAT_0809f520:
-    .word  0x00001cf4                     @ 0809f520 f41c0000
+equip_scan_cid_9f518:
+    .word  ULTIMATE_INSECT_LV3_CID        @ 0809f518 22180000  Internal CID 0x1822; see verified card mapping.
+equip_scan_field_base_9f51c:
+    .word  gDuelFieldSlots                @ 0809f51c 10c50102  Base/target gDuelFieldSlots; preserve the stored address and all unrelated references.
+equip_scan_cursor_from_field_offset_f520:
+    .word  FIELD_STATE_OFF                @ 0809f520 f41c0000  Byte offset from gDuelFieldSlots to the shared scan cursor; equals LP+0x1d24.
 LAB_0809f524:
     ldr r0,[r6,#0x0]                         @ 0809f524 3068
     adds r0,#0x1    @ 0809f526 0130
@@ -3840,7 +4058,7 @@ LAB_0809f530:
     bx r1                                    @ 0809f534 0847
     .zero  0x2
 
-@ 被 5 个 card-specific thin-wrapper 调用 (Revival Jam/Vampire Lord/Sacred Phoenix of Nephthys 等), 作为装备区实体查找+精灵入队+激活的通用枢纽. 入口 r0=player_id (->r4), r1=card_id (->r6). 调用 get_zone_node_entity_hword_or_miss(r4, slot=0xb, r6) 查询链节点实体 r5; 若 r5 < 0 (未命中) 返回 1. 命中后: 调用 enqueue_sprite_attr_for_chain_node_match(r4, 0xb, r6, r5) 入队精灵; 构建 OAM attr (player bit | DAT_0x044e0000 | (r6 & 0xffff)<<0), 调用 apply_equip_activation_with_id_lookup; 返回 0. Side effects: sprite attr buffer via enqueue_sprite_attr_for_chain_node_match; equip activation state. Constants: ZONE=0xb, OAM_BASE=0x044e0000.
+@ r0=player, r1=internal CID. Query zone 11 for a matching entity; a negative result returns 1. Otherwise enqueue the chain-match sprite, build player bit OR 0x044e0000 OR CID low16, and call apply_equip_activation_with_id_lookup with the entity low16 and zero payload. Ignore the activation result and return 0.
 scan_equip_zone_for_entity_sprite_and_activation:
     push {r4,r5,r6,lr}                       @ 0809f538 70b5
     adds r4,r0,#0x0    @ 0809f53a 041c
@@ -3860,9 +4078,9 @@ LAB_0809f550:
     adds r3,r5,#0x0    @ 0809f556 2b1c
     bl enqueue_sprite_attr_for_chain_node_match @ 0809f558 a3f772fe
     lsls r0,r4,#0x1f    @ 0809f55c e007
-    ldr r2, DAT_0809f57c                     @ 0809f55e 074a
+    ldr r2, equip_scan_cid_mask_9f57c        @ 0809f55e 074a
     ands r2,r6    @ 0809f560 3240
-    ldr r1, DAT_0809f580                     @ 0809f562 0749
+    ldr r1, equip_scan_array_attr_prefix_9f580 @ 0809f562 0749
     orrs r1,r2    @ 0809f564 1143
     orrs r0,r1    @ 0809f566 0843
     lsls r1,r5,#0x10    @ 0809f568 2904
@@ -3875,66 +4093,66 @@ LAB_0809f574:
     pop {r1}                                 @ 0809f576 02bc
     bx r1                                    @ 0809f578 0847
     .zero  0x2
-DAT_0809f57c:
-    .word  0x0000ffff                     @ 0809f57c ffff0000
-DAT_0809f580:
-    .word  0x044e0000                     @ 0809f580 00004e04
+equip_scan_cid_mask_9f57c:
+    .word  EQUIP_ACTIVATION_CID_U16_MASK  @ 0809f57c ffff0000  Value for cid mask.
+equip_scan_array_attr_prefix_9f580:
+    .word  EQUIP_ACTIVATION_CARD_ARRAY_ATTR_PREFIX @ 0809f580 00004e04  Value for array attr prefix.
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x13c7 (Revival Jam card_id), tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x13c7). 入口 r0 透传. Side effects: via callee on hit. Constants: CARD_ID=0x13c7 (Revival Jam).
+@ r0=player. Call scan_equip_zone_for_entity_sprite_and_activation(player, CID 0x13c7) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_equip_zone_for_equip_activation_revival_jam:
     push {lr}                                @ 0809f584 00b5
-    ldr r1, DAT_0809f590                     @ 0809f586 0249
+    ldr r1, equip_scan_cid_9f590             @ 0809f586 0249
     bl scan_equip_zone_for_entity_sprite_and_activation @ 0809f588 fff7d6ff
     pop {r1}                                 @ 0809f58c 02bc
     bx r1                                    @ 0809f58e 0847
-DAT_0809f590:
-    .word  0x000013c7                     @ 0809f590 c7130000
+equip_scan_cid_9f590:
+    .word  REVIVAL_JAM_CID                @ 0809f590 c7130000  Internal CID 0x13c7; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x1522 (Vampire Lord card_id), tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x1522). 与 0x0809f584 (Revival Jam) 及 0x0809f5a4 (Sacred Phoenix) 构成同族 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x1522 (Vampire Lord).
+@ r0=player. Call scan_equip_zone_for_entity_sprite_and_activation(player, CID 0x1522) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_equip_zone_for_equip_activation_vampire_lord:
     push {lr}                                @ 0809f594 00b5
-    ldr r1, DAT_0809f5a0                     @ 0809f596 0249
+    ldr r1, equip_scan_cid_9f5a0             @ 0809f596 0249
     bl scan_equip_zone_for_entity_sprite_and_activation @ 0809f598 fff7ceff
     pop {r1}                                 @ 0809f59c 02bc
     bx r1                                    @ 0809f59e 0847
-DAT_0809f5a0:
-    .word  0x00001522                     @ 0809f5a0 22150000
+equip_scan_cid_9f5a0:
+    .word  VAMPIRE_LORD_CID               @ 0809f5a0 22150000  Internal CID 0x1522; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: 加载 r1=DAT_0x185c (Sacred Phoenix of Nephthys card_id), tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x185c). 与 0x0809f584 (Revival Jam) 及 0x0809f594 (Vampire Lord) 构成同族 sibling 簇. Side effects: via callee on hit. Constants: CARD_ID=0x185c (Sacred Phoenix of Nephthys).
+@ r0=player. Call scan_equip_zone_for_entity_sprite_and_activation(player, CID 0x185c) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_equip_zone_for_equip_activation_sacred_phoenix:
     push {lr}                                @ 0809f5a4 00b5
-    ldr r1, DAT_0809f5b0                     @ 0809f5a6 0249
+    ldr r1, equip_scan_cid_9f5b0             @ 0809f5a6 0249
     bl scan_equip_zone_for_entity_sprite_and_activation @ 0809f5a8 fff7c6ff
     pop {r1}                                 @ 0809f5ac 02bc
     bx r1                                    @ 0809f5ae 0847
-DAT_0809f5b0:
-    .word  0x0000185c                     @ 0809f5b0 5c180000
+equip_scan_cid_9f5b0:
+    .word  SACRED_PHOENIX_CID             @ 0809f5b0 5c180000  Internal CID 0x185c; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 4 条指令 thin wrapper: r0=player_id 透传, r1=DAT_0809f5c0=0x188f (Curse of Vampire card_id), tail-call scan_equip_zone_for_entity_sprite_and_activation. 与 0x0809f5a4 (Sacred Phoenix) / 0x0809f594 (Vampire Lord) / 0x0809f584 (Revival Jam) 构成同族 sibling 簇 (己方侧, 无 player-invert). Side effects: via callee on hit. Constants: CARD_ID=0x188f (Curse of Vampire).
+@ r0=player. Call scan_equip_zone_for_entity_sprite_and_activation(player, CID 0x188f) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_equip_zone_for_entity_sprite_activation_curse_of_vampire:
     push {lr}                                @ 0809f5b4 00b5
-    ldr r1, DAT_0809f5c0                     @ 0809f5b6 0249
+    ldr r1, equip_scan_cid_9f5c0             @ 0809f5b6 0249
     bl scan_equip_zone_for_entity_sprite_and_activation @ 0809f5b8 fff7beff
     pop {r1}                                 @ 0809f5bc 02bc
     bx r1                                    @ 0809f5be 0847
-DAT_0809f5c0:
-    .word  0x0000188f                     @ 0809f5c0 8f180000
+equip_scan_cid_9f5c0:
+    .word  CURSE_OF_VAMPIRE_CID           @ 0809f5c0 8f180000  Internal CID 0x188f; see verified card mapping.
 
-@ 由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. 5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), r1=DAT_0809f5d8=0x188f (Curse of Vampire card_id), tail-call scan_equip_zone_for_entity_sprite_and_activation. 与 FUN_0809f5b4 (Curse of Vampire, 己方版) 构成同卡不同侧 sibling 对. Side effects: via callee on hit. Constants: CARD_ID=0x188f (Curse of Vampire), PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_equip_zone_for_entity_sprite_and_activation(1-player, CID 0x188f) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_equip_zone_for_entity_sprite_activation_curse_of_vampire_opponent:
     push {lr}                                @ 0809f5c4 00b5
     adds r1,r0,#0x0    @ 0809f5c6 011c
     movs r0,#0x1    @ 0809f5c8 0120
     subs r0,r0,r1    @ 0809f5ca 401a
-    ldr r1, DAT_0809f5d8                     @ 0809f5cc 0249
+    ldr r1, equip_scan_cid_9f5d8             @ 0809f5cc 0249
     bl scan_equip_zone_for_entity_sprite_and_activation @ 0809f5ce fff7b3ff
     pop {r1}                                 @ 0809f5d2 02bc
     bx r1                                    @ 0809f5d4 0847
     .zero  0x2
-DAT_0809f5d8:
-    .word  0x0000188f                     @ 0809f5d8 8f180000
+equip_scan_cid_9f5d8:
+    .word  CURSE_OF_VAMPIRE_CID           @ 0809f5d8 8f180000  Internal CID 0x188f; see verified card mapping.
 
-@ General spell/trap zone equip activation scanner (packed OAM attr variant). r0=player_id([0..1]), r1=card_id(16-bit internal ID). Checks gP1LifePoints+0x1d24 loop counter; if 0: init to 5, forward scan slots 0..9, builds packed_attr (player_bit|slot|card_id mask merge), calls test_slot_has_active_card, on hit calls apply_equip_activation_via_packed_attr; if non-zero then calls set_lp_display_row_all_slots; reverse path calls submit_slot_card_sprite_row_packed. Resets counter to 0 when done. Constants: COUNTER_OFFSET=0x1d24, CARD_ID_MASK=0xffff, SLOT_COUNT=10 (0..9), OAM_MASK1=0xf8<<13=0x1f0000, OAM_BASE=0x84<<19=0x4200000.
+@ r0=player, r1=internal CID. Cursor LP+0x1d24==0 starts a scan at slot 5 through 9. On successful packed activation, set the LP row and return 0 without advancing that slot. Exhaustion returns 1 with cursor 10. On entry with nonzero cursor, zero u16 at LP+0x1da8 returns 1 unchanged; nonzero submits that cursor slot as packed sprite data, clears cursor and returns 0.
 scan_spell_trap_zone_for_equip_activation_via_packed_attr:
     push {r4,r5,r6,r7,lr}                    @ 0809f5dc f0b5
     .hword 0x4657    @ 0809f5de 5746
@@ -3944,8 +4162,8 @@ scan_spell_trap_zone_for_equip_activation_via_packed_attr:
     sub sp,#0x4                              @ 0809f5e6 81b0
     adds r5,r0,#0x0    @ 0809f5e8 051c
     adds r6,r1,#0x0    @ 0809f5ea 0e1c
-    ldr r4, PTR_gP1LifePoints_0809f67c       @ 0809f5ec 234c
-    ldr r0, DAT_0809f680                     @ 0809f5ee 2448
+    ldr r4, equip_scan_lp_base_9f67c         @ 0809f5ec 234c
+    ldr r0, equip_scan_cursor_offset_9f680   @ 0809f5ee 2448
     adds r7,r4,r0    @ 0809f5f0 2718
     ldr r3,[r7,#0x0]                         @ 0809f5f2 3b68
     .hword 0x46a2    @ 0809f5f4 a246
@@ -3955,7 +4173,7 @@ scan_spell_trap_zone_for_equip_activation_via_packed_attr:
     str r0,[r7,#0x0]                         @ 0809f5fc 3860
     lsls r1,r5,#0x1f    @ 0809f5fe e907
     str r1,[sp,#0x0]                         @ 0809f600 0091
-    ldr r3, DAT_0809f684                     @ 0809f602 204b
+    ldr r3, equip_scan_cid_mask_9f684        @ 0809f602 204b
     .hword 0x4699    @ 0809f604 9946
     .hword 0x4648    @ 0809f606 4846
     ands r0,r6    @ 0809f608 3040
@@ -3987,7 +4205,7 @@ LAB_0809f616:
     lsls r1,r4,#0x2    @ 0809f63c a100
     adds r1,r1,r4    @ 0809f63e 0919
     lsls r1,r1,#0x2    @ 0809f640 8900
-    ldr r2, DAT_0809f688                     @ 0809f642 114a
+    ldr r2, equip_scan_player_stride_9f688   @ 0809f642 114a
     .hword 0x4643    @ 0809f644 4346
     muls r3,r2    @ 0809f646 5343
     adds r2,r3,#0x0    @ 0809f648 1a1c
@@ -4010,22 +4228,22 @@ LAB_0809f66a:
     ldr r0,[r7,#0x0]                         @ 0809f66a 3868
     adds r0,#0x1    @ 0809f66c 0130
     str r0,[r7,#0x0]                         @ 0809f66e 3860
-    ldr r1, PTR_gP1LifePoints_0809f67c       @ 0809f670 0249
+    ldr r1, equip_scan_lp_base_9f67c         @ 0809f670 0249
     .hword 0x468a    @ 0809f672 8a46
     cmp r0,#0x9                              @ 0809f674 0928
     bls LAB_0809f616                         @ 0809f676 ced9
     b LAB_0809f6f0                           @ 0809f678 3ae0
     .zero  0x2
-PTR_gP1LifePoints_0809f67c:
-    .word  gP1LifePoints                  @ 0809f67c e0c40102
-DAT_0809f680:
-    .word  0x00001d24                     @ 0809f680 241d0000
-DAT_0809f684:
-    .word  0x0000ffff                     @ 0809f684 ffff0000
-DAT_0809f688:
-    .word  0x00000868                     @ 0809f688 68080000
+equip_scan_lp_base_9f67c:
+    .word  gP1LifePoints                  @ 0809f67c e0c40102  Base/target gP1LifePoints; preserve the stored address and all unrelated references.
+equip_scan_cursor_offset_9f680:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f680 241d0000  Byte offset from gP1LifePoints; cursor offset.
+equip_scan_cid_mask_9f684:
+    .word  EQUIP_ACTIVATION_CID_U16_MASK  @ 0809f684 ffff0000  Value for cid mask.
+equip_scan_player_stride_9f688:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f688 68080000  Value for player stride.
 LAB_0809f68c:
-    ldr r1, DAT_0809f6dc                     @ 0809f68c 1349
+    ldr r1, equip_scan_lp_track_offset_9f6dc @ 0809f68c 1349
     adds r0,r4,r1    @ 0809f68e 6018
     ldrh r0,[r0,#0x0]                        @ 0809f690 0088
     cmp r0,#0x0                              @ 0809f692 0028
@@ -4035,7 +4253,7 @@ LAB_0809f68c:
     lsls r0,r3,#0x2    @ 0809f69a 9800
     adds r0,r0,r3    @ 0809f69c c018
     lsls r0,r0,#0x2    @ 0809f69e 8000
-    ldr r1, DAT_0809f6e0                     @ 0809f6a0 0f49
+    ldr r1, equip_scan_player_stride_9f6e0   @ 0809f6a0 0f49
     muls r1,r2    @ 0809f6a2 5143
     adds r0,r0,r1    @ 0809f6a4 4018
     adds r1,r4,#0x0    @ 0809f6a6 211c
@@ -4064,10 +4282,10 @@ LAB_0809f68c:
     movs r0,#0x0    @ 0809f6d6 0020
     str r0,[r7,#0x0]                         @ 0809f6d8 3860
     b LAB_0809f6f2                           @ 0809f6da 0ae0
-DAT_0809f6dc:
-    .word  0x00001da8                     @ 0809f6dc a81d0000
-DAT_0809f6e0:
-    .word  0x00000868                     @ 0809f6e0 68080000
+equip_scan_lp_track_offset_9f6dc:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 0809f6dc a81d0000  Byte offset from gP1LifePoints; lp track offset.
+equip_scan_player_stride_9f6e0:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f6e0 68080000  Value for player stride.
 LAB_0809f6e4:
     adds r0,r5,#0x0    @ 0809f6e4 281c
     adds r1,r6,#0x0    @ 0809f6e6 311c
@@ -4087,54 +4305,54 @@ LAB_0809f6f2:
     bx r1                                    @ 0809f700 0847
     .zero  0x2
 
-@ reserved_icid_e (0x1367, no valid card) spell/trap zone equip activation scan thin wrapper. r0=player_id([0..1]). Inverts player_id (r0=1-player_id), loads card_id=0x1367 into r1, tail-calls scan_spell_trap_zone_for_equip_activation_via_packed_attr(1-player, 0x1367). Symmetric to 0x0809f71c (Recycle, no player invert). icid 0x1367 maps to 0xFFFF (no card). Constants: CARD_ID=0x1367=reserved_icid_e (no valid card).
+@ r0=player. Call scan_spell_trap_zone_for_equip_activation_via_packed_attr(1-player, CID 0x1367) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_spell_trap_zone_for_equip_activation_reserved_icid_e:
     push {lr}                                @ 0809f704 00b5
     adds r1,r0,#0x0    @ 0809f706 011c
     movs r0,#0x1    @ 0809f708 0120
     subs r0,r0,r1    @ 0809f70a 401a
-    ldr r1, DAT_0809f718                     @ 0809f70c 0249
+    ldr r1, equip_scan_cid_9f718             @ 0809f70c 0249
     bl scan_spell_trap_zone_for_equip_activation_via_packed_attr @ 0809f70e fff765ff
     pop {r1}                                 @ 0809f712 02bc
     bx r1                                    @ 0809f714 0847
     .zero  0x2
-DAT_0809f718:
-    .word  0x00001367                     @ 0809f718 67130000
+equip_scan_cid_9f718:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_1367 @ 0809f718 67130000  Internal CID 0x1367; see verified card mapping.
 
-@ Recycle (0x16d5) spell/trap zone equip activation scan thin wrapper. r0=player_id([0..1]). Loads card_id=0x16d5 into r1, directly (no player invert) tail-calls scan_spell_trap_zone_for_equip_activation_via_packed_attr(player, 0x16d5). Symmetric to 0x0809f704 (reserved_icid_e, inverts player). Constants: CARD_ID=0x16d5=Recycle.
+@ r0=player. Call scan_spell_trap_zone_for_equip_activation_via_packed_attr(player, CID 0x16d5) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_spell_trap_zone_for_equip_activation_recycle:
     push {lr}                                @ 0809f71c 00b5
-    ldr r1, DAT_0809f728                     @ 0809f71e 0249
+    ldr r1, equip_scan_cid_9f728             @ 0809f71e 0249
     bl scan_spell_trap_zone_for_equip_activation_via_packed_attr @ 0809f720 fff75cff
     pop {r1}                                 @ 0809f724 02bc
     bx r1                                    @ 0809f726 0847
-DAT_0809f728:
-    .word  0x000016d5                     @ 0809f728 d5160000
+equip_scan_cid_9f728:
+    .word  RECYCLE_CID                    @ 0809f728 d5160000  Internal CID 0x16d5; see verified card mapping.
 
-@ Aqua Spirit (0x1485) opponent-side monster zone equip activation scan thin wrapper. r0=player_id([0..1]). Entry inverts player: r0 = 1 - r0; loads card_id=0x1485, tail-calls scan_monster_zone_for_equip_activation_by_card(1-player_id, 0x1485). Player invert at entry distinguishes this from symmetric stubs without inversion. Constants: CARD_ID=0x1485=Aqua Spirit, PLAYER_INVERT=1-r0.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card(1-player, CID 0x1485) with an ordinary BL and return its result unchanged. The callee owns scan state and sprite side effects.
 scan_monster_zone_for_equip_activation_aqua_spirit_opponent:
     push {lr}                                @ 0809f72c 00b5
     adds r1,r0,#0x0    @ 0809f72e 011c
     movs r0,#0x1    @ 0809f730 0120
     subs r0,r0,r1    @ 0809f732 401a
-    ldr r1, DAT_0809f740                     @ 0809f734 0249
+    ldr r1, equip_scan_cid_9f740             @ 0809f734 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f736 fff7f3f8
     pop {r1}                                 @ 0809f73a 02bc
     bx r1                                    @ 0809f73c 0847
     .zero  0x2
-DAT_0809f740:
-    .word  0x00001485                     @ 0809f740 85140000
+equip_scan_cid_9f740:
+    .word  AQUA_SPIRIT_CID                @ 0809f740 85140000  Internal CID 0x1485; see verified card mapping.
 
-@ Mirage of Nightmare (0x1539) all-monster-zone-slot equip activation scan. r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; test_slot_has_active_card(side, col, 0x1539); on hit build OAM attr (0x84<<0x13=0x4200000 prefix + player_bit + col_encoded); apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. Structurally identical to scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend(0x0809ed50). Constants: CARD_ID=0x1539=Mirage of Nightmare, COUNTER_OFFSET=0x1d24, SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13=0x4200000.
-scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare:
+@ r0=player. Resume cursor 0..9 at gP1LifePoints+EQUIP_ACTIVATION_SCAN_CURSOR_OFF. Decode side=player^(cursor/5) and spell/trap slot=cursor%5+5. On an active Mirage of Nightmare, pack the slot entry and call apply_equip_activation_with_id_lookup, advance the cursor, and return0. Misses advance and continue; exhaustion returns1.
+scan_all_spell_trap_zone_slots_for_equip_activation_mirage_of_nightmare:
     push {r4,r5,r6,r7,lr}                    @ 0809f744 f0b5
     .hword 0x4657    @ 0809f746 5746
     .hword 0x464e    @ 0809f748 4e46
     .hword 0x4645    @ 0809f74a 4546
     push {r5,r6,r7}                          @ 0809f74c e0b4
     .hword 0x4681    @ 0809f74e 8146
-    ldr r1, PTR_gP1LifePoints_0809f7dc       @ 0809f750 2249
-    ldr r0, DAT_0809f7e0                     @ 0809f752 2348
+    ldr r1, gp1lp_base_9f7dc                 @ 0809f750 2249
+    ldr r0, equip_activation_scan_cursor_off_9f7e0 @ 0809f752 2348
     adds r4,r1,r0    @ 0809f754 0c18
     ldr r0,[r4,#0x0]                         @ 0809f756 2068
     cmp r0,#0x9                              @ 0809f758 0928
@@ -4160,7 +4378,7 @@ LAB_0809f762:
     lsls r0,r4,#0x2    @ 0809f782 a000
     adds r0,r0,r4    @ 0809f784 0019
     lsls r0,r0,#0x2    @ 0809f786 8000
-    ldr r1, DAT_0809f7e4                     @ 0809f788 1649
+    ldr r1, player_block_stride_9f7e4        @ 0809f788 1649
     muls r1,r2    @ 0809f78a 5143
     adds r0,r0,r1    @ 0809f78c 4018
     .hword 0x4651    @ 0809f78e 5146
@@ -4170,7 +4388,7 @@ LAB_0809f762:
     lsrs r7,r0,#0x13    @ 0809f796 c70c
     adds r0,r5,#0x0    @ 0809f798 281c
     adds r1,r4,#0x0    @ 0809f79a 211c
-    ldr r2, DAT_0809f7e8                     @ 0809f79c 124a
+    ldr r2, mirage_of_nightmare_cid_9f7e8    @ 0809f79c 124a
     bl test_slot_has_active_card             @ 0809f79e 92f7d3fe
     cmp r0,#0x0                              @ 0809f7a2 0028
     beq LAB_0809f7ec                         @ 0809f7a4 22d0
@@ -4200,14 +4418,14 @@ LAB_0809f762:
     movs r0,#0x0    @ 0809f7d6 0020
     b LAB_0809f7fa                           @ 0809f7d8 0fe0
     .zero  0x2
-PTR_gP1LifePoints_0809f7dc:
-    .word  gP1LifePoints                  @ 0809f7dc e0c40102
-DAT_0809f7e0:
-    .word  0x00001d24                     @ 0809f7e0 241d0000
-DAT_0809f7e4:
-    .word  0x00000868                     @ 0809f7e4 68080000
-DAT_0809f7e8:
-    .word  0x00001539                     @ 0809f7e8 39150000
+gp1lp_base_9f7dc:
+    .word  gP1LifePoints                  @ 0809f7dc e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+equip_activation_scan_cursor_off_9f7e0:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f7e0 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_9f7e4:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f7e4 68080000  Byte stride between the two player state blocks.
+mirage_of_nightmare_cid_9f7e8:
+    .word  MIRAGE_OF_NIGHTMARE_CID        @ 0809f7e8 39150000  Internal CID 0x1539 for Mirage of Nightmare; card mapping and password cross-check are recorded.
 LAB_0809f7ec:
     .hword 0x4641    @ 0809f7ec 4146
     ldr r0,[r1,#0x0]                         @ 0809f7ee 0868
@@ -4226,14 +4444,14 @@ LAB_0809f7fa:
     pop {r1}                                 @ 0809f804 02bc
     bx r1                                    @ 0809f806 0847
 
-@ Called by FUN_0809d984 and FUN_0809fb16 (each once). r0=player_id [0..1] (adds r5,r0,#0). Reads [gP1LifePoints+(r0&1)*0x868+0x0c] trap-zone slot counter; if > 4: returns 1 immediately. Sets slot start r4=5; loops slot 5..9 (cmp r4,#9): calls test_slot_has_active_card(player_id, slot, card_type_id=0x1540); if active: calls enqueue_equip_slot_bitmap_update(player,slot,0,0); returns 0. Returns r0=u32 hit_flag (0=at least one slot processed, 1=no active slot found). Side effects: enqueue_equip_slot_bitmap_update writes equip-slot bitmap sprite buffer. Constants: SLOT_START=5, SLOT_END=9, CARD_ID=0x1540 (=0xaa<<5), player_stride=0x868, counter_offset=0x0c.
+@ r0=player. If the per-player zone count at base+0xc exceeds4, return1. Otherwise scan spell/trap slots5..9 for Bottomless Shifting Sand (ICID 0x1540). On the first active match, enqueue its equip-slot bitmap and return0. Return1 when no active match remains.
 scan_trap_zone_for_equip_bitmap_update_bottomless_shifting_sand:
     push {r4,r5,lr}                          @ 0809f808 30b5
     adds r5,r0,#0x0    @ 0809f80a 051c
-    ldr r2, PTR_gP1LifePoints_0809f844       @ 0809f80c 0d4a
+    ldr r2, gp1lp_base_9f844                 @ 0809f80c 0d4a
     movs r0,#0x1    @ 0809f80e 0120
     ands r0,r5    @ 0809f810 2840
-    ldr r1, DAT_0809f848                     @ 0809f812 0d49
+    ldr r1, player_block_stride_9f848        @ 0809f812 0d49
     muls r0,r1    @ 0809f814 4843
     adds r2,#0xc    @ 0809f816 0c32
     adds r0,r0,r2    @ 0809f818 8018
@@ -4257,10 +4475,10 @@ LAB_0809f822:
     movs r0,#0x0    @ 0809f83e 0020
     b LAB_0809f854                           @ 0809f840 08e0
     .zero  0x2
-PTR_gP1LifePoints_0809f844:
-    .word  gP1LifePoints                  @ 0809f844 e0c40102
-DAT_0809f848:
-    .word  0x00000868                     @ 0809f848 68080000
+gp1lp_base_9f844:
+    .word  gP1LifePoints                  @ 0809f844 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+player_block_stride_9f848:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809f848 68080000  Byte stride between the two player state blocks.
 LAB_0809f84c:
     adds r4,#0x1    @ 0809f84c 0134
     cmp r4,#0x9                              @ 0809f84e 092c
@@ -4273,55 +4491,55 @@ LAB_0809f854:
     bx r1                                    @ 0809f858 0847
     .zero  0x2
 
-@ 4-instruction thin wrapper stub for reserved internal card_id 0x1282 equip activation. icid=0x1282 has no public name in cards-ids-array (between Relinquished=0x1281 and Thousand-Eyes Idol=0x1283). r0=player_id [0..1] (pass-through); fixed r1=0x1282. Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 done_flag (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x1282 (internal id, no public name).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card with the unmapped internal CID 0x1282. Return the callee result: 0 after one activation, 1 after scan exhaustion. The wrapper uses BL and returns through its own epilogue.
 scan_monster_zone_for_equip_activation_reserved_icid_a:
     push {lr}                                @ 0809f85c 00b5
-    ldr r1, DAT_0809f868                     @ 0809f85e 0249
+    ldr r1, equip_activation_unmapped_cid_1282_9f868 @ 0809f85e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f860 fff75ef8
     pop {r1}                                 @ 0809f864 02bc
     bx r1                                    @ 0809f866 0847
-DAT_0809f868:
-    .word  0x00001282                     @ 0809f868 82120000
+equip_activation_unmapped_cid_1282_9f868:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_1282 @ 0809f868 82120000  Unmapped internal CID 0x1282; inverse table is 0xffff and no card-stat record exists.
 
-@ 4-instruction thin wrapper stub for reserved internal card_id 0x11ea equip activation. icid=0x11ea has no public name in cards-ids-array (between Abyss Flower=0x11e9 and Takuhee=0x11eb). r0=player_id [0..1] (pass-through); fixed r1=0x11ea. Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). Returns r0=u32 done_flag (0=activated, 1=done/no match). Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. Constants: CARD_ID=0x11ea (internal id, no public name).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card with the unmapped internal CID 0x11ea. Return the callee result: 0 after one activation, 1 after scan exhaustion. The wrapper uses BL and returns through its own epilogue.
 scan_monster_zone_for_equip_activation_reserved_icid_b:
     push {lr}                                @ 0809f86c 00b5
-    ldr r1, DAT_0809f878                     @ 0809f86e 0249
+    ldr r1, equip_activation_unmapped_cid_11ea_9f878 @ 0809f86e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f870 fff756f8
     pop {r1}                                 @ 0809f874 02bc
     bx r1                                    @ 0809f876 0847
-DAT_0809f878:
-    .word  0x000011ea                     @ 0809f878 ea110000
+equip_activation_unmapped_cid_11ea_9f878:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_11EA @ 0809f878 ea110000  Unmapped internal CID 0x11ea; inverse table is 0xffff and no card-stat record exists.
 
-@ Equip activation scan case stub for A Man with Wdjat (internal_card_id=0x158e, cid=1170). Called by duel_field main dispatch hub (FUN_0809d984) and auxiliary scan (FUN_0809fb16). Fixes r1=0x158e then tail-calls scan_monster_zone_for_equip_activation_by_card. Side effects: via scan_monster_zone_for_equip_activation_by_card on hit.
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card with A_MAN_WITH_WDJAT_CID. Return the callee result: 0 after one activation, 1 after scan exhaustion. The wrapper uses BL and returns through its own epilogue.
 scan_monster_zone_for_equip_activation_a_man_with_wdjat:
     push {lr}                                @ 0809f87c 00b5
-    ldr r1, DAT_0809f888                     @ 0809f87e 0249
+    ldr r1, a_man_with_wdjat_cid_9f888       @ 0809f87e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f880 fff74ef8
     pop {r1}                                 @ 0809f884 02bc
     bx r1                                    @ 0809f886 0847
-DAT_0809f888:
-    .word  0x0000158e                     @ 0809f888 8e150000
+a_man_with_wdjat_cid_9f888:
+    .word  A_MAN_WITH_WDJAT_CID           @ 0809f888 8e150000  Internal CID 0x158e for A Man with Wdjat; card mapping and password cross-check are recorded.
 
-@ Equip activation scan case stub for reserved internal_card_id=0x1147 (cid=0xFFFF, no valid card). Called by FUN_0809d984 and FUN_0809fb16. Fixes r1=0x1147 then tail-calls scan_monster_zone_for_equip_activation_by_card. At runtime scan will never match a valid card slot. Sibling of reserved_icid_a (0x0809f85c) and reserved_icid_b (0x0809f86c).
+@ r0=player. Call scan_monster_zone_for_equip_activation_by_card with the unmapped internal CID 0x1147. Return the callee result: 0 after one activation, 1 after scan exhaustion. The wrapper uses BL and returns through its own epilogue.
 scan_monster_zone_for_equip_activation_reserved_icid_c:
     push {lr}                                @ 0809f88c 00b5
-    ldr r1, DAT_0809f898                     @ 0809f88e 0249
+    ldr r1, equip_activation_unmapped_cid_1147_9f898 @ 0809f88e 0249
     bl scan_monster_zone_for_equip_activation_by_card @ 0809f890 fff746f8
     pop {r1}                                 @ 0809f894 02bc
     bx r1                                    @ 0809f896 0847
-DAT_0809f898:
-    .word  0x00001147                     @ 0809f898 47110000
+equip_activation_unmapped_cid_1147_9f898:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_1147 @ 0809f898 47110000  Unmapped internal CID 0x1147; inverse table is 0xffff and no card-stat record exists.
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) with r0=card_id (icid). Maps specific field spell card icids to their LP activation costs via a binary-search cmp chain. Mapping: icid=0x1381(5041)->2000, icid=0x134a(4938)->100, icid=0x1360(4960)->700, icid=0x13f4(5108)->1000, icid=0x13f9(5113)->500, icid=0x168c(5772)->500, icid=0x168d(5773)->900, icid=0x168f(5775)->500, icid=0x1691(5777)->800; unmatched icid->0 (no LP cost). Pure read-only lookup, no external side effects. LP cost tiers: {0, 100, 500, 700, 800, 900, 1000, 2000} = complete set of field spell activation costs in-game. Inputs: r0=u16 card_id (icid) [0..0x1fff]. Returns: r0=u32 lp_cost [0, 100, 500, 700, 800, 900, 1000, 2000]. Side effects: none. Constants: icid_0x1381->lp_2000, icid_0x134a->lp_100, icid_0x1360->lp_700, icid_0x13f4->lp_1000, icid_0x13f9->lp_500, icid_0x168c->lp_500, icid_0x168d->lp_900, icid_0x168f->lp_500, icid_0x1691->lp_800, default->lp_0.
-get_lp_cost_by_field_spell_icid:
+@ r0=internal CID. Return the periodic LP maintenance cost, or0 when unmatched. Mappings are Messenger100, Imperial Order700, Mirror Wall2000, Mask of Brutality1000, Fairy Box500, token1639=1000, Vilepawn500, Shadowknight900, Darkbishop500, Desrook500, Infernalqueen500, Terrorking800, and Skull Archfiend500. Pure lookup.
+get_maintenance_lp_cost_by_icid:
     adds r1,r0,#0x0    @ 0809f89c 011c
-    ldr r0, DAT_0809f8c0                     @ 0809f89e 0848
+    ldr r0, vilepawn_archfiend_cid_9f8c0     @ 0809f89e 0848
     cmp r1,r0                                @ 0809f8a0 8142
     beq LAB_0809f93a                         @ 0809f8a2 4ad0
     cmp r1,r0                                @ 0809f8a4 8142
     bgt LAB_0809f8e8                         @ 0809f8a6 1fdc
-    ldr r0, DAT_0809f8c4                     @ 0809f8a8 0648
+    ldr r0, mirror_wall_cid_9f8c4            @ 0809f8a8 0648
     cmp r1,r0                                @ 0809f8aa 8142
     beq LAB_0809f918                         @ 0809f8ac 34d0
     cmp r1,r0                                @ 0809f8ae 8142
@@ -4333,12 +4551,12 @@ get_lp_cost_by_field_spell_icid:
     cmp r1,r0                                @ 0809f8ba 8142
     beq LAB_0809f922                         @ 0809f8bc 31d0
     b LAB_0809f940                           @ 0809f8be 3fe0
-DAT_0809f8c0:
-    .word  0x0000168c                     @ 0809f8c0 8c160000
-DAT_0809f8c4:
-    .word  0x00001381                     @ 0809f8c4 81130000
+vilepawn_archfiend_cid_9f8c0:
+    .word  VILEPAWN_ARCHFIEND_CID         @ 0809f8c0 8c160000  Internal CID 0x168c for Vilepawn Archfiend; card mapping and password cross-check are recorded.
+mirror_wall_cid_9f8c4:
+    .word  MIRROR_WALL_CID                @ 0809f8c4 81130000  Internal CID 0x1381 for Mirror Wall; card mapping and password cross-check are recorded.
 LAB_0809f8c8:
-    ldr r0, DAT_0809f8d8                     @ 0809f8c8 0348
+    ldr r0, fairy_box_cid_9f8d8              @ 0809f8c8 0348
     cmp r1,r0                                @ 0809f8ca 8142
     beq LAB_0809f93a                         @ 0809f8cc 35d0
     cmp r1,r0                                @ 0809f8ce 8142
@@ -4346,18 +4564,18 @@ LAB_0809f8c8:
     subs r0,#0x5    @ 0809f8d2 0538
     b LAB_0809f8de                           @ 0809f8d4 03e0
     .zero  0x2
-DAT_0809f8d8:
-    .word  0x000013f9                     @ 0809f8d8 f9130000
+fairy_box_cid_9f8d8:
+    .word  FAIRY_BOX_CID                  @ 0809f8d8 f9130000  Internal CID 0x13f9 for Fairy Box; card mapping and password cross-check are recorded.
 LAB_0809f8dc:
-    ldr r0, DAT_0809f8e4                     @ 0809f8dc 0148
+    ldr r0, token_1639_cid_9f8e4             @ 0809f8dc 0148
 LAB_0809f8de:
     cmp r1,r0                                @ 0809f8de 8142
     beq LAB_0809f928                         @ 0809f8e0 22d0
     b LAB_0809f940                           @ 0809f8e2 2de0
-DAT_0809f8e4:
-    .word  0x00001639                     @ 0809f8e4 39160000
+token_1639_cid_9f8e4:
+    .word  TOKEN_1639_CID                 @ 0809f8e4 39160000  Special token CID 0x1639; inverse index 2090 has no ordinary card-stat record.
 LAB_0809f8e8:
-    ldr r0, DAT_0809f8fc                     @ 0809f8e8 0448
+    ldr r0, desrook_archfiend_cid_9f8fc      @ 0809f8e8 0448
     cmp r1,r0                                @ 0809f8ea 8142
     beq LAB_0809f93a                         @ 0809f8ec 25d0
     cmp r1,r0                                @ 0809f8ee 8142
@@ -4367,10 +4585,10 @@ LAB_0809f8e8:
     beq LAB_0809f92e                         @ 0809f8f6 1ad0
     b LAB_0809f90a                           @ 0809f8f8 07e0
     .zero  0x2
-DAT_0809f8fc:
-    .word  0x0000168f                     @ 0809f8fc 8f160000
+desrook_archfiend_cid_9f8fc:
+    .word  DESROOK_ARCHFIEND_CID          @ 0809f8fc 8f160000  Internal CID 0x168f for Desrook Archfiend; card mapping and password cross-check are recorded.
 LAB_0809f900:
-    ldr r0, DAT_0809f914                     @ 0809f900 0448
+    ldr r0, terrorking_archfiend_cid_9f914   @ 0809f900 0448
     cmp r1,r0                                @ 0809f902 8142
     beq LAB_0809f934                         @ 0809f904 16d0
     cmp r1,r0                                @ 0809f906 8142
@@ -4381,8 +4599,8 @@ LAB_0809f90a:
     beq LAB_0809f93a                         @ 0809f90e 14d0
     b LAB_0809f940                           @ 0809f910 16e0
     .zero  0x2
-DAT_0809f914:
-    .word  0x00001691                     @ 0809f914 91160000
+terrorking_archfiend_cid_9f914:
+    .word  TERRORKING_ARCHFIEND_CID       @ 0809f914 91160000  Internal CID 0x1691 for Terrorking Archfiend; card mapping and password cross-check are recorded.
 LAB_0809f918:
     movs r0,#0xfa    @ 0809f918 fa20
     lsls r0,r0,#0x3    @ 0809f91a c000
@@ -4415,22 +4633,15 @@ LAB_0809f940:
 LAB_0809f942:
     bx lr                                    @ 0809f942 7047
 
-@ Checks if r0 (player_side) matches active player stored at gP1LifePoints+0x1ce8; returns 0 on mismatch.
-@ Computes combined_slot (r1+r2); if > 4 returns 0 (out of range).
-@ Calls check_slot_card_can_be_equipped(player_side, player_side, combined_slot) to check equippability.
-@ If not equippable returns 0.
-@ Checks if combined_slot equals already-recorded current slot index at gP1LifePoints+0x1d24; if equal returns 0 (prevents re-equipping same slot).
-@ Otherwise returns 0x800 (equippable).
-@ Used in dispatch_duel_field_ai_phase_by_state_code AI equip target selection path (fn-ptr ref at 0x080a01c8).
-@ Constants: gP1LifePoints=0x0201c4e0, ACTIVE_PLAYER_OFFSET=0x1ce8, CURRENT_SLOT_OFFSET=0x1d24, MAX_SLOT=4, ELIGIBLE_FLAG=0x800.
+@ r0=player, r1+r2=monster slot. Require slot<=4, player equal to the active selector at gP1LifePoints+0x1ce8, check_slot_card_can_be_equipped nonzero, and slot different from the shared scan cursor. Return0x800 when all checks pass, else0. Stored as a THUMB callback at 0x080a01c8.
 check_slot_equippable_for_active_player:
     push {r4,r5,lr}                          @ 0809f944 30b5
     adds r3,r0,#0x0    @ 0809f946 031c
     adds r4,r1,r2    @ 0809f948 8c18
     cmp r4,#0x4                              @ 0809f94a 042c
     bgt LAB_0809f984                         @ 0809f94c 1adc
-    ldr r5, PTR_gP1LifePoints_0809f978       @ 0809f94e 0a4d
-    ldr r1, DAT_0809f97c                     @ 0809f950 0a49
+    ldr r5, gp1lp_base_9f978                 @ 0809f94e 0a4d
+    ldr r1, p1lp_block2_off_1ce8_9f97c       @ 0809f950 0a49
     adds r0,r5,r1    @ 0809f952 6818
     ldr r0,[r0,#0x0]                         @ 0809f954 0068
     cmp r3,r0                                @ 0809f956 8342
@@ -4441,7 +4652,7 @@ check_slot_equippable_for_active_player:
     bl check_slot_card_can_be_equipped       @ 0809f960 93f7e6fe
     cmp r0,#0x0                              @ 0809f964 0028
     beq LAB_0809f984                         @ 0809f966 0dd0
-    ldr r1, DAT_0809f980                     @ 0809f968 0549
+    ldr r1, equip_activation_scan_cursor_off_9f980 @ 0809f968 0549
     adds r0,r5,r1    @ 0809f96a 6818
     ldr r0,[r0,#0x0]                         @ 0809f96c 0068
     cmp r4,r0                                @ 0809f96e 8442
@@ -4449,12 +4660,12 @@ check_slot_equippable_for_active_player:
     movs r0,#0x80    @ 0809f972 8020
     lsls r0,r0,#0x4    @ 0809f974 0001
     b LAB_0809f986                           @ 0809f976 06e0
-PTR_gP1LifePoints_0809f978:
-    .word  gP1LifePoints                  @ 0809f978 e0c40102
-DAT_0809f97c:
-    .word  0x00001ce8                     @ 0809f97c e81c0000
-DAT_0809f980:
-    .word  0x00001d24                     @ 0809f980 241d0000
+gp1lp_base_9f978:
+    .word  gP1LifePoints                  @ 0809f978 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+p1lp_block2_off_1ce8_9f97c:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809f97c e81c0000  Byte offset from gP1LifePoints to the active-player selector word.
+equip_activation_scan_cursor_off_9f980:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809f980 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 LAB_0809f984:
     movs r0,#0x0    @ 0809f984 0020
 LAB_0809f986:
@@ -4462,20 +4673,15 @@ LAB_0809f986:
     pop {r1}                                 @ 0809f988 02bc
     bx r1                                    @ 0809f98a 0847
 
-@ Reads gP1LifePoints+0x1ce8 and gP1LifePoints+0x1d20 (offset+0x38) and XORs them; if result mismatches r0 (player_side) returns 0.
-@ Computes combined_slot (r1+r2); if > 10 (0xa) returns 0 (out of range).
-@ Calls get_slot_effect_card_value(player_side, combined_slot) to check if valid effect card exists at slot.
-@ If returns 0: returns 0 (invalid). Otherwise returns 0x800 (valid/eligible).
-@ Called via .word 0x0809f98d fn-ptr in dispatch_duel_field_ai_phase_by_state_code state=0x84 path (advance_display_slot_if_zone_active inline fragment).
-@ Constants: gP1LifePoints=0x0201c4e0, ACTIVE_PLAYER_OFFSET=0x1ce8, XOR_OFFSET=0x38, MAX_SLOT=10, ELIGIBLE_FLAG=0x800.
+@ r0=player, r1+r2=slot. Require player to match the XOR-derived side from gP1LifePoints+0x1ce8/+0x1d20, slot<=10, and get_slot_effect_card_value nonzero. Return0x800 on success, else0. Stored as a THUMB callback at 0x080a02b8.
 check_slot_effect_valid_for_active_player:
     push {r4,lr}                             @ 0809f98c 10b5
     adds r3,r0,#0x0    @ 0809f98e 031c
     adds r2,r1,r2    @ 0809f990 8a18
     cmp r2,#0xa                              @ 0809f992 0a2a
     bgt LAB_0809f9c4                         @ 0809f994 16dc
-    ldr r1, PTR_gP1LifePoints_0809f9bc       @ 0809f996 0949
-    ldr r4, DAT_0809f9c0                     @ 0809f998 094c
+    ldr r1, gp1lp_base_9f9bc                 @ 0809f996 0949
+    ldr r4, p1lp_block2_off_1ce8_9f9c0       @ 0809f998 094c
     adds r0,r1,r4    @ 0809f99a 0819
     adds r4,#0x38    @ 0809f99c 3834
     adds r1,r1,r4    @ 0809f99e 0919
@@ -4492,10 +4698,10 @@ check_slot_effect_valid_for_active_player:
     movs r0,#0x80    @ 0809f9b6 8020
     lsls r0,r0,#0x4    @ 0809f9b8 0001
     b LAB_0809f9c6                           @ 0809f9ba 04e0
-PTR_gP1LifePoints_0809f9bc:
-    .word  gP1LifePoints                  @ 0809f9bc e0c40102
-DAT_0809f9c0:
-    .word  0x00001ce8                     @ 0809f9c0 e81c0000
+gp1lp_base_9f9bc:
+    .word  gP1LifePoints                  @ 0809f9bc e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+p1lp_block2_off_1ce8_9f9c0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809f9c0 e81c0000  Byte offset from gP1LifePoints to the active-player selector word.
 LAB_0809f9c4:
     movs r0,#0x0    @ 0809f9c4 0020
 LAB_0809f9c6:
@@ -4503,24 +4709,23 @@ LAB_0809f9c6:
     pop {r1}                                 @ 0809f9c8 02bc
     bx r1                                    @ 0809f9ca 0847
 
-@ Called exclusively by FUN_08094c60 (depth=5, indeg=1). Very long function (~600+ rows, multiple case branches). Prologue: push + multiple .hword 0x46xx saves high registers: .hword 0x4657=mov r7,r10 (Rm=bits[6:3]=1010=r10); .hword 0x464e=mov r6,r9 (Rm=1001=r9); .hword 0x4645=mov r5,r8 (Rm=1000=r8) -- all high-register callee-save, not APCS r0/r1/r2 spill. .hword 0x4680=mov r8,r0 at 0x0809f9e2: at that point r0 is already overwritten by adds r0,r2,r1 @ 0x0809f9de + ldr r0,[r0] @ 0x0809f9e0, not APCS input. r0/r1/r2 all overwritten within 5 entry instructions, void entry confirmed. Large frame (sp -= 0x298 via add sp,r4 with r4=0xfffffd68). Reads gP1LifePoints+0x1ce8 -> player_id bit0; *0x868 -> player_offset; reads gP1LifePoints+0x1d1c -> phase_state_code. Checks icid=0x137e slot chain -> sp[0x280] conditional. Jump-tree dispatch on phase_state_code: case 0x1 -> enqueue_sprite_attr; case 0x3 -> LAB_0809fba6; case 0x64/0x65 -> display slot branch; case 0x82 -> LAB_080a022c; case 0x84 -> bl advance_display_slot_if_zone_active (0x080a02e8); case 0x96 -> bl set_phase_code_c8_exit_zero; case 0xc8 -> bl dispatch_equip_sprite_update_by_slot_icid; else -> return_one_from_duel_ai_main. Parent dispatcher for batch #64 inline exit stubs. Returns: 0=phase still pending/processed; 1=phase complete.
-@ Constants: gP1LifePoints=0x0201c4e0, gDuelFieldSlots=0x0201c510, player_stride=0x868, phase_code_offset=0x1d1c, icid_check=0x137e, player_id_offset=0x1ce8, action_avail_offset=0x011c (bit23).
-dispatch_duel_field_ai_phase_by_state_code:
+@ No APCS inputs. Allocate0x298 bytes, read player and equip-display phase from gP1LifePoints, and drive the large phase tree. Paths run the 4-entry phase-1 callbacks, resume the 54-entry phase-3 callbacks by cursor, scan slots, render maintenance LP values, initialize validation callbacks, or dispatch special equip sprites. Return0 while work remains and1 when complete through the shared frame epilogue.
+run_equip_activation_display_phase_by_state_code:
     push {r4,r5,r6,r7,lr}                    @ 0809f9cc f0b5
     .hword 0x4657    @ 0809f9ce 5746
     .hword 0x464e    @ 0809f9d0 4e46
     .hword 0x4645    @ 0809f9d2 4546
     push {r5,r6,r7}                          @ 0809f9d4 e0b4
-    ldr r4, DAT_0809fa48                     @ 0809f9d6 1c4c
+    ldr r4, equip_phase_frame_alloc_neg_0x298_9fa48 @ 0809f9d6 1c4c
     add sp,r4                                @ 0809f9d8 a544
-    ldr r2, PTR_gP1LifePoints_0809fa4c       @ 0809f9da 1c4a
-    ldr r1, DAT_0809fa50                     @ 0809f9dc 1c49
+    ldr r2, gp1lp_base_9fa4c                 @ 0809f9da 1c4a
+    ldr r1, p1lp_block2_off_1ce8_9fa50       @ 0809f9dc 1c49
     adds r0,r2,r1    @ 0809f9de 5018
     ldr r0,[r0,#0x0]                         @ 0809f9e0 0068
     .hword 0x4680    @ 0809f9e2 8046
     movs r3,#0x1    @ 0809f9e4 0123
     ands r0,r3    @ 0809f9e6 1840
-    ldr r1, DAT_0809fa54                     @ 0809f9e8 1a49
+    ldr r1, player_block_stride_9fa54        @ 0809f9e8 1a49
     muls r0,r1    @ 0809f9ea 4843
     movs r1,#0x8e    @ 0809f9ec 8e21
     lsls r1,r1,#0x1    @ 0809f9ee 4900
@@ -4533,7 +4738,7 @@ dispatch_duel_field_ai_phase_by_state_code:
     str r2,[sp,#0x280]                       @ 0809f9fc a092
     cmp r5,#0x0                              @ 0809f9fe 002d
     bne LAB_0809fa10                         @ 0809fa00 06d1
-    ldr r2, DAT_0809fa58                     @ 0809fa02 154a
+    ldr r2, solomons_lawbook_cid_9fa58       @ 0809fa02 154a
     .hword 0x4640    @ 0809fa04 4046
     movs r1,#0xb    @ 0809fa06 0b21
     bl check_slot_has_node_by_card_id        @ 0809fa08 90f7f4f9
@@ -4543,8 +4748,8 @@ LAB_0809fa10:
     movs r3,#0x1    @ 0809fa10 0123
     str r3,[sp,#0x280]                       @ 0809fa12 a093
 LAB_0809fa14:
-    ldr r4, PTR_gP1LifePoints_0809fa4c       @ 0809fa14 0d4c
-    ldr r0, DAT_0809fa5c                     @ 0809fa16 1148
+    ldr r4, gp1lp_base_9fa4c                 @ 0809fa14 0d4c
+    ldr r0, card_play_phase_ctr_off_9fa5c    @ 0809fa16 1148
     adds r7,r4,r0    @ 0809fa18 2718
     ldr r1,[r7,#0x0]                         @ 0809fa1a 3968
     cmp r1,#0x6f                             @ 0809fa1c 6f29
@@ -4572,18 +4777,18 @@ LAB_0809fa3a:
     bne LAB_0809fada                         @ 0809fa42 4ad1
     b LAB_0809fad0                           @ 0809fa44 44e0
     .zero  0x2
-DAT_0809fa48:
-    .word  0xfffffd68                     @ 0809fa48 68fdffff
-PTR_gP1LifePoints_0809fa4c:
-    .word  gP1LifePoints                  @ 0809fa4c e0c40102
-DAT_0809fa50:
-    .word  0x00001ce8                     @ 0809fa50 e81c0000
-DAT_0809fa54:
-    .word  0x00000868                     @ 0809fa54 68080000
-DAT_0809fa58:
-    .word  0x0000137e                     @ 0809fa58 7e130000
-DAT_0809fa5c:
-    .word  0x00001d1c                     @ 0809fa5c 1c1d0000
+equip_phase_frame_alloc_neg_0x298_9fa48:
+    .word  EQUIP_PHASE_FRAME_ALLOC_NEG_0X298 @ 0809fa48 68fdffff  Signed frame allocation used by add sp.
+gp1lp_base_9fa4c:
+    .word  gP1LifePoints                  @ 0809fa4c e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+p1lp_block2_off_1ce8_9fa50:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0809fa50 e81c0000  Byte offset from gP1LifePoints to the active-player selector word.
+player_block_stride_9fa54:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809fa54 68080000  Byte stride between the two player state blocks.
+solomons_lawbook_cid_9fa58:
+    .word  SOLOMONS_LAWBOOK_CID           @ 0809fa58 7e130000  Internal CID 0x137e for Solomon's Lawbook; card mapping and password cross-check are recorded.
+card_play_phase_ctr_off_9fa5c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809fa5c 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809fa60:
     cmp r1,#0x65                             @ 0809fa60 6529
     bne LAB_0809fa66                         @ 0809fa62 00d1
@@ -4595,7 +4800,7 @@ LAB_0809fa66:
     bne LAB_0809fa70                         @ 0809fa6c 00d1
     b LAB_0809fbd8                           @ 0809fa6e b3e0
 LAB_0809fa70:
-    bl return_one_from_duel_ai_main          @ 0809fa70 00f018fe
+    bl return_one_from_equip_activation_display_phase @ 0809fa70 00f018fe
 LAB_0809fa74:
     cmp r1,#0x66                             @ 0809fa74 6629
     bne LAB_0809fa7a                         @ 0809fa76 00d1
@@ -4605,7 +4810,7 @@ LAB_0809fa7a:
     bne LAB_0809fa80                         @ 0809fa7c 00d1
     b LAB_0809ff9c                           @ 0809fa7e 8de2
 LAB_0809fa80:
-    bl return_one_from_duel_ai_main          @ 0809fa80 00f010fe
+    bl return_one_from_equip_activation_display_phase @ 0809fa80 00f010fe
 LAB_0809fa84:
     cmp r1,#0x82                             @ 0809fa84 8229
     bne LAB_0809fa8a                         @ 0809fa86 00d1
@@ -4623,13 +4828,13 @@ LAB_0809fa94:
     bne LAB_0809fa9e                         @ 0809fa9a 00d1
     b LAB_080a0144                           @ 0809fa9c 52e3
 LAB_0809fa9e:
-    bl return_one_from_duel_ai_main          @ 0809fa9e 00f001fe
+    bl return_one_from_equip_activation_display_phase @ 0809fa9e 00f001fe
 LAB_0809faa2:
     cmp r1,#0x7a                             @ 0809faa2 7a29
     bne LAB_0809faa8                         @ 0809faa4 00d1
     b LAB_080a01ec                           @ 0809faa6 a1e3
 LAB_0809faa8:
-    bl return_one_from_duel_ai_main          @ 0809faa8 00f0fcfd
+    bl return_one_from_equip_activation_display_phase @ 0809faa8 00f0fcfd
 LAB_0809faac:
     cmp r1,#0x84                             @ 0809faac 8429
     bne LAB_0809fab4                         @ 0809faae 01d1
@@ -4647,28 +4852,28 @@ LAB_0809fac4:
     bne LAB_0809facc                         @ 0809fac6 01d1
     bl dispatch_equip_sprite_update_by_slot_icid @ 0809fac8 00f034fc
 LAB_0809facc:
-    bl return_one_from_duel_ai_main          @ 0809facc 00f0eafd
+    bl return_one_from_equip_activation_display_phase @ 0809facc 00f0eafd
 LAB_0809fad0:
     movs r1,#0x9a    @ 0809fad0 9a21
     lsls r1,r1,#0x1    @ 0809fad2 4900
     .hword 0x4640    @ 0809fad4 4046
     bl trigger_card_display_op31_if_not_active @ 0809fad6 f3f75bfc
 LAB_0809fada:
-    ldr r0, PTR_gP1LifePoints_0809fae4       @ 0809fada 0248
-    ldr r2, DAT_0809fae8                     @ 0809fadc 024a
+    ldr r0, gp1lp_base_9fae4                 @ 0809fada 0248
+    ldr r2, card_play_phase_ctr_off_9fae8    @ 0809fadc 024a
     adds r0,r0,r2    @ 0809fade 8018
     movs r1,#0xc8    @ 0809fae0 c821
     b LAB_0809fbc6                           @ 0809fae2 70e0
-PTR_gP1LifePoints_0809fae4:
-    .word  gP1LifePoints                  @ 0809fae4 e0c40102
-DAT_0809fae8:
-    .word  0x00001d1c                     @ 0809fae8 1c1d0000
+gp1lp_base_9fae4:
+    .word  gP1LifePoints                  @ 0809fae4 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_9fae8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809fae8 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809faec:
     movs r0,#0xd    @ 0809faec 0d20
     .hword 0x4643    @ 0809faee 4346
     cmp r3,#0x0                              @ 0809faf0 002b
     beq LAB_0809faf6                         @ 0809faf2 00d0
-    ldr r0, DWORD_0809fb1c                   @ 0809faf4 0948
+    ldr r0, oam_equip_sprite_p2_0d_9fb1c     @ 0809faf4 0948
 LAB_0809faf6:
     movs r1,#0x0    @ 0809faf6 0021
     movs r2,#0x0    @ 0809faf8 0022
@@ -4682,42 +4887,42 @@ LAB_0809faf6:
     adds r0,r4,r1    @ 0809fb0a 6018
     ldr r2,[sp,#0x280]                       @ 0809fb0c a09a
     str r2,[r0,#0x0]                         @ 0809fb0e 0260
-    ldr r3, DWORD_0809fb20                   @ 0809fb10 034b
+    ldr r3, equip_activation_scan_cursor_off_9fb20 @ 0809fb10 034b
     adds r0,r4,r3    @ 0809fb12 e018
     str r2,[r0,#0x0]                         @ 0809fb14 0260
 
-@ Called by set_phase_code_c8_exit_zero (0x080a032c) and write_display_code_exit_zero (0x080a069a, duel_field) via bl/b. Only 2 instructions: movs r0,#0 (set return value to 0) + bl restore_frame_and_return_from_duel_ai_main (0x080a06a6). Serves as the unified return-0 entry point for all "failure/wait/miss" paths of the large duel AI main function. Tail-calls 0x080a06a6 to unwind the stack frame and return. Inputs: none; this entry point unconditionally sets r0 to 0. Returns: r0=u32 0 (fixed). Side effects: stack frame unwound by 0x298 bytes via restore_frame_and_return_from_duel_ai_main.
-return_zero_from_duel_ai_main:
+@ Entry sets r0=0 and calls release_equip_activation_display_phase_frame. Ghidra body also owns pools at0x0809fb1c/20 and the parent phase fragment at0x0809fb24..80, reached from the parent branch at0x0809fa32. That fragment runs four phase-1 callbacks, then resumes one of 54 phase-3 callbacks by cursor. Preserve the discontiguous parent-flow ownership.
+return_zero_from_equip_activation_display_phase:
     movs r0,#0x0    @ 0809fb16 0020
-    bl release_duel_ai_main_frame            @ 0809fb18 00f0c5fd
-DWORD_0809fb1c:
-    .word  0x0000800d                     @ 0809fb1c 0d800000
-DWORD_0809fb20:
-    .word  0x00001d24                     @ 0809fb20 241d0000
+    bl release_equip_activation_display_phase_frame @ 0809fb18 00f0c5fd
+oam_equip_sprite_p2_0d_9fb1c:
+    .word  OAM_EQUIP_SPRITE_P2_0D         @ 0809fb1c 0d800000  Player-side sprite code 0x0d with bit15 set.
+equip_activation_scan_cursor_off_9fb20:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809fb20 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 LAB_0809fb24:
     movs r6,#0x0    @ 0809fb24 0026
-    ldr r4, DAT_0809fb84                     @ 0809fb26 174c
+    ldr r4, equip_activation_phase1_callbacks_9fb84 @ 0809fb26 174c
 LAB_0809fb28:
     ldr r1,[r4,#0x0]                         @ 0809fb28 2168
     .hword 0x4640    @ 0809fb2a 4046
     bl invoke_r1                             @ 0809fb2c 6ef04efd
     cmp r0,#0x0                              @ 0809fb30 0028
-    beq return_zero_from_duel_ai_main        @ 0809fb32 f0d0
+    beq return_zero_from_equip_activation_display_phase @ 0809fb32 f0d0
     adds r4,#0x4    @ 0809fb34 0434
     adds r6,#0x1    @ 0809fb36 0136
     cmp r6,#0x3                              @ 0809fb38 032e
     bls LAB_0809fb28                         @ 0809fb3a f5d9
-    ldr r0, PTR_gP1LifePoints_0809fb88       @ 0809fb3c 1248
+    ldr r0, gp1lp_base_9fb88                 @ 0809fb3c 1248
     movs r1,#0xe9    @ 0809fb3e e921
     lsls r1,r1,#0x5    @ 0809fb40 4901
     adds r2,r0,r1    @ 0809fb42 4218
     ldr r1,[r2,#0x0]                         @ 0809fb44 1168
     cmp r1,#0x35                             @ 0809fb46 3529
     bhi LAB_0809fb74                         @ 0809fb48 14d8
-    ldr r6, DAT_0809fb8c                     @ 0809fb4a 104e
+    ldr r6, equip_activation_phase3_callbacks_9fb8c @ 0809fb4a 104e
     adds r4,r2,#0x0    @ 0809fb4c 141c
     adds r2,r0,#0x0    @ 0809fb4e 021c
-    ldr r3, DAT_0809fb90                     @ 0809fb50 0f4b
+    ldr r3, equip_activation_scan_cursor_off_9fb90 @ 0809fb50 0f4b
     adds r5,r2,r3    @ 0809fb52 d518
 LAB_0809fb54:
     ldr r0,[r4,#0x0]                         @ 0809fb54 2068
@@ -4727,7 +4932,7 @@ LAB_0809fb54:
     .hword 0x4640    @ 0809fb5c 4046
     bl invoke_r1                             @ 0809fb5e 6ef035fd
     cmp r0,#0x0                              @ 0809fb62 0028
-    beq return_zero_from_duel_ai_main        @ 0809fb64 d7d0
+    beq return_zero_from_equip_activation_display_phase @ 0809fb64 d7d0
     movs r0,#0x0    @ 0809fb66 0020
     str r0,[r5,#0x0]                         @ 0809fb68 2860
     ldr r0,[r4,#0x0]                         @ 0809fb6a 2068
@@ -4736,23 +4941,23 @@ LAB_0809fb54:
     cmp r0,#0x35                             @ 0809fb70 3528
     bls LAB_0809fb54                         @ 0809fb72 efd9
 LAB_0809fb74:
-    ldr r0, PTR_gP1LifePoints_0809fb88       @ 0809fb74 0448
-    ldr r2, DAT_0809fb94                     @ 0809fb76 074a
+    ldr r0, gp1lp_base_9fb88                 @ 0809fb74 0448
+    ldr r2, card_play_phase_ctr_off_9fb94    @ 0809fb76 074a
     adds r1,r0,r2    @ 0809fb78 8118
     ldr r0,[r1,#0x0]                         @ 0809fb7a 0868
     adds r0,#0x1    @ 0809fb7c 0130
     bl write_display_code_exit_zero          @ 0809fb7e 00f08cfd
     .zero  0x2
-DAT_0809fb84:
-    .word  0x09e47884                     @ 0809fb84 8478e409
-PTR_gP1LifePoints_0809fb88:
-    .word  gP1LifePoints                  @ 0809fb88 e0c40102
-DAT_0809fb8c:
-    .word  0x09e477ac                     @ 0809fb8c ac77e409
-DAT_0809fb90:
-    .word  0x00001d24                     @ 0809fb90 241d0000
-DAT_0809fb94:
-    .word  0x00001d1c                     @ 0809fb94 1c1d0000
+equip_activation_phase1_callbacks_9fb84:
+    .word  equip_activation_phase1_callbacks @ 0809fb84 8478e409  Base of the 4-entry phase-1 THUMB callback table.
+gp1lp_base_9fb88:
+    .word  gP1LifePoints                  @ 0809fb88 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+equip_activation_phase3_callbacks_9fb8c:
+    .word  equip_activation_phase3_callbacks @ 0809fb8c ac77e409  Base of the 54-entry phase-3 THUMB callback table.
+equip_activation_scan_cursor_off_9fb90:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809fb90 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+card_play_phase_ctr_off_9fb94:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809fb94 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809fb98:
     movs r0,#0x2    @ 0809fb98 0220
     movs r1,#0x0    @ 0809fb9a 0021
@@ -4762,44 +4967,44 @@ LAB_0809fb98:
     b LAB_080a032e                           @ 0809fba4 c3e3
 LAB_0809fba6:
     movs r6,#0x0    @ 0809fba6 0026
-    ldr r4, DAT_0809fbcc                     @ 0809fba8 084c
+    ldr r4, equip_activation_phase1_callbacks_9fbcc @ 0809fba8 084c
 LAB_0809fbaa:
     ldr r1,[r4,#0x0]                         @ 0809fbaa 2168
     .hword 0x4640    @ 0809fbac 4046
     bl invoke_r1                             @ 0809fbae 6ef00dfd
     cmp r0,#0x0                              @ 0809fbb2 0028
-    beq return_zero_from_duel_ai_main        @ 0809fbb4 afd0
+    beq return_zero_from_equip_activation_display_phase @ 0809fbb4 afd0
     adds r4,#0x4    @ 0809fbb6 0434
     adds r6,#0x1    @ 0809fbb8 0136
     cmp r6,#0x3                              @ 0809fbba 032e
     bls LAB_0809fbaa                         @ 0809fbbc f5d9
-    ldr r0, PTR_gP1LifePoints_0809fbd0       @ 0809fbbe 0448
-    ldr r3, DAT_0809fbd4                     @ 0809fbc0 044b
+    ldr r0, gp1lp_base_9fbd0                 @ 0809fbbe 0448
+    ldr r3, card_play_phase_ctr_off_9fbd4    @ 0809fbc0 044b
     adds r0,r0,r3    @ 0809fbc2 c018
     movs r1,#0x64    @ 0809fbc4 6421
 LAB_0809fbc6:
     str r1,[r0,#0x0]                         @ 0809fbc6 0160
-    b return_zero_from_duel_ai_main          @ 0809fbc8 a5e7
+    b return_zero_from_equip_activation_display_phase @ 0809fbc8 a5e7
     .zero  0x2
-DAT_0809fbcc:
-    .word  0x09e47884                     @ 0809fbcc 8478e409
-PTR_gP1LifePoints_0809fbd0:
-    .word  gP1LifePoints                  @ 0809fbd0 e0c40102
-DAT_0809fbd4:
-    .word  0x00001d1c                     @ 0809fbd4 1c1d0000
+equip_activation_phase1_callbacks_9fbcc:
+    .word  equip_activation_phase1_callbacks @ 0809fbcc 8478e409  Base of the 4-entry phase-1 THUMB callback table.
+gp1lp_base_9fbd0:
+    .word  gP1LifePoints                  @ 0809fbd0 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_9fbd4:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809fbd4 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809fbd8:
     movs r1,#0xe9    @ 0809fbd8 e921
     lsls r1,r1,#0x5    @ 0809fbda 4901
     adds r0,r4,r1    @ 0809fbdc 6018
     movs r1,#0x0    @ 0809fbde 0021
     str r1,[r0,#0x0]                         @ 0809fbe0 0160
-    ldr r2, DAT_0809fc74                     @ 0809fbe2 244a
+    ldr r2, equip_activation_scan_cursor_off_9fc74 @ 0809fbe2 244a
     adds r0,r4,r2    @ 0809fbe4 a018
     str r1,[r0,#0x0]                         @ 0809fbe6 0160
     movs r0,#0x65    @ 0809fbe8 6520
     str r0,[r7,#0x0]                         @ 0809fbea 3860
 LAB_0809fbec:
-    ldr r3, PTR_gP1LifePoints_0809fc78       @ 0809fbec 224b
+    ldr r3, gp1lp_base_9fc78                 @ 0809fbec 224b
     movs r1,#0xe9    @ 0809fbee e921
     lsls r1,r1,#0x5    @ 0809fbf0 4901
     adds r0,r3,r1    @ 0809fbf2 5818
@@ -4808,7 +5013,7 @@ LAB_0809fbec:
     bls LAB_0809fbfc                         @ 0809fbf8 00d9
     b LAB_0809fdf0                           @ 0809fbfa f9e0
 LAB_0809fbfc:
-    ldr r2, DAT_0809fc74                     @ 0809fbfc 1d4a
+    ldr r2, equip_activation_scan_cursor_off_9fc74 @ 0809fbfc 1d4a
     adds r3,r3,r2    @ 0809fbfe 9b18
     .hword 0x469a    @ 0809fc00 9a46
 LAB_0809fc02:
@@ -4821,15 +5026,15 @@ LAB_0809fc0c:
     .hword 0x4640    @ 0809fc0c 4046
     movs r1,#0x1    @ 0809fc0e 0121
     ands r0,r1    @ 0809fc10 0840
-    ldr r3, DAT_0809fc7c                     @ 0809fc12 1a4b
+    ldr r3, player_block_stride_9fc7c        @ 0809fc12 1a4b
     adds r2,r0,#0x0    @ 0809fc14 021c
     muls r2,r3    @ 0809fc16 5a43
     .hword 0x4691    @ 0809fc18 9146
-    ldr r0, PTR_gP1LifePoints_0809fc78       @ 0809fc1a 1748
+    ldr r0, gp1lp_base_9fc78                 @ 0809fc1a 1748
     add r0,r9                                @ 0809fc1c 4844
     str r0,[sp,#0x284]                       @ 0809fc1e a190
 LAB_0809fc20:
-    ldr r1, PTR_gP1LifePoints_0809fc78       @ 0809fc20 1549
+    ldr r1, gp1lp_base_9fc78                 @ 0809fc20 1549
     movs r2,#0xe9    @ 0809fc22 e922
     lsls r2,r2,#0x5    @ 0809fc24 5201
     adds r0,r1,r2    @ 0809fc26 8818
@@ -4844,10 +5049,10 @@ LAB_0809fc20:
     lsls r0,r7,#0x2    @ 0809fc38 b800
     adds r0,r0,r7    @ 0809fc3a c019
     lsls r0,r0,#0x2    @ 0809fc3c 8000
-    ldr r3, DAT_0809fc7c                     @ 0809fc3e 0f4b
+    ldr r3, player_block_stride_9fc7c        @ 0809fc3e 0f4b
     muls r1,r3    @ 0809fc40 5943
     adds r0,r0,r1    @ 0809fc42 4018
-    ldr r2, DAT_0809fc80                     @ 0809fc44 0e4a
+    ldr r2, gduelfieldslots_9fc80            @ 0809fc44 0e4a
     adds r1,r0,r2    @ 0809fc46 8118
     ldr r0,[r1,#0x0]                         @ 0809fc48 0868
     lsls r0,r0,#0x13    @ 0809fc4a c004
@@ -4873,20 +5078,20 @@ LAB_0809fc5c:
 LAB_0809fc70:
     b LAB_0809fc8a                           @ 0809fc70 0be0
     .zero  0x2
-DAT_0809fc74:
-    .word  0x00001d24                     @ 0809fc74 241d0000
-PTR_gP1LifePoints_0809fc78:
-    .word  gP1LifePoints                  @ 0809fc78 e0c40102
-DAT_0809fc7c:
-    .word  0x00000868                     @ 0809fc7c 68080000
-DAT_0809fc80:
-    .word  0x0201c510                     @ 0809fc80 10c50102
+equip_activation_scan_cursor_off_9fc74:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809fc74 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+gp1lp_base_9fc78:
+    .word  gP1LifePoints                  @ 0809fc78 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+player_block_stride_9fc7c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809fc7c 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_9fc80:
+    .word  gDuelFieldSlots                @ 0809fc80 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
 LAB_0809fc84:
     cmp r7,#0x4                              @ 0809fc84 042f
     bgt LAB_0809fc8a                         @ 0809fc86 00dc
     b LAB_0809fdc8                           @ 0809fc88 9ee0
 LAB_0809fc8a:
-    ldr r0, DAT_0809fca4                     @ 0809fc8a 0648
+    ldr r0, mask_of_brutality_cid_9fca4      @ 0809fc8a 0648
     cmp r4,r0                                @ 0809fc8c 8442
     beq LAB_0809fd24                         @ 0809fc8e 49d0
     cmp r4,r0                                @ 0809fc90 8442
@@ -4899,8 +5104,8 @@ LAB_0809fc8a:
     subs r0,#0xe    @ 0809fc9e 0e38
     b LAB_0809fcd0                           @ 0809fca0 16e0
     .zero  0x2
-DAT_0809fca4:
-    .word  0x000013f4                     @ 0809fca4 f4130000
+mask_of_brutality_cid_9fca4:
+    .word  MASK_OF_BRUTALITY_CID          @ 0809fca4 f4130000  Internal CID 0x13f4 for Mask of Brutality; card mapping and password cross-check are recorded.
 LAB_0809fca8:
     movs r0,#0x9b    @ 0809fca8 9b20
     lsls r0,r0,#0x5    @ 0809fcaa 4001
@@ -4909,7 +5114,7 @@ LAB_0809fca8:
     adds r0,#0x21    @ 0809fcb0 2130
     b LAB_0809fcd0                           @ 0809fcb2 0de0
 LAB_0809fcb4:
-    ldr r0, DAT_0809fcc4                     @ 0809fcb4 0348
+    ldr r0, equip_activation_unmapped_cid_144a_9fcc4 @ 0809fcb4 0348
     cmp r4,r0                                @ 0809fcb6 8442
     beq LAB_0809fcdc                         @ 0809fcb8 10d0
     cmp r4,r0                                @ 0809fcba 8442
@@ -4917,10 +5122,10 @@ LAB_0809fcb4:
     subs r0,#0x51    @ 0809fcbe 5138
     b LAB_0809fcd0                           @ 0809fcc0 06e0
     .zero  0x2
-DAT_0809fcc4:
-    .word  0x0000144a                     @ 0809fcc4 4a140000
+equip_activation_unmapped_cid_144a_9fcc4:
+    .word  EQUIP_ACTIVATION_UNMAPPED_CID_144A @ 0809fcc4 4a140000  Unmapped internal CID 0x144a; inverse table is 0xffff and no card-stat record exists.
 LAB_0809fcc8:
-    ldr r0, DAT_0809fcd8                     @ 0809fcc8 0348
+    ldr r0, armor_exe_cid_9fcd8              @ 0809fcc8 0348
     cmp r4,r0                                @ 0809fcca 8442
     beq LAB_0809fd6c                         @ 0809fccc 4ed0
     adds r0,#0x1e    @ 0809fcce 1e30
@@ -4929,8 +5134,8 @@ LAB_0809fcd0:
     beq LAB_0809fd24                         @ 0809fcd2 27d0
     b LAB_0809fdb8                           @ 0809fcd4 70e0
     .zero  0x2
-DAT_0809fcd8:
-    .word  0x0000161b                     @ 0809fcd8 1b160000
+armor_exe_cid_9fcd8:
+    .word  ARMOR_EXE_CID                  @ 0809fcd8 1b160000  Internal CID 0x161b for Armor Exe; card mapping and password cross-check are recorded.
 LAB_0809fcdc:
     cmp r6,r8                                @ 0809fcdc 4645
     bne LAB_0809fdb8                         @ 0809fcde 6bd1
@@ -4938,7 +5143,7 @@ LAB_0809fcdc:
     adds r0,r0,r7    @ 0809fce2 c019
     lsls r0,r0,#0x2    @ 0809fce4 8000
     add r0,r9                                @ 0809fce6 4844
-    ldr r4, DAT_0809fd20                     @ 0809fce8 0d4c
+    ldr r4, gduelfieldslots_9fd20            @ 0809fce8 0d4c
     adds r0,r0,r4    @ 0809fcea 0019
     ldr r0,[r0,#0x0]                         @ 0809fcec 0068
     lsls r2,r0,#0x2    @ 0809fcee 8200
@@ -4964,8 +5169,8 @@ LAB_0809fcdc:
 LAB_0809fd1c:
     b LAB_0809fdbc                           @ 0809fd1c 4ee0
     .zero  0x2
-DAT_0809fd20:
-    .word  0x0201c510                     @ 0809fd20 10c50102
+gduelfieldslots_9fd20:
+    .word  gDuelFieldSlots                @ 0809fd20 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
 LAB_0809fd24:
     cmp r6,r8                                @ 0809fd24 4645
     bne LAB_0809fdb8                         @ 0809fd26 47d1
@@ -4973,7 +5178,7 @@ LAB_0809fd24:
     adds r0,r0,r7    @ 0809fd2a c019
     lsls r0,r0,#0x2    @ 0809fd2c 8000
     add r0,r9                                @ 0809fd2e 4844
-    ldr r5, DAT_0809fd64                     @ 0809fd30 0c4d
+    ldr r5, gduelfieldslots_9fd64            @ 0809fd30 0c4d
     adds r0,r0,r5    @ 0809fd32 4019
     ldr r0,[r0,#0x0]                         @ 0809fd34 0068
     lsls r2,r0,#0x2    @ 0809fd36 8200
@@ -4986,20 +5191,20 @@ LAB_0809fd24:
     adds r1,r7,#0x0    @ 0809fd44 391c
     bl enqueue_sprite_attr_for_zone_card_id_lookup @ 0809fd46 a8f795fc
     adds r0,r4,#0x0    @ 0809fd4a 201c
-    bl get_lp_cost_by_field_spell_icid       @ 0809fd4c fff7a6fd
+    bl get_maintenance_lp_cost_by_icid       @ 0809fd4c fff7a6fd
     ldr r2,[sp,#0x284]                       @ 0809fd50 a19a
     ldr r1,[r2,#0x0]                         @ 0809fd52 1168
     cmp r1,r0                                @ 0809fd54 8142
     ble LAB_0809fdbc                         @ 0809fd56 31dd
-    ldr r3, DAT_0809fd68                     @ 0809fd58 034b
+    ldr r3, p1lp_timer_off_9fd68             @ 0809fd58 034b
     adds r1,r5,r3    @ 0809fd5a e918
     movs r0,#0x6e    @ 0809fd5c 6e20
     bl write_display_code_exit_zero          @ 0809fd5e 00f09cfc
     .zero  0x2
-DAT_0809fd64:
-    .word  0x0201c510                     @ 0809fd64 10c50102
-DAT_0809fd68:
-    .word  0x00001cec                     @ 0809fd68 ec1c0000
+gduelfieldslots_9fd64:
+    .word  gDuelFieldSlots                @ 0809fd64 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+p1lp_timer_off_9fd68:
+    .word  P1LP_TIMER_OFF                 @ 0809fd68 ec1c0000  Byte offset from gP1LifePoints to the duel display timer word.
 LAB_0809fd6c:
     adds r1,r6,#0x0    @ 0809fd6c 311c
     movs r0,#0x1    @ 0809fd6e 0120
@@ -5007,10 +5212,10 @@ LAB_0809fd6c:
     lsls r0,r7,#0x2    @ 0809fd72 b800
     adds r0,r0,r7    @ 0809fd74 c019
     lsls r0,r0,#0x2    @ 0809fd76 8000
-    ldr r2, DAT_0809fdac                     @ 0809fd78 0c4a
+    ldr r2, player_block_stride_9fdac        @ 0809fd78 0c4a
     muls r1,r2    @ 0809fd7a 5143
     adds r0,r0,r1    @ 0809fd7c 4018
-    ldr r4, DAT_0809fdb0                     @ 0809fd7e 0c4c
+    ldr r4, gduelfieldslots_9fdb0            @ 0809fd7e 0c4c
     adds r0,r0,r4    @ 0809fd80 0019
     ldr r0,[r0,#0x0]                         @ 0809fd82 0068
     lsls r2,r0,#0x2    @ 0809fd84 8200
@@ -5026,16 +5231,16 @@ LAB_0809fd6c:
     bl sum_equip_slot_effect_values_for_player @ 0809fd9a 96f76dfe
     cmp r0,#0x0                              @ 0809fd9e 0028
     beq LAB_0809fdbc                         @ 0809fda0 0cd0
-    ldr r3, DAT_0809fdb4                     @ 0809fda2 044b
+    ldr r3, p1lp_timer_off_9fdb4             @ 0809fda2 044b
     adds r1,r4,r3    @ 0809fda4 e118
     movs r0,#0x82    @ 0809fda6 8220
     bl write_display_code_exit_zero          @ 0809fda8 00f077fc
-DAT_0809fdac:
-    .word  0x00000868                     @ 0809fdac 68080000
-DAT_0809fdb0:
-    .word  0x0201c510                     @ 0809fdb0 10c50102
-DAT_0809fdb4:
-    .word  0x00001cec                     @ 0809fdb4 ec1c0000
+player_block_stride_9fdac:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809fdac 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_9fdb0:
+    .word  gDuelFieldSlots                @ 0809fdb0 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+p1lp_timer_off_9fdb4:
+    .word  P1LP_TIMER_OFF                 @ 0809fdb4 ec1c0000  Byte offset from gP1LifePoints to the duel display timer word.
 LAB_0809fdb8:
     cmp r5,#0x0                              @ 0809fdb8 002d
     beq LAB_0809fdc8                         @ 0809fdba 05d0
@@ -5057,7 +5262,7 @@ LAB_0809fdd6:
     movs r0,#0x0    @ 0809fdd6 0020
     .hword 0x4652    @ 0809fdd8 5246
     str r0,[r2,#0x0]                         @ 0809fdda 1060
-    ldr r3, PTR_gP1LifePoints_0809fe00       @ 0809fddc 084b
+    ldr r3, gp1lp_base_9fe00                 @ 0809fddc 084b
     movs r0,#0xe9    @ 0809fdde e920
     lsls r0,r0,#0x5    @ 0809fde0 4001
     adds r1,r3,r0    @ 0809fde2 1918
@@ -5068,19 +5273,19 @@ LAB_0809fdd6:
     bhi LAB_0809fdf0                         @ 0809fdec 00d8
     b LAB_0809fc02                           @ 0809fdee 08e7
 LAB_0809fdf0:
-    ldr r2, PTR_gP1LifePoints_0809fe00       @ 0809fdf0 034a
-    ldr r3, DAT_0809fe04                     @ 0809fdf2 044b
+    ldr r2, gp1lp_base_9fe00                 @ 0809fdf0 034a
+    ldr r3, card_play_phase_ctr_off_9fe04    @ 0809fdf2 044b
     adds r1,r2,r3    @ 0809fdf4 d118
     ldr r0,[r1,#0x0]                         @ 0809fdf6 0868
     adds r0,#0x1    @ 0809fdf8 0130
     bl write_display_code_exit_zero          @ 0809fdfa 00f04efc
     .zero  0x2
-PTR_gP1LifePoints_0809fe00:
-    .word  gP1LifePoints                  @ 0809fe00 e0c40102
-DAT_0809fe04:
-    .word  0x00001d1c                     @ 0809fe04 1c1d0000
+gp1lp_base_9fe00:
+    .word  gP1LifePoints                  @ 0809fe00 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_9fe04:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809fe04 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809fe08:
-    ldr r0, DAT_0809fe5c                     @ 0809fe08 1448
+    ldr r0, equip_activation_scan_cursor_off_9fe5c @ 0809fe08 1448
     adds r1,r4,r0    @ 0809fe0a 2118
     ldr r0,[r1,#0x0]                         @ 0809fe0c 0868
     cmp r0,#0x9                              @ 0809fe0e 0928
@@ -5092,16 +5297,16 @@ LAB_0809fe14:
     ands r2,r1    @ 0809fe18 0a40
     str r2,[sp,#0x288]                       @ 0809fe1a a292
 LAB_0809fe1c:
-    ldr r3, DAT_0809fe60                     @ 0809fe1c 104b
+    ldr r3, gequipactivationscancursor_9fe60 @ 0809fe1c 104b
     ldr r7,[r3,#0x0]                         @ 0809fe1e 1f68
     lsls r0,r7,#0x2    @ 0809fe20 b800
     adds r0,r0,r7    @ 0809fe22 c019
     lsls r0,r0,#0x2    @ 0809fe24 8000
-    ldr r1, DAT_0809fe64                     @ 0809fe26 0f49
+    ldr r1, player_block_stride_9fe64        @ 0809fe26 0f49
     ldr r2,[sp,#0x288]                       @ 0809fe28 a29a
     muls r1,r2    @ 0809fe2a 5143
     adds r0,r0,r1    @ 0809fe2c 4018
-    ldr r3, DAT_0809fe68                     @ 0809fe2e 0e4b
+    ldr r3, gduelfieldslots_9fe68            @ 0809fe2e 0e4b
     adds r1,r0,r3    @ 0809fe30 c118
     ldr r0,[r1,#0x0]                         @ 0809fe32 0868
     lsls r0,r0,#0x13    @ 0809fe34 c004
@@ -5126,20 +5331,20 @@ LAB_0809fe46:
 LAB_0809fe58:
     b LAB_0809fe72                           @ 0809fe58 0be0
     .zero  0x2
-DAT_0809fe5c:
-    .word  0x00001d24                     @ 0809fe5c 241d0000
-DAT_0809fe60:
-    .word  0x0201e204                     @ 0809fe60 04e20102
-DAT_0809fe64:
-    .word  0x00000868                     @ 0809fe64 68080000
-DAT_0809fe68:
-    .word  0x0201c510                     @ 0809fe68 10c50102
+equip_activation_scan_cursor_off_9fe5c:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809fe5c 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+gequipactivationscancursor_9fe60:
+    .word  gEquipActivationScanCursor     @ 0809fe60 04e20102  Absolute u32 shared equip activation scan cursor.
+player_block_stride_9fe64:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809fe64 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_9fe68:
+    .word  gDuelFieldSlots                @ 0809fe68 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
 LAB_0809fe6c:
     cmp r7,#0x4                              @ 0809fe6c 042f
     bgt LAB_0809fe72                         @ 0809fe6e 00dc
     b LAB_0809ff78                           @ 0809fe70 82e0
 LAB_0809fe72:
-    ldr r0, DAT_0809ff5c                     @ 0809fe72 3a48
+    ldr r0, skull_archfiend_of_lightning_cid_9ff5c @ 0809fe72 3a48
     cmp r5,r0                                @ 0809fe74 8542
     bgt LAB_0809ff40                         @ 0809fe76 63dc
     subs r0,#0x6    @ 0809fe78 0638
@@ -5156,11 +5361,11 @@ LAB_0809fe72:
     lsls r0,r7,#0x2    @ 0809fe90 b800
     adds r0,r0,r7    @ 0809fe92 c019
     lsls r0,r0,#0x2    @ 0809fe94 8000
-    ldr r2, DAT_0809ff60                     @ 0809fe96 324a
+    ldr r2, player_block_stride_9ff60        @ 0809fe96 324a
     adds r4,r1,#0x0    @ 0809fe98 0c1c
     muls r4,r2    @ 0809fe9a 5443
     adds r0,r0,r4    @ 0809fe9c 0019
-    ldr r6, DAT_0809ff64                     @ 0809fe9e 314e
+    ldr r6, gduelfieldslots_9ff64            @ 0809fe9e 314e
     adds r0,r0,r6    @ 0809fea0 8019
     ldr r0,[r0,#0x0]                         @ 0809fea2 0068
     lsls r2,r0,#0x2    @ 0809fea4 8200
@@ -5178,21 +5383,21 @@ LAB_0809fe72:
     .hword 0x469a    @ 0809febe 9a46
     add r4,r10                               @ 0809fec0 5444
     adds r0,r5,#0x0    @ 0809fec2 281c
-    bl get_lp_cost_by_field_spell_icid       @ 0809fec4 fff7eafc
+    bl get_maintenance_lp_cost_by_icid       @ 0809fec4 fff7eafc
     ldr r1,[r4,#0x0]                         @ 0809fec8 2168
     cmp r1,r0                                @ 0809feca 8142
     ble LAB_0809ff46                         @ 0809fecc 3bdd
     adds r0,r5,#0x0    @ 0809fece 281c
-    bl get_lp_cost_by_field_spell_icid       @ 0809fed0 fff7e4fc
+    bl get_maintenance_lp_cost_by_icid       @ 0809fed0 fff7e4fc
     adds r4,r0,#0x0    @ 0809fed4 041c
     .hword 0x4640    @ 0809fed6 4046
     adds r1,r4,#0x0    @ 0809fed8 211c
     bl enqueue_sprite_attr_clamped           @ 0809feda a8f739fc
-    ldr r1, DAT_0809ff68                     @ 0809fede 2249
+    ldr r1, p2lp_block2_off_1cf4_9ff68       @ 0809fede 2249
     adds r0,r6,r1    @ 0809fee0 7018
     ldr r1,[r0,#0x0]                         @ 0809fee2 0168
     .hword 0x4640    @ 0809fee4 4046
-    ldr r2, DAT_0809ff6c                     @ 0809fee6 214a
+    ldr r2, battle_scarred_cid_9ff6c         @ 0809fee6 214a
     .hword 0x4643    @ 0809fee8 4346
     bl query_slot_effect_eligibility_with_equip_fallback @ 0809feea 8ff779fa
     cmp r0,#0x0                              @ 0809feee 0028
@@ -5202,7 +5407,7 @@ LAB_0809fe72:
     subs r1,r2,r3    @ 0809fef6 d11a
     adds r0,r1,#0x0    @ 0809fef8 081c
     ands r0,r2    @ 0809fefa 1040
-    ldr r2, DAT_0809ff60                     @ 0809fefc 184a
+    ldr r2, player_block_stride_9ff60        @ 0809fefc 184a
     muls r0,r2    @ 0809fefe 5043
     add r0,r10                               @ 0809ff00 5044
     ldr r0,[r0,#0x0]                         @ 0809ff02 0068
@@ -5212,19 +5417,19 @@ LAB_0809fe72:
     adds r1,r4,#0x0    @ 0809ff0a 211c
     bl enqueue_sprite_attr_clamped           @ 0809ff0c a8f720fc
 LAB_0809ff10:
-    ldr r6, PTR_gP1LifePoints_0809ff70       @ 0809ff10 174e
-    ldr r3, DAT_0809ff74                     @ 0809ff12 184b
+    ldr r6, gp1lp_base_9ff70                 @ 0809ff10 174e
+    ldr r3, gequipactivationscancursor_9ff74 @ 0809ff12 184b
     ldr r1,[r3,#0x0]                         @ 0809ff14 1968
     movs r5,#0x1    @ 0809ff16 0125
     .hword 0x4640    @ 0809ff18 4046
     subs r3,r5,r0    @ 0809ff1a 2b1a
-    ldr r2, DAT_0809ff6c                     @ 0809ff1c 134a
+    ldr r2, battle_scarred_cid_9ff6c         @ 0809ff1c 134a
     bl query_slot_effect_eligibility_with_equip_fallback @ 0809ff1e 8ff75ffa
     cmp r0,#0x0                              @ 0809ff22 0028
     beq LAB_0809ff40                         @ 0809ff24 0cd0
     .hword 0x4640    @ 0809ff26 4046
     ands r0,r5    @ 0809ff28 2840
-    ldr r1, DAT_0809ff60                     @ 0809ff2a 0d49
+    ldr r1, player_block_stride_9ff60        @ 0809ff2a 0d49
     muls r0,r1    @ 0809ff2c 4843
     adds r0,r0,r6    @ 0809ff2e 8019
     lsls r1,r4,#0x1    @ 0809ff30 6100
@@ -5244,27 +5449,27 @@ LAB_0809ff46:
     movs r2,#0x0    @ 0809ff4a 0022
     movs r3,#0x0    @ 0809ff4c 0023
     bl enqueue_equip_slot_bitmap_update      @ 0809ff4e a7f7fdfc
-    ldr r2, DAT_0809ff74                     @ 0809ff52 084a
+    ldr r2, gequipactivationscancursor_9ff74 @ 0809ff52 084a
     ldr r0,[r2,#0x0]                         @ 0809ff54 1068
     adds r0,#0x1    @ 0809ff56 0130
     str r0,[r2,#0x0]                         @ 0809ff58 1060
-    b return_zero_from_duel_ai_main          @ 0809ff5a dce5
-DAT_0809ff5c:
-    .word  0x00001692                     @ 0809ff5c 92160000
-DAT_0809ff60:
-    .word  0x00000868                     @ 0809ff60 68080000
-DAT_0809ff64:
-    .word  0x0201c510                     @ 0809ff64 10c50102
-DAT_0809ff68:
-    .word  0x00001cf4                     @ 0809ff68 f41c0000
-DAT_0809ff6c:
-    .word  0x000016a2                     @ 0809ff6c a2160000
-PTR_gP1LifePoints_0809ff70:
-    .word  gP1LifePoints                  @ 0809ff70 e0c40102
-DAT_0809ff74:
-    .word  0x0201e204                     @ 0809ff74 04e20102
+    b return_zero_from_equip_activation_display_phase @ 0809ff5a dce5
+skull_archfiend_of_lightning_cid_9ff5c:
+    .word  SKULL_ARCHFIEND_OF_LIGHTNING_CID @ 0809ff5c 92160000  Internal CID 0x1692 for Skull Archfiend of Lightning; card mapping and password cross-check are recorded.
+player_block_stride_9ff60:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ff60 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_9ff64:
+    .word  gDuelFieldSlots                @ 0809ff64 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+p2lp_block2_off_1cf4_9ff68:
+    .word  P2LP_BLOCK2_OFF_1CF4           @ 0809ff68 f41c0000  Byte offset from gP1LifePoints to the paired LP/display state word.
+battle_scarred_cid_9ff6c:
+    .word  BATTLE_SCARRED_CID             @ 0809ff6c a2160000  Internal CID 0x16a2 for Battle-Scarred; card mapping and password cross-check are recorded.
+gp1lp_base_9ff70:
+    .word  gP1LifePoints                  @ 0809ff70 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+gequipactivationscancursor_9ff74:
+    .word  gEquipActivationScanCursor     @ 0809ff74 04e20102  Absolute u32 shared equip activation scan cursor.
 LAB_0809ff78:
-    ldr r3, DAT_0809ff90                     @ 0809ff78 054b
+    ldr r3, gequipactivationscancursor_9ff90 @ 0809ff78 054b
     ldr r0,[r3,#0x0]                         @ 0809ff7a 1868
     adds r0,#0x1    @ 0809ff7c 0130
     str r0,[r3,#0x0]                         @ 0809ff7e 1860
@@ -5272,28 +5477,28 @@ LAB_0809ff78:
     bhi LAB_0809ff86                         @ 0809ff82 00d8
     b LAB_0809fe1c                           @ 0809ff84 4ae7
 LAB_0809ff86:
-    ldr r0, PTR_gP1LifePoints_0809ff94       @ 0809ff86 0348
-    ldr r2, DAT_0809ff98                     @ 0809ff88 034a
+    ldr r0, gp1lp_base_9ff94                 @ 0809ff86 0348
+    ldr r2, card_play_phase_ctr_off_9ff98    @ 0809ff88 034a
     adds r1,r0,r2    @ 0809ff8a 8118
     movs r0,#0x96    @ 0809ff8c 9620
     b write_display_code_exit_zero           @ 0809ff8e 84e3
-DAT_0809ff90:
-    .word  0x0201e204                     @ 0809ff90 04e20102
-PTR_gP1LifePoints_0809ff94:
-    .word  gP1LifePoints                  @ 0809ff94 e0c40102
-DAT_0809ff98:
-    .word  0x00001d1c                     @ 0809ff98 1c1d0000
+gequipactivationscancursor_9ff90:
+    .word  gEquipActivationScanCursor     @ 0809ff90 04e20102  Absolute u32 shared equip activation scan cursor.
+gp1lp_base_9ff94:
+    .word  gP1LifePoints                  @ 0809ff94 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_9ff98:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 0809ff98 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_0809ff9c:
     movs r2,#0x1    @ 0809ff9c 0122
     .hword 0x4643    @ 0809ff9e 4346
     ands r2,r3    @ 0809ffa0 1a40
-    ldr r1, DAT_0809ffe8                     @ 0809ffa2 1149
+    ldr r1, equip_activation_scan_cursor_off_9ffe8 @ 0809ffa2 1149
     adds r0,r4,r1    @ 0809ffa4 6018
     ldr r1,[r0,#0x0]                         @ 0809ffa6 0168
     lsls r0,r1,#0x2    @ 0809ffa8 8800
     adds r0,r0,r1    @ 0809ffaa 4018
     lsls r0,r0,#0x2    @ 0809ffac 8000
-    ldr r1, DAT_0809ffec                     @ 0809ffae 0f49
+    ldr r1, player_block_stride_9ffec        @ 0809ffae 0f49
     muls r2,r1    @ 0809ffb0 4a43
     adds r0,r0,r2    @ 0809ffb2 8018
     adds r1,r4,#0x0    @ 0809ffb4 211c
@@ -5302,7 +5507,7 @@ LAB_0809ff9c:
     ldr r0,[r0,#0x0]                         @ 0809ffba 0068
     lsls r0,r0,#0x13    @ 0809ffbc c004
     lsrs r5,r0,#0x13    @ 0809ffbe c50c
-    ldr r0, DAT_0809fff0                     @ 0809ffc0 0b48
+    ldr r0, gduelcardctxbase_9fff0           @ 0809ffc0 0b48
     lsls r1,r3,#0x2    @ 0809ffc2 9900
     adds r0,#0x8    @ 0809ffc4 0830
     adds r1,r1,r0    @ 0809ffc6 0918
@@ -5313,7 +5518,7 @@ LAB_0809ff9c:
     lsls r3,r3,#0x5    @ 0809ffd0 5b01
     adds r6,r4,r3    @ 0809ffd2 e618
     str r1,[r6,#0x0]                         @ 0809ffd4 3160
-    ldr r0, DAT_0809fff4                     @ 0809ffd6 0748
+    ldr r0, mirror_wall_cid_9fff4            @ 0809ffd6 0748
     cmp r5,r0                                @ 0809ffd8 8542
     beq LAB_080a0004                         @ 0809ffda 13d0
     cmp r5,r0                                @ 0809ffdc 8542
@@ -5322,26 +5527,26 @@ LAB_0809ff9c:
     cmp r5,r0                                @ 0809ffe2 8542
     beq LAB_080a001c                         @ 0809ffe4 1ad0
     b LAB_080a0038                           @ 0809ffe6 27e0
-DAT_0809ffe8:
-    .word  0x00001d24                     @ 0809ffe8 241d0000
-DAT_0809ffec:
-    .word  0x00000868                     @ 0809ffec 68080000
-DAT_0809fff0:
-    .word  0x0201e2a0                     @ 0809fff0 a0e20102
-DAT_0809fff4:
-    .word  0x00001381                     @ 0809fff4 81130000
+equip_activation_scan_cursor_off_9ffe8:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 0809ffe8 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_9ffec:
+    .word  PLAYER_BLOCK_STRIDE            @ 0809ffec 68080000  Byte stride between the two player state blocks.
+gduelcardctxbase_9fff0:
+    .word  gDuelCardCtxBase               @ 0809fff0 a0e20102  Duel card activation context base.
+mirror_wall_cid_9fff4:
+    .word  MIRROR_WALL_CID                @ 0809fff4 81130000  Internal CID 0x1381 for Mirror Wall; card mapping and password cross-check are recorded.
 LAB_0809fff8:
-    ldr r0, DAT_080a0000                     @ 0809fff8 0148
+    ldr r0, token_1639_cid_a0000             @ 0809fff8 0148
     cmp r5,r0                                @ 0809fffa 8542
     beq LAB_080a002e                         @ 0809fffc 17d0
     b LAB_080a0038                           @ 0809fffe 1be0
-DAT_080a0000:
-    .word  0x00001639                     @ 080a0000 39160000
+token_1639_cid_a0000:
+    .word  TOKEN_1639_CID                 @ 080a0000 39160000  Special token CID 0x1639; inverse index 2090 has no ordinary card-stat record.
 LAB_080a0004:
     movs r3,#0x0    @ 080a0004 0023
     adds r0,r2,r4    @ 080a0006 1019
     ldr r1,[r0,#0x0]                         @ 080a0008 0168
-    ldr r0, DAT_080a0018                     @ 080a000a 0348
+    ldr r0, lp_delta_6000_a0018              @ 080a000a 0348
     cmp r1,r0                                @ 080a000c 8142
     ble LAB_080a0012                         @ 080a000e 00dd
     movs r3,#0x1    @ 080a0010 0123
@@ -5349,8 +5554,8 @@ LAB_080a0012:
     str r3,[r6,#0x0]                         @ 080a0012 3360
     b LAB_080a0038                           @ 080a0014 10e0
     .zero  0x2
-DAT_080a0018:
-    .word  0x00001770                     @ 080a0018 70170000
+lp_delta_6000_a0018:
+    .word  LP_DELTA_6000                  @ 080a0018 70170000  LP threshold value 6000; this consumer compares an LP word, not a CID.
 LAB_080a001c:
     .hword 0x4640    @ 080a001c 4046
     bl compare_zone_max_scores_by_player     @ 080a001e 0ef0d9fe
@@ -5371,14 +5576,14 @@ LAB_080a0038:
     .hword 0x4640    @ 080a003a 4046
     ands r0,r2    @ 080a003c 1040
     .hword 0x4680    @ 080a003e 8046
-    ldr r5, PTR_gP1LifePoints_080a0084       @ 080a0040 104d
-    ldr r1, DAT_080a0088                     @ 080a0042 1149
+    ldr r5, gp1lp_base_a0084                 @ 080a0040 104d
+    ldr r1, equip_activation_scan_cursor_off_a0088 @ 080a0042 1149
     adds r0,r5,r1    @ 080a0044 6818
     ldr r1,[r0,#0x0]                         @ 080a0046 0168
     lsls r0,r1,#0x2    @ 080a0048 8800
     adds r0,r0,r1    @ 080a004a 4018
     lsls r0,r0,#0x2    @ 080a004c 8000
-    ldr r1, DAT_080a008c                     @ 080a004e 0f49
+    ldr r1, player_block_stride_a008c        @ 080a004e 0f49
     .hword 0x4643    @ 080a0050 4346
     muls r3,r1    @ 080a0052 4b43
     adds r1,r3,#0x0    @ 080a0054 191c
@@ -5405,12 +5610,12 @@ LAB_080a0038:
     str r4,[r0,#0x0]                         @ 080a007e 0460
     b LAB_080a00b8                           @ 080a0080 1ae0
     .zero  0x2
-PTR_gP1LifePoints_080a0084:
-    .word  gP1LifePoints                  @ 080a0084 e0c40102
-DAT_080a0088:
-    .word  0x00001d24                     @ 080a0088 241d0000
-DAT_080a008c:
-    .word  0x00000868                     @ 080a008c 68080000
+gp1lp_base_a0084:
+    .word  gP1LifePoints                  @ 080a0084 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+equip_activation_scan_cursor_off_a0088:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a0088 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_a008c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a008c 68080000  Byte stride between the two player state blocks.
 LAB_080a0090:
     add r4,sp,#0x100                         @ 080a0090 40ac
     adds r0,r5,#0x0    @ 080a0092 281c
@@ -5420,7 +5625,7 @@ LAB_080a0090:
     movs r1,#0xe8    @ 080a009c e821
     bl format_game_text_with_text_arg        @ 080a009e 7ff711f9
     adds r0,r5,#0x0    @ 080a00a2 281c
-    bl get_lp_cost_by_field_spell_icid       @ 080a00a4 fff7fafb
+    bl get_maintenance_lp_cost_by_icid       @ 080a00a4 fff7fafb
     adds r2,r0,#0x0    @ 080a00a8 021c
     .hword 0x4668    @ 080a00aa 6846
     adds r1,r4,#0x0    @ 080a00ac 211c
@@ -5428,16 +5633,16 @@ LAB_080a0090:
     .hword 0x4668    @ 080a00b2 6846
     bl invoke_card_display_op_0x31_sub1      @ 080a00b4 f3f77ef9
 LAB_080a00b8:
-    ldr r1, PTR_gP1LifePoints_080a00c4       @ 080a00b8 0249
-    ldr r2, DAT_080a00c8                     @ 080a00ba 034a
+    ldr r1, gp1lp_base_a00c4                 @ 080a00b8 0249
+    ldr r2, card_play_phase_ctr_off_a00c8    @ 080a00ba 034a
     adds r1,r1,r2    @ 080a00bc 8918
     ldr r0,[r1,#0x0]                         @ 080a00be 0868
     adds r0,#0x1    @ 080a00c0 0130
     b write_display_code_exit_zero           @ 080a00c2 eae2
-PTR_gP1LifePoints_080a00c4:
-    .word  gP1LifePoints                  @ 080a00c4 e0c40102
-DAT_080a00c8:
-    .word  0x00001d1c                     @ 080a00c8 1c1d0000
+gp1lp_base_a00c4:
+    .word  gP1LifePoints                  @ 080a00c4 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_a00c8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a00c8 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_080a00cc:
     movs r3,#0xea    @ 080a00cc ea23
     lsls r3,r3,#0x5    @ 080a00ce 5b01
@@ -5448,13 +5653,13 @@ LAB_080a00cc:
     movs r2,#0x1    @ 080a00d8 0122
     .hword 0x4640    @ 080a00da 4046
     ands r2,r0    @ 080a00dc 0240
-    ldr r1, DAT_080a010c                     @ 080a00de 0b49
+    ldr r1, equip_activation_scan_cursor_off_a010c @ 080a00de 0b49
     adds r0,r4,r1    @ 080a00e0 6018
     ldr r1,[r0,#0x0]                         @ 080a00e2 0168
     lsls r0,r1,#0x2    @ 080a00e4 8800
     adds r0,r0,r1    @ 080a00e6 4018
     lsls r0,r0,#0x2    @ 080a00e8 8000
-    ldr r1, DAT_080a0110                     @ 080a00ea 0949
+    ldr r1, player_block_stride_a0110        @ 080a00ea 0949
     muls r1,r2    @ 080a00ec 5143
     adds r0,r0,r1    @ 080a00ee 4018
     adds r1,r4,#0x0    @ 080a00f0 211c
@@ -5463,18 +5668,18 @@ LAB_080a00cc:
     ldr r0,[r0,#0x0]                         @ 080a00f6 0068
     lsls r0,r0,#0x13    @ 080a00f8 c004
     lsrs r0,r0,#0x13    @ 080a00fa c00c
-    bl get_lp_cost_by_field_spell_icid       @ 080a00fc fff7cefb
+    bl get_maintenance_lp_cost_by_icid       @ 080a00fc fff7cefb
     adds r1,r0,#0x0    @ 080a0100 011c
     .hword 0x4640    @ 080a0102 4046
     bl enqueue_sprite_attr_clamped           @ 080a0104 a8f724fb
     b LAB_080a0124                           @ 080a0108 0ce0
     .zero  0x2
-DAT_080a010c:
-    .word  0x00001d24                     @ 080a010c 241d0000
-DAT_080a0110:
-    .word  0x00000868                     @ 080a0110 68080000
+equip_activation_scan_cursor_off_a010c:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a010c 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_a0110:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a0110 68080000  Byte stride between the two player state blocks.
 LAB_080a0114:
-    ldr r2, DAT_080a0138                     @ 080a0114 084a
+    ldr r2, equip_activation_scan_cursor_off_a0138 @ 080a0114 084a
     adds r0,r4,r2    @ 080a0116 a018
     ldr r1,[r0,#0x0]                         @ 080a0118 0168
     .hword 0x4640    @ 080a011a 4046
@@ -5482,24 +5687,24 @@ LAB_080a0114:
     movs r3,#0x0    @ 080a011e 0023
     bl enqueue_equip_slot_bitmap_update      @ 080a0120 a7f714fc
 LAB_080a0124:
-    ldr r1, PTR_gP1LifePoints_080a013c       @ 080a0124 0549
-    ldr r3, DAT_080a0138                     @ 080a0126 044b
+    ldr r1, gp1lp_base_a013c                 @ 080a0124 0549
+    ldr r3, equip_activation_scan_cursor_off_a0138 @ 080a0126 044b
     adds r2,r1,r3    @ 080a0128 ca18
     ldr r0,[r2,#0x0]                         @ 080a012a 1068
     adds r0,#0x1    @ 080a012c 0130
     str r0,[r2,#0x0]                         @ 080a012e 1060
-    ldr r0, DAT_080a0140                     @ 080a0130 0348
+    ldr r0, card_play_phase_ctr_off_a0140    @ 080a0130 0348
     adds r1,r1,r0    @ 080a0132 0918
     movs r0,#0x65    @ 080a0134 6520
     b write_display_code_exit_zero           @ 080a0136 b0e2
-DAT_080a0138:
-    .word  0x00001d24                     @ 080a0138 241d0000
-PTR_gP1LifePoints_080a013c:
-    .word  gP1LifePoints                  @ 080a013c e0c40102
-DAT_080a0140:
-    .word  0x00001d1c                     @ 080a0140 1c1d0000
+equip_activation_scan_cursor_off_a0138:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a0138 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+gp1lp_base_a013c:
+    .word  gP1LifePoints                  @ 080a013c e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_a0140:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a0140 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_080a0144:
-    ldr r0, DAT_080a0164                     @ 080a0144 0748
+    ldr r0, gduelcardctxbase_a0164           @ 080a0144 0748
     .hword 0x4642    @ 080a0146 4246
     lsls r1,r2,#0x2    @ 080a0148 9100
     adds r0,#0x8    @ 080a014a 0830
@@ -5515,20 +5720,20 @@ LAB_080a0144:
     movs r0,#0x79    @ 080a015e 7920
     b LAB_080a032e                           @ 080a0160 e5e0
     .zero  0x2
-DAT_080a0164:
-    .word  0x0201e2a0                     @ 080a0164 a0e20102
+gduelcardctxbase_a0164:
+    .word  gDuelCardCtxBase               @ 080a0164 a0e20102  Duel card activation context base.
 LAB_080a0168:
     movs r0,#0x1    @ 080a0168 0120
     .hword 0x4641    @ 080a016a 4146
     ands r1,r0    @ 080a016c 0140
     .hword 0x4688    @ 080a016e 8846
-    ldr r2, DAT_080a01ac                     @ 080a0170 0e4a
+    ldr r2, equip_activation_scan_cursor_off_a01ac @ 080a0170 0e4a
     adds r0,r4,r2    @ 080a0172 a018
     ldr r1,[r0,#0x0]                         @ 080a0174 0168
     lsls r0,r1,#0x2    @ 080a0176 8800
     adds r0,r0,r1    @ 080a0178 4018
     lsls r0,r0,#0x2    @ 080a017a 8000
-    ldr r1, DAT_080a01b0                     @ 080a017c 0c49
+    ldr r1, player_block_stride_a01b0        @ 080a017c 0c49
     .hword 0x4643    @ 080a017e 4346
     muls r3,r1    @ 080a0180 4b43
     adds r1,r3,#0x0    @ 080a0182 191c
@@ -5549,10 +5754,10 @@ LAB_080a0168:
     ldr r0,[r7,#0x0]                         @ 080a01a6 3868
     adds r0,#0x1    @ 080a01a8 0130
     b LAB_080a032e                           @ 080a01aa c0e0
-DAT_080a01ac:
-    .word  0x00001d24                     @ 080a01ac 241d0000
-DAT_080a01b0:
-    .word  0x00000868                     @ 080a01b0 68080000
+equip_activation_scan_cursor_off_a01ac:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a01ac 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_a01b0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a01b0 68080000  Byte stride between the two player state blocks.
 LAB_080a01b4:
     movs r1,#0xea    @ 080a01b4 ea21
     lsls r1,r1,#0x5    @ 080a01b6 4901
@@ -5562,12 +5767,12 @@ LAB_080a01b4:
     beq LAB_080a01cc                         @ 080a01be 05d0
     movs r0,#0x7a    @ 080a01c0 7a20
     str r0,[r7,#0x0]                         @ 080a01c2 3860
-    ldr r0, DAT_080a01c8                     @ 080a01c4 0048
+    ldr r0, check_slot_equippable_for_active_player_thumb_ptr_a01c8 @ 080a01c4 0048
     b LAB_080a02b2                           @ 080a01c6 74e0
-DAT_080a01c8:
-    .word  0x0809f945                     @ 080a01c8 45f90908
+check_slot_equippable_for_active_player_thumb_ptr_a01c8:
+    .word  CHECK_SLOT_EQUIPPABLE_FOR_ACTIVE_PLAYER_THUMB_PTR @ 080a01c8 45f90908  Stored THUMB callback value; the auxiliary reference targets the even Function entry.
 LAB_080a01cc:
-    ldr r2, DAT_080a01e8                     @ 080a01cc 064a
+    ldr r2, equip_activation_scan_cursor_off_a01e8 @ 080a01cc 064a
     adds r4,r4,r2    @ 080a01ce a418
     ldr r1,[r4,#0x0]                         @ 080a01d0 2168
     .hword 0x4640    @ 080a01d2 4046
@@ -5580,16 +5785,16 @@ LAB_080a01cc:
     movs r0,#0x65    @ 080a01e2 6520
     b LAB_080a032e                           @ 080a01e4 a3e0
     .zero  0x2
-DAT_080a01e8:
-    .word  0x00001d24                     @ 080a01e8 241d0000
+equip_activation_scan_cursor_off_a01e8:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a01e8 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 LAB_080a01ec:
     bl check_activation_display_state_is_confirmed @ 080a01ec f6f792fc
     cmp r0,#0x0                              @ 080a01f0 0028
     beq LAB_080a0228                         @ 080a01f2 19d0
-    ldr r3, DAT_080a021c                     @ 080a01f4 094b
+    ldr r3, eligib_sprite_ctrl_off_a021c     @ 080a01f4 094b
     adds r0,r4,r3    @ 080a01f6 e018
     ldr r0,[r0,#0x0]                         @ 080a01f8 0068
-    ldr r2, DAT_080a0220                     @ 080a01fa 094a
+    ldr r2, eligib_anim_state_off_a0220      @ 080a01fa 094a
     adds r1,r4,r2    @ 080a01fc a118
     adds r3,#0x8    @ 080a01fe 0833
     adds r2,r4,r3    @ 080a0200 e218
@@ -5597,7 +5802,7 @@ LAB_080a01ec:
     ldr r2,[r2,#0x0]                         @ 080a0204 1268
     adds r1,r1,r2    @ 080a0206 8918
     bl submit_equip_sprite_if_slot_eligible  @ 080a0208 a7f78efd
-    ldr r0, DAT_080a0224                     @ 080a020c 0548
+    ldr r0, equip_activation_scan_cursor_off_a0224 @ 080a020c 0548
     adds r1,r4,r0    @ 080a020e 2118
     ldr r0,[r1,#0x0]                         @ 080a0210 0868
     adds r0,#0x1    @ 080a0212 0130
@@ -5605,12 +5810,12 @@ LAB_080a01ec:
     movs r0,#0x65    @ 080a0216 6520
     b LAB_080a032e                           @ 080a0218 89e0
     .zero  0x2
-DAT_080a021c:
-    .word  0x00001d68                     @ 080a021c 681d0000
-DAT_080a0220:
-    .word  0x00001d6c                     @ 080a0220 6c1d0000
-DAT_080a0224:
-    .word  0x00001d24                     @ 080a0224 241d0000
+eligib_sprite_ctrl_off_a021c:
+    .word  ELIGIB_SPRITE_CTRL_OFF         @ 080a021c 681d0000  Byte offset from gP1LifePoints to the eligibility sprite-control word.
+eligib_anim_state_off_a0220:
+    .word  ELIGIB_ANIM_STATE_OFF          @ 080a0220 6c1d0000  Byte offset from gP1LifePoints to the eligibility animation-state word.
+equip_activation_scan_cursor_off_a0224:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a0224 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 LAB_080a0228:
     movs r0,#0x78    @ 080a0228 7820
     b LAB_080a032e                           @ 080a022a 80e0
@@ -5621,7 +5826,7 @@ LAB_080a022c:
     ldr r6,[r0,#0x0]                         @ 080a0232 0668
     .hword 0x4642    @ 080a0234 4246
     eors r6,r2    @ 080a0236 5640
-    ldr r0, DAT_080a0254                     @ 080a0238 0648
+    ldr r0, gduelcardctxbase_a0254           @ 080a0238 0648
     lsls r1,r6,#0x2    @ 080a023a b100
     adds r0,#0x8    @ 080a023c 0830
     adds r1,r1,r0    @ 080a023e 0918
@@ -5635,18 +5840,18 @@ LAB_080a022c:
     str r1,[r0,#0x0]                         @ 080a024e 0160
     movs r0,#0x83    @ 080a0250 8320
     b LAB_080a032e                           @ 080a0252 6ce0
-DAT_080a0254:
-    .word  0x0201e2a0                     @ 080a0254 a0e20102
+gduelcardctxbase_a0254:
+    .word  gDuelCardCtxBase               @ 080a0254 a0e20102  Duel card activation context base.
 LAB_080a0258:
     movs r0,#0x1    @ 080a0258 0120
     ands r6,r0    @ 080a025a 0640
-    ldr r1, DAT_080a0298                     @ 080a025c 0e49
+    ldr r1, equip_activation_scan_cursor_off_a0298 @ 080a025c 0e49
     adds r0,r4,r1    @ 080a025e 6018
     ldr r1,[r0,#0x0]                         @ 080a0260 0168
     lsls r0,r1,#0x2    @ 080a0262 8800
     adds r0,r0,r1    @ 080a0264 4018
     lsls r0,r0,#0x2    @ 080a0266 8000
-    ldr r1, DAT_080a029c                     @ 080a0268 0c49
+    ldr r1, player_block_stride_a029c        @ 080a0268 0c49
     muls r1,r6    @ 080a026a 7143
     adds r0,r0,r1    @ 080a026c 4018
     adds r1,r4,#0x0    @ 080a026e 211c
@@ -5667,12 +5872,12 @@ LAB_080a0258:
     adds r0,#0x1    @ 080a0292 0130
     b LAB_080a032e                           @ 080a0294 4be0
     .zero  0x2
-DAT_080a0298:
-    .word  0x00001d24                     @ 080a0298 241d0000
-DAT_080a029c:
-    .word  0x00000868                     @ 080a029c 68080000
+equip_activation_scan_cursor_off_a0298:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a0298 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
+player_block_stride_a029c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a029c 68080000  Byte stride between the two player state blocks.
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) as an internal code fragment. Non-APCS register inputs: r4=gP1LifePoints region base (parent callee-save), r1=current slot index, r7=pointer to slot index storage. Reads [r4+0x1d40] (0xea<<5=0x1d40, zone activation state flag): if nonzero -> writes r1+1 to [r7] (advances slot index), loads r0=0x0809f98d (field handler pointer or param), calls init_zone_activation_display_fields, tail-calls return_zero_from_duel_ai_main (return 0). If [r4+0x1d40]==0 -> reads [r4+0x1d20] (0xe9<<5=0x1d20), performs XOR/bit operation, calls enqueue_equip_slot_bitmap_update, increments [r4+0x1d24] by 1, tail-calls shared return with r0=0x65. Inputs: r4=ptr gP1LifePoints_base, r1=u32 slot_idx [0..4], r7=ptr slot_idx_storage. Returns: r0=u32 status_code (0=active path, 0x65=bitmap update path). Side effects: [r7]:=r1+1 (active path); [r4+0x1d24]:=old+1 (bitmap path); OAM queue write via enqueue_equip_slot_bitmap_update. Constants: zone_active_flag_offset=0x1d40 (=0xea<<5), bitmap_src_offset=0x1d20 (=0xe9<<5), bitmap_counter_offset=0x1d24, status_bitmap_path=0x65 (101, bitmap update path return code).
+@ Shared parent fragment; non-APCS r4=state base, r1=slot, r7=slot-index pointer. If state+0x1d40 is set, advance *r7, initialize the effect-valid callback, and return0. Otherwise enqueue the slot bitmap using state+0x1d20, advance the shared cursor, write phase0x65, and return0 through the parent epilogue.
 advance_display_slot_if_zone_active:
     movs r2,#0xea    @ 080a02a0 ea22
     lsls r2,r2,#0x5    @ 080a02a2 5201
@@ -5682,12 +5887,12 @@ advance_display_slot_if_zone_active:
     beq LAB_080a02bc                         @ 080a02aa 07d0
     adds r0,r1,#0x1    @ 080a02ac 481c
     str r0,[r7,#0x0]                         @ 080a02ae 3860
-    ldr r0, DAT_080a02b8                     @ 080a02b0 0148
+    ldr r0, check_slot_effect_valid_for_active_player_thumb_ptr_a02b8 @ 080a02b0 0148
 LAB_080a02b2:
     bl init_zone_activation_display_fields   @ 080a02b2 f6f787fb
-    b return_zero_from_duel_ai_main          @ 080a02b6 2ee4
-DAT_080a02b8:
-    .word  0x0809f98d                     @ 080a02b8 8df90908
+    b return_zero_from_equip_activation_display_phase @ 080a02b6 2ee4
+check_slot_effect_valid_for_active_player_thumb_ptr_a02b8:
+    .word  CHECK_SLOT_EFFECT_VALID_FOR_ACTIVE_PLAYER_THUMB_PTR @ 080a02b8 8df90908  Stored THUMB callback value; the auxiliary reference targets the even Function entry.
 LAB_080a02bc:
     movs r3,#0xe9    @ 080a02bc e923
     lsls r3,r3,#0x5    @ 080a02be 5b01
@@ -5696,7 +5901,7 @@ LAB_080a02bc:
     .hword 0x4641    @ 080a02c4 4146
     eors r1,r0    @ 080a02c6 4140
     .hword 0x4688    @ 080a02c8 8846
-    ldr r2, DAT_080a02e4                     @ 080a02ca 064a
+    ldr r2, equip_activation_scan_cursor_off_a02e4 @ 080a02ca 064a
     adds r4,r4,r2    @ 080a02cc a418
     ldr r1,[r4,#0x0]                         @ 080a02ce 2168
     .hword 0x4640    @ 080a02d0 4046
@@ -5708,19 +5913,18 @@ LAB_080a02bc:
     str r0,[r4,#0x0]                         @ 080a02de 2060
     movs r0,#0x65    @ 080a02e0 6520
     b LAB_080a032e                           @ 080a02e2 24e0
-DAT_080a02e4:
-    .word  0x00001d24                     @ 080a02e4 241d0000
+equip_activation_scan_cursor_off_a02e4:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a02e4 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 
-@ Called by FUN_0809f9cc (duel_field main AI dispatch, depth=6, indeg=1) in one AI phase branch. First calls check_activation_display_state_is_confirmed; if not confirmed jumps to write phase_code=0x82 exit branch. If confirmed: takes [gP1LifePoints+0x1d68] as slot_A_ptr, [gP1LifePoints+0x1d6c]+[gP1LifePoints+0x1d74] summed as position, with movs r2,#0x1; rsbs r2,r2,#0 (r2=-1) calls enqueue_effect_card_slot_sprite_attr(slot_A_ptr, position, -1); then increments [gP1LifePoints+0x1d24] by 1 to advance effect card slot display count. Returns phase_code=0x65 (101) via shared exit path LAB_080a032e. Sibling of advance_display_slot_if_zone_active (0x080a02a0, checks zone_active_flag bitmap); this variant advances effect card slot sprite attr queue. Non-APCS input: r4 = ptr base (gP1LifePoints region offset base; set by parent 0x0809f9cc at 0x0809fa14: ldr r4, PTR_gP1LifePoints_0809fa4c=0x0201c4e0 then passed via bl 0x0809fab0).
-@ Constants: offset_slot_ptr=0x1d68, offset_pos_a=0x1d6c, offset_pos_b=0x1d74, offset_slot_counter=0x1d24, phase_code_active=0x65, phase_code_inactive=0x82, sprite_attr_mode=-1.
+@ Shared parent fragment; non-APCS r4=state base and r7=phase pointer. If display state is unconfirmed, write phase0x82 and return0. Otherwise enqueue an effect-card slot sprite from offsets0x1d68/0x1d6c/0x1d74, advance the shared cursor, write phase0x65, and return0.
 advance_effect_card_slot_display_if_zone_active:
     bl check_activation_display_state_is_confirmed @ 080a02e8 f6f714fc
     cmp r0,#0x0                              @ 080a02ec 0028
     beq LAB_080a0328                         @ 080a02ee 1bd0
-    ldr r3, DAT_080a031c                     @ 080a02f0 0a4b
+    ldr r3, eligib_sprite_ctrl_off_a031c     @ 080a02f0 0a4b
     adds r0,r4,r3    @ 080a02f2 e018
     ldr r0,[r0,#0x0]                         @ 080a02f4 0068
-    ldr r2, DAT_080a0320                     @ 080a02f6 0a4a
+    ldr r2, eligib_anim_state_off_a0320      @ 080a02f6 0a4a
     adds r1,r4,r2    @ 080a02f8 a118
     adds r3,#0x8    @ 080a02fa 0833
     adds r2,r4,r3    @ 080a02fc e218
@@ -5730,7 +5934,7 @@ advance_effect_card_slot_display_if_zone_active:
     movs r2,#0x1    @ 080a0304 0122
     rsbs r2,r2,#0    @ 080a0306 5242
     bl enqueue_effect_card_slot_sprite_attr  @ 080a0308 a5f704f8
-    ldr r0, DAT_080a0324                     @ 080a030c 0548
+    ldr r0, equip_activation_scan_cursor_off_a0324 @ 080a030c 0548
     adds r1,r4,r0    @ 080a030e 2118
     ldr r0,[r1,#0x0]                         @ 080a0310 0868
     adds r0,#0x1    @ 080a0312 0130
@@ -5738,36 +5942,36 @@ advance_effect_card_slot_display_if_zone_active:
     movs r0,#0x65    @ 080a0316 6520
     b LAB_080a032e                           @ 080a0318 09e0
     .zero  0x2
-DAT_080a031c:
-    .word  0x00001d68                     @ 080a031c 681d0000
-DAT_080a0320:
-    .word  0x00001d6c                     @ 080a0320 6c1d0000
-DAT_080a0324:
-    .word  0x00001d24                     @ 080a0324 241d0000
+eligib_sprite_ctrl_off_a031c:
+    .word  ELIGIB_SPRITE_CTRL_OFF         @ 080a031c 681d0000  Byte offset from gP1LifePoints to the eligibility sprite-control word.
+eligib_anim_state_off_a0320:
+    .word  ELIGIB_ANIM_STATE_OFF          @ 080a0320 6c1d0000  Byte offset from gP1LifePoints to the eligibility animation-state word.
+equip_activation_scan_cursor_off_a0324:
+    .word  EQUIP_ACTIVATION_SCAN_CURSOR_OFF @ 080a0324 241d0000  Byte offset from gP1LifePoints to the shared activation scan cursor.
 LAB_080a0328:
     movs r0,#0x82    @ 080a0328 8220
     b LAB_080a032e                           @ 080a032a 00e0
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) as its phase-code 0xc8=200 write + return-0 exit point. Only 2 effective instructions: movs r0,#0xc8 (200), then falls through to LAB_080a032e (shared write+return path): str r0,[r7,#0] writes phase code 0xc8 to address in r7, then bl return_zero_from_duel_ai_main (movs r0,#0 + frame unwind). Shares LAB_080a032e write+return sequence with advance_display_slot_if_zone_active (writes 0x65/0x82 paths). Phase code 0xc8=200 meaning is context-dependent. Non-APCS input: r7=ptr phase_field (parent callee-save, points to phase code storage). Returns: r0=u32 0 (fixed via return_zero_from_duel_ai_main). Side effects: [r7]:=0xc8 (writes phase status code 200). Constants: phase_code=0xc8 (=200, phase status code).
+@ Shared parent exit with non-APCS r7=phase pointer. Write0xc8 to *r7, then call return_zero_from_equip_activation_display_phase. Returns0 after releasing the parent frame.
 set_phase_code_c8_exit_zero:
     movs r0,#0xc8    @ 080a032c c820
 LAB_080a032e:
     str r0,[r7,#0x0]                         @ 080a032e 3860
-    bl return_zero_from_duel_ai_main         @ 080a0330 fff7f1fb
+    bl return_zero_from_equip_activation_display_phase @ 080a0330 fff7f1fb
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) with r8=player_id (callee-save from parent, accessed via 0x4641=mov r1,r8). Double loop r7=[0..4] (zone index) x r4=[0..4] (slot index): computes gDuelFieldSlots + player*0x868 + slot*0x14 (stride=20), checks slot validity (icid low 13 bits nonzero and [+8] card_id nonzero). For valid slots: if icid==0x0ff9 (4089) -> calls enqueue_relinquished_slot_sprite_attrs (0x0808dc48); if icid==0x14ac (5292) -> calls enqueue_exchange_slot_sprite_attrs (0x0808f2f0). After both loops, calls scan_field_for_equip_set_slot_sprite_update(player) for set-slot updates. Inputs: r8=u32 player_id [0..1] (non-APCS callee-save). Returns: r0=void (via return_zero_from_duel_ai_main, no independent return). Side effects: indirect OAM queue writes via enqueue_relinquished_slot_sprite_attrs / enqueue_exchange_slot_sprite_attrs / scan_field_for_equip_set_slot_sprite_update. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_size=0x14 (20 bytes), icid_0x0ff9=4089 (Relinquished-type special equip), icid_0x14ac=5292 (Exchange-type equip), loop_bounds=[0..4]x[0..4].
+@ Shared parent fragment with non-APCS r8=player. Scan monster slots0..4 for Castle of Dark Illusions and Viser Des sprite paths, then spell/trap slots5..9 for card-specific set-slot, bitmap, and LP indicator paths. After the slot scan, handle Lightforce Sword chain nodes, advance the equip-display phase, and return0 through the parent epilogue.
 dispatch_equip_sprite_update_by_slot_icid:
     movs r7,#0x0    @ 080a0334 0027
     movs r0,#0x1    @ 080a0336 0120
     .hword 0x4641    @ 080a0338 4146
     ands r0,r1    @ 080a033a 0840
     movs r4,#0x0    @ 080a033c 0024
-    ldr r1, DAT_080a0368                     @ 080a033e 0a49
+    ldr r1, player_block_stride_a0368        @ 080a033e 0a49
     adds r5,r0,#0x0    @ 080a0340 051c
     muls r5,r1    @ 080a0342 4d43
 LAB_080a0344:
     adds r1,r4,r5    @ 080a0344 6119
-    ldr r0, DAT_080a036c                     @ 080a0346 0948
+    ldr r0, gduelfieldslots_a036c            @ 080a0346 0948
     adds r1,r1,r0    @ 080a0348 0918
     ldr r0,[r1,#0x0]                         @ 080a034a 0868
     lsls r0,r0,#0x13    @ 080a034c c004
@@ -5777,21 +5981,21 @@ LAB_080a0344:
     ldrh r0,[r1,#0x8]                        @ 080a0354 0889
     cmp r0,#0x0                              @ 080a0356 0028
     beq LAB_080a038e                         @ 080a0358 19d0
-    ldr r0, DAT_080a0370                     @ 080a035a 0548
+    ldr r0, castle_of_dark_illusions_cid_a0370 @ 080a035a 0548
     cmp r2,r0                                @ 080a035c 8242
     beq LAB_080a0378                         @ 080a035e 0bd0
-    ldr r0, DAT_080a0374                     @ 080a0360 0448
+    ldr r0, viser_des_cid_a0374              @ 080a0360 0448
     cmp r2,r0                                @ 080a0362 8242
     beq LAB_080a0384                         @ 080a0364 0ed0
     b LAB_080a038e                           @ 080a0366 12e0
-DAT_080a0368:
-    .word  0x00000868                     @ 080a0368 68080000
-DAT_080a036c:
-    .word  0x0201c510                     @ 080a036c 10c50102
-DAT_080a0370:
-    .word  0x00000ff9                     @ 080a0370 f90f0000
-DAT_080a0374:
-    .word  0x000014ac                     @ 080a0374 ac140000
+player_block_stride_a0368:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a0368 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_a036c:
+    .word  gDuelFieldSlots                @ 080a036c 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+castle_of_dark_illusions_cid_a0370:
+    .word  CASTLE_OF_DARK_ILLUSIONS_CID   @ 080a0370 f90f0000  Internal CID 0x0ff9 for Castle of Dark Illusions; card mapping and password cross-check are recorded.
+viser_des_cid_a0374:
+    .word  VISER_DES_CID                  @ 080a0374 ac140000  Internal CID 0x14ac for Viser Des; card mapping and password cross-check are recorded.
 LAB_080a0378:
     .hword 0x4640    @ 080a0378 4046
     adds r1,r7,#0x0    @ 080a037a 391c
@@ -5815,11 +6019,11 @@ LAB_080a038e:
     .hword 0x4640    @ 080a03a0 4046
     movs r2,#0x1    @ 080a03a2 0122
     ands r0,r2    @ 080a03a4 1040
-    ldr r1, DAT_080a03f4                     @ 080a03a6 1349
+    ldr r1, player_block_stride_a03f4        @ 080a03a6 1349
     adds r3,r0,#0x0    @ 080a03a8 031c
     muls r3,r1    @ 080a03aa 4b43
     str r3,[sp,#0x28c]                       @ 080a03ac a393
-    ldr r1, DAT_080a03f8                     @ 080a03ae 1249
+    ldr r1, gduelfieldslots_a03f8            @ 080a03ae 1249
     str r1,[sp,#0x290]                       @ 080a03b0 a491
     str r0,[sp,#0x294]                       @ 080a03b2 a590
     adds r0,r3,r1    @ 080a03b4 5818
@@ -5849,7 +6053,7 @@ LAB_080a03d4:
 LAB_080a03de:
     cmp r6,r0                                @ 080a03de 8642
     bgt LAB_080a040c                         @ 080a03e0 14dc
-    ldr r0, DAT_080a03fc                     @ 080a03e2 0648
+    ldr r0, stim_pack_cid_a03fc              @ 080a03e2 0648
     cmp r6,r0                                @ 080a03e4 8642
     bne LAB_080a03ea                         @ 080a03e6 00d1
     b LAB_080a0540                           @ 080a03e8 aae0
@@ -5859,28 +6063,28 @@ LAB_080a03ea:
     subs r0,#0xd    @ 080a03ee 0d38
     b LAB_080a041a                           @ 080a03f0 13e0
     .zero  0x2
-DAT_080a03f4:
-    .word  0x00000868                     @ 080a03f4 68080000
-DAT_080a03f8:
-    .word  0x0201c510                     @ 080a03f8 10c50102
-DAT_080a03fc:
-    .word  0x0000131a                     @ 080a03fc 1a130000
+player_block_stride_a03f4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a03f4 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_a03f8:
+    .word  gDuelFieldSlots                @ 080a03f8 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+stim_pack_cid_a03fc:
+    .word  STIM_PACK_CID                  @ 080a03fc 1a130000  Internal CID 0x131a for Stim-Pack; card mapping and password cross-check are recorded.
 LAB_080a0400:
-    ldr r0, DAT_080a0408                     @ 080a0400 0148
+    ldr r0, different_dimension_capsule_cid_a0408 @ 080a0400 0148
     cmp r6,r0                                @ 080a0402 8642
     beq LAB_080a043c                         @ 080a0404 1ad0
     b LAB_080a058c                           @ 080a0406 c1e0
-DAT_080a0408:
-    .word  0x0000159c                     @ 080a0408 9c150000
+different_dimension_capsule_cid_a0408:
+    .word  DIFFERENT_DIMENSION_CAPSULE_CID @ 080a0408 9c150000  Internal CID 0x159c for Different Dimension Capsule; card mapping and password cross-check are recorded.
 LAB_080a040c:
-    ldr r0, DAT_080a0424                     @ 080a040c 0548
+    ldr r0, dust_barrier_cid_a0424           @ 080a040c 0548
     cmp r6,r0                                @ 080a040e 8642
     bne LAB_080a0414                         @ 080a0410 00d1
     b LAB_080a054c                           @ 080a0412 9be0
 LAB_080a0414:
     cmp r6,r0                                @ 080a0414 8642
     bgt LAB_080a042c                         @ 080a0416 09dc
-    ldr r0, DAT_080a0428                     @ 080a0418 0348
+    ldr r0, wave_motion_cannon_cid_a0428     @ 080a0418 0348
 LAB_080a041a:
     cmp r6,r0                                @ 080a041a 8642
     bne LAB_080a0420                         @ 080a041c 00d1
@@ -5888,20 +6092,20 @@ LAB_080a041a:
 LAB_080a0420:
     b LAB_080a058c                           @ 080a0420 b4e0
     .zero  0x2
-DAT_080a0424:
-    .word  0x000017a1                     @ 080a0424 a1170000
-DAT_080a0428:
-    .word  0x000015ee                     @ 080a0428 ee150000
+dust_barrier_cid_a0424:
+    .word  DUST_BARRIER_CID               @ 080a0424 a1170000  Internal CID 0x17a1 for Dust Barrier; card mapping and password cross-check are recorded.
+wave_motion_cannon_cid_a0428:
+    .word  WAVE_MOTION_CANNON_CID         @ 080a0428 ee150000  Internal CID 0x15ee for Wave-Motion Cannon; card mapping and password cross-check are recorded.
 LAB_080a042c:
-    ldr r0, DAT_080a0438                     @ 080a042c 0248
+    ldr r0, swords_of_concealing_light_cid_a0438 @ 080a042c 0248
     cmp r6,r0                                @ 080a042e 8642
     bne LAB_080a0434                         @ 080a0430 00d1
     b LAB_080a054c                           @ 080a0432 8be0
 LAB_080a0434:
     b LAB_080a058c                           @ 080a0434 aae0
     .zero  0x2
-DAT_080a0438:
-    .word  0x0000187c                     @ 080a0438 7c180000
+swords_of_concealing_light_cid_a0438:
+    .word  SWORDS_OF_CONCEALING_LIGHT_CID @ 080a0438 7c180000  Internal CID 0x187c for Swords of Concealing Light; card mapping and password cross-check are recorded.
 LAB_080a043c:
     .hword 0x4640    @ 080a043c 4046
     adds r1,r7,#0x0    @ 080a043e 391c
@@ -6069,7 +6273,7 @@ LAB_080a058c:
     bgt LAB_080a059a                         @ 080a0596 00dc
     b LAB_080a03be                           @ 080a0598 11e7
 LAB_080a059a:
-    ldr r2, DAT_080a066c                     @ 080a059a 344a
+    ldr r2, lightforce_sword_cid_a066c       @ 080a059a 344a
     .hword 0x4640    @ 080a059c 4046
     movs r1,#0xb    @ 080a059e 0b21
     bl check_value_in_slot_chain             @ 080a05a0 8ff776fb
@@ -6078,9 +6282,9 @@ LAB_080a059a:
     movs r0,#0x1    @ 080a05a8 0120
     .hword 0x4641    @ 080a05aa 4146
     ands r0,r1    @ 080a05ac 0840
-    ldr r1, DAT_080a0670                     @ 080a05ae 3049
+    ldr r1, player_block_stride_a0670        @ 080a05ae 3049
     muls r0,r1    @ 080a05b0 4843
-    ldr r2, DAT_080a0674                     @ 080a05b2 304a
+    ldr r2, gduelfieldspellzonebase_a0674    @ 080a05b2 304a
     adds r0,r0,r2    @ 080a05b4 8018
     ldrh r1,[r0,#0xa]                        @ 080a05b6 4189
     cmp r1,#0x0                              @ 080a05b8 0029
@@ -6088,19 +6292,19 @@ LAB_080a059a:
     movs r0,#0x1    @ 080a05bc 0120
     .hword 0x4647    @ 080a05be 4746
     ands r7,r0    @ 080a05c0 0740
-    ldr r3, DAT_080a0678                     @ 080a05c2 2d4b
+    ldr r3, field_spell_to_zone_count_delta_neg_0x100_a0678 @ 080a05c2 2d4b
     adds r3,r3,r2    @ 080a05c4 9b18
     .hword 0x469a    @ 080a05c6 9a46
 LAB_080a05c8:
     lsls r0,r1,#0x3    @ 080a05c8 c800
-    ldr r1, DAT_080a067c                     @ 080a05ca 2c49
+    ldr r1, gequipnodepool_a067c             @ 080a05ca 2c49
     adds r4,r0,r1    @ 080a05cc 4418
     ldrh r2,[r4,#0x6]                        @ 080a05ce e288
     .hword 0x4691    @ 080a05d0 9146
     ldr r1,[r4,#0x0]                         @ 080a05d2 2168
-    ldr r0, DAT_080a0680                     @ 080a05d4 2a48
+    ldr r0, equip_node_tag_mask_a0680        @ 080a05d4 2a48
     ands r1,r0    @ 080a05d6 0140
-    ldr r0, DAT_080a0684                     @ 080a05d8 2a48
+    ldr r0, lightforce_sword_chain_node_tag_a0684 @ 080a05d8 2a48
     cmp r1,r0                                @ 080a05da 8142
     bne LAB_080a0658                         @ 080a05dc 3cd1
     ldrb r3,[r4,#0x2]                        @ 080a05de a378
@@ -6111,9 +6315,9 @@ LAB_080a05c8:
     .hword 0x4642    @ 080a05e8 4246
     cmp r2,#0x0                              @ 080a05ea 002a
     beq LAB_080a05f0                         @ 080a05ec 00d0
-    ldr r1, DAT_080a0688                     @ 080a05ee 2649
+    ldr r1, oam_equip_set_slot_p2_a0688      @ 080a05ee 2649
 LAB_080a05f0:
-    ldr r6, DAT_080a066c                     @ 080a05f0 1e4e
+    ldr r6, lightforce_sword_cid_a066c       @ 080a05f0 1e4e
     lsls r3,r0,#0x10    @ 080a05f2 0304
     lsrs r3,r3,#0x10    @ 080a05f4 1b0c
     adds r0,r1,#0x0    @ 080a05f6 081c
@@ -6150,7 +6354,7 @@ LAB_080a05f0:
     movs r0,#0x1    @ 080a063a 0120
     .hword 0x4642    @ 080a063c 4246
     ands r0,r2    @ 080a063e 1040
-    ldr r2, DAT_080a0670                     @ 080a0640 0b4a
+    ldr r2, player_block_stride_a0670        @ 080a0640 0b4a
     muls r0,r2    @ 080a0642 5043
     add r0,r10                               @ 080a0644 5044
     ldrb r0,[r0,#0x0]                        @ 080a0646 0078
@@ -6166,53 +6370,53 @@ LAB_080a0658:
     cmp r1,#0x0                              @ 080a065a 0029
     bne LAB_080a05c8                         @ 080a065c b4d1
 LAB_080a065e:
-    ldr r1, PTR_gP1LifePoints_080a068c       @ 080a065e 0b49
-    ldr r3, DAT_080a0690                     @ 080a0660 0b4b
+    ldr r1, gp1lp_base_a068c                 @ 080a065e 0b49
+    ldr r3, card_play_phase_ctr_off_a0690    @ 080a0660 0b4b
     adds r1,r1,r3    @ 080a0662 c918
     ldr r0,[r1,#0x0]                         @ 080a0664 0868
     adds r0,#0x1    @ 080a0666 0130
     b write_display_code_exit_zero           @ 080a0668 17e0
     .zero  0x2
-DAT_080a066c:
-    .word  0x000012c8                     @ 080a066c c8120000
-DAT_080a0670:
-    .word  0x00000868                     @ 080a0670 68080000
-DAT_080a0674:
-    .word  0x0201c5ec                     @ 080a0674 ecc50102
-DAT_080a0678:
-    .word  0xffffff00                     @ 080a0678 00ffffff
-DAT_080a067c:
-    .word  0x0201d9c0                     @ 080a067c c0d90102
-DAT_080a0680:
-    .word  0x000fffff                     @ 080a0680 ffff0f00
-DAT_080a0684:
-    .word  0x000112c8                     @ 080a0684 c8120100
-DAT_080a0688:
-    .word  0x0000803b                     @ 080a0688 3b800000
-PTR_gP1LifePoints_080a068c:
-    .word  gP1LifePoints                  @ 080a068c e0c40102
-DAT_080a0690:
-    .word  0x00001d1c                     @ 080a0690 1c1d0000
+lightforce_sword_cid_a066c:
+    .word  LIGHTFORCE_SWORD_CID           @ 080a066c c8120000  Internal CID 0x12c8 for Lightforce Sword; card mapping and password cross-check are recorded.
+player_block_stride_a0670:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a0670 68080000  Byte stride between the two player state blocks.
+gduelfieldspellzonebase_a0674:
+    .word  gDuelFieldSpellZoneBase        @ 080a0674 ecc50102  Field-spell slot base; this consumer derives the zone-count base with -0x100.
+field_spell_to_zone_count_delta_neg_0x100_a0678:
+    .word  FIELD_SPELL_TO_ZONE_COUNT_DELTA_NEG_0X100 @ 080a0678 00ffffff  Signed delta from gDuelFieldSpellZoneBase to the per-player zone-count base.
+gequipnodepool_a067c:
+    .word  gEquipNodePool                 @ 080a067c c0d90102  Equip-chain node pool base; entries use an 8-byte stride.
+equip_node_tag_mask_a0680:
+    .word  EQUIP_NODE_TAG_MASK            @ 080a0680 ffff0f00  Mask selecting the low 20-bit equip-chain node tag.
+lightforce_sword_chain_node_tag_a0684:
+    .word  LIGHTFORCE_SWORD_CHAIN_NODE_TAG @ 080a0684 c8120100  Equip-chain node low-20-bit tag for Lightforce Sword.
+oam_equip_set_slot_p2_a0688:
+    .word  OAM_EQUIP_SET_SLOT_P2          @ 080a0688 3b800000  Player-side equip set-slot sprite code.
+gp1lp_base_a068c:
+    .word  gP1LifePoints                  @ 080a068c e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_a0690:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a0690 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) as a write+return-0 path. Loads offset DAT=0x1cec, computes target address r1=r4+0x1cec (r4=gP1LifePoints or region base from parent), sets r0=0x78; then falls through to write_display_code_exit_zero (0x080a069a): str r0,[r1,#0x0] writes 0x78 to [r4+0x1cec], then calls return_zero_from_duel_ai_main (movs r0,#0 + frame epilogue) returning 0. 0x78=120 is a display phase status code. Non-APCS input: r4=parent callee-save (gP1LifePoints region base). Returns: r0=u32 0 (fixed). Side effects: [r4+0x1cec]:=0x78 (writes display phase status code 120). Constants: phase_field_offset=0x1cec (display phase status code storage offset in gP1LifePoints region), phase_code=0x78 (=120).
+@ Shared parent entry with non-APCS r4=state base. Form r1=r4+P1LP_TIMER_OFF and r0=0x78, then fall through to write_display_code_exit_zero. The combined path writes0x78 and returns0 through the parent epilogue.
 set_display_phase_code_78_exit_zero:
-    ldr r0, DAT_080a06a0                     @ 080a0694 0248
+    ldr r0, p1lp_timer_off_a06a0             @ 080a0694 0248
     adds r1,r4,r0    @ 080a0696 2118
     movs r0,#0x78    @ 080a0698 7820
 
-@ Called by 0x0809f9cc (duel_field main AI function) and 0x0809fb16 (return-zero path), total 2 callers. Entry: r0=status_code, r1=write target address (r4+offset, set by set_display_phase_code_78_exit_zero or caller). Executes str r0,[r1,#0x0] to write status code to target address, then bl return_zero_from_duel_ai_main (movs r0,#0 + frame unwind). Is the write-then-return-0 version of return_zero_from_duel_ai_main. Inputs: r0=u32 status_code (set by caller before entry, e.g. 0x78 from set_display_phase_code_78_exit_zero), r1=ptr target_addr (set by caller). Returns: r0=u32 0 (fixed via return_zero_from_duel_ai_main). Side effects: [r1]:=r0 (writes status code to caller-specified address).
+@ Shared parent exit. Inputs r0=value and r1=target word. Store r0 to *r1, then call return_zero_from_equip_activation_display_phase. Returns0 after releasing the parent frame. Eight explicit incoming jumps/calls are preserved.
 write_display_code_exit_zero:
     str r0,[r1,#0x0]                         @ 080a069a 0860
-    bl return_zero_from_duel_ai_main         @ 080a069c fff73bfa
-DAT_080a06a0:
-    .word  0x00001cec                     @ 080a06a0 ec1c0000
+    bl return_zero_from_equip_activation_display_phase @ 080a069c fff73bfa
+p1lp_timer_off_a06a0:
+    .word  P1LP_TIMER_OFF                 @ 080a06a0 ec1c0000  Byte offset from gP1LifePoints to the duel display timer word.
 
-@ Called by 0x0809f9cc (duel_field main AI function, indeg=1) as the r0=1 return entry point for that large function. Contains only one instruction: movs r0,#1, then falls through to release_duel_ai_main_frame (0x080a06a6) which performs frame unwind and returns 1. Entry point fixed-returns 1 (success/complete). Inputs: none; this entry point unconditionally sets r0 to 1. Returns: r0=u32 1 (fixed, indicates success/completion). Side effects: none (frame unwind only via tail fall-through).
-return_one_from_duel_ai_main:
+@ Shared parent return entry. Set r0=1 and fall through to release_equip_activation_display_phase_frame. Returns1 after the common frame release. Five explicit incoming jumps are preserved.
+return_one_from_equip_activation_display_phase:
     movs r0,#0x1    @ 080a06a4 0120
 
-@ Called as shared tail by return_zero_from_duel_ai_main (0x0809fb16) and return_one_from_duel_ai_main (0x080a06a4), indeg=2 combined multi-path. r0 is the return value already set by caller (0 or 1). Executes the shared frame-release sequence for the large parent function (0x0809f9cc region): movs r3,#0xa6; lsls r3,#2 = 0x298 bytes (166 word stack frame); add sp,r3 unwinds stack; pop {r3,r4,r5}; 0x4698=mov r8,r3; 0x46a1=mov r9,r4; 0x46aa=mov r10,r5 (restores high callee-save registers); pop {r4,r5,r6,r7}; pop {r1}; bx r1 (returns). Does not modify r0 on entry. Inputs: r0=u32 return_val (set by caller, either 0 or 1). Returns: r0=u32 return_val (passthrough). Side effects: sp+=0x298 (unwinds large frame), r8/r9/r10 restored from pop. Constants: frame_words=0xa6 (166 words), frame_bytes=0x298 (=0xa6*4=664 bytes, parent function 0x0809f9cc frame size), hword_0x4698=mov r8,r3, hword_0x46a1=mov r9,r4, hword_0x46aa=mov r10,r5.
-release_duel_ai_main_frame:
+@ Shared epilogue for run_equip_activation_display_phase_by_state_code. Preserve incoming r0, add0x298 to sp, restore r8-r10 and r4-r7, then return through the saved link register. The explicit incoming call is from return_zero; return_one reaches it by fallthrough.
+release_equip_activation_display_phase_frame:
     movs r3,#0xa6    @ 080a06a6 a623
     lsls r3,r3,#0x2    @ 080a06a8 9b00
     add sp,r3                                @ 080a06aa 9d44
@@ -6225,18 +6429,17 @@ release_duel_ai_main_frame:
     bx r1                                    @ 080a06b8 0847
     .zero  0x2
 
-@ Called exclusively by FUN_08094c60 (depth=5, indeg=1). Prologue: push + .hword 0x4647=mov r7,r0 callee-save; sub sp,#4. Reads gP1LifePoints+0x1ce8 -> r6=player_raw; reads gP1LifePoints+0x1d1c -> r1=display_phase_code. Three-way dispatch on display_phase_code: case 0 -> jump LAB_080a06ec: select attr_type (r6==0 -> 0x3, r6!=0 -> DWORD=0x8003), enqueue_sprite_attr_record(attr_type, 0, 0, 0); [gP1LifePoints+0x1d1c]+1; b LAB_080a0826. case 1 -> iterate monster zone slots [0..4] (step 0x14, base gDuelFieldSlots+player*0x868+offset): check [slot+8] card_id nonzero and bits[19:0]==0xba<<5=0x1740 (icid match); if matched call enqueue_sprite_attr_with_mode(player_offset, slot_idx, 1, 0, r3=1); [gP1LifePoints+0x1d1c]+1; if [gP1LifePoints+0x7400] nonzero -> call init_duel_phase_display_flag_with_sprite(player). case 2 -> complex compare: [gP1LifePoints+0x1cec] vs [gP1LifePoints+0x1cf0]+3; player LP compare; write [gP1LifePoints+0x1cfc]; write [gP1LifePoints+player*0x868+0x2c]=9; [gP1LifePoints+0x10dc]:=1; enqueue_sprite_attr_record. Common exit path: [gP1LifePoints+0x1d1c]+1; movs r0,#0; return void (pop {r0}; bx r0 = lr restore; movs r0,#0 at LAB_080a0826 is dead write, does not affect caller r0).
-@ Constants: gP1LifePoints=0x0201c4e0, player_id_offset=0x1ce8, phase_offset=0x1d1c, gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, slot_count=[0..4], ATTR_TYPE_P1=0x3, ATTR_TYPE_P2=0x8003, icid_mask=0x1740 (0xba<<5), zone_offset=0x2c, flag_offset=0x10dc.
+@ No APCS inputs. Read player and display phase from gP1LifePoints. Phase0 enqueues side-specific sprite code3. Phase1 scans five monster slots for CID0x1740 and advances the phase. Phase2 compares timer/LP state, writes DISP_SET_VARIANT_OFF and LP_DISCARD_ZONE_OFF, and enqueues side-specific code4. All handled paths advance CARD_PLAY_PHASE_CTR_OFF and return0.
 tick_equip_display_phase_by_state_code:
     push {r4,r5,r6,r7,lr}                    @ 080a06bc f0b5
     .hword 0x4647    @ 080a06be 4746
     push {r7}                                @ 080a06c0 80b4
     sub sp,#0x4                              @ 080a06c2 81b0
-    ldr r2, DWORD_080a06e0                   @ 080a06c4 064a
-    ldr r1, DWORD_080a06e4                   @ 080a06c6 0749
+    ldr r2, gp1lp_base_a06e0                 @ 080a06c4 064a
+    ldr r1, p1lp_block2_off_1ce8_a06e4       @ 080a06c6 0749
     adds r0,r2,r1    @ 080a06c8 5018
     ldr r6,[r0,#0x0]                         @ 080a06ca 0668
-    ldr r0, DWORD_080a06e8                   @ 080a06cc 0648
+    ldr r0, card_play_phase_ctr_off_a06e8    @ 080a06cc 0648
     adds r4,r2,r0    @ 080a06ce 1418
     ldr r1,[r4,#0x0]                         @ 080a06d0 2168
     cmp r1,#0x1                              @ 080a06d2 0129
@@ -6246,17 +6449,17 @@ tick_equip_display_phase_by_state_code:
     cmp r1,#0x2                              @ 080a06da 0229
     beq LAB_080a0764                         @ 080a06dc 42d0
     b LAB_080a0826                           @ 080a06de a2e0
-DWORD_080a06e0:
-    .word  gP1LifePoints                  @ 080a06e0 e0c40102
-DWORD_080a06e4:
-    .word  0x00001ce8                     @ 080a06e4 e81c0000
-DWORD_080a06e8:
-    .word  0x00001d1c                     @ 080a06e8 1c1d0000
+gp1lp_base_a06e0:
+    .word  gP1LifePoints                  @ 080a06e0 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+p1lp_block2_off_1ce8_a06e4:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 080a06e4 e81c0000  Byte offset from gP1LifePoints to the active-player selector word.
+card_play_phase_ctr_off_a06e8:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a06e8 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_080a06ec:
     movs r0,#0x3    @ 080a06ec 0320
     cmp r6,#0x0                              @ 080a06ee 002e
     beq LAB_080a06f4                         @ 080a06f0 00d0
-    ldr r0, DWORD_080a0708                   @ 080a06f2 0548
+    ldr r0, oam_equip_sprite_p2_03_a0708     @ 080a06f2 0548
 LAB_080a06f4:
     movs r1,#0x0    @ 080a06f4 0021
     movs r2,#0x0    @ 080a06f6 0022
@@ -6267,12 +6470,12 @@ LAB_080a06f4:
     str r0,[r4,#0x0]                         @ 080a0702 2060
     b LAB_080a0826                           @ 080a0704 8fe0
     .zero  0x2
-DWORD_080a0708:
-    .word  0x00008003                     @ 080a0708 03800000
+oam_equip_sprite_p2_03_a0708:
+    .word  OAM_EQUIP_SPRITE_P2_03         @ 080a0708 03800000  Player-side sprite code 3 with bit15 set.
 LAB_080a070c:
     subs r3,r1,r6    @ 080a070c 8b1b
     ands r1,r3    @ 080a070e 1940
-    ldr r0, DWORD_080a077c                   @ 080a0710 1a48
+    ldr r0, player_block_stride_a077c        @ 080a0710 1a48
     muls r1,r0    @ 080a0712 4143
     adds r0,r2,#0x0    @ 080a0714 101c
     adds r0,#0xc    @ 080a0716 0c30
@@ -6286,7 +6489,7 @@ LAB_080a070c:
     adds r7,r1,#0x0    @ 080a0726 0f1c
 LAB_080a0728:
     adds r0,r5,r7    @ 080a0728 e819
-    ldr r1, DWORD_080a0780                   @ 080a072a 1549
+    ldr r1, gduelfieldslots_a0780            @ 080a072a 1549
     adds r1,r0,r1    @ 080a072c 4118
     ldrh r0,[r1,#0x8]                        @ 080a072e 0889
     cmp r0,#0x0                              @ 080a0730 0028
@@ -6310,14 +6513,14 @@ LAB_080a0750:
     cmp r4,#0x4                              @ 080a0754 042c
     ble LAB_080a0728                         @ 080a0756 e7dd
 LAB_080a0758:
-    ldr r1, DWORD_080a0784                   @ 080a0758 0a49
-    ldr r2, DWORD_080a0788                   @ 080a075a 0b4a
+    ldr r1, gp1lp_base_a0784                 @ 080a0758 0a49
+    ldr r2, card_play_phase_ctr_off_a0788    @ 080a075a 0b4a
     adds r1,r1,r2    @ 080a075c 8918
     ldr r0,[r1,#0x0]                         @ 080a075e 0868
     adds r0,#0x1    @ 080a0760 0130
     str r0,[r1,#0x0]                         @ 080a0762 0860
 LAB_080a0764:
-    ldr r3, DWORD_080a0784                   @ 080a0764 074b
+    ldr r3, gp1lp_base_a0784                 @ 080a0764 074b
     movs r1,#0xe8    @ 080a0766 e821
     lsls r1,r1,#0x5    @ 080a0768 4901
     adds r0,r3,r1    @ 080a076a 5818
@@ -6328,16 +6531,16 @@ LAB_080a0764:
     bl init_duel_phase_display_flag_with_sprite @ 080a0774 f3f7ecff
     b LAB_080a081a                           @ 080a0778 4fe0
     .zero  0x2
-DWORD_080a077c:
-    .word  0x00000868                     @ 080a077c 68080000
-DWORD_080a0780:
-    .word  0x0201c510                     @ 080a0780 10c50102
-DWORD_080a0784:
-    .word  gP1LifePoints                  @ 080a0784 e0c40102
-DWORD_080a0788:
-    .word  0x00001d1c                     @ 080a0788 1c1d0000
+player_block_stride_a077c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a077c 68080000  Byte stride between the two player state blocks.
+gduelfieldslots_a0780:
+    .word  gDuelFieldSlots                @ 080a0780 10c50102  Field-slot array base; consumers add player stride and 20-byte slot offsets.
+gp1lp_base_a0784:
+    .word  gP1LifePoints                  @ 080a0784 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_a0788:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a0788 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 LAB_080a078c:
-    ldr r2, DWORD_080a07f4                   @ 080a078c 194a
+    ldr r2, p1lp_timer_off_a07f4             @ 080a078c 194a
     adds r1,r3,r2    @ 080a078e 9918
     adds r2,#0x4    @ 080a0790 0432
     adds r0,r3,r2    @ 080a0792 9818
@@ -6349,7 +6552,7 @@ LAB_080a078c:
     movs r4,#0x1    @ 080a079e 0124
     adds r0,r6,#0x0    @ 080a07a0 301c
     ands r0,r4    @ 080a07a2 2040
-    ldr r5, DWORD_080a07f8                   @ 080a07a4 144d
+    ldr r5, player_block_stride_a07f8        @ 080a07a4 144d
     adds r1,r0,#0x0    @ 080a07a6 011c
     muls r1,r5    @ 080a07a8 6943
     adds r1,r1,r3    @ 080a07aa c918
@@ -6369,9 +6572,9 @@ LAB_080a078c:
     ble LAB_080a07ca                         @ 080a07c6 00dd
     movs r2,#0x1    @ 080a07c8 0122
 LAB_080a07ca:
-    ldr r0, DWORD_080a07fc                   @ 080a07ca 0c48
+    ldr r0, disp_set_variant_off_a07fc       @ 080a07ca 0c48
     adds r6,r3,r0    @ 080a07cc 1e18
-    ldr r0, DWORD_080a0800                   @ 080a07ce 0c48
+    ldr r0, gduelcardctxbase_a0800           @ 080a07ce 0c48
     ldr r0,[r0,#0x4]                         @ 080a07d0 4068
     movs r1,#0x2    @ 080a07d2 0221
     cmp r2,r0                                @ 080a07d4 8242
@@ -6387,33 +6590,33 @@ LAB_080a07da:
     adds r0,r0,r1    @ 080a07e6 4018
     movs r1,#0x9    @ 080a07e8 0921
     str r1,[r0,#0x0]                         @ 080a07ea 0160
-    ldr r1, DWORD_080a0804                   @ 080a07ec 0549
+    ldr r1, lp_discard_zone_off_a0804        @ 080a07ec 0549
     adds r0,r3,r1    @ 080a07ee 5818
     str r4,[r0,#0x0]                         @ 080a07f0 0460
     b LAB_080a081a                           @ 080a07f2 12e0
-DWORD_080a07f4:
-    .word  0x00001cec                     @ 080a07f4 ec1c0000
-DWORD_080a07f8:
-    .word  0x00000868                     @ 080a07f8 68080000
-DWORD_080a07fc:
-    .word  0x00001cfc                     @ 080a07fc fc1c0000
-DWORD_080a0800:
-    .word  0x0201e2a0                     @ 080a0800 a0e20102
-DWORD_080a0804:
-    .word  0x000010dc                     @ 080a0804 dc100000
+p1lp_timer_off_a07f4:
+    .word  P1LP_TIMER_OFF                 @ 080a07f4 ec1c0000  Byte offset from gP1LifePoints to the duel display timer word.
+player_block_stride_a07f8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080a07f8 68080000  Byte stride between the two player state blocks.
+disp_set_variant_off_a07fc:
+    .word  DISP_SET_VARIANT_OFF           @ 080a07fc fc1c0000  Byte offset from gP1LifePoints to display variant 1/2.
+gduelcardctxbase_a0800:
+    .word  gDuelCardCtxBase               @ 080a0800 a0e20102  Duel card activation context base.
+lp_discard_zone_off_a0804:
+    .word  LP_DISCARD_ZONE_OFF            @ 080a0804 dc100000  Byte offset from gP1LifePoints to LP discard-zone tracking.
 LAB_080a0808:
     movs r0,#0x4    @ 080a0808 0420
     cmp r6,#0x0                              @ 080a080a 002e
     beq LAB_080a0810                         @ 080a080c 00d0
-    ldr r0, DAT_080a0834                     @ 080a080e 0948
+    ldr r0, oam_equip_sprite_p2_04_a0834     @ 080a080e 0948
 LAB_080a0810:
     movs r1,#0x0    @ 080a0810 0021
     movs r2,#0x0    @ 080a0812 0022
     movs r3,#0x0    @ 080a0814 0023
     bl enqueue_sprite_attr_record            @ 080a0816 9bf789fa
 LAB_080a081a:
-    ldr r1, PTR_gP1LifePoints_080a0838       @ 080a081a 0749
-    ldr r2, DAT_080a083c                     @ 080a081c 074a
+    ldr r1, gp1lp_base_a0838                 @ 080a081a 0749
+    ldr r2, card_play_phase_ctr_off_a083c    @ 080a081c 074a
     adds r1,r1,r2    @ 080a081e 8918
     ldr r0,[r1,#0x0]                         @ 080a0820 0868
     adds r0,#0x1    @ 080a0822 0130
@@ -6426,27 +6629,17 @@ LAB_080a0826:
     pop {r4,r5,r6,r7}                        @ 080a082e f0bc
     pop {r1}                                 @ 080a0830 02bc
     bx r1                                    @ 080a0832 0847
-DAT_080a0834:
-    .word  0x00008004                     @ 080a0834 04800000
-PTR_gP1LifePoints_080a0838:
-    .word  gP1LifePoints                  @ 080a0838 e0c40102
-DAT_080a083c:
-    .word  0x00001d1c                     @ 080a083c 1c1d0000
+oam_equip_sprite_p2_04_a0834:
+    .word  OAM_EQUIP_SPRITE_P2_04         @ 080a0834 04800000  Player-side sprite code 4 with bit15 set.
+gp1lp_base_a0838:
+    .word  gP1LifePoints                  @ 080a0838 e0c40102  gP1LifePoints base; preserve the existing DATA reference and its source.
+card_play_phase_ctr_off_a083c:
+    .word  CARD_PLAY_PHASE_CTR_OFF        @ 080a083c 1c1d0000  Byte offset from gP1LifePoints to the equip display phase word.
 
-@ Equip sprite slot status updater, called by FUN_080a0a8c (equip sprite sequence
-@ controller) when DAT_080a0ab0 (0x0201b870) + 0x301 corresponding bit (bit27) is 1
-@ (indeg=1). Reads sprite_buf status byte from 0x0201b870 + 0x30d, routes by value:
-@ 0 -> clear two sprite_buf slots (offsets 0x1ac/0x1b4), increment status counter;
-@ 1 -> main path (read DAT_080a08d4+DAT_080a08d8 offset to store card_id, call
-@      invoke_card_effect_node_handler(card_id, slot));
-@ 2 -> second branch (LAB_080a08e4).
-@ Side effects include writing sprite_buf fields and updating counters.
-@ Constants: sprite_buf_base=0x0201b870, slot_idx_base=0xc4,
-@ sprite_buf_offset=0x0201b590, status_byte_offset=0x30d,
-@ card_id_store_base=0x0201b290, counter_offset=0x484.
+@ No arguments. Uses gSpriteAttrBuf+0x310 as the effect-entry count and gEffectEntryArray stride 0x18. Control byte +0x30d selects initialization, handler, or sprite-row paths. The handler stores the current entry at gDuelPhaseFlags+EQUIP_ACTIVE_CTX_OFF, calls invoke_card_effect_node_handler(current, previous), records the result sign, and advances the control byte. Returns 0 only after the handler path; otherwise 1. Caller: route_equip_slot_tick_by_flag.
 update_equip_sprite_state_by_slot_status:
     push {r4,r5,r6,lr}                       @ 080a0840 70b5
-    ldr r2, DAT_080a0874                     @ 080a0842 0c4a
+    ldr r2, sprite_attr_buf_ref_080a0874     @ 080a0842 0c4a
     movs r1,#0xc4    @ 080a0844 c421
     lsls r1,r1,#0x2    @ 080a0846 8900
     adds r0,r2,r1    @ 080a0848 5018
@@ -6454,7 +6647,7 @@ update_equip_sprite_state_by_slot_status:
     lsls r0,r1,#0x1    @ 080a084c 4800
     adds r0,r0,r1    @ 080a084e 4018
     lsls r0,r0,#0x3    @ 080a0850 c000
-    ldr r3, DAT_080a0878                     @ 080a0852 094b
+    ldr r3, effect_entry_array_ref_080a0878  @ 080a0852 094b
     adds r4,r0,r3    @ 080a0854 c418
     movs r5,#0x0    @ 080a0856 0025
     cmp r1,#0x0                              @ 080a0858 0029
@@ -6462,7 +6655,7 @@ update_equip_sprite_state_by_slot_status:
     adds r5,r4,#0x0    @ 080a085c 251c
     subs r5,#0x18    @ 080a085e 183d
 LAB_080a0860:
-    ldr r6, DAT_080a087c                     @ 080a0860 064e
+    ldr r6, sprite_row_entry_30d_off_080a087c @ 080a0860 064e
     adds r2,r2,r6    @ 080a0862 9219
     ldrb r1,[r2,#0x0]                        @ 080a0864 1178
     cmp r1,#0x1                              @ 080a0866 0129
@@ -6472,12 +6665,12 @@ LAB_080a0860:
     cmp r1,#0x0                              @ 080a086e 0029
     beq LAB_080a0886                         @ 080a0870 09d0
     b LAB_080a08f2                           @ 080a0872 3ee0
-DAT_080a0874:
-    .word  0x0201b870                     @ 080a0874 70b80102
-DAT_080a0878:
-    .word  0x0201b590                     @ 080a0878 90b50102
-DAT_080a087c:
-    .word  0x0000030d                     @ 080a087c 0d030000
+sprite_attr_buf_ref_080a0874:
+    .word  gSpriteAttrBuf                 @ 080a0874 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+effect_entry_array_ref_080a0878:
+    .word  gEffectEntryArray              @ 080a0878 90b50102  gEffectEntryArray: 0x18-byte effect entry array base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30d_off_080a087c:
+    .word  SPRITE_ROW_ENTRY_30D_OFF       @ 080a087c 0d030000  SPRITE_ROW_ENTRY_30D_OFF: gSpriteAttrBuf control byte for status path A.
 LAB_080a0880:
     cmp r1,#0x2                              @ 080a0880 0229
     beq LAB_080a08e4                         @ 080a0882 2fd0
@@ -6494,8 +6687,8 @@ LAB_080a0886:
     adds r0,#0x1    @ 080a0896 0130
     strb r0,[r2,#0x0]                        @ 080a0898 1070
 LAB_080a089a:
-    ldr r0, DAT_080a08d4                     @ 080a089a 0e48
-    ldr r1, DAT_080a08d8                     @ 080a089c 0e49
+    ldr r0, duel_phase_flags_ref_080a08d4    @ 080a089a 0e48
+    ldr r1, equip_active_ctx_off_080a08d8    @ 080a089c 0e49
     adds r0,r0,r1    @ 080a089e 4018
     str r4,[r0,#0x0]                         @ 080a08a0 0460
     adds r0,r4,#0x0    @ 080a08a2 201c
@@ -6514,8 +6707,8 @@ LAB_080a08b6:
     ands r0,r2    @ 080a08bc 1040
     orrs r0,r1    @ 080a08be 0843
     strb r0,[r4,#0x3]                        @ 080a08c0 e070
-    ldr r0, DAT_080a08dc                     @ 080a08c2 0648
-    ldr r6, DAT_080a08e0                     @ 080a08c4 064e
+    ldr r0, sprite_attr_buf_ref_080a08dc     @ 080a08c2 0648
+    ldr r6, sprite_row_entry_30d_off_080a08e0 @ 080a08c4 064e
     adds r0,r0,r6    @ 080a08c6 8019
     ldrb r1,[r0,#0x0]                        @ 080a08c8 0178
     adds r1,#0x1    @ 080a08ca 0131
@@ -6524,14 +6717,14 @@ LAB_080a08ce:
     movs r0,#0x0    @ 080a08ce 0020
     b LAB_080a08f4                           @ 080a08d0 10e0
     .zero  0x2
-DAT_080a08d4:
-    .word  0x0201b290                     @ 080a08d4 90b20102
-DAT_080a08d8:
-    .word  0x00000484                     @ 080a08d8 84040000
-DAT_080a08dc:
-    .word  0x0201b870                     @ 080a08dc 70b80102
-DAT_080a08e0:
-    .word  0x0000030d                     @ 080a08e0 0d030000
+duel_phase_flags_ref_080a08d4:
+    .word  gDuelPhaseFlags                @ 080a08d4 90b20102  gDuelPhaseFlags: duel phase and equip activation state base; add operand-0 DATA/USER_DEFINED reference.
+equip_active_ctx_off_080a08d8:
+    .word  EQUIP_ACTIVE_CTX_OFF           @ 080a08d8 84040000  EQUIP_ACTIVE_CTX_OFF: gDuelPhaseFlags current effect-entry pointer.
+sprite_attr_buf_ref_080a08dc:
+    .word  gSpriteAttrBuf                 @ 080a08dc 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30d_off_080a08e0:
+    .word  SPRITE_ROW_ENTRY_30D_OFF       @ 080a08e0 0d030000  SPRITE_ROW_ENTRY_30D_OFF: gSpriteAttrBuf control byte for status path A.
 LAB_080a08e4:
     movs r1,#0x1    @ 080a08e4 0121
     rsbs r1,r1,#0    @ 080a08e6 4942
@@ -6547,12 +6740,10 @@ LAB_080a08f4:
     bx r1                                    @ 080a08f8 0847
     .zero  0x2
 
-@ Called by FUN_080a0a8c (equip slot flag router) in bit5 (0x20) check branch. Reads equip slot count from EWRAM 0x0201b870+0x310 (r2), computes last slot pointer (r5=count>0 ? base+count*0x18-0x18 : 0). Reads status byte at offset 0x30e, dispatches by value 0/1/2: 0 -> writes zero to two EWRAM fields and increments count; 1 -> invoke_effect_node_action_if_found; 2 -> submit_sprite_row_data. Returns 1 when current tick is complete.
-@ 
-@ Constants: equip_slot_base=0x0201b870, slot_count_offset=0x310 (0xc4*4), slot_stride=0x18, status_byte_offset=0x30e (DAT_080a0944=0x30e).
+@ No arguments. Uses gSpriteAttrBuf+0x310 and gEffectEntryArray stride 0x18. Control byte +0x30e selects initialization, invoke_effect_node_action_if_found, or sprite-row 0x1b. Initialization clears two gDuelPhaseFlags fields. The handler stores the current entry at +EQUIP_ACTIVE_CTX_OFF, updates entry byte +4 bit 0, and advances the control byte. Returns 0 after the handler path; otherwise 1. Caller: route_equip_slot_tick_by_flag.
 dispatch_equip_effect_by_slot_state:
     push {r4,r5,r6,lr}                       @ 080a08fc 70b5
-    ldr r3, DWORD_080a093c                   @ 080a08fe 0f4b
+    ldr r3, sprite_attr_buf_ref_080a093c     @ 080a08fe 0f4b
     movs r1,#0xc4    @ 080a0900 c421
     lsls r1,r1,#0x2    @ 080a0902 8900
     adds r0,r3,r1    @ 080a0904 5818
@@ -6562,7 +6753,7 @@ LAB_080a0908:
 LAB_080a090a:
     adds r0,r0,r2    @ 080a090a 8018
     lsls r0,r0,#0x3    @ 080a090c c000
-    ldr r1, DAT_080a0940                     @ 080a090e 0c49
+    ldr r1, effect_entry_array_ref_080a0940  @ 080a090e 0c49
     adds r4,r0,r1    @ 080a0910 4418
     movs r5,#0x0    @ 080a0912 0025
     cmp r2,#0x0                              @ 080a0914 002a
@@ -6577,7 +6768,7 @@ LAB_080a091c:
     bne LAB_080a0928                         @ 080a0924 00d1
     movs r5,#0x0    @ 080a0926 0025
 LAB_080a0928:
-    ldr r2, DAT_080a0944                     @ 080a0928 064a
+    ldr r2, sprite_row_entry_30e_off_080a0944 @ 080a0928 064a
     adds r3,r3,r2    @ 080a092a 9b18
     ldrb r2,[r3,#0x0]                        @ 080a092c 1a78
     cmp r2,#0x1                              @ 080a092e 012a
@@ -6587,31 +6778,31 @@ LAB_080a0928:
     cmp r2,#0x0                              @ 080a0936 002a
     beq LAB_080a094e                         @ 080a0938 09d0
     b LAB_080a09be                           @ 080a093a 40e0
-DWORD_080a093c:
-    .word  0x0201b870                     @ 080a093c 70b80102
-DAT_080a0940:
-    .word  0x0201b590                     @ 080a0940 90b50102
-DAT_080a0944:
-    .word  0x0000030e                     @ 080a0944 0e030000
+sprite_attr_buf_ref_080a093c:
+    .word  gSpriteAttrBuf                 @ 080a093c 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+effect_entry_array_ref_080a0940:
+    .word  gEffectEntryArray              @ 080a0940 90b50102  gEffectEntryArray: 0x18-byte effect entry array base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30e_off_080a0944:
+    .word  SPRITE_ROW_ENTRY_30E_OFF       @ 080a0944 0e030000  SPRITE_ROW_ENTRY_30E_OFF: gSpriteAttrBuf control byte for status path B.
 LAB_080a0948:
     cmp r2,#0x2                              @ 080a0948 022a
     beq LAB_080a09b0                         @ 080a094a 31d0
     b LAB_080a09be                           @ 080a094c 37e0
 LAB_080a094e:
-    ldr r0, DAT_080a099c                     @ 080a094e 1348
+    ldr r0, duel_phase_flags_ref_080a099c    @ 080a094e 1348
     movs r6,#0x96    @ 080a0950 9626
     lsls r6,r6,#0x3    @ 080a0952 f600
     adds r1,r0,r6    @ 080a0954 8119
     str r2,[r1,#0x0]                         @ 080a0956 0a60
-    ldr r1, DAT_080a09a0                     @ 080a0958 1149
+    ldr r1, equip_activation_aux_off_080a09a0 @ 080a0958 1149
     adds r0,r0,r1    @ 080a095a 4018
     str r2,[r0,#0x0]                         @ 080a095c 0260
     ldrb r0,[r3,#0x0]                        @ 080a095e 1878
     adds r0,#0x1    @ 080a0960 0130
     strb r0,[r3,#0x0]                        @ 080a0962 1870
 LAB_080a0964:
-    ldr r0, DAT_080a099c                     @ 080a0964 0d48
-    ldr r2, DAT_080a09a4                     @ 080a0966 0f4a
+    ldr r0, duel_phase_flags_ref_080a099c    @ 080a0964 0d48
+    ldr r2, equip_active_ctx_off_080a09a4    @ 080a0966 0f4a
     adds r0,r0,r2    @ 080a0968 8018
     str r4,[r0,#0x0]                         @ 080a096a 0460
     adds r0,r4,#0x0    @ 080a096c 201c
@@ -6630,8 +6821,8 @@ LAB_080a0980:
     ands r0,r6    @ 080a0986 3040
     orrs r0,r1    @ 080a0988 0843
     strb r0,[r4,#0x4]                        @ 080a098a 2071
-    ldr r0, DAT_080a09a8                     @ 080a098c 0648
-    ldr r1, DAT_080a09ac                     @ 080a098e 0749
+    ldr r0, sprite_attr_buf_ref_080a09a8     @ 080a098c 0648
+    ldr r1, sprite_row_entry_30e_off_080a09ac @ 080a098e 0749
     adds r0,r0,r1    @ 080a0990 4018
     ldrb r1,[r0,#0x0]                        @ 080a0992 0178
     adds r1,#0x1    @ 080a0994 0131
@@ -6639,16 +6830,16 @@ LAB_080a0980:
 LAB_080a0998:
     movs r0,#0x0    @ 080a0998 0020
     b LAB_080a09c0                           @ 080a099a 11e0
-DAT_080a099c:
-    .word  0x0201b290                     @ 080a099c 90b20102
-DAT_080a09a0:
-    .word  0x000004b4                     @ 080a09a0 b4040000
-DAT_080a09a4:
-    .word  0x00000484                     @ 080a09a4 84040000
-DAT_080a09a8:
-    .word  0x0201b870                     @ 080a09a8 70b80102
-DAT_080a09ac:
-    .word  0x0000030e                     @ 080a09ac 0e030000
+duel_phase_flags_ref_080a099c:
+    .word  gDuelPhaseFlags                @ 080a099c 90b20102  gDuelPhaseFlags: duel phase and equip activation state base; add operand-0 DATA/USER_DEFINED reference.
+equip_activation_aux_off_080a09a0:
+    .word  EQUIP_ACTIVATION_AUX_OFF       @ 080a09a0 b4040000  EQUIP_ACTIVATION_AUX_OFF: gDuelPhaseFlags equip activation auxiliary field.
+equip_active_ctx_off_080a09a4:
+    .word  EQUIP_ACTIVE_CTX_OFF           @ 080a09a4 84040000  EQUIP_ACTIVE_CTX_OFF: gDuelPhaseFlags current effect-entry pointer.
+sprite_attr_buf_ref_080a09a8:
+    .word  gSpriteAttrBuf                 @ 080a09a8 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30e_off_080a09ac:
+    .word  SPRITE_ROW_ENTRY_30E_OFF       @ 080a09ac 0e030000  SPRITE_ROW_ENTRY_30E_OFF: gSpriteAttrBuf control byte for status path B.
 LAB_080a09b0:
     movs r1,#0x1    @ 080a09b0 0121
     rsbs r1,r1,#0    @ 080a09b2 4942
@@ -6664,12 +6855,10 @@ LAB_080a09c0:
     bx r1                                    @ 080a09c4 0847
     .zero  0x2
 
-@ Called by FUN_080a0a8c in equip slot bit6 (0x40) set branch. Reads equip slot count from EWRAM 0x0201b870+0x310 (offset 0xc4*4=0x310) (r1), computes r1*0x18 offset to last slot (r5=r1>0 ? base+r1*0x18-0x18 : 0). Reads status byte at EWRAM 0x0201b870+0x30f; dispatches by value 0/1/2: 0 -> writes 0x80 to display flag at [base+0x1a0], clears [+0x1a4] and [+0x1a8], increments count, enters 0x080a0a2c path; 1 -> submit_sprite_row_data; 2 -> alternate branch. Returns 1 (complete) or 0 (pending).
-@ 
-@ Constants: equip_slot_base=0x0201b870, slot_count_offset=0x310 (0xc4*4=0x310), slot_stride=0x18, status_byte_offset=0x30f, EWRAM_flag_0x1a0=0x1a0 (0xd0*2), EWRAM_flag_0x1a4=0x1a4 (0xd2*2), EWRAM_flag_0x1a8=0x1a8.
+@ No arguments. Uses gSpriteAttrBuf+0x310 and gEffectEntryArray stride 0x18. Control byte +0x30f selects initialization, LP-delta handling, or sprite-row 0x19. The handler stores the current entry at gDuelPhaseFlags+EQUIP_ACTIVE_CTX_OFF, calls apply_equip_lp_delta_by_node_flag(current, previous), stores the result at +0x4a0, and advances only when the result is zero. Returns 0 after the handler path; otherwise 1.
 dispatch_equip_lp_delta_by_slot_status:
     push {r4,r5,r6,lr}                       @ 080a09c8 70b5
-    ldr r2, DWORD_080a09fc                   @ 080a09ca 0c4a
+    ldr r2, sprite_attr_buf_ref_080a09fc     @ 080a09ca 0c4a
     movs r1,#0xc4    @ 080a09cc c421
     lsls r1,r1,#0x2    @ 080a09ce 8900
     adds r0,r2,r1    @ 080a09d0 5018
@@ -6677,7 +6866,7 @@ dispatch_equip_lp_delta_by_slot_status:
     lsls r0,r1,#0x1    @ 080a09d4 4800
     adds r0,r0,r1    @ 080a09d6 4018
     lsls r0,r0,#0x3    @ 080a09d8 c000
-    ldr r3, DWORD_080a0a00                   @ 080a09da 094b
+    ldr r3, effect_entry_array_ref_080a0a00  @ 080a09da 094b
     adds r5,r0,r3    @ 080a09dc c518
     movs r6,#0x0    @ 080a09de 0026
     cmp r1,#0x0                              @ 080a09e0 0029
@@ -6685,7 +6874,7 @@ dispatch_equip_lp_delta_by_slot_status:
     adds r6,r5,#0x0    @ 080a09e4 2e1c
     subs r6,#0x18    @ 080a09e6 183e
 LAB_080a09e8:
-    ldr r0, DWORD_080a0a04                   @ 080a09e8 0648
+    ldr r0, sprite_row_entry_30f_off_080a0a04 @ 080a09e8 0648
     adds r4,r2,r0    @ 080a09ea 1418
     ldrb r2,[r4,#0x0]                        @ 080a09ec 2278
     cmp r2,#0x1                              @ 080a09ee 012a
@@ -6695,12 +6884,12 @@ LAB_080a09e8:
     cmp r2,#0x0                              @ 080a09f6 002a
     beq LAB_080a0a0e                         @ 080a09f8 09d0
     b LAB_080a0a82                           @ 080a09fa 42e0
-DWORD_080a09fc:
-    .word  0x0201b870                     @ 080a09fc 70b80102
-DWORD_080a0a00:
-    .word  0x0201b590                     @ 080a0a00 90b50102
-DWORD_080a0a04:
-    .word  0x0000030f                     @ 080a0a04 0f030000
+sprite_attr_buf_ref_080a09fc:
+    .word  gSpriteAttrBuf                 @ 080a09fc 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+effect_entry_array_ref_080a0a00:
+    .word  gEffectEntryArray              @ 080a0a00 90b50102  gEffectEntryArray: 0x18-byte effect entry array base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30f_off_080a0a04:
+    .word  SPRITE_ROW_ENTRY_30F_OFF       @ 080a0a04 0f030000  SPRITE_ROW_ENTRY_30F_OFF: gSpriteAttrBuf control byte for LP-delta path.
 LAB_080a0a08:
     cmp r2,#0x2                              @ 080a0a08 022a
     beq LAB_080a0a68                         @ 080a0a0a 2dd0
@@ -6722,8 +6911,8 @@ LAB_080a0a0e:
     adds r0,#0x1    @ 080a0a28 0130
     strb r0,[r4,#0x0]                        @ 080a0a2a 2070
 LAB_080a0a2c:
-    ldr r4, DWORD_080a0a58                   @ 080a0a2c 0a4c
-    ldr r1, DWORD_080a0a5c                   @ 080a0a2e 0b49
+    ldr r4, duel_phase_flags_ref_080a0a58    @ 080a0a2c 0a4c
+    ldr r1, equip_active_ctx_off_080a0a5c    @ 080a0a2e 0b49
     adds r0,r4,r1    @ 080a0a30 6018
     str r5,[r0,#0x0]                         @ 080a0a32 0560
     adds r0,r5,#0x0    @ 080a0a34 281c
@@ -6735,8 +6924,8 @@ LAB_080a0a2c:
     str r0,[r4,#0x0]                         @ 080a0a42 2060
     cmp r0,#0x0                              @ 080a0a44 0028
     bne LAB_080a0a54                         @ 080a0a46 05d1
-    ldr r0, DWORD_080a0a60                   @ 080a0a48 0548
-    ldr r1, DWORD_080a0a64                   @ 080a0a4a 0649
+    ldr r0, sprite_attr_buf_ref_080a0a60     @ 080a0a48 0548
+    ldr r1, sprite_row_entry_30f_off_080a0a64 @ 080a0a4a 0649
     adds r0,r0,r1    @ 080a0a4c 4018
     ldrb r1,[r0,#0x0]                        @ 080a0a4e 0178
     adds r1,#0x1    @ 080a0a50 0131
@@ -6744,14 +6933,14 @@ LAB_080a0a2c:
 LAB_080a0a54:
     movs r0,#0x0    @ 080a0a54 0020
     b LAB_080a0a84                           @ 080a0a56 15e0
-DWORD_080a0a58:
-    .word  0x0201b290                     @ 080a0a58 90b20102
-DWORD_080a0a5c:
-    .word  0x00000484                     @ 080a0a5c 84040000
-DWORD_080a0a60:
-    .word  0x0201b870                     @ 080a0a60 70b80102
-DWORD_080a0a64:
-    .word  0x0000030f                     @ 080a0a64 0f030000
+duel_phase_flags_ref_080a0a58:
+    .word  gDuelPhaseFlags                @ 080a0a58 90b20102  gDuelPhaseFlags: duel phase and equip activation state base; add operand-0 DATA/USER_DEFINED reference.
+equip_active_ctx_off_080a0a5c:
+    .word  EQUIP_ACTIVE_CTX_OFF           @ 080a0a5c 84040000  EQUIP_ACTIVE_CTX_OFF: gDuelPhaseFlags current effect-entry pointer.
+sprite_attr_buf_ref_080a0a60:
+    .word  gSpriteAttrBuf                 @ 080a0a60 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_entry_30f_off_080a0a64:
+    .word  SPRITE_ROW_ENTRY_30F_OFF       @ 080a0a64 0f030000  SPRITE_ROW_ENTRY_30F_OFF: gSpriteAttrBuf control byte for LP-delta path.
 LAB_080a0a68:
     adds r2,r6,#0x0    @ 080a0a68 321c
     cmp r2,#0x0                              @ 080a0a6a 002a
@@ -6775,13 +6964,11 @@ LAB_080a0a84:
     bx r1                                    @ 080a0a88 0847
     .zero  0x2
 
-@ Equip slot tick router called by FUN_080a0b14 (direct child of tick_equip_activation_main_sequence). Reads flag byte at EWRAM 0x0201b870+0x301; dispatches to three sub-paths by bit: bit4 (0x10) set -> calls update_equip_sprite_state_by_slot_status; on success clears bit4 and writes back flag; bit5 (0x20) set -> calls dispatch_equip_effect_by_slot_state (FUN_080a08fc); bit6 (0x40, via LAB_080a0ab8 from bit5 branch) -> calls dispatch_equip_lp_delta_by_slot_status (FUN_080a09c8). Returns 1 (tick complete) or 0 (pending).
-@ 
-@ Constants: equip_slot_base=0x0201b870, flag_byte_offset=0x301 (DAT_080a0ab4=0x301), bit4_mask=0x10, bit5_mask=0x20, bit6_mask=0x40, clear_bit4_mask=~0x11.
+@ No arguments. Reads gSpriteAttrBuf+SPRITE_ROW_BUSY_BYTE_OFF. In order, it services flag 0x10 with update_equip_sprite_state_by_slot_status, flag 0x20 with dispatch_equip_effect_by_slot_state, gSpriteAttrBuf+0x300 flag 0x10 with dispatch_equip_slot_state_by_index, and flag 0x40 with dispatch_equip_lp_delta_by_slot_status. Completed handlers clear their flag. Returns 1 after a selected handler and 0 when no relevant flag is set.
 route_equip_slot_tick_by_flag:
     push {r4,r5,lr}                          @ 080a0a8c 30b5
-    ldr r2, DWORD_080a0ab0                   @ 080a0a8e 084a
-    ldr r0, DWORD_080a0ab4                   @ 080a0a90 0848
+    ldr r2, sprite_attr_buf_ref_080a0ab0     @ 080a0a8e 084a
+    ldr r0, sprite_row_busy_byte_off_080a0ab4 @ 080a0a90 0848
     adds r5,r2,r0    @ 080a0a92 1518
     ldrb r1,[r5,#0x0]                        @ 080a0a94 2978
     lsls r0,r1,#0x1b    @ 080a0a96 c806
@@ -6796,10 +6983,10 @@ route_equip_slot_tick_by_flag:
     ands r0,r1    @ 080a0aaa 0840
     b LAB_080a0b04                           @ 080a0aac 2ae0
     .zero  0x2
-DWORD_080a0ab0:
-    .word  0x0201b870                     @ 080a0ab0 70b80102
-DWORD_080a0ab4:
-    .word  0x00000301                     @ 080a0ab4 01030000
+sprite_attr_buf_ref_080a0ab0:
+    .word  gSpriteAttrBuf                 @ 080a0ab0 70b80102  gSpriteAttrBuf: sprite attribute buffer base; add operand-0 DATA/USER_DEFINED reference.
+sprite_row_busy_byte_off_080a0ab4:
+    .word  SPRITE_ROW_BUSY_BYTE_OFF       @ 080a0ab4 01030000  SPRITE_ROW_BUSY_BYTE_OFF: gSpriteAttrBuf busy and route flag byte.
 LAB_080a0ab8:
     lsls r0,r1,#0x1d    @ 080a0ab8 4807
     cmp r0,#0x0                              @ 080a0aba 0028
@@ -6852,7 +7039,7 @@ LAB_080a0b0c:
     bx r1                                    @ 080a0b10 0847
     .zero  0x2
 
-@ Single-step tick wrapper called by tick_equip_activation_main_sequence (0x08094cd4). Only 3 instructions: push lr, bl route_equip_slot_tick_by_flag (FUN_080a0a8c), then forces r0=0 before pop {r1}; bx r1 return. Always returns 0 regardless of sub-function result, indicating "frame tick complete, no further polling needed". All side effects delegated to route_equip_slot_tick_by_flag.
+@ No arguments. Calls route_equip_slot_tick_by_flag, discards its return value, and always returns 0. Called once from tick_equip_activation_main_sequence at 0x08094d96.
 tick_equip_slot_activation_step:
     push {lr}                                @ 080a0b14 00b5
     bl route_equip_slot_tick_by_flag         @ 080a0b16 fff7b9ff
@@ -6861,24 +7048,7 @@ tick_equip_slot_activation_step:
     bx r1                                    @ 080a0b1e 0847
     ROM_INCBIN 0xa0b20, 0x818
 
-@ equip activation animation sequence phase-A step advancer. Reads step counter at gP1LifePoints+0x1d94 (0/1/2), three-way dispatch:
-@ - step=0: clears [+0x1da8]/[+0x1daa] two hwords, calls sample_prng_scaled(2) to randomize slot param and writes back [+0x1da8]; loops r4 times; selects OAM tile (0x5b/0x0000805b based on r7), calls enqueue_sprite_attr_record + increments [gP1LP+0x1d94]; returns 0.
-@ - step=1: calls count_available_effect_zones(-1,0x150f,...) + check_value_in_slot_chain + invoke_card_display_op_0x31_sub1 or writes [+0x1d94 calc]; returns 0.
-@ - step=2: calls enqueue_sprite_attr_by_sign + enqueue_sprite_attr_type11; clears [r5]; returns 0.
-@ Other step values return 1.
-@ No APCS params (r8/r9/r10 are parent-frame implicit inputs, need caller asm to confirm).
-@ 
-@ Constants:
-@ - gP1LifePoints = 0x0201c4e0
-@ - STEP_OFFSET = 0x1d94
-@ - SLOT_OFFSET = 0x1da8
-@ - SLOT2_OFFSET = 0x1daa
-@ - CARD_ID_150F = 0x150f (Second Coin Toss)
-@ - OAM_TILE_A = 0x5b (or 0x805b=OBJ_TILE_HIGH|0x5b)
-@ 
-@ Inputs: r8/r9/r10 non-APCS implicit (parent-frame context, indeg=0).
-@ Returns: r0=i32 (0=step advance continue, 1=sequence done/stall; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
-@ Side effects: [gP1LifePoints+0x1da8]:=0 (step=0 initial clear); [gP1LifePoints+0x1daa]:=0; [gP1LifePoints+0x1da8]:=packed_sprite_attr; [gP1LifePoints+0x1d94]+=1 (step advance); enqueue_sprite_attr_record (OAM queue).
+@ No APCS arguments; r8-r10 are inherited context. Drives the three-state Second Coin Toss reroll display at gP1LifePoints+0x1d94. State 0 builds coin sprite records from the packed parameters at +0x1d98/+0x1d9a. State 1 checks CID 0x150f, issues game string 287 when confirmation is needed, and advances. State 2 enqueues the zone sprite and resets the display phase state. Other states return 1. No incoming call or pointer reference is defined in the current image.
 tick_equip_zone_sprite_phase_a:
     push {r4,r5,r6,r7,lr}                    @ 080a1338 f0b5
     .hword 0x4657    @ 080a133a 5746
@@ -6886,14 +7056,14 @@ tick_equip_zone_sprite_phase_a:
     .hword 0x4645    @ 080a133e 4546
     push {r5,r6,r7}                          @ 080a1340 e0b4
     sub sp,#0x8                              @ 080a1342 82b0
-    ldr r4, DWORD_080a1378                   @ 080a1344 0c4c
-    ldr r1, DWORD_080a137c                   @ 080a1346 0d49
+    ldr r4, gp1lp_ptr_080a1378               @ 080a1344 0c4c
+    ldr r1, equip_context_player_off_080a137c @ 080a1346 0d49
     adds r0,r4,r1    @ 080a1348 6018
     ldr r7,[r0,#0x0]                         @ 080a134a 0768
-    ldr r2, DWORD_080a1380                   @ 080a134c 0c4a
+    ldr r2, equip_reroll_sprite_param_off_080a1380 @ 080a134c 0c4a
     adds r0,r4,r2    @ 080a134e a018
     ldrh r3,[r0,#0x0]                        @ 080a1350 0388
-    ldr r5, DWORD_080a1384                   @ 080a1352 0c4d
+    ldr r5, equip_reroll_count_target_off_080a1384 @ 080a1352 0c4d
     adds r0,r4,r5    @ 080a1354 6019
     ldrb r1,[r0,#0x0]                        @ 080a1356 0178
     .hword 0x4689    @ 080a1358 8946
@@ -6913,16 +7083,16 @@ tick_equip_zone_sprite_phase_a:
 LAB_080a1374:
     b LAB_080a14c4                           @ 080a1374 a6e0
     .zero  0x2
-DWORD_080a1378:
-    .word  gP1LifePoints                  @ 080a1378 e0c40102
-DWORD_080a137c:
-    .word  0x00001d8c                     @ 080a137c 8c1d0000
-DWORD_080a1380:
-    .word  0x00001d98                     @ 080a1380 981d0000
-DWORD_080a1384:
-    .word  0x00001d9a                     @ 080a1384 9a1d0000
+gp1lp_ptr_080a1378:
+    .word  gP1LifePoints                  @ 080a1378 e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_context_player_off_080a137c:
+    .word  EQUIP_CONTEXT_PLAYER_OFF       @ 080a137c 8c1d0000  EQUIP_CONTEXT_PLAYER_OFF: gP1LifePoints-relative equip context player field.
+equip_reroll_sprite_param_off_080a1380:
+    .word  EQUIP_REROLL_SPRITE_PARAM_OFF  @ 080a1380 981d0000  EQUIP_REROLL_SPRITE_PARAM_OFF: gP1LifePoints-relative coin/dice sprite parameter hword.
+equip_reroll_count_target_off_080a1384:
+    .word  EQUIP_REROLL_COUNT_TARGET_OFF  @ 080a1384 9a1d0000  EQUIP_REROLL_COUNT_TARGET_OFF: gP1LifePoints-relative packed reroll count/target hword.
 LAB_080a1388:
-    ldr r5, DWORD_080a1404                   @ 080a1388 1e4d
+    ldr r5, lp_card_track_base_off_080a1404  @ 080a1388 1e4d
     adds r2,r4,r5    @ 080a138a 6219
     movs r0,#0x0    @ 080a138c 0020
     strh r0,[r2,#0x0]                        @ 080a138e 1080
@@ -6963,7 +7133,7 @@ LAB_080a13d0:
     movs r5,#0x5b    @ 080a13d0 5b25
     cmp r7,#0x0                              @ 080a13d2 002f
     beq LAB_080a13d8                         @ 080a13d4 00d0
-    ldr r5, DWORD_080a1408                   @ 080a13d6 0c4d
+    ldr r5, oam_coin_reroll_sprite_p2_5b_080a1408 @ 080a13d6 0c4d
 LAB_080a13d8:
     .hword 0x4653    @ 080a13d8 5346
     lsrs r1,r3,#0x10    @ 080a13da 190c
@@ -6972,13 +7142,13 @@ LAB_080a13d8:
     ldr r3,[sp,#0x4]                         @ 080a13e0 019b
     orrs r2,r3    @ 080a13e2 1a43
     lsrs r2,r2,#0x10    @ 080a13e4 120c
-    ldr r4, DWORD_080a140c                   @ 080a13e6 094c
-    ldr r3, DWORD_080a1404                   @ 080a13e8 064b
+    ldr r4, gp1lp_ptr_080a140c               @ 080a13e6 094c
+    ldr r3, lp_card_track_base_off_080a1404  @ 080a13e8 064b
     adds r0,r4,r3    @ 080a13ea e018
     ldrh r3,[r0,#0x0]                        @ 080a13ec 0388
     adds r0,r5,#0x0    @ 080a13ee 281c
     bl enqueue_sprite_attr_record            @ 080a13f0 9af79cfc
-    ldr r5, DWORD_080a1410                   @ 080a13f4 064d
+    ldr r5, equip_phase_display_state_off_080a1410 @ 080a13f4 064d
     adds r4,r4,r5    @ 080a13f6 6419
     ldr r0,[r4,#0x0]                         @ 080a13f8 2068
     adds r0,#0x1    @ 080a13fa 0130
@@ -6986,16 +7156,16 @@ LAB_080a13d8:
     movs r0,#0x0    @ 080a13fe 0020
     b LAB_080a1512                           @ 080a1400 87e0
     .zero  0x2
-DWORD_080a1404:
-    .word  0x00001da8                     @ 080a1404 a81d0000
-DWORD_080a1408:
-    .word  0x0000805b                     @ 080a1408 5b800000
-DWORD_080a140c:
-    .word  gP1LifePoints                  @ 080a140c e0c40102
-DWORD_080a1410:
-    .word  0x00001d94                     @ 080a1410 941d0000
+lp_card_track_base_off_080a1404:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 080a1404 a81d0000  LP_CARD_TRACK_BASE_OFF: gP1LifePoints scratch hword base reused by reroll animation.
+oam_coin_reroll_sprite_p2_5b_080a1408:
+    .word  OAM_COIN_REROLL_SPRITE_P2_5B   @ 080a1408 5b800000  OAM_COIN_REROLL_SPRITE_P2_5B: P2-side coin-reroll sprite code; P1 uses inline 0x5b.
+gp1lp_ptr_080a140c:
+    .word  gP1LifePoints                  @ 080a140c e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_phase_display_state_off_080a1410:
+    .word  EQUIP_PHASE_DISPLAY_STATE_OFF  @ 080a1410 941d0000  EQUIP_PHASE_DISPLAY_STATE_OFF: gP1LifePoints equip display phase state word.
 LAB_080a1414:
-    ldr r5, DWORD_080a1468                   @ 080a1414 144d
+    ldr r5, second_coin_toss_cid_080a1468    @ 080a1414 144d
     movs r2,#0x1    @ 080a1416 0122
     rsbs r2,r2,#0    @ 080a1418 5242
     adds r0,r7,#0x0    @ 080a141a 381c
@@ -7009,7 +7179,7 @@ LAB_080a1414:
     bl check_value_in_slot_chain             @ 080a142c 8ef730fc
     cmp r0,#0x0                              @ 080a1430 0028
     bne LAB_080a14c4                         @ 080a1432 47d1
-    ldr r0, DWORD_080a146c                   @ 080a1434 0d48
+    ldr r0, duel_card_ctx_ref_080a146c       @ 080a1434 0d48
     lsls r1,r7,#0x2    @ 080a1436 b900
     adds r0,#0x8    @ 080a1438 0830
     adds r1,r1,r0    @ 080a143a 0918
@@ -7017,7 +7187,7 @@ LAB_080a1414:
     cmp r0,#0x1                              @ 080a143e 0128
     bne LAB_080a1474                         @ 080a1440 18d1
     movs r3,#0x0    @ 080a1442 0023
-    ldr r0, DWORD_080a1470                   @ 080a1444 0a48
+    ldr r0, lp_card_track_next_off_080a1470  @ 080a1444 0a48
     adds r1,r4,r0    @ 080a1446 2118
     .hword 0x464a    @ 080a1448 4a46
     lsrs r0,r2,#0x1    @ 080a144a 5008
@@ -7037,18 +7207,18 @@ LAB_080a1462:
     str r2,[r0,#0x0]                         @ 080a1462 0260
     b LAB_080a147a                           @ 080a1464 09e0
     .zero  0x2
-DWORD_080a1468:
-    .word  0x0000150f                     @ 080a1468 0f150000
-DWORD_080a146c:
-    .word  0x0201e2a0                     @ 080a146c a0e20102
-DWORD_080a1470:
-    .word  0x00001daa                     @ 080a1470 aa1d0000
+second_coin_toss_cid_080a1468:
+    .word  SECOND_COIN_TOSS_CID           @ 080a1468 0f150000  SECOND_COIN_TOSS_CID: Second Coin Toss internal CID.
+duel_card_ctx_ref_080a146c:
+    .word  gDuelCardCtxBase               @ 080a146c a0e20102  gDuelCardCtxBase: duel card activation context base; add operand-0 DATA/USER_DEFINED reference.
+lp_card_track_next_off_080a1470:
+    .word  LP_CARD_TRACK_NEXT_OFF         @ 080a1470 aa1d0000  LP_CARD_TRACK_NEXT_OFF: adjacent gP1LifePoints scratch hword.
 LAB_080a1474:
-    ldr r0, DWORD_080a148c                   @ 080a1474 0548
+    ldr r0, game_str_perform_coin_toss_again_id_080a148c @ 080a1474 0548
     bl invoke_card_display_op_0x31_sub1      @ 080a1476 f1f79dff
 LAB_080a147a:
-    ldr r1, DWORD_080a1490                   @ 080a147a 0549
-    ldr r0, DWORD_080a1494                   @ 080a147c 0548
+    ldr r1, gp1lp_ptr_080a1490               @ 080a147a 0549
+    ldr r0, equip_phase_display_state_off_080a1494 @ 080a147c 0548
     adds r1,r1,r0    @ 080a147e 0918
     ldr r0,[r1,#0x0]                         @ 080a1480 0868
     adds r0,#0x1    @ 080a1482 0130
@@ -7056,12 +7226,12 @@ LAB_080a147a:
     movs r0,#0x0    @ 080a1486 0020
     b LAB_080a1512                           @ 080a1488 43e0
     .zero  0x2
-DWORD_080a148c:
-    .word  0x0000011f                     @ 080a148c 1f010000
-DWORD_080a1490:
-    .word  gP1LifePoints                  @ 080a1490 e0c40102
-DWORD_080a1494:
-    .word  0x00001d94                     @ 080a1494 941d0000
+game_str_perform_coin_toss_again_id_080a148c:
+    .word  GAME_STR_PERFORM_COIN_TOSS_AGAIN_ID @ 080a148c 1f010000  GAME_STR_PERFORM_COIN_TOSS_AGAIN_ID: game string 287: Perform coin toss again?.
+gp1lp_ptr_080a1490:
+    .word  gP1LifePoints                  @ 080a1490 e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_phase_display_state_off_080a1494:
+    .word  EQUIP_PHASE_DISPLAY_STATE_OFF  @ 080a1494 941d0000  EQUIP_PHASE_DISPLAY_STATE_OFF: gP1LifePoints equip display phase state word.
 LAB_080a1498:
     movs r1,#0xea    @ 080a1498 ea21
     lsls r1,r1,#0x5    @ 080a149a 4901
@@ -7069,7 +7239,7 @@ LAB_080a1498:
     ldr r0,[r0,#0x0]                         @ 080a149e 0068
     cmp r0,#0x0                              @ 080a14a0 0028
     beq LAB_080a14c4                         @ 080a14a2 0fd0
-    ldr r4, DWORD_080a14c0                   @ 080a14a4 064c
+    ldr r4, second_coin_toss_cid_080a14c0    @ 080a14a4 064c
     adds r0,r7,#0x0    @ 080a14a6 381c
     adds r1,r4,#0x0    @ 080a14a8 211c
     bl enqueue_sprite_attr_by_sign           @ 080a14aa a7f701f9
@@ -7081,16 +7251,16 @@ LAB_080a1498:
     movs r0,#0x0    @ 080a14ba 0020
     str r0,[r5,#0x0]                         @ 080a14bc 2860
     b LAB_080a1512                           @ 080a14be 28e0
-DWORD_080a14c0:
-    .word  0x0000150f                     @ 080a14c0 0f150000
+second_coin_toss_cid_080a14c0:
+    .word  SECOND_COIN_TOSS_CID           @ 080a14c0 0f150000  SECOND_COIN_TOSS_CID: Second Coin Toss internal CID.
 LAB_080a14c4:
-    ldr r0, DWORD_080a14fc                   @ 080a14c4 0d48
+    ldr r0, duel_card_ctx_ref_080a14fc       @ 080a14c4 0d48
     ldr r0,[r0,#0x4]                         @ 080a14c6 4068
     cmp r7,r0                                @ 080a14c8 8742
     bne LAB_080a1510                         @ 080a14ca 21d1
     movs r2,#0x0    @ 080a14cc 0022
-    ldr r0, DWORD_080a1500                   @ 080a14ce 0c48
-    ldr r3, DWORD_080a1504                   @ 080a14d0 0c4b
+    ldr r0, gp1lp_ptr_080a1500               @ 080a14ce 0c48
+    ldr r3, lp_card_track_next_off_080a1504  @ 080a14d0 0c4b
     adds r0,r0,r3    @ 080a14d2 c018
     .hword 0x464d    @ 080a14d4 4d46
     lsrs r1,r5,#0x1    @ 080a14d6 6908
@@ -7110,12 +7280,12 @@ LAB_080a14e0:
     movs r0,#0x34    @ 080a14f4 3420
     bl write_card_display_index_if_above_bit @ 080a14f6 f3f713fd
     b LAB_080a1510                           @ 080a14fa 09e0
-DWORD_080a14fc:
-    .word  0x0201e2a0                     @ 080a14fc a0e20102
-DWORD_080a1500:
-    .word  gP1LifePoints                  @ 080a1500 e0c40102
-DWORD_080a1504:
-    .word  0x00001daa                     @ 080a1504 aa1d0000
+duel_card_ctx_ref_080a14fc:
+    .word  gDuelCardCtxBase               @ 080a14fc a0e20102  gDuelCardCtxBase: duel card activation context base; add operand-0 DATA/USER_DEFINED reference.
+gp1lp_ptr_080a1500:
+    .word  gP1LifePoints                  @ 080a1500 e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+lp_card_track_next_off_080a1504:
+    .word  LP_CARD_TRACK_NEXT_OFF         @ 080a1504 aa1d0000  LP_CARD_TRACK_NEXT_OFF: adjacent gP1LifePoints scratch hword.
 LAB_080a1508:
     movs r0,#0x33    @ 080a1508 3320
     movs r1,#0x0    @ 080a150a 0021
@@ -7133,36 +7303,21 @@ LAB_080a1512:
     bx r1                                    @ 080a1520 0847
     .zero  0x2
 
-@ equip activation animation sequence phase-B step advancer, symmetric with tick_equip_zone_sprite_phase_a (0x080a1338). Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
-@ - step=0: calls sample_prng_scaled(6) to randomize hword and writes [+0x1da8]; loops writing enqueue_sprite_attr_record (OAM tile 0x5c/0x0000805c); advances step.
-@ - step=1: calls check_node_in_slot_chain(player,0xb,0x16a5,mode=1) + check_node_in_slot_chain(...,mode=2); if confirmed reads [0x0201e2a0+player*4+8]; writes [gP1LP+0x1d94 calc] or calls invoke_card_display_op_0x31_sub1; advances step.
-@ - step=2: calls enqueue_equip_zone_sprite_by_side + enqueue_sprite_attr_type11; clears [r5].
-@ Difference from phase_a: step=0 uses check_node_in_slot_chain (vs check_value_in_slot_chain), tile number 0x5c for right-side sprite; CARD_ID 0x16a5.
-@ 
-@ Constants:
-@ - gP1LifePoints = 0x0201c4e0
-@ - STEP_OFFSET = 0x1d94
-@ - SLOT_OFFSET = 0x1da8
-@ - CARD_ID_16A5 = 0x16a5 (Dice Re-Roll)
-@ - OAM_TILE_B = 0x5c (or 0x0000805c)
-@ 
-@ Inputs: r8/r9/r10 non-APCS implicit (parent-frame context, indeg=0).
-@ Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
-@ Side effects: [gP1LifePoints+0x1da8]:=packed_sprite_attr (step=0); [gP1LifePoints+0x1d94]+=1; [0x0201e2a0+offset] written on step=1 path.
+@ No APCS arguments; r8-r10 are inherited context. Drives the three-state Dice Re-Roll display at gP1LifePoints+0x1d94. State 0 builds die sprite records from +0x1d98/+0x1d9a. State 1 checks CID 0x16a5 in zone 11 for modes 1 and 2, issues game string 288 when confirmation is needed, and advances. State 2 enqueues the equip-zone sprite and resets the display phase state. Other states return 1. No incoming call or pointer reference is defined in the current image.
 tick_equip_zone_sprite_phase_b:
     push {r4,r5,r6,r7,lr}                    @ 080a1524 f0b5
-    ldr r4, DWORD_080a1554                   @ 080a1526 0b4c
-    ldr r1, DWORD_080a1558                   @ 080a1528 0b49
+    ldr r4, gp1lp_ptr_080a1554               @ 080a1526 0b4c
+    ldr r1, equip_context_player_off_080a1558 @ 080a1528 0b49
     adds r0,r4,r1    @ 080a152a 6018
     ldr r6,[r0,#0x0]                         @ 080a152c 0668
-    ldr r2, DWORD_080a155c                   @ 080a152e 0b4a
+    ldr r2, equip_reroll_sprite_param_off_080a155c @ 080a152e 0b4a
     adds r0,r4,r2    @ 080a1530 a018
     ldrh r1,[r0,#0x0]                        @ 080a1532 0188
-    ldr r3, DWORD_080a1560                   @ 080a1534 0a4b
+    ldr r3, equip_reroll_count_target_off_080a1560 @ 080a1534 0a4b
     adds r0,r4,r3    @ 080a1536 e018
     ldrh r3,[r0,#0x0]                        @ 080a1538 0388
     adds r2,r3,#0x1    @ 080a153a 5a1c
-    ldr r0, DWORD_080a1564                   @ 080a153c 0948
+    ldr r0, equip_phase_display_state_off_080a1564 @ 080a153c 0948
     adds r5,r4,r0    @ 080a153e 2518
     ldr r0,[r5,#0x0]                         @ 080a1540 2868
     cmp r0,#0x1                              @ 080a1542 0128
@@ -7174,20 +7329,20 @@ tick_equip_zone_sprite_phase_b:
     movs r0,#0x0    @ 080a154e 0020
     b LAB_080a1652                           @ 080a1550 7fe0
     .zero  0x2
-DWORD_080a1554:
-    .word  gP1LifePoints                  @ 080a1554 e0c40102
-DWORD_080a1558:
-    .word  0x00001d8c                     @ 080a1558 8c1d0000
-DWORD_080a155c:
-    .word  0x00001d98                     @ 080a155c 981d0000
-DWORD_080a1560:
-    .word  0x00001d9a                     @ 080a1560 9a1d0000
-DWORD_080a1564:
-    .word  0x00001d94                     @ 080a1564 941d0000
+gp1lp_ptr_080a1554:
+    .word  gP1LifePoints                  @ 080a1554 e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_context_player_off_080a1558:
+    .word  EQUIP_CONTEXT_PLAYER_OFF       @ 080a1558 8c1d0000  EQUIP_CONTEXT_PLAYER_OFF: gP1LifePoints-relative equip context player field.
+equip_reroll_sprite_param_off_080a155c:
+    .word  EQUIP_REROLL_SPRITE_PARAM_OFF  @ 080a155c 981d0000  EQUIP_REROLL_SPRITE_PARAM_OFF: gP1LifePoints-relative coin/dice sprite parameter hword.
+equip_reroll_count_target_off_080a1560:
+    .word  EQUIP_REROLL_COUNT_TARGET_OFF  @ 080a1560 9a1d0000  EQUIP_REROLL_COUNT_TARGET_OFF: gP1LifePoints-relative packed reroll count/target hword.
+equip_phase_display_state_off_080a1564:
+    .word  EQUIP_PHASE_DISPLAY_STATE_OFF  @ 080a1564 941d0000  EQUIP_PHASE_DISPLAY_STATE_OFF: gP1LifePoints equip display phase state word.
 LAB_080a1568:
     cmp r2,#0x0                              @ 080a1568 002a
     beq LAB_080a1598                         @ 080a156a 15d0
-    ldr r2, DWORD_080a15a0                   @ 080a156c 0c4a
+    ldr r2, lp_card_track_base_off_080a15a0  @ 080a156c 0c4a
     adds r5,r4,r2    @ 080a156e a518
     lsls r7,r1,#0x10    @ 080a1570 0f04
     adds r4,r3,#0x1    @ 080a1572 5c1c
@@ -7199,7 +7354,7 @@ LAB_080a1574:
     movs r0,#0x5c    @ 080a157e 5c20
     cmp r6,#0x0                              @ 080a1580 002e
     beq LAB_080a1586                         @ 080a1582 00d0
-    ldr r0, DWORD_080a15a4                   @ 080a1584 0748
+    ldr r0, oam_dice_reroll_sprite_p2_5c_080a15a4 @ 080a1584 0748
 LAB_080a1586:
     ldrh r2,[r5,#0x0]                        @ 080a1586 2a88
     lsrs r1,r7,#0x10    @ 080a1588 390c
@@ -7210,20 +7365,20 @@ LAB_080a1586:
     cmp r4,#0x0                              @ 080a1594 002c
     bne LAB_080a1574                         @ 080a1596 edd1
 LAB_080a1598:
-    ldr r1, DWORD_080a15a8                   @ 080a1598 0349
-    ldr r3, DWORD_080a15ac                   @ 080a159a 044b
+    ldr r1, gp1lp_ptr_080a15a8               @ 080a1598 0349
+    ldr r3, equip_phase_display_state_off_080a15ac @ 080a159a 044b
     adds r1,r1,r3    @ 080a159c c918
     b LAB_080a1612                           @ 080a159e 38e0
-DWORD_080a15a0:
-    .word  0x00001da8                     @ 080a15a0 a81d0000
-DWORD_080a15a4:
-    .word  0x0000805c                     @ 080a15a4 5c800000
-DWORD_080a15a8:
-    .word  gP1LifePoints                  @ 080a15a8 e0c40102
-DWORD_080a15ac:
-    .word  0x00001d94                     @ 080a15ac 941d0000
+lp_card_track_base_off_080a15a0:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 080a15a0 a81d0000  LP_CARD_TRACK_BASE_OFF: gP1LifePoints scratch hword base reused by reroll animation.
+oam_dice_reroll_sprite_p2_5c_080a15a4:
+    .word  OAM_DICE_REROLL_SPRITE_P2_5C   @ 080a15a4 5c800000  OAM_DICE_REROLL_SPRITE_P2_5C: P2-side dice-reroll sprite code; P1 uses inline 0x5c.
+gp1lp_ptr_080a15a8:
+    .word  gP1LifePoints                  @ 080a15a8 e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_phase_display_state_off_080a15ac:
+    .word  EQUIP_PHASE_DISPLAY_STATE_OFF  @ 080a15ac 941d0000  EQUIP_PHASE_DISPLAY_STATE_OFF: gP1LifePoints equip display phase state word.
 LAB_080a15b0:
-    ldr r5, DWORD_080a15f8                   @ 080a15b0 114d
+    ldr r5, dice_re_roll_cid_080a15f8        @ 080a15b0 114d
     adds r0,r6,#0x0    @ 080a15b2 301c
     movs r1,#0xb    @ 080a15b4 0b21
     adds r2,r5,#0x0    @ 080a15b6 2a1c
@@ -7238,7 +7393,7 @@ LAB_080a15b0:
     bl check_node_in_slot_chain              @ 080a15ca 8ef7f9fb
     cmp r0,#0x0                              @ 080a15ce 0028
     bne LAB_080a1650                         @ 080a15d0 3ed1
-    ldr r0, DWORD_080a15fc                   @ 080a15d2 0a48
+    ldr r0, duel_card_ctx_ref_080a15fc       @ 080a15d2 0a48
     lsls r1,r6,#0x2    @ 080a15d4 b100
     adds r0,#0x8    @ 080a15d6 0830
     adds r1,r1,r0    @ 080a15d8 0918
@@ -7249,7 +7404,7 @@ LAB_080a15b0:
     lsls r0,r0,#0x5    @ 080a15e2 4001
     adds r2,r4,r0    @ 080a15e4 2218
     movs r1,#0x0    @ 080a15e6 0021
-    ldr r3, DWORD_080a1600                   @ 080a15e8 054b
+    ldr r3, lp_card_track_base_off_080a1600  @ 080a15e8 054b
     adds r0,r4,r3    @ 080a15ea e018
     ldrh r0,[r0,#0x0]                        @ 080a15ec 0088
     cmp r0,#0x2                              @ 080a15ee 0228
@@ -7258,19 +7413,19 @@ LAB_080a15b0:
 LAB_080a15f4:
     str r1,[r2,#0x0]                         @ 080a15f4 1160
     b LAB_080a160c                           @ 080a15f6 09e0
-DWORD_080a15f8:
-    .word  0x000016a5                     @ 080a15f8 a5160000
-DWORD_080a15fc:
-    .word  0x0201e2a0                     @ 080a15fc a0e20102
-DWORD_080a1600:
-    .word  0x00001da8                     @ 080a1600 a81d0000
+dice_re_roll_cid_080a15f8:
+    .word  DICE_RE_ROLL_CID               @ 080a15f8 a5160000  DICE_RE_ROLL_CID: Dice Re-Roll internal CID.
+duel_card_ctx_ref_080a15fc:
+    .word  gDuelCardCtxBase               @ 080a15fc a0e20102  gDuelCardCtxBase: duel card activation context base; add operand-0 DATA/USER_DEFINED reference.
+lp_card_track_base_off_080a1600:
+    .word  LP_CARD_TRACK_BASE_OFF         @ 080a1600 a81d0000  LP_CARD_TRACK_BASE_OFF: gP1LifePoints scratch hword base reused by reroll animation.
 LAB_080a1604:
     movs r0,#0x90    @ 080a1604 9020
     lsls r0,r0,#0x1    @ 080a1606 4000
     bl invoke_card_display_op_0x31_sub1      @ 080a1608 f1f7d4fe
 LAB_080a160c:
-    ldr r1, DWORD_080a161c                   @ 080a160c 0349
-    ldr r0, DWORD_080a1620                   @ 080a160e 0448
+    ldr r1, gp1lp_ptr_080a161c               @ 080a160c 0349
+    ldr r0, equip_phase_display_state_off_080a1620 @ 080a160e 0448
     adds r1,r1,r0    @ 080a1610 0918
 LAB_080a1612:
     ldr r0,[r1,#0x0]                         @ 080a1612 0868
@@ -7278,10 +7433,10 @@ LAB_080a1612:
     str r0,[r1,#0x0]                         @ 080a1616 0860
     movs r0,#0x0    @ 080a1618 0020
     b LAB_080a1652                           @ 080a161a 1ae0
-DWORD_080a161c:
-    .word  gP1LifePoints                  @ 080a161c e0c40102
-DWORD_080a1620:
-    .word  0x00001d94                     @ 080a1620 941d0000
+gp1lp_ptr_080a161c:
+    .word  gP1LifePoints                  @ 080a161c e0c40102  gP1LifePoints base; preserve existing operand-0 DATA/USER_DEFINED reference.
+equip_phase_display_state_off_080a1620:
+    .word  EQUIP_PHASE_DISPLAY_STATE_OFF  @ 080a1620 941d0000  EQUIP_PHASE_DISPLAY_STATE_OFF: gP1LifePoints equip display phase state word.
 LAB_080a1624:
     movs r1,#0xea    @ 080a1624 ea21
     lsls r1,r1,#0x5    @ 080a1626 4901
@@ -7289,7 +7444,7 @@ LAB_080a1624:
     ldr r0,[r0,#0x0]                         @ 080a162a 0068
     cmp r0,#0x0                              @ 080a162c 0028
     beq LAB_080a1650                         @ 080a162e 0fd0
-    ldr r4, DWORD_080a164c                   @ 080a1630 064c
+    ldr r4, dice_re_roll_cid_080a164c        @ 080a1630 064c
     adds r0,r6,#0x0    @ 080a1632 301c
     adds r1,r4,#0x0    @ 080a1634 211c
     bl enqueue_equip_zone_sprite_by_side     @ 080a1636 a7f755f8
@@ -7301,8 +7456,8 @@ LAB_080a1624:
     movs r0,#0x0    @ 080a1646 0020
     str r0,[r5,#0x0]                         @ 080a1648 2860
     b LAB_080a1652                           @ 080a164a 02e0
-DWORD_080a164c:
-    .word  0x000016a5                     @ 080a164c a5160000
+dice_re_roll_cid_080a164c:
+    .word  DICE_RE_ROLL_CID               @ 080a164c a5160000  DICE_RE_ROLL_CID: Dice Re-Roll internal CID.
 LAB_080a1650:
     movs r0,#0x1    @ 080a1650 0120
 LAB_080a1652:

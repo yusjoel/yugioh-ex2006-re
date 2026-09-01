@@ -566,3 +566,77 @@
 .equ EQUIP_CHAIN_CANCEL_OFF,     0x00001d30  @ [gP1LifePoints+player*0x868+0x1d30] equip chain cancel/deactivation trigger field; enqueue_frozen_soul_zone_sprite_or_default writes 1 to [+0x1d30] on frozen_soul found path; adjacent to EQUIP_CHAIN_STEP_OFF(0x1d28)+8; 14 ROM refs; C5 grep=0; conf: high
 .equ EQUIP_ACTIVATION_HANDLER_TABLE, 0x09e47560  @ ROM equip activation handler dispatch table base; 18 entries x 0x10B stride; fields [+0x0]=card_type, [+0x4]=param, [+0x8]=fn_activate+1(THUMB), [+0xc]=fn_id_lookup+1(THUMB); scan_card_type_effect_handler_table + get_equip_handler_card_type/param; 5 ROM refs; C5 grep=0; conf: high
 .equ APPLY_EQUIP_ACT_ID_LOOKUP_TYPE_A_THUMB, 0x08097025  @ THUMB+1 fn-ptr to apply_equip_activation_with_id_lookup_type_a (fn@0x08097024 push{lr} confirmed); check_equip_handler_uses_fixed_activation: table[r0*0x10+0xc] compared vs this; eors/rsbs/orrs/lsrs#0x1f pattern = equals-0 test; returns 0 if handler==this (uses id_lookup), 1 otherwise (uses fixed/non-id-lookup); 6 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-6 additions: activation display phases and card predicates
+@ Source: doc/dev/refine/F12-Seg-6.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_CHAIN_STEP_FROM_FIELD_OFF, 0x00001cf8  @ gDuelFieldSlots+0x1cf8 = gP1LifePoints+EQUIP_CHAIN_STEP_OFF; equip display step word.
+.equ EQUIP_CHAIN_ACTIVE_FROM_FIELD_OFF, 0x00001cfc  @ gDuelFieldSlots+0x1cfc = gP1LifePoints+EQUIP_CHAIN_ACTIVE_OFF; equip activation phase word.
+.equ EQUIP_ACTIVATION_PACKED_TYPE18, 0x24200000  @ Packed activation: type 18 in bits 30:25 plus bit21; record +2 bits 11:6 = 18, +3 bits 5:4 = 1.
+.equ EQUIP_ACTIVATION_PACKED_TYPE20, 0x28200000  @ Packed activation: type 20 in bits 30:25 plus bit21; record +2 bits 11:6 = 20, +3 bits 5:4 = 1.
+.equ CHECK_CARD_ID_IS_NORMAL_SUMMON_TYPE_THUMB, 0x0804b165  @ check_card_id_is_normal_summon_type+1; THUMB predicate for count_monster_slots_by_fnptr.
+
+@ =============================================================================
+@ file 12 Seg-7 additions: equip field, slot, and spell display phases
+@ Source: doc/dev/refine/F12-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_PAYLOAD_LOW9_MASK, 0x000001ff  @ Low 9-bit entity field of packed equip activation extra_payload; read context[+0xc] before packing.
+.equ EQUIP_PAYLOAD_CLEAR_LOW9_MASK, 0xfffffe00  @ Clear low 9 bits of packed equip activation extra_payload before inserting context[+0xc] low bits.
+.equ EQUIP_ACTIVATION_PACKED_TYPE21, 0x2a200000  @ Packed activation: type 21 in bits 30:25 plus bit21; record +2 bits 11:6 = 21, +3 bits 5:4 = 1.
+
+@ =============================================================================
+@ file 12 Seg-8 additions: paired equip eligibility display
+@ Source: doc/dev/refine/F12-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_PACKED_TYPE22, 0x2c200000  @ Packed activation: type 22 in bits 30:25 plus bit21; record +2 bits 11:6 = 22, +3 bits 5:4 = 1.
+
+@ =============================================================================
+@ file 12 Seg-9 additions: equip display state and phase dispatch
+@ Source: doc/dev/refine/F12-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ TRIGGER_OP_PARAM_133, 0x00000133  @ Second argument to trigger_card_display_op31_if_not_active; forwarded as dispatch op31 parameter.
+.equ EQUIP_PHASE_DISPLAY_STATE_OFF, 0x00001d94  @ Byte offset from gP1LifePoints to the outer equip display state word; distinct from step and active phase.
+
+@ =============================================================================
+@ file 12 Seg-10 additions: equip activation scans and candidate tables
+@ Source: doc/dev/refine/F12-Seg-10.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_SCAN_CURSOR_OFF, 0x00001d24  @ Byte offset from gP1LifePoints to the shared u32 activation scan cursor.
+.equ EQUIP_ACTIVATION_CID_U16_MASK, 0x0000ffff  @ Keep the input CID low16 before OR into packed activation attributes; not an empty-slot sentinel.
+.equ DD_SCOUT_PLANE_SLOT_MATCH_MASK, 0x00301fff  @ Keep slot CID bits12:0 and flags21:20 for equality with DD_SCOUT_PLANE_CID.
+.equ EQUIP_SCAN_CID_TABLE_NEG_BASE, 0xffffe82e  @ u32 negative CID base -0x17d2; add to CID before the nine-entry switch bounds check.
+
+@ F13-Seg-1: reviewed literal values and RAM timer address.
+@ Display op0x31 parameter, forwarded from r1 by trigger_card_display_op31_if_not_active.
+.equ CARD_DISPLAY_OP31_PARAM_0135, 0x00000135
+
+@ =============================================================================
+@ file 13 Seg-2 additions: equip activation subphase dispatcher and card-array scans
+@ Source: doc/dev/refine/F13-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_SAVED_PHASE_OFF, 0x00001cf8  @ Byte offset from gP1LifePoints to saved activation phase; copied from LP+0x1cf4.
+.equ EQUIP_ACTIVATION_SUBPHASE_OFF, 0x00001d34  @ Byte offset from gP1LifePoints to the u32 activation subphase counter.
+.equ CARD_WORD_CID_AND_BIT21_MASK, 0x00201fff  @ Keep card-word CID bits 0..12 and exclusion bit 21 for exact CID comparisons.
+.equ EQUIP_ACTIVATION_CARD_ARRAY_ATTR_PREFIX, 0x044e0000  @ Packed activation prefix: bits 16..20=14 and bits 21..26=34; player and CID supplied separately.
+.equ DIMENSIONHOLE_PACKED_ACTIVATION_ATTR, 0x0450140c  @ Packed activation word 0x0450140c: Dimensionhole CID 0x140c, upper half 0x0450; player bit supplied separately.
+.equ LAST_TURN_SETUP_EXTRA_WORD, 0x151e0000  @ Setup extra word: low16=0, high16=Last Turn CID; callee stores halves at context+4 and +6.
+.equ EQUIP_CHAIN_PAIR_MISSING, 0x0000ffff  @ Missing player/slot pair returned as 0xffff by find_equip_chain_pair_across_field.
+
+@ =============================================================================
+@ file 13 Seg-3 additions: equip activation display phase and callback tables
+@ Source: doc/dev/refine/F13-Seg-3.proposal.md (review PASS)
+@ =============================================================================
+.equ CHECK_SLOT_EQUIPPABLE_FOR_ACTIVE_PLAYER_THUMB_PTR, 0x0809f945  @ THUMB callback value check_slot_equippable_for_active_player+1.
+.equ CHECK_SLOT_EFFECT_VALID_FOR_ACTIVE_PLAYER_THUMB_PTR, 0x0809f98d  @ THUMB callback value check_slot_effect_valid_for_active_player+1.
+.equ EQUIP_PHASE_FRAME_ALLOC_NEG_0X298, 0xfffffd68  @ Signed -0x298 used by add sp in run_equip_activation_display_phase_by_state_code.
+.equ FIELD_SPELL_TO_ZONE_COUNT_DELTA_NEG_0X100, 0xffffff00  @ Signed -0x100 converts gDuelFieldSpellZoneBase to the per-player zone-count base.
+
+@ =============================================================================
+@ file 13 Seg-4 additions: equip reroll display fields and prompt
+@ Source: doc/dev/refine/F13-Seg-4.proposal.md (review PASS)
+@ =============================================================================
+.equ GAME_STR_PERFORM_COIN_TOSS_AGAIN_ID, 0x0000011f  @ Game string 287: Perform coin toss again?.
+.equ EQUIP_CONTEXT_PLAYER_OFF, 0x00001d8c  @ gP1LifePoints-relative equip context player field.
+.equ EQUIP_REROLL_SPRITE_PARAM_OFF, 0x00001d98  @ gP1LifePoints-relative coin/dice sprite parameter hword.
+.equ EQUIP_REROLL_COUNT_TARGET_OFF, 0x00001d9a  @ gP1LifePoints-relative packed reroll count/target hword.

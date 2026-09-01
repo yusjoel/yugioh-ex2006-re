@@ -1368,7 +1368,134 @@ puzzle_token_str_union:
 puzzle_token_str_captured:
 	.ascii "CAPTURED"                   @ 8B NO NUL (NUL at 0x09e4755c is in after-incbin)
 
-	.incbin "roms/2343.gba", 0x1E4755C, 0x27B0  @ after string table [0x1e4755c..0x1e49d0c]
+.incbin "roms/2343.gba", 0x1e4755c, 0x154
+equip_activation_phase11_callbacks:
+    .word scan_monster_zone_for_equip_activation_spiritual_energy_settle_machine + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_mirage_knight + 1
+    .word scan_equip_zone_for_interdimensional_matter_transporter + 1
+    .word scan_equip_zone_for_strike_ninja_activation + 1
+    .word scan_zone_f_for_equip_activation_dd_scout_plane + 1
+    .word scan_equip_slot_for_dd_survivor_activation + 1
+    .word scan_monster_zone_slots_for_equip_activation_by_cid_table + 1
+    .word scan_equip_zone_for_super_rejuvenation_activation + 1
+    .word scan_spell_trap_zone_for_two_man_cell_battle_equip + 1
+    .word scan_monster_zone_slots_for_equip_activation_solar_flare_dragon + 1
+    .word scan_monster_zone_slots_for_equip_activation_satellite_cannon + 1
+    .word scan_spell_trap_zone_slots_for_equip_activation_ectoplasmer + 1
+    .word scan_monster_zone_slots_for_equip_activation_berserk_dragon + 1
+    .word scan_monster_zone_slots_for_equip_activation_reserved_icid_d + 1
+    .word scan_equip_zone_for_return_of_the_doomed_activation + 1
+    .word scan_equip_activation_candidates_with_name_display + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_insect_queen + 1
+    .word scan_equip_zone_for_infinite_dismissal_activation + 1
+    .word scan_equip_zone_chain_for_sprite_and_bitmap_update + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_dd_guide + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_karate_man + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_wild_natures_release + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_limiter_removal + 1
+    .word scan_spell_trap_zone_for_equip_activation_bottomless_shifting_sand + 1
+    .word scan_spell_trap_zone_for_equip_activation_destiny_board + 1
+    .word scan_spell_trap_zone_for_equip_activation_first_sarcophagus + 1
+    .word scan_monster_zone_for_equip_activation_garuda_opponent + 1
+    .word scan_equip_zone_for_fox_fire_activation + 1
+    .word scan_spell_trap_zone_slots_for_equip_activation_human_wave_tactics + 1
+    .word scan_spell_trap_zone_slots_for_equip_activation_boss_rush + 1
+    .word scan_equip_zone_for_helios_duo_megiste_activation + 1
+    .word scan_equip_zone_for_helios_tris_megiste_activation + 1
+    .word scan_monster_zone_slots_for_equip_activation_little_winguard + 1
+    .word scan_spell_trap_zone_slots_for_equip_activation_labyrinth_of_nightmare + 1
+equip_activation_phase12_callbacks:
+    .word scan_spell_trap_zone_slots_for_equip_activation_greed + 1
+    .word scan_equip_chain_for_power_bond_sprite_and_lp_indicator + 1
+    .word scan_monster_zone_slots_for_equip_activation_cyber_archfiend + 1
+    .word scan_field_slots_for_equip_bitmap_update_by_card_range + 1
+    .word scan_monster_zone_for_equip_activation_spiritual_energy_settle_machine + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_crush_d_gandra + 1
+    .word scan_monster_zone_for_equip_sprite_and_bitmap_wicked_worm_beast + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_magical_scientist + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_gaia_soul + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_limiter_removal + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_summoner_of_illusions + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_archfiends_roar + 1
+    .word scan_all_zone_slots_for_equip_chain_sprite_rescue_cat + 1
+    .word scan_all_zone_slots_for_return_from_different_dimension_equip + 1
+    .word scan_equip_chain_and_slots_for_graverobber_sprite + 1
+    .word scan_equip_zone_for_super_rejuvenation_activation + 1
+    .word scan_equip_slot_for_twin_headed_behemoth_activation + 1
+    .word scan_equip_zone_for_dark_necrofear_activation + 1
+    .word scan_equip_zone_for_interdimensional_matter_transporter + 1
+    .word scan_equip_zone_for_strike_ninja_activation + 1
+    .word scan_zone_f_for_equip_activation_dd_scout_plane + 1
+    .word scan_equip_slot_for_dd_survivor_activation + 1
+    .word scan_equip_zone_for_manticore_of_darkness_activation + 1
+    .word scan_equip_zone_for_infinite_cards_lp_display_update + 1
+    .word scan_equip_zone_for_last_turn_sprite + 1
+equip_activation_phase20_callbacks:
+    .word scan_equip_chain_list_for_sprite_crush_card + 1
+    .word scan_equip_chain_list_for_sprite_deck_devastation_virus + 1
+    .word scan_equip_chain_list_for_sprite_pikeru_second_sight + 1
+    .word scan_equip_zone_for_final_countdown_sprite + 1
+equip_activation_phase3_callbacks:
+    .word scan_equip_zone_for_dimensionhole + 1
+    .word scan_monster_zone_slots_for_equip_activation_reserved_icid_g + 1
+    .word scan_monster_zone_for_equip_activation_spirit_of_the_breeze + 1
+    .word scan_monster_zone_for_equip_activation_dancing_fairy + 1
+    .word scan_monster_zone_for_equip_activation_cure_mermaid + 1
+    .word scan_player_card_array_for_equip_activation_marie_the_fallen_one + 1
+    .word scan_trap_zone_for_equip_activation_life_absorbing_machine + 1
+    .word scan_monster_zone_for_equip_activation_white_magician_pikeru + 1
+    .word scan_monster_zone_for_equip_activation_princess_pikeru + 1
+    .word scan_monster_zone_for_equip_activation_bowganian + 1
+    .word scan_all_zone_slots_for_equip_lp_indicator_graverobbers_retribution + 1
+    .word scan_trap_zone_for_equip_activation_mask_of_dispel + 1
+    .word scan_trap_zone_for_equip_activation_mask_of_accursed + 1
+    .word scan_trap_zone_for_equip_activation_nightmare_wheel + 1
+    .word scan_trap_zone_for_equip_activation_ominous_fortunetelling + 1
+    .word scan_monster_zone_for_equip_activation_ebon_magician_curran + 1
+    .word scan_monster_zone_for_equip_activation_princess_curran + 1
+    .word scan_monster_zone_for_equip_activation_reserved_icid_b + 1
+    .word scan_monster_zone_for_equip_activation_a_man_with_wdjat + 1
+    .word scan_monster_zone_for_equip_activation_reserved_icid_c + 1
+    .word scan_trap_zone_for_equip_activation_blind_destruction + 1
+    .word scan_trap_zone_for_equip_activation_needle_wall + 1
+    .word scan_trap_zone_for_equip_activation_dangerous_machine_type6 + 1
+    .word scan_monster_zone_slots_for_equip_activation_mucus_yolk + 1
+    .word scan_monster_zone_for_equip_activation_legendary_fiend + 1
+    .word scan_monster_zone_for_equip_activation_exodia_necross + 1
+    .word scan_all_spell_trap_zone_slots_for_equip_activation_mirage_of_nightmare + 1
+    .word scan_monster_zone_for_equip_activation_agent_of_wisdom_mercury + 1
+    .word scan_monster_zone_for_equip_activation_amazoness_blowpiper + 1
+    .word scan_field_slots_for_lv_monster_equip_activation + 1
+    .word scan_monster_zone_for_equip_activation_reserved_icid_a + 1
+    .word scan_monster_zone_for_equip_activation_reserved_icid_f + 1
+    .word scan_all_zone_slots_for_lp_indicator_burning_land + 1
+    .word scan_monster_zone_for_equip_activation_lava_golem + 1
+    .word scan_trap_slots_for_kiseitai_equip_chain_sprite + 1
+    .word scan_trap_zone_for_equip_activation_blast_sphere + 1
+    .word scan_trap_zone_for_equip_activation_adhesive_explosive + 1
+    .word scan_trap_zone_for_equip_activation_minor_goblin_official + 1
+    .word scan_monster_zone_for_equip_activation_malice_ascendant + 1
+    .word scan_trap_zone_for_equip_activation_snatch_steal + 1
+    .word scan_trap_zone_for_equip_activation_brain_jacker + 1
+    .word scan_trap_zone_for_equip_activation_the_eye_of_truth + 1
+    .word scan_trap_zone_for_equip_activation_falling_down + 1
+    .word scan_equip_zone_for_equip_activation_vampire_lord + 1
+    .word scan_equip_zone_for_equip_activation_sacred_phoenix + 1
+    .word scan_equip_zone_for_equip_activation_revival_jam + 1
+    .word scan_equip_zone_for_entity_sprite_activation_curse_of_vampire + 1
+    .word scan_equip_zone_for_entity_sprite_activation_curse_of_vampire_opponent + 1
+    .word scan_trap_zone_for_equip_activation_jam_breeding_machine + 1
+    .word scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend + 1
+    .word scan_spell_trap_zone_for_equip_activation_reserved_icid_e + 1
+    .word scan_spell_trap_zone_for_equip_activation_recycle + 1
+    .word scan_monster_zone_for_equip_activation_aqua_spirit_opponent + 1
+    .word scan_trap_zone_for_equip_activation_senri_eye + 1
+equip_activation_phase1_callbacks:
+    .word scan_trap_zone_for_equip_bitmap_update_bottomless_shifting_sand + 1
+    .word scan_equip_zone_for_special_summon_activation_return_zombie + 1
+    .word scan_player_card_array_for_equip_activation_sinister_serpent + 1
+    .word scan_player_card_array_for_equip_activation_treeborn_frog + 1
+	.incbin "roms/2343.gba", 0x1e47894, 0x2478
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

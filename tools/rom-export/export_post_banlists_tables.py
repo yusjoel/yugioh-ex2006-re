@@ -93,7 +93,12 @@ def generate_asm():
     L.append('@ caller: base @ 0x080EF474, rec[0].field_a @ 0x0801D8A0, rec[0].field_b @ 0x0801D8FC')
     L.append('@ -----------------------------------------------------------------------------')
     L.append('level_signature_table:')
-    L.append('    .incbin "roms/2343.gba", 0x%X, 0x%X' % (LEVEL_SIG_OFFSET, LEVEL_SIG_SIZE))
+    # 保留渲染代码已引用的记录内字段标签，避免全量重导后链接失败。
+    L.append('    .incbin "roms/2343.gba", 0x%X, 0x2   @ rec[0].so_code field (u16, 2B)' % LEVEL_SIG_OFFSET)
+    L.append('level_signature_table_field_a:                 @ 0x09E5F71E: rec[0].field_a base (char[8], stride=20B per rec)')
+    L.append('    .incbin "roms/2343.gba", 0x%X, 0x8   @ rec[0].field_a (8B)' % (LEVEL_SIG_OFFSET + 2))
+    L.append('level_signature_table_field_b:                 @ 0x09E5F726: rec[0].field_b base (char[8], stride=20B per rec)')
+    L.append('    .incbin "roms/2343.gba", 0x%X, 0x%x @ remainder: 0x118 - 0x2 - 0x8 = 0x10e (field_b + rest of table)' % (LEVEL_SIG_OFFSET + 10, LEVEL_SIG_SIZE - 10))
     L.append('')
 
     # ---- font_jp_dim_table ----

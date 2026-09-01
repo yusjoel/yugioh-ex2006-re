@@ -230,3 +230,44 @@
 @ C5 grep 0x00008015: 0 exact .equ hits before adding
 @ =============================================================================
 .equ OAM_EQUIP_SPRITE_P2_15,  0x00008015  @ equip activation sprite OAM attr0 P2 (bit15+0x15); dispatch_equip_activation_state_by_substate caseD_0 P2 path: enqueue_sprite_attr_record(0x8015,0,0,0); P1 uses inline 0x15; bit15=P2 flag; sibling of OAM_SPRITE_CODE_P1_ACTIVATION(0x8019); 1 pool slot in Seg-5; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-7 additions: equip field, slot, and spell display phases
+@ Source: doc/dev/refine/F12-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ OAM_EQUIP_SPRITE_P2_16, 0x00008016  @ Equip display sprite code for nonzero player side; side zero uses 0x16; enqueue_sprite_attr_record argument 0.
+.equ OAM_EQUIP_SPRITE_P2_17, 0x00008017  @ Equip display sprite code for nonzero player side; side zero uses 0x17; enqueue_sprite_attr_record argument 0.
+.equ OAM_EQUIP_SPRITE_P2_21, 0x00008021  @ Equip display sprite code for nonzero player side; side zero uses 0x21; enqueue_sprite_attr_record argument 0.
+.equ OAM_EQUIP_SPRITE_P2_46, 0x00008046  @ Equip display sprite code for nonzero player side; side zero uses 0x46; enqueue_sprite_attr_record argument 0.
+.equ OAM_EQUIP_SPRITE_P2_60, 0x00008060  @ Equip display sprite code for nonzero player side; side zero uses 0x60; enqueue_sprite_attr_record argument 0.
+
+@ =============================================================================
+@ file 12 Seg-9 additions: equip display state and phase dispatch
+@ Source: doc/dev/refine/F12-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ SPRITE_ATTR_DUEL_PHASE_P2_0C, 0x0000800c  @ Sprite record code 0x0c with side bit15 for nonzero player; enqueue_sprite_attr_record arg0.
+
+@ F13-Seg-1: reviewed literal values and RAM timer address.
+@ Nonzero-player sprite selector; the zero-player branch uses2. Argument0 of enqueue_sprite_attr_record.
+.equ OAM_EQUIP_SPRITE_P2_02, 0x00008002
+@ Nonzero-player sprite selector; the zero-player branch uses0xe. Argument0 of enqueue_sprite_attr_record.
+.equ OAM_EQUIP_SPRITE_P2_0E, 0x0000800e
+@ Nonzero-player sprite selector; the zero-player branch uses0x10. Argument0 of enqueue_sprite_attr_record.
+.equ OAM_EQUIP_SPRITE_P2_10, 0x00008010
+@ Nonzero-player sprite selector; the zero-player branch uses0x11. Argument0 of enqueue_sprite_attr_record.
+.equ OAM_EQUIP_SPRITE_P2_11, 0x00008011
+
+@ =============================================================================
+@ file 13 Seg-3 additions: equip activation display phase and callback tables
+@ Source: doc/dev/refine/F13-Seg-3.proposal.md (review PASS)
+@ =============================================================================
+.equ OAM_EQUIP_SPRITE_P2_03, 0x00008003  @ Equip display sprite code 3 with player-side bit15 set.
+.equ OAM_EQUIP_SPRITE_P2_04, 0x00008004  @ Equip display sprite code 4 with player-side bit15 set.
+.equ OAM_EQUIP_SPRITE_P2_0D, 0x0000800d  @ Equip display sprite code 0x0d with player-side bit15 set.
+
+@ =============================================================================
+@ file 13 Seg-4 additions: equip reroll display P2 sprites
+@ Source: doc/dev/refine/F13-Seg-4.proposal.md (review PASS)
+@ =============================================================================
+.equ OAM_COIN_REROLL_SPRITE_P2_5B, 0x0000805b  @ P2-side coin-reroll sprite code; P1 uses inline 0x5b.
+.equ OAM_DICE_REROLL_SPRITE_P2_5C, 0x0000805c  @ P2-side dice-reroll sprite code; P1 uses inline 0x5c.

@@ -3788,3 +3788,10 @@
 .equ deck_horus_the_black_flame_d, 0x09E65806
 .equ deck_sacred_phoenix_of_n,     0x09E658C6
 .equ deck_raviel_lord_of_phantasms, 0x09E65986
+
+@ =============================================================================
+@ file 12 Seg-10 additions: equip activation scans and candidate tables
+@ Source: doc/dev/refine/F12-Seg-10.proposal.md (review PASS)
+@ =============================================================================
+.equ equip_chain_bitmap_cid_table, 0x09e47680  @ ROM u32[2] CID table for chain bitmap scan: Thousand Energy, Triangle Power.
+.equ equip_name_display_candidate_table, 0x09e47688  @ ROM five 8-byte records: u32 CID, u32 name-prompt flag; activation candidate scan.

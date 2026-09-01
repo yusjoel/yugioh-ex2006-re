@@ -622,3 +622,39 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ SPRITE_ATTR_BYTE_2FF_OFF,       0x000002ff  @ offset from gSpriteAttrBufData to gSpriteAttrBuf+0x301; caseD_1f: adds r4,r4,r0 r0=0x2ff ORs control bits; 198 ROM refs; C5 grep=0; conf: high
 @ gSpriteAttrBuf+2 global alias
 .equ gSpriteAttrBufData,             0x0201b872  @ gSpriteAttrBuf+2; halfword start of sprite attribute data fields (after 2-byte type header); consistently used as copy_bytes_by_halfword dst alongside gEquipZoneRankState/gEquipChainEntryBase; 8 ROM refs; C5 grep=0; conf: high
+
+@ =============================================================================
+@ file 12 Seg-6 additions: activation display phases and card predicates
+@ Source: doc/dev/refine/F12-Seg-6.proposal.md (review PASS)
+@ =============================================================================
+.equ SPRITE_ROW_PROCESSED_COUNT_OFF, 0x00000482  @ gDuelPhaseFlags+0x482: u16 processed sprite-row count; iterates records from +0x300.
+.equ gEquipSlotActivationSnapshot, 0x0201bc7c  @ gEquipChainSlotRefs+0xec: 0x44-byte cached slot activation snapshot written by fill_slot_activation_state_array.
+
+@ =============================================================================
+@ file 12 Seg-7 additions: equip field, slot, and spell display phases
+@ Source: doc/dev/refine/F12-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ gDuelEquipCtxSlotIndex, 0x0201bbc0  @ gDuelEquipCtx+4: slot-index word of the first equip context; corresponding player entries use stride 0x38.
+
+@ =============================================================================
+@ file 12 Seg-8 additions: paired equip eligibility display
+@ Source: doc/dev/refine/F12-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ gDuelEffectChainSlotsSecond, 0x0201bc68  @ Second 0x14-byte effect-context slot at gDuelEffectChainSlots+0x14; paired-slot fallback record, not a fixed player-side base.
+
+@ =============================================================================
+@ file 12 Seg-9 additions: equip display state and phase dispatch
+@ Source: doc/dev/refine/F12-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ gEquipChainActivePhase, 0x0201e20c  @ u32 active phase; gP1LifePoints+EQUIP_CHAIN_ACTIVE_OFF = gDuelFieldSlots+EQUIP_CHAIN_ACTIVE_FROM_FIELD_OFF.
+.equ equip_display_step_fn_table, 0x09e5aaec  @ ROM table base: 14 Thumb handler pointers and a null terminator; indexed by EQUIP_CHAIN_STEP_OFF word.
+
+@ F13-Seg-1: reviewed literal values and RAM timer address.
+@ Absolute u32 timer address, equal to gP1LifePoints+P1LP_TIMER_OFF; used for Final Countdown progress.
+.equ gP1LpTimer, 0x0201e1cc
+
+@ =============================================================================
+@ file 13 Seg-3 additions: equip activation display phase and callback tables
+@ Source: doc/dev/refine/F13-Seg-3.proposal.md (review PASS)
+@ =============================================================================
+.equ gEquipActivationScanCursor, 0x0201e204  @ Absolute u32 cursor address equal to gP1LifePoints+EQUIP_ACTIVATION_SCAN_CURSOR_OFF and gDuelFieldSlots+FIELD_STATE_OFF.
