@@ -15354,7 +15354,7 @@ invoke_r6:
     bx r6                                    @ 0810e5e0 3047
     .byte  0xc0, 0x46
 
-@ Single-instruction function pointer trampoline: executes bx r7 to jump to the target function held in r7. r7 is a non-APCS callee-save register set by callers in non-standard fashion. Called from 4 sites: (1) 0x08030048 / 0x0803009c (duel_field zone-slot chain traversal, r7=predicate fn ptr for node testing); (2) 0x08033214 (count_matching_monster_zone_slots, iterates 5 monster zone slots via r7 fn ptr); (3) 0x080a3c2c (check_banisher_of_light_activatable). ASM comment labels this function as "trampoline (bx r7)".
+@ Single-instruction function-pointer trampoline: executes bx r7 to jump to the target held in r7. r7 is a non-APCS callee-save register set by callers. Called from duel-field zone-slot chain traversal at 0x08030048/0x0803009c, count_matching_monster_zone_slots at 0x08033214, and check_banisher_sensitive_summon_allowed at 0x080a3c2c. Confidence: high.
 invoke_r7:
     bx r7                                    @ 0810e5e4 3847
     .byte  0xc0, 0x46

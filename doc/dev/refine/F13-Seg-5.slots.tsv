@@ -1,0 +1,250 @@
+address	old_name	original_value	action	target_symbol	slot_label	reuse_status	evidence	eol_ascii
+0x080a0b5c	new_pool	0xfffffcf0	EQ	EQUIP_CARD_MESSAGE_FRAME_NEG	equip_card_message_frame_neg_080a0b5c	NEW	ROM LDR @080a0b2a->080a0b5c	EQUIP_CARD_MESSAGE_FRAME_NEG: named literal value.
+0x080a0b60	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a0b60	REUSE	ROM LDR @080a0b34->080a0b60	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a0b64	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a0b64	REUSE	ROM LDR @080a0b36->080a0b64	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a0b68	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0b68	REUSE	ROM LDR @080a0b50->080a0b68	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0b9c	new_pool	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a0b9c	REUSE	ROM LDR @080a0b6c->080a0b9c	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a0ba0	new_pool	0x00001488	EQ	GILASAURUS_CID	gilasaurus_cid_080a0ba0	REUSE	ROM LDR @080a0b7c->080a0ba0	GILASAURUS_CID: named literal value.
+0x080a0ba4	new_pool	0x000012fd	EQ	SOLEMN_JUDGMENT_CID	solemn_judgment_cid_080a0ba4	REUSE	ROM LDR @080a0b86->080a0ba4	SOLEMN_JUDGMENT_CID: named literal value.
+0x080a0bbc	new_pool	0x0000140d	EQ	MAGIC_DRAIN_CID	magic_drain_cid_080a0bbc	REUSE	ROM LDR @080a0bb2->080a0bbc	MAGIC_DRAIN_CID: named literal value.
+0x080a0bd8	new_pool	0x000015dd	EQ	DIMENSION_JAR_CID	dimension_jar_cid_080a0bd8	REUSE	ROM LDR @080a0bc0->080a0bd8	DIMENSION_JAR_CID: named literal value.
+0x080a0bf0	new_pool	0x0000167a	EQ	FRIENDSHIP_CID	friendship_cid_080a0bf0	REUSE	ROM LDR @080a0bdc->080a0bf0	FRIENDSHIP_CID: named literal value.
+0x080a0bf4	new_pool	0x00001932	EQ	TRIAGE_CID	triage_cid_080a0bf4	REUSE	ROM LDR @080a0be4->080a0bf4	TRIAGE_CID: named literal value.
+0x080a0c04	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a0c04	REUSE	ROM LDR @080a0bf8->080a0c04	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a0c08	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0c08	REUSE	ROM LDR @080a0bfa->080a0c08	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0c18	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0c18	REUSE	ROM LDR @080a0c12->080a0c18	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0c3c	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a0c3c	REUSE	ROM LDR @080a0c20->080a0c3c	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a0c40	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0c40	REUSE	ROM LDR @080a0c32->080a0c40	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0c98	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a0c98	REUSE	ROM LDR @080a0c50->080a0c98	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a0c9c	new_pool	0x0201c600	REF	gP1FieldArrayCBase	ptr_g_p1_field_array_c_base_080a0c9c	REUSE	ROM LDR @080a0c7e->080a0c9c	gP1FieldArrayCBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a0d0c	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a0d0c	REUSE	ROM LDR @080a0cc6,@080a0cda->080a0d0c	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a0d10	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a0d10	REUSE	ROM LDR @080a0cde,@080a0d00->080a0d10	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a0d14	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0d14	REUSE	ROM LDR @080a0d02->080a0d14	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0d40	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a0d40	REUSE	ROM LDR @080a0d1e->080a0d40	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a0d44	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0d44	REUSE	ROM LDR @080a0d38->080a0d44	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0d78	new_pool	0x00001ce8	EQ	P1LP_BLOCK2_OFF_1CE8	p1lp_block2_off_1ce8_080a0d78	REUSE	ROM LDR @080a0d4e->080a0d78	P1LP_BLOCK2_OFF_1CE8: named literal value.
+0x080a0d7c	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0d7c	REUSE	ROM LDR @080a0d6e->080a0d7c	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0da8	new_pool	0x00001ce8	EQ	P1LP_BLOCK2_OFF_1CE8	p1lp_block2_off_1ce8_080a0da8	REUSE	ROM LDR @080a0d84->080a0da8	P1LP_BLOCK2_OFF_1CE8: named literal value.
+0x080a0dac	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a0dac	REUSE	ROM LDR @080a0d90->080a0dac	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a0db0	new_pool	0x00000bb7	EQ	ATK_THRESHOLD_2999	atk_threshold_2999_080a0db0	REUSE	ROM LDR @080a0d98->080a0db0	ATK_THRESHOLD_2999: named literal value.
+0x080a0db4	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0db4	REUSE	ROM LDR @080a0da0->080a0db4	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0dc8	new_pool	0x00001ce8	EQ	P1LP_BLOCK2_OFF_1CE8	p1lp_block2_off_1ce8_080a0dc8	REUSE	ROM LDR @080a0db8->080a0dc8	P1LP_BLOCK2_OFF_1CE8: named literal value.
+0x080a0dd8	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a0dd8	REUSE	ROM LDR @080a0dcc->080a0dd8	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a0ddc	new_pool	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a0ddc	REUSE	ROM LDR @080a0dce->080a0ddc	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a0e2c	new_pool	0x000015dd	EQ	DIMENSION_JAR_CID	dimension_jar_cid_080a0e2c	REUSE	ROM LDR @080a0de6->080a0e2c	DIMENSION_JAR_CID: named literal value.
+0x080a0e30	new_pool	0x00001488	EQ	GILASAURUS_CID	gilasaurus_cid_080a0e30	REUSE	ROM LDR @080a0df4->080a0e30	GILASAURUS_CID: named literal value.
+0x080a0e34	new_pool	0x000012fd	EQ	SOLEMN_JUDGMENT_CID	solemn_judgment_cid_080a0e34	REUSE	ROM LDR @080a0e00->080a0e34	SOLEMN_JUDGMENT_CID: named literal value.
+0x080a0e38	new_pool	0x000010f8	EQ	MOOYAN_CURRY_CID	mooyan_curry_cid_080a0e38	REUSE	ROM LDR @080a0e0c->080a0e38	MOOYAN_CURRY_CID: named literal value.
+0x080a0e4c	new_pool	0x000012c6	EQ	cid_12c6	cid_12c6_080a0e4c	REUSE	ROM LDR @080a0e3c->080a0e4c	cid_12c6: named literal value.
+0x080a0e5c	new_pool	0x000012f3	EQ	ULTIMATE_OFFERING_CID	ultimate_offering_cid_080a0e5c	REUSE	ROM LDR @080a0e50->080a0e5c	ULTIMATE_OFFERING_CID: named literal value.
+0x080a0e7c	new_pool	0x00001368	EQ	SPELL_ZONE_TARGET_CARD_ID	spell_zone_target_card_id_080a0e7c	REUSE	ROM LDR @080a0e60->080a0e7c	SPELL_ZONE_TARGET_CARD_ID: named literal value.
+0x080a0e8c	new_pool	0x0000135b	EQ	cid_135b	cid_135b_080a0e8c	REUSE	ROM LDR @080a0e80->080a0e8c	cid_135b: named literal value.
+0x080a0ea0	new_pool	0x0000139c	EQ	PATRICIAN_OF_DARKNESS_CID	patrician_of_darkness_cid_080a0ea0	REUSE	ROM LDR @080a0e90->080a0ea0	PATRICIAN_OF_DARKNESS_CID: named literal value.
+0x080a0eb0	new_pool	0x0000140d	EQ	MAGIC_DRAIN_CID	magic_drain_cid_080a0eb0	REUSE	ROM LDR @080a0ea4->080a0eb0	MAGIC_DRAIN_CID: named literal value.
+0x080a0edc	new_pool	0x00001544	EQ	DARK_COFFIN_CID	dark_coffin_cid_080a0edc	REUSE	ROM LDR @080a0eb4->080a0edc	DARK_COFFIN_CID: named literal value.
+0x080a0ee4	new_pool	0x00001519	EQ	OMINOUS_FORTUNETELLING_CID	ominous_fortunetelling_cid_080a0ee4	REUSE	ROM LDR @080a0ee0->080a0ee4	OMINOUS_FORTUNETELLING_CID: named literal value.
+0x080a0ef8	new_pool	0x0000153d	EQ	PYRAMID_ENERGY_CID	pyramid_energy_cid_080a0ef8	REUSE	ROM LDR @080a0ee8->080a0ef8	PYRAMID_ENERGY_CID: named literal value.
+0x080a0f08	new_pool	0x0000153f	EQ	ORDEAL_OF_A_TRAVELER_CID	ordeal_of_a_traveler_cid_080a0f08	REUSE	ROM LDR @080a0efc->080a0f08	ORDEAL_OF_A_TRAVELER_CID: named literal value.
+0x080a0f28	new_pool	0x00001593	EQ	AN_OWL_OF_LUCK_CID	an_owl_of_luck_cid_080a0f28	REUSE	ROM LDR @080a0f0c->080a0f28	AN_OWL_OF_LUCK_CID: named literal value.
+0x080a0f30	new_pool	0x00001590	EQ	A_CAT_OF_ILL_OMEN_CID	a_cat_of_ill_omen_cid_080a0f30	REUSE	ROM LDR @080a0f2c->080a0f30	A_CAT_OF_ILL_OMEN_CID: named literal value.
+0x080a0f44	new_pool	0x000015a5	EQ	REVERSAL_QUIZ_CID	reversal_quiz_cid_080a0f44	REUSE	ROM LDR @080a0f34->080a0f44	REVERSAL_QUIZ_CID: named literal value.
+0x080a0f4c	new_pool	0x000015d3	EQ	SECOND_GOBLIN_CID	second_goblin_cid_080a0f4c	REUSE	ROM LDR @080a0f48->080a0f4c	SECOND_GOBLIN_CID: named literal value.
+0x080a0f80	new_pool	0x00001717	EQ	JADE_INSECT_WHISTLE_CID	jade_insect_whistle_cid_080a0f80	REUSE	ROM LDR @080a0f50->080a0f80	JADE_INSECT_WHISTLE_CID: named literal value.
+0x080a0f9c	new_pool	0x000015f7	EQ	FORMATION_UNION_CID	formation_union_cid_080a0f9c	REUSE	ROM LDR @080a0f84->080a0f9c	FORMATION_UNION_CID: named literal value.
+0x080a0fa4	new_pool	0x0000161e	EQ	CLIFF_THE_TRAP_REMOVER_CID	cliff_the_trap_remover_cid_080a0fa4	REUSE	ROM LDR @080a0fa0->080a0fa4	CLIFF_THE_TRAP_REMOVER_CID: named literal value.
+0x080a0fc8	new_pool	0x00001686	EQ	DARK_SCORPION_MEANAE_CID	dark_scorpion_meanae_cid_080a0fc8	REUSE	ROM LDR @080a0fa8->080a0fc8	DARK_SCORPION_MEANAE_CID: named literal value.
+0x080a0fdc	new_pool	0x000016d3	EQ	cid_16d3	cid_16d3_080a0fdc	REUSE	ROM LDR @080a0fcc->080a0fdc	cid_16d3: named literal value.
+0x080a0fec	new_pool	0x000016df	EQ	SPATIAL_COLLAPSE_CARD_ID	spatial_collapse_card_id_080a0fec	REUSE	ROM LDR @080a0fe0->080a0fec	SPATIAL_COLLAPSE_CARD_ID: named literal value.
+0x080a1020	new_pool	0x00001841	EQ	NECKLACE_OF_COMMAND_CID	necklace_of_command_cid_080a1020	REUSE	ROM LDR @080a0ff0->080a1020	NECKLACE_OF_COMMAND_CID: named literal value.
+0x080a1028	new_pool	0x00001746	EQ	VAMPIRE_LADY_CID	vampire_lady_cid_080a1028	REUSE	ROM LDR @080a1024->080a1028	VAMPIRE_LADY_CID: named literal value.
+0x080a103c	new_pool	0x000017c3	EQ	FAMILIAR_KNIGHT_CID	familiar_knight_cid_080a103c	REUSE	ROM LDR @080a102c->080a103c	FAMILIAR_KNIGHT_CID: named literal value.
+0x080a104c	new_pool	0x00001803	EQ	cid_1803	cid_1803_080a104c	REUSE	ROM LDR @080a1040->080a104c	cid_1803: named literal value.
+0x080a106c	new_pool	0x00001968	EQ	SILLVA_WARLORD_OF_DARK_WORLD_CID	sillva_warlord_of_dark_world_cid_080a106c	REUSE	ROM LDR @080a1050->080a106c	SILLVA_WARLORD_OF_DARK_WORLD_CID: named literal value.
+0x080a107c	new_pool	0x00001932	EQ	TRIAGE_CID	triage_cid_080a107c	REUSE	ROM LDR @080a1070->080a107c	TRIAGE_CID: named literal value.
+0x080a1098	new_pool	0x000019c2	EQ	DISCIPLE_FORBIDDEN_SPELL_CID	disciple_forbidden_spell_cid_080a1098	REUSE	ROM LDR @080a1080->080a1098	DISCIPLE_FORBIDDEN_SPELL_CID: named literal value.
+0x080a10a4	new_pool	0x000019d3	EQ	DIVINE_DRAGON_EXCELION_CID	divine_dragon_excelion_cid_080a10a4	REUSE	ROM LDR @080a109c->080a10a4	DIVINE_DRAGON_EXCELION_CID: named literal value.
+0x080a11b0	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a11b0	REUSE	ROM LDR @080a116a->080a11b0	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a11b4	new_pool	0x00000103	EQ	EQUIP_ACT_SCORE_MODE_103	equip_act_score_mode_103_080a11b4	REUSE	ROM LDR @080a119e->080a11b4	EQUIP_ACT_SCORE_MODE_103: named literal value.
+0x080a1250	new_pool	0x00000129	EQ	EQUIP_CARD_MESSAGE_FORMAT_ID_129	equip_card_message_format_id_129_080a1250	NEW	ROM LDR @080a1230->080a1250	EQUIP_CARD_MESSAGE_FORMAT_ID_129: named literal value.
+0x080a1270	new_pool	0x00000141	EQ	EQUIP_CARD_DISPLAY_SUB_ID_141	equip_card_display_sub_id_141_080a1270	NEW	ROM LDR @080a126a->080a1270	EQUIP_CARD_DISPLAY_SUB_ID_141: named literal value.
+0x080a12f4	new_pool	0x09e47894	RENAME	0x09e47894	equip_card_message_separator_ptr_080a12f4	NEW	ROM LDR @080a12c6->080a12f4; asm/rom.s:1498 bytes 0a 00	Raw game-text separator pointer 0x09e47894; target remains outside this landing scope.
+0x080a1330	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a1330	REUSE	ROM LDR @080a130e->080a1330	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a1334	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a1334	REUSE	ROM LDR @080a1310->080a1334	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a166c	DWORD_080a166c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a166c	REUSE	asm/13_equip_placement.s:7478 @080a165a	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1670	DWORD_080a1670	0x00001d88	EQ	LP_EQUIP_ROW_ACTIVE_OFF	lp_equip_row_active_off_080a1670	NEW	asm/13_equip_placement.s:7479 @080a165c	LP_EQUIP_ROW_ACTIVE_OFF: named literal value.
+0x080a16a0	DWORD_080a16a0	0x00001d84	EQ	LP_EQUIP_DISPLAY_FLAG_OFF	lp_equip_display_flag_off_080a16a0	REUSE	asm/13_equip_placement.s:7492 @080a1674	LP_EQUIP_DISPLAY_FLAG_OFF: named literal value.
+0x080a16a4	DWORD_080a16a4	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a16a4	REUSE	asm/13_equip_placement.s:7497 @080a167e	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a16a8	DWORD_080a16a8	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a16a8	REUSE	asm/13_equip_placement.s:7499 @080a1682	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a16ac	DWORD_080a16ac	0x0201b870	REF	gSpriteAttrBuf	ptr_g_sprite_attr_buf_080a16ac	REUSE	asm/13_equip_placement.s:7506 @080a1690	gSpriteAttrBuf: add operand-0 DATA/USER_DEFINED reference.
+0x080a16b0	DWORD_080a16b0	0x00000301	EQ	SPRITE_ROW_BUSY_BYTE_OFF	sprite_row_busy_byte_off_080a16b0	REUSE	asm/13_equip_placement.s:7507 @080a1692	SPRITE_ROW_BUSY_BYTE_OFF: named literal value.
+0x080a16cc	DWORD_080a16cc	0x00001d90	EQ	LP_EQUIP_ROW_TYPE_OFF	lp_equip_row_type_off_080a16cc	NEW	asm/13_equip_placement.s:7525 @080a16b4	LP_EQUIP_ROW_TYPE_OFF: named literal value.
+0x080a16d0	PTR_PTR_080a16d0	0x080a16d4	RENAME	equip_row_type_switch_table	ptr_equip_row_type_switch_table_080a16d0	NEW	asm/13_equip_placement.s:7534 @080a16c4	equip_row_type_switch_table: preserve the existing operand-0 DATA reference.
+0x080a16d4	PTR_DAT_080a16d4	0x080a1720	RENAME	equip_row_type_case_1_or_2	equip_row_type_switch_table	NEW	asm/13_equip_placement.s:7542 switch table entry[0] @080a16d4; row types 1 and 2 both target 080a1720	equip_row_type_case_1_or_2: preserve the existing operand-0 DATA/DEFAULT/primary reference.
+0x080a1738	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1738	REUSE	ROM LDR @080a1720->080a1738	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a173c	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a173c	REUSE	ROM LDR @080a1726->080a173c	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1758	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1758	REUSE	ROM LDR @080a1740->080a1758	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a175c	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a175c	REUSE	ROM LDR @080a1746->080a175c	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1760	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a1760	REUSE	ROM LDR @080a174c->080a1760	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a177c	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a177c	REUSE	ROM LDR @080a1764->080a177c	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1780	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1780	REUSE	ROM LDR @080a176a->080a1780	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1784	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a1784	REUSE	ROM LDR @080a1770->080a1784	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a17a0	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a17a0	REUSE	ROM LDR @080a1788->080a17a0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a17a4	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a17a4	REUSE	ROM LDR @080a178e->080a17a4	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a17a8	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a17a8	REUSE	ROM LDR @080a1794->080a17a8	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a17c0	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a17c0	REUSE	ROM LDR @080a17ac->080a17c0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a17c4	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a17c4	REUSE	ROM LDR @080a17b2->080a17c4	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a17d4	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a17d4	REUSE	ROM LDR @080a17c8->080a17d4	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a17f0	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a17f0	REUSE	ROM LDR @080a17d8->080a17f0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a17f4	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a17f4	REUSE	ROM LDR @080a17de->080a17f4	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a17f8	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a17f8	REUSE	ROM LDR @080a17e4->080a17f8	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a1814	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1814	REUSE	ROM LDR @080a17fc->080a1814	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1818	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1818	REUSE	ROM LDR @080a1802->080a1818	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a181c	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a181c	REUSE	ROM LDR @080a1808->080a181c	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a1834	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1834	REUSE	ROM LDR @080a1820->080a1834	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1838	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1838	REUSE	ROM LDR @080a1826->080a1838	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1850	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1850	REUSE	ROM LDR @080a183c->080a1850	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1854	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1854	REUSE	ROM LDR @080a1842->080a1854	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a186c	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a186c	REUSE	ROM LDR @080a1858->080a186c	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1870	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1870	REUSE	ROM LDR @080a185e->080a1870	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1880	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1880	REUSE	ROM LDR @080a1874->080a1880	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a189c	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a189c	REUSE	ROM LDR @080a1884->080a189c	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a18a0	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a18a0	REUSE	ROM LDR @080a188a->080a18a0	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a18a4	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a18a4	REUSE	ROM LDR @080a1890->080a18a4	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a18c0	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a18c0	REUSE	ROM LDR @080a18a8->080a18c0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a18c4	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a18c4	REUSE	ROM LDR @080a18ae->080a18c4	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a18c8	new_pool	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a18c8	REUSE	ROM LDR @080a18b4->080a18c8	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a18e0	new_pool	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a18e0	REUSE	ROM LDR @080a18cc->080a18e0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a18e4	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a18e4	REUSE	ROM LDR @080a18d2->080a18e4	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a194c	DWORD_080a194c	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a194c	REUSE	asm/13_equip_placement.s:7573 @080a191a	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1950	new_pool	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1950	REUSE	asm/13_equip_placement.s:7563 raw block; ROM @080a18fa (0x4a15) -> literal 080a1950	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1954	DWORD_080a1954	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1954	REUSE	asm/13_equip_placement.s:7567 @080a190e,asm/13_equip_placement.s:7588 @080a1938	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1958	DWORD_080a1958	0x00001d84	EQ	LP_EQUIP_DISPLAY_FLAG_OFF	lp_equip_display_flag_off_080a1958	REUSE	asm/13_equip_placement.s:7568 @080a1910	LP_EQUIP_DISPLAY_FLAG_OFF: named literal value.
+0x080a195c	DWORD_080a195c	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a195c	REUSE	asm/13_equip_placement.s:7575 @080a191e	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a1960	DWORD_080a1960	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a1960	REUSE	asm/13_equip_placement.s:7582 @080a192c	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a1964	DWORD_080a1964	0x00001d88	EQ	LP_EQUIP_ROW_ACTIVE_OFF	lp_equip_row_active_off_080a1964	NEW	asm/13_equip_placement.s:7589 @080a193a	LP_EQUIP_ROW_ACTIVE_OFF: named literal value.
+0x080a19e0	PTR_gP1LifePoints_080a19e0	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a19e0	REUSE	asm/13_equip_placement.s:7618 @080a196c	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a19e4	DAT_080a19e4	0x00001d88	EQ	LP_EQUIP_ROW_ACTIVE_OFF	lp_equip_row_active_off_080a19e4	NEW	asm/13_equip_placement.s:7619 @080a196e	LP_EQUIP_ROW_ACTIVE_OFF: named literal value.
+0x080a19e8	DAT_080a19e8	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a19e8	REUSE	asm/13_equip_placement.s:7623 @080a1976	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a19ec	DAT_080a19ec	0x00001d84	EQ	LP_EQUIP_DISPLAY_FLAG_OFF	lp_equip_display_flag_off_080a19ec	REUSE	asm/13_equip_placement.s:7627 @080a197e	LP_EQUIP_DISPLAY_FLAG_OFF: named literal value.
+0x080a19f0	DAT_080a19f0	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a19f0	REUSE	asm/13_equip_placement.s:7632 @080a1988	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a19f4	DAT_080a19f4	0x00001d08	EQ	P1LP_BLOCK2_OFF	p1_lp_block2_off_080a19f4	REUSE	asm/13_equip_placement.s:7638 @080a1994	P1LP_BLOCK2_OFF: named literal value.
+0x080a19f8	DAT_080a19f8	0x0201b870	REF	gSpriteAttrBuf	ptr_g_sprite_attr_buf_080a19f8	REUSE	asm/13_equip_placement.s:7660 @080a19c4	gSpriteAttrBuf: add operand-0 DATA/USER_DEFINED reference.
+0x080a19fc	DAT_080a19fc	0x00000301	EQ	SPRITE_ROW_BUSY_BYTE_OFF	sprite_row_busy_byte_off_080a19fc	REUSE	asm/13_equip_placement.s:7661 @080a19c6	SPRITE_ROW_BUSY_BYTE_OFF: named literal value.
+0x080a1a28	PTR_gP1LifePoints_080a1a28	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1a28	REUSE	asm/13_equip_placement.s:7695 @080a1a02	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1a2c	DAT_080a1a2c	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1a2c	REUSE	asm/13_equip_placement.s:7696 @080a1a04	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1a30	DAT_080a1a30	0x00001d90	EQ	LP_EQUIP_ROW_TYPE_OFF	lp_equip_row_type_off_080a1a30	NEW	asm/13_equip_placement.s:7699 @080a1a0a	LP_EQUIP_ROW_TYPE_OFF: named literal value.
+0x080a1a34	DAT_080a1a34	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a1a34	REUSE	asm/13_equip_placement.s:7705 @080a1a16	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a1a6c	PTR_gP1LifePoints_080a1a6c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1a6c	REUSE	asm/13_equip_placement.s:7732 @080a1a46	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1a70	DAT_080a1a70	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1a70	REUSE	asm/13_equip_placement.s:7733 @080a1a48	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1a74	DAT_080a1a74	0x00001d98	EQ	EQUIP_REROLL_SPRITE_PARAM_OFF	equip_reroll_sprite_param_off_080a1a74	REUSE	asm/13_equip_placement.s:7739 @080a1a54	EQUIP_REROLL_SPRITE_PARAM_OFF: named literal value.
+0x080a1bf4	PTR_gP1LifePoints_080a1bf4	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1bf4	REUSE	asm/13_equip_placement.s:7992 @080a1bc8	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1bf8	DAT_080a1bf8	0x00001d88	EQ	LP_EQUIP_ROW_ACTIVE_OFF	lp_equip_row_active_off_080a1bf8	NEW	asm/13_equip_placement.s:7993 @080a1bca	LP_EQUIP_ROW_ACTIVE_OFF: named literal value.
+0x080a1bfc	DAT_080a1bfc	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a1bfc	REUSE	asm/13_equip_placement.s:8008 @080a1be8	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a1cfc	PTR_gP1LifePoints_080a1cfc	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1cfc	REUSE	asm/13_equip_placement.s:8160 @080a1cd4	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1d00	DAT_080a1d00	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a1d00	REUSE	asm/13_equip_placement.s:8164 @080a1cdc	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a1e04	PTR_gP1LifePoints_080a1e04	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1e04	REUSE	asm/13_equip_placement.s:8326 @080a1dec	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1e08	DAT_080a1e08	0x00001ce8	EQ	P1LP_BLOCK2_OFF_1CE8	p1_lp_block2_off_1_ce8_080a1e08	REUSE	asm/13_equip_placement.s:8327 @080a1dee	P1LP_BLOCK2_OFF_1CE8: named literal value.
+0x080a1f30	PTR_gP1LifePoints_080a1f30	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a1f30	REUSE	asm/13_equip_placement.s:8429 @080a1e8a	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a1f34	DAT_080a1f34	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a1f34	REUSE	asm/13_equip_placement.s:8430 @080a1e8c	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a1f38	DAT_080a1f38	0x00001d9a	EQ	EQUIP_REROLL_COUNT_TARGET_OFF	equip_reroll_count_target_off_080a1f38	REUSE	asm/13_equip_placement.s:8437 @080a1e9a	EQUIP_REROLL_COUNT_TARGET_OFF: named literal value.
+0x080a1f3c	DAT_080a1f3c	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a1f3c	REUSE	asm/13_equip_placement.s:8455 @080a1ebe,asm/13_equip_placement.s:8491 @080a1f06	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a1f40	DAT_080a1f40	0x000012a1	EQ	zone_query_hand_tag_12a1	zone_query_hand_tag_12a1_080a1f40	REUSE	asm/13_equip_placement.s:8488 @080a1f00	zone_query_hand_tag_12a1: named literal value.
+0x080a1f44	DAT_080a1f44	0x0201c600	REF	gP1FieldArrayCBase	ptr_g_p1_field_array_cbase_080a1f44	REUSE	asm/13_equip_placement.s:8494 @080a1f0c	gP1FieldArrayCBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a1fbc	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a1fbc	REUSE	ROM LDR @080a1fae->080a1fbc	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a1fc0	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a1fc0	REUSE	ROM LDR @080a1fb2->080a1fc0	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a1ff8	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a1ff8	REUSE	ROM LDR @080a1fe0->080a1ff8	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a1ffc	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a1ffc	REUSE	ROM LDR @080a1fe2->080a1ffc	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2000	new_pool	0x080a2004	REF	equip_target_select_phase_switch_table	ptr_equip_target_select_phase_switch_table_080a2000	NEW	ROM LDR @080a1ff0->080a2000	equip_target_select_phase_switch_table: add operand-0 DATA/USER_DEFINED reference.
+0x080a2004	PTR_DAT_080a2004	0x080a2018	RENAME	equip_target_select_phase_case_0	equip_target_select_phase_switch_table	NEW	asm/13_equip_placement.s:8533 switch table entry[0] @080a2004	equip_target_select_phase_case_0: preserve the existing operand-0 DATA/DEFAULT/primary reference.
+0x080a2058	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a2058	REUSE	ROM LDR @080a2024->080a2058	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a205c	new_pool	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a205c	REUSE	ROM LDR @080a2026->080a205c	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a2060	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2060	REUSE	ROM LDR @080a2030->080a2060	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2064	new_pool	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a2064	REUSE	ROM LDR @080a203a->080a2064	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a2098	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a2098	REUSE	ROM LDR @080a208a->080a2098	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a209c	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a209c	REUSE	ROM LDR @080a208c->080a209c	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a20b8	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a20b8	REUSE	ROM LDR @080a20a0->080a20b8	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a20bc	new_pool	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a20bc	REUSE	ROM LDR @080a20a2->080a20bc	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a20e8	new_pool	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a20e8	REUSE	ROM LDR @080a20c0->080a20e8	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a20ec	new_pool	0x080a1e81	EQ	check_equip_slot_eligibility_extended_1	check_equip_slot_eligibility_extended_1_080a20ec	NEW	ROM LDR @080a20de->080a20ec	check_equip_slot_eligibility_extended_1: named literal value.
+0x080a212c	new_pool	0x00001d70	EQ	LP_BANISHER_CTX_OFF	lp_banisher_ctx_off_080a212c	REUSE	ROM LDR @080a20f0->080a212c	LP_BANISHER_CTX_OFF: named literal value.
+0x080a2130	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2130	REUSE	ROM LDR @080a20fc->080a2130	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a2134	new_pool	0x080a1e81	EQ	check_equip_slot_eligibility_extended_1	check_equip_slot_eligibility_extended_1_080a2134	NEW	ROM LDR @080a211c->080a2134	check_equip_slot_eligibility_extended_1: named literal value.
+0x080a2138	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a2138	REUSE	ROM LDR @080a2122->080a2138	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a213c	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a213c	REUSE	ROM LDR @080a2124->080a213c	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a215c	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a215c	REUSE	ROM LDR @080a2148->080a215c	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a2160	new_pool	0x00001d70	EQ	LP_BANISHER_CTX_OFF	lp_banisher_ctx_off_080a2160	REUSE	ROM LDR @080a214a->080a2160	LP_BANISHER_CTX_OFF: named literal value.
+0x080a2164	new_pool	0x00001dac	EQ	LP_CARD_TRACK_ALT_OFF	lp_card_track_alt_off_080a2164	REUSE	ROM LDR @080a2150->080a2164	LP_CARD_TRACK_ALT_OFF: named literal value.
+0x080a2168	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2168	REUSE	ROM LDR @080a2156->080a2168	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2174	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a2174	REUSE	ROM LDR @080a216c->080a2174	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a2178	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2178	REUSE	ROM LDR @080a216e->080a2178	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a219c	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a219c	REUSE	ROM LDR @080a2182->080a219c	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a21a0	new_pool	0x00001dac	EQ	LP_CARD_TRACK_ALT_OFF	lp_card_track_alt_off_080a21a0	REUSE	ROM LDR @080a2184->080a21a0	LP_CARD_TRACK_ALT_OFF: named literal value.
+0x080a21c8	new_pool	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a21c8	REUSE	ROM LDR @080a21a8->080a21c8	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a21e0	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a21e0	REUSE	ROM LDR @080a21cc->080a21e0	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a21e4	new_pool	0x00001dac	EQ	LP_CARD_TRACK_ALT_OFF	lp_card_track_alt_off_080a21e4	REUSE	ROM LDR @080a21ce->080a21e4	LP_CARD_TRACK_ALT_OFF: named literal value.
+0x080a2228	new_pool	0x0201c4e0	REF	gP1LifePoints	ptr_g_p1_life_points_080a2228	REUSE	ROM LDR @080a21fe->080a2228	gP1LifePoints: add operand-0 DATA/USER_DEFINED reference.
+0x080a222c	new_pool	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a222c	REUSE	ROM LDR @080a2200->080a222c	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a2230	new_pool	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2230	REUSE	ROM LDR @080a220a->080a2230	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a225c	DWORD_080a225c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a225c	REUSE	asm/13_equip_placement.s:8567 @080a2242	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2260	DWORD_080a2260	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2260	REUSE	asm/13_equip_placement.s:8568 @080a2244	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2290	DWORD_080a2290	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a2290	REUSE	asm/13_equip_placement.s:8585 @080a2264	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a2294	DWORD_080a2294	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2294	REUSE	asm/13_equip_placement.s:8592 @080a2272	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a2320	DWORD_080a2320	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a2320	REUSE	asm/13_equip_placement.s:8611 @080a2298	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a2324	DWORD_080a2324	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2324	REUSE	asm/13_equip_placement.s:8618 @080a22a6	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a2328	DWORD_080a2328	0x00008052	EQ	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2	oam_equip_zone_chain_sprite_p2_080a2328	REUSE	asm/13_equip_placement.s:8632 @080a22c4	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2: named literal value.
+0x080a232c	DWORD_080a232c	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a232c	REUSE	asm/13_equip_placement.s:8666 @080a230c	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a2340	DWORD_080a2340	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2340	REUSE	asm/13_equip_placement.s:8685 @080a2330	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a238c	DWORD_080a238c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a238c	REUSE	asm/13_equip_placement.s:8736 @080a2374	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2390	DWORD_080a2390	0x0201e274	REF	gEquipPhaseDisplayState	ptr_g_equip_phase_display_state_080a2390	NEW	asm/13_equip_placement.s:8737 @080a2376	gEquipPhaseDisplayState: add operand-0 DATA/USER_DEFINED reference.
+0x080a23c4	DWORD_080a23c4	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a23c4	REUSE	asm/13_equip_placement.s:8756 @080a2398	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a23c8	DWORD_080a23c8	0x00001daa	EQ	LP_CARD_TRACK_NEXT_OFF	lp_card_track_next_off_080a23c8	REUSE	asm/13_equip_placement.s:8768 @080a23ae	LP_CARD_TRACK_NEXT_OFF: named literal value.
+0x080a23cc	DWORD_080a23cc	0x0201e274	REF	gEquipPhaseDisplayState	ptr_g_equip_phase_display_state_080a23cc	NEW	asm/13_equip_placement.s:8776 @080a23be	gEquipPhaseDisplayState: add operand-0 DATA/USER_DEFINED reference.
+0x080a2448	DWORD_080a2448	0x0201e28a	REF	gLpCardTrackNext	ptr_g_lp_card_track_next_080a2448	NEW	asm/13_equip_placement.s:8786 @080a23d0	gLpCardTrackNext: add operand-0 DATA/USER_DEFINED reference.
+0x080a244c	DWORD_080a244c	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a244c	REUSE	asm/13_equip_placement.s:8791 @080a23da	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a2450	DWORD_080a2450	0x00008052	EQ	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2	oam_equip_zone_chain_sprite_p2_080a2450	REUSE	asm/13_equip_placement.s:8805 @080a23f8	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2: named literal value.
+0x080a2454	DWORD_080a2454	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2454	REUSE	asm/13_equip_placement.s:8833 @080a2432	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a2458	DWORD_080a2458	0x0201e274	REF	gEquipPhaseDisplayState	ptr_g_equip_phase_display_state_080a2458	NEW	asm/13_equip_placement.s:8837 @080a243a	gEquipPhaseDisplayState: add operand-0 DATA/USER_DEFINED reference.
+0x080a2494	DWORD_080a2494	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2494	REUSE	asm/13_equip_placement.s:8872 @080a2480	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a2498	DWORD_080a2498	0x0201e28a	REF	gLpCardTrackNext	ptr_g_lp_card_track_next_080a2498	NEW	asm/13_equip_placement.s:8875 @080a2486	gLpCardTrackNext: add operand-0 DATA/USER_DEFINED reference.
+0x080a24ac	DWORD_080a24ac	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a24ac	REUSE	asm/13_equip_placement.s:8887 @080a249c	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a24e4	PTR_gP1LifePoints_080a24e4	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a24e4	REUSE	asm/13_equip_placement.s:8915 @080a24ce	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a24e8	DAT_080a24e8	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a24e8	REUSE	asm/13_equip_placement.s:8916 @080a24d0	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a252c	PTR_gP1LifePoints_080a252c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a252c	REUSE	asm/13_equip_placement.s:8941 @080a24f4	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2530	DAT_080a2530	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a2530	REUSE	asm/13_equip_placement.s:8942 @080a24f6	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a2534	DAT_080a2534	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2534	REUSE	asm/13_equip_placement.s:8952 @080a250a	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a257c	PTR_gP1LifePoints_080a257c	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a257c	REUSE	asm/13_equip_placement.s:8987 @080a2544	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2580	DAT_080a2580	0x00001d8c	EQ	EQUIP_CONTEXT_PLAYER_OFF	equip_context_player_off_080a2580	REUSE	asm/13_equip_placement.s:8988 @080a2546	EQUIP_CONTEXT_PLAYER_OFF: named literal value.
+0x080a2584	DAT_080a2584	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2584	REUSE	asm/13_equip_placement.s:8998 @080a255a	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a25a8	DAT_080a25a8	0x080a24cd	EQ	check_equip_opponent_zone11_target_1	check_equip_opponent_zone11_target_1_080a25a8	NEW	asm/13_equip_placement.s:9040 @080a2596	check_equip_opponent_zone11_target_1: named literal value.
+0x080a25ac	DAT_080a25ac	0x00001509	EQ	FENGSHENG_MIRROR_CID	fengsheng_mirror_cid_080a25ac	REUSE	asm/13_equip_placement.s:9041 @080a2598	FENGSHENG_MIRROR_CID: named literal value.
+0x080a25b8	DAT_080a25b8	0x00001546	EQ	TRAP_DUSTSHOOT_CID	trap_dustshoot_cid_080a25b8	REUSE	asm/13_equip_placement.s:9054 @080a25b0	TRAP_DUSTSHOOT_CID: named literal value.
+0x080a25c0	DAT_080a25c0	0x080a24f1	EQ	check_equip_slot_card_stat8_is_7_1	check_equip_slot_card_stat8_is_7_1_080a25c0	NEW	asm/13_equip_placement.s:9062 @080a25bc	check_equip_slot_card_stat8_is_7_1: named literal value.
+0x080a25e0	DAT_080a25e0	0x080a2541	EQ	check_equip_slot_card_field5_is_nonzero_1	check_equip_slot_card_field5_is_nonzero_1_080a25e0	NEW	asm/13_equip_placement.s:9067 @080a25c4	check_equip_slot_card_field5_is_nonzero_1: named literal value.
+0x080a25e4	PTR_gP1LifePoints_080a25e4	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a25e4	REUSE	asm/13_equip_placement.s:9069 @080a25c6	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a25e8	DAT_080a25e8	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a25e8	REUSE	asm/13_equip_placement.s:9070 @080a25c8	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a25ec	DAT_080a25ec	0x080a25f0	RENAME	equip_activation_card_type_switch_table	ptr_equip_activation_card_type_switch_table_080a25ec	NEW	asm/13_equip_placement.s:9080 @080a25d8	equip_activation_card_type_switch_table: rename the slot and preserve its no-reference operand-0 pre-state.
+0x080a2634	DAT_080a2634	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2634	REUSE	asm/13_equip_placement.s:9104 @080a260e	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a2638	DAT_080a2638	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2638	REUSE	asm/13_equip_placement.s:9112 @080a261e	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a263c	DAT_080a263c	0x0000ffff	EQ	SLOT_CARD_EMPTY	slot_card_empty_080a263c	REUSE	asm/13_equip_placement.s:9114 @080a2622	SLOT_CARD_EMPTY: named literal value.
+0x080a2640	DAT_080a2640	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2640	REUSE	asm/13_equip_placement.s:9120 @080a262e	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2688	DAT_080a2688	0x0201e2a0	REF	gDuelCardCtxBase	ptr_g_duel_card_ctx_base_080a2688	REUSE	asm/13_equip_placement.s:9141 @080a2652	gDuelCardCtxBase: add operand-0 DATA/USER_DEFINED reference.
+0x080a268c	DAT_080a268c	0x00008052	EQ	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2	oam_equip_zone_chain_sprite_p2_080a268c	REUSE	asm/13_equip_placement.s:9151 @080a2666	OAM_EQUIP_ZONE_CHAIN_SPRITE_P2: named literal value.
+0x080a2690	PTR_gP1LifePoints_080a2690	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a2690	REUSE	asm/13_equip_placement.s:9162 @080a267e	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2694	DAT_080a2694	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2694	REUSE	asm/13_equip_placement.s:9163 @080a2680	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a26c0	PTR_gP1LifePoints_080a26c0	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a26c0	REUSE	asm/13_equip_placement.s:9176 @080a2698,asm/13_equip_placement.s:9190 @080a26b4	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a26c4	DAT_080a26c4	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a26c4	REUSE	asm/13_equip_placement.s:9179 @080a269e	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a26c8	DAT_080a26c8	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a26c8	REUSE	asm/13_equip_placement.s:9186 @080a26ae	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a26cc	DAT_080a26cc	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a26cc	REUSE	asm/13_equip_placement.s:9191 @080a26b6	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a26e0	PTR_gP1LifePoints_080a26e0	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a26e0	REUSE	asm/13_equip_placement.s:9207 @080a26d6	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a26e4	DAT_080a26e4	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a26e4	REUSE	asm/13_equip_placement.s:9208 @080a26d8	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2708	PTR_gP1LifePoints_080a2708	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a2708	REUSE	asm/13_equip_placement.s:9221 @080a26f2	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a270c	DAT_080a270c	0x00001d70	EQ	LP_BANISHER_CTX_OFF	lp_banisher_ctx_off_080a270c	REUSE	asm/13_equip_placement.s:9222 @080a26f4	LP_BANISHER_CTX_OFF: named literal value.
+0x080a2710	DAT_080a2710	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2710	REUSE	asm/13_equip_placement.s:9225 @080a26fa	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a2714	DAT_080a2714	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2714	REUSE	asm/13_equip_placement.s:9228 @080a2700	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2724	PTR_gP1LifePoints_080a2724	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a2724	REUSE	asm/13_equip_placement.s:9241 @080a2718	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2728	DAT_080a2728	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2728	REUSE	asm/13_equip_placement.s:9242 @080a271a	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2764	DAT_080a2764	0x00001da8	EQ	LP_CARD_TRACK_BASE_OFF	lp_card_track_base_off_080a2764	REUSE	asm/13_equip_placement.s:9257 @080a2734	LP_CARD_TRACK_BASE_OFF: named literal value.
+0x080a2768	DAT_080a2768	0x00000868	EQ	PLAYER_BLOCK_STRIDE	player_block_stride_080a2768	REUSE	asm/13_equip_placement.s:9261 @080a273c	PLAYER_BLOCK_STRIDE: named literal value.
+0x080a276c	DAT_080a276c	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a276c	REUSE	asm/13_equip_placement.s:9277 @080a275e	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.
+0x080a2790	PTR_gP1LifePoints_080a2790	0x0201c4e0	RENAME	gP1LifePoints	ptr_g_p1_life_points_080a2790	REUSE	asm/13_equip_placement.s:9295 @080a277e	gP1LifePoints: preserve the existing operand-0 DATA reference.
+0x080a2794	DAT_080a2794	0x00001d94	EQ	EQUIP_PHASE_DISPLAY_STATE_OFF	equip_phase_display_state_off_080a2794	REUSE	asm/13_equip_placement.s:9296 @080a2780	EQUIP_PHASE_DISPLAY_STATE_OFF: named literal value.

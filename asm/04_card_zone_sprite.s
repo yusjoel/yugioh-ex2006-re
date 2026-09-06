@@ -2980,22 +2980,7 @@ LAB_08041538:
 id_zone_find_step_lock_off:
     .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08041548 0c080000
 
-@ Called by dispatch_duel_event_display_seq (duel event dispatcher) caseD_44 (op=0x44). Reads EWRAM 0x0201bcc0:
-@ player_id ([+0] bit15, r5), slot_idx ([+2], r6), secondary ([+4], r7), packed_info ([+6]).
-@ Extracts sub-player id (bit0, r4=lsrs #0x8) and flags from packed_info. Uses
-@ player*0x868+slot*0x14 to locate field slot struct (0x0201c510 base + 0x10b1 per-slot offset).
-@ Checks slot type range [0x1578..0x1578+0xfa]: on match calls write_card_display_index_with_bit_offset
-@ to write multiple display flag bits (indices 0x15/0x16/0x17/0x18/0x19/0x1a/0x1b/0x1c). Also
-@ calls check_card_field8_is_9 and FUN_08094f58 (write_spell_activation_type_display_bit).
-@ Finally calls write_field_slot_bit_by_player(player_id, slot_idx, 1, 0) to mark slot active,
-@ then calls dispatch_card_display_op with op_code=0x24 and clears [+0x810].
-@ 
-@ Constants:
-@   CARD_TYPE_RANGE_BASE=0x1578
-@   CARD_TYPE_RANGE_END=0x1672 (=0x1578+0xfa)
-@   DISP_INDICES: 0x15..0x1c (multiple display flag bits)
-@   SLOT_STRUCT_BASE=0x0201c510, SLOT_STRIDE=0x14, PLAYER_STRIDE=0x868
-@   OP_DONE=0x24
+@ Handles duel display sequence case 0x44 for a spell or equip field slot. Reads the player, slot and packed flags from the display state, writes applicable display-index bits, and calls write_special_summon_material_rule_display_bit with the current field-slot card ID. Marks the field slot active, dispatches display operation 0x24, and clears the step-lock field. Confidence: high.
 tick_spell_equip_zone_display_seq:
     push {r4,r5,r6,r7,lr}                    @ 0804154c f0b5
     .hword 0x464f    @ 0804154e 4f46
@@ -3054,7 +3039,7 @@ tick_spell_equip_zone_display_seq:
     ldr r0,[r1,#0x0]                         @ 080415b8 0868
     lsls r0,r0,#0x13    @ 080415ba c004
     lsrs r0,r0,#0x13    @ 080415bc c00c
-    bl write_spell_activation_type_display_bit @ 080415be 53f0cbfc
+    bl write_special_summon_material_rule_display_bit @ 080415be 53f0cbfc
 LAB_080415c2:
     movs r0,#0x4    @ 080415c2 0420
     ands r0,r7    @ 080415c4 3840

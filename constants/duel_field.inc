@@ -640,3 +640,30 @@
 .equ EQUIP_CONTEXT_PLAYER_OFF, 0x00001d8c  @ gP1LifePoints-relative equip context player field.
 .equ EQUIP_REROLL_SPRITE_PARAM_OFF, 0x00001d98  @ gP1LifePoints-relative coin/dice sprite parameter hword.
 .equ EQUIP_REROLL_COUNT_TARGET_OFF, 0x00001d9a  @ gP1LifePoints-relative packed reroll count/target hword.
+
+@ =============================================================================
+@ file 13 Seg-5 additions: equip-card message and row-display state
+@ Source: doc/dev/refine/F13-Seg-5.proposal.md (review EXPANDED_IMPLEMENTATION_PASS)
+@ =============================================================================
+.equ EQUIP_CARD_MESSAGE_FRAME_NEG, 0xfffffcf0  @ Signed -0x310 stack-frame adjustment in tick_equip_card_message_by_id.
+.equ EQUIP_CARD_MESSAGE_FORMAT_ID_129, 0x00000129  @ Game-text format ID passed to format_game_text_with_int_arg.
+.equ EQUIP_CARD_DISPLAY_SUB_ID_141, 0x00000141  @ Card-display sub-ID passed to trigger_card_display_op31_if_not_active.
+.equ LP_EQUIP_ROW_ACTIVE_OFF, 0x00001d88  @ gP1LifePoints-relative equip-row active flag.
+.equ LP_EQUIP_ROW_TYPE_OFF, 0x00001d90  @ gP1LifePoints-relative equip-row type/state selector.
+
+@ =============================================================================
+@ file 13 Seg-6 additions: equip-target selection and display state
+@ Source: doc/dev/refine/F13-Seg-6.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_DISPLAY_HANDLER_SUCCESS_OP31_SUB, 0x00000121
+.equ EQUIP_TARGET_SELECTION_DELAY_OFF, 0x00001d9e
+.equ EQUIP_LP_ACTIV_BITMAP_FROM_FIELD_SLOTS_OFF, 0x00001d10
+
+@ =============================================================================
+@ file 13 Seg-7 additions: equip-score display and activation masks
+@ Source: doc/dev/refine/F13-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_SCORE_DISPLAY_SLOT_12D, 0x0000012d
+.equ EQUIP_SCORE_DISPLAY_FIELD_12F, 0x0000012f
+.equ EQUIP_ACTIVATION_CARD_ID_MASK, 0x00007fff
+.equ EQUIP_ACTIVATION_CARD_ID_CLEAR_MASK, 0xff8000ff

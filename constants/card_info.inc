@@ -2078,3 +2078,15 @@
 @ =============================================================================
 .equ SECOND_COIN_TOSS_CID, 0x0000150f  @ Internal CID for Second Coin Toss.
 .equ DICE_RE_ROLL_CID, 0x000016a5  @ Internal CID for Dice Re-Roll.
+
+@ =============================================================================
+@ file 13 Seg-7 additions: special-summon and equip-placement card IDs
+@ Source: doc/dev/refine/F13-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ WALL_OF_REVEALING_LIGHT_CID, 0x00001766
+.equ ANTEATEREATINGANT_CID, 0x000019c8
+.equ GRAND_TIKI_ELDER_CID, 0x000013e5
+.equ XZ_TANK_CANNON_CID, 0x000015f9
+.equ W_WING_CATAPULT_CID, 0x0000194b
+.equ ELEMENTAL_HERO_NECROSHADE_CID, 0x0000197f
+.equ KAZEJIN_CID, 0x0000111a

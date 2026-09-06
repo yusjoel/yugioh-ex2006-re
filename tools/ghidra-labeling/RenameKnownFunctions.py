@@ -5133,18 +5133,8 @@ RENAMES = [
         "Called by AI placement hub (FUN_080a46a0) as card-type filter before normal-summon check. "
         "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=normal-summon type). "
         "Constants: whitelist_max=0x194e, extra_ids=0x18f9/0x1981/0x19a6/0x19b4/0x19ef."),
-    ("FUN_080a4574", "check_equip_slot_has_field_spell_target",
-        "Check whether a valid Field Spell target card exists in the equip slots for player (r0), slot (r1). "
-        "Guard 1: count_available_monster_slots(player)==0 -> return 0. "
-        "Guard 2: eval_equip_bonus_for_slot(player, slot_idx) <= 4 -> return 0. "
-        "Main scan: read gP1LifePoints+0x14+player*0x868 count; traverse descending (r4=count-1..0) "
-        "over 0x0201c8f8 zone array; compare card_id low 13 bits to 0x197f (target Field Spell ID); "
-        "hit: call find_effect_node_in_zone(player, zone=0xb); found -> return 1. "
-        "All fail -> return 0. "
-        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]. "
-        "Returns u32 bool (1=field spell target present). Read-only. "
-        "Constants: FIELD_SPELL_ZONE=0xb, target_card_id=0x197f, "
-        "gP1LifePoints=0x0201c4e0, player_stride=0x868, zone_array=0x0201c8f8."),
+    ("FUN_080a4574", "check_necroshade_normal_summon_available",
+        "Checks whether a normal-summon placement for player r0 and slot r1 can use Elemental Hero Necroshade. Requires an available monster slot and equip bonus above 4, then scans gP1HandSlotArray for Necroshade card 0x197f and rejects an existing matching zone-0xb effect node. Returns a boolean and has no writes. Exclusive caller: 0x080a49e4. Confidence: high."),
     ("FUN_08032e20", "count_equip_slots_meeting_atk_threshold",
         "Count monster-zone slots for player (r0 bit0) matching target_card_id (r12, non-APCS) "
         "and atk >= atk_threshold (r2). "
@@ -5296,36 +5286,10 @@ RENAMES = [
         "Returns u32 bool (1=alt activatable pair found, 0=none). "
         "Side-effects: same as scan_activatable_equip_slots_init. "
         "Constants: state_base=0x0201e4d0, player_loop=[0..1], slot_loop=[0..4]."),
-    ("FUN_080a3c2c", "check_banisher_of_light_activatable",
-        "Check whether equip card 0x1332 (Banisher of the Light) can be activated. "
-        "Guard: count_field_copies_of_card(0x1332)>0 -> return 0 (duplicate blocked). "
-        "Init 0x0201e4d0 state struct (same sequence as scan_activatable_equip_slots_init). "
-        "BST dispatch on card_id (r4=r1): "
-        "0x19a3->fnptr=0x080a839d loop_count=3; 0x19a4->fnptr=0x080a840d loop_count=3; "
-        "0x19c8->fnptr=0x080a8479 loop_count=2; else->loop_count=0. "
-        "Outer loop slot_idx=0..10: call FUN_0810e5e4 trampoline (bx fnptr)(player,slot,0); "
-        "slot<=4 and hit -> r8|=1 (flag); loop_count--. "
-        "loop_count==0: if r8 set or count_monster_slots_accepting_card>0 -> return 1; else 0. "
-        "r0=u32 player_side [0..1]; r1=u32 card_id_context [0..0x1fff]. "
-        "Returns u32 bool (1=activatable, 0=not). "
-        "Side-effects: [0x0201e4d0] struct fields updated. "
-        "Constants: guard_card_id=0x1332, state_base=0x0201e4d0, slot_loop=0..10, "
-        "set_A=0x19a3, set_B=0x19a4, set_C=0x19c8."),
-    ("FUN_080a3dac", "check_equip_set_activatable_for_player",
-        "Determine whether player (r0) has any activatable equip card pair on the field. "
-        "Flow: count_available_monster_slots(player)->r10; "
-        "count_field_copies_of_card(0x13f2)>0 -> return 0. "
-        "Load 3-word slot_order_table from ROM (0x09e47898) to stack via ldmia/stmia. "
-        "Double loop outer idx=0..2 x inner slot=0..4: "
-        "read card_id r9 from sp[idx*4] (slot_order ROM word); "
-        "compare gDuelFieldSlots[player][slot] card_id to r9; hit: "
-        "check_slot_card_can_be_equipped -> check_slot_placement_blocked_by_field_effect; "
-        "unblocked -> r10++. "
-        "Symmetric scan for opponent slots. "
-        "Final: r10>3 -> return 1; else 0 (if sp[0x10] unset -> return 0). "
-        "r0=u32 player_side [0..1]. Returns u32 bool (1=activatable pair present). Read-only. "
-        "Constants: guard_card_id=0x13f2, slot_order_table=0x09e47898, "
-        "gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080a3c2c", "check_banisher_sensitive_summon_allowed",
+        "Checks whether the r1 summon card can satisfy its field-slot requirement for player r0 while Banisher of the Light is absent. Dispatches Uria, Hamon, and Anteatereatingant to three Thumb callbacks and scans slots 0..10. Writes gEquipZoneRankState and returns 1 when the requirement is met, else 0. Called from 0x080a50a0. Inputs: r0=player_side, r1=card_id. Confidence: high."),
+    ("FUN_080a3dac", "check_gate_guardian_summon_allowed",
+        "Checks whether player r0 can satisfy the Gate Guardian summon setup. Requires Mask of Restrict to be absent, copies the Sanga, Kazejin, and Suijin CID table, scans both players' field slots for usable matching materials, and requires the resulting available-slot/material count to exceed 3. Returns 1 when allowed, else 0. Read-only. Callers dispatch Gate Guardian card 0x111c. Confidence: high."),
     ("FUN_0803bc24", "check_spell_zone_slot_placeable",
         "Comprehensive check: is the spell/trap zone available for placement for player (r0)? "
         "Phase 1: count_available_effect_zones(1-r0, 0xa4<<5=0x1480, -1); "
@@ -5342,11 +5306,8 @@ RENAMES = [
         "gP1LifePoints=0x0201c4e0, ui_sfx_occupied=0x31, ui_sfx_blocked=0x32."),
 
     # --- batch #20 (campaign-20, 2026-05-08) duel core spell/equip activation eval cluster ---
-    ("FUN_080a422c", "classify_spell_card_activation_type",
-        "Maps card_id to spell activation type code: 0=normal/unsupported, 1=equip, 2=field_spell, "
-        "3=special_field. Multi-branch BST; key boundaries 0x16c6/0x1487/0x16cb/0x18b4/0x19ca. "
-        "Leaf function, bx lr exit. "
-        "r0=u16 card_id [0..0x1fff]. Returns u8 activation_type [0..3]."),
+    ("FUN_080a422c", "get_special_summon_material_rule_by_card_id",
+        "Maps special-summon monster card_id r0 to material rule 0..3. The keys cover elemental spirits, Chaos monsters, Fenrir, Dark Necrofear, Megarock Dragon, and Doom Dozer. Rule 0 means this classifier has no dedicated rule. Leaf function with no side effects. Callers: 0x08094f5a and 0x080a42c4. Confidence: high."),
     ("FUN_0808da68", "find_effect_record_index_by_id",
         "Binary search on ROM effect record table (0x09e5a128, 0x132 entries, 8 bytes each) "
         "for effect_id (r0). Returns table index [0..0x131] if found, -1 if not found. "
@@ -5375,14 +5336,8 @@ RENAMES = [
         "85 callsites; core gate for duel field spell activation. "
         "r0=u32 player_side [0..1]. Returns u32 bool (1=placeable, 0=blocked). "
         "Constants: effect_zone_id=0x13ff, FIELD_SPELL_ZONE=0xb."),
-    ("FUN_080a42b0", "eval_spell_card_activation_placeable",
-        "Comprehensive check whether player (r0) can activate spell card (r1=card_id). "
-        "Steps: classify_spell_card_activation_type -> check_value_in_slot_chain(0x14a0) -> "
-        "check_field_spell_neo_daedalus_group_placeable -> check_spell_zone_slot_placeable -> "
-        "count_available_monster_slots; dispatches loop or dispatch_effect_handler_by_card_id. "
-        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
-        "Returns u32 bool (1=activatable, 0=blocked). "
-        "Constants: chain_check_id=0x14a0, player_stride=0x868, gDuelFieldSlots=0x0201c510."),
+    ("FUN_080a42b0", "check_special_summon_material_rule_satisfied",
+        "Checks whether player r0 can satisfy the dedicated special-summon material rule for card_id r1. Gets rule 0..3 from get_special_summon_material_rule_by_card_id, applies zone and chain gates, scans five field slots, and falls back to dispatch_effect_handler_by_card_id for rule 0. Returns 1 when the summon setup is accepted, else 0. Confidence: high."),
     ("FUN_08037a2c", "count_valid_monster_pair_slots",
         "Count monster zone slots for player (r0) satisfying check_card_pair_allowed. "
         "r8=target_card_id is non-APCS caller-set implicit input. "
@@ -5390,14 +5345,8 @@ RENAMES = [
         "r0=u32 player_side [0..1]; r8 (non-APCS, caller-set)=u16 target_card_id [0..0x1fff]. "
         "Returns u32 count [0..5]. Pure read-only. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, monster_count_offset=0xc, slot_entry=0x14."),
-    ("FUN_080a3eb4", "eval_equip_card_placeable_for_player",
-        "Evaluate whether player (r0) can activate equip spell (r10=equip_card_id, non-APCS). "
-        "count_available_monster_slots -> count_field_copies_of_card(0x13f2) > 0 -> return 0; "
-        "dual-side 5-slot loop check_slot_card_can_be_equipped + check_slot_placement_blocked_by_field_effect; "
-        "call count_valid_monster_pair_slots for pairing check. "
-        "r0=u32 player_side [0..1]; r10 (non-APCS, caller-set)=u16 equip_card_id [0..0x1fff]. "
-        "Returns u32 bool (1=placeable, 0=blocked). "
-        "Constants: lockdown_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080a3eb4", "check_valkyrion_summon_allowed",
+        "Checks whether player r0 can satisfy the Valkyrion summon setup. Requires Mask of Restrict to be absent, copies the Alpha, Beta, and Gamma Magnet Warrior CID table, scans both players' field slots for usable matching materials, and applies the material-pair count gate. r10 is the current table CID, not an input. Returns 1 when allowed, else 0. Read-only. Callers dispatch Valkyrion card 0x138a. Confidence: high."),
     ("FUN_08032fa4", "count_unpaired_slots_for_card",
         "Count player (r0) slots 0..10 satisfying check_slot_card_pair_allowed "
         "AND find_paired_zone_entry_for_card==0 (unpaired). "
@@ -5405,12 +5354,8 @@ RENAMES = [
         "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
         "Returns u32 count [0..10]. Pure read-only. "
         "Constants: slot_range=[0..10], player_stride=0x868."),
-    ("FUN_080a4134", "check_ritual_fusion_pairable_slots_exist",
-        "Check whether player (r0) field has unpaired slots for ritual/fusion card (r1=card_id). "
-        "Branches on card_id (0x15f9/0x15fa/0x15fb/0x15b0/0x15b3/0x15b4/0x1947/0x194b/0x1953/0x1954) "
-        "and calls count_unpaired_slots_for_card once or twice; any nonzero -> return 1. "
-        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
-        "Returns u32 bool (1=pairable slot exists, 0=none)."),
+    ("FUN_080a4134", "check_fusion_material_pair_slots_exist",
+        "Checks whether player r0 has the required unpaired material slots for fusion card r1. Dispatches the XZ, YZ, XYZ, VW, and VWXYZ fusion cluster and tests the corresponding V/W/X/Y/Z materials with count_unpaired_slots_for_card. Returns 1 when the required material combination exists, else 0. Read-only. Confidence: high."),
     ("FUN_080a40bc", "check_equip_target_monster_placeable",
         "Check whether player (r0) can place equip spell on a target monster slot. "
         "gP1LifePoints+0x11c bit17 equip lock -> check_value_in_slot_chain(0xb, 0x12f3) nonzero -> return 0; "
@@ -5553,14 +5498,8 @@ RENAMES = [
         "Returns u32 bool (1=activatable, 0=not). "
         "Side-effects: [0x0201e4d0+0x0/0x12/0x8] written as described. "
         "Constants: state_base=0x0201e4d0, mask=0xff8000ff."),
-    ("FUN_080a3d74", "check_banisher_pair_activation_allowed",
-        "Check if banisher card pair can be activated for player. "
-        "Guard 1: count_field_copies_of_card(0x1332)>0 -> return 0 (Banisher already on field). "
-        "Guard 2: count_valid_monster_pair_slots(player, 0x15a3)==0 -> return 0 (Ectoplasmer absent). "
-        "Then: call scan_activatable_equip_slots_alt; return its result. "
-        "r0=u32 player_side [0..1]. Returns u32 bool (1=allowed, 0=blocked). "
-        "confidence: med (indirect scan via scan_activatable_equip_slots_alt). "
-        "Constants: banisher_card_id=0x1332, pair_card_id=0x15a3."),
+    ("FUN_080a3d74", "check_neo_bubbleman_summon_allowed",
+        "Checks the Neo Bubbleman summon setup for player r0. Requires Banisher of the Light to be absent and at least one valid Metamorphosis pair, then delegates to scan_activatable_equip_slots_alt with card context r1. Returns a boolean and may update gEquipZoneRankState through the delegate. Exclusive caller: 0x080a50aa for card 0x19a6. Confidence: high."),
     ("FUN_080a4af4", "eval_equip_target_slot_flags",
         "Large equip target slot flag evaluator; reads gDuelFieldSlots[slot_idx] card_id and "
         "checks multiple special card IDs to determine activation flags. "
@@ -13259,6 +13198,9 @@ RENAMES = [
         "zone effects via dispatch_card_effect_zone_action_by_card_id. "
         "Constants: TYPE_MAX=4, PLAYER_BIT_SHIFT=0x16, TYPE_FIELD_SHIFT=0x12/0x1c, "
         "gDuelFieldSlots=0x0201bc54."),
+
+    ("FUN_08094f58", "write_special_summon_material_rule_display_bit",
+        "Tests whether card_id r0 has a dedicated special-summon material rule. Calls get_special_summon_material_rule_by_card_id; if the result is nonzero, calls write_card_display_index_with_bit_offset with display index 0x1a and bit value 1. Returns without writing when the rule is 0. Input: r0=u16 card_id. Returns: void. Confidence: high."),
 
     # NOTE: batch #72+ are handled by RenameFromCSV.py (CSV-driven, avoids Jython method size limit).
     # Data truth source: doc/dev/naming-proposals.csv + doc/dev/eval/<addr>.plate.txt

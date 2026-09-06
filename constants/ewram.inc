@@ -658,3 +658,10 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ Source: doc/dev/refine/F13-Seg-3.proposal.md (review PASS)
 @ =============================================================================
 .equ gEquipActivationScanCursor, 0x0201e204  @ Absolute u32 cursor address equal to gP1LifePoints+EQUIP_ACTIVATION_SCAN_CURSOR_OFF and gDuelFieldSlots+FIELD_STATE_OFF.
+
+@ =============================================================================
+@ file 13 Seg-5 additions: equip display state and LP card tracking
+@ Source: doc/dev/refine/F13-Seg-5.proposal.md (review EXPANDED_IMPLEMENTATION_PASS)
+@ =============================================================================
+.equ gEquipPhaseDisplayState, 0x0201e274  @ u32 equip phase-display state; gP1LifePoints+EQUIP_PHASE_DISPLAY_STATE_OFF.
+.equ gLpCardTrackNext, 0x0201e28a  @ u16 next LP-card tracking field; gP1LifePoints+0x1daa.

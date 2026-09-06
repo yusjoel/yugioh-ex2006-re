@@ -1601,7 +1601,7 @@ LAB_08094d12:
     adds r1,r0,#0x0    @ 08094d2a 011c
     cmp r1,#0x0                              @ 08094d2c 0029
     bne LAB_08094d54                         @ 08094d2e 11d1
-    bl check_equip_target_slot_state         @ 08094d30 0cf092fc
+    bl tick_equip_display_row_by_type        @ 08094d30 0cf092fc
     adds r1,r0,#0x0    @ 08094d34 011c
     cmp r1,#0x0                              @ 08094d36 0029
     bne LAB_08094d54                         @ 08094d38 0cd1
@@ -1903,18 +1903,10 @@ write_card_display_index_with_bit_offset:
     bx r0                                    @ 08094f54 0047
     .zero  0x2
 
-@ Called by tick_spell_equip_zone_display_seq (caseD_44). No caller-passed parameters; function itself calls
-@ classify_spell_card_activation_type to get current card spell activation type. If result
-@ is nonzero (spell card has a defined activation type), calls
-@ write_card_display_index_with_bit_offset with index=0x1a / bit=1 to write the activation
-@ type flag bit into the display index buffer. If result is 0 (no activation type), returns
-@ immediately without writing.
-@ 
-@ Constants:
-@   DISP_INDEX_SPELL_ACT_TYPE=0x1a (display index 26)
-write_spell_activation_type_display_bit:
+@ Tests whether card_id r0 has a dedicated special-summon material rule. Calls get_special_summon_material_rule_by_card_id; if the result is nonzero, calls write_card_display_index_with_bit_offset with display index 0x1a and bit value 1. Returns without writing when the rule is 0. Input: r0=u16 card_id. Returns: void. Confidence: high.
+write_special_summon_material_rule_display_bit:
     push {lr}                                @ 08094f58 00b5
-    bl classify_spell_card_activation_type   @ 08094f5a 0ff067f9
+    bl get_special_summon_material_rule_by_card_id @ 08094f5a 0ff067f9
     cmp r0,#0x0                              @ 08094f5e 0028
     beq LAB_08094f6a                         @ 08094f60 03d0
     movs r0,#0x1a    @ 08094f62 1a20

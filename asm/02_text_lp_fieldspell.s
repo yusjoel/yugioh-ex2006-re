@@ -16366,7 +16366,7 @@ LAB_08033606:
     bx r1                                    @ 0803360c 0847
     .zero  0x2
 
-@ Count monster zone slots [0..4] for player (r0) that accept new card placement. Loops slot_idx 0..4 calling check_monster_slot_accepts_card(player, slot_idx); counts returns of 1. Returns r5=total accepting slot count [0..5]. Counting sibling of count_available_monster_slots (which only checks presence). Called by check_equip_card_activation_valid and check_banisher_of_light_activatable. r0=u32 player_side [0..1]. Returns u32 count [0..5]. Constants: slot_count=5 [0..4].
+@ Counts monster-zone slots 0..4 for player r0 that accept a new card placement. Calls check_monster_slot_accepts_card for each slot and returns the number of accepted slots in r0, range 0..5. Counting sibling of count_available_monster_slots. Called by check_equip_card_activation_valid and check_banisher_sensitive_summon_allowed. Input: r0=player_side. Confidence: high.
 count_monster_slots_accepting_card:
     push {r4,r5,r6,lr}                       @ 08033610 70b5
     adds r6,r0,#0x0    @ 08033612 061c

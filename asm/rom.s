@@ -76,6 +76,27 @@
 	.equ check_equip_activation_at_slot11_1, check_equip_activation_at_slot11+1
 	.equ check_equip_slot_eligible_by_equip_type_1, check_equip_slot_eligible_by_equip_type+1
 
+@ file 13 Seg-5 THUMB function-pointer +1 aliases
+	.equ check_equip_opponent_zone11_target_1, check_equip_opponent_zone11_target+1
+	.equ check_equip_slot_card_stat8_is_7_1, check_equip_slot_card_stat8_is_7+1
+	.equ check_equip_slot_card_field5_is_nonzero_1, check_equip_slot_card_field5_is_nonzero+1
+	.equ check_equip_slot_eligibility_extended_1, check_equip_slot_eligibility_extended+1
+
+@ file 13 Seg-6 THUMB function-pointer +1 aliases
+	.equ check_equip_slot_by_card_id_dispatch_1, check_equip_slot_by_card_id_dispatch+1
+	.equ check_equip_target_slot_state_matches_1, check_equip_target_slot_state_matches+1
+	.equ check_equip_target_slot_eligible_for_equip_card_1, check_equip_target_slot_eligible_for_equip_card+1
+	.equ check_equip_target_slot_eligible_with_whitelist_1, check_equip_target_slot_eligible_with_whitelist+1
+	.equ check_equip_target_slot_eligible_active_card_1, check_equip_target_slot_eligible_active_card+1
+	.equ check_equip_target_slot_eligible_with_field_checks_1, check_equip_target_slot_eligible_with_field_checks+1
+	.equ check_equip_target_slot_eligible_pair_check_1, check_equip_target_slot_eligible_pair_check+1
+	.equ check_equip_target_slot_eligible_via_activation_eval_1, check_equip_target_slot_eligible_via_activation_eval+1
+
+
+@ file 13 Seg-7 THUMB function-pointer +1 aliases
+	.equ check_equip_target_slot_eligible_by_field6_eq17_1, check_equip_target_slot_eligible_by_field6_eq17+1
+	.equ check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_1, check_equip_target_slot_eligible_by_field9_eq4_field6_eq16+1
+	.equ check_equip_target_slot_eligible_by_whitelist_or_special_1, check_equip_target_slot_eligible_by_whitelist_or_special+1
 
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
@@ -1495,7 +1516,16 @@ equip_activation_phase1_callbacks:
     .word scan_equip_zone_for_special_summon_activation_return_zombie + 1
     .word scan_player_card_array_for_equip_activation_sinister_serpent + 1
     .word scan_player_card_array_for_equip_activation_treeborn_frog + 1
-	.incbin "roms/2343.gba", 0x1e47894, 0x2478
+	.incbin "roms/2343.gba", 0x1e47894, 0x4
+gate_guardian_material_cids:
+    .word SANGA_OF_THUNDER_CID
+    .word KAZEJIN_CID
+    .word SUIJIN_CID
+valkyrion_material_cids:
+    .word ALPHA_MAGNET_WARRIOR_CID
+    .word BETA_MAGNET_WARRIOR_CID
+    .word GAMMA_MAGNET_WARRIOR_CID
+	.incbin "roms/2343.gba", 0x1e478b0, 0x245c
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

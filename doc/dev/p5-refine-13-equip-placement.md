@@ -1,8 +1,8 @@
 # 函数/数据细化计划 -- `asm/13_equip_placement.s`
 
 > 范围 `[0x0809d718,0x080a78dc)`, 精确长度 **41412 B / 0xa1c4**。这是按文件序推进的第14个模块。
-> F13-Seg-1至Seg-4均已完成精确落地、构建、持久化检查及root独立验收；其余6段尚未开始。
-> 下一任务: **F13-Seg-5 `[0x080a1658,0x080a27a0)`**；本轮工作在Seg-4完整验收后进入提交收束，尚未启动Seg-5。
+> F13-Seg-1至Seg-7均已完成精确落地、构建和持久化检查；其余3段尚未开始。
+> 下一任务: **F13-Seg-8 `[0x080a46a0,0x080a585c)`**；必须从`0x080a46a0`起按低地址向高地址推进。
 > 所有落地必须保持ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`；后续仍按executor -> reviewer -> fixer顺序使用gpt-5.6-sol + xhigh。
 
 ## 一、细化要求 (R1-R9)
@@ -34,17 +34,17 @@ source/.rep备份 -> executor proposal -> reviewer独立C1-C13
 
 ## 三、当前进度 (13_equip_placement.s)
 
-2026-09-01完成Seg-1至Seg-4：共495槽全部落地。Seg-1的142槽、15PLATE/142EOL、两函数改名及三表carve，Seg-2的158槽、59PLATE/158槽EOL、8个case EOL、4函数改名及424B R4反汇编，Seg-3的138槽、20PLATE/138EOL、6函数改名及两张回调表carve，以及Seg-4的57槽、7PLATE/57EOL和8个新定义，均通过ROM、保存后检查和root独立验收。Seg-4把2072B零有效入口引用块保留为§5.1；Seg-5至Seg-10尚未开始。
+2026-09-06完成Seg-1至Seg-7：前四段495槽、Seg-5扩展闭包249槽及Seg-6的184槽均已落地。Seg-5因`0x080a18ba -> 0x080a0b20`真实CALL重新打开Seg-4历史Rule-3块，连同原Seg-5完成4个顶层R4区、80个code ranges、141个pool/dataization槽、3个新Function和1个Function改名；历史`[0x080a0b20,0x080a1338)`已从§5.1撤销。Seg-6完成138 EQ、14 REF、32 RENAME，并把末端`[0x080a38f8,0x080a38fc)`反汇编为新Function。全量导出、保存后只读检查、49步资产导出及ROM逐字节验证通过。Seg-7完成73 EQ、19 REF、4 RENAME、96 EOL、9 FUNC_RENAME、14 PLATE和2 carve，本段未引用登记新增0项；Seg-8至Seg-10尚未开始。
 
 | Seg | 半开地址范围 | 字节 | 函数对象 | 4B自动槽 | 裸块/字节 | 状态 |
 |---|---|---:|---:|---:|---:|---|
 | 1 | `[0x0809d718,0x0809e6f4)` | 4060 | 15 | 142 → 0 | 0/0 | ✅ 已验证 |
 | 2 | `[0x0809e6f4,0x0809f744)` | 4176 | 59 | 126+32新增 → 0 | 0/0 | ✅ 已验证 |
 | 3 | `[0x0809f744,0x080a0840)` | 4348 | 20 | 138 → 0 | 0/0 | ✅ 已验证 |
-| 4 | `[0x080a0840,0x080a1658)` | 3608 | 7 | 57 → 0 | 1/2072 | ✅ 已验证；§5.1保留2072B |
-| 5 | `[0x080a1658,0x080a27a0)` | 4424 | 38 | 108 | 5/1222 | 未开始 |
-| 6 | `[0x080a27a0,0x080a38fc)` | 4444 | 16 | 184 | 1/4 | 未开始 |
-| 7 | `[0x080a38fc,0x080a46a0)` | 3492 | 22 | 96 | 0/0 | 未开始 |
+| 4 | `[0x080a0840,0x080a1658)` | 3608 | 8 | 57 → 0 | 0/0 | ✅ 已验证；历史闭包由Seg-5重开并完成 |
+| 5 | `[0x080a1658,0x080a27a0)` | 4424 | 40 | 108 → 0 | 2/36 | ✅ 已验证；§5.1保留36B |
+| 6 | `[0x080a27a0,0x080a38fc)` | 4444 | 16+1新增 | 184 → 0 | 0/0 | ✅ 已验证；§5.1为0 |
+| 7 | `[0x080a38fc,0x080a46a0)` | 3492 | 22 | 96 | 0/0 | ✅ 已完成 |
 | 8 | `[0x080a46a0,0x080a585c)` | 4540 | 7 | 155 | 0/0 | 未开始 |
 | 9 | `[0x080a585c,0x080a689c)` | 4160 | 13 | 111 | 0/0 | 未开始 |
 | 10 | `[0x080a689c,0x080a78dc)` | 4160 | 13 | 78 | 2/1038 | 未开始 |
@@ -55,7 +55,7 @@ source/.rep备份 -> executor proposal -> reviewer独立C1-C13
 
 建档时全模块已有1329条.word, 其中134条不属于当时的自动槽定义; 仍须在所属段测绘检查用途。初始注释扫描命中90行旧自动名、18行非ASCII注释, 这是扫描行数而非PLATE数量; 正式段内分析须归并到实际comment对象。
 
-Seg-1完成后实测剩余 **1057个自动标签定义**：四字节池槽 **1053 = DAT631 + DWORD313 + PTR109 + UNK0**，另4个DAT裸块头。Seg-2再消除原126个自动槽及`DAT_0809e74c`块头，剩余 **930个自动标签定义**：四字节池槽 **927 = DAT528 + DWORD310 + PTR89 + UNK0**，另3个DAT裸块头。Seg-3再消除138个自动槽，剩余 **792个自动标签定义**：四字节池槽 **789 = DAT422 + DWORD295 + PTR72 + UNK0**，另3个DAT裸块头。Seg-4再消除57个自动槽，当前剩余 **735个自动标签定义**：四字节池槽 **732 = DAT408 + DWORD252 + PTR72 + UNK0**，另3个DAT裸块头。上述阶段计数及初始注释扫描数均保留为历史；模块尚未整体清零。
+Seg-1完成后实测剩余 **1057个自动标签定义**：四字节池槽 **1053 = DAT631 + DWORD313 + PTR109 + UNK0**，另4个DAT裸块头。Seg-2再消除原126个自动槽及`DAT_0809e74c`块头，剩余 **930个自动标签定义**：四字节池槽 **927 = DAT528 + DWORD310 + PTR89 + UNK0**，另3个DAT裸块头。Seg-3再消除138个自动槽，剩余 **792个自动标签定义**：四字节池槽 **789 = DAT422 + DWORD295 + PTR72 + UNK0**，另3个DAT裸块头。Seg-4再消除57个自动槽，曾剩余 **735个自动标签定义**：四字节池槽 **732 = DAT408 + DWORD252 + PTR72 + UNK0**，另3个DAT裸块头。Seg-5再消除原108个四字节自动槽及`DAT_080a1720`、`DAT_080a2018`两个裸块头，剩余 **625个自动标签定义**：四字节池槽624个，另1个Seg-10裸块头；R4中新产生并已命名的141个pool/dataization槽不计入自动残留。Seg-6再消除184个四字节自动槽，当前剩余 **441个自动标签定义**：四字节池槽440个，另1个Seg-10裸块头。上述阶段计数及初始注释扫描数均保留为历史；模块尚未整体清零。
 
 ## 四、工作记录
 
@@ -132,7 +132,40 @@ Seg-1完成后实测剩余 **1057个自动标签定义**：四字节池槽 **105
 - 全量Ghidra导出、4条独立mode清理、inject、split及25模块边界检查完成；`export_all.py` 49/49、`NOPAUSE=1 build.bat`和fresh只读持久化检查均成功。输出ROM为33554432B，与原ROM逐字节相同，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。相对pre-Seg-4的59文件快照仅`asm/13_equip_placement.s`、三份新增常量文件和`output/2343.elf`变化；其他24模块、`rom.s`、includes、CSV、registry、四份inventory和exporter修复保持。
 - 自身`f13-seg4-landing-gates.json`与root汇总`root-f13-seg4-final-gates.json`均PASS：57槽asm表达式/ELF/ROM值、8定义、62地址、7函数、2072B块、ASCII/残留和模块scope全部精确；root的fresh只读查询结束后15DB文件hash保持。当前asm13 SHA256 `aaa2b403112747ba06a0994ca7688044542adc935c807f8a95edb3d54a7b9044`。本轮在Seg-4完整验收后进入提交收束。
 
-下一段为Seg-5 `[0x080a1658,0x080a27a0)`；尚未启动语义分析。
+下一段为Seg-5 `[0x080a1658,0x080a27a0)`；本句保留§4.04完成时的时态；其后完成结果见§4.05。
+
+### 4.05 F13-Seg-5 扩展闭包完成记录 (2026-09-05，已验证)
+
+- 最终冻结输入为script SHA256 `32f868a41634f1854da60be8a8e50224497e5d57a12a71a7c9f4ec50b625e154`、proposal `b045999088ac6e758eb236e9920d26a74941532b7ce208bd6322176244d67317`、review `191048643145dffc834f8b6ed78330ba857886deddc9a26765bbf2fd678e7477`、TSV `ff0425315b47c77c8576776d66abfe01d8415acdb1cda3c3f3bc7ab4d64d4664`、plan `b88304291a070a70b89da05eb4599b0a15bab32956487a3362726473c142387a`、ref-scan `a5677da287f2168237d108e6233ebeef240e0d9d798ee24796c9f7c90c429eac`及375行direct-edge ledger `88ac58dc4bc0815933535bbd8252a84d959acb9e4955bc05936ed4563dbf182a`。
+- 本轮按扩展闭包一次事务落地249槽=`190 EQ + 33 REF + 26 RENAME`，4个顶层R4区、80个精确code ranges、1231条指令/2640B、141个pool/dataization槽、29个padding ranges、10 PLATE和250 EOL；7个新常量/全局及4个Thumb `fn+1` GAS alias同步到正式源码。所有Ghidra PLATE/EOL为ASCII，最大PLATE 456字符；0 carve、0未批准边。
+- `0x080a18ba -> 0x080a0b20`真实CALL使Seg-4历史`[0x080a0b20,0x080a1338)`退出Rule 3。该2072B闭包完整恢复为49个code ranges、822条指令/1754B、71个pool/284B与17处padding/34B；创建`tick_equip_card_message_by_id` Function，精确49-range body，`0x080a131c`只保留为该函数local shared epilogue，不创建独立Function。原Seg-5的31个code ranges、70个pool/dataization槽及动作合同原样保留。
+- 原五个Seg-5裸块中：`[0x080a1720,0x080a190a)`和`[0x080a2018,0x080a2234)`按R4反汇编，`[0x080a1950,0x080a1954)`按消费者dataize；`[0x080a1f68,0x080a2000)`按R4成为`tick_equip_target_slot_selection_phase`，其前缀`[0x080a1f54,0x080a1f68)`20B继续Rule 3；`[0x080a1dd8,0x080a1de8)`16B继续Rule 3。Seg-5残余§5.1因此精确为两块36B。
+- 全局Function数5209 -> 5212：创建`0x080a0b20 tick_equip_card_message_by_id`（ID32955）、`0x080a1f68 tick_equip_target_slot_selection_phase`（ID32959）、`0x080a24cc check_equip_opponent_zone11_target`（ID32960）；既有ID16936的`0x080a1658`仅改名为`tick_equip_display_row_by_type`并扩展审定body，APCS、incoming、精确body ranges和Symbol合同均通过fresh只读检查。
+- Retry-1/2暴露递归反汇编coverage gap；Retry-3确认必须在pool/listing重建前规范switch Symbol，并把`0x080a16d4`同址唯一primary一起前移。expanded probe又固化边界`0x080a38f8`的完整只读投影合同。最终脚本采用批准range内确定性gap-fill，所有probe均强制rollback并在退出后从物理备份恢复；正式expanded apply的PREFLIGHT、POSTCHECK及STATUS均FAIL=0，receipt保存成功。fresh `-noanalysis -readOnly` persisted check复核249槽、80 ranges、141 pools、3 create+1 rename、10 PLATE/250 EOL、375 edges、32个Symbol身份和两Rule-3区，DB查询前后15文件hash完全相同。
+- `0x080a187a`的CALL只投影出一个global primary DEFAULT Label `SUB_080a38f8`；`0x080a38f8`四字节仍为`01 20 70 47`，Data/Instruction/Function/EOL/PLATE均为空且无alias。本轮没有对其disasm、建Function、命名、注释或retype；它是下一完整Seg-6必须从低地址向高地址闭合的边界stub。
+- 全量导出`080000c0..084c7637`后删除4条独立mode、inject/split及25段边界检查通过。相对正式source snapshot，25模块中仅asm12和asm13变化：asm12唯一变化是`0x08094d30`调用名，asm13仅历史闭包、原Seg-5及唯一`SUB_080a38f8:`投影行变化；`[0x080a1338,0x080a1658)`、`[0x080a27a0,0x080a38f8)`与38f8原`.byte`起至EOF逐行相同。当前asm13 SHA256为`29bc339007301208e3877dc7ce5722580a87f5b21a932227083fc0438102abf3`。
+- 真实Function inventory为total5212/named5122/auto90。三项新Function只进入真实inventory，不新增历史评分行；CSV仅`0x080a1658`一行name cell改变，registry与source snapshot逐字节相同。`export_all.py` 49/49和`NOPAUSE=1 build.bat`成功；`output/2343.gba`为33554432B，`fc /b`无差异，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+
+主要证据位于`output/refine-run-20260831-194634/`：`f13-seg5-expanded-apply-receipt.json`、`f13-seg5-expanded-persisted-check.json`、`f13-seg5-expanded-production-scope.json`、`f13-seg5-expanded-inventory-check.json`、`f13-seg5-expanded-rom-verify.json`及`f13-seg5-expanded-landing-gates.json`。
+
+下一段为Seg-6 `[0x080a27a0,0x080a38fc)`；本句保留§4.05完成时的时态，其后完成结果见§4.06。
+
+### 4.06 F13-Seg-6 完成记录 (2026-09-06，已验证)
+
+- 最终冻结输入为review SHA256 `abf6c5209a3f9138e7c247488575cea913f78c586ca03c0d57b1107a01e942d1`、plan `6e80777abf14d0e74436bd47ae1990f2efc63ae5c6a2db1839384ed5ba195d8a`、script `f2bd90aed7fe29f717c67204c621cd9ca922cd556050fa6c6dd0222b76372ebb`、apply wrapper `45d343d0ed2018610b6c1f31e1c31e3eaa284928625f9d57dd5bc776c0b0b57a`、proposal `e8b6d3846956140b66a09876873622bb7bb6b1f2de332cd36ef1de3779ceaeab`及TSV `2070db7653e739f32396fa55c7ca49c70575edb857f3523fb0e55416f983d1fe`。实写前物理`.rep`备份15/15与完整63-path source baseline均通过冻结门禁。
+- 一次事务完成184槽=`138 EQ + 14 REF + 32 RENAME`、5个target合同、14个REF Data不变合同、9 PLATE和184 EOL；新增3个`duel_field.inc`常量及8个Thumb `fn+1` GAS alias。全部Ghidra PLATE/EOL为ASCII；0 carve、0 §5.1、0未批准边。
+- `0x080a38f8`的原始字节`01 20 70 47`按R4成为两条Thumb指令和新Function `return_equip_row_type_13_complete`，body精确为`[0x080a38f8,0x080a38fc)`；全局Function数5212 -> 5213。post状态覆盖97个code ranges、1714条指令/3594B及47个padding ranges，并保持16个既有Function body；379条直接B/BL/Bcc边全部通过冻结ledger。
+- 前两次正式尝试分别因target Data后态比较缺少完整跨度字段、外层wrapper依赖JSON属性顺序而安全停止；均未越过持久化/导出门禁。窄修只收紧守卫与wrapper判定，184项语义动作不变。retry-3 apply exit 0、事务commit marker与postcheck FAIL=0；receipt SHA256 `8065eb2faef3fa5be32e612d428424fc18fad6a5880e758eb2069bc2935f0b43`。随后fresh `-noanalysis -readOnly` persisted check PASS，查询前后15个DB文件完全相同。
+- 全量导出`080000c0..084c7637`、4条独立mode清理、inject/split及25模块边界检查完成。25模块仅`asm/13_equip_placement.s`变化；Seg-6前唯一投影为`0x080a187a`的callee名从`SUB_080a38f8`变为`return_equip_row_type_13_complete`，`0x080a38fc`起后缀逐字节不变。asm13 SHA256 `bedc6c7c34abfb18f1ddbcc979e1ad49d5f33d1bfcc740ba1a76316d2090042f`。
+- 真实Function inventory为total5213/named5123/auto90，新Function只进入inventory；`naming-proposals.csv`和function registry均保持。`export_all.py` 49/49和`NOPAUSE=1 build.bat`成功；`output/2343.gba`为33554432B，`fc /b=0`，与原ROM逐字节相同，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+
+主要证据位于`output/refine-run-20260831-194634/`：`f13-seg6-apply-gate.json`、`f13-seg6-apply-receipt.json`、`f13-seg6-persisted-gate.json`、`f13-seg6-source-scope.json`、`f13-seg6-inventory-check.json`、`f13-seg6-rom-verify.json`及`f13-seg6-landing-gate.json`。
+
+### 4.07 F13-Seg-7 完成记录 (2026-09-06，已验证)
+
+- 一次事务完成73 EQ、19 REF、4 RENAME、96 EOL、9 FUNC_RENAME、14 PLATE和2 carve；全部动作、持久化、导出、inventory、构建与ROM逐字节门禁通过。
+- 事实链: retry1_failure=POWERSHELL_WRAPPER_LEXICAL_FAILURE; retry1_restore=COMPLETE; retry2_apply=SUCCESS; retry2_persisted=SUCCESS; retry2_failure=INVENTORY_SCHEMA_KEYERROR; retry2_restore=COMPLETE; retry3_status=PREWRITE_REJECTED_BAD_SEG8_BOUNDARY; retry3_ghidra_write=NONE; retry3_source_write=NONE; retry3_restore=NOT_REQUIRED; retry4_status=PREWRITE_REJECTED_PROPOSAL_SHA256_LENGTH_65; retry4_ghidra_write=NONE; retry4_source_write=NONE; retry4_restore=COMPLETE; retry5_apply=SUCCESS; retry5_persisted=SUCCESS; retry5_source_edits=SUCCESS; retry5_inventory=SUCCESS; retry5_failure=SEG8_SUFFIX_SCOPE_OVERSTRICT; retry5_restore=COMPLETE; retry6_apply=SUCCESS; retry6_persisted=SUCCESS; retry6_source_edits=SUCCESS; retry6_inventory=SUCCESS; retry6_failure=SUFFIX_NORMALIZATION_PADDING_MISMATCH; retry6_restore=COMPLETE; retry7_apply=SUCCESS; retry7_persisted=SUCCESS; retry7_source_edits=SUCCESS; retry7_inventory=SUCCESS; retry7_seg8_suffix=SUCCESS; retry7_failure=MODULE04_EXPORT_PADDING_ASSERTION; retry7_restore=COMPLETE; retry8_status=FINAL_SUCCESS; retry8_landing=PASS; §5.1=0; 下一任务 F13-Seg-8 [0x080a46a0,0x080a585c)。
+- 本段无ROM_INCBIN/.byte裸块，未引用登记新增0项；下一段继续按地址序执行。
 
 ## 五、10段路线图 (地址序)
 
@@ -143,10 +176,10 @@ Seg-1完成后实测剩余 **1057个自动标签定义**：四字节池槽 **105
 | 1 | `0809d718..0809e6f4` | 15/0 | 0/0/0/0 | 0 | 0 | 本轮完成 | ✅ 已验证 |
 | 2 | `0809e6f4..0809f744` | 59/1 | 0/0/0/0 | 0 | 0 | 本轮完成 | ✅ 已验证 |
 | 3 | `0809f744..080a0840` | 20/10 | 0/0/0/0 | 0 | 0 | 本轮完成 | ✅ 已验证 |
-| 4 | `080a0840..080a1658` | 7/0 | 0/0/0/0 | 0 | `080a0b20/818` incbin | 本轮完成 | ✅ 已验证；§5.1保留2072B |
-| 5 | `080a1658..080a27a0` | 38/0 | 52/36/20/0 | 2 | `080a1720/1ea` incbin; `080a1950/4` .byte; `080a1dd8/10` .byte; `080a1f54/ac` incbin; `080a2018/21c` incbin | 未核验 | executor -> reviewer -> fixer |
-| 6 | `080a27a0..080a38fc` | 16/0 | 66/101/17/0 | 0 | `080a38f8/4` .byte | 未核验 | executor -> reviewer -> fixer |
-| 7 | `080a38fc..080a46a0` | 22/2 | 92/0/4/0 | 0 | 0 | 未核验 | executor -> reviewer -> fixer |
+| 4 | `080a0840..080a1658` | 8/0 | 0/0/0/0 | 0 | 0 | 本轮完成；历史闭包重开 | ✅ 已验证；原§5.1块已R4闭合 |
+| 5 | `080a1658..080a27a0` | 40/0 | 0/0/0/0 | 0 | `080a1dd8/10` .byte; `080a1f54/14` incbin | 本轮完成 | ✅ 已验证；§5.1保留36B |
+| 6 | `080a27a0..080a38fc` | 16/0 + 1新增 | 0/0/0/0 | 0 | 0 | 本轮完成 | ✅ 已验证；38f8边界stub已R4闭合 |
+| 7 | `080a38fc..080a46a0` | 22/2 | 92/0/4/0 | 0 | 0 | ✅ 已完成 | ✅ 已验证；本段未引用登记新增0项 |
 | 8 | `080a46a0..080a585c` | 7/0 | 138/0/17/0 | 0 | 0 | 未核验 | executor -> reviewer -> fixer |
 | 9 | `080a585c..080a689c` | 13/0 | 60/37/14/0 | 0 | 0 | 未核验 | executor -> reviewer -> fixer |
 | 10 | `080a689c..080a78dc` | 13/0 | 0/78/0/0 | 1 | `080a7234/40a` incbin; `080a764c/4` .byte | 未核验 | executor -> reviewer -> fixer |
@@ -184,20 +217,21 @@ Seg-2有59个既有函数对象; Seg-4含2072B裸块; Seg-5含5块; Seg-6有184�
 | 地址范围 | 类型 | 大小 | Seg | 当前块头自动标签 | 状态 |
 |---|---|---:|---:|---|---|
 | `[0x0809e74c,0x0809e8f4)` | ROM_INCBIN | 424 | 2 | `DAT_0809e74c` | ✅ R4反汇编为145指令+25池+4处2B padding，残留0；见§4.02 |
-| `[0x080a0b20,0x080a1338)` | ROM_INCBIN | 2072 | 4 | `none` | ✅ Rule 3 / §5.1保留；entry raw/THUMB=0/0、有效内部入口引用0；见§4.04 |
-| `[0x080a1720,0x080a190a)` | ROM_INCBIN | 490 | 5 | `DAT_080a1720` | 所属段执行raw/THUMB扫描及消费者分类 |
-| `[0x080a1950,0x080a1954)` | .byte | 4 | 5 | `none` | 所属段执行raw/THUMB扫描及消费者分类 |
-| `[0x080a1dd8,0x080a1de8)` | .byte | 16 | 5 | `none` | 所属段执行raw/THUMB扫描及消费者分类 |
-| `[0x080a1f54,0x080a2000)` | ROM_INCBIN | 172 | 5 | `none` | 所属段执行raw/THUMB扫描及消费者分类 |
-| `[0x080a2018,0x080a2234)` | ROM_INCBIN | 540 | 5 | `DAT_080a2018` | 所属段执行raw/THUMB扫描及消费者分类 |
-| `[0x080a38f8,0x080a38fc)` | .byte | 4 | 6 | `none` | 所属段执行raw/THUMB扫描及消费者分类 |
+| `[0x080a0b20,0x080a1338)` | ROM_INCBIN | 2072 | 4 | `none` | ✅ `080a18ba -> 080a0b20`真实CALL触发重开；49 ranges/822指令+71 pools+17 padding完整R4，§5.1撤销；见§4.05 |
+| `[0x080a1720,0x080a190a)` | ROM_INCBIN | 490 | 5 | `DAT_080a1720` | ✅ 18个code ranges及19个switch word完整R4，块头自动名消除 |
+| `[0x080a1950,0x080a1954)` | .byte | 4 | 5 | `none` | ✅ 按`080a18fa` literal消费者dataize为一个4B scalar |
+| `[0x080a1dd8,0x080a1de8)` | .byte | 16 | 5 | `none` | ✅ Rule 3 / §5.1保留16B；raw/THUMB入口均0 |
+| `[0x080a1f54,0x080a2000)` | ROM_INCBIN | 172 | 5 | `none` | ✅ `[1f54,1f68)`20B Rule 3；`[1f68,2000)`2 ranges/Function完整R4 |
+| `[0x080a2018,0x080a2234)` | ROM_INCBIN | 540 | 5 | `DAT_080a2018` | ✅ 11个code ranges及switch/pool完整R4，块头自动名消除 |
+| `[0x080a38f8,0x080a38fc)` | .byte | 4 | 6 | `none` | ✅ R4反汇编为2条Thumb指令并创建`return_equip_row_type_13_complete` Function；见§4.06 |
 | `[0x080a7234,0x080a763e)` | ROM_INCBIN | 1034 | 10 | `DAT_080a7234` | 所属段执行raw/THUMB扫描及消费者分类 |
 | `[0x080a764c,0x080a7650)` | .byte | 4 | 10 | `none` | 所属段执行raw/THUMB扫描及消费者分类 |
 
 ### 5.1 未引用数据登记表
 
-Seg-1段内无裸块，三个有真实引用的段外表均carve；Seg-2的424B块有真实switch/控制流/literal引用并已按R4完整反汇编；Seg-3段内无裸块，两张有真实引用的段外回调表均carve。Seg-4新增下列1项§5.1登记；Seg-5至Seg-10尚未分类，建档机械测绘不构成零引用结论。
+Seg-1段内无裸块，三个有真实引用的段外表均carve；Seg-2的424B块有真实switch/控制流/literal引用并已按R4完整反汇编；Seg-3段内无裸块，两张有真实引用的段外回调表均carve。Seg-4原登记的`[0x080a0b20,0x080a1338)`因Seg-5调查发现真实外部CALL `0x080a18ba -> 0x080a0b20`而撤销，扩展闭包已完整R4。当前Seg-5仅保留下列2项共36B；Seg-6的4B尾块已R4闭合且本段§5.1为0；Seg-7无裸块且本段未引用登记新增0项；Seg-8至Seg-10尚未完成分类。
 
 | 地址 | 大小 | Seg | raw/THUMB原始命中 | 引用/分支排除证据 | 已评审结论 |
 |---|---|---|---|---|---|
-| `[0x080a0b20,0x080a1338)` | 2072B | 4 | entry `0/0`；内部滑窗raw=391、thumb=367 | 758个内部命中均不来自当前asm真实机器行或结构化数据行；Ghidra前后保持2072个DataDB1且无Function/Instruction/DefinedData/ref。55个BL均为出边，块内共享退出不构成入口引用 | Rule 3保留原`ROM_INCBIN`；仅在后续发现真实外部入口引用时重新进入R4 |
+| `[0x080a1dd8,0x080a1de8)` | 16B | 5 | entry raw/THUMB=`0/0` | 全ROM ref-scan、直接边和Ghidra引用均无有效入口；不属于相邻Function body，原字节及listing保持 | Rule 3保留原16B `.byte`/zero投影 |
+| `[0x080a1f54,0x080a1f68)` | 20B | 5 | entry raw/THUMB=`0/0` | 原`[1f54,2000)`仅1个raw资产偶合；真实BL目标为`1f68`，前20B无入口、无fall-through且不属于新Function body | Rule 3保留`ROM_INCBIN 0xa1f54, 0x14` |
