@@ -138,15 +138,7 @@ DWORD_080a7b70:
 DWORD_080a7b74:
     .word  0x000005ac                     @ 080a7b74 ac050000
 
-@ Equip phase tick function, called by dispatch_equip_phase_by_card_id_range
-@ (0x080a8c30) via LAB_080a8f4e path (indeg=1). Reads struct 0x0201e4d0 byte[0x13]
-@ and byte[0x14], extracts combined_index = (byte[0x14] & 1) << 7 | byte[0x13] >> 1.
-@ Dispatches: == 0: LAB_080a7bba; == 1: LAB_080a7d10; == 2: LAB_080a7d48;
-@ == 3: LAB_080a7e30; > 3: LAB_080a7f38 (out of range). Frame: sub sp,#0x8 (small
-@ frame). High registers saved via .hword 0x4657/464e/4645 = mov r7,r10/r6,r9/r5,r8.
-@ Case 0 (LAB_080a7bba): str r0,[r3+0x5a0] (0xb4*8=0x5a0, set status word).
-@ Symmetric with tick_equip_phase_by_lp_index_range_b, switch range [0..3].
-@ Constants: STRUCT_BASE=0x0201e4d0, frame_delta=-0x8, switch_range=[0..3].
+@ Four-state equip phase callback called by dispatch_equip_phase_by_card_id_range at 0x080a8f4e (indeg=1). It derives combined_index from gEquipZoneRankState bytes 0x13 and 0x14, then routes values 0..3 to case entries 0x080a7bba, 0x080a7d10, 0x080a7d48, and 0x080a7e30; larger values use 0x080a7f38. Case 0 writes the status word at gEquipZoneRankState+0x5a0. No APCS inputs. Returns phase status and updates equip-selection state.
 tick_equip_phase_by_lp_index_range_c:
     push {r4,r5,r6,r7,lr}                    @ 080a7b78 f0b5
     .hword 0x4657    @ 080a7b7a 5746
@@ -1873,7 +1865,7 @@ DWORD_080a8b28:
 DWORD_080a8b2c:
     .word  0x0201e2a0                     @ 080a8b2c a0e20102
 DWORD_080a8b30:
-    .word  0x080a5da1                     @ 080a8b30 a15d0a08
+    .word  check_ancient_gear_castle_counter_slot_requirement_1 @ 080a8b30 a15d0a08
 LAB_080a8b34:
     ldr r0, DWORD_080a8b70                   @ 080a8b34 0e48
     bl init_zone_activation_display_fields   @ 080a8b36 edf745ff
@@ -1906,7 +1898,7 @@ LAB_080a8b3a:
     movs r0,#0x0    @ 080a8b6c 0020
     b LAB_080a8c28                           @ 080a8b6e 5be0
 DWORD_080a8b70:
-    .word  0x080a5da1                     @ 080a8b70 a15d0a08
+    .word  check_ancient_gear_castle_counter_slot_requirement_1 @ 080a8b70 a15d0a08
 DWORD_080a8b74:
     .word  0x0201e4d0                     @ 080a8b74 d0e40102
 LAB_080a8b78:
@@ -2003,22 +1995,7 @@ LAB_080a8c28:
     pop {r1}                                 @ 080a8c2c 02bc
     bx r1                                    @ 080a8c2e 0847
 
-@ Equip phase hub dispatcher, called by dispatch_equip_entry_slot_by_mode (0x080ab200)
-@ in struct[0x12] bit0=1 path (indeg=1). Reads struct 0x0201e4d0[0x0] dword, extracts
-@ bits[16:8] as card_id (lsls #9; lsrs #17). Compares card_id against a series of
-@ threshold constants and dispatches to different equip tick functions:
-@ - card_id == 0x17c2: bl tick_equip_target_phase_with_lp_confirm_slot_context
-@ - card_id in bitmap-confirm range: bl tick_equip_target_phase_with_bitmap_confirm
-@ - card_id range including 0x1487-0x4: bl tick_equip_phase_by_lp_index_range_a
-@ - card_id ranges: bl tick_equip_phase_by_lp_index_range_b/c
-@ - check_card_id_is_normal_summon_type nonzero: bl tick_equip_phase_normal_summon_type
-@ - others: bl dispatch_equip_confirm_action_by_phase / dispatch_equip_phase_unless_activation_pending
-@ Exit LAB_080a8fb0 converges; failure exit LAB_080a8f18 goes to parent shared exit.
-@ Constants: STRUCT_BASE=0x0201e4d0, card_id_field=bits[16:8] of [+0x0],
-@ Threshold set: 0x17c2 (Blue-Eyes Shining Dragon), 0x1487 (Garuda the Wind Spirit),
-@ 0x1299 (The Fiend Megacyber), 0x0fe9 (Perfectly Ultimate Great Moth),
-@ 0x112e (Metalzoa), 0x128c (Red-Eyes Black Metal Dragon),
-@ 0x13b5 (Moisture Creature), 0x19f8 (Helios Tris Megiste).
+@ Card-ID phase hub called by dispatch_equip_entry_slot_by_mode. It extracts the card ID from gEquipZoneRankState and routes to card-specific state machines. Updated routes include Metamorphosis, Vampire Genesis/Neo Bubbleman, Gate Guardian, Valkyrion, Masked Beast Des Gardius, special-summon banish materials, Swift Gaia, and Behemoth. The branch at 0x080a8f36 calls tick_special_summon_banish_material_phase. Returns the selected handler result.
 dispatch_equip_phase_by_card_id_range:
     push {r4,r5,r6,r7,lr}                    @ 080a8c30 f0b5
     .hword 0x4647    @ 080a8c32 4746
@@ -2455,7 +2432,7 @@ LAB_080a8f0c:
     bl dispatch_equip_confirm_action_by_phase @ 080a8f0c fdf7fcfa
     b LAB_080a8fb0                           @ 080a8f10 4ee0
 LAB_080a8f12:
-    bl tick_equip_target_phase_with_bitmap_confirm @ 080a8f12 fdf711fe
+    bl tick_gate_guardian_material_phase_with_confirm @ 080a8f12 fdf711fe
     b LAB_080a8fb0                           @ 080a8f16 4be0
 LAB_080a8f18:
     bl tick_equip_target_phase_with_lp_confirm_slot_context @ 080a8f18 fdf78afb
@@ -2467,19 +2444,19 @@ LAB_080a8f24:
     bl dispatch_equip_state_by_activation_flag @ 080a8f24 fef7aef8
     b LAB_080a8fb0                           @ 080a8f28 42e0
 LAB_080a8f2a:
-    bl tick_equip_multi_target_phase_with_slot_confirm @ 080a8f2a fdf7cdfe
+    bl tick_valkyrion_material_phase_with_slot_confirm @ 080a8f2a fdf7cdfe
     b LAB_080a8fb0                           @ 080a8f2e 3fe0
 LAB_080a8f30:
-    bl tick_equip_phase_by_lp_index_range_b  @ 080a8f30 fdf7a0ff
+    bl tick_masked_beast_des_gardius_material_phase @ 080a8f30 fdf7a0ff
     b LAB_080a8fb0                           @ 080a8f34 3ce0
 LAB_080a8f36:
-    bl tick_equip_phase_by_lp_index_range_a  @ 080a8f36 fef755f9
+    bl tick_special_summon_banish_material_phase @ 080a8f36 fef755f9
     b LAB_080a8fb0                           @ 080a8f3a 39e0
 LAB_080a8f3c:
-    bl tick_equip_ai_placement_phase_with_slot_filter @ 080a8f3c fef788fb
+    bl tick_swift_gaia_summon_placement_phase @ 080a8f3c fef788fb
     b LAB_080a8fb0                           @ 080a8f40 36e0
 LAB_080a8f42:
-    bl dispatch_equip_placement_action_by_phase @ 080a8f42 fef721fc
+    bl tick_behemoth_summon_placement_phase  @ 080a8f42 fef721fc
     b LAB_080a8fb0                           @ 080a8f46 33e0
 LAB_080a8f48:
     bl tick_equip_card_phase_by_7step_table  @ 080a8f48 fef7c8fc
@@ -2497,10 +2474,10 @@ LAB_080a8f60:
     bl tick_equip_sprite_enqueue_by_activation_flag @ 080a8f60 fef7a4f8
     b LAB_080a8fb0                           @ 080a8f64 24e0
 LAB_080a8f66:
-    bl tick_equip_card_phase_with_multi_state_machine @ 080a8f66 fdf799fc
+    bl tick_metamorphosis_target_phase_with_lp_confirm @ 080a8f66 fdf799fc
     b LAB_080a8fb0                           @ 080a8f6a 21e0
 LAB_080a8f6c:
-    bl tick_equip_target_phase_with_bitmap_query_confirm @ 080a8f6c fdf758fd
+    bl tick_vampire_genesis_or_neo_bubbleman_target_phase @ 080a8f6c fdf758fd
     b LAB_080a8fb0                           @ 080a8f70 1ee0
 LAB_080a8f72:
     bl tick_equip_banisher_sprite_phase_by_combined_index @ 080a8f72 fef7b1f8

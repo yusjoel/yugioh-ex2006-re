@@ -69,8 +69,7 @@
 @ PRNG LCG constants (advance_prng_state LCG multiplier/increment; asm/12 Seg-1)
 	.include "constants/prng.inc"
 
-@ F15 uses the reviewed names for these existing entries in files 13 and 14.
-	.equ init_equip_zone_rank_state_from_lp_context, apply_equip_entry_sprite_from_slot_context
+@ F15 uses the reviewed names for these existing entries in file 14.
 	.equ check_player_lp_exceeds_chain_energy_cost, check_player_lp_exceeds_toon_world_cost
 	.equ check_card_id_in_field_spell_placement_bypass_set, check_card_id_in_field_spell_bst
 	.equ compute_peak_monster_zone_score_with_gates, find_best_scored_slot_for_player_with_gate
@@ -108,6 +107,22 @@
 	.equ check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_1, check_equip_target_slot_eligible_by_field9_eq4_field6_eq16+1
 	.equ check_equip_target_slot_eligible_by_whitelist_or_special_1, check_equip_target_slot_eligible_by_whitelist_or_special+1
 
+@ file 13 Seg-8 THUMB function-pointer +1 alias
+	.equ check_card_is_archfiend_type_1, check_card_is_archfiend_type+1
+
+@ file 13 Seg-9 THUMB function-pointer +1 aliases
+	.equ check_equip_sub_entry_slot_pair_eligible_1, check_equip_sub_entry_slot_pair_eligible+1
+	.equ check_moth_evolution_slot_requirement_1, check_moth_evolution_slot_requirement+1
+	.equ check_special_summon_slot_requirement_with_pair_exclusions_1, check_special_summon_slot_requirement_with_pair_exclusions+1
+	.equ check_gate_guardian_material_slot_requirement_1, check_gate_guardian_material_slot_requirement+1
+	.equ check_valkyrion_material_slot_requirement_1, check_valkyrion_material_slot_requirement+1
+	.equ check_masked_beast_des_gardius_material_slot_requirement_1, check_masked_beast_des_gardius_material_slot_requirement+1
+	.equ check_ancient_gear_castle_counter_slot_requirement_1, check_ancient_gear_castle_counter_slot_requirement+1
+
+@ file 13 Seg-10 THUMB function-pointer +1 aliases
+	.equ check_vampire_genesis_or_neo_bubbleman_slot_requirement_1, check_vampire_genesis_or_neo_bubbleman_slot_requirement+1
+	.equ check_equip_target_slot_eligible_by_display_code_1, check_equip_target_slot_eligible_by_display_code+1
+	.equ check_equip_target_slot_eligible_by_extended_stat_1, check_equip_target_slot_eligible_by_extended_stat+1
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 
@@ -1535,7 +1550,15 @@ valkyrion_material_cids:
     .word ALPHA_MAGNET_WARRIOR_CID
     .word BETA_MAGNET_WARRIOR_CID
     .word GAMMA_MAGNET_WARRIOR_CID
-	.incbin "roms/2343.gba", 0x1e478b0, 0x938
+valkyrion_target_material_cids:
+    .word ALPHA_MAGNET_WARRIOR_CID
+    .word BETA_MAGNET_WARRIOR_CID
+    .word GAMMA_MAGNET_WARRIOR_CID
+valkyrion_prompt_material_cids:
+    .word ALPHA_MAGNET_WARRIOR_CID
+    .word BETA_MAGNET_WARRIOR_CID
+    .word GAMMA_MAGNET_WARRIOR_CID
+	.incbin "roms/2343.gba", 0x1e478c8, 0x920
 	.include "asm/equip_activation_response_tables.inc"
 	.incbin "roms/2343.gba", 0x1e491c0, 0xb4c
 assert_pdst_null:

@@ -668,6 +668,12 @@
 .equ EQUIP_ACTIVATION_CARD_ID_MASK, 0x00007fff
 .equ EQUIP_ACTIVATION_CARD_ID_CLEAR_MASK, 0xff8000ff
 
+@ =============================================================================
+@ file 13 Seg-8 addition: equip placement card-ID range lower bound
+@ Source: doc/dev/refine/F13-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_SLOT_CARD_ID_RANGE_MIN,         0x00001386
+
 @ Existing definitions used by file 15.
 .equ EQUIP_SCORE_THRESHOLD_999,                  0x000003e7
 .equ SCORE_DELTA_NEG_1000,                        0xfffffc18  @ signed score -1000

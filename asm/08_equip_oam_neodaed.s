@@ -13435,30 +13435,7 @@ LAB_08069e36:
     pop {r1}                                 @ 08069e3c 02bc
     bx r1                                    @ 08069e3e 0847
 
-@ Entry: effect_slot_ptr (r0) and auxiliary param r1; r9=r1 via .hword 0x4689 = mov r9,r1; r8/r9 inherited from parent frame via .hword 0x464f/0x4646. Checks slot[+0x4].bit2 skip_flag; if set returns 0. Extracts player_id (bit0->r2) and zone_id (bits[6:5]->r5) from slot[+0x2]; computes zone_slot_ptr = r5*20 + player_id*0x868 + gDuelFieldSlots (0x0201c510); compares zone_slot characteristics, if mismatch returns 0. Reads gDuelFieldState+0x4a0 minus 0x77, dispatches via 10-entry switch (states 0x77..0x80):
-@ 
-@ case 0x80: check_monster_zone_field_state_eligible(slot, r9); if != 2 returns 0x78; else trigger_card_display_op31_if_not_active(player, 0x27), returns 0x7f.
-@ case 0x7f: checks 0x0201e2a0+0x8+player_id*4 display flag; if set calls scan_hand_and_field_cards_for_equip_activation(player_id); else write_card_display_ctx_fields(6); returns 0x7e.
-@ case 0x7e: reads gP1LifePoints+0x1d54; if 0 returns 0x80; if [+0x1d5c]==4 or 6 calls apply_equip_entry_sprite_from_slot_context(flag, 0, 0), returns 0x7d; else returns 0x7f.
-@ case 0x7d: checks 0x0201e4d0+0x12 bit3; if clear calls enqueue_sprite_attr_type11(player, card_id, 1, 0), fall-through to case_79.
-@ case 0x78: check_zone_eligible_with_deck_flag(player, 1) + set_lp_display_row_all_slots(opponent, card_id), returns 0x77.
-@ case 0x77: check_zone_eligible_with_deck_flag(player, 0), fall-through to case_79, returns 0.
-@ cases 0x79..0x7b: returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
-@ 
-@ Constants:
-@ - SKIP_BIT = 0x4 (slot[+0x4].bit2)
-@ - STATE_OFFSET = 0x4a0 (0x94<<3)
-@ - gDuelFieldState = 0x0201b290
-@ - gP1LifePoints = 0x0201c4e0
-@ - gDuelFieldSlots = 0x0201c510 (monster zone slot base)
-@ - PLAYER_STRIDE = 0x868
-@ - ZONE_SLOT_SIZE = 0x14 (=20; zone_id*20 for zone_slot_ptr calc)
-@ - LP_ACTIVE_OFFSET = 0x1d54 (gP1LifePoints+0x1d54 activation check)
-@ - LP_MODE_OFFSET = 0x1d5c (gP1LifePoints+0x1d5c mode field: 4 or 6)
-@ - RULE_BASE = 0x0201e2a0 (display rule struct)
-@ - DISP_FLAG_BASE = 0x0201e4d0 (display flag struct; [+0x12].bit3)
-@ - OP31_ARG = 0x27 (trigger_card_display_op31 argument)
-@ - STATE_RANGE_LO = 0x77, STATE_RANGE_HI = 0x80 (switch table bounds)
+@ Equip monster-zone placement state machine for the effect slot in r0. It validates the slot and dispatches field states 0x77..0x80. State 0x7f scans equip activation; state 0x7e reads pending LP context and calls init_equip_zone_rank_state_from_lp_context for modes 4 or 6; later states test zone eligibility, enqueue display work, or advance the field state. Returns the next state code or 0.
 tick_equip_monster_zone_placement_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 08069e40 f0b5
     .hword 0x464f    @ 08069e42 4f46
@@ -13638,7 +13615,7 @@ LAB_08069f98:
     adds r0,r1,#0x0    @ 08069f98 081c
     movs r1,#0x0    @ 08069f9a 0021
     movs r2,#0x0    @ 08069f9c 0022
-    bl apply_equip_entry_sprite_from_slot_context @ 08069f9e 3bf0cbff
+    bl init_equip_zone_rank_state_from_lp_context @ 08069f9e 3bf0cbff
     movs r0,#0x7d    @ 08069fa2 7d20
     b LAB_08069ff6                           @ 08069fa4 27e0
     .zero  0x2

@@ -549,6 +549,26 @@ def resolve_word_symbol(program, data_obj):
     sym = program.getSymbolTable().getPrimarySymbol(to)
     if sym is None:
         return None
+    # F13-Seg-9: preserve the ANALYSIS switch label and its namespace.
+    # Only its reviewed USER DATA pointer may use the existing GAS label.
+    if (data_obj.getAddress().getOffset() == 0x080a5fac and
+            primary.getSource() == SourceType.USER_DEFINED and
+            str(primary.getReferenceType()) == "DATA" and
+            primary.getOperandIndex() == 0 and primary.isPrimary()):
+        target_data = program.getListing().getDefinedDataAt(to)
+        if not (data_obj.getLength() == 4 and to_off == 0x080a5fb0 and
+                (program.getMemory().getInt(data_obj.getAddress()) & 0xffffffff) == to_off and
+                sym.getID() == 5291 and sym.getSource() == SourceType.ANALYSIS and
+                sym.getSymbolType() == SymbolType.LABEL and
+                sym.getName(True) == "switchD_080a5fa2::switchdataD_080a5fb0" and
+                len(iter_any(program.getSymbolTable().getSymbols(to))) == 1 and
+                target_data is not None and target_data.getLength() == 4 and
+                target_data.getDataType().getPathName() == "/pointer"):
+            raise RuntimeError("F13-Seg-9 switch pointer contract changed")
+        gas_label = resolve_unique_label_for_addr(program, to)
+        if gas_label != "switchD_080a5fa2__switchdataD_080a5fb0":
+            raise RuntimeError("F13-Seg-9 switch GAS label changed")
+        return gas_label
     if sym.getSource() != SourceType.USER_DEFINED:
         return None
     if in_rom and sym.getSymbolType() != SymbolType.LABEL:

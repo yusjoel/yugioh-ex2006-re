@@ -2347,13 +2347,13 @@ dispatch_case_3_tickseq1:
 LAB_08095294:
     movs r1,#0x0    @ 08095294 0021
     movs r2,#0x1    @ 08095296 0122
-    bl apply_equip_entry_sprite_from_slot_context @ 08095298 10f04efe
+    bl init_equip_zone_rank_state_from_lp_context @ 08095298 10f04efe
     b LAB_0809533c                           @ 0809529c 4ee0
 dispatch_case_1_tickseq1:
     movs r0,#0x1    @ 0809529e 0120  -- case[1]: movs r0,#1; movs r1,#1; movs r2,#0; bl tick_equip_target_selection_display_seq; b epilogue
     movs r1,#0x1    @ 080952a0 0121
     movs r2,#0x0    @ 080952a2 0022
-    bl apply_equip_entry_sprite_from_slot_context @ 080952a4 10f048fe
+    bl init_equip_zone_rank_state_from_lp_context @ 080952a4 10f048fe
     b LAB_0809533c                           @ 080952a8 48e0
 dispatch_case_2_anim_cmp:
     ldr r2, eligib_anim_state_952cc          @ 080952aa 084a  -- case[2]: ldr+adds+ldr cmp r2,#0xb; branches; bl dispatch_effect_slot_by_display_state; b epilogue
@@ -6310,13 +6310,7 @@ apply_equip_activation_with_id_lookup_type_b:
 card_attr_mask_706c:
     .word  SPRITE_LOW_HALF_MASK           @ 0809706c ffff0000  apply_equip_activation_with_id_lookup_type_b: ands low 16 bits
 
-@ Writes r0 (slot_ref) to gP1LifePoints+0x1d68 and r2 (extra_param) to gP1LifePoints+0x1d48.
-@ Then calls apply_equip_entry_sprite_from_slot_context with fixed params (r0=1, r1=1, r2=0) to submit sprite.
-@ Returns fixed value 0.
-@ Symmetric sibling to submit_equip_slot_sprite_with_ref_b (0x080970a0); both write same fields but call different target offset of apply_equip_entry_sprite_from_slot_context.
-@ Both called via fn-ptr table in dispatch_equip_slot_display_state_by_phase case paths.
-@ Side effects: [gP1LifePoints+0x1d68] := r0; [gP1LifePoints+0x1d48] := r2; apply_equip_entry_sprite_from_slot_context side effects.
-@ Constants: gP1LifePoints=0x0201c4e0, SLOT_REF_OFFSET=0x1d68, EXTRA_PARAM_OFFSET=0x1d48.
+@ Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the first of two symmetric table callbacks.
 submit_equip_slot_sprite_with_ref_a:
     push {r4,lr}                             @ 08097070 10b5
     ldr r1, gp1lp_ptr_97094                  @ 08097072 0849
@@ -6329,7 +6323,7 @@ submit_equip_slot_sprite_with_ref_a:
     movs r0,#0x1    @ 08097080 0120
     movs r1,#0x1    @ 08097082 0121
     movs r2,#0x0    @ 08097084 0022
-    bl apply_equip_entry_sprite_from_slot_context @ 08097086 0ef057ff
+    bl init_equip_zone_rank_state_from_lp_context @ 08097086 0ef057ff
     movs r0,#0x0    @ 0809708a 0020
     pop {r4}                                 @ 0809708c 10bc
     pop {r1}                                 @ 0809708e 02bc
@@ -6342,14 +6336,7 @@ eligib_spr_ctrl_7098:
 actstate_a_709c:
     .word  ACTIVATION_STATE_A_OFF         @ 0809709c 481d0000  submit_equip_slot_sprite_with_ref_a: [+0x1d48] activation state A
 
-@ Symmetric sibling of submit_equip_slot_sprite_with_ref_a (0x08097070).
-@ Writes r0 (slot_ref) to gP1LifePoints+0x1d68 and r2 (extra_param) to gP1LifePoints+0x1d48.
-@ Then calls apply_equip_entry_sprite_from_slot_context with fixed params (r0=1, r1=1, r2=0) to submit sprite.
-@ Only difference from sibling: bl target offset differs (calls alternate entry of apply_equip_entry_sprite_from_slot_context).
-@ Returns fixed value 0.
-@ Called via fn-ptr table in dispatch_equip_slot_display_state_by_phase at different case path than sibling.
-@ Side effects: [gP1LifePoints+0x1d68] := r0; [gP1LifePoints+0x1d48] := r2; apply_equip_entry_sprite_from_slot_context side effects.
-@ Constants: gP1LifePoints=0x0201c4e0, SLOT_REF_OFFSET=0x1d68, EXTRA_PARAM_OFFSET=0x1d48.
+@ Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the second of two symmetric table callbacks.
 submit_equip_slot_sprite_with_ref_b:
     push {r4,lr}                             @ 080970a0 10b5
     ldr r1, gp1lp_ptr_970c4                  @ 080970a2 0849
@@ -6362,7 +6349,7 @@ submit_equip_slot_sprite_with_ref_b:
     movs r0,#0x1    @ 080970b0 0120
     movs r1,#0x1    @ 080970b2 0121
     movs r2,#0x0    @ 080970b4 0022
-    bl apply_equip_entry_sprite_from_slot_context @ 080970b6 0ef03fff
+    bl init_equip_zone_rank_state_from_lp_context @ 080970b6 0ef03fff
     movs r0,#0x0    @ 080970ba 0020
     pop {r4}                                 @ 080970bc 10bc
     pop {r1}                                 @ 080970be 02bc

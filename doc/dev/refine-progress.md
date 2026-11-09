@@ -8,8 +8,10 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `13_equip_placement.s` (0x0809d718..0x080a78dc)。已按地址拆10段，Seg-1..7完成；活动 doc `doc/dev/p5-refine-13-equip-placement.md`记录真实Ghidra函数范围、直接边、裸块分类及落地证据。
-> **下一任务**: file 13 Seg-8 `[0x080a46a0,0x080a585c)`，按executor -> reviewer -> fixer顺序继续；Seg-8尚未开始，必须从`0x080a46a0`起按低地址向高地址推进。
+> **当前文件** `14_equip_ai_scoring.s`（`0x080a78dc..0x080b5348`）。
+> **下一项待纳入 Git 的模块** F14。F15 已有独立提交。
+> **本次续接**: 2026-10-28完成F13-Seg-10及Historical-Closure，模块13全模块独立验收通过：214Fn/1530words/41412B覆盖，自动名/旧注释/非ASCII注释均0，仅保留两项无有效外部引用的§5.1共36B。总进度14/25模块闭合；继续file14。证据 `output/refine-run-20261028-105948/`，ROM33554432B逐字节一致，未stage/commit。
+> **上轮结果**: 2026-10-11完成F13-Seg-8和Seg-9，266槽、10函数改名、32 PLATE及12B carve全部验收；证据目录`output/refine-run-20261011-103530/`。上轮按用户指令在Seg-9完成后停止，本轮新指令恢复。
 > **本轮执行**: 2026-08-31～2026-09-06 从 file 12 Seg-6 恢复，Seg-6..10共685槽及历史补漏8槽完成；file 13 Seg-1..7已完成。全部通过正式review、落地和保存后检查；file 12已闭合，file 13完成7/10段，00..12共13/25模块完成。Seg-7 landing的全量导出、49步资产导出、构建与byte-identical门禁通过。
 > **模块12收尾结果**: F12-Historical-Closure 第二轮 review PASS，8槽（6 RENAME / 2 REF）、19 PLATE、8 EOL、8字节3指令完成；全模块自动数据名/旧自动名注释/裸 `.byte` 均0，仅保留四个无有效引用 §5.1 块共134B。dry/apply/保存后check及主线程 WORD+ELF+ROM/范围/函数/槽引用后态核验全部通过。ROM全字节一致，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。详见活动文档 §4.11 和 `doc/dev/refine/F12-Historical-Closure.review.md`。
 > **file 13 Seg-2结果**: `[0x0809e6f4,0x0809f744)`的119EQ/20REF/19RENAME共158槽、59 PLATE、158槽EOL+8 case EOL、4 FUNC_RENAME完成；424B裸块按R4成为145指令/316B+25池/100B+4处原样2B padding。24NEW/48REUSE，0新增Function/0 carve/0 §5.1。首次apply因后置观察器对Ghidra显示别名、派生prototype和批准incoming分支比较过严而事务rollback，完整语义state等同后窄修守卫并由root重新放行；重试apply、保存后check、全流水线与root scope/names/state/slots均PASS。ROM 33554432B逐字节一致，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`；4 CSV name cells、4 registry tuples及4 inventory names精确同步。详见活动文档 §4.02 和`root-f13-seg2-final-gates.json`。
@@ -138,7 +140,7 @@
 | 10 | equip_effect_dispatch | 0x08079e60..0x080850d8 | Seg-1..10 ✅ 全 10 段完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-10-equip-effect-dispatch.md` |
 | 11 | effect_slot_puzzletext | 0x080850d8..0x080941c4 | Seg-1..10 全完成 (Seg-4=巨块拆 4a..4g) | ✅ 全 10 段完成，池槽补清完成 | `doc/dev/p5-refine-11-effect-slot-puzzletext.md` |
 | 12 | equip_activation_scan | 0x080941c4..0x0809d718 | Seg-1..10 全完成，历史补漏闭合 | ✅ 全模块验收通过；四个§5.1块134B保留 | `doc/dev/p5-refine-12-equip-activation-scan.md` |
-| 13 | equip_placement | 0x0809d718..0x080a78dc | Seg-1..7 ✅，Seg-8..10 已拆 | 🟡 7/10段已验证；下一Seg-8 `[0x080a46a0,0x080a585c)` | `doc/dev/p5-refine-13-equip-placement.md` |
+| 13 | equip_placement | 0x0809d718..0x080a78dc | Seg-1..10及历史收尾完成 | ✅ 全模块验收通过；两项§5.1共36B保留 | `doc/dev/p5-refine-13-equip-placement.md` |
 | 14 | equip_ai_scoring | 0x080a78dc..0x080b5348 | 未拆 | ⬜ | |
 | 15 | equip_target_summon_zoom | 0x080b5348..0x080c1448 | Seg-1..10 全完成 | ✅ 全模块验收通过；自动名/raw 均 0 | `doc/dev/refine/15_equip_target_summon_zoom.md` |
 | 16 | duelfield_zone | 0x080c1448..0x080cbf0c | 未拆 | ⬜ | |

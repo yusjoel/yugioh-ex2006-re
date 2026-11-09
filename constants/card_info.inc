@@ -1149,7 +1149,7 @@
 .equ RAIGEKI_CID,                0x000010f7  @ Raigeki (pw=12580477; card-stats.s slot=0x10F7); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
 .equ ALPHA_MAGNET_WARRIOR_CID,   0x00001288  @ Alpha The Magnet Warrior (pw=99785935; card-stats.s slot=0x1288); check_equip_eligible_with_magnet_warrior_trio; conf: high
 .equ BETA_MAGNET_WARRIOR_CID,    0x0000129b  @ Beta The Magnet Warrior (pw=39256679; card-stats.s slot=0x129B); check_equip_eligible_with_magnet_warrior_trio; conf: high
-.equ GAMMA_MAGNET_WARRIOR_CID,   0x000012b8  @ Gamma The Magnet Warrior (pw=27175001; card-stats.s slot=0x12B8); check_equip_eligible_with_magnet_warrior_trio; conf: high
+.equ GAMMA_MAGNET_WARRIOR_CID,   0x000012b8  @ Gamma The Magnet Warrior (pw=11549357; card-stats.s slot=0x12B8); check_equip_eligible_with_magnet_warrior_trio; conf: high
 .equ cid_12f7,                   0x000012f7  @ unassigned slot 0x12f7 (not in card-stats.s; neighbors: 0x12f8=Tribute to the Doomed, 0x12f9=Soul Release); conf: low
 .equ MAGIC_DRAIN_CID,            0x0000140d  @ Magic Drain (pw=59344077; card-stats.s slot=0x140D); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
 .equ RIRYOKU_FIELD_CID,          0x0000148f  @ Riryoku Field (pw=70344351; card-stats.s slot=0x148F); check_equip_zone_effect_eligible_by_card_id BST leaf; conf: high
@@ -2086,10 +2086,30 @@
 .equ WALL_OF_REVEALING_LIGHT_CID, 0x00001766
 .equ ANTEATEREATINGANT_CID, 0x000019c8
 .equ GRAND_TIKI_ELDER_CID, 0x000013e5
+.equ MELCHID_THE_FOUR_FACE_BEAST_CID, 0x000013e7  @ Melchid the Four-Face Beast (pw=86569121)
 .equ XZ_TANK_CANNON_CID, 0x000015f9
 .equ W_WING_CATAPULT_CID, 0x0000194b
 .equ ELEMENTAL_HERO_NECROSHADE_CID, 0x0000197f
 .equ KAZEJIN_CID, 0x0000111a
+
+@ =============================================================================
+@ file 13 Seg-8 additions: equip placement and special-summon card IDs
+@ Source: doc/dev/refine/F13-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ GREAT_MOTH_CID,                         0x00000fdf
+.equ BLUE_EYES_ULTIMATE_DRAGON_CID,          0x00001122
+.equ ZOA_CID,                                0x0000112d
+.equ CAVE_DRAGON_CID,                        0x000014db
+.equ LEVIA_DRAGON_DAEDALUS_CID,              0x00001707
+.equ CID_GAP_1725,                           0x00001725
+.equ CID_GAP_1729,                           0x00001729
+.equ WARRIOR_OF_ZERA_CID,                    0x0000173b
+.equ MAZERA_DEVILLE_CID,                     0x0000176c
+.equ PYRAMID_OF_LIGHT_CID,                   0x000017bf
+.equ FUSILIER_DRAGON_CID,                    0x00001838
+.equ CID_GAP_1986,                           0x00001986
+.equ PETIT_MOTH_CID_SHIFTED,                 0x85e00000
+.equ COCOON_OF_EVOLUTION_CID_SHIFTED,        0x7f700000
 
 @ Existing definitions used by file 15.
 .equ AUSSA_THE_EARTH_CHARMER_CID, 0x000018bf

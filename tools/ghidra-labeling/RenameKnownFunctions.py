@@ -5069,26 +5069,7 @@ RENAMES = [
         "Returns u32 bool (1=valid, 0=invalid). Read-only. "
         "Constants: guard_card_id=0x13f2, atk_threshold_card=0x19b2, "
         "equip_bonus_threshold=4, mode_weak=1, mode_strong=2."),
-    ("FUN_080a46a0", "eval_card_placement_flags_for_ai",
-        "AI placement decision core: evaluates card_id (r4, non-APCS) for player (r5, non-APCS), "
-        "returns placement suggestion flag-set r6. "
-        "Non-APCS inputs via .hword mov instructions: r4=card_id, r5/r8=player_side, r10=slot_data. "
-        "Main flow: (1) card_id==0 or check_card_field5_is_nonzero fail -> return 0; "
-        "(2) check_card_targeted_by_spell_zone_effect; (3) check_lp_exceeds_spell_copy_threshold; "
-        "(4) count_field_copies_of_card(0x135d) guard; "
-        "(5) large card_id BST dispatch: calls check_field_spell_card_placeable_strict / "
-        "check_field_spell_group_placeable / eval_equip_targets_for_card / "
-        "count_available_monster_slots / count_equip_placements_with_chain_check / "
-        "check_player_can_place_card / check_equip_card_activation_valid / "
-        "count_paired_slots_with_field5_default; accumulates results via orrs r6; "
-        "(6) return r6. "
-        "r5 (non-APCS)=u32 player_side [0..1]; r4 (non-APCS)=u16 card_id [0..0x1fff]; "
-        "r8 (non-APCS)=u32 player_side copy; r10 (non-APCS)=u32 slot_data; "
-        "sp[0]=u32 additional_flag. "
-        "Returns u32 placement_flags (0=do not place). "
-        "Side-effects: [gP1LifePoints+0x1d78] := 0x10/0x11/0x17/0xb on block paths. "
-        "Constants: gDuelFieldSlots=0x0201c510, gP1LifePoints=0x0201c4e0, "
-        "player_stride=0x868, FIELD_SPELL_ZONE=0xb, guard_card_id=0x135d."),
+    ("FUN_080a46a0", "eval_card_placement_flags_for_ai", "Evaluates AI placement flags for player r0, slot selector r1, and mode r2. Loads card_id from gP1LifePoints+r1*4+0x10e0, rejects empty or field5-zero cards, applies spell-target and LP gates, then dispatches card-specific placement checks. Returns combined flags. On active-player block paths writes 0x10, 0x11, 0x17, or 0x0b to gP1LifePoints+ACTIVATION_STATE_B_OFF."),
     ("FUN_080a4694", "eval_card_placement_flags_default",
         "One-parameter wrapper of eval_card_placement_flags_for_ai (FUN_080a46a0) "
         "with fixed chain_check_flag r2=1 (standard check). "
@@ -5110,32 +5091,8 @@ RENAMES = [
         "Returns u16 set_code (0=invalid or no pair). Read-only. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
         "active_flag=0xa5600000, no_pair_sentinel=0xffff0000, set_code_offset=0xc."),
-    ("FUN_080a533c", "check_equip_slot_pair_can_activate",
-        "Check whether the equip-card pair at slot (r0=player, r1+r2=slot) can activate. "
-        "Guard: (r1+r2)>4 -> return 0. "
-        "Read current player bit0 from 0x0201e4d0, call check_slot_card_can_be_equipped. "
-        "If equippable and active (lsls #0x13 == 0x85e00000): call count_available_monster_slots; "
-        "if 0: player mismatch -> return 0; else call check_slot_placement_blocked_by_field_effect. "
-        "Set_code dispatch: read 0x0201e4d0 word, extract set_code (lsls #0x9 lsrs #0x11); "
-        "compare to 0xfdf / 0xfe9 paths; call get_equip_card_set_code_for_slot + "
-        "check_slot_card_pair_allowed; success -> return 0x800; else -> return 0. "
-        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]; "
-        "r9 (non-APCS, caller-set)=u32 match_threshold. "
-        "Returns u32 (0=cannot activate, 0x800=can activate). Read-only. "
-        "Constants: slot_max=4, active_flag=0x85e00000, "
-        "set_code_a=0xfdf, set_code_b=0xfe9, state_base=0x0201e4d0, success=0x800."),
-    ("FUN_080a3a80", "scan_activatable_equip_slots_init",
-        "Initialize equip activation state struct (0x0201e4d0) then scan all field slots for "
-        "an activatable equip pair. "
-        "Init: byte[0] := (r0&1) | (old & ~0x2) (player bit0); word[0] updated with r1 high byte; "
-        "byte[0x12] |= 0x2 (activate-phase flag); byte[0x8] := 0. "
-        "Double loop player=0..1 x slot_idx=0..4: call check_equip_slot_pair_can_activate(p,s,0); "
-        "non-0 -> return 1 immediately. All fail -> return 0. "
-        "r0=u32 player_side [0..1]; r1=u32 card_context (low 15 bits written to state struct). "
-        "Returns u32 bool (1=at least one activatable equip pair found, 0=none). "
-        "Side-effects: [0x0201e4d0] byte/word/byte[0x12]/byte[0x8] updated. "
-        "Constants: state_base=0x0201e4d0, player_mask=0x7fff, activate_flag=0x2, "
-        "player_loop=[0..1], slot_loop=[0..4]."),
+    ("FUN_080a533c", "check_moth_evolution_slot_requirement", "Checks whether slot r1+r2 satisfies the moth evolution card stored in gEquipZoneRankState. Requires Petit Moth in the slot, scans Cocoon of Evolution chain nodes, and compares get_equip_card_set_code_for_slot against stage thresholds 2, 4, or 6 for Larvae Moth, Great Moth, or Perfectly Ultimate Great Moth. Returns 0x800 on success, else 0. Read-only."),
+    ("FUN_080a3a80", "scan_activatable_equip_slots_init", "Initializes gEquipZoneRankState from player r0 and card context r1: player bit0, card-ID bits, activation flag bit1 at +0x12, and mode byte +8=0. Scans players 0..1 and monster slots 0..4 with check_moth_evolution_slot_requirement(player,slot,0). Returns 1 on the first accepted slot, else 0. Writes only the state fields above."),
     ("FUN_08031184", "find_slot_idx_by_set_code",
         "Search player (r0 bit0) hand/slot list for a slot matching set_code r1; return its index. "
         "Reads count from gP1LifePoints+0x10+player*0x868; "
@@ -5164,30 +5121,8 @@ RENAMES = [
         "Result: found (Toon World present) -> 1; not found -> 0. "
         "r0=u32 player_side [0..1]. Returns u32 bool (1=Toon World equip present). "
         "Constants: target_card_id=0x12be (DAT_08033098)."),
-    ("FUN_080a57b8", "check_equip_slot_pair_can_activate_alt",
-        "Alternate variant of check_equip_slot_pair_can_activate for set_code 0x1895/0x19a6. "
-        "Guards: current player bit0 ([0x0201e4d0] byte bit0)==r4 and r5=(r1+r2)<=4. "
-        "Active check: lsls #0x13 on gDuelFieldSlots slot. "
-        "count_available_monster_slots: if 0 and player mismatch -> return 0; "
-        "else check_slot_placement_blocked_by_field_effect. "
-        "Set_code dispatch: 0x1895 -> pair_code=0x1522 (DAT_080a5838); "
-        "0x19a6 -> pair_code=0x18f9 (DAT_080a5850); "
-        "call check_slot_card_pair_allowed(player, slot, pair_code); success -> return 0x800; else 0. "
-        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]. "
-        "Returns u32 (0=cannot activate, 0x800=can activate). Read-only. "
-        "Constants: state_base=0x0201e4d0, set_code_c=0x1895, set_code_d=0x19a6, "
-        "pair_1895=0x1522, pair_19a6=0x18f9, success=0x800."),
-    ("FUN_080a3d0c", "scan_activatable_equip_slots_alt",
-        "Symmetrical alternate variant of scan_activatable_equip_slots_init; "
-        "calls check_equip_slot_pair_can_activate_alt (FUN_080a57b8, set_code 0x1895/0x19a6). "
-        "Same init sequence for 0x0201e4d0: player bit0, r1 high byte, byte[0x12]|=0x2, byte[0x8]:=0. "
-        "Double loop player=0..1 x slot_idx=0..4: "
-        "call check_equip_slot_pair_can_activate_alt(p,s,0); non-0 -> return 1. "
-        "All fail -> return 0. "
-        "r0=u32 player_side [0..1]; r1=u32 card_context. "
-        "Returns u32 bool (1=alt activatable pair found, 0=none). "
-        "Side-effects: same as scan_activatable_equip_slots_init. "
-        "Constants: state_base=0x0201e4d0, player_loop=[0..1], slot_loop=[0..4]."),
+    ("FUN_080a57b8", "check_vampire_genesis_or_neo_bubbleman_slot_requirement", "Checks two upgrade summons for slot r1+r2. Vampire Genesis requires Vampire Lord; Elemental Hero Neo Bubbleman requires Elemental Hero Bubbleman. Enforces current-player, slot-range, active-card, zone-capacity, and field-effect gates, then calls check_slot_card_pair_allowed. Returns 0x800 on success, else 0. r0=player, r1=base slot, r2=offset; read-only."),
+    ("FUN_080a3d0c", "scan_activatable_equip_slots_alt", "Initializes gEquipZoneRankState from player r0 and card context r1, then scans both players and slots 0..4 with check_vampire_genesis_or_neo_bubbleman_slot_requirement. Returns 1 at the first accepted slot, else 0. Writes the state header, activation flag, and mode byte."),
     ("FUN_080a3c2c", "check_banisher_sensitive_summon_allowed",
         "Checks whether the r1 summon card can satisfy its field-slot requirement for player r0 while Banisher of the Light is absent. Dispatches Uria, Hamon, and Anteatereatingant to three Thumb callbacks and scans slots 0..10. Writes gEquipZoneRankState and returns 1 when the requirement is met, else 0. Called from 0x080a50a0. Inputs: r0=player_side, r1=card_id. Confidence: high."),
     ("FUN_080a3dac", "check_gate_guardian_summon_allowed",
@@ -5339,38 +5274,9 @@ RENAMES = [
         "Constants: gDuelFieldSlots=0x0201c510, node_pool=0x0201D9C0, player_stride=0x868."),
 
     # --- batch #21 (campaign-21, 2026-05-08) duel field equip activation eval cluster ---
-    ("FUN_080a5498", "check_equip_slot_pair_can_activate_full",
-        "Core equip slot pair activation checker. "
-        "Guards: (r1+r2)<=4; reads [0x0201e4d0] activation state, gDuelFieldSlots. "
-        "Dispatches on set_code (0x112e/0x128c/0x1758/0x1895/0x19a6) to specialized sub-checks; "
-        "default path: check_slot_card_can_be_equipped + check_slot_placement_blocked_by_field_effect. "
-        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]. "
-        "Returns u32 (0x800=can activate, 0=cannot). Read-only. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, state_base=0x0201e4d0, "
-        "success=0x800, set_code_sphinx=0x112e, set_code_sphinx_teleia=0x128c, "
-        "set_code_ra=0x1758, set_code_c=0x1895, set_code_d=0x19a6."),
-    ("FUN_080a5714", "check_equip_slot_can_activate_with_context",
-        "check_equip_slot_pair_can_activate_full looser variant with count-list prohibition check. "
-        "Entry: r4=(r1+r2)<=4 guard; reads [0x0201e4d0+8] count; "
-        "count==0: (A) count_available_monster_slots==0 and player bit0 mismatch -> return 0; "
-        "(B) else check_slot_placement_blocked_by_field_effect. "
-        "count>0: scan [state+0xc] prohibition pair list; hit (player,slot) -> return 0. "
-        "Tail-calls check_equip_slot_pair_can_activate_full(r0, r1, r2). "
-        "Non-APCS: r8 saves slot_offset at entry (.hword 0x4690 = mov r8,r2) for tail-call restore. "
-        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]. "
-        "Returns u32 (0x800=can activate, 0=cannot). Read-only. "
-        "Constants: state_base=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
-    ("FUN_080a3ae8", "scan_equip_activation_for_player",
-        "Scan all field equip slots for player and return 1 if any activatable slot exists. "
-        "Init: writes player_side bit0 to [0x0201e4d0] byte0, player<<8 bitmask to dword, "
-        "byte[0x12]|=0x2, byte[0x8]:=0. "
-        "Double loop player=[0..1] x slot=[0..4]: call check_equip_slot_can_activate_with_context(p,s,0); "
-        "hit -> return 1 immediately. "
-        "All fail: if r10==0 and count_available_monster_slots(player)==0 -> return 0; else return 1. "
-        "r0=u32 player_side [0..1]. Returns u32 bool (1=activatable slot exists, 0=none). "
-        "Side-effects: [0x0201e4d0+0x0] byte:=player_side; [0x0201e4d0] dword bits[23:8]:=player<<8; "
-        "[0x0201e4d0+0x12] byte|=0x02; [0x0201e4d0+0x8] byte:=0. "
-        "Constants: state_base=0x0201e4d0, player_stride=0x868, ff8000ff_mask=0xff8000ff."),
+    ("FUN_080a5498", "check_special_summon_slot_requirement", "Checks whether slot r1+r2 satisfies the special-summon card_id stored in gEquipZoneRankState. After player, slot, active-card, zone-capacity, and field-effect gates, dispatches concrete card IDs to required partner, field spell, active-effect, chain score/count, fusion range, or card-state tests. Returns 0x800 on success, else 0. r0=player, r1=base slot, r2=offset; read-only."),
+    ("FUN_080a5714", "check_special_summon_slot_requirement_with_pair_exclusions", "Applies pair exclusions before check_special_summon_slot_requirement. Validates slot r1+r2, active-card state, zone capacity, and field-effect gates; when gEquipZoneRankState+8 is nonzero, rejects packed player/slot pairs in the list at +0x0c. Otherwise forwards r0/r1/r2 to the core checker. Returns 0x800 or 0; read-only."),
+    ("FUN_080a3ae8", "scan_equip_activation_for_player", "Initializes gEquipZoneRankState from player r0 and card context r1: player bit0, card-ID bits, activation flag bit1 at +0x12, and mode byte +8=0. Scans players 0..1 and monster slots 0..4 with check_special_summon_slot_requirement_with_pair_exclusions(player,slot,0). Returns 1 on the first accepted slot, else 0. Writes only the state fields above."),
     ("FUN_080312ec", "find_slot_idx_by_card_id_in_player_zones",
         "Linear scan gDuelFieldSlots[side*0x868+slot*0x14] for card_id match; return slot index or -1. "
         "Entry: r0=player_side (bit0), r1=card_id. "
@@ -5387,31 +5293,10 @@ RENAMES = [
         "Result written by caller scan_equip_activation_with_mode to [0x0201e4d0+8]. "
         "r0=u16 card_id [0..0x1fff]. Returns u8 mode_code [1..3]. Leaf, pure read-only. "
         "Constants: card_id_mode2=0x17c6, card_id_mode3=0x19a5."),
-    ("FUN_080a3b74", "scan_equip_activation_with_mode",
-        "scan_equip_activation_for_player precise variant with extra card_id mode initialization. "
-        "Entry: call get_equip_activation_mode_by_card_id(r1) -> mode_code; "
-        "write to [0x0201e4d0]: byte0:=player_side, dword bits[23:8]:=player<<8, "
-        "byte[0x12]|=0x2, byte[0x8]:=mode_code. "
-        "Double loop player=[0..1] x slot=[0..4]: call check_equip_slot_pair_can_activate_full(p,s,s_off); "
-        "hit and player==r7 and slot<=4: call check_slot_placement_blocked_by_field_effect; "
-        "pass -> r9:=1. Any slot: r6-- (available count). "
-        "Final: r6<=0 and r10==0 and count_available_monster_slots==0 -> return 0; else return 1. "
-        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
-        "Returns u32 bool (1=activatable, 0=not). "
-        "Side-effects: [0x0201e4d0+0x0/0x12/0x8] written as described. "
-        "Constants: state_base=0x0201e4d0, mask=0xff8000ff."),
+    ("FUN_080a3b74", "scan_equip_activation_with_mode", "Gets mode from get_equip_activation_mode_by_card_id(r1), initializes gEquipZoneRankState for player r0, and scans players 0..1 and slots 0..4 with check_special_summon_slot_requirement. Each hit decrements the remaining required count; a same-player hit sets the success flag only if check_slot_placement_blocked_by_field_effect passes. Returns 0 while the required count remains. Otherwise returns 1 if that flag is set or count_available_monster_slots(r0) is nonzero, else 0."),
     ("FUN_080a3d74", "check_neo_bubbleman_summon_allowed",
         "Checks the Neo Bubbleman summon setup for player r0. Requires Banisher of the Light to be absent and at least one valid Metamorphosis pair, then delegates to scan_activatable_equip_slots_alt with card context r1. Returns a boolean and may update gEquipZoneRankState through the delegate. Exclusive caller: 0x080a50aa for card 0x19a6. Confidence: high."),
-    ("FUN_080a4af4", "eval_equip_target_slot_flags",
-        "Large equip target slot flag evaluator; reads gDuelFieldSlots[slot_idx] card_id and "
-        "checks multiple special card IDs to determine activation flags. "
-        "Paths: LAB_080a50b0 -> scan_equip_activation_for_player(player); "
-        "LAB_080a50ba -> scan_equip_activation_with_mode(player, card_id). "
-        "Various card_id checks (0x112e/0x128c/0x1758/0x1895/0x19a6) dispatch specialized sub-checks; "
-        "each success writes [gDuelFieldSlots+0x1d78] phase code (0x10/0x11/0x17). "
-        "Returns r7=accumulated activation flags. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, duel_phase_code_offset=0x1d78, "
-        "set_code_sphinx=0x112e, set_code_sphinx_teleia=0x128c, set_code_ra=0x1758."),
+    ("FUN_080a4af4", "eval_equip_target_slot_flags", "Evaluates target-slot flags for player r0 and slot selector r1. Loads card_id from gP1LifePoints+r1*4+0x10e0, applies common spell and LP gates, then dispatches concrete card IDs to material, target, field, zone-capacity, and pair checks. Returns flags in r0. Active-player block paths write phase codes through gP1LifePoints+ACTIVATION_STATE_B_OFF; 0x1cf4 reads use P2LP_BLOCK2_OFF_1CF4."),
     ("FUN_08095fe0", "eval_spell_activation_flags_by_zone",
         "Large equip/spell card activation condition evaluator; dispatches by equip_type (field6). "
         "Entry: reads gDuelFieldSlots[player][slot] card_id; checks active_player (duel_state+4) bit0 XOR player; "
@@ -11670,28 +11555,10 @@ RENAMES = [
         "Side effects: 无外部写入. "
         "Constants: SCORE_HIGH=3, SCORE_MED=2, SCORE_LOW=1, SCORE_SKIP=0, "
         "bonus_threshold=4, LP_stride=0x868, CARD_IDS=[0x1725,0x1386,0x1388,0x16ec,0x1729,0x1986,0x1864]."),
-    ("FUN_080a5e28", "init_equip_entry_sprite_fields",
-        "由 FUN_080a5f38 (装备条目激活初始化) 以及 FUN_080a5f7c (switch 分派器) 调用 (indeg>=2). "
-        "入口 r0=player_id, r1=equip_slot_idx, r2=mode, r3=extra_flag; "
-        "对全局装备子条目结构体 0x0201e4d0 进行精灵属性初始化: "
-        "写 byte[0] 的 player_id bit0 + 置位 bit5(0x20)/bit7(0x80); "
-        "从 gP1LifePoints+slot*4+0x87*0x20 读 hword 提取 card_stat bits[12:5] 写入 word[0] 高位; "
-        "slot<<7 写入 hword[+0x2] bits[13:7]; 清零 hword[+0x6], byte[+0x8]; "
-        "根据 mode(0/1/2) 设置 byte[0] 附加标志 "
-        "(mode=0: 检查 0x135d 场上数量后置 bit5; mode=1: 清零 bit5; mode=2: 置 byte[+0x12] bit1); "
-        "最终置位 byte[+0x12] bit0, 写 byte[+0x13] bit0, 清 byte[+0x14] bit1, AND masks 清理字段. "
-        "Side effects: 0x0201e4d0 子结构多字段. "
-        "Constants: EQUIP_STRUCT=0x0201e4d0, CARD_ID_A=0x135d, "
-        "SLOT_LP_OFFSET=0x87*0x20=0x10c0, player_stride=0x868."),
-    ("FUN_080a5f38", "apply_equip_entry_sprite_from_slot_context",
-        "由 FUN_080a5f7c (switch 分派器, indeg>=2) 和 FUN_080bbde8 (field spell equip placement) 调用. "
-        "入口 r0=player_id, r1=mode_flag (0=使用 player_id 作 mode, 否则 mode=2), r2=extra_flag; "
-        "从 gP1LifePoints+0x1d68 读 equip_slot_idx, 从 +0x1d48 读 equip_card_slot; "
-        "根据 mode_flag==0 选择 player_id 还是常量 2 作 mode 参数传给 init_equip_entry_sprite_fields; "
-        "调用后清零 [gP1LifePoints+0x1d54]; 返回 1 表示成功. "
-        "Side effects: [gP1LifePoints+0x1d54] := 0 (清零 pending equip 激活标志), "
-        "以及 init_equip_entry_sprite_fields 的所有副作用 (0x0201e4d0 多字段). "
-        "Constants: EQUIP_SLOT_IDX_OFF=0x1d68, EQUIP_CARD_SLOT_OFF=0x1d48, PENDING_FLAG_OFF=0x1d54."),
+    ("FUN_080a5e28", "init_equip_zone_rank_state_from_slot",
+        "Initializes gEquipZoneRankState from player r0, slot r1, mode r2, and extra flag r3. Copies the slot card field, stores slot<<7, clears phase fields, sets activation bits, and applies mode 0/1/2 behavior. Mode 0 also tests LIGHT_OF_INTERVENTION_CID field presence. It finishes by clearing phase bit fields with DEMO_CLEAR_BITS_8_1 and DEMO_CLEAR_BITS_16_9. Returns void."),
+    ("FUN_080a5f38", "init_equip_zone_rank_state_from_lp_context",
+        "Initializes gEquipZoneRankState from pending LP context. Loads the callee player and slot arguments from gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and +ACTIVATION_STATE_A_OFF. When mode_flag r1 is zero it uses input r0 as mode; otherwise it uses mode 2. It passes extra flag r2 to init_equip_zone_rank_state_from_slot, clears gP1LifePoints+ELIGIB_STATE_CTRL_OFF, and returns 1."),
     ('FUN_080bbde8', 'execute_field_spell_equip_placement',
         'Inputs r0=player,r1=index,r2=mode. Scores with input mode; strict failure forces effective mode1. Candidate -1 returns-1. A nonzero same-player restriction initializes and returns0. field7 nonzero writes the candidate twice and spends two budget units; others once. Completion caches player twice, writes LP+1d48 from selected word bits22..29 plus bit13, ranks with effective_mode==0, clears scoreBase+0x180, and returns1.'),
     ("FUN_080acbf0", "check_player_lp_exceeds_toon_world_cost",
@@ -13057,6 +12924,66 @@ RENAMES = [
         'Inputs r0=player key, r1=mode. Each field-array row needs field5!=0. Extra gates: 1488 needs other hand field5 count 0; 127D..127F/12A5/154A need mode!=0 and slot score!=0; 18B4 handler result>3; 1578 needs other LP<=1000, owner whitelist, or summed score>2999 with owner occupied count 0; 19A5 needs allowed-pair count 0. All rows need target flags!=0. Success writes FieldArray player/ready, target(player,11,index,2), clears EquipLpScore+0x180, returns1; exhaustion returns0.'),
     ('FUN_080bb2d4', 'dispatch_equip_activation_ai_by_phase',
         'No APCS input. Uses phase gEquipLpScoreBase+8. In one call, phase0 scans 57 rows; failure increments and falls through phase1. Phase1 runs the full activation sequence; failure increments and falls through phase2. Phase2 calls try_activate_equip_from_field_array_for_player(mode=0); failure increments and returns1. Any success returns0 without incrementing its current phase; earlier increments remain. Invalid phase returns1. Evidence: 080bb2d4-080bb356.'),
+    # --- file 13 reviewed registry projections ---
+    ("FUN_080a5188", "check_equip_sub_entry_slot_pair_eligible", "Checks player r0 and slot r1+r2 (<=4) against gEquipZoneRankState. Activation flag bit1 selects direct check_slot_card_can_be_equipped. Otherwise it validates stored card-ID whitelists and ranges, active pair variants, chain vacancy, zone capacity, field blocking, and exclusions. Returns 0x800 or 0 and writes no state. Full-ROM scan finds packed Thumb pointers at 0x080a6434 and 0x080a6474; Ghidra has no direct CALL reference."),
+    ("FUN_080a6508", "dispatch_equip_confirm_action_by_phase", "Equip confirmation phase callback using gEquipZoneRankState. State 0 reads player control: value 1 selects a target through check_moth_evolution_slot_requirement; otherwise formats the card name and starts prompt 0x12. State 1 waits for confirmation, dispatches card op 0x28 with LP deltas, stores the result byte at +8 and target bytes at +0x0c, and returns 1; wait returns -1. Other states return 0. Updates phase bytes at +0x13/+0x14."),
+    ("FUN_080a6630", "tick_equip_target_phase_with_lp_confirm_slot_context", "Equip target phase callback. If activation bit1 at gEquipZoneRankState+0x12 is clear, returns dispatch_equip_state_by_combined_phase_index(). With bit1 set, state 0 selects through check_special_summon_slot_requirement_with_pair_exclusions or starts prompt 0x12 and returns 0; state 1 returns 1 after confirmed op 0x28 and target storage, or -1 while waiting; later states return 0."),
+    ("FUN_080a6a20", "tick_vampire_genesis_or_neo_bubbleman_target_phase", "Vampire Genesis/Neo Bubbleman target phase callback, called at 0x080a8f6c. Phase 0 selects through check_vampire_genesis_or_neo_bubbleman_slot_requirement or starts prompt 0x7e. Phase 1 waits for display confirmation, queries the target bitmap with the LP eligibility context, and advances; phase 2 returns complete. No APCS inputs. Returns -1 for pending confirmation, 0 for advance, or 1 for completion. Writes gEquipZoneRankState phase fields."),
+    ("FUN_08069e40", "tick_equip_monster_zone_placement_state_machine",
+        "Equip monster-zone placement state machine for the effect slot in r0. It validates the slot and dispatches field states 0x77..0x80. State 0x7f scans equip activation; state 0x7e reads pending LP context and calls init_equip_zone_rank_state_from_lp_context for modes 4 or 6; later states test zone eligibility, enqueue display work, or advance the field state. Returns the next state code or 0."),
+    ("FUN_08097070", "submit_equip_slot_sprite_with_ref_a",
+        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the first of two symmetric table callbacks."),
+    ("FUN_080970a0", "submit_equip_slot_sprite_with_ref_b",
+        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the second of two symmetric table callbacks."),
+    ("FUN_080a585c", "check_gate_guardian_material_slot_requirement",
+        "Gate Guardian material-slot predicate for player r0, zone r1, and offset r2. Requires total slot <=4, an equip-eligible active card whose ID equals SANGA_OF_THUNDER_CID + gEquipZoneRankState[8], and available monster space or an unblocked matching slot. It scans recorded player/slot pairs and then material phases 1..2 across slots 0..4. Returns 0x800 on the first valid material slot, else 0. Read-only."),
+    ("FUN_080a5994", "check_valkyrion_material_slot_requirement",
+        "Valkyrion material-slot predicate for player r0, zone type r1, and offset r2. Loads the required Alpha, Beta, or Gamma Magnet Warrior CID from valkyrion_target_material_cids[gEquipZoneRankState[8]], verifies the requested entity, and scans candidate slots for equip eligibility plus field blocking. Returns 0x800 when the required material slot is valid, else 0. Read-only."),
+    ("FUN_080a5afc", "check_equip_target_slot_eligible_by_extended_stat",
+        "Special-summon target predicate for player r0 and slot r1+r2. Requires the stored player and total slot <=4. Card-specific branches compare the slot state code with the stored card extended-stat field or call check_slot_zone_bit_eligible using an extended-stat field. Covered IDs include Dark Necrofear, the Chaos envoys, Megarock Dragon, and Doom Dozer. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5bc8", "check_masked_beast_des_gardius_material_slot_requirement",
+        "Masked Beast Des Gardius material-slot predicate for player r0 and slot r1+r2. After equip eligibility passes, phase 0 accepts Grand Tiki Elder or Melchid the Four-Face Beast. Later phases reject recorded player/slot duplicates, then require monster space or an unblocked slot. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5cc8", "check_equip_target_slot_eligible_by_monster_space",
+        "Opponent monster-space target predicate for player r0 and slot r1+r2. Requires r0 to be the opponent of the player stored in gEquipZoneRankState and the slot to pass equip eligibility. Phase 0 requires available monster space or an unblocked slot; later phases require a player/slot pair absent from the recorded list. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5d4c", "check_equip_target_slot_eligible_by_display_code",
+        "Display-code mismatch target predicate. Requires player r0 to match gEquipZoneRankState player, zone type r1 to equal 0xb, and compares the stored display code with the code extracted from the selected slot word. Returns 0x800 only when the codes differ, else 0. Read-only."),
+    ("FUN_080a5da0", "check_ancient_gear_castle_counter_slot_requirement",
+        "Ancient Gear Castle counter-slot predicate for player r0 and spell/trap slot r1+r2 in 5..9. Requires the stored player, no Mask of Restrict on the field, and an active Ancient Gear Castle in the slot. It accepts when the evaluated bonus and the slot counter satisfy either bonus>6 with counter>1 or bonus<=6 with counter!=0. Returns 0x800 or 0. Read-only."),
+    ("FUN_080a5f7c", "dispatch_equip_state_by_combined_phase_index",
+        "Dispatches the 34-case equip phase table selected by ((gEquipZoneRankState[0x14]&1)<<7)|(state[0x13]>>1). It allocates a 512-byte frame, rejects indices above 0x21 through the default case, and executes card, slot, display, and placement handlers for the indexed phase. The table at 0x080a5fb0 remains 34 existing pointer words. Returns each case result; default returns -1."),
+    ("FUN_080a672c", "tick_equip_target_phase_with_lp_confirm_multistep",
+        "Multistep equip confirmation callback. State 0 clears gEquipZoneRankState[8], starts prompt 0x12, advances the combined phase, and returns 0. State 1 commits card op 0x28 after confirmation, increments the substep, and either repeats or advances when the card-specific activation count is reached; a pending confirmation dispatches op 0x29 and returns -1. Later states return 1."),
+    ("FUN_080a689c", "tick_metamorphosis_target_phase_with_lp_confirm",
+        "Metamorphosis target phase callback, called by dispatch_equip_phase_by_card_id_range at 0x080a8f66. Phase 0 selects through the Vampire Genesis/Neo Bubbleman predicate when the player context is active, otherwise starts prompt 0x3a. Phase 1 confirms, updates the LP display context, submits the zone sprite, and advances. Returns -1 while confirmation is pending, 0 while advancing, or 1 when complete. Writes gEquipZoneRankState phase fields; uses METAMORPHOSIS_CID."),
+    ("FUN_080a6b38", "tick_gate_guardian_material_phase_with_confirm",
+        "Gate Guardian material phase callback, called at 0x080a8f12. Phase 0 selects the required Sanga, Kazejin, or Suijin material through check_gate_guardian_material_slot_requirement, or formats prompt 0xd2. Phase 1 confirms display op 0x28, records the selected material in gEquipZoneRankState, and repeats until three entries are stored. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 after all materials are recorded."),
+    ("FUN_080a6c8c", "dispatch_equip_state_with_phase_reset",
+        "Phase-reset wrapper called at 0x080a8f7e. When the combined phase index is zero, it preserves gEquipZoneRankState[0x13] bit0, sets bits 2..5, and clears state[0x14] bit1. It then calls dispatch_equip_state_by_combined_phase_index unconditionally. No APCS inputs. Returns the dispatcher result. Direct side effects are limited to the phase-bit reset."),
+    ("FUN_080a6cc8", "tick_valkyrion_material_phase_with_slot_confirm",
+        "Valkyrion material phase callback, called at 0x080a8f2a. Phase 0 selects Alpha, Beta, or Gamma Magnet Warrior through check_valkyrion_material_slot_requirement, or formats prompt 0xd3 from valkyrion_prompt_material_cids. Phase 1 confirms, submits the selected material sprite, records the entry, and repeats until three materials are processed. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 when complete."),
+    ("FUN_080a6e74", "tick_masked_beast_des_gardius_material_phase",
+        "Masked Beast Des Gardius material phase callback, called at 0x080a8f30. It selects Grand Tiki Elder and Melchid the Four-Face Beast through check_masked_beast_des_gardius_material_slot_requirement, formats their names for prompts, commits display op 0x28 results, and advances a four-state material sequence. No APCS inputs. Returns phase status and writes gEquipZoneRankState plus LP display fields."),
+    ("FUN_080a7064", "dispatch_equip_phase_unless_activation_pending",
+        "Activation-pending guard called at 0x080a8f1e. If gEquipZoneRankState[0x12] bit1 is clear, it calls dispatch_equip_state_by_combined_phase_index and returns that result. If the bit is set, it returns 1 without dispatching. No APCS inputs. It has no direct writes."),
+    ("FUN_080a7084", "dispatch_equip_state_by_activation_flag",
+        "Activation-flag wrapper called at 0x080a8f24. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it clears state[0] bits 6..7 and returns 1. No APCS inputs. Direct side effect: mode-bit clear in gEquipZoneRankState."),
+    ("FUN_080a70ac", "tick_equip_sprite_enqueue_by_activation_flag",
+        "Activation sprite callback called at 0x080a8f60. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it extracts the player bit, enqueues sprite attribute value 0x1f4, and returns 1. No APCS inputs. Side effect: sprite queue submission."),
+    ("FUN_080a70d8", "tick_equip_banisher_sprite_phase_by_combined_index",
+        "Banisher-sprite phase callback called at 0x080a8f72. If activation bit1 is clear, it delegates to dispatch_equip_state_by_combined_phase_index. Otherwise phase 0 selects a slot through the display-code predicate or starts prompt 0xeb; phase 1 confirms and submits the banisher sprite with LP eligibility context. No APCS inputs. Returns dispatcher status, 0 while advancing, or 1 when complete; updates gEquipZoneRankState phase fields."),
+    ("FUN_080a71e4", "tick_special_summon_banish_material_phase",
+        "Seven-stage banish-material callback for Dark Necrofear, the Chaos monsters, Megarock Dragon, and Doom Dozer, called at 0x080a8f36. It formats field/graveyard removal prompts, initializes and renders effect-slot candidates, selects through check_equip_target_slot_eligible_by_extended_stat, confirms the bitmap, and advances or backtracks the combined phase. No APCS inputs. Returns phase status; writes gEquipZoneRankState and LP display context."),
+    ("FUN_080a7650", "tick_swift_gaia_summon_placement_phase",
+        "Swift Gaia the Fierce Knight summon-placement callback, selected for CID 0x147b at 0x080a8f3c. Phase 0 evaluates AI placement flags, writes the effect-slot count field, and formats text 0x72 when needed. Phase 1 commits the selected card ID or backtracks to the generic phase dispatcher. No APCS inputs. Returns 0 while advancing or 1 when a placement is accepted; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
+    ("FUN_080a7788", "tick_behemoth_summon_placement_phase",
+        "Behemoth the King of All Animals summon-placement callback, selected for CID 0x1864 at 0x080a8f42. Phase 0 evaluates placement flags, writes the effect-slot count field, and formats tribute-summon text 0x013f or prompt 0x12. Phase 1 commits the card ID and advances, or clears the phase and delegates to the generic dispatcher. No APCS inputs. Returns phase status; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
+    ("FUN_080a8c30", "dispatch_equip_phase_by_card_id_range",
+        "Card-ID phase hub called by dispatch_equip_entry_slot_by_mode. It extracts the card ID from gEquipZoneRankState and routes to card-specific state machines. Updated routes include Metamorphosis, Vampire Genesis/Neo Bubbleman, Gate Guardian, Valkyrion, Masked Beast Des Gardius, special-summon banish materials, Swift Gaia, and Behemoth. The branch at 0x080a8f36 calls tick_special_summon_banish_material_phase. Returns the selected handler result."),
+    ("FUN_0804448c", "dispatch_equip_zone_sprite_banisher_with_spell_check",
+        "Zone-sprite dispatcher called by dispatch_equip_zone_activation_state and tick_valkyrion_material_phase_with_slot_confirm (indeg=2). Inputs: r0=player_id, r1=slot_idx, r2=sub_zone_flag. It counts Banisher of the Light (CID 0x1332) and CID 0x19da, tests the second card for Spell type, and selects zone state 0xc, 0xe, or 0xf. It dispatches sprite/activation updates and enqueues CID 0x14e2 when extended-stat field6 is 1. Returns void; callers ignore r0."),
+    ("FUN_080a7b78", "tick_equip_phase_by_lp_index_range_c",
+        "Four-state equip phase callback called by dispatch_equip_phase_by_card_id_range at 0x080a8f4e (indeg=1). It derives combined_index from gEquipZoneRankState bytes 0x13 and 0x14, then routes values 0..3 to case entries 0x080a7bba, 0x080a7d10, 0x080a7d48, and 0x080a7e30; larger values use 0x080a7f38. Case 0 writes the status word at gEquipZoneRankState+0x5a0. No APCS inputs. Returns phase status and updates equip-selection state."),
+    ("FUN_080a38fc", "tick_equip_score_display_phase", "Three-step card-specific display callback, called by tick_equip_display_row_by_type row type 19. Inputs: r0=player_id, r1=card_id, r2=display_value. Step 0 sets gEquipPhaseDisplayState to 1. Step 1 handles Bark of Dark Ruler (LP-cost texts 301/303), Reasoning (level texts 280/304 or random level 4..7), and Wall of Revealing Light (LP-cost texts 301/302 and a bounded thousands score), then advances. Later steps copy the score to LP card tracking. Returns 0 while active, 1 when complete."),
 ]
 
 
