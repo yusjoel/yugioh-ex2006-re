@@ -69,6 +69,16 @@
 @ PRNG LCG constants (advance_prng_state LCG multiplier/increment; asm/12 Seg-1)
 	.include "constants/prng.inc"
 
+@ F15 uses the reviewed names for these existing entries in files 13 and 14.
+	.equ init_equip_zone_rank_state_from_lp_context, apply_equip_entry_sprite_from_slot_context
+	.equ check_player_lp_exceeds_chain_energy_cost, check_player_lp_exceeds_toon_world_cost
+	.equ check_card_id_in_field_spell_placement_bypass_set, check_card_id_in_field_spell_bst
+	.equ compute_peak_monster_zone_score_with_gates, find_best_scored_slot_for_player_with_gate
+	.equ check_field_spell_placement_available_by_card_id, check_dual_field_slot_owner_mismatch
+	.equ count_equip_eligible_cards_across_field_zones, count_equip_whitelist_cards_in_monster_zone
+	.equ check_effect_zone_unavailable_for_player, check_effect_zone_available_for_player
+	.equ select_preferred_spell_zone_slot_from_bitmap, sample_random_monster_slot_with_field9_filter
+
 @ file 08 THUMB fn-ptr +1 aliases -- GAS .equ for _cb_1 symbols
 @ (asm/08 literal pool slots reference these _1 names; function label + GAS auto-|1 for THUMB)
 	.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1
@@ -1525,7 +1535,9 @@ valkyrion_material_cids:
     .word ALPHA_MAGNET_WARRIOR_CID
     .word BETA_MAGNET_WARRIOR_CID
     .word GAMMA_MAGNET_WARRIOR_CID
-	.incbin "roms/2343.gba", 0x1e478b0, 0x245c
+	.incbin "roms/2343.gba", 0x1e478b0, 0x938
+	.include "asm/equip_activation_response_tables.inc"
+	.incbin "roms/2343.gba", 0x1e491c0, 0xb4c
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1
@@ -1997,7 +2009,20 @@ aob_phase_table:                                @ 0x09E59DB4: AOB phase dispatch
 deck_type_table:                                @ 0x09E59DC4: 8-entry u16 deck_type->sprite_tile_offset lookup (f02 Seg-2 carve)
 	.incbin "roms/2343.gba", 0x1E59DC4, 0x10   @ deck_type_table (8 halfwords)
 scene_scroll_table:                             @ 0x09E59DD4: 0x20-entry u16 symmetric scroll position table (f02 Seg-2 carve)
-	.incbin "roms/2343.gba", 0x1E59DD4, 0xE28  @ scene_scroll_table + tail to host end 0x1E5ABFC
+	.incbin "roms/2343.gba", 0x1E59DD4, 0xD88  @ scene_scroll_table + tail to F15 callback table
+duel_field_ai_state_callback_table:
+    .word dispatch_equip_activation_ai_by_phase+1
+    .word dispatch_equip_activation_by_field_state+1
+    .word run_equip_activation_state_machine_p1+1
+    .word dispatch_equip_activation_phase_by_state+1
+    .word try_execute_toon_world_equip_placement+1
+    .word run_equip_activation_state_machine_p1+1
+    .word dispatch_equip_activation_phase_by_state+1
+    .word run_equip_activation_state_machine_p2+1
+    .word eval_field_spell_equip_activation_candidate+1
+duel_field_ai_state_callback_table_end:
+    .word 0
+	.incbin "roms/2343.gba", 0x1E5AB84, 0x78
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

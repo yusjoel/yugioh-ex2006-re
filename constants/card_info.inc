@@ -2090,3 +2090,66 @@
 .equ W_WING_CATAPULT_CID, 0x0000194b
 .equ ELEMENTAL_HERO_NECROSHADE_CID, 0x0000197f
 .equ KAZEJIN_CID, 0x0000111a
+
+@ Existing definitions used by file 15.
+.equ AUSSA_THE_EARTH_CHARMER_CID, 0x000018bf
+.equ CYBER_JAR_CID,                          0x00001331  @ password 34124316
+.equ DARK_SPIRIT_OF_THE_SILENT_CID,                  0x0000146b
+.equ DREAM_CLOWN_CID,                0x0000101e
+.equ EXILED_FORCE_CID,                       0x000014cb  @ password 74131780
+.equ GILFORD_THE_LIGHTNING_CID,                      0x0000154b
+.equ GRAVITY_BIND_CID,               0x0000140e
+.equ HAND_OF_NEPHTHYS_CID,                   0x0000185d  @ password 98446407
+.equ KING_TIGER_WANGHU_CID,         0x00001398
+.equ MESSENGER_OF_PEACE_CID,                      0x0000134a  @ password 44656491
+.equ MOISTURE_CREATURE_CID,                  0x000013b5
+.equ OCEAN_DRAGON_LORD_NEO_DAEDALUS_CID,     0x000018e8
+.equ SWARM_OF_LOCUSTS_CID,          0x0000152b
+
+@ =============================================================================
+@ file 15 Seg-1 equip-target constants
+@ Source: doc/dev/refine/F15-Seg-1.proposal.md (review PASS)
+@ =============================================================================
+.equ CID_GAP_10D3,                                    0x000010d3
+.equ STOP_DEFENSE_CID,                                0x000010e6
+.equ MEGAMORPH_CID,                                   0x00001237
+.equ CASTLE_WALLS_CID,                                0x000012f2
+.equ TRIBUTE_TO_THE_DOOMED_CID,                       0x000012f8
+.equ BLOCK_ATTACK_CID,                                0x0000130a
+.equ MYSTICAL_SPACE_TYPHOON_CID,                      0x0000132d
+.equ RIRYOKU_CID,                                     0x00001391
+.equ MAKIU_CID,                                       0x00001475
+.equ INFERNO_HAMMER_CID,                              0x0000172a
+.equ FLINT_CID,                                       0x00001842
+.equ GUARDIAN_STATUE_CID,                             0x000018ba
+.equ MEDUSA_WORM_CID,                                 0x000018bb
+.equ RISING_ENERGY_CID,                               0x0000192d
+.equ PATRICIAN_OF_DARKNESS_PACKED_CID_FIELD,          (PATRICIAN_OF_DARKNESS_CID << 19)
+@ =============================================================================
+@ file 15 Seg-2 equip activation constants
+@ Source: doc/dev/refine/F15-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ ANTI_AIRCRAFT_FLOWER_CID,                           0x00001702
+.equ CATAPULT_TURTLE_CID,                                0x00000fff
+.equ EQUIP_LEVEL_RESTRICTION_SCORE_THRESHOLD_2399,       0x0000095f
+.equ UMI_PACKED_CID_FIELD, (UMI_CARD_ID << 19)
+.equ CARD_FIELD3_THRESHOLD_1700, 0x000006a4
+.equ CHAOS_COMMAND_MAGICIAN_CID, 0x00001614
+.equ RAPID_FIRE_MAGICIAN_CID, 0x00001964
+.equ FIELD_COPY_GUARD_CID_049C, 0x0000049c
+.equ SEBEKS_BLESSING_CID, 0x0000138f
+.equ CARD_NAME_INK_PAIR_7, 0x00000707
+.equ CARD_TEXT_INK_PAIR_8, 0x00000808
+.equ CARD_STAT_VALUE_MISSING, 0x0000ffff
+.equ CARD_FRAME_TILE_INDEX_MASK, 0x000003ff
+.equ CARD_IMAGE_TILE_BASE_INDEX, 0x00000246
+.equ CARD_FRAME_NIBBLE_ORIGIN_X6_Y6, 0x00060006
+.equ CARD_STAR_NIBBLE_ORIGIN_X80_Y5, 0x00050050
+.equ CARD_IMAGE_RIGHT_COLUMN_OBJ_ATTR, 0x00008080
+.equ CARD_DISPLAY_WIN0H_BOUNDS, 0x00005abe
+.equ CARD_DISPLAY_WIN0V_BOUNDS, 0x0000028e
+.equ CARD_COUNT_DISPLAY_MAX_999, 0x000003e7
+.equ CARD_COUNT_PANEL_ENDCAP_TILE_ATTR, 0x0000061a
+.equ CARD_COUNT_PANEL_FILL_TILE_ATTR, 0x0000061b
+.equ CARD_COUNT_LABEL_TILE_PAL1, 0x00001218
+.equ CARD_COUNT_LABEL_TILE_PAL2, 0x00002218

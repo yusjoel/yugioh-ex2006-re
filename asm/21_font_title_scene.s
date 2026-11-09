@@ -3078,7 +3078,7 @@ compute_half_floor:
     bx r1                                    @ 080f559c 0847
     ROM_INCBIN 0xf559e, 0x36
 
-@ blend+frame_counter 工具族的清除变体 (indeg=26). 清除 gFrameCounter (0x03000240) byte 中的 bit6 (blend_active 标志位), 然后将 BLDCNT (0x04000050) 和 BLDY (0x04000054) 均写 0, 彻底禁用 GBA 混合效果. 被 FUN_080f58b8 在 blend_step 归零时调用, 也被 play_ui_effect_3b/play_ui_effect_30 等特效函数直接调用以重置混合状态.
+@ Disables the active blend step. AND0xc0 clears gFrameCounter byte bits0..5 while preserving bits6/7, writes zero to BLDCNT and BLDY, and returns void. Called by play_vija_scene_with_sprite_intro, play_three_sprite_banner_blend, and other blend state machines during teardown.
 disable_blend_and_clear_step:
     ldr r1, PTR_gPrng_080f55f4               @ 080f55d4 0749
     movs r0,#0x80    @ 080f55d6 8020
@@ -3101,7 +3101,7 @@ PTR_gPrng_080f55f4:
 PTR_BLDCNT_080f55f8:
     .word  BLDCNT                         @ 080f55f8 50000004
 
-@ Converge gPrng+0x200 blend counter (low 6 bits) toward r0 target. If current>target: subtract delta, mask 0x3f. Else: clear and set negative 0x40. Callers: play_ui_effect_33, play_ui_effect_34.
+@ Decrease the low-six-bit blend step at gPrng+0x200 by r0, flooring at0 and preserving bits6/7. If the result is0, call disable_blend_and_clear_step and return1. Otherwise write the step to BLDY, write u16(r1) to BLDCNT, and return0. The negative0x40 immediate is a mask; it is not installed as a new step.
 clamp_blend_counter_to_target:
     push {r4,r5,r6,r7,lr}                    @ 080f55fc f0b5
     adds r5,r0,#0x0    @ 080f55fe 051c
@@ -3161,7 +3161,7 @@ LAB_080f565e:
 PTR_BLDY_080f5664:
     .word  BLDY                           @ 080f5664 54000004
 
-@ 被 play_ui_effect_33/34 调用, 设置 BLDCNT (0x04000050) = r1, 累加 r0 (delta) 到 gPrng+0x200 bits[5:0] (blend step 计步字节, clamp 至 0x1f), 写 BLDY (0x04000054) = current_step; step > 0x1e 返回 1 (完成), 否则返回 0. Constants: BLDCNT=0x04000050, BLDY=0x04000054, gPrng_BLEND_STEP_OFFSET=gPrng+0x200, BLEND_STEP_MAX_ACTIVE=0x1e, BLEND_STEP_CLAMP=0x1f, BLEND_STEP_FIELD_MASK=0x3f.
+@ Write u16(r1) to BLDCNT. If the low-six-bit step at gPrng+0x200 is<=0x1e, replace it with(step+r0)&0x3f, then clamp that result to0x1f while preserving bits6/7. Write the resulting low-six-bit value to BLDY. Return1 when it exceeds0x1e, else0. Used by the two card-display reveal effects.
 tick_blend_step_with_bldcnt:
     push {r4,r5,r6,lr}                       @ 080f5668 70b5
     adds r5,r0,#0x0    @ 080f566a 051c
@@ -6477,7 +6477,7 @@ DAT_080f6cc4:
 DAT_080f6cc8:
     .word  0x00000401                     @ 080f6cc8 01040000
 
-@ 根据方向码调整坐标并写入 OBJ sprite OAM 属性 (pack 场景, r3 双 16-bit 均入栈变体). 与 write_pack_obj_attr_by_dir (0x080f6adc) / write_pack_obj_attr_by_dir_split (0x080f68ec) 三函数对称结构. 本变体特点: sub sp,#0x8 (额外 8 字节栈帧, 其他变体为 4 字节); r3 的高低 16 位分别保存到 sp+0 和 sp+4 (两个独立栈参数槽): r3[31:16]=affine_ctrl (0x8000|counter*8), r3[15:0]=scale_ramp [0..0x20]. 方向码 dispatch 与前两变体相同 (0x0/0x40/0x80/0xc0/0x4040/0x8000/0x8080/0x80c0); 像素偏移调整 (4/8/16/32px) 也相同. 结束时同样写 attr0/attr1/attr2 并调用 affine 写入. 6 个 caller: play_ui_effect_21 (场景通用 UI), play_card_zoom_in (卡牌 zoom 动画), FUN_080c4edc (card_ids/duel_field), FUN_080d0150 (scene_pack), FUN_080d71f4 (scene_pack). Constants: gPrng+0x1bc (0xde<<1): OBJ 缓冲区基址; DAT_080f6d50 = 0xfffffe00: attr1 X 坐标掩码; DAT_080f6d58 = 0x4040: 方向码枚举之一; 0xc0<<2=0x300: OBJ affine 双尺寸标志.
+@ Emit one affine OBJ entry from packed X/Y in r0, shape/size attributes in u16(r1), and tile attributes in u16(r2). r1 selects coordinate adjustments; r2 is not a direction code. Split r3 into two halfword affine parameters. Return without writing when the OBJ index is0x80 or affine index0x20; otherwise write the OBJ and affine state and advance both allocation counters.
 write_pack_obj_attr_by_dir_stacked:
     push {r4,r5,r6,r7,lr}                    @ 080f6ccc f0b5
     .hword 0x4657    @ 080f6cce 5746
@@ -9302,7 +9302,7 @@ LAB_080f7ff4:
     bx r1                                    @ 080f7ffc 0847
     .zero  0x2
 
-@ Render AOB animation object current frame to OAM buffer and copy tile data to VRAM 0x06010000. 16-case shape/color dispatch; calls copy_bytes_by_halfword + push_oam_entry_to_aob_slot. 11 callers including play_ui_effect_37/38/3b.
+@ Renders the current AOB frame into the OAM buffer and copies frame tiles to OBJ VRAM0x06010000. Its shape/color dispatch emits entries through push_oam_entry_to_aob_slot. Used by play_correct_miss_result_effect, play_windowed_aob_slide_effect, and other AOB effects.
 render_aob_frame_to_oam:
     push {r4,r5,r6,r7,lr}                    @ 080f8000 f0b5
     .hword 0x4657    @ 080f8002 5746

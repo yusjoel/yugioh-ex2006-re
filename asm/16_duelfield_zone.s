@@ -254,7 +254,7 @@ switchD_080c14ac__caseD_2:
     adds r0,r7,#0x0    @ 080c1646 381c
     movs r1,#0x74    @ 080c1648 7421
     movs r2,#0x2c    @ 080c164a 2c22
-    bl render_card_zoom_oam_sprite_grid      @ 080c164c fff7fefd
+    bl render_card_count_panel_oam           @ 080c164c fff7fefd
     ldr r1, DAT_080c1668                     @ 080c1650 0549
     ldrb r0,[r1,#0x11]                       @ 080c1652 487c
     adds r0,#0x1    @ 080c1654 0130
@@ -328,7 +328,7 @@ LAB_080c16c4:
     adds r0,r7,#0x0    @ 080c16d2 381c
     movs r1,#0x74    @ 080c16d4 7421
     movs r2,#0x2c    @ 080c16d6 2c22
-    bl render_card_zoom_oam_sprite_grid      @ 080c16d8 fff7b8fd
+    bl render_card_count_panel_oam           @ 080c16d8 fff7b8fd
 LAB_080c16dc:
     ldr r6, DAT_080c1714                     @ 080c16dc 0d4e
     ldrh r2,[r6,#0x12]                       @ 080c16de 728a
@@ -351,7 +351,7 @@ LAB_080c16ea:
     adds r0,r7,#0x0    @ 080c16fe 381c
     movs r1,#0x74    @ 080c1700 7421
     movs r2,#0x2c    @ 080c1702 2c22
-    bl render_card_zoom_oam_sprite_grid      @ 080c1704 fff7a2fd
+    bl render_card_count_panel_oam           @ 080c1704 fff7a2fd
     strh r4,[r6,#0x12]                       @ 080c1708 7482
     ldrb r0,[r6,#0x10]                       @ 080c170a 307c
     adds r0,#0x1    @ 080c170c 0130
@@ -372,7 +372,7 @@ switchD_080c14ac__caseD_4:
     adds r0,r7,#0x0    @ 080c1728 381c
     movs r1,#0x74    @ 080c172a 7421
     movs r2,#0x2c    @ 080c172c 2c22
-    bl render_card_zoom_oam_sprite_grid      @ 080c172e fff78dfd
+    bl render_card_count_panel_oam           @ 080c172e fff78dfd
     ldr r1, DAT_080c1748                     @ 080c1732 0549
     ldrb r0,[r1,#0x11]                       @ 080c1734 487c
     adds r0,#0x1    @ 080c1736 0130
@@ -672,7 +672,7 @@ switchD_080c180a__caseD_2:
     adds r0,r5,#0x0    @ 080c1984 281c
     .hword 0x4641    @ 080c1986 4146
     .hword 0x464a    @ 080c1988 4a46
-    bl render_card_zoom_oam_sprite_grid      @ 080c198a fff75ffc
+    bl render_card_count_panel_oam           @ 080c198a fff75ffc
     ldr r1, DAT_080c19a4                     @ 080c198e 0549
     ldrb r0,[r1,#0x11]                       @ 080c1990 487c
     adds r0,#0x1    @ 080c1992 0130
@@ -714,7 +714,7 @@ LAB_080c19c8:
     adds r0,r5,#0x0    @ 080c19d8 281c
     .hword 0x4641    @ 080c19da 4146
     .hword 0x464a    @ 080c19dc 4a46
-    bl render_card_zoom_oam_sprite_grid      @ 080c19de fff735fc
+    bl render_card_count_panel_oam           @ 080c19de fff735fc
 LAB_080c19e2:
     ldr r6, DAT_080c1a10                     @ 080c19e2 0b4e
     ldrh r1,[r6,#0x12]                       @ 080c19e4 718a
@@ -731,7 +731,7 @@ LAB_080c19e2:
     adds r0,r5,#0x0    @ 080c19fa 281c
     .hword 0x4641    @ 080c19fc 4146
     .hword 0x464a    @ 080c19fe 4a46
-    bl render_card_zoom_oam_sprite_grid      @ 080c1a00 fff724fc
+    bl render_card_count_panel_oam           @ 080c1a00 fff724fc
     strh r4,[r6,#0x12]                       @ 080c1a04 7482
     ldrb r0,[r6,#0x10]                       @ 080c1a06 307c
     adds r0,#0x1    @ 080c1a08 0130
@@ -751,7 +751,7 @@ switchD_080c180a__caseD_4:
     adds r0,r5,#0x0    @ 080c1a22 281c
     .hword 0x4641    @ 080c1a24 4146
     .hword 0x464a    @ 080c1a26 4a46
-    bl render_card_zoom_oam_sprite_grid      @ 080c1a28 fff710fc
+    bl render_card_count_panel_oam           @ 080c1a28 fff710fc
     ldr r1, DAT_080c1a40                     @ 080c1a2c 0449
     ldrb r0,[r1,#0x11]                       @ 080c1a2e 487c
     adds r0,#0x1    @ 080c1a30 0130
@@ -1401,7 +1401,7 @@ DAT_080c1f08:
 DAT_080c1f0c:
     .word  0x02023130                     @ 080c1f0c 30310202
 
-@ pack banner 3D 动画状态机, 每帧由 play_ui_effect_3d (唯一 caller) 调用. 读 gBannerState[+0x11] (u8 phase [0..6]) 通过 switch-dispatch 驱动 7 个子状态; phase 超出 6 则返回 0 (done). case 0: 拷贝调色板到 0x05000260 via copy_bytes_by_halfword, 根据 [gPrng+0x6c2c] bit[4:0]*3<<10 写 tile_2d_row_copy 到 VRAM 0x06014000, 调 disable_blend_and_clear_step, 写 WINOUT=0x1f3f/WIN1H=0/WININ=0xff, 读 DISPCNT 置 bit15 (0x8000) 后写回. case 1: 从 BLDY 读/写递增 gBannerState[+0x12] 最多 7 次后 phase++. case 2/3: 调 blend_palette_entry_toward_target 做调色板渐变, 循环写 OAM 3 entries (r6=0..2, tile_id 0x48c0/0x40c0), 计时 0xf 帧后 phase++. case 4: 循环写 OAM 3 entries (不调 blend), 计时 0x1f 帧后 phase++. case 5: 写 BLDY = 8 - gBannerState[+0x12], 递增计时最多 7 后 phase++. case 6: 调 disable_blend_and_clear_step, 读 DISPCNT ands 0x7fff, 写回, phase++. 返回 1=进行中 / 0=完成. Constants: gBannerState=0x0201fec0, BLDY=0x04000054, WINOUT=0x0400004a, DISPCNT=0x04000000, tile_vram=0x06014000, pal_src=0x05000260, gPrng_offset=0x6c2c, OAM_tile_a=0x48c0, OAM_tile_b=0x40c0.
+@ Pack-banner 3D state machine. Phase0 loads resources and configures OBJ-window state. Phase1 only advances BLDY. Phases2/3 run forward/reverse palette ramps and each append six OAM entries as three pairs; phase4 also appends six paired entries. Phase5 only advances BLDY. Phase6 disables blend, applies DISPCNT&0x7fff, advances to7, and returns1. Phases0..6 return1; phase>6 returns0 without cleanup.
 tick_pack_banner_3d_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080c1f10 f0b5
     .hword 0x4647    @ 080c1f12 4746
@@ -1514,7 +1514,7 @@ switchD_080c1f2e__caseD_2:
     ldr r0, DAT_080c2054                     @ 080c1fec 1948
     ldrh r2,[r3,#0x12]                       @ 080c1fee 5a8a
     movs r1,#0x3    @ 080c1ff0 0321
-    bl blend_palette_entry_toward_target     @ 080c1ff2 faf7f5fb
+    bl blend_palette_block_toward_white      @ 080c1ff2 faf7f5fb
     movs r6,#0x0    @ 080c1ff6 0026
     lsls r4,r4,#0x10    @ 080c1ff8 2404
     .hword 0x46a0    @ 080c1ffa a046
@@ -1578,7 +1578,7 @@ switchD_080c1f2e__caseD_3:
     lsls r2,r2,#0x10    @ 080c206c 1204
     lsrs r2,r2,#0x10    @ 080c206e 120c
     movs r1,#0x3    @ 080c2070 0321
-    bl blend_palette_entry_toward_target     @ 080c2072 faf7b5fb
+    bl blend_palette_block_toward_white      @ 080c2072 faf7b5fb
     movs r6,#0x0    @ 080c2076 0026
     lsls r4,r4,#0x10    @ 080c2078 2404
     .hword 0x46a0    @ 080c207a a046
@@ -1733,7 +1733,7 @@ LAB_080c2196:
     pop {r1}                                 @ 080c219c 02bc
     bx r1                                    @ 080c219e 0847
 
-@ pack banner 3D 动画状态机变体, 与 tick_pack_banner_3d_state_machine (0x080c1f10) 共享同一 caller (play_ui_effect_3d) 和相同 gBannerState 相位结构 (7 states, [+0x11] phase / [+0x12] sub-tick), 但使用不同的 ROM 资源基地址: 调色板来自 0x0991767c (vs 0x09912e3c) / 0x0991be9c (vs 0x09912e5c). case 0 同样拷贝调色板 + tile_2d_row_copy + disable_blend_and_clear_step + 写 WINOUT/WIN1H/WININ/DISPCNT. case 1: 读 BLDY 写 gBannerState[+0x12] 递增计时. case 2: 调 blend_palette_entry_toward_target + OAM 3 entries 循环 (tile 0x48c0/0x40c0). case 3: blend + OAM loop. case 4: 纯 OAM loop 无 blend. case 5: BLDY = 8 - step 淡出. case 6: disable_blend_and_clear_step + DISPCNT &= ~0x8000. 返回 1=进行中 / 0=完成. Constants: gBannerState=0x0201fec0, BLDY=0x04000054, WINOUT=0x0400004a, OAM_tile_a=0x48c0, OAM_tile_b=0x40c0, pal_src_a=0x0991767c, pal_src_b=0x0991be9c.
+@ Alternate pack-banner 3D state machine. Phase0 loads alternate resources and configures OBJ-window state. Each phase1..5 appends six OAM entries as three pairs; phases2/3 also run forward/reverse palette ramps. Phase6 disables blend, applies DISPCNT&0x7fff, advances to7, and returns1. Phases0..6 return1; phase>6 returns0 without cleanup.
 tick_pack_banner_3d_state_machine_alt:
     push {r4,r5,r6,r7,lr}                    @ 080c21a0 f0b5
     .hword 0x4657    @ 080c21a2 5746
@@ -1930,7 +1930,7 @@ switchD_080c2210__caseD_2:
     ldrh r2,[r6,#0x12]                       @ 080c2320 728a
     adds r0,r3,#0x0    @ 080c2322 181c
     movs r1,#0x3    @ 080c2324 0321
-    bl blend_palette_entry_toward_target     @ 080c2326 faf75bfa
+    bl blend_palette_block_toward_white      @ 080c2326 faf75bfa
     movs r6,#0x0    @ 080c232a 0026
     lsls r7,r7,#0x10    @ 080c232c 3f04
     .hword 0x46b8    @ 080c232e b846
@@ -1992,7 +1992,7 @@ switchD_080c2210__caseD_3:
     lsrs r2,r2,#0x10    @ 080c239c 120c
     adds r0,r3,#0x0    @ 080c239e 181c
     movs r1,#0x3    @ 080c23a0 0321
-    bl blend_palette_entry_toward_target     @ 080c23a2 faf71dfa
+    bl blend_palette_block_toward_white      @ 080c23a2 faf71dfa
     movs r6,#0x0    @ 080c23a6 0026
     lsls r7,r7,#0x10    @ 080c23a8 3f04
     .hword 0x46b8    @ 080c23aa b846
@@ -3270,7 +3270,7 @@ DAT_080c2d1c:
 DAT_080c2d20:
     .word  0xfff807ff                     @ 080c2d20 ff07f8ff
 
-@ Copy card_medium_frame_tile_data row to OBJ VRAM 0x06010000+r1*0x20. Checks DAT_080000ae flag 0x4a for field_spell frame variant. Calls tile_2d_row_copy(dest, 0, 8, 6). 5 callers: play_ui_effect_20/21/23/25/0c.
+@ Upload a medium card image to OBJ VRAM at0x06010000+32*u16(r1). Index card_image_index with2*u16(r0)+variant: variant0 only when header byte0xaf==0x4a and (gSettings.language&7)==0, else1. A nonzero card ID copies six rows of128 halfwords from card_medium_frame_tile_data+index*1536, adding0x70 to each nonzero byte modulo256; destination row stride is0x400. Card ID0 clears an8x6 tile rectangle.
 blit_card_frame_tile_row_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 080c2d24 f0b5
     lsls r0,r0,#0x10    @ 080c2d26 0004
@@ -4423,7 +4423,7 @@ LAB_080c359a:
     bx r0                                    @ 080c35a8 0047
     .zero  0x2
 
-@ Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. 16-case switch; returns packed (y<<16|x). Pure query. 11 callers including play_ui_effect_15/10/play_card_zoom_in.
+@ Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. 16-case switch; returns packed (y<<16|x). Pure query. 11 callers including play_zone_type_13_card_reveal_effect/10/play_card_zoom_in.
 resolve_zone_oam_base_coords_by_type:
     push {r4,r5,r6,r7,lr}                    @ 080c35ac f0b5
     .hword 0x4647    @ 080c35ae 4746
@@ -17682,7 +17682,7 @@ DAT_080ca5f0:
 PTR_icon_tiles_base_080ca5f4:
     .word  icon_tiles_base                @ 080ca5f4 30cf8809
 
-@ 按 player_id (r0) 与 EWRAM 对手 ID (0x0201e2a0+4 XOR 1) 比对, 选择 VRAM 基地址 (LP_VRAM_BASE=0x0600f000) 的目标区域 (P1 偏移 +8, P2 偏移 0x448), 将 LP 数值 (r1, clamp 至 99999) 逐位分解为十进制数字, 以 strh 循环写入 5 个 tile 索引 halfword (tile base index 0x134=0x9a*2). 由 play_ui_effect_0e / FUN_080ca8ec / FUN_0801ec9c 调用. Constants: LP_VRAM_BASE=0x0600f000, LP_DIGIT_AREA_OFFSET_P2=0x448, LP_DIGIT_AREA_OFFSET_P1=+8, TILE_IDX_BASE=0x134, LP_MAX=99999, EWRAM_GAME_CTX=0x0201e2a0.
+@ Writes five decimal LP digits for player_id r0 and value r1, clamped to99999, into the selected LP VRAM row. The opponent comparison selects offset+8 or+0x448; each digit writes a tile index based at0x134. Called by play_life_point_change_effect and two other display paths.
 write_lp_digit_tiles_to_vram:
     push {r4,r5,r6,lr}                       @ 080ca5f8 70b5
     adds r5,r1,#0x0    @ 080ca5fa 0d1c

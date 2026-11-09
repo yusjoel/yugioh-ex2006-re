@@ -1369,7 +1369,7 @@ DAT_080cc8fc:
 PTR_gP1LifePoints_080cc900:
     .word  gP1LifePoints                  @ 080cc900 e0c40102
 
-@ duel field 场地 VRAM 完整初始化 hub, 被 play_demo_shuen / play_ui_effect_3b/3a / FUN_0801fec0 等 8 个调用方共享. 依次: (1) zero_fill_by_halfword 清空 VRAM OBJ tile 区; (2) store_ewram_ctx_ptr_and_clear_mode_flags; (3) reset_display_and_obj_vram; (4) apply_blend_fadeout_flat; (5) reset_all_bg_scroll_regs_and_shadows; (6) 设置 gPrng[0xba*2]=1; (7) 配置 BG0-3CNT 四寄存器; (8) 复制多组 tile/screen 数据; (9) init_duel_field_lp_aob_ctx; (10) 条件性复制 tile; (11) write_palette_tile_row_to_vram; (12) init_duel_field_tile_indices + redraw_all_field_slot_tiles; (13) strh DISPCNT. Constants: BG0CNT=0x1f08, BG1CNT=0x1f09, BG2CNT=0x1d82, BG3CNT=0x1c0b.
+@ Initializes the complete duel-field VRAM/display layout. It is the restore phase used by play_vija_scene_with_sprite_intro, play_exodia_demo_scene_with_field_restore, play_demo_shuen, and other duel-field transitions. Clears and reloads VRAM/palettes, initializes LP AOB state, rebuilds field tiles, and writes display control. Returns void.
 init_duel_field_vram_layout:
     push {r4,r5,lr}                          @ 080cc904 30b5
     movs r0,#0xc0    @ 080cc906 c020
@@ -1511,7 +1511,7 @@ DAT_080cca30:
 DAT_080cca34:
     .word  0x09850c5c                     @ 080cca34 5c0c8509
 
-@ 在 duel field 状态机收尾步骤中被 8 个 caller 调用 (play_demo_shuen / play_ui_effect_3b/3a / FUN_0801fec0 等). 先将 EWRAM 标志字节 [0x02023345] bit1 置 1 (激活淡出信号), 然后以步进量 2 调用 tick_blend_step_by_delta 推进混合淡出过渡. 无参数; 返回 tick_blend_step_by_delta 的返回值 (0=进行中, 1=完成). Constants: EWRAM_FLAG_ADDR=0x02023345, BLEND_STEP_DELTA=2, FLAG_BIT1=0x2.
+@ Duel-field fade-out tick used by play_vija_scene_with_sprite_intro, play_exodia_demo_scene_with_field_restore, play_demo_shuen, and other field transitions. Sets the fade-out flag byte at gDuelFieldState+0x215 bit1, then advances tick_blend_step_by_delta with step 2 and returns that result.
 tick_duel_field_fadeout_step:
     push {lr}                                @ 080cca38 00b5
     ldr r0, DAT_080cca54                     @ 080cca3a 0648

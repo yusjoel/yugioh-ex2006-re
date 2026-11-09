@@ -271,3 +271,10 @@
 @ =============================================================================
 .equ OAM_COIN_REROLL_SPRITE_P2_5B, 0x0000805b  @ P2-side coin-reroll sprite code; P1 uses inline 0x5b.
 .equ OAM_DICE_REROLL_SPRITE_P2_5C, 0x0000805c  @ P2-side dice-reroll sprite code; P1 uses inline 0x5c.
+.equ BANNER_OAM_TILE_ATTR_3208, 0x00003208
+.equ BANNER_OAM_TILE_ATTR_3210, 0x00003210
+.equ VIJA_INTRO_OAM_PACKED_POS, 0x0028006d
+.equ OAM_ATTR2_TILE_C0_PAL4, 0x000040c0
+.equ OAM_ATTR2_TILE_48_PAL4_PRI2, 0x00004848
+.equ OAM_ATTR2_TILE_C0_PAL4_PRI2, 0x000048c0
+.equ LP_DELTA_PREFIX_TILE_MODE0, 0x00000202

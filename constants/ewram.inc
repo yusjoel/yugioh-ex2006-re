@@ -189,7 +189,7 @@
 @ -----------------------------------------------------------------------------
 @ Demo 过场动画 (cinematic; demo/shuen, demo/exodia, demo/vija ...)
 @ -----------------------------------------------------------------------------
-.equ gVijaState,                 0x02029EB0  @ vija scene (play_ui_effect_3b) per-frame state struct (0xc0 bytes)
+.equ gVijaState,                 0x02029EB0  @ vija scene (play_vija_scene_with_sprite_intro) per-frame state struct (0xc0 bytes)
                                              @ +0x8c = u8  scroll_phase (vija BG3 horizontal scroll counter)
                                              @ +0x8d = u8  scene_main_state (10-phase state, run_vija_scene_state_machine)
                                              @ +0x90 = u8  bg2_affine_angle_counter (tick_bg2_affine_anim_frame)
@@ -665,3 +665,15 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 @ =============================================================================
 .equ gEquipPhaseDisplayState, 0x0201e274  @ u32 equip phase-display state; gP1LifePoints+EQUIP_PHASE_DISPLAY_STATE_OFF.
 .equ gLpCardTrackNext, 0x0201e28a  @ u16 next LP-card tracking field; gP1LifePoints+0x1daa.
+
+@ Existing definitions used by file 15.
+.equ NORMAL_SUMMON_PLAYER_CACHE_OFF, 0x00001c44
+.equ EQUIP_ACTIVATION_READY_FLAG_OFF, 0x00001c38
+.equ gEquipActivationStateA,    gP1LifePoints + ACTIVATION_STATE_A_OFF
+.equ gEquipActivationReadyFlag, gP1FieldArrayCBase + EQUIP_ACTIVATION_READY_FLAG_OFF
+.equ DUEL_FIELD_UI_EFFECT_FLAGS_OFF, 0x00000215
+.equ gVijaIntroAobCtxA, 0x0201fedc
+.equ gVijaIntroAobCtxB, 0x0201fef0
+.equ SLOT_SET_CODE_TO_COUNT_NEG_OFF, 0xfffffdb0
+.equ gDuelFieldAuxAobCtx, 0x020230f8
+.equ gBannerEffectArgs, 0x0201fec4

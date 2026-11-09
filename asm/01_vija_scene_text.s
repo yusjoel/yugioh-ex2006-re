@@ -1,7 +1,7 @@
 @ ==== 01_vija_scene_text.s ====
 @ vija 场景状态机 + 文本渲染 + puzzle 显示派发
 .thumb
-@ vija scene (play_ui_effect_3b) per-frame state machine driver. No parameters; all state from IWRAM 0x02029eb0. 10-phase dispatch (phases 0-9): phase 0: init display regs (DISPCNT/BGxCNT), load BG+OBJ gfx, clear palette, init 5 OBJ slots; phase 1: check blend done, start fade-in; phase 2/3: advance blend, check affine init; phase 4: tick_all_vija_obj_anim_slots + tick_bg_scroll_anim_frame + tick_bg2_affine_anim_frame each frame; phase 5: start fade-out blend; phase 6: tick blend; phase 7: tick_all_vija_obj_anim_slots + check fade; phase 8/9: epilogue return 1. Returns r0=1 (scene done) or r0=0 (scene continue). Side-effects: DISPCNT/BG0-2CNT/palette VRAM, OAM, IWRAM state fields. Constants: VIJA_STATE=0x02029eb0, DISPCNT_INIT=0x1741, SLOT_COUNT=5.
+@ Main Vija per-frame state machine called by play_vija_scene_with_sprite_intro. Dispatches ten phases from gVijaState+0x8d to load assets, run blend transitions, and update OBJ, BG scroll, and BG2 affine animation. At the common exit it returns1 only when check_blend_transition_done()==0 and gVijaState+0x92 bit0 is set; otherwise it advances the blend with tick_blend_transition_step and returns0. Evidence: 0801cf4c-0801cf68.
 run_vija_scene_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 0801cb00 f0b5
     sub sp,#0x18                             @ 0801cb02 86b0
@@ -4516,7 +4516,7 @@ tick_duel_field_main_frame_prng_state_213_c:
 tick_duel_field_main_frame_prng_state_217_c:
     .word  GPRNG_PRNG_STATE_OFF217        @ 0801ec98 17020000
 
-@ Core card display operation dispatcher (indeg=114). r0=op_code [1..0x3d] (subs#1; cmp#0x3c); dispatches via 61-entry jump table 0x0801ecc4. Case handlers (sample): 0x01/0x21=init_field_slot_aob_ctx_a, 0x03=write_zone_slot_oam_descriptor+update_zone_activation_display_state, 0x06=init_card_effect_aob_ctx, 0x09=build_slot_activation_mask_for_player+write_field_slot_activation_mask, 0x0b=init_field_slot_aob_ctx_b, 0x0c=write_zone_oam_entry_with_flip, 0x0d=write_lp_digit_tiles_to_vram, 0x14=get_player_lp_by_field_type+render_field_zone_card_tile_by_type, 0x18=init_field_slot_aob_ctx_d, 0x19=init_field_slot_aob_ctx_c, 0x1a=init_field_slot_ctx_zoom, 0x1b=render_field_slot_card_tile_by_id, 0x1c=init_field_slot_aob_ctx_a (case alias), 0x24=refresh_duel_field+refresh_zone_effect_buff_cache+refresh_all_zone_slot_tile_display, 0x31=copy_game_text_to_card_name_vram, 0x32=build_field_zone_display_state. r1/r2/r3=op args (transparent to callee). Returns 1=done or 0=default/invalid. Constants: jump_table=0x0801ecc4, op_range=[1..0x3d].
+@ Card-display opcode dispatcher for1..0x3d through a 61-entry table. Opcode0x21 calls init_banner_state then writes zone OAM. Opcode1 and several shared opcodes enter the same current handler. Other cases invoke card, zone, LP, text, or field handlers with r1-r3. Every handled path reaches the constant1 exit; invalid/default reaches the constant0 exit. Evidence: [0801ec9c,0801ef94).
 dispatch_card_display_op:
     push {r4,r5,r6,r7,lr}                    @ 0801ec9c f0b5
     .hword 0x4657    @ 0801ec9e 5746
@@ -4798,7 +4798,7 @@ switchD_0801ecbc__caseD_21:
     adds r0,r6,#0x0    @ 0801ef38 301c
     adds r1,r7,#0x0    @ 0801ef3a 391c
     adds r2,r4,#0x0    @ 0801ef3c 221c
-    bl init_field_slot_aob_ctx_a             @ 0801ef3e 9df029fc
+    bl init_banner_state                     @ 0801ef3e 9df029fc
 switchD_0801ecbc__caseD_7:
     adds r0,r6,#0x0    @ 0801ef42 301c
     adds r1,r7,#0x0    @ 0801ef44 391c
@@ -4816,7 +4816,7 @@ switchD_0801ecbc__caseD_1:
     adds r0,r6,#0x0    @ 0801ef60 301c
     adds r1,r7,#0x0    @ 0801ef62 391c
     adds r2,r4,#0x0    @ 0801ef64 221c
-    bl init_field_slot_aob_ctx_a             @ 0801ef66 9df015fc
+    bl init_banner_state                     @ 0801ef66 9df015fc
     b switchD_0801ecbc__caseD_a              @ 0801ef6a 2ae7
 LAB_0801ef6c:
     adds r0,r5,#0x0    @ 0801ef6c 281c
@@ -4842,15 +4842,7 @@ LAB_0801ef86:
     pop {r1}                                 @ 0801ef90 02bc
     bx r1                                    @ 0801ef92 0847
 
-@ UI effect dispatcher (per-frame tick). r0=effect_id [0..0x3d]; dispatches ~28 independent
-@ effect handler sub-state-machines; returns busy(0)/done(1). Unrecognized IDs fall through
-@ to caseD_7 (returns 0). Known effects: 0x01=banner_anim_state_machine (pack banner enter/exit),
-@ 0x1a=play_card_zoom_in (small->large zoom transition), 0x3c=play_demo_shuen (ending cinematic).
-@ Other cases delegated to play_ui_effect_<id_hex> stubs. cmp upper bound 0x3d; >0x3d -> default.
-@ case 0/0x18/0x19 share caseD_0 (state-bit check -> run_ui_effect_card_pair_state_machine or
-@ dispatch_ui_effect_by_card_type); case 1: [gPrng+0x23f] bit0 -> banner_anim_state_machine
-@ else tick_banner_pack_state_machine; case 2: gBannerState[+4] state [1..3] dispatch.
-@ case 0x31/0x32 inline reads (no bl, special readback).
+@ Per-frame UI-effect dispatcher for IDs0..0x3d. Case2 returns1 early if gFontState bit0 or duel-context zone-state bit0 is set; otherwise gBannerState+4 values1/2/3 select three banner state machines. Case0x31 returns the OR of two flag bit0 values; case0x32 returns zone bit0. Cases0x30/0x3a/0x3b/0x3c call play_three_sprite_banner_blend, play_exodia_demo_scene_with_field_restore, play_vija_scene_with_sprite_intro, and play_demo_shuen. Invalid/default returns0.
 play_ui_effect:
     push {lr}                                @ 0801ef94 00b5
     cmp r0,#0x3d                             @ 0801ef96 3d28
@@ -4954,13 +4946,13 @@ switchD_0801efa4__caseD_3:
     bl play_ui_effect_03                     @ 0801f0cc adf0d8fc
     b LAB_0801f234                           @ 0801f0d0 b0e0
 switchD_0801efa4__caseD_15:
-    bl play_ui_effect_15                     @ 0801f0d2 9ff0dffc
+    bl play_zone_type_13_card_reveal_effect  @ 0801f0d2 9ff0dffc
     b LAB_0801f234                           @ 0801f0d6 ade0
 switchD_0801efa4__caseD_10:
     bl play_ui_effect_10                     @ 0801f0d8 a3f068fa
     b LAB_0801f234                           @ 0801f0dc aae0
 switchD_0801efa4__caseD_11:
-    bl play_ui_effect_11                     @ 0801f0de a0f0a3f8
+    bl play_zone_info_palette_cycle_effect   @ 0801f0de a0f0a3f8
     b LAB_0801f234                           @ 0801f0e2 a7e0
 switchD_0801efa4__caseD_31:
     ldr r0, play_ui_effect_font_state_a      @ 0801f0e4 0548
@@ -4985,7 +4977,7 @@ switchD_0801efa4__caseD_1a:
     bl play_card_zoom_in                     @ 0801f108 a4f00afe
     b LAB_0801f234                           @ 0801f10c 92e0
 switchD_0801efa4__caseD_e:
-    bl play_ui_effect_0e                     @ 0801f10e a0f041f9
+    bl play_life_point_change_effect         @ 0801f10e a0f041f9
     b LAB_0801f234                           @ 0801f112 8fe0
 switchD_0801efa4__caseD_32:
     ldr r0, play_ui_effect_duel_ctx_b        @ 0801f114 0348
@@ -5004,7 +4996,7 @@ switchD_0801efa4__caseD_6:
     bl play_ui_effect_06                     @ 0801f12c aaf058f8
     b LAB_0801f234                           @ 0801f130 80e0
 switchD_0801efa4__caseD_5:
-    bl play_ui_effect_05                     @ 0801f132 a0f06bfe
+    bl play_lp_timer_aob_effect              @ 0801f132 a0f06bfe
     b LAB_0801f234                           @ 0801f136 7de0
 switchD_0801efa4__caseD_4:
     bl play_ui_effect_04                     @ 0801f138 9ef0e0fd
@@ -5079,13 +5071,13 @@ LAB_0801f1ba:
     bl tick_duel_puzzle_banner_state_machine @ 0801f1ba 9ef051fa
     b LAB_0801f234                           @ 0801f1be 39e0
 switchD_0801efa4__caseD_30:
-    bl play_ui_effect_30                     @ 0801f1c0 9ef056fb
+    bl play_three_sprite_banner_blend        @ 0801f1c0 9ef056fb
     b LAB_0801f234                           @ 0801f1c4 36e0
 switchD_0801efa4__caseD_20:
-    bl play_ui_effect_20                     @ 0801f1c6 a1f053fd
+    bl play_card_display_window_effect       @ 0801f1c6 a1f053fd
     b LAB_0801f234                           @ 0801f1ca 33e0
 switchD_0801efa4__caseD_21:
-    bl play_ui_effect_21                     @ 0801f1cc a1f0b4fe
+    bl play_zone_card_display_window_effect  @ 0801f1cc a1f0b4fe
     b LAB_0801f234                           @ 0801f1d0 30e0
 switchD_0801efa4__caseD_23:
     bl play_ui_effect_23                     @ 0801f1d2 a2f0fffa
@@ -5103,28 +5095,28 @@ switchD_0801efa4__caseD_b:
     bl play_ui_effect_0b                     @ 0801f1ea a3f06ffc
     b LAB_0801f234                           @ 0801f1ee 21e0
 switchD_0801efa4__caseD_33:
-    bl play_ui_effect_33                     @ 0801f1f0 a1f0f8fa
+    bl play_card_display_sine_reveal_effect  @ 0801f1f0 a1f0f8fa
     b LAB_0801f234                           @ 0801f1f4 1ee0
 switchD_0801efa4__caseD_34:
-    bl play_ui_effect_34                     @ 0801f1f6 a1f043fc
+    bl play_card_display_alpha_reveal_effect @ 0801f1f6 a1f043fc
     b LAB_0801f234                           @ 0801f1fa 1be0
 switchD_0801efa4__caseD_37:
-    bl play_ui_effect_37                     @ 0801f1fc a0f0fcfa
+    bl play_correct_miss_result_effect       @ 0801f1fc a0f0fcfa
     b LAB_0801f234                           @ 0801f200 18e0
 switchD_0801efa4__caseD_38:
-    bl play_ui_effect_38                     @ 0801f202 a0f0cdf9
+    bl play_windowed_aob_slide_effect        @ 0801f202 a0f0cdf9
     b LAB_0801f234                           @ 0801f206 15e0
 switchD_0801efa4__caseD_3a:
-    bl play_ui_effect_3a                     @ 0801f208 9df0e4fc
+    bl play_exodia_demo_scene_with_field_restore @ 0801f208 9df0e4fc
     b LAB_0801f234                           @ 0801f20c 12e0
 switchD_0801efa4__caseD_3b:
-    bl play_ui_effect_3b                     @ 0801f20e 9df083fb
+    bl play_vija_scene_with_sprite_intro     @ 0801f20e 9df083fb
     b LAB_0801f234                           @ 0801f212 0fe0
 switchD_0801efa4__caseD_3c:
     bl play_demo_shuen                       @ 0801f214 9df034fb
     b LAB_0801f234                           @ 0801f218 0ce0
 switchD_0801efa4__caseD_17:
-    bl play_ui_effect_17                     @ 0801f21a 9ff0d1fe
+    bl play_zone_card_display_transition     @ 0801f21a 9ff0d1fe
     b LAB_0801f234                           @ 0801f21e 09e0
 switchD_0801efa4__caseD_2f:
     bl play_ui_effect_2f                     @ 0801f220 a2f03cfe

@@ -89,12 +89,8 @@ RENAMES = [
     # 完全无关; 内容是 banner 出/入场 7-state 动画 (BLDY/WINOUT 调制 + tile copy).
     # 2026-04-30 (后续): 修正 plate, FUN_0801ef94 实为 play_ui_effect (UI 特效派发器),
     # 不是 PageManager.
-    ("banner_anim_state_machine", "banner_anim_state_machine",
-        "banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init "
-        "(载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out "
-        "(BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 "
-        "[gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: play_ui_effect "
-        "(FUN_0801ef94) case 1 (effect_id=1)."),
+    ('banner_anim_state_machine', 'banner_anim_state_machine',
+        'Banner animation state machine. Phases0..2 load resources, configure OAM/windows, fade in, and display for exactly64 calls. Phase3 performs an 8-call OAM transition, then calls sync_state_and_init_sprite(8). Phases4..6 complete fade-out and teardown. Every phase0..6 returns1. Phase>6 selects the saved channel, clears gBannerState bit0 and gDuelFieldState+0x215 bit2, and returns0. Palette transitions use blend_palette_block_toward_white.'),
     ("FUN_080d8ddc", "pack_visible_count",
         "pack-banner: 返回当前可见 pack 数 (clamp 1..5)"),
     ("FUN_080d8f84", "pack_detail_bg_tile_load",
@@ -222,17 +218,8 @@ RENAMES = [
         "等 runtime 验证."),
 
     # 2026-04-30: UI 特效派发器 (effect-id-based per-frame dispatcher)
-    ("FUN_0801ef94", "play_ui_effect",
-        "UI 特效派发器 (per-frame tick). r0 = effect_id (0..0x3d), 按 ID 分派到 "
-        "~28 个独立的 effect handler 子状态机, busy/done 返回. dispatch table 中 "
-        "重复 fallthrough 到 default 的 case = 未实现/无效 ID. 已识别 effect: "
-        "0x01 = banner_anim_state_machine (pack 横幅出/入场), "
-        "0x1a = play_card_zoom_in (小图→大图缩放过渡), "
-        "0x3c = play_demo_shuen (终焉过场). 其他 case 子函数批量占位为 "
-        "play_ui_effect_<id_hex>, 待详细分析. cmp 上限 0x3d, 大于则 default. "
-        "case 0/0x18/0x19 共享 caseD_0 (state-bit 检查后选 FUN_080c4edc 或 FUN_080c4350); "
-        "case 1 状态化 (banner_anim 或 FUN_080be600); case 2 三向状态分派. "
-        "case 0x31/0x32 内联无 bl (特殊 readback)."),
+    ('FUN_0801ef94', 'play_ui_effect',
+        'Per-frame UI-effect dispatcher for IDs0..0x3d. Case2 returns1 early if gFontState bit0 or duel-context zone-state bit0 is set; otherwise gBannerState+4 values1/2/3 select three banner state machines. Case0x31 returns the OR of two flag bit0 values; case0x32 returns zone bit0. Cases0x30/0x3a/0x3b/0x3c call play_three_sprite_banner_blend, play_exodia_demo_scene_with_field_restore, play_vija_scene_with_sprite_intro, and play_demo_shuen. Invalid/default returns0.'),
 
     # 2026-04-30: 卡牌小图→大图缩放/旋转过渡动画 (play_ui_effect case 0x1a)
     ("FUN_080c3d20", "play_card_zoom_in",
@@ -252,32 +239,32 @@ RENAMES = [
     # 2026-04-30: play_ui_effect 子 handler 占位名 (按 case_id hex 编号, 待详细分析)
     ("FUN_080cca80", "play_ui_effect_03",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x03 子状态机, 待详细分析."),
-    ("FUN_080bdcfc", "play_ui_effect_04",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x04 子状态机, 待详细分析."),
-    ("FUN_080bfe0c", "play_ui_effect_05",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x05 子状态机, 待详细分析."),
+    ('FUN_080bdcfc', 'play_ui_effect_04',
+        'UI effect0x04 banner state machine. Phases0..5 configure resources, OAM, windows, and blend state; palette phases call blend_palette_block_toward_white. Each phase0..5 returns1. For phase>5, bit3 of byte[0x0201ff30] is set only when halfword[gBannerState+8]==0, dword[gP1LifePoints+0x1ce8]==dword[0x0201e2a4], and dword[gP1LifePoints+0x1d00]==0; otherwise it is cleared with AND0xf7. Then banner bit0 and field+0x215 bit2 are cleared and 0 is returned.'),
+    ('FUN_080bfe0c', 'play_lp_timer_aob_effect',
+        'LP-timer AOB effect. If gP1LifePoints+0x1cec is0, it clears banner bit0 and field+0x215 bit2 and returns0 without aux init or masking. Otherwise phase0 loads resources and uses anm1 when player==ctx+4; phase1 renders, advances when tick returns0, and still returns1. Final aux init uses anm1 when player==(ctx+4 XOR1), applies u32[0x03000254]&=0x80000000, clears both flags, and returns0.'),
     ("FUN_080c91e0", "play_ui_effect_06",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析."),
     ("FUN_080c2acc", "play_ui_effect_0b",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x0b 子状态机, 待详细分析."),
     ("FUN_080c3080", "play_ui_effect_0c",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x0c 子状态机, 待详细分析."),
-    ("FUN_080bf394", "play_ui_effect_0e",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0e 子状态机, 待详细分析."),
+    ('FUN_080bf394', 'play_life_point_change_effect',
+        'Life-point delta effect. Exit on abs(banner+8)==0 or banner+0xc!=0. Phase0 positions/draws the delta and sets countdown0x20; phase1 redraws until ++u16counter>2. Phase2 selects0x25/0x26 and advances progress at banner+0x18 by a decimal-scale step>=10, capped at delta. It sends LP+progress (mode1) or max(LP-progress,0) (mode0) to the VRAM digit writer and redraws the original delta. Phase3 decrements u8 countdown to0xff; cleanup clears both flags and returns0.'),
     ("FUN_080c25ac", "play_ui_effect_10",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x10 子状态机, 待详细分析."),
-    ("FUN_080bf228", "play_ui_effect_11",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x11 子状态机, 待详细分析."),
+    ('FUN_080bf228', 'play_zone_info_palette_cycle_effect',
+        'Zone-info palette-cycle effect for UI effect0x11. It computes the zone-type0xb count delta and clamps it to0..6. Phase0 renders the zone and falls through to the first palette update. Phase1 performs the remaining 63 updates; counter%3 selects the attr2 palette while coordinates stay fixed. Completion clears banner bit0 and field+0x215 bit2 and returns0; active phases return1.'),
     ("FUN_080c1ad0", "play_ui_effect_13",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x13 子状态机, 待详细分析."),
-    ("FUN_080bea94", "play_ui_effect_15",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x15 子状态机, 待详细分析."),
-    ("FUN_080befc0", "play_ui_effect_17",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x17 子状态机, 待详细分析."),
-    ("FUN_080c0c70", "play_ui_effect_20",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x20 子状态机, 待详细分析."),
-    ("FUN_080c0f38", "play_ui_effect_21",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x21 子状态机, 待详细分析."),
+    ('FUN_080bea94', 'play_zone_type_13_card_reveal_effect',
+        'Zone13 card reveal. Phase0 loads two small-card images, toggles field+0x215 bit6, prepares tile data and sprite3. Phase1 makes five single-OAM-entry calls at counter0..4, using LUT[0,1,8,15,16] through sin[(4*v)&127] to scale offsets. Phase2 draws zone13 and its large card if bit6 is set. Phase3 waits32 calls. Phases0..3 return1; phase>3 clears banner bit0 and field bit2, then returns0.'),
+    ('FUN_080befc0', 'play_zone_card_display_transition',
+        'Zone-card display transition. Phase0 optionally renders the large card. Phase1 performs 32 palette-cycle updates; unlike play_zone_info_palette_cycle_effect, phase0 does not fall through into phase1. Phase2 refreshes zone information before advancing. Final cleanup clears banner bit0 and field+0x215 bit2 and returns0; active phases return1.'),
+    ('FUN_080c0c70', 'play_card_display_window_effect',
+        'Run effect0x20 as a seven-phase card window sequence. Phase0 resolves the cached card or fallback ID, uploads tiles, initializes the AOB from ptnsect data, and enables WIN0. Phase1 writes five BLDY steps. Phases2/4 attempt two card OAM writes for17 calls each. Phase3 renders the AOB plus those two writes and advances only when its tick returns0. Phase5 writes five closing BLDY steps. Phase6 clears WIN0 and refreshes UI, returning1; default clears both UI flags and returns0.'),
+    ('FUN_080c0f38', 'play_zone_card_display_window_effect',
+        'Run effect0x21 as a seven-phase zone-card window sequence. Phase0 resolves zone/card references, uploads/remaps label pixels, and enables WIN0. Phase1 opens with five BLDY steps. Phase2 attempts two card OAM writes per call; phase3 adds one affine entry; phase4 adds one normal entry instead. Each runs17 calls. Phase5 closes with five BLDY steps. Phase6 clears WIN0 and refreshes UI, returning1; default clears banner bit0 and field+0x215 bit2 and returns0.'),
     ("FUN_080c17d4", "play_ui_effect_23",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x23 子状态机, 待详细分析."),
     ("FUN_080c1448", "play_ui_effect_25",
@@ -286,20 +273,20 @@ RENAMES = [
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x2e 子状态机, 待详细分析."),
     ("FUN_080c1e9c", "play_ui_effect_2f",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x2f 子状态机, 待详细分析."),
-    ("FUN_080bd870", "play_ui_effect_30",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x30 子状态机, 待详细分析."),
-    ("FUN_080c07e4", "play_ui_effect_33",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x33 子状态机, 待详细分析."),
-    ("FUN_080c0a80", "play_ui_effect_34",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x34 子状态机, 待详细分析."),
-    ("FUN_080bf7f8", "play_ui_effect_37",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x37 子状态机, 待详细分析."),
-    ("FUN_080bf5a0", "play_ui_effect_38",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x38 子状态机, 待详细分析."),
-    ("FUN_080bcbd4", "play_ui_effect_3a",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3a 子状态机, 待详细分析."),
-    ("FUN_080bc918", "play_ui_effect_3b",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3b 子状态机, 待详细分析."),
+    ('FUN_080bd870', 'play_three_sprite_banner_blend',
+        'UI effect 0x30. Phases0..4 load a palette/tile set, emit exactly three fixed OAM entries, run a 9-tick alpha ramp, hold65 ticks, and run a 9-tick reverse ramp. Returns1 while active. Completion disables blend, clears gBannerState bit0 with AND0xfe and gDuelFieldState+0x215 bit2 with AND0xfb, then returns0. No sine-motion helper is called. Evidence: 080bd870-080bda70.'),
+    ('FUN_080c07e4', 'play_card_display_sine_reveal_effect',
+        'Run effect0x33 as a six-phase card reveal. Phase0 renders the display and enables WIN0/blend. Phase1 attempts45 sine-positioned OAM writes per call for16 ticks. Phase2 raises the six-bit blend step by5; phase3 lowers it by5 and advances after16 completion ticks. Phase4 draws the card grid during an8-tick alpha ramp. Phase5 copies0x100B palette and clears WIN0, still returning1. Default disables blend, clears banner bit0 and field+0x215 bit2, and returns0.'),
+    ('FUN_080c0a80', 'play_card_display_alpha_reveal_effect',
+        'Run effect0x34 as a six-phase alpha reveal. Phase0 renders the display and enables WIN0/blend. Phase1 draws the card grid for8 alpha-ramp ticks. Phase2 raises the six-bit blend step by5; phase3 lowers it by5 and waits16 completion ticks. Phase4 reverses the alpha coefficients for8 ticks, using the same grid argument1 as phase1. Phase5 copies0x100B palette and clears WIN0, still returning1. Default clears both UI flags and returns0.'),
+    ('FUN_080bf7f8', 'play_correct_miss_result_effect',
+        'Correct/Miss effect. Phase0 initializes 20B AOB contexts from ptnsect resources, selects anm0/1/2/3, and draws localized strings to a line buffer. Phase2 renders/ticks each context; a nonzero tick latches active for this call. Two result OAM entries per context are emitted only while that latch is0. Only all-zero-tick calls increment the hold byte; hold>63 advances. Phase3 writes BLDY in5 steps; phase4 restores0x100B palette and disables WIN0, returning1. Default clears both flags and returns0.'),
+    ('FUN_080bf5a0', 'play_windowed_aob_slide_effect',
+        'Windowed AOB slide effect. Phase0 loads two tile blocks, palette, and ptnsect data, initializes the AOB context, and enables WIN0/blend. Later phases fade BLDY in, move the AOB with the sine table, hold the frame, fade out, and clear WIN0. Completion clears banner bit0 and field+0x215 bit2 and returns0; active phases return1.'),
+    ('FUN_080bcbd4', 'play_exodia_demo_scene_with_field_restore',
+        'UI effect 0x3a. Phases 0..5 run field fade-in, display reset, Exodia load/tick, field restore, and fade-out. Nonzero callee results advance; restore advances unconditionally. Returns 1 while active. Completion clears gBannerState bit0 with AND 0xfe and gDuelFieldState+0x215 bit2 with AND 0xfb, then returns 0. Evidence: 080bcbd4-080bcc62.'),
+    ('FUN_080bc918', 'play_vija_scene_with_sprite_intro',
+        'UI effect 0x3b. Phase0 with gBannerState+0xd nonzero jumps to phase6 and returns1. Otherwise phases0..4 load regional Vija-intro assets and animate two AOB contexts. Phase5 disables blend/window, advances to6, clears banner bit0 and field+0x215 bit2, and returns0. Phases6..11 fade in, reset/load/run Vija, restore field, and fade out; nonzero results advance, restore/refresh advance unconditionally, returning1. Above11 cleans up and returns0.'),
     ("FUN_080c2544", "play_ui_effect_3d",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x3d 子状态机, 待详细分析."),
 
@@ -775,12 +762,8 @@ RENAMES = [
         "则将帧计数器继续递增并以帧数计算滚动偏移量, 写入 [+0x18] (像素 Y 偏移) 和 [+0x1c] (子计数器); "
         "若帧计数器未超阈值则清零并停止滚动. "
         "最终写 VRAM 0x03000240 (gFrameCounter 偏移处) 的对应字段以同步 HW 位置."),
-    ("FUN_080f0cc0", "setup_line_buf_with_font_and_align",
-        "font_jp 模块高频工具函数 (indeg=32). 先调用 setup_line_buf_pos_and_font 完成基础行缓冲区位置和字体设置, "
-        "再写入 EWRAM 0x02006ed0 结构体中的两个字节字段: "
-        "[+0x15] 的 bit1 根据 r2 (align_flag) 决定左/右对齐; "
-        "[+0x14] 的 bits[7:2] 根据 r3 (color_index & 0x1f) 设置文字颜色索引. "
-        "被 render_card_description_text/play_ui_effect_37 等多个文字渲染入口调用, 是行对齐+颜色二合一配置函数."),
+    ('FUN_080f0cc0', 'setup_line_buf_with_font_and_align',
+        'Line-buffer font/alignment setup. After base setup, ctx[0x15]=(old&0xfe)|(r2&1), so r2 writes bit0. ctx[0x14]=(old&0x83)|((r3&0x1f)<<2), so r3 writes bits6:2 while preserving bit7 and bits1:0. Counterexamples: old15=0,r2=1 gives1; old14=0x80,r3=0 stays0x80. Other initialized fields and ABI remain unchanged.'),
     ("FUN_080ef488", "resolve_card_flag_table_ptr",
         "仅被 FUN_080ef4bc (scene_card_info) 调用. 接收卡片索引 (r0, u16 截断), "
         "与常量 FIELD_card_flag_table_idx=0x0fa6=4006 比较: "
@@ -796,12 +779,8 @@ RENAMES = [
         "否则以 r1>>4 作行内 u16 偏移 (每 16 bit 一组), r1 & 0xf 作位索引, "
         "读取 flag halfword 并测试目标 bit. 返回 1 表示标志位置位, 0 表示未置位. "
         "被 card_info_page_finalize 和 FUN_08104130/FUN_0810a52c (card_stats) 调用."),
-    ("FUN_080f55d4", "disable_blend_and_clear_step",
-        "blend+frame_counter 工具族的清除变体 (indeg=26). "
-        "清除 gFrameCounter (0x03000240) byte 中的 bit6 (blend_active 标志位), "
-        "然后将 BLDCNT (0x04000050) 和 BLDY (0x04000054) 均写 0, 彻底禁用 GBA 混合效果. "
-        "被 FUN_080f58b8 在 blend_step 归零时调用, "
-        "也被 play_ui_effect_3b/play_ui_effect_30 等特效函数直接调用以重置混合状态."),
+    ('FUN_080f55d4', 'disable_blend_and_clear_step',
+        'Disables the active blend step. AND0xc0 clears gFrameCounter byte bits0..5 while preserving bits6/7, writes zero to BLDCNT and BLDY, and returns void. Called by play_vija_scene_with_sprite_intro, play_three_sprite_banner_blend, and other blend state machines during teardown.'),
     ("FUN_080f58b8", "tick_blend_step_by_delta",
         "blend+frame_counter 工具族的递减变体 (indeg=17). "
         "从 gFrameCounter byte (gPrng+0x200 = 0x03000240) 提取 bits[5:0] (当前 blend_step, 0..63), "
@@ -2390,15 +2369,8 @@ RENAMES = [
         "若两个值均 >= 0 则将 +8 的低 2 位清零并置 bit1 (fade 激活); "
         "若任一值 < 0 则置 +8 为 3 (idle/disabled). "
         "副作用: [0x02023480+8] 写入新 flag 字节."),
-    ("FUN_08013510", "reset_display_and_gl_state",
-        "由 play_ui_effect_3a 及 FUN_08014398 在需要完全重置显示层时调用. "
-        "执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); "
-        "(2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); "
-        "(3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; "
-        "(4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; "
-        "(5) gl_state_init 重置 GL 状态结构体; "
-        "(6) gl_clear_frame_callbacks 清空帧回调队列. "
-        "Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B."),
+    ('FUN_08013510', 'reset_display_and_gl_state',
+        'Resets the Exodia demo display before play_exodia_demo_scene_with_field_restore. Clears gDemoState, writes DISPCNT/BG0CNT-BG3CNT defaults, sets brightness to -16, reinitializes GL state, and resets IG2D load counters. No inputs; display, palette, and demo state are overwritten. Evidence: 08013510 body and caller 080bcc0e.'),
     ("FUN_08015fc8", "zero_struct_36bytes",
         "被 scene_demo/scene_name_input 初始化器等 13 个调用点使用, "
         "将 r0 传入的指针所指向的 36 字节结构体清零. "
@@ -3127,14 +3099,8 @@ RENAMES = [
         "r0=u8 current_frame [0..max_frames-1], r1=u8 max_frames [1..15]. "
         "Symmetric sibling of apply_demo_window_fade_in_step (0x08013af4), direction reversed. "
         "Side-effects: WIN0V(0x04000044), gl_set_brightness(-16), tick_blend_transition_step."),
-    ("FUN_08013bd4", "tick_demo_scene_state_machine",
-        "Called by FUN_08014398 and play_ui_effect_3a (0x080bcbd4); drives the demo scene (Exodia animation) "
-        "per-frame state machine. Reads gDemoState+0x8c bits[22:15] as state_idx (0-9), dispatches via 10-entry jump table: "
-        "case0 load BG gfx set0+FS+sprites; case1/2 check blend progress and advance fade-in; "
-        "case3/4 step sprite animation frames; case5 load BG gfx set1; case6/7 fade-out window animation; "
-        "case8/9 end states. Each case increments state counter and falls through to default (no change). "
-        "No parameters (void); all inputs from gDemoState EWRAM struct. "
-        "Side-effects: gDemoState+0x8c state field, DISPCNT/BG3CNT/BLDCNT IO registers."),
+    ('FUN_08013bd4', 'tick_demo_scene_state_machine',
+        'Per-frame Exodia demo state machine called by play_exodia_demo_scene_with_field_restore. Dispatches ten phases from gDemoState+0x8c bits16:9, loads two graphics sets, advances sprite animation, and runs fade/window transitions. At the common exit it returns1 only when check_blend_transition_done()==0 and low-byte bit0 of that word is set; otherwise it calls tick_blend_transition_step and returns0. Evidence: 08013be8-08014384.'),
     ("FUN_0801469c", "clear_demo_sprite_enable_bits",
         "Called by tick_demo_scene_state_machine (0x08013bd4) caseD_4 after blend-done check "
         "to reset sprite-enable bits in gDemoState+0x8. "
@@ -3320,19 +3286,8 @@ RENAMES = [
         "Returns void. "
         "Side-effects: OBJ VRAM/OAM updated for all active sprite slots. "
         "Constants: MAX_SLOTS=0x13, GROUP_SIZE=0xB(11), COORD_TABLE=0x09e3cfbf."),
-    ("FUN_0801c2ac", "reset_gl_display_state",
-        "Full GL display state reset called at scene transitions. "
-        "Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). "
-        "No input params (r0 clobbered by movs r0,#0 at entry). Returns r0=1 (success). "
-        "Sequence: (1) bios_cpu_set 32-bit fill-zero EWRAM 0x02029eb0, 192 bytes (48 words); "
-        "(2) gl_clear_vram_palram_scroll; "
-        "(3) writes DISPCNT(0x04000000)=0x1741 (BG mode 1, OBJ 1D, BG0+BG1+BG2+OBJ on), "
-        "BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; "
-        "(4) gl_set_brightness(0x3F, -16); (5) gl_state_init; (6) gl_clear_frame_callbacks. "
-        "Side-effects: EWRAM 0x02029eb0..0x02029f6f zeroed; DISPCNT/BG0-2CNT written; "
-        "VRAM/palette/scroll cleared; GL state and callbacks reset. "
-        "Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, "
-        "ZERO_FILL_CTRL=0x05000030, BRIGHTNESS_TARGET=0x3F, BRIGHTNESS_STEP=-16."),
+    ('FUN_0801c2ac', 'reset_gl_display_state',
+        'Resets the Vija display for play_vija_scene_with_sprite_intro and two table-driven scene wrappers. Clears 0xc0 bytes at gVijaState, resets VRAM/palette scroll state, writes DISPCNT/BG0CNT-BG2CNT defaults, sets brightness to -16, initializes GL state, and resets IG2D load counters. Returns 1. Evidence: direct call 080bcb6e.'),
     ("FUN_0801c310", "load_vija_bg_gfx_embedded",
         "vija scene BG GFX loader - embedded ROM data variant. "
         "Called by load_vija_bg_gfx_by_mode (0x0801c484) when r0==0. "
@@ -3384,17 +3339,8 @@ RENAMES = [
         "Symmetric with load_shuen_obj_resource_by_slot (0x0801ba04). "
         "Constants: VIJA_STATE=0x02029eb0, VIJA_OBJ_RES_TABLE=0x09e3d964, "
         "OBJ_RESOURCE_STRIDE=0x10, OBJ_VRAM_FLAGS=0x200."),
-    ("FUN_0801c50c", "load_vija_obj_resource_gated",
-        "vija scene OBJ resource load entry with JP/US region gate. "
-        "Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). "
-        "No input params (void). Returns r0=u8 1 (always success). "
-        "Reads ROM header 0x080000ae u16 high byte: if != 0x4a ('J') -> use_us_variant=1; "
-        "if JP, checks [0x02006c2c] bits[2:0]: non-zero -> use_us_variant=1, else 0. "
-        "Calls load_vija_obj_resource_by_region(use_us_variant). "
-        "Side-effects: VRAM OBJ Tile/Palette written (via callee). "
-        "Symmetric with load_shuen_obj_resource_slot0 (0x0801ba4c). "
-        "Constants: ROM_REGION_CODE_ADDR=0x080000ae, REGION_CODE_JP=0x4a, "
-        "GAME_STATE_REGION_FLAGS_OFFSET=0x6c2c, REGION_FLAGS_MASK=0x7."),
+    ('FUN_0801c50c', 'load_vija_obj_resource_gated',
+        'Loads the Vija OBJ resource variant used by play_vija_scene_with_sprite_intro. Selects the non-JP resource when ROM region is not J or when the JP settings byte low three bits are nonzero, then calls load_vija_obj_resource_by_region. No inputs; returns 1. Evidence: direct call 080bcb74.'),
     ("FUN_0801c5d8", "drive_vija_obj_cell_anim",
         "vija scene NNS G2D CellAnimation driver (Vija/VIJ_main.c). "
         "Called by FUN_0801c74c and FUN_0801c794 (vija animation state machine). "
@@ -3420,46 +3366,14 @@ RENAMES = [
         "Returns void. "
         "Side-effects: [0x04000020] BG2PA, [0x04000022] BG2PB, [0x04000024] BG2PC, "
         "[0x04000026] BG2PD, [0x04000028] BG2X, [0x0400002c] BG2Y written."),
-    ("FUN_0801c694", "tick_bg2_affine_anim_frame",
-        "Per-frame BG2 affine rotation tick for play_ui_effect_3b scene. "
-        "Called by FUN_0801cb00 (display, palette, demo, fs) each frame. "
-        "No input params (r0 unused; first instruction is ldr r1,DAT). "
-        "Reads IWRAM 0x02029eb0+0x90 frame counter byte, increments it (u8 natural wrap), "
-        "zero-extends old value (lsls/lsrs #0x18) -> angle, "
-        "then calls apply_bg2_affine_fixed_angle(angle). Returns void. "
-        "Side-effects: [0x02029eb0+0x90] incremented; BG2 affine regs updated via callee."),
-    ("FUN_0801c6b0", "tick_bg_scroll_anim_frame",
-        "Per-frame BG scroll and tile animation tick for play_ui_effect_3b scene. "
-        "Called by FUN_0801cb00 (display, palette, demo, fs) each frame. "
-        "r0=u32 tick_count (frame counter from IWRAM 0x02029eb0, passed by caller). "
-        "Triggers update only when tick_count mod 13 == 0; otherwise returns immediately. "
-        "On trigger: memcpy 4-byte ROM anim params from 0x09e3d9cf to stack; "
-        "increments [0x02029eb0+0x91] sub-frame index AND 0x3 (4-frame cycle [0..3]); "
-        "calls load_vija_bg_gfx_by_mode(mode=0) for OBJ/tile update; "
-        "writes BG0VOFS (0x04000012) = 4. "
-        "Returns void. "
-        "Side-effects: [0x02029eb0+0x91] updated; [BG0VOFS 0x04000012] := 4; "
-        "OBJ/tile VRAM via load_vija_bg_gfx_by_mode. "
-        "Constants: MOD_PERIOD=13, SUB_FRAME_MASK=0x3, BG0VOFS=0x04000012, BG0VOFS_VAL=4."),
-    ("FUN_0801c728", "advance_scene_phase_counter",
-        "Scene internal 2-level phase counter advance. "
-        "Called by FUN_0801c794 (play_ui_effect_3b state machine); return value used for dispatch. "
-        "r0=void* pSceneState: byte[2]=phase tick count [0..7], byte[3]=phase index [0..3]. "
-        "If byte[2]==7 (phase tick complete): increments byte[3] AND 0x3 (4-phase cycle), clears byte[2]=0. "
-        "Else: increments byte[2]. "
-        "Returns r0=u8 phase_index = byte[r0+3] [0..3]. "
-        "Leaf function (no callees). "
-        "Side-effects: [r0+2] and [r0+3] updated."),
-    ("FUN_0801c74c", "update_dual_cell_anim_oam_pos",
-        "Update two ISD cell animation OAM entries simultaneously. "
-        "Called by FUN_0801c794 (play_ui_effect_3b state machine). "
-        "r0=u8 base_obj_index [0..7] (bits[2:0] of [r7+4], extracted by caller; 2nd call uses r0+3), "
-        "r1=s16 sequence_idx [0..4], r2=s16 x_pos_px, r3=s16 y_pos_px. "
-        "Subtracts 0x10 from x and y (center anchor), then calls drive_vija_obj_cell_anim twice: "
-        "first with obj_index=2, second with obj_index=base_obj_index+3; same sequence_idx and coords. "
-        "[sp+0]=0, [sp+4]=0 for both calls. Returns void. "
-        "Side-effects: OAM slots [obj_index=2] and [obj_index=r0+3] updated via drive_vija_obj_cell_anim "
-        "-> dispatch_isd_cell_anim_oam_setup."),
+    ('FUN_0801c694', 'tick_bg2_affine_anim_frame',
+        'Per-frame Vija BG2 affine tick used by play_vija_scene_with_sprite_intro through run_vija_scene_state_machine. Increments gVijaState+0x90 as an 8-bit counter and passes the old value as the affine angle. Returns void and updates BG2 affine registers through the callee.'),
+    ('FUN_0801c6b0', 'tick_bg_scroll_anim_frame',
+        'Per-frame Vija background tick used by play_vija_scene_with_sprite_intro through run_vija_scene_state_machine. On tick_count modulo 13 equal to zero, advances a four-frame subcounter, loads the next background frame, and writes BG0VOFS=4. Otherwise it returns without an update.'),
+    ('FUN_0801c728', 'advance_scene_phase_counter',
+        'Scene internal 2-level phase counter advance. Called by FUN_0801c794 (play_vija_scene_with_sprite_intro state machine); return value used for dispatch. r0=void* pSceneState: byte[2]=phase tick count [0..7], byte[3]=phase index [0..3]. If byte[2]==7 (phase tick complete): increments byte[3] AND 0x3 (4-phase cycle), clears byte[2]=0. Else: increments byte[2]. Returns r0=u8 phase_index = byte[r0+3] [0..3]. Leaf function (no callees). Side-effects: [r0+2] and [r0+3] updated.'),
+    ('FUN_0801c74c', 'update_dual_cell_anim_oam_pos',
+        'Updates the paired Vija cell-animation OAM entries used by play_vija_scene_with_sprite_intro. Inputs are base object index, sequence index, x, and y. Subtracts 16 from each coordinate, then updates fixed object 2 and object base+3 with the same sequence and position. Returns void.'),
 
     # 2026-05-07: campaign-10 batch (topo=170..265 subset) vija scene + card list + sound + duel core
     ("FUN_0801c794", "tick_vija_obj_anim_slot",
@@ -3480,20 +3394,8 @@ RENAMES = [
         "No parameters; returns void. "
         "Called by run_vija_scene_state_machine (FUN_0801cb00) in phase 4 (active anim) and phase 7 (transition). "
         "Constants: SLOT_BASE_OFFSET=0x98, SLOT_STRIDE=8, SLOT_COUNT=5."),
-    ("FUN_0801cb00", "run_vija_scene_state_machine",
-        "vija scene (play_ui_effect_3b) per-frame state machine driver. "
-        "No parameters; all state from IWRAM 0x02029eb0. "
-        "10-phase dispatch (phases 0-9): "
-        "phase 0: init display regs (DISPCNT/BGxCNT), load BG+OBJ gfx, clear palette, init 5 OBJ slots; "
-        "phase 1: check blend done, start fade-in; "
-        "phase 2/3: advance blend, check affine init; "
-        "phase 4: tick_all_vija_obj_anim_slots + tick_bg_scroll_anim_frame + tick_bg2_affine_anim_frame each frame; "
-        "phase 5: start fade-out blend; phase 6: tick blend; "
-        "phase 7: tick_all_vija_obj_anim_slots + check fade; "
-        "phase 8/9: epilogue return 1. "
-        "Returns r0=1 (scene done) or r0=0 (scene continue). "
-        "Side-effects: DISPCNT/BG0-2CNT/palette VRAM, OAM, IWRAM state fields. "
-        "Constants: VIJA_STATE=0x02029eb0, DISPCNT_INIT=0x1741, SLOT_COUNT=5."),
+    ('FUN_0801cb00', 'run_vija_scene_state_machine',
+        'Main Vija per-frame state machine called by play_vija_scene_with_sprite_intro. Dispatches ten phases from gVijaState+0x8d to load assets, run blend transitions, and update OBJ, BG scroll, and BG2 affine animation. At the common exit it returns1 only when check_blend_transition_done()==0 and gVijaState+0x92 bit0 is set; otherwise it advances the blend with tick_blend_transition_step and returns0. Evidence: 0801cf4c-0801cf68.'),
     ("FUN_0801e6f4", "open_card_info_page_from_list",
         "Transition entry called by card_list scene dispatchers (FUN_080c64b8 state=0, FUN_080d2c60 state=0) "
         "when player selects a card in the list to view its info page. "
@@ -6084,15 +5986,8 @@ RENAMES = [
         "tile_row_start_local=0x1CE, tile_row_start_remote=0x1D7."),
 
     # 2026-05-09: campaign-24 batch (topo=539-560, 20 functions)
-    ("FUN_080ca5f8", "write_lp_digit_tiles_to_vram",
-        "按 player_id (r0) 与 EWRAM 对手 ID (0x0201e2a0+4 XOR 1) 比对, "
-        "选择 VRAM 基地址 (LP_VRAM_BASE=0x0600f000) 的目标区域 (P1 偏移 +8, P2 偏移 0x448), "
-        "将 LP 数值 (r1, clamp 至 99999) 逐位分解为十进制数字, "
-        "以 strh 循环写入 5 个 tile 索引 halfword (tile base index 0x134=0x9a*2). "
-        "由 play_ui_effect_0e / FUN_080ca8ec / FUN_0801ec9c 调用. "
-        "Constants: LP_VRAM_BASE=0x0600f000, LP_DIGIT_AREA_OFFSET_P2=0x448, "
-        "LP_DIGIT_AREA_OFFSET_P1=+8, TILE_IDX_BASE=0x134, LP_MAX=99999, "
-        "EWRAM_GAME_CTX=0x0201e2a0."),
+    ('FUN_080ca5f8', 'write_lp_digit_tiles_to_vram',
+        'Writes five decimal LP digits for player_id r0 and value r1, clamped to99999, into the selected LP VRAM row. The opponent comparison selects offset+8 or+0x448; each digit writes a tile index based at0x134. Called by play_life_point_change_effect and two other display paths.'),
     ("FUN_080ca8ec", "init_duel_field_tile_indices",
         "在 duel field 初始化流程中被 init_duel_field_vram_layout (indeg=8) 调用, "
         "向 VRAM 两块 tile 索引区写入连续递增 tile 编号序列, "
@@ -6132,129 +6027,49 @@ RENAMES = [
         "(init_aob_ctx_with_anm_entry, anm_no 0 或 1), 再拷贝两组 tile 完成 LP 区域布局. "
         "写 [r4+0x13] bit0=1 标记 AOB ctx 已激活. "
         "Constants: PTR_gP1LifePoints, ANM_NO_OPPONENT=0, ANM_NO_SELF=1."),
-    ("FUN_080cc904", "init_duel_field_vram_layout",
-        "duel field 场地 VRAM 完整初始化 hub, 被 play_demo_shuen / play_ui_effect_3b/3a / "
-        "FUN_0801fec0 等 8 个调用方共享. "
-        "依次: (1) zero_fill_by_halfword 清空 VRAM OBJ tile 区; "
-        "(2) store_ewram_ctx_ptr_and_clear_mode_flags; (3) reset_display_and_obj_vram; "
-        "(4) apply_blend_fadeout_flat; (5) reset_all_bg_scroll_regs_and_shadows; "
-        "(6) 设置 gPrng[0xba*2]=1; (7) 配置 BG0-3CNT 四寄存器; "
-        "(8) 复制多组 tile/screen 数据; (9) init_duel_field_lp_aob_ctx; "
-        "(10) 条件性复制 tile; (11) write_palette_tile_row_to_vram; "
-        "(12) init_duel_field_tile_indices + redraw_all_field_slot_tiles; (13) strh DISPCNT. "
-        "Constants: BG0CNT=0x1f08, BG1CNT=0x1f09, BG2CNT=0x1d82, BG3CNT=0x1c0b."),
-    ("FUN_080cca38", "tick_duel_field_fadeout_step",
-        "在 duel field 状态机收尾步骤中被 8 个 caller 调用 "
-        "(play_demo_shuen / play_ui_effect_3b/3a / FUN_0801fec0 等). "
-        "先将 EWRAM 标志字节 [0x02023345] bit1 置 1 (激活淡出信号), "
-        "然后以步进量 2 调用 tick_blend_step_by_delta 推进混合淡出过渡. "
-        "无参数; 返回 tick_blend_step_by_delta 的返回值 (0=进行中, 1=完成). "
-        "Constants: EWRAM_FLAG_ADDR=0x02023345, BLEND_STEP_DELTA=2, FLAG_BIT1=0x2."),
+    ('FUN_080cc904', 'init_duel_field_vram_layout',
+        'Initializes the complete duel-field VRAM/display layout. It is the restore phase used by play_vija_scene_with_sprite_intro, play_exodia_demo_scene_with_field_restore, play_demo_shuen, and other duel-field transitions. Clears and reloads VRAM/palettes, initializes LP AOB state, rebuilds field tiles, and writes display control. Returns void.'),
+    ('FUN_080cca38', 'tick_duel_field_fadeout_step',
+        'Duel-field fade-out tick used by play_vija_scene_with_sprite_intro, play_exodia_demo_scene_with_field_restore, play_demo_shuen, and other field transitions. Sets the fade-out flag byte at gDuelFieldState+0x215 bit1, then advances tick_blend_step_by_delta with step 2 and returns that result.'),
     ("FUN_080cca5c", "tick_duel_field_fadein_step",
         "与 tick_duel_field_fadeout_step (0x080cca38) 构成对称函数对, 被 10 个 caller 共享. "
         "先将 EWRAM 标志字节 [0x02023345] bits[1:0] 同时清零 (ands ~0x3=0xFC), "
         "然后以步进量 2 调用 start_blend_fadein_with_target 开始混合淡入过渡. "
         "无参数; 返回 start_blend_fadein_with_target 的返回值. "
         "Constants: EWRAM_FLAG_ADDR=0x02023345, BLEND_STEP_DELTA=2, FLAG_CLEAR_MASK=0xFC."),
-    ("FUN_080bc7e0", "blend_palette_entry_toward_target",
-        "给定 BGR555 调色板条目指针 (r0), 目标颜色 (r1, u16), 混合步数 (r2, u16, clamp 至 0x10), "
-        "对 R/G/B 各 5 bit 分量执行线性插值混合 (delta*blend_steps/16), 写回 PAL RAM. "
-        "由 banner_anim_state_machine / play_ui_effect_04 / FUN_080bd0a8 等 8 个 caller 调用. "
-        "Constants: COMPONENT_MASK=0x1f, BLEND_DIVISOR=16, "
-        "PAL_VRAM_BASE=0x05000200, BLEND_MAX_STEPS=0x10."),
-    ("FUN_080be600", "tick_banner_pack_state_machine",
-        "pack 场景 banner 状态机驱动器, 读取 gBannerState[+0x10] (当前状态 0-4), "
-        "通过 switch 跳转到 5 个子状态处理函数, 协调 pack 开包 banner 动画全流程 "
-        "(含 display/window/blend/palette/vram). "
-        "唯一调用方: play_ui_effect (0x0801ef94, scene_pack). "
-        "Constants: gBannerState_OFFSET=0x10, CASE_COUNT=5, OBJ_PAL_HIGH_MASK=0xe000."),
-    ("FUN_080c0760", "write_card_image_oam_grid",
-        "将卡图 tile 以 5x4 网格形式写入 OAM, 被 play_ui_effect_33/34 调用. "
-        "根据 r0 (tile_offset_sign, 0 或 1) 计算 OAM attr bit7 (0x400 掩码), "
-        "对 5 行 x 4 列 OAM 条目循环调用 write_oam_entry_with_tile_inc, "
-        "每行 tile 步进 0x20, 每列 attr 步进 4. "
-        "r1 在入口第一条指令 (rsbs r1,r0,#0) 被覆盖, 不是独立参数. "
-        "Constants: GRID_COLS=4, GRID_ROWS=5, TILE_ROW_STEP=0x20, ATTR_STEP=4, "
-        "OAM_ATTR_MASK=0x400."),
-    ("FUN_080f5668", "tick_blend_step_with_bldcnt",
-        "被 play_ui_effect_33/34 调用, 设置 BLDCNT (0x04000050) = r1, "
-        "累加 r0 (delta) 到 gPrng+0x200 bits[5:0] (blend step 计步字节, clamp 至 0x1f), "
-        "写 BLDY (0x04000054) = current_step; step > 0x1e 返回 1 (完成), 否则返回 0. "
-        "Constants: BLDCNT=0x04000050, BLDY=0x04000054, "
-        "gPrng_BLEND_STEP_OFFSET=gPrng+0x200, BLEND_STEP_MAX_ACTIVE=0x1e, "
-        "BLEND_STEP_CLAMP=0x1f, BLEND_STEP_FIELD_MASK=0x3f."),
-    ("FUN_080f0db4", "init_line_buf_with_jp_font_flag",
-        "被 draw_card_name_to_bg_tile_vram / draw_card_atkdef_label_to_vram 调用, "
-        "是 card stats 区域文字渲染的字体初始化路径. "
-        "调用 setup_line_buf_pos_and_font (r0=x_pos, r1=font_type) 建立 line buffer 渲染状态, "
-        "然后对 EWRAM [0x02006ed0+0x14] bit7 置 1, 标记启用 JP 字体扩展渲染模式. "
-        "Callsite 固定传入 r0=0xe / r1=0x2. "
-        "Constants: EWRAM_FONT_CTX=0x02006ed0, FLAG_JP_EXT=0x80."),
-    ("FUN_080c0180", "draw_card_atkdef_label_to_vram",
-        "从 card_stats_table 按 card_idx (r0) 读取 ATK (offset 3) / DEF (offset 4), "
-        "调用 init_line_buf_with_jp_font_flag (r0=0xe, r1=2) 建立 JP 字体上下文, "
-        "检查 ATK 有效性后选择渲染路径: 等级文字 (lookup_level_glyph_index + render_card_level_text_to_buf) "
-        "或 ATK/DEF 数字 (render_atk_def_digits_to_buf), "
-        "最后调用 write_line_buf_to_bg_tile_vram 写入 BG tile VRAM. "
-        "唯一调用方: FUN_080c05b4 (card image 显示页 hub). "
-        "Constants: CARD_STATS_FIELD_ATK=3, CARD_STATS_FIELD_DEF=4, "
-        "INVALID_STAT_SENTINEL=0xffff, ENTRY_STRIDE=0xb."),
-    ("FUN_080bff34", "repack_nibbles_with_palette_offset",
-        "将 r0 (nibble_packed, u16, 含 4 个 nibble 调色板索引) 的每个 nibble "
-        "加上 r1 (palette_offset, u8) 后截断至 nibble, 重新打包为 16 位输出. "
-        "由 render_card_image_to_vram 4 次调用, 用于卡图调色板索引批量偏移. "
-        "纯叶子函数, 无外部副作用. "
-        "Constants: NIBBLE_MASK=0x0f0f, UPPER_NIBBLE_MASK=0xf0."),
-    ("FUN_080bff6c", "render_card_image_to_vram",
-        "从 ROM 卡图数据表按 card_idx (r0) 和 VRAM 目标槽位 (r1) 加载卡图 tile 和调色板到 VRAM. "
-        "4 次调用 repack_nibbles_with_palette_offset 转换调色板索引后写入 PAL RAM (0x05000200), "
-        "再将 tile 数据复制到 BG VRAM (0x060148c0 + slot_offset); "
-        "外层循环 11 行 x 0x4f halfword. 唯一调用方: FUN_080c05b4. "
-        "Constants: VRAM_CARD_TILE_BASE=0x060148c0, PAL_RAM_BASE=0x05000200, "
-        "TILE_ROW_HALFWORDS=0x4f, OUTER_LOOP_COUNT=0xa."),
-    ("FUN_080c00f0", "draw_card_name_to_bg_tile_vram",
-        "渲染卡牌名称到 BG tile VRAM. 唯一调用方: FUN_080c05b4 (card image 显示页 hub). "
-        "调用 init_line_buf_with_jp_font_flag (r0=0xe, r1=2) 建立 JP 字体上下文, "
-        "读 EWRAM 字体方向标志选择字体基址, "
-        "调用 render_card_name_to_line_buf (card_idx) 渲染到 line buffer, "
-        "检查 card_stats_table type 字段 (offset 6, 与 0x16 比较) 选择竖排/横排字体映射表, "
-        "最后调用 write_line_buf_to_bg_tile_vram 写入 VRAM. "
-        "Constants: CARD_STATS_TYPE_FIELD=6, CARD_TYPE_VERTICAL_LIMIT=0x16."),
-    ("FUN_080c0204", "write_nibble_to_bg_tile_cell",
-        "在 BG tile VRAM 指定二维坐标 (tile_x=r0, tile_y=r1) 写入单个 nibble (r2=palette_nibble, r3=vram_row_base). "
-        "将坐标转换为 VRAM halfword 地址 (VRAM_BASE=0x06010000, 行步进 0x400 halfword), "
-        "根据 tile_y 奇偶确定写高/低 nibble, 修改 halfword 后写回. "
-        "被 write_nibble_sequence_to_bg_tiles 两次调用. "
-        "Constants: VRAM_BG_TILE_BASE=0x06010000, TILE_ROW_STRIDE=0x400, "
-        "NIBBLE_HIGH_MASK=0xff00, NIBBLE_LOW_MASK=0x00ff."),
-    ("FUN_080c0274", "write_nibble_sequence_to_bg_tiles",
-        "从 packed nibble 字节数组 (r2) 中逐字节读取双 nibble, "
-        "对每个非零 nibble 调用 write_nibble_to_bg_tile_cell 写入对应 BG tile VRAM 坐标. "
-        "外层循环 8 槽 (r7: 0..7), 内层循环 nibble 序列 (r8, 步进 -1), "
-        "坐标由 r0 (packed: lo16=tile_x_even [6..80], hi16=inner_row_base [5..6]) 和 r1 (vram_row_param) 驱动. "
-        "被 FUN_080c0310 和 FUN_080c05b4 调用. "
-        "Constants: OUTER_LOOP_COUNT=8, NIBBLE_LOW_MASK=0x0f, NIBBLE_HIGH_MASK=0xf0."),
+    ('FUN_080bc7e0', 'blend_palette_block_toward_white',
+        'Input r0 points to 16 BGR555 colors; r1 is the OBJ palette block index and r2 is a step clamped to 16. Writes to OBJ_PALRAM_BASE+(u16(r1)<<5). Each 5-bit component moves toward 31 by (31-component)*step/16. Processes exactly 16 halfwords and returns void. Evidence: loop 080bc7fc-080bc872.'),
+    ('FUN_080be600', 'tick_banner_pack_state_machine',
+        'Pack-banner coordinator. Phase0 loads assets. Phase1 appends12 OAM entries as two groups of three pairs and runs an 8-step fade-in. Phase2 appends six entries as three pairs and displays for exactly64 calls. Phase3 appends12 paired entries and runs an 8-step reverse fade. Phase4 tears down; phases0..4 return1. Phase>4 selects the saved channel, clears banner bit0 and field+0x215 bit2, and returns0. Palette steps use blend_palette_block_toward_white.'),
+    ('FUN_080c0760', 'write_card_image_oam_grid',
+        'Attempt20 OAM writes as a 5-row,4-column card grid. The tile argument is0xe1+0x40*row+4*column; write_oam_entry_with_tile_inc doubles its char-name bits. Nonzero r0 adds packed attribute0x400. The normal row attribute is0x80, bottom row0x4080, right column0x8080, and bottom-right0x40. r1 is overwritten at entry.'),
+    ('FUN_080f5668', 'tick_blend_step_with_bldcnt',
+        'Write u16(r1) to BLDCNT. If the low-six-bit step at gPrng+0x200 is<=0x1e, replace it with(step+r0)&0x3f, then clamp that result to0x1f while preserving bits6/7. Write the resulting low-six-bit value to BLDY. Return1 when it exceeds0x1e, else0. Used by the two card-display reveal effects.'),
+    ('FUN_080f0db4', 'init_line_buf_with_jp_font_flag',
+        'Initialize line-buffer position/font through setup_line_buf_pos_and_font(r0,r1), then set bit7 at gFontJpCtx+0x14. Called by draw_card_name_to_obj_tile_vram and draw_card_stats_label_to_obj_tile_vram.'),
+    ('FUN_080c0180', 'draw_card_stats_label_to_obj_tile_vram',
+        "Render a card's stats or level text to OBJ tile VRAM at0x06017840. Map ATK/DEF0xffff to0 and initialize the line buffer. If check_card_atk_in_valid_range returns0, render ATK/DEF. Otherwise render level text only when lookup_level_glyph_index returns!=-1; a -1 result has no ATK/DEF fallback. Finally write the line buffer with ink pair0x0808. Input r0 is a u16 card index."),
+    ('FUN_080bff34', 'repack_nibbles_with_palette_offset',
+        'Packed-halfword high-nibble adjuster. For a=u16(r0), b=u8(r1), start with a&0x0f0f; OR ((((a>>4)&15)+b)&255)<<4 and ((((a>>12)&15)+b)&255)<<12, then return low16. Carry from the lower adjusted nibble may set bits[11:8], so these bits are not preserved unchanged. ROM: 0000+1=1010,1234+1=2244,00f0+1=1100,ffff+1=0f0f.'),
+    ('FUN_080bff6c', 'render_card_image_to_vram',
+        'Reformats card-display type graphics. Copies0x80B to palette05000200+(u16(r2)<<5). Ten rows each process80 groups of four halfwords:800 groups,3200 repack calls/strh,4800B source and6400B destination. Row0 writes060148c0; rows1..9 write06010000+32*(u16(r1)+32*i). Uses the regional lookup and is called only by render_card_display_with_type_gfx.'),
+    ('FUN_080c00f0', 'draw_card_name_to_obj_tile_vram',
+        'Render the u16 card-index name into OBJ tile VRAM at0x06013c40. Initialize the JP font, set font flags/base using gSettings.language&7, and render the name. The final writer uses ink-byte pair0x0808 for card types<=0x16, else0x0707; these select pixel ink, not tile layout.'),
+    ('FUN_080c0204', 'write_palette_index_to_obj_tile_pixel',
+        'Write one u8 palette index to an OBJ tile pixel. r0/r1 are X/Y; r3 is a u16 base tile index scaled by32 from0x06010000. Use an 8x8,64-byte tile layout with0x400-byte tile-row stride. X parity selects the target halfword byte; preserve the other byte. r2 supplies the complete palette-index byte.'),
+    ('FUN_080c0274', 'expand_nibbles_to_obj_tile',
+        'Expand one packed 4bpp tile into OBJ tile pixels. r0 packs X in low16 and Y in high16; r1 is the u16 base tile index, r2 points to32 source bytes, and u8 r3 supplies the palette bank. Eight rows each consume four bytes; nonzero low/high nibbles are ORed with bank<<4 and written at adjacent X positions. Zero nibbles leave the destination unchanged. No fifth argument is read.'),
     # 2026-05-09: batch #25 (campaign-25) landing (topo=561-582, 20 functions)
-    ("FUN_080c0310", "write_nibble_row_pair_to_bg_tiles",
-        "BG tile VRAM nibble dual-row writer: 4x bl write_nibble_sequence_to_bg_tiles, "
-        "stride 0x20 per row, 2x2 tile block. VRAM base 0x06010000 (DAT_080c03e8). "
-        "Caller: render_card_display_with_type_gfx (ATK/DEF nibble rows)."),
-    ("FUN_080c0394", "copy_card_frame_nibbles_to_palette_vram",
-        "Card frame nibble tile copy to OBJ/BG VRAM by palette offset. "
-        "r1>>11=type selects 0x06010000 BG or 0x05000200 PAL VRAM. "
-        "Tail-jumps to LAB_080c0598 (no independent return). Caller: render_card_display_with_type_gfx."),
-    ("FUN_080c05b4", "render_card_display_with_type_gfx",
-        "Full card display render: card image + ATK/DEF nibble tiles + name label + type icon. "
-        "Reads card_stats_table[card_id*11]. Dispatches on card_type 0x16/0x17 (fusion/ritual frame). "
-        "Callers: play_ui_effect_33, play_ui_effect_34."),
-    ("FUN_080f55fc", "clamp_blend_counter_to_target",
-        "Converge gPrng+0x200 blend counter (low 6 bits) toward r0 target. "
-        "If current>target: subtract delta, mask 0x3f. Else: clear and set negative 0x40. "
-        "Callers: play_ui_effect_33, play_ui_effect_34."),
-    ("FUN_080c2d24", "blit_card_frame_tile_row_to_vram",
-        "Copy card_medium_frame_tile_data row to OBJ VRAM 0x06010000+r1*0x20. "
-        "Checks DAT_080000ae flag 0x4a for field_spell frame variant. "
-        "Calls tile_2d_row_copy(dest, 0, 8, 6). 5 callers: play_ui_effect_20/21/23/25/0c."),
+    ('FUN_080c0310', 'expand_nibbles_to_obj_tile_block',
+        'Expand four packed tiles as a 2x2 OBJ tile block. r0 packs the initial X/Y, r1 is the unchanged u16 base tile index, r2 is the source pointer, and u8 r3 is the palette bank. Call expand_nibbles_to_obj_tile at offsets(0,0),(8,0),(0,8),(8,8), advancing the source by0x20 bytes between calls.'),
+    ('FUN_080c0394', 'repack_card_frame_nibbles_to_vram',
+        'Repack encoded card-frame data into OBJ tile VRAM. r0 is a u16 palette-index offset, r1 a u16 base tile index, and r2 the frame-data pointer. First copy the header-count palette halfwords from src+8 to0x05000200+2*r0. Expand32-byte packed tiles into64-byte tiles at0x06010000+32*r1 plus record coordinates; record modes0..3 select mirroring. Add r0 to nonzero nibbles modulo256.'),
+    ('FUN_080c05b4', 'render_card_display_with_type_gfx',
+        'Render the full large-card display for internal card ID r0. Uploads the card image and type-dependent frame tiles and palettes, writes the name and stats or level labels, copies the type icon, and emits attribute and star overlay nibbles from card_stats_table fields.'),
+    ('FUN_080f55fc', 'clamp_blend_counter_to_target',
+        'Decrease the low-six-bit blend step at gPrng+0x200 by r0, flooring at0 and preserving bits6/7. If the result is0, call disable_blend_and_clear_step and return1. Otherwise write the step to BLDY, write u16(r1) to BLDCNT, and return0. The negative0x40 immediate is a mask; it is not installed as a new step.'),
+    ('FUN_080c2d24', 'blit_card_frame_tile_row_to_vram',
+        'Upload a medium card image to OBJ VRAM at0x06010000+32*u16(r1). Index card_image_index with2*u16(r0)+variant: variant0 only when header byte0xaf==0x4a and (gSettings.language&7)==0, else1. A nonzero card ID copies six rows of128 halfwords from card_medium_frame_tile_data+index*1536, adding0x70 to each nonzero byte modulo256; destination row stride is0x400. Card ID0 clears an8x6 tile rectangle.'),
     ("FUN_080c8bf0", "build_slot_activation_mask_for_player",
         "Build slot activation bitmask at 0x020230c0+3 for current player. "
         "Only runs when player_state==3 (duel phase check). "
@@ -6262,10 +6077,8 @@ RENAMES = [
     ("FUN_080f70c4", "push_oam_entry_to_aob_slot",
         "Write OAM attr0/1/2 (from r2 ptr) to AOB slot array at gPrng+0x1bc, then increment slot write ptr. "
         "Skips if slot ptr byte==0x80 (full). Slot stride 8 bytes (lsls r1,#3)."),
-    ("FUN_080f8000", "render_aob_frame_to_oam",
-        "Render AOB animation object current frame to OAM buffer and copy tile data to VRAM 0x06010000. "
-        "16-case shape/color dispatch; calls copy_bytes_by_halfword + push_oam_entry_to_aob_slot. "
-        "11 callers including play_ui_effect_37/38/3b."),
+    ('FUN_080f8000', 'render_aob_frame_to_oam',
+        'Renders the current AOB frame into the OAM buffer and copies frame tiles to OBJ VRAM0x06010000. Its shape/color dispatch emits entries through push_oam_entry_to_aob_slot. Used by play_correct_miss_result_effect, play_windowed_aob_slide_effect, and other AOB effects.'),
     ("FUN_080f7f08", "tick_aob_frame_counter",
         "Advance AOB frame counter (aob+0xc/0xd/0x12/0x13), resolve new ptn entry on frame change. "
         "Returns 0 if uninitialized (bit5 of aob+0x12), 1 on normal tick. "
@@ -6292,10 +6105,8 @@ RENAMES = [
         "Mirror OAM coords (r2=x, r3=y) by player_id vs ctx.current_player^1; 16-case zone_type switch. "
         "Returns packed (y<<16|x). Pure calc, no external writes. "
         "Callers: render_duel_field_slot_oam_grid, compute_card_sprite_oam_coords_by_zone."),
-    ("FUN_080c35ac", "resolve_zone_oam_base_coords_by_type",
-        "Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. "
-        "16-case switch; returns packed (y<<16|x). Pure query. "
-        "11 callers including play_ui_effect_15/10/play_card_zoom_in."),
+    ('FUN_080c35ac', 'resolve_zone_oam_base_coords_by_type',
+        'Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. 16-case switch; returns packed (y<<16|x). Pure query. 11 callers including play_zone_type_13_card_reveal_effect/10/play_card_zoom_in.'),
     ("FUN_080c8aa8", "render_duel_field_slot_oam_grid",
         "Iterate all duel_field zone slots (type 0..10 + b..f), compute OAM coords via "
         "resolve_zone_oam_base_coords_by_type + transform_zone_oam_coords_by_player, "
@@ -6599,21 +6410,8 @@ RENAMES = [
         "X_MASK=0x1ff, TILE_STRIDE_OFFSET=0x401."),
 
     # 2026-05-09: BATCH-28 落地 (campaign-28, topo=626..647)
-    ("FUN_080bf2d0", "draw_number_digits_to_oam",
-        "将十进制数值分解为各位数字并写入 OAM 影子缓冲区 (用于 LP/数值显示). "
-        "r1 = number (待渲染的十进制整数, [0..8000] LP 值); r2 = player_flag {0,1} (保存到 r8). "
-        "Y 位置: gBannerState[+0x14] * 8 + 0x70 = 屏幕 Y 坐标. "
-        "X 起始: 基于 gBannerState[+0x14] * 8 + 0x70 区间 (r6), 每位数字向左偏移 0xc 像素. "
-        "digit tile = 0x204 + digit * 2 (tile 基址 0x81*4=0x204 起, 每个数字占 2 tile). "
-        "flag 字段: 读 DAT_0x0201e2a0[+0x4] bit0 XOR 1 -> 若非零则 r1 |= 0x80 (palette 或 flip bit). "
-        "循环: r5 % 10 = 当前最低位数字 -> 写入 OAM; r5 /= 10; 重复直到 r5 == 0. "
-        "最后再写一次末位确保 0 不被跳过. 调用 write_oam_entry_from_packed_args (已命名) 写入 OAM. "
-        "唯一 caller: play_ui_effect_0e (0x080bf394, vram/scene_duel_field/duel_field). "
-        "Constants: gBannerState (0x0201fec0)[+0x14]: Y/X 位置参数 byte; "
-        "DAT_080bf368 = gBannerState; DAT_080bf36c = 0x0201e2a0 (struct); "
-        "0x204 = 0x81*4: digit tile 基址; 0xc: 每个数字 X 间距; 0x70: Y 基准偏移; "
-        "0x80: palette/flip flag bit; 0xa: 十进制 mod/div 基数; "
-        "0x202: 某 OAM attr 常量 (DAT_080bf390)."),
+    ('FUN_080bf2d0', 'draw_number_digits_to_oam',
+        'Draws decimal magnitude r1 to OAM for player key r0; r2 is the header kind4 delta-display mode (current callers use0/1). Zero emits one digit. Nonzero values also emit a leading prefix: mode0 tile0x202, mode1 tile0x200, attr2 palette=(2-mode)<<12. Digits use tile0x204+2*digit with12-pixel right-to-left spacing. Used by play_life_point_change_effect.'),
     ("FUN_080fa4d8", "return_void_noop",
         "发布版空操作占位函数. 函数体仅一条 bx lr 指令, 不接受任何参数, 无任何副作用, 无返回值. "
         "在所有 4 个调用点均紧跟在 suppress_display_output (0x080fa4cc) 之后, "
@@ -6710,31 +6508,10 @@ RENAMES = [
         "DAT_080f696c = 0xfffffe00: attr1 X 坐标掩码; "
         "0x4040/0x8000/0x8080/0x80c0: 方向码枚举; "
         "0x300 (0xc0<<2): OBJ affine double-size 标志位."),
-    ("FUN_080f6ccc", "write_pack_obj_attr_by_dir_stacked",
-        "根据方向码调整坐标并写入 OBJ sprite OAM 属性 (pack 场景, r3 双 16-bit 均入栈变体). "
-        "与 write_pack_obj_attr_by_dir (0x080f6adc) / write_pack_obj_attr_by_dir_split (0x080f68ec) 三函数对称结构. "
-        "本变体特点: sub sp,#0x8 (额外 8 字节栈帧, 其他变体为 4 字节); "
-        "r3 的高低 16 位分别保存到 sp+0 和 sp+4 (两个独立栈参数槽): "
-        "r3[31:16]=affine_ctrl (0x8000|counter*8), r3[15:0]=scale_ramp [0..0x20]. "
-        "方向码 dispatch 与前两变体相同 (0x0/0x40/0x80/0xc0/0x4040/0x8000/0x8080/0x80c0); "
-        "像素偏移调整 (4/8/16/32px) 也相同. 结束时同样写 attr0/attr1/attr2 并调用 affine 写入. "
-        "6 个 caller: play_ui_effect_21 (场景通用 UI), play_card_zoom_in (卡牌 zoom 动画), "
-        "FUN_080c4edc (card_ids/duel_field), FUN_080d0150 (scene_pack), FUN_080d71f4 (scene_pack). "
-        "Constants: gPrng+0x1bc (0xde<<1): OBJ 缓冲区基址; "
-        "DAT_080f6d50 = 0xfffffe00: attr1 X 坐标掩码; "
-        "DAT_080f6d58 = 0x4040: 方向码枚举之一; 0xc0<<2=0x300: OBJ affine 双尺寸标志."),
-    ("FUN_080bcc6c", "dispatch_banner_anim_tick_by_state",
-        "banner 动画帧状态机 tick 分派器. 读取 gBannerState[+0x11] (byte, 状态索引 [0..8]), "
-        "超出范围则跳转到默认 handler (LAB_080bd09c). 在范围内则以 state*4 查找跳转表 "
-        "(switchD_080bcc8e__switchdataD_080bcc98, 9 个 entry: 0x080bccbc..0x080bd080), "
-        "通过 bx 跳入对应 handler. 每个 case 处理一种 banner 动画阶段 (初始化/过渡/显示/退出等). "
-        "case 0 (0x080bccbc): 进一步判断 r2 (= gBannerState 基址) [+0x1/+0x2] 字段决定子 case. "
-        "3 个 caller 均属相同 banner/display/palette/vram 场景 (FUN_080bd0a8, FUN_080bd3f4, FUN_080bd660), "
-        "均为 banner 状态机的外层 tick 循环调用本函数推进一帧. "
-        "Constants: gBannerState (0x0201fec0): banner 全局状态结构基址; "
-        "gBannerState[+0x11]: 主状态索引 [0..8]; 0x8 = 最大合法状态; "
-        "switchD_080bcc8e__switchdataD_080bcc98: 9-entry 跳转表; "
-        "r7 = 0x18 / r5 = 0x30: 参数常量 (传递给 sub-handler)."),
+    ('FUN_080f6ccc', 'write_pack_obj_attr_by_dir_stacked',
+        'Emit one affine OBJ entry from packed X/Y in r0, shape/size attributes in u16(r1), and tile attributes in u16(r2). r1 selects coordinate adjustments; r2 is not a direction code. Split r3 into two halfword affine parameters. Return without writing when the OBJ index is0x80 or affine index0x20; otherwise write the OBJ and affine state and advance both allocation counters.'),
+    ('FUN_080bcc6c', 'dispatch_banner_anim_tick_by_state',
+        'Shared inner banner renderer using gBannerState+0x11. Case0 selects resource pair1/2 from +8; cases1/3 run 9 alpha steps; case2 advances directly; cases4/6 wait 33 halfword ticks; case5 runs 17 window steps; case7 runs 9 action steps; case8 advances only when start_blend_fadein_with_target(1) is nonzero. Cases0..8 return1, including case8 after setting inner=9. Inner>8 returns0 without cleanup or outer-state write.'),
     ("FUN_080cc694", "compute_duel_zone_dir_for_player",
         "计算决斗场地指定玩家的区域方向状态码. r0 = player_side [1..2] (1=玩家1, 2=玩家2). "
         "通过 gP1LifePoints 表 (stride=0x868) 索引当前玩家的 zone 子结构, 读取 zone_type 字段 "
@@ -6751,22 +6528,8 @@ RENAMES = [
         "gPrng+0x23f (DAT=0x23f): zone byte 数组起点; gPrng+0x241 (DAT=0x241): 第二数组起点; "
         "gPrng+0x240: 方向标志字节; "
         "返回值: 0=停止/中性待定, 1=正向, 2=反向, 3=中性激活."),
-    ("FUN_080bd0a8", "dispatch_banner_scene_tick_by_state",
-        "banner/pack 场景主帧状态机 tick 分派器. 读取 gBannerState[+0x10] (byte, 主场景状态索引 [0..8]), "
-        "超出范围则跳转 switchD_080bd0c8__caseD_7 (默认处理). "
-        "在范围内则以 state*4 查找 9-entry 跳转表 "
-        "(switchD_080bd0c8__switchdataD_080bd0d4, entry: 0x080bd0f8..0x080bd3ac), "
-        "通过 bx 跳入对应 case handler. "
-        "与 dispatch_banner_anim_tick_by_state (0x080bcc6c) 对称: "
-        "0x080bcc6c 读 gBannerState[+0x11] (sub-state), 本函数读 gBannerState[+0x10] (main-state). "
-        "两函数配合构成双层状态机. "
-        "入口: .hword 0x4647=mov r7,r8; movs r0,#0x18 -> r8=0x18; movs r5,#0x30 初始化参数常量. "
-        "唯一 caller: play_ui_effect (0x0801ef94) - 游戏顶层 UI 效果循环调用本函数推进每帧. "
-        "case 0 (0x080bd0f8): 执行 copy_bytes_by_halfword 复制数据, 读取场景 type 字段 gPrng+0x3d0. "
-        "Constants: gBannerState (0x0201fec0): banner 全局状态结构基址; "
-        "gBannerState[+0x10]: 主场景状态索引 [0..8]; "
-        "0x18 / 0x30: case handler 初始参数常量 (r8 / r5); "
-        "switchD_080bd0c8__switchdataD_080bd0d4: 9-entry 跳转表."),
+    ('FUN_080bd0a8', 'dispatch_banner_scene_tick_by_state',
+        'Outer banner scene dispatcher. Phase1 runs 8 motion ticks; phases2/3 run 17 white-ramp ticks each; phase4 waits 65 ticks, then gPrng+0x23f bit0 and duel-zone direction(1) in {1,2} route to phase8 and store +8, else phase5. Phases5/6 advance on nonzero blend results; phase7 or invalid cleans up and returns0. Phase8 calls the inner renderer; inner0 advances outer but this call returns1. It does not advance PRNG.'),
     ("FUN_080c678c", "update_zone_oam_card_count_tag",
         "根据玩家场地区域卡牌数量更新 OAM entry 中的 tag/count 字段. "
         "无 APCS 参数 (r0 入口立即被内部 ldr 覆盖). "
@@ -6812,32 +6575,10 @@ RENAMES = [
         "被 11 个高层牌局函数调用, 是 zone slot entity 读取的公共出口. "
         "Constants: player_stride=0x868, zone_0b=0x0201c600, zone_0c=0x0201c880, "
         "zone_0d=0x0201c740, zone_0e=0x0201c8f8, zone_0f=0x0201cab0, default_extended=0x0201bc54."),
-    ("FUN_080c1f10", "tick_pack_banner_3d_state_machine",
-        "pack banner 3D 动画状态机, 每帧由 play_ui_effect_3d (唯一 caller) 调用. "
-        "读 gBannerState[+0x11] (u8 phase [0..6]) 通过 switch-dispatch 驱动 7 个子状态; phase 超出 6 则返回 0 (done). "
-        "case 0: 拷贝调色板到 0x05000260 via copy_bytes_by_halfword, "
-        "根据 [gPrng+0x6c2c] bit[4:0]*3<<10 写 tile_2d_row_copy 到 VRAM 0x06014000, "
-        "调 disable_blend_and_clear_step, 写 WINOUT=0x1f3f/WIN1H=0/WININ=0xff, 读 DISPCNT 置 bit15 (0x8000) 后写回. "
-        "case 1: 从 BLDY 读/写递增 gBannerState[+0x12] 最多 7 次后 phase++. "
-        "case 2/3: 调 blend_palette_entry_toward_target 做调色板渐变, 循环写 OAM 3 entries (r6=0..2, tile_id 0x48c0/0x40c0), 计时 0xf 帧后 phase++. "
-        "case 4: 循环写 OAM 3 entries (不调 blend), 计时 0x1f 帧后 phase++. "
-        "case 5: 写 BLDY = 8 - gBannerState[+0x12], 递增计时最多 7 后 phase++. "
-        "case 6: 调 disable_blend_and_clear_step, 读 DISPCNT ands 0x7fff, 写回, phase++. "
-        "返回 1=进行中 / 0=完成. "
-        "Constants: gBannerState=0x0201fec0, BLDY=0x04000054, WINOUT=0x0400004a, DISPCNT=0x04000000, "
-        "tile_vram=0x06014000, pal_src=0x05000260, gPrng_offset=0x6c2c, OAM_tile_a=0x48c0, OAM_tile_b=0x40c0."),
-    ("FUN_080c21a0", "tick_pack_banner_3d_state_machine_alt",
-        "pack banner 3D 动画状态机变体, 与 tick_pack_banner_3d_state_machine (0x080c1f10) 共享同一 caller (play_ui_effect_3d) "
-        "和相同 gBannerState 相位结构 (7 states, [+0x11] phase / [+0x12] sub-tick), "
-        "但使用不同的 ROM 资源基地址: 调色板来自 0x0991767c (vs 0x09912e3c) / 0x0991be9c (vs 0x09912e5c). "
-        "case 0 同样拷贝调色板 + tile_2d_row_copy + disable_blend_and_clear_step + 写 WINOUT/WIN1H/WININ/DISPCNT. "
-        "case 1: 读 BLDY 写 gBannerState[+0x12] 递增计时. "
-        "case 2: 调 blend_palette_entry_toward_target + OAM 3 entries 循环 (tile 0x48c0/0x40c0). "
-        "case 3: blend + OAM loop. case 4: 纯 OAM loop 无 blend. "
-        "case 5: BLDY = 8 - step 淡出. case 6: disable_blend_and_clear_step + DISPCNT &= ~0x8000. "
-        "返回 1=进行中 / 0=完成. "
-        "Constants: gBannerState=0x0201fec0, BLDY=0x04000054, WINOUT=0x0400004a, "
-        "OAM_tile_a=0x48c0, OAM_tile_b=0x40c0, pal_src_a=0x0991767c, pal_src_b=0x0991be9c."),
+    ('FUN_080c1f10', 'tick_pack_banner_3d_state_machine',
+        'Pack-banner 3D state machine. Phase0 loads resources and configures OBJ-window state. Phase1 only advances BLDY. Phases2/3 run forward/reverse palette ramps and each append six OAM entries as three pairs; phase4 also appends six paired entries. Phase5 only advances BLDY. Phase6 disables blend, applies DISPCNT&0x7fff, advances to7, and returns1. Phases0..6 return1; phase>6 returns0 without cleanup.'),
+    ('FUN_080c21a0', 'tick_pack_banner_3d_state_machine_alt',
+        'Alternate pack-banner 3D state machine. Phase0 loads alternate resources and configures OBJ-window state. Each phase1..5 appends six OAM entries as three pairs; phases2/3 also run forward/reverse palette ramps. Phase6 disables blend, applies DISPCNT&0x7fff, advances to7, and returns1. Phases0..6 return1; phase>6 returns0 without cleanup.'),
     ("FUN_080f67f4", "write_oam_entry_with_slot_check",
         "向 OAM 写入一个精灵条目, 但仅当 gPrng 指向的 slot 尚未被标记为 '已写' 时才写入. "
         "入口打包参数 r0 low16=sprite_x, r0 hi16=sprite_y, r1=OAM_attr1, r2=OAM_attr0_low8 (颜色模式等), r3=OAM_attr2 (tile/priority). "
@@ -6848,14 +6589,8 @@ RENAMES = [
         "被 10 个调用者使用, 是区域动画 OAM 写入的核心出口. "
         "Constants: gPrng=0x03000040, slot_offset=0xde*2=0x1bc, sentinel=0x80, "
         "OAM_entry_size=8, attr0_mask=0xfffffe00, attr1_mask=0x000001ff."),
-    ("FUN_080c124c", "render_card_zoom_oam_sprite_grid",
-        "为卡牌缩放/展示 UI 效果计算并写入 OAM sprite 网格. "
-        "由 play_ui_effect_25 和 play_ui_effect_23 调用, 处理 pack UI 场景中卡牌放大动画的 OAM 布局. "
-        "入口: r0=player_side / r1=base_y_or_param / r2=tile_ptr_base / r3=packed (low16=clamp_max [0..0x3e7], hi16=sign_flag). "
-        "计算动画帧所需的 sprite 网格尺寸 (通过 __divsi3 / __modsi3 反复计算行列数), "
-        "对每个子精灵调用 write_oam_entry_from_packed_args 及 write_oam_entry_with_slot_check (FUN_080f67f4) 完成 OAM 写入. "
-        "关键常量: clamp_max=0x3e7 (最大列数), step=10 (% 10 折行), OAM tile pair 0x061a/0x0215 (pack banner OAM 属性). "
-        "函数体含 __divsi3/__modsi3 调用, 是计算量较重的 OAM layout 函数."),
+    ('FUN_080c124c', 'render_card_count_panel_oam',
+        'Render a card-count panel. r3 low16 is an unsigned value clamped to999; signed high16 selects the label palette via style<=1 versus>1. r0 selects the digit palette relative to the display player. r1+8 anchors two card pieces and r2 supplies Y offsets; panel/digit X positions are centered from digit count. Draw endcaps/fill and the label, then1..3 decimal digits including0. This routine does not take a signed delta or infer its sign.'),
     ("FUN_080c2990", "write_zone_pair_oam_with_coords",
         "解包两个 zone OAM 描述字, 分别调用 resolve_zone_oam_base_coords_by_type 获取各自基础坐标, "
         "再计算相对位移后调用 write_oam_entry_with_slot_check (FUN_080f67f4) 写入 OAM. "
@@ -6865,36 +6600,10 @@ RENAMES = [
         "被 play_ui_effect_0b 和 FUN_080c8c58 调用, 是 duel zone 动画配对高亮的核心写入函数. "
         "Constants: gDuelActivation=0x0201e2a0, OAM_attr_normal=0x2488, OAM_attr_flip=0x248c, "
         "OAM_y_offset=0x18, coord_x_pad=4."),
-    ("FUN_080bdbb4", "tick_pack_banner_state_machine_b",
-        "pack banner 子状态机 B, 驱动 pack banner 淡入/OAM 动画序列. "
-        "读 gBannerState[+0x10] (u8 phase [0..4]) 通过 switch-dispatch 5 cases 执行. "
-        "case 0: 从 [gPrng+0x6c2c] 读出 player bit[4:0] 计算 tile VRAM 地址 0x06014000 偏移, "
-        "copy_bytes_by_halfword 拷贝调色板 (src 0x098c9064 to 0x05000260, 0x20 halfwords), "
-        "tile_2d_row_copy 写 VRAM, disable_blend_and_clear_step, 写 BLDCNT=0xbf40 / BLDALPHA=0, "
-        "清 gBannerState[+0x11], phase++. "
-        "case 1: 直接 phase++. "
-        "case 2: blend_palette_entry_toward_target (淡入, step=[+0x11]*2, max=0x20), "
-        "OAM 2 entries loop (tile 0x40c0, x=0x4c, y 每次+0x40), 计时 0x1f 帧后 phase++. "
-        "case 3: 计时后触发 sync_state_and_init_sprite (code=0x23) + phase++. "
-        "case 4: 直接 phase++. "
-        "默认 (phase>4): disable_blend_and_clear_step 后返回 0. "
-        "返回 1=进行中 / 0=完成. "
-        "Constants: gBannerState=0x0201fec0, BLDCNT=0x04000050, BLDALPHA=0x04000052, "
-        "pal_src=0x098c9064, pal_dst=0x05000260, tile_vram=0x06014000, OAM_tile=0x40c0, OAM_attr=0xc0c0, x_base=0x4c."),
-    ("FUN_080bda7c", "tick_pack_banner_state_machine_a",
-        "pack banner 子状态机 A, 与 tick_pack_banner_state_machine_b (0x080bdbb4) 结构完全对称, "
-        "同为 play_ui_effect_0b 唯一调用路径的两个变体之一. "
-        "使用不同 ROM palette 地址: case 0 copy_bytes_by_halfword src=0x098cc0a4 (vs B 的 0x098c9064); "
-        "case 2 blend 源=0x098c9064 (两者共用). "
-        "switch 覆盖 phase [0..4]: "
-        "case 0 = palette+tile init+BLDCNT/BLDALPHA+phase++; "
-        "case 1 = 直接 phase++; "
-        "case 2 = blend + OAM 2 entries (tile 0x40c0, x=0x4c, y 每次+0x40); "
-        "case 3 = 计时后 gBannerState[+0x10]++ (32+1=0x21 帧触发 sync_state_and_init_sprite); "
-        "case 4 = 直接 phase++. default = disable_blend + return 0. "
-        "Constants: gBannerState=0x0201fec0, BLDCNT=0x04000050, BLDALPHA=0x04000052, "
-        "pal_init_src=0x098cc0a4, pal_blend_src=0x098c9064, pal_dst=0x05000260, "
-        "tile_vram=0x06014000, OAM_tile=0x40c0, x_base=0x4c."),
+    ('FUN_080bdbb4', 'tick_pack_banner_state_machine_b',
+        'Pack-banner state machine B. Phase0 initializes regional assets. Phases1/3 advance phase and clear gBannerState+0x11; phase4 only advances. Phase2 starts at0 and runs exactly32 calls: counts0..8 use step=2*c, 9..16 use 32-2*c, and 17..31 draw two OAM entries without a palette step. Phases0..4 return1. Only phase>4 disables blend and returns0. Palette ramps call blend_palette_block_toward_white.'),
+    ('FUN_080bda7c', 'tick_pack_banner_state_machine_a',
+        'Pack-banner state machine A. Phase0 initializes and configures the effect. Phase1 only advances phase. Phase2 starts at0 and runs exactly32 calls: counts0..8 use step=2*c, 9..16 use 32-2*c, and 17..31 draw two OAM entries without a palette step. Phases3/4 only advance phase. Phases0..4 return1. Only phase>4 disables blend and returns0. Palette ramps call blend_palette_block_toward_white; counters use gBannerState+0x10/+0x11.'),
     ("FUN_080c6a20", "write_zone_slot_oam_descriptor",
         "根据 zone_type_code 更新 gDuelFieldCtx (0x02023130) 中对应 slot 的 OAM 描述字段, "
         "并调用 render_duel_field_zone_info 重绘区域信息. "
@@ -6942,21 +6651,8 @@ RENAMES = [
         "被 play_ui_effect (0x0801ef94) 作为 UI effect 的子状态机入口调用. "
         "Constants: gUIEffectState=0x02023110, gUIEffectState_card_ref1=0x02023114, "
         "gUIEffectState_card_ref2=0x02023118, card_type_max=4."),
-    ("FUN_080bd660", "tick_duel_puzzle_banner_state_machine",
-        "驱动 duel puzzle (场景 scene_duel_puzzle) 的 banner 状态机, 每帧由 play_ui_effect (0x0801ef94) 调用. "
-        "读 gBannerState[+0x10] (u8 phase [0..8]) 驱动 switch 9 cases. "
-        "case 0: 置 gDuelFieldCtx[+0x21e] bit0, 从 [gPrng+0x6c2c] 读 bit[4:0] 计算 player side, "
-        "以 side*3<<11 得 tile 偏移加 ROM 基址 (0x098f6104), "
-        "copy_bytes_by_halfword 拷贝调色板 (src 0x098f60e4 to 0x05000260, 0x20 halfwords), "
-        "tile_2d_row_copy 写 VRAM 0x06014000 (0x18 tiles x 8 rows), phase++. "
-        "case 1 (sin 动画): 每帧从 rom_sin_table_q8 读 OAM y 坐标 (sin[gBannerState[+0x12]]*0x70/256), "
-        "循环写 3 OAM entries (tile 0xc0 attr), 计时 0x20 帧 phase++. "
-        "case 2..7: 各阶段推进 OAM 动画 (垂直摆动 / 写 gBannerState[+0x8]). "
-        "case 8: 切换下一动画 via sync_state_and_init_sprite + compute_duel_zone_dir_for_player 判 player. "
-        "default: 置 gBannerState[+0x19] bit1 反转, return 0. "
-        "返回 1=进行中 / 0=完成. "
-        "Constants: gBannerState=0x0201fec0, rom_sin_table_q8=0x09e5f8f0, "
-        "tile_src=0x098f60e4, VRAM=0x06014000."),
+    ('FUN_080bd660', 'tick_duel_puzzle_banner_state_machine',
+        'Outer duel-puzzle banner dispatcher. Phase0 loads regional assets. Phase1 adds3 to a halfword counter and advances when the new value exceeds0x20. Phase2 waits65 ticks, then gPrng+0x23f bit0 and duel-zone direction(3) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes; phases4..7/invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer. No PRNG advance occurs.'),
     ("FUN_080c8fd8", "init_window_regs_for_campaign_banner",
         "为 campaign banner 场景设置 GBA 窗口和混合寄存器初值. "
         "写入 WIN0H=WIN1H=0x50c8 (left=0x50, right=0xc8), WIN0V=WIN1V=0x1878 (top=0x18, bottom=0x78), "
@@ -6989,15 +6685,8 @@ RENAMES = [
         "函数固定返回 1, 供调用方判断操作是否已执行. "
         "Constants: BLDCNT=0x04000050, MASK_9FFF=0x9fff (清除 BLDCNT[15:13]=blend mode), "
         "BLDCOEF=+2, BLDALPHA=+4 (相对 BLDCNT 偏移)."),
-    ("FUN_080bd3f4", "tick_banner_display_state_machine",
-        "由 play_ui_effect (0x0801ef94) 调用. "
-        "读取 gBannerState (0x0201feC0, 偏移 +0x10 字节) 作为 switch 索引 [0..8], 共 9 个 case (case 4..7 合并为同一分支). "
-        "每个 case 执行对应帧阶段操作: case 0 设置 VRAM/palette 标志并拷贝调色板数据, 按 LP 状态选择 tile 源; "
-        "case 1 更新 banner 贴图行偏移并调 tile_2d_row_copy; 后续 case 逐步完成 banner 动画帧推进. "
-        "函数通过 high-register callee-save (.hword 0x4647=mov r7,r0; .hword 0x4680=mov r8,r0) "
-        "保存 gBannerState 指针和输入参数供 switch 各分支复用. "
-        "Constants: gBannerState=0x0201feC0, VRAM_BG_BASE=0x06014000, "
-        "PALETTE_SRC_0=0x05000260, ROM_PALETTE_A=0x098db0c4, ROM_PALETTE_B=0x098ed0e4."),
+    ('FUN_080bd3f4', 'tick_banner_display_state_machine',
+        'Outer banner display dispatcher. Phase1 runs 16 motion ticks. Phase2 waits 89 ticks; then gPrng+0x23f bit0 and duel-zone direction(2) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes. Phases4..7 and invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer but the current call returns1. It does not advance PRNG.'),
     ("FUN_0803bc58", "check_card_play_condition_eligible",
         "检查给定卡牌播放/效果条件是否满足. "
         "r0 为来自调用方的索引 (从 FUN_080c9f50 传入 ldr r0,[r0,#0x4] 的值). "
@@ -8206,14 +7895,8 @@ RENAMES = [
         "update_field_slot_tile_display(player, slot, 0). "
         "No APCS params (all data from globals). Returns void. "
         "Constants: gDuelZoneDisplay=0x02023130, slot_type_lo=[0..4], slot_type_hi=[5..10]."),
-    ("FUN_080bc794", "init_field_slot_aob_ctx_a",
-        "Initialises duel_field slot AOB context structure (DAT_080bc7d4, zero_len=0x6c halfwords=0xd8 bytes) "
-        "for dispatch_card_display_op cases 0x01 and 0x21. "
-        "Calls zero_fill_by_halfword(base, 0x6c), writes r0->[base+4], r1->[base+8], "
-        "r2 (via mov r8,r2 / mov r0,r8)->[base+c]. Sets [base+0] bit0 (init done). "
-        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
-        "r0=ptr arg_data; r1=ptr arg_target; r2=ptr arg_extra (saved via r8). Returns void. "
-        "Constants: base_struct=DAT_080bc7d4, zero_len=0x6c halfwords=0xd8 bytes, player_flag_bit=0x4."),
+    ('FUN_080bc794', 'init_banner_state',
+        'Initializes gBannerState. Clears 0xd8 bytes, stores r0/r1/r2 at +4/+8/+0xc, sets gBannerState byte0 bit0, and sets gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op at 0801ef3e and 0801ef66; returns void. It does not write a field-slot AOB context. Evidence: 080bc794-080bc7d0.'),
     ("FUN_080c291c", "write_zone_oam_entry_with_flip",
         "Reads zone_type[2:0] and sub_idx[7:3] from slot struct (0x0201fe60), "
         "forms zone_oam_key = sub_idx<<5 | zone_type. "
@@ -8313,21 +7996,8 @@ RENAMES = [
         "Called by dispatch_card_display_op case 0x14; return used as zone_type param for "
         "render_field_zone_card_tile_by_type. Pure read, no side effects. "
         "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, type_range=[0xc..0xf]."),
-    ("FUN_0801ec9c", "dispatch_card_display_op",
-        "Core card display operation dispatcher (indeg=114). "
-        "r0=op_code [1..0x3d] (subs#1; cmp#0x3c); dispatches via 61-entry jump table 0x0801ecc4. "
-        "Case handlers (sample): 0x01/0x21=init_field_slot_aob_ctx_a, 0x03=write_zone_slot_oam_descriptor+"
-        "update_zone_activation_display_state, 0x06=init_card_effect_aob_ctx, "
-        "0x09=build_slot_activation_mask_for_player+write_field_slot_activation_mask, "
-        "0x0b=init_field_slot_aob_ctx_b, 0x0c=write_zone_oam_entry_with_flip, "
-        "0x0d=write_lp_digit_tiles_to_vram, 0x14=get_player_lp_by_field_type+render_field_zone_card_tile_by_type, "
-        "0x18=init_field_slot_aob_ctx_d, 0x19=init_field_slot_aob_ctx_c, "
-        "0x1a=init_field_slot_ctx_zoom, 0x1b=render_field_slot_card_tile_by_id, "
-        "0x1c=init_field_slot_aob_ctx_a (case alias), 0x24=refresh_duel_field+refresh_zone_effect_buff_cache+"
-        "refresh_all_zone_slot_tile_display, 0x31=copy_game_text_to_card_name_vram, "
-        "0x32=build_field_zone_display_state. "
-        "r1/r2/r3=op args (transparent to callee). Returns 1=done or 0=default/invalid. "
-        "Constants: jump_table=0x0801ecc4, op_range=[1..0x3d]."),
+    ('FUN_0801ec9c', 'dispatch_card_display_op',
+        'Card-display opcode dispatcher for1..0x3d through a 61-entry table. Opcode0x21 calls init_banner_state then writes zone OAM. Opcode1 and several shared opcodes enter the same current handler. Other cases invoke card, zone, LP, text, or field handlers with r1-r3. Every handled path reaches the constant1 exit; invalid/default reaches the constant0 exit. Evidence: [0801ec9c,0801ef94).'),
     ("FUN_0809355c", "invoke_card_display_op_0x31",
         "Lightweight thunk: sets r0=0x31, r1=0x0b, r2=0, r3=0, then calls "
         "dispatch_card_display_op (0x0801ec9c). "
@@ -9618,12 +9288,8 @@ RENAMES = [
         "Both paths write [gP1LifePoints+0x1d64]:=player_id and call init_duel_zone_target_slot_refs. "
         "Returns u32: 1=eligible+initialized, 0=not eligible. "
         "Constants: gDuelCardMain=0x0201b290+0x300, gDuelEffectZones=0x0201c510, player_stride=0x868."),
-    ("FUN_080bb3dc", "check_normal_summon_eligible_for_any_effect_zone",
-        "Scans up to 0xce effect zone entries (base=0x09e48918, stride=8) for player r0. "
-        "For each entry: check_card_field5_is_nonzero; if valid call check_normal_summon_eligible_for_slot(player, entry, 0). "
-        "Returns u32: 1=any effect zone card passes normal summon eligibility, 0=none. "
-        "r0=u32 player_id [0..1]. "
-        "Constants: effect_zone_base=0x09e48918, max_entries=0xce, entry_stride=8."),
+    ('FUN_080bb3dc', 'check_normal_summon_eligible_for_any_effect_zone',
+        'Input r0=player. Scans effect-zone response indices 0..0xce inclusive (207 rows, stride 8). For each row, requires check_card_field5_is_nonzero and check_normal_summon_eligible_for_slot(player,row,0). Returns1 on the first eligible row, else0 after all 207. Evidence: 080bb3dc-080bb412.'),
     ("FUN_080b4ba8", "check_normal_summon_eligible_any_slot",
         "Checks whether player r0 has any card slot or effect zone satisfying normal summon eligibility. "
         "Writes r0 to [0x0201afe0] (current player ptr). "
@@ -9783,15 +9449,8 @@ RENAMES = [
         "r0=ptr card_slot_ptr (slot[+0]=card_id, slot[+2]=flags, slot[+4]=zone_bits). "
         "Returns u32: 1=special-summon eligible, 0=not. "
         "indeg=3: FUN_0809f21c, FUN_080ad974, FUN_080bae6c."),
-    ("FUN_080bae6c", "check_card_summon_eligible_by_field6",
-        "Determines player_side and zone_id from get_card_extended_stat_field6 value "
-        "(0x16 -> zone_id=0x17d4; 0x17 -> zone_id=0x17c6; default -> zone_id=0x1771). "
-        "Calls count_available_effect_zones(player_side, zone_id, -1); "
-        "if count > 0 returns 1 (slot available); "
-        "else falls back to check_card_special_summon_eligible_full (FUN_0805bcf0). "
-        "r0=ptr card_slot_ptr. Returns u32: 1=summon eligible, 0=not. "
-        "Constants: field6_vals=0x16/0x17, zone_ids=0x17d4/0x17c6/0x1771, quota=-1. "
-        "Callers: FUN_080b499c, FUN_080baed0 (duel_field activation eval chain)."),
+    ('FUN_080bae6c', 'check_card_summon_eligible_by_field6',
+        'Entry r0 is a card slot. Field6 value 22 selects the other player and Horus LV8; value 23 selects the other player and Sorcerer of Dark Magic; other values select the owner and Skull Descovery Knight. An available zone accepts; otherwise returns the full special-summon predicate. Evidence: 080bae6c-080baece.'),
     # --- campaign-45 batch #45 ---
     ("FUN_0808ec08", "scan_field_slots_for_graveyard_equip_activation",
         "Called by FUN_08090218 (duel_field main control) as one step in equip-chain activation scanner sequence. "
@@ -11824,20 +11483,8 @@ RENAMES = [
         "与 dispatch_card_effect_activation (0x08090848) 构成兄弟对 (后者含单播路径). "
         "Side effects: [0x0201b290+0x4bc] := 0; via FUN_0810e5d4: zone 效果节点激活状态. "
         "Constants: GLOBAL_CTR_ADDR=0x0201b290, CTR_OFFSET=0x4bc, ZONE_MAX=0xa."),
-    ("FUN_080bbbf8", "check_field_spell_icid_summon_restriction",
-        "由字段咒文放置处理器 FUN_080bbde8 调用 (indeg=1). "
-        "入口 r0=player_id -> r7, r1=slot_idx [0..9] -> r6. "
-        "先 check_field_spell_slot_placeable(r7, r6); 不可放置返回 0. "
-        "计算 gDuelFieldSlots[player*0x868+slot*0x14] 条目; 提取低 13 位 icid -> r5. "
-        "多段阈值 binary-search cmp 链: "
-        "icid=0x0ffa/0x11c3/0x13ab/0x13b0/0x152b/0x152e/0x16ba/0x18bb -> "
-        "memset + count_effect_node_activations_by_zone (返回 0 或 restriction code); "
-        "icid=0x11f5 -> slot_count<=5 返回 0 or 1; "
-        "icid=0x16fa/0x19f1 -> 返回 1; "
-        "其余 -> get_card_field_summon_restriction. "
-        "Side effects: via count_effect_node_activations_by_zone: [0x0201b290+0x4bc] 清零; zone 激活. "
-        "Constants: ICID_THRESHOLD=0x152b, ICID_SLOT_COUNT_CHECK=0x11f5, "
-        "player_stride=0x868, slot_size=0x14, gDuelFieldSlots=0x0201c510."),
+    ('FUN_080bbbf8', 'check_field_spell_icid_summon_restriction',
+        'Inputs r0=player and r1=slot. Rejects unless check_field_spell_slot_placeable passes, then extracts the slot low-13-bit CID. The CID dispatch at 080bbc2c-080bbd18 selects direct true, Morphing Jar count<=5, a whitelist-count>1 path, or a local effect-node count path. The node path returns 0 when its count is zero; remaining dispatched/default paths return get_card_field_summon_restriction(CID).'),
     ("FUN_0803b854", "set_player_state_bit",
         "对 [gP1LifePoints + player&1 * 0x868 + 0x11c] 执行单比特 OR (置位) 或 BIC (清位). "
         "入口 r0=player_id, r1=bit_pos [0..31], r2=set_flag (0=clear, nonzero=set). "
@@ -12045,27 +11692,8 @@ RENAMES = [
         "Side effects: [gP1LifePoints+0x1d54] := 0 (清零 pending equip 激活标志), "
         "以及 init_equip_entry_sprite_fields 的所有副作用 (0x0201e4d0 多字段). "
         "Constants: EQUIP_SLOT_IDX_OFF=0x1d68, EQUIP_CARD_SLOT_OFF=0x1d48, PENDING_FLAG_OFF=0x1d54."),
-    ("FUN_080bbde8", "execute_field_spell_equip_placement",
-        "由 score_equip_slot_placement_for_ai 的调用方 hub 调用 (indeg>=2), "
-        "为场地魔法卡的装备效果完成目标选择和初始化. "
-        "入口 r0=player_id (.hword 0x4680=mov r8,r0), r1=equip_card_slot (sp[0xc]), "
-        "r2=mode (sp[0x10]). "
-        "从 gDuelFieldSlots (0x0201c600) 读取 r1 指定槽的 card word, "
-        "提取 card_icid (bits[12:0]) 存 sp[0x14], "
-        "提取面向/位置复合值传给 score_equip_slot_placement_for_ai 获取 score; "
-        "调用 check_field_spell_card_placeable_strict 确认可放置性. "
-        "主循环 (score 次迭代): 对每个候选调用 eval_equip_target_slot_with_score; "
-        "返回 -1 则整体返回 -1; "
-        "target_player==r8 时调用 check_field_spell_icid_summon_restriction "
-        "和 init_equip_sub_entry_fields_from_slot; "
-        "否则调用 check_equip_cards_share_field7 过滤. "
-        "完成后写 [gP1LifePoints+0x1d64] 和 [+0x1d68], 读 equip 数据写 [+0x1d48], "
-        "调用 apply_equip_entry_sprite_from_slot_context, 清零 [0x0201b160]. "
-        "返回 1=成功, 0=不可放置, -1=无目标. "
-        "Side effects: [gP1LifePoints+0x1d64/0x1d68] := 0 (equip slot context), "
-        "[gP1LifePoints+0x1d48] := equip card data, [0x0201b160] := 0 (global state flag). "
-        "Constants: GY=gDuelFieldSlots=0x0201c600, GP1=gP1LifePoints, "
-        "STRIDE=0x868, STATE_FLAG=0x0201b160."),
+    ('FUN_080bbde8', 'execute_field_spell_equip_placement',
+        'Inputs r0=player,r1=index,r2=mode. Scores with input mode; strict failure forces effective mode1. Candidate -1 returns-1. A nonzero same-player restriction initializes and returns0. field7 nonzero writes the candidate twice and spends two budget units; others once. Completion caches player twice, writes LP+1d48 from selected word bits22..29 plus bit13, ranks with effective_mode==0, clears scoreBase+0x180, and returns1.'),
     ("FUN_080acbf0", "check_player_lp_exceeds_toon_world_cost",
         "由 FUN_080acc30 (大型装备激活判断 hub) 调用 (indeg=1). "
         "入口 r0=player_id; 加载卡牌 0x132c (Toon World), "
@@ -12335,42 +11963,12 @@ RENAMES = [
         "(6) 调用 execute_field_spell_equip_placement; 失败则 fail; "
         "(7) fail 路径: [0x0201afe0+8] += 1 (计数器递增); 所有路径返回 0. 成功路径 (execute_field_spell_equip_placement 成功) 也返回 0. 非成功分支 (战斗状态) 返回 1. "
         "Constants: gP1LifePoints=0x0201c4e0, player_offset_in=0x1ce8, battle_state_ptr=0x0201afe0, player_stride=0x868, toon_flag_bit17_word_offset=0x11c."),
-    ("FUN_080baed0", "try_activate_equip_for_matching_slot",
-        "被 FUN_080bb35c (scan_all_effect_zone_entries_for_equip_activation) 以及另一 sibling 调用 (indeg>=2). "
-        "入口 r0=player_id [0..1], r1=entry_ptr (指向 0x09e483b0 pool 的一个 8 字节条目; entry[0]=target_card_id). "
-        "函数体: (1) 从 entry[0] 读 target_card_id -> 内部 r9; "
-        "(2) 以 r8=player_id&1 和 r10=1 为内部循环控制量, 遍历 gDuelFieldSlots[player*0x868] slot 0..0xa (11 个格): "
-        "对每格检查 slot[0].bits[12..0]==r9 (card_id 匹配); "
-        "(3) 匹配时: 检查 slot[+0x10].bit5=0 (非已激活), bit1=0 (非锁定); memset 0x18 字节到 sp 局部区; "
-        "写 OAM attr (r2=entry[+4]=sprite_ptr: attr0/attr1/attr2 位域操作); "
-        "(4) 检查 slot[+8]: 非 0 则调用 eval_equip_activation_for_slot, 否则调用 check_card_zone_activation_blocked; "
-        "(5) 若通过: check_card_summon_eligible_by_field6; FUN_0810e5d0 (equip chain validation); "
-        "(6) 成功路径: init_duel_zone_target_slot_refs; 写 [gP1LifePoints+0x1c44]:=player_id / [gP1LifePoints+0x1c38]:=3; 返回 1. 失败路径返回 0. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, gP1LifePoints=0x0201c4e0, LOOP_MAX=0xa."),
-    ("FUN_080bb35c", "scan_all_effect_zone_entries_for_equip_activation",
-        "被 FUN_080bc22c (toon world equip AI 决策) 以 r0=player_id 调用 (indeg=1, @ 080bc2d6). "
-        "入口 r0=player_id [0..1]. 遍历固定 ROM 常量池 0x09e483b0: "
-        "以 r4=0..0xa4 (165 次, 步长 8 字节) 计算 entry_ptr=0x09e483b0+r4*8; "
-        "调用 try_activate_equip_for_matching_slot(player, entry_ptr); "
-        "若返回 1 (找到匹配并激活成功) 立即返回 1; 全部条目失败则返回 0. "
-        "纯扫描器, 外部写入通过 callee 副作用传播. "
-        "Constants: ENTRY_POOL_BASE=0x09e483b0, ENTRY_SIZE=8, ENTRY_COUNT=0xa4+1=165."),
-    ("FUN_080bbf38", "check_field_spell_equip_placement_eligible",
-        "被 FUN_080bc22c 调用 (indeg>=1, 在 toon world equip 决策链上). "
-        "入口 r0=player_id [0..1]. "
-        "逻辑: (1) 调用 check_field_spell_card_placeable_strict(player); 失败直接返回 0; "
-        "(2) 检查 gP1LifePoints[player*0x868+0xc] > 0 (LP 基础检查); "
-        "(3) 以 r8=0 (loop counter), r9=0 (entry scan 基准) 遍历 gDuelFieldSlots2 (0x0201c600) 条目: "
-        "提取 card_id 和 field7_type; 调用 eval_card_placement_flags_default(player, card_type, card_id); "
-        "对返回 flags 的 bit4 检查; "
-        "(4) 对匹配卡牌按 BST 分派 card_id 到多条路径: count_occupied_monster_zones / count_equip_slots_active_only / "
-        "count_equip_placements_with_chain_check / count_slot_card_pair_allowed_for_card / "
-        "check_any_pair_slot_available_for_card / count_equippable_slots_for_card / dispatch_effect_handler_by_card_id; "
-        "各路径设置 r10 位标志; "
-        "(5) 通过路径: 写 [gP1LifePoints+0x1d64] := player_id, [gP1LifePoints+0x1d68] := player_id; "
-        "构建 OAM slot attr; 调用 apply_equip_entry_sprite_from_slot_context; 返回 1. 失败返回 0. "
-        "Constants: gP1LifePoints=0x0201c4e0, gDuelFieldSlots2=0x0201c600, player_stride=0x868, "
-        "card_id_set=[0x13b5, 0x147b, 0x154b, 0x16ec, 0x1870, 0x185d, 0x1905, 0x18cd]."),
+    ('FUN_080baed0', 'try_activate_equip_for_matching_slot',
+        'Inputs r0=player,r1=row. Scan matching-CID slots0..10 with state bits5/1 clear. slot+8!=0 selects eval_equip_activation_for_slot, else check_card_zone_activation_blocked; require result!=0, summon==0, row callback!=0. If no slot commits, fallback needs index>=0, unavailable!=0, blocked!=0, summon==0, callback!=0. Slot commit: gP1LifePoints+0x1d64=player,+0x1d58=1, refs(player,slot,0,3). Fallback: gP1FieldArrayCBase+0x1c44=player,+0x1c38=1, refs(player,11,index,3). Success1, else0.'),
+    ('FUN_080bb35c', 'scan_all_effect_zone_entries_for_equip_activation',
+        'Input r0 is player. Scans all 165 rows at equip_activation_response_table and returns 1 on the first try_activate_equip_for_matching_slot success; returns 0 after all rows fail. Evidence: 080bb35c-080bb388.'),
+    ('FUN_080bbf38', 'check_field_spell_equip_placement_eligible',
+        'Input r0=player. Requires strict placeability and positive zone count, then scans placement-bit0x10 entries. CID gates decide acceptance. Success caches player twice, stores (((word>>22)&0xff)*2)|((word>>13)&1), initializes rank(1,0,1), and returns1; exhaustion0. The packed field preserves all original bits22..29 plus bit13.'),
     ("FUN_080b0bc0", "prepare_effect_zone_slots_for_field_action",
         "被 duel AI field action 决策路径调用 (indeg 待确认). "
         "入口 r0=player_id [0..1]. "
@@ -12572,41 +12170,10 @@ RENAMES = [
         "遍历完无匹配返回 r0=-1 (movs#1; rsbs). 纯查询, 无外部写. "
         "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
         "extra_deck_count_offset=0x14, extra_deck_base=gP1LifePoints+0x418, card_id_mask=bits[12:0]."),
-    ("FUN_080bb414", "dispatch_equip_activation_full_sequence",
-        "被 FUN_080bc168 (0x080bc2be/0x080bc592/0x080bc610) 及 FUN_080bb31e 调用 (indeg>=4). "
-        "入口 r6=r0=player_side. 大型装备激活全流程分派器. "
-        "首先线性扫描 effect_zone_base=0x09e48918 (stride=8, 上界 0xce) 调用 try_activate_equip_for_matching_slot; 命中立即返回 1. "
-        "扫描无命中后依次: (D) dispatch_effect_handler_by_card_id(player,0xfffe,0xd) -> get_duel_activation_zone_id > 0 "
-        "-> get_activation_zone_card_type_field(0) -> find_card_pair_in_player_deck_list -> dispatch_to_effect_handler_by_card_type; "
-        "(E) dispatch_effect_handler_by_card_id(player,0xfffe,0xe) -> find_deck_slot_by_card_pair_match "
-        "-> dispatch_to_effect_handler_by_card_type; "
-        "(C) dispatch_effect_handler_by_card_id(player,0xfffe,0xc) -> 内层循环 r7=[0..zone_count] "
-        "调用 get_activation_zone_card_type_field(r7) 进行 BST (0x15ab/0x15f9/0x15fa) "
-        "-> count_equip_slots_matching_whitelist/count_monster_slots_by_chain_head_id "
-        "-> get_effect_slot_entry_ptr x2 -> dispatch_to_effect_handler_by_card_type. "
-        "若全部失败: count_field_copies_of_card(0x166c) > 0 返回 1. 最后大型 monster_zone+field_spell 循环. "
-        "返回 r0=u32 success (1=激活成功, 0=无). "
-        "Side effects: 通过 try_activate_equip_for_matching_slot/dispatch_to_effect_handler_by_card_type 写 gDuelBattleState; "
-        "通过 enqueue_equip_slot_bitmap_update 写 OAM bitmap. "
-        "Constants: effect_zone_base=0x09e48918, max_entries=0xce=206, entry_stride=8, "
-        "card_id_mask=0xfffe, dispatch_types=[0xc/0xd/0xe], gDuelFieldSlots=0x0201c510."),
-    ("FUN_080bc168", "dispatch_equip_activation_by_field_state",
-        "被 dispatch_equip_field_scan_sequence (0x080bc592 内) 及上级循环调用 (indeg>=2). "
-        "入口 r4=sp[0x1ce8]=player_side (从 gP1LifePoints+0x1ce8 读取). "
-        "读 gDuelBattleState (0x0201afe0)[+0x8]=field_state [0..4]; 超出范围跳默认返回. 5-case switch: "
-        "case_0: 清零 [+0x180]; toon_flag 检查 -> check_player_lp_exceeds_toon_world_cost "
-        "+ check_field_spell_card_placeable_strict/check_field_spell_group_placeable "
-        "-> count_available_effect_zones -> find_best_equip_target_slot_for_player x2; "
-        "成功: gDuelBattleState[+8]++; 失败同. "
-        "case_1: compare_zone_max_scores_by_player -> compute_equip_zone_score_with_cache; 失败: [+0xc]=0+[+8]++. "
-        "case_2: dispatch_equip_activation_full_sequence -> 若成功 [+8]=0; 失败 [+8]++. "
-        "case_3: scan_all_effect_zone_entries_for_equip_activation -> 成功 [+8]=0; 失败 [+8]++. "
-        "case_4: 大型 monster_zone+field_spell slot 扫描循环. "
-        "返回 r0=u32 (sub-call 返回值或 [+8]++ 后的 advance 值). "
-        "Side effects: [gDuelBattleState+0x8]+=1 (field_state advance) 或 :=0 (reset on success); "
-        "[gDuelBattleState+0xc]:=0 (case_1 失败); [gDuelBattleState+0x180]:=0 (case_0 清零缓存). "
-        "Constants: gDuelBattleState=0x0201afe0, gP1LifePoints=0x0201c4e0, "
-        "field_state_offset=0x8, toon_flag_offset=0x1cec."),
+    ('FUN_080bb414', 'dispatch_equip_activation_full_sequence',
+        'Input r0=player. Scans 207 effect-zone rows; first activation returns1. After a miss, wildcard D/E/C paths call their handler and return1 without testing its result. If none dispatches, nonzero Skill Drain count returns0. Otherwise scans slots0..4 with card/field gates. Type9/5/8 commits store32(player) at 0x0201e244, store32(1) at 0x0201e238, initialize target refs, and return1; exhaustion returns0.'),
+    ('FUN_080bc168', 'dispatch_equip_activation_by_field_state',
+        'No input; state=scoreBase+8. state0 clears +0x180; LP+1cec==0 returns1. Other gate failure advances1/returns0; successful context/placement may keep0/return0. state1 signed<0 or cache==0 clears +0xc, advances2, returns0; else1. states2/3: nonzero callee resets0, zero advances; both return0. state4 gate failure advances5/0; no slot or nonzero score=>1; placement0 keeps4/0, positive resets1/0, negative=>1. Other states=>1.'),
     ("FUN_080b0fe8", "eval_equip_monster_zone_score_full",
         "被 FUN_08097828 (switchD case_1 路径, 0x0809794e) 和 FUN_080bc68c 调用 (indeg=2). "
         "入口 r10=r0=player_side, r1=sp[0]=activation_mode (spill via r9->sp). "
@@ -12618,15 +12185,8 @@ RENAMES = [
         "通过 dispatch_zone_slot_score_by_player_flag 写得分表. "
         "Constants: gDuelBattleState=0x0201afe0, gDuelFieldSlots=0x0201c510, "
         "gDuelNodePool=0x0201aff8, player_stride=0x868, slot_loop=[0..4]."),
-    ("FUN_080bb38c", "try_activate_equip_via_two_tables",
-        "被 FUN_08097828 (switchD case_1, 0x08097958) 和 FUN_080bc698 调用 (indeg=2). "
-        "入口 r6=r0=player_side, r7=r1=retry_flag. 两阶段扫描 effect zone 表: "
-        "Phase 1 (r4=[0..2]): gEffectZoneTable_A=0x09e488d8 基址 (stride=8) 调用 try_activate_equip_for_matching_slot; "
-        "若命中立即返回 1. Phase 1 无命中: retry_flag==0 -> Phase 2; retry_flag!=0 -> 返回 0. "
-        "Phase 2 (r4=[0..4]): gEffectZoneTable_B=0x09e488f0 基址再次调用; 命中返回 1. 全部失败返回 0. "
-        "Side effects: 通过 try_activate_equip_for_matching_slot 间接触发装备激活副作用. "
-        "Constants: gEffectZoneTable_A=0x09e488d8, gEffectZoneTable_B=0x09e488f0, "
-        "stride=8, phase1_max=2, phase2_max=4."),
+    ('FUN_080bb38c', 'try_activate_equip_via_two_tables',
+        'Inputs r0=player and r1=retry flag. Scans three rows at equip_activation_three_row_response_table; success returns 1. If that scan fails and retry is zero, scans five secondary rows. Nonzero retry skips the second table. Returns 0 when all enabled scans fail. Evidence: 080bb38c-080bb3d6.'),
     ("FUN_080977a0", "enqueue_frozen_soul_zone_sprite_or_default",
         "入口 r4=r0=player_side. 调用 check_equip_zone_has_frozen_soul_or_great_long_nose(player_side): "
         "若非 0 (找到特殊卡): enqueue_equip_slot_sprite_attr(player, 0xb, 0x16a1, 1); "
@@ -13204,6 +12764,299 @@ RENAMES = [
 
     # NOTE: batch #72+ are handled by RenameFromCSV.py (CSV-driven, avoids Jython method size limit).
     # Data truth source: doc/dev/naming-proposals.csv + doc/dev/eval/<addr>.plate.txt
+    # --- file 15 reviewed registry projections ---
+    ('FUN_080bb9b8', 'eval_field_spell_equip_activation_candidate',
+        'Phase0 scans70 rows: hit returns0; exhaustion enters phase1. Phase1 needs capacity>1, no-node/unavailable nonzero, <=1 flagged slots5..10. After early gates, primary needs owner==player and (field6!=0x16 or field9==5 or count049C!=0); 131E/10DD force primary,138F forbids it. Else fallback uses last post-gate index>=0 when active count0 and zones>4. Commit refs(player,11,index,7), 0x0201e244=player, 0x0201e238=1 (STR32), return0. Failure/other phase returns1.'),
+    ("FUN_080b5bac", "score_slot_by_summon_restriction_without_chain",
+        "Comparator for r0 player and r1 slot index. It extracts the slot's low-13-bit card ID and returns 1 only when get_card_field_summon_restriction is nonzero and slot halfword [+8] is zero; otherwise returns 0. Its Thumb pointer is stored at 0x080b6578."),
+    ("FUN_080b76a4", "return_true_response_callback",
+        "Returns 1 unconditionally and ignores callback arguments. Referenced by 201 card-response table rows: 79 normal-summon rows and 122 rows across five equip and field-response tables. Body is exactly [0x080b76a4,0x080b76a8), bytes 01207047."),
+    ("FUN_080b76e4", "check_card_pair_slot_count_below_requirement",
+        "Input: r0 points to a zone record with internal CID at +0 and player/type bits at +2. Calls count_slot_card_pair_allowed_for_card. Returns 1 when the count is below the requirement: count<=1 for type bits[5:1]<=10, or count<=0 for type>10. Returns 0 when the requirement is met."),
+    ("FUN_080b771c", "check_effect_handler_result_positive",
+        "Input: r0 points to a zone record. Reads player bit0 and the internal CID, obtains the display value, and calls dispatch_effect_handler_by_card_id(player, CID, display_value). Returns 1 when the signed handler result is greater than zero and 0 otherwise."),
+    ("FUN_080b7760", "check_self_effect_node_inactive",
+        "Input: r0 points to a zone record whose +2 bit0 is player. Calls count_effect_node_activations_by_zone for that player. Returns 1 exactly when the count is zero and 0 otherwise."),
+    ("FUN_080b77f8", "check_opponent_lp_below_self_plus_500",
+        "Input: r0 points to a zone record whose +2 bit0 is player. Loads both players' LP and returns 1 when opponent LP is less than self LP plus 500. Returns 0 when opponent LP is at least self LP plus 500."),
+    ("FUN_080b7a68", "check_beast_soul_swap_target_slot_eligible",
+        "Beast Soul Swap response callback. Input r0 is the activation record. Requires the placement and effect-node gates, then scans owner-side slots. The parallel slot-state word at +0x10 must have bit22 or bit23 set, and the candidate must have no equip-placement type. Returns 1 on the first qualifying slot and 0 otherwise. Evidence: 080b7a72, 080b7a78, 080b7ab8-080b7ad0, 080b7ae8."),
+    ("FUN_080b7b18", "check_spiritual_earth_art_target_slot_eligible",
+        "Spiritual Earth Art response callback. Input r0 is the activation record. After the effect-node gate it scans owner-side slots. The parallel slot-state word at +0x10 must have bit22 or bit23 set, and signed field5 must be at most 4. Returns 1 on the first qualifying slot and 0 after the scan. Evidence: 080b7b20, 080b7b36, 080b7b54-080b7b6c, 080b7b88-080b7ba4."),
+    ("FUN_080b7bb8", "check_de_fusion_response_eligible",
+        "De-Fusion response callback. Requires the owner field-spell placement gate, then scans slots 0..4. Each candidate needs a nonzero node-handler result, nonzero slot eligibility, and parallel-state bit22 or bit23 set. get_equip_display_type_code_by_card_id yields threshold r4; owner available monster slots plus 1 must reach r4, the activation-record CID dispatcher must equal r4, and the candidate-CID criteria build at gEquipLpZoneEntryBase must be nonzero. Evidence: 080b7bcc-080b7ca8."),
+    ("FUN_080b7cd8", "check_soul_release_response_eligible",
+        "Soul Release response callback. If the other player LP-block [+0x14] is above 4, returns 1 immediately. Otherwise it evaluates fixed Reversal of Graves CID pair counts with short circuit: a nonzero first count skips the second call; when the first is zero, the second must be nonzero. It then requires own LP above 1000 and own LP-block [+0x14] above 14. Evidence: 080b7d00-080b7d48."),
+    ("FUN_080b7d6c", "check_windstorm_score_pair_straddles_player_max",
+        "Windstorm of Etaqua response callback. Stores the owner main-channel maximum in sp[0x24], then scans opposing slots while skipping an empty low-13-bit CID or slot [+8] equal to zero. For slot [+6] nonzero it requires sp[0x18] > sp[0x24] > sp[0x14]; for [+6] zero it requires sp[0x14] > sp[0x24] > sp[0x18]. Returns 1 on the first match and 0 otherwise. Evidence: 080b7d82, 080b7dac-080b7e10."),
+    ("FUN_080b7e2c", "check_toon_world_player_list_has_field8_6",
+        "Toon World response callback. Requires check_card_pair_slot_count_below_requirement, selects the owner-side list, and scans its entries for check_card_stat_field8_is_6. Returns 1 on the first matching entry and 0 when the list ends. Evidence: 080b7e36, 080b7e5a, 080b7e82, 080b7e9c."),
+    ("FUN_080b7eb8", "check_mesmeric_control_lower_opponent_score_target",
+        "Mesmeric Control response callback. Rejects immediately when opposing slot 11 already contains the Mesmeric Control CID. Otherwise it computes the gated peak and scans opposing slots. A candidate needs a nonzero low-13-bit CID, slot [+8] equal to zero, and field5 strictly below the peak. Returns 1 on the first match and 0 otherwise. Evidence: 080b7ed0-080b7ed8, 080b7f0e-080b7f36."),
+    ("FUN_080b7f94", "check_opponent_monster_zone_has_multiple_vacancies",
+        "Input r0 is a zone record. Extracts owner from record[2] bit0, calls count_available_monster_slots for the other player, and returns 1 only when the result is greater than one. Returns 0 for zero or one vacancy. Evidence: 080b7f96-080b7fae; sole callback holder 09e49134."),
+    ("FUN_080b7fb4", "check_opponent_lp_at_most_500_or_self_above_1500",
+        "Input r0 is a zone record. Returns 1 when the other player's LP is at most 500; otherwise returns 1 only when the owner's LP is above 1500. Uses gP1LifePoints and PLAYER_BLOCK_STRIDE and has no writes. Evidence: 080b7fba-080b7fd6; sole callback holder 09e4913c."),
+    ("FUN_080b8004", "check_infinite_cards_count_above_five",
+        "Infinite Cards response callback. Requires check_card_pair_slot_count_below_requirement, reads the owner-side count through gP1LifePoints and PLAYER_BLOCK_STRIDE, and returns 1 only when the count is above 5. Evidence: 080b8008-080b802e."),
+    ("FUN_080b803c", "check_spiritual_energy_settle_zone_count_eligible",
+        "Spiritual Energy Settle response callback. Counts monster slots using check_card_stat_field8_is_7 as a Thumb comparator; a nonzero count rejects. It then calls get_lp_count_minus_zone_slot_offset for the owner and returns 1 only when that result is greater than 1. Evidence: 080b8046, 080b8048, 080b8060-080b806c."),
+    ("FUN_080b8074", "check_mirage_of_nightmare_zone_count_eligible",
+        "Mirage of Nightmare response callback. Extracts the owner from activation record byte2, calls get_lp_count_minus_zone_slot_offset, and returns 1 only when the result is greater than 1. Evidence: 080b8078-080b808a."),
+    ("FUN_080b8090", "check_mass_driver_response_eligible",
+        "Mass Driver response callback. Branches on activation record[3] & 0x30. When nonzero, returns 1 iff resolve_equip_target_slot_for_player(owner,0) is nonnegative. When zero, passes the original record to check_card_pair_slot_count_below_requirement and returns that result. Evidence: 080b8094-080b80b8."),
+    ("FUN_080b80bc", "check_lock_card_counts_and_opponent_score_advantage",
+        "Response callback for four lock cards. Sums four allowed-pair counts. If record type is at most 10, the sum must be at most 1; otherwise it must be at most 0. After that gate, returns the sign predicate from compare_zone_max_scores_by_player. Evidence: 080b80c8-080b8132."),
+    ("FUN_080b8138", "check_pair_limit_and_opponent_state10_present",
+        "Response callback for internal CID 0x12e0. Requires check_card_pair_slot_count_below_requirement, then counts state-10 monster slots for the other player and returns 1 when that count is nonzero. Evidence: 080b813c-080b815e."),
+    ("FUN_080b8164", "check_book_of_taiyou_restricted_inactive_target_available",
+        "Book of Taiyou response callback. Scans five owner-side slots and accepts an occupied target only when get_card_field_summon_restriction is nonzero and slot field8 is zero. Returns 1 on the first target and 0 after five slots. Evidence: 080b816e-080b81c8."),
+    ("FUN_080b81d0", "check_hieroglyph_lithograph_chain_clear_and_count_above_six",
+        "Hieroglyph Lithograph response callback. Rejects when value 1 is present in the selected slot chain. Otherwise calls get_lp_count_minus_zone_slot_offset and returns 1 only when the result is above 6. Evidence: 080b81d8-080b8202."),
+    ("FUN_080b8208", "check_wave_motion_cannon_response_eligible",
+        "Wave-Motion Cannon response callback. If record[3] & 0x30 is zero, accepts immediately. Otherwise a count not above 1000 times set_code also accepts. Only an over-limit record requires both more than one available effect zone and set_code above 1. Returns 0 when that final pair of gates fails. Evidence: 080b8214-080b825a."),
+    ("FUN_080b8270", "check_gravedigger_ghoul_opponent_hand_targets_available",
+        "Gravedigger Ghoul response callback. Extracts the owner from activation record byte2, counts opposing hand cards with field5, and returns 1 only when the count is greater than 1. Evidence: 080b8274-080b828a."),
+    ("FUN_080b8290", "check_last_will_player_state_bit0",
+        "Last Will response callback. Extracts the owner from activation record byte2, reads byte 0x11f from that player's LP block, and returns its bit0. This is bit24 of the aligned word at offset 0x11c. Evidence: 080b8290-080b82a8."),
+    ("FUN_080b82b4", "check_multiplication_of_ants_response_eligible",
+        "Multiplication of Ants response callback. Requires a positive allowed-pair count for PETIT_MOTH_CID, then resolves an equip target for the owner with mode 0. Returns 1 when the resolver result is nonnegative and 0 otherwise. Evidence: 080b82be-080b82dc."),
+    ("FUN_080b82e8", "check_insect_imitation_slot_handler_eligible",
+        "Insect Imitation response callback. Scans five effect-node slots. A slot must pass invoke_effect_node_handler_3arg; its chain score is then dispatched by card ID and the dispatcher result must be nonzero. Returns 1 on the first passing slot and 0 after five slots. Evidence: 080b82f8, 080b830c, 080b8316, 080b8324."),
+    ("FUN_080b8330", "check_creature_swap_response_eligible",
+        "Creature Swap response callback. If an occupied owner slot has a nonzero tier, returns 1 immediately. If the scan finds no such slot, acceptance requires the owner's occupied monster count to equal 1 and compare_zone_max_scores_by_player(owner) to be negative. Evidence: 080b8356-080b8382."),
+    ("FUN_080b8398", "check_cathedral_of_nobles_response_eligible",
+        "Cathedral of Nobles response callback. If record[3] & 0x30 is zero, directly returns the pair-slot gate result at 080b83d8. Otherwise it returns 1 only when both the opponent whitelist count and occupied monster count are zero; any nonzero count rejects. Evidence: 080b83a2-080b83d8."),
+    ("FUN_080b83e4", "check_mustering_dark_scorpions_response_eligible",
+        "Mustering of the Dark Scorpions response callback. Requires the owner field-spell gate and an available monster slot, then scans the bounded card list for check_card_is_dark_scorpion_type. Returns 1 on the first Dark Scorpion entry and 0 when the list ends. Evidence: 080b83f4, 080b8402, 080b844e, 080b8468."),
+    ("FUN_080b8484", "check_monster_gate_target_slot_available",
+        "Monster Gate response callback. Extracts the owner from activation record byte2, calls resolve_equip_target_slot_for_player(owner, 0), and returns 1 when the signed result is nonnegative. Evidence: 080b8486-080b8498."),
+    ("FUN_080b849c", "check_dust_barrier_response_eligible",
+        "Dust Barrier response callback. Counts owner slots with check_card_field8_is_zero. A nonzero count continues, but compare_zone_max_scores_by_player must be strictly positive before the pair-slot gate is evaluated and returned. Other paths return 0. Evidence: 080b84a8-080b84d0."),
+    ("FUN_080b84d8", "check_player_field_spell_slot_empty",
+        "Input r0 is an activation record. Extracts the owner from record[2] bit0, reads that player's slot 10 from gDuelFieldSlots, extracts the low-13-bit internal CID, and returns 1 when the CID is zero. Evidence: 080b84da-080b84f4."),
+    ("FUN_080b8500", "check_fusion_gate_response_eligible",
+        "Fusion Gate response callback. Returns 1 immediately when record[3] has either bit4 or bit5 set. Otherwise delegates to check_player_field_spell_slot_empty and returns that result. Evidence: 080b8502-080b8518."),
+    ("FUN_080b851c", "check_field_spell_slot_empty_or_umi",
+        "A Legendary Ocean response callback. Reads the owner-side field-spell slot low-13-bit CID. Returns 1 when it equals UMI_CARD_ID or when the CID is zero; returns 0 for any other CID. Evidence: 080b8526-080b8564; pool 080b8544 is UMI_CARD_ID shifted left 19."),
+    ("FUN_080b8568", "check_harpies_hunting_ground_response_eligible",
+        "Harpies' Hunting Ground response callback. Requires the other player's active-equip count to be nonzero. It then reads the owner field-spell slot low-13-bit CID and returns 1 only when that CID is zero; a nonzero CID rejects. Evidence: 080b8574-080b859e."),
+    ("FUN_080b85b0", "check_opponent_chain_field_match_present",
+        "Response callback for internal CID 0x12c2. Extracts the owner, then calls count_slots_with_chain_field_match(other,1,0). Returns 1 when the signed count is positive and 0 otherwise. Evidence: 080b85b4-080b85d0."),
+    ("FUN_080b85d4", "check_tribe_infecting_virus_response_eligible",
+        "Tribe-Infecting Virus response callback. First requires the owner hand helper to return nonzero. It then calls count_slots_with_chain_field_match(other,1,0) and requires that signed count to be positive. Returns 1 only when both gates pass. Evidence: 080b85de-080b8608."),
+    ("FUN_080b860c", "check_dark_hole_score_response_eligible",
+        "Dark Hole response callback. Accepts when either check_player_score_advantage_exceeds_lp(owner) is nonzero or compare_zone_max_scores_by_player(owner) is negative. Returns 0 only when neither early-accept condition holds. Evidence: 080b8610-080b8634."),
+    ("FUN_080b8638", "check_special_hurricane_response_eligible",
+        "Special Hurricane response callback. Requires check_hand_equip_target_available_for_zone for the owner, then returns the result of check_self_effect_node_inactive. Evidence: 080b863c-080b8654."),
+    ("FUN_080b8658", "check_mass_removal_score_response_eligible",
+        "Shared Raigeki and Lightning Vortex response callback. A nonzero score/LP gate or a negative owner zone-max comparison accepts immediately. Only when both early gates fail does it require more than one effect-node activation. Returns 1 on any accepted route and 0 otherwise. Evidence: 080b8662-080b8694."),
+    ("FUN_080b8698", "check_hammer_shot_highest_score_on_opponent",
+        "Hammer Shot response callback. Owner zone-max values at most zero pass the initial gate. It scans five slots on each side; only a nonzero active node-handler result allows that slot field5 into the comparison. Best starts at -1 and the winning side changes only for a strictly larger field5. Returns 1 iff the final winning side is the opponent. Evidence: 080b86b4, 080b86c6-080b86f6."),
+    ("FUN_080b870c", "check_final_destiny_opponent_score_advantage",
+        "Final Destiny response callback. Extracts the owner from activation record byte2, calls compare_zone_max_scores_by_player(owner), and returns the sign bit of that result. Evidence: 080b8710-080b871c."),
+    ("FUN_080b8720", "check_control_change_hand_target_response_eligible",
+        "Shared Change of Heart, Brain Control, and Reshef response callback. Requires opponent placement count >0 and own LP-block +0x11c bit17 clear. Each hand candidate needs field5 nonzero, no equip-placement type, and at least one available owner monster slot. The packed word expression 2*bits[29:22]+bit13 is the bonus helper input. Its returned bonus 5..6 accepts; above 6 calls resolver(owner,1); at most 4 or a negative resolver skips only that candidate. Evidence: 080b873a-080b8848."),
+    ("FUN_080b885c", "check_opponent_equip_blockers_absent_then_control_change_eligible",
+        "Equip blocker response callback. Scans five slots belonging to the other player. If check_slot_equip_eligibility is nonzero for any occupied slot, returns 0 immediately. Only when all five slots contain no blocker does the call at 080b88b0 delegate to check_control_change_hand_target_response_eligible and return its result unchanged. Evidence: 080b8872-080b88b8."),
+    ("FUN_080b88c0", "return_true_for_hand_equip_target_scan",
+        "Returns 1 unconditionally and ignores callback arguments. Body is exactly [0x080b88c0,0x080b88c4), bytes 01207047. Its sole Thumb pointer holder is 080b89e8, used by scan_hand_for_best_equip_target_slot at 080b8914-080b891a."),
+    ("FUN_080b88c4", "check_hand_equip_target_bonus_above_four_eligible",
+        "Hand equip-target bonus callback. Requires opponent placement count >0 and own LP-block +0x11c bit17 clear. The hand selector receives the always-true B88C0 callback and r2=r3=1, and may advance shared PRNG when replacing a candidate. Its negative result rejects; otherwise skip its index. Other candidates need nonzero field5, no equip-placement type, and an open owner monster slot. Bonus 5..6 accepts; >6 needs resolver(owner,1)>=0. Failures skip that candidate. Evidence: 080b88e0-080b8a0e."),
+    ("FUN_080b8a54", "check_mystic_box_zone_count_response_eligible",
+        "Returns 0 when the owner has a positive zone-score advantage; otherwise returns 1 only when that owner has more than one occupied monster zone. Entry r0 is the response-table record. Evidence: 0x080b8a54, 0x080b8a5e, 0x080b8a70, 0x080b8a82."),
+    ("FUN_080b8a84", "check_snatch_steal_high_value_target_response_eligible",
+        "A nonzero LP/score gate accepts immediately. Otherwise a candidate accepts only when its node handler is nonzero, its card-type helper is zero, its equip whitelist helper is nonzero, its CID differs from both excluded literals, and field5 is greater than 1799. Entry r0 is the response-table record. Evidence: 0x080b8ae6-0x080b8b10."),
+    ("FUN_080b8b38", "check_falling_down_archfiend_target_response_eligible",
+        "Requires at least one Archfiend monster slot, then delegates the target-value decision to the Snatch Steal response predicate. Entry r0 is the response-table record. Evidence: 0x080b8b38, 0x080b8b46, 0x080b8b52, 0x080b8b62."),
+    ("FUN_080b8b64", "check_mind_control_zone_response_eligible",
+        "A nonzero first pair count accepts immediately. Otherwise own occupied-monster count must be nonzero, after which either a nonzero valid-pair count or own zone maximum greater than zero accepts. Entry r0 is the response-table record. Evidence: 0x080b8b78-0x080b8ba4."),
+    ("FUN_080b8bb8", "check_monster_reborn_target_response_eligible",
+        "Rejects failed target selection. For selected CID x, accepts when field3(x)>1700 and exceeds the opponent zone maximum, or when its field8 category is nonzero and summon restriction is zero. It compares packed bit13 of x with the record owner and rejects an owner mismatch when x belongs to the field-spell bypass set. Entry r0 is the response-table record. Evidence: 0x080b8bc8-0x080b8c50."),
+    ("FUN_080b8c54", "check_silent_fiend_target_attribute_response_eligible",
+        "Activates the selected slot, reads its card attribute-table-A value, and returns 1 only when that value is above 1800. Entry r0 is the response-table record. Evidence: 0x080b8c54, 0x080b8c62, 0x080b8c6a, 0x080b8c74, 0x080b8c88."),
+    ("FUN_080b8c8c", "check_grave_revival_target_response_eligible",
+        "Rejects failed target selection or a nonzero special-activation result. For record CID 0x14f7 or 0x1880, score s is table-A(x); for 0x1536 or 0x1881, s=max(field3(x),table-A(x)); otherwise s=field3(x). Accepts s>1700 above the opponent zone maximum, or s>1000 with nonzero field8 category and zero summon restriction. Entry r0 is the response-table record. Evidence: 0x080b8c9c-0x080b8d68."),
+    ("FUN_080b8d6c", "check_shallow_grave_dual_target_response_eligible",
+        "An unavailable opponent target leaves saved score at zero and continues; otherwise saved=max(field3,table-A) for that target. A negative owner target rejects. Let m be the maximum of saved and both opponent score channels. Accepts when owner field3>1700 and table-A>=m, or on the fallback when field8 category equals 1. Entry r0 is the response-table record. Evidence: 0x080b8d72-0x080b8e28."),
+    ("FUN_080b8e2c", "check_tribute_doll_target_score_response_eligible",
+        "Selects a bitmap target and returns 1 only when a slot exists and its field5 score is at most 2399. Entry r0 is the response-table record. Evidence: 0x080b8e2c, 0x080b8e36, 0x080b8e4e, 0x080b8e60."),
+    ("FUN_080b8e68", "check_dark_magic_curtain_handler_response_eligible",
+        "Builds the Dark Magic Curtain handler request and returns 1 only when the dispatched card-effect handler result is positive. Entry r0 is the response-table record. Evidence: 0x080b8e68, 0x080b8e96, 0x080b8ea8."),
+    ("FUN_080b8eac", "check_graverobber_target_response_eligible",
+        "Requires owner LP signed greater than 2000. Scans stride-8 table entries until GRAVEROBBER_CID 0x1379, which ends the scan and rejects. For each earlier CID, writes it to a local record and requires field6==0x16, opponent extra-deck count nonzero, indirect predicate nonzero, and zone-block helper nonzero. Only a candidate passing the final gate is committed to gEquipLpScoreBase+0x14 and returns 1; failures continue. Entry r0 is the response-table record. Evidence: 0x080b8ece-0x080b8f52."),
+    ("FUN_080b8f68", "check_stop_defense_target_score_response_eligible",
+        "Requires a nonzero effect-zone precondition and opponent occupied-monster count. Owner maximum field5 starts at zero and is updated only by owner slots 0..4 with CID!=0 and halfword+6==0. An opponent candidate requires CID!=0 and +6!=0; it accepts when score channel1>=maximum and channel0<maximum. Entry r0 is the response-table record. Evidence: 0x080b8f7c-0x080b9086."),
+    ("FUN_080b9090", "check_curse_of_anubis_multi_target_response_eligible",
+        "Requires the effect-zone precondition, scans the monster slots with check_slot_card_activatable, and returns 1 only when more than one slot passes. Entry r0 is the response-table record. Evidence: 0x080b9090, 0x080b909c, 0x080b90b4, 0x080b90cc."),
+    ("FUN_080b90d0", "check_block_attack_target_score_response_eligible",
+        "Requires a nonzero effect-zone precondition and opponent occupied-monster count. Owner maximum field5 starts at zero and is updated only by owner slots 0..4 with CID!=0 and halfword+6==0. An opponent candidate requires CID!=0 and +6==0; it accepts when score channel0>=maximum and channel1<maximum. Entry r0 is the response-table record. Evidence: 0x080b90e4-0x080b91ee."),
+    ("FUN_080b91f8", "check_enemy_controller_target_score_response_eligible",
+        "Requires a nonzero effect-zone precondition. Owner maximum field5 starts at zero and is updated only by owner slots 0..4 with CID!=0 and halfword+6==0. An opponent candidate must have a nonzero handler result; +6==0 accepts channel0>=maximum>channel1, while +6!=0 accepts channel1>=maximum>channel0. Entry r0 is the response-table record. Evidence: 0x080b920e-0x080b930e."),
+    ("FUN_080b9310", "check_reverse_trap_zone_score_response_eligible",
+        "Requires record type at most 9 and an initial owner zone maximum at most zero. It writes 1 to the selected owner slot halfword +8, rescans the zone maximum, then writes 0 to +8 without restoring the prior value. Accepts only when the second result is greater than zero; the slot halfword remains zero on return. Entry r0 is the response-table record. Evidence: 0x080b931e-0x080b9396."),
+    ("FUN_080b9398", "check_shield_and_sword_zone_score_response_eligible",
+        "Runs both maximum-score scans with r3=1. Rejects when own primary score exceeds the maximum of the two opponent channels; otherwise accepts only when own secondary score exceeds that same opponent maximum. Entry r0 is the response-table record. Evidence: 0x080b93c2-0x080b93e4."),
+    ("FUN_080b93f0", "check_card_destruction_hand_response_eligible",
+        "Rejects when the LP-block count is at most 2. A nonzero available-effect count accepts immediately. During the hand scan, nonzero activation rejects and nonzero placement permission increments the accepted count. Afterward, opponent LP-block count above 4 accepts; otherwise at least one accepted candidate is required. Entry r0 is the response-table record. Evidence: 0x080b941e-0x080b94ee."),
+    ("FUN_080b94fc", "check_exchange_hand_target_response_eligible",
+        "Searches the other player's hand through find_hand_slot_by_card_id_table and returns 1 exactly when a matching slot index exists. Entry r0 is the response-table record. Evidence: 0x080b94fc, 0x080b9508, 0x080b9512."),
+    ("FUN_080b9514", "check_megamorph_target_score_response_eligible",
+        "Rejects when owner LP is at least opponent LP. It performs a scored search; a nonzero chain-copy check on the first index triggers a second scored search. The final index must be nonnegative and its field5 score must exceed 1799. Entry r0 is the response-table record. Evidence: 0x080b9534-0x080b9582."),
+    ("FUN_080b95a4", "check_metalmorph_effect_zone_response_eligible",
+        "Returns 1 when the response owner has at least one available effect zone for RED_EYES_B_DRAGON_CID; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080b95a4, 0x080b95b2, 0x080b95c2."),
+    ("FUN_080b95c8", "check_discard_recovery_spell_response_eligible",
+        "In the first candidate group, any nonzero activation result or nonzero eligible-set result rejects. If that group completes, the second group is scanned and a nonzero eligible-set result accepts immediately; exhaustion without such a result rejects. Entry r0 is the response-table record. Evidence: 0x080b9622-0x080b96ae."),
+    ("FUN_080b96c4", "check_blast_with_chain_target_score_response_eligible",
+        "Requires the opponent monster-space helper to be nonzero. If own available effect zones for Hane-Hane CID 0x13c3 are nonzero, accepts immediately. Only when that count is zero does it select an own target, which must be nonnegative with field5 greater than 1799. Entry r0 is the response-table record. Evidence: 0x080b96d2-0x080b972c."),
+    ("FUN_080b9734", "check_generic_equip_target_score_response_eligible",
+        "Finds the best scored equip target and returns 1 only when a target exists and its field5 score is above 1799. Entry r0 is the response-table record. Evidence: 0x080b9734, 0x080b9746, 0x080b9758, 0x080b976a."),
+    ("FUN_080b9770", "check_generic_equip_target_available_response_eligible",
+        "Calls find_best_equip_target_slot_scored with exclude index -1 and returns 1 exactly when the result is nonnegative. Entry r0 is the response-table record. Evidence: 0x080b9770, 0x080b977e, 0x080b9788."),
+    ("FUN_080b978c", "check_equip_pair_and_target_response_eligible",
+        "Requires the card-pair slot-count predicate and then delegates to the generic equip target score predicate. Entry r0 is the response-table record. Evidence: 0x080b978c, 0x080b9794, 0x080b97a0, 0x080b97b0."),
+    ("FUN_080b97b4", "check_special_equip_target_handler_response_eligible",
+        "When record byte3 bits 0x30 are clear, selects a target; a negative index rejects, and a nonzero check_card_pair_slot_count_below_requirement result accepts. Otherwise it derives the dispatch side from record bits, looks up the display value, and accepts only when the dispatched handler result is signed greater than zero. Entry r0 is the response-table record. Evidence: 0x080b97c0-0x080b9818."),
+    ("FUN_080b981c", "check_heart_of_clear_water_target_response_eligible",
+        "Accepts when the best target has field5 score above 1299 or when the fallback card-pair slot-count predicate passes. Entry r0 is the response-table record. Evidence: 0x080b981c, 0x080b9830, 0x080b9842, 0x080b9850, 0x080b9860."),
+    ("FUN_080b9868", "check_equip_debuff_target_score_response_eligible",
+        "Requires own zone maximum below zero, a nonnegative opponent target index, and field5 of that opponent target greater than 1299. Any failed gate rejects. Entry r0 is the response-table record. Evidence: 0x080b9878-0x080b98ac."),
+    ("FUN_080b98bc", "check_riryoku_chain_match_response_eligible",
+        "Requires the effect-zone precondition and returns 1 when count_slots_with_chain_field_match(owner,1,1) is nonzero. Entry r0 is the response-table record. Evidence: 0x080b98bc, 0x080b98c6, 0x080b98dc, 0x080b98ee."),
+    ("FUN_080b98f0", "check_hand_reload_response_eligible",
+        "Requires owner zone maximum below zero and hand count greater than 3. It scans the single owner-hand candidate group; any candidate with nonzero activation result or nonzero eligible-set result rejects. If every candidate has both results zero, completion accepts. Entry r0 is the response-table record. Evidence: 0x080b9908-0x080b999e."),
+    ("FUN_080b99b0", "check_magical_mallet_hand_response_eligible",
+        "Requires hand count above 3. It excludes the record-selected index, then counts entries whose activation result is zero, card type is greater than 2, and protected-set helper is zero. Accepts only when more than one entry qualifies. Entry r0 is the response-table record. Evidence: 0x080b99da-0x080b9aa2."),
+    ("FUN_080b9abc", "check_mass_revive_zone_capacity_response_eligible",
+        "Requires a positive handler result and sufficient monster/effect-zone capacity on the relevant sides for Dimension Fusion and Return from the Different Dimension. Entry r0 is the response-table record. Evidence: 0x080b9abc, 0x080b9aca, 0x080b9ad6, 0x080b9ae2, 0x080b9af8, 0x080b9b3a."),
+    ("FUN_080b9b3c", "check_level_limit_area_b_response_eligible",
+        "Rejects immediately when available effect-zone count is nonzero or owner zone maximum is greater than zero. Only the remaining path returns the pair-gate result. Entry r0 is the response-table record. Evidence: 0x080b9b54-0x080b9b68."),
+    ("FUN_080b9b7c", "check_big_wave_small_wave_response_eligible",
+        "Requires own zone maximum below zero. It dispatches the owner/record-CID/mode0 handler and accepts only when that result is at least the effect-node activation count. Entry r0 is the response-table record. Evidence: 0x080b9b8c-0x080b9bac."),
+    ("FUN_080b9bb8", "check_beckoning_light_response_eligible",
+        "Returns 1 only when the record's bounded count field is at most two and count_field_zone_cards_with_field5(owner) is zero. Entry r0 is the response-table record. Evidence: 0x080b9bb8, 0x080b9bd2, 0x080b9bec."),
+    ("FUN_080b9bf0", "check_level_modulation_target_response_eligible",
+        "Activates the selected slot, reads the selected card's extended field5, and returns 1 only when that value is above four. Entry r0 is the response-table record. Evidence: 0x080b9bf0, 0x080b9bfe, 0x080b9c06, 0x080b9c10, 0x080b9c24."),
+    ("FUN_080b9c28", "check_pot_draw_count_response_eligible",
+        "Reads the side-indexed response count at offset 0xc and returns 1 when that count is at most five. Entry r0 is the response-table record. Evidence: 0x080b9c28, 0x080b9c44."),
+    ("FUN_080b9c50", "check_makiu_target_score_response_eligible",
+        "Rejects when the pair gate is zero. It scans opponent slots 0..4; a candidate needs CID!=0 and halfword+8!=0. It accepts when signed field6 score is at most the fixed threshold 2500, and rejects after exhausting all five slots. Entry r0 is the response-table record. Evidence: 0x080b9c90-0x080b9cba."),
+    ("FUN_080b9cdc", "check_knights_title_handler_response_eligible",
+        "Requires the other player to have an occupied monster zone, then returns the normalized positive result from check_effect_handler_result_positive. Entry r0 is the response-table record. Evidence: 0x080b9cdc, 0x080b9cec, 0x080b9cf8, 0x080b9d04."),
+    ("FUN_080b9d08", "check_inferno_fire_blast_active_equip_response_eligible",
+        "Returns 1 when count_equip_slots_active_only for the selected side is nonzero; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080b9d08, 0x080b9d14, 0x080b9d24."),
+    ("FUN_080b9d28", "check_rescue_cat_handler_response_eligible",
+        "Looks up the card's display value, dispatches its handler, and returns 1 only when the handler result is above one. Entry r0 is the response-table record. Evidence: 0x080b9d28, 0x080b9d32, 0x080b9d3c, 0x080b9d4e."),
+    ("FUN_080b9d50", "check_slot_chain_value_absent_response_eligible",
+        "Returns 1 exactly when check_value_in_slot_chain(owner,11,record_card_id) returns zero. Entry r0 is the response-table record. Evidence: 0x080b9d50, 0x080b9d5e, 0x080b9d6e."),
+    ("FUN_080b9d70", "check_call_of_the_mummy_response_eligible",
+        "Accepts immediately when record byte3 has bits 0x30; otherwise returns the card-pair slot-count decision. Entry r0 is the response-table record. Evidence: 0x080b9d70, 0x080b9d84, 0x080b9d8a."),
+    ("FUN_080b9d8c", "check_toon_table_contents_search_response_eligible",
+        "A nonzero Toon World or Exodia compound-pair count accepts immediately. Otherwise it scans owner slots 0..10; a candidate needs CID!=0, halfword+8!=0, and a nonzero result from the external eight-CID predicate. The first such candidate accepts, and exhaustion rejects. Entry r0 is the response-table record. Evidence: 0x080b9da4-0x080b9e1c."),
+    ("FUN_080b9e34", "check_excavation_mage_stones_response_eligible",
+        "Returns 1 when either the Sinister Serpent or Night Assailant monster-pair slot count is nonzero. Entry r0 is the response-table record. Evidence: 0x080b9e34, 0x080b9e40, 0x080b9e50, 0x080b9e6a."),
+    ("FUN_080b9e6c", "check_level_up_evolution_target_response_eligible",
+        "Scans five equip slots and returns 1 on the first slot with a nonzero evolution target; returns 0 after all five fail. Entry r0 is the response-table record. Evidence: 0x080b9e6c, 0x080b9e90, 0x080b9eb2."),
+    ("FUN_080b9eb4", "check_jade_insect_whistle_chain_response_eligible",
+        "Returns check_value_in_slot_chain for the other side, zone 11, and PARASITE_PARACIDE_CID. Entry r0 is the response-table record. Evidence: 0x080b9eb4, 0x080b9ec4, 0x080b9eca."),
+    ("FUN_080b9ed0", "check_earthquake_pair_response_eligible",
+        "Returns 1 when count_slot_card_pair_allowed_for_card(owner,TRAGEDY_CID) is nonzero. Entry r0 is the response-table record. Evidence: 0x080b9ed0, 0x080b9eda, 0x080b9eea."),
+    ("FUN_080b9ef0", "check_metal_reflect_slime_pair_response_eligible",
+        "Returns check_any_pair_slot_available_for_card(owner,METAMORPHOSIS_CID) as the response result. Entry r0 is the response-table record. Evidence: 0x080b9ef0, 0x080b9efa, 0x080b9f00."),
+    ("FUN_080b9f08", "check_metamorphosis_nonspell_target_response_eligible",
+        "Scans five effect nodes and returns 1 when a nonzero handler result selects a card whose type is not spell; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080b9f08, 0x080b9f1a, 0x080b9f38, 0x080b9f5a."),
+    ("FUN_080b9f5c", "check_monster_reincarnation_source_response_eligible",
+        "Accepts when any hand target, field6 hand card, pair slot, matching extra-deck card, or matching field-zone card source exists. Entry r0 is the response-table record. Evidence: 0x080b9f5c, 0x080b9f66, 0x080b9f76, 0x080b9f88, 0x080b9f98, 0x080b9fbe."),
+    ("FUN_080b9fc0", "check_overpowering_eye_peak_score_response_eligible",
+        "After effect-zone and occupied-monster gates, computes the peak monster-zone score and returns 1 only when it is above 999. Entry r0 is the response-table record. Evidence: 0x080b9fc0, 0x080b9fcc, 0x080b9fde, 0x080b9ffc, 0x080ba012."),
+    ("FUN_080ba018", "check_tribute_handler_response_eligible",
+        "Scans five candidate entries with invoke_effect_node_handler_3arg and returns 1 on the first nonzero handler result. Entry r0 is the response-table record. Evidence: 0x080ba018, 0x080ba060, 0x080ba08c."),
+    ("FUN_080ba090", "check_catapult_turtle_target_score_response_eligible",
+        "Evaluates candidate field5 scores and a resolved target slot, then returns 1 only when the selected score is above 999. Entry r0 is the response-table record. Evidence: 0x080ba090, 0x080ba0c4, 0x080ba0f8, 0x080ba10a, 0x080ba130."),
+    ("FUN_080ba134", "check_cannon_soldier_target_response_eligible",
+        "Accepts directly when opponent LP is at most 500 times opponent occupied-monster count. Otherwise owner occupied-monster count must exceed 1 and resolve_equip_target_slot_for_player must return a nonnegative index. Entry r0 is the response-table record. Evidence: 0x080ba15e-0x080ba192."),
+    ("FUN_080ba194", "check_ultimate_baseball_kid_threshold_response_eligible",
+        "Reads opponent LP and accepts when it is at most 500 times count_effect_node_zone_activations. A larger opponent LP rejects. Entry r0 is the response-table record. Evidence: 0x080ba1aa-0x080ba1cc."),
+    ("FUN_080ba1d4", "check_time_wizard_zone_score_response_eligible",
+        "Returns 1 when compare_zone_max_scores_by_player(owner) is nonpositive; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080ba1d4, 0x080ba1dc, 0x080ba1ec."),
+    ("FUN_080ba1f0", "check_jowgen_zone_activation_absent_response_eligible",
+        "Returns 1 exactly when count_effect_node_activations_by_zone(owner) is zero. Entry r0 is the response-table record. Evidence: 0x080ba1f0, 0x080ba1f8, 0x080ba208."),
+    ("FUN_080ba20c", "check_amazon_archer_monster_count_response_eligible",
+        "Accepts immediately when opponent LP is at most 1200. Otherwise it accepts only when owner occupied-monster count is greater than 2. Entry r0 is the response-table record. Evidence: 0x080ba220-0x080ba242."),
+    ("FUN_080ba24c", "check_forgiving_maiden_target_response_eligible",
+        "Requires an occupied monster, activates the selected slot, requires normal field8, and accepts only when selected CID differs from record CID. Entry r0 is the response-table record. Evidence: 0x080ba24c, 0x080ba256, 0x080ba268, 0x080ba270, 0x080ba27e, 0x080ba29a."),
+    ("FUN_080ba29c", "check_karate_man_slot_score_response_eligible",
+        "Requires nonzero effect-zone and slot-activatable gates. For each nonempty opponent slot 0..4 it evaluates both score channels, selects channel1 when halfword+6 is nonzero and channel0 when +6 is zero, and accepts only when the unsigned adjusted comparison proves 1000<=selected score<=1999. Exhaustion rejects. Entry r0 is the response-table record. Evidence: 0x080ba2ac-0x080ba354."),
+    ("FUN_080ba358", "check_valkyrion_opponent_zone_empty_response_eligible",
+        "Requires the effect-zone precondition and returns 1 only when the other player has no occupied monster zone. Entry r0 is the response-table record. Evidence: 0x080ba358, 0x080ba364, 0x080ba376, 0x080ba386."),
+    ("FUN_080ba388", "check_cyber_stein_target_response_eligible",
+        "Accepts only when the effect-zone precondition is nonzero, owner occupied-monster count is at most 1, and the effect-node eligible helper returns zero. Entry r0 is the response-table record. Evidence: 0x080ba398-0x080ba3be."),
+    ("FUN_080ba3cc", "check_goddess_of_whim_slot_response_eligible",
+        "Requires the effect-zone precondition and returns 1 when check_slot_full_activation_eligibility passes. Entry r0 is the response-table record. Evidence: 0x080ba3cc, 0x080ba3d6, 0x080ba3ea, 0x080ba3fc."),
+    ("FUN_080ba400", "check_xyz_dragon_cannon_zone_response_eligible",
+        "Counts available effect zones for the fixed CID on both sides. A nonzero count on either side accepts immediately; only when both counts are zero does it delegate to check_hand_equip_target_available_for_zone. Entry r0 is the response-table record. Evidence: 0x080ba41e-0x080ba44e."),
+    ("FUN_080ba450", "check_vw_tiger_catapult_zone_response_eligible",
+        "Requires a matching card-pair slot and returns 1 when count_effect_node_activations_by_zone is nonzero. Entry r0 is the response-table record. Evidence: 0x080ba450, 0x080ba462, 0x080ba474, 0x080ba486."),
+    ("FUN_080ba488", "check_ritual_field_clear_response_eligible",
+        "Requires nonzero opponent activation count and zero own Neo-Daedalus pair count. If opponent LP is at most record-CID field3, a nonzero owner effect-zone precondition accepts early. Otherwise full-slot eligibility zero or owner zone maximum at most zero accepts; only the remaining path rejects. Entry r0 is the response-table record. Evidence: 0x080ba498-0x080ba516."),
+    ("FUN_080ba518", "apply_blast_magician_slot_value_and_check_response",
+        "Stores get_slot_effect_card_value into record+0xc, then returns check_opponent_effect_node_active(record,r1). Entry r0 is the response-table record. Evidence: 0x080ba518, 0x080ba528, 0x080ba532, 0x080ba53a."),
+    ("FUN_080ba53c", "check_neo_daedalus_field_clear_response_eligible",
+        "Rejects when opponent activation count plus opponent LP-block +0xc is zero. When opponent LP is at most 2900, a nonzero owner effect-zone precondition accepts early. Otherwise full-slot eligibility zero or owner zone maximum at most zero accepts; only the remaining path rejects. Entry r0 is the response-table record. Evidence: 0x080ba54c-0x080ba5c2."),
+    ("FUN_080ba5c4", "mark_swarm_effect_mode_and_check_response",
+        "Rejects immediately when parallel-slot state bit21 is set. Otherwise it writes record byte3 bits[5:4]=01, counts opponent activations, then writes bits[5:4]=11 and retains that state. Returns 1 for a nonzero count and 0 for zero. Entry r0 is the response-table record. Evidence: 0x080ba5e8-0x080ba626."),
+    ("FUN_080ba628", "check_union_equip_chain_absent_response_eligible",
+        "Finds the equip chain pair and scans eleven slot pairs; returns 1 only when no matching equip-chain node is found. Entry r0 is the response-table record. Evidence: 0x080ba628, 0x080ba63c, 0x080ba662, 0x080ba676."),
+    ("FUN_080ba678", "check_breaker_whitelist_response_eligible",
+        "Requires the opponent effect node to be inactive and returns 1 when the whitelist equip-slot count is nonzero. Entry r0 is the response-table record. Evidence: 0x080ba678, 0x080ba67c, 0x080ba698, 0x080ba6aa."),
+    ("FUN_080ba6ac", "check_agent_saturn_lp_ratio_response_eligible",
+        "Requires the owner field-spell slot CID to equal Sanctuary in the Sky packed value 0xbaf00000. It then accepts only when owner LP is at least twice opponent LP. Entry r0 is the response-table record. Evidence: 0x080ba6be-0x080ba704."),
+    ("FUN_080ba708", "check_thunder_dragon_zone_pair_response_eligible",
+        "Returns count_zone_card_pair_allowed_for_card(owner,record_card_id) as the response result. Entry r0 is the response-table record. Evidence: 0x080ba708, 0x080ba714, 0x080ba71a."),
+    ("FUN_080ba71c", "check_king_of_swamp_fusion_response_eligible",
+        "Requires a deck card pair, an available pair slot, and a combined occupied-monster plus field5-zone-card count above two. Entry r0 is the response-table record. Evidence: 0x080ba71c, 0x080ba72a, 0x080ba73a, 0x080ba752, 0x080ba75e, 0x080ba772."),
+    ("FUN_080ba774", "check_gear_golem_slot_score_response_eligible",
+        "Requires the effect-zone and full-slot gates, then returns 1 when the side-indexed score is at most 1999. Entry r0 is the response-table record. Evidence: 0x080ba774, 0x080ba77e, 0x080ba792, 0x080ba7a4, 0x080ba7de."),
+    ("FUN_080ba7e0", "check_chaos_banish_response_eligible",
+        "Rejects when opponent activation count is zero. Then field-state==4, nonzero opponent eligible-node count, zero owner precondition, or zero final score-helper result each accepts early. Only the remaining path rejects. Entry r0 is the response-table record. Evidence: 0x080ba7f6-0x080ba84a."),
+    ("FUN_080ba84c", "check_diffusion_wave_motion_response_eligible",
+        "Requires the effect-zone gate and favorable zone-score comparison, then accepts only when the other player has more than two occupied monsters. Entry r0 is the response-table record. Evidence: 0x080ba84c, 0x080ba856, 0x080ba864, 0x080ba87a, 0x080ba88c."),
+    ("FUN_080ba890", "check_checkmate_archfiend_count_response_eligible",
+        "Requires the effect-zone precondition and returns 1 only when more than one monster slot satisfies check_card_is_archfiend_type. Entry r0 is the response-table record. Evidence: 0x080ba890, 0x080ba8b2, 0x080ba8c2, 0x080ba8e2."),
+    ("FUN_080ba8e4", "check_dark_scorpion_combination_response_eligible",
+        "Returns 1 only when the other player has an occupied monster and check_equip_effect_zone_preconditions passes. Entry r0 is the response-table record. Evidence: 0x080ba8e4, 0x080ba8f2, 0x080ba900, 0x080ba912."),
+    ("FUN_080ba914", "check_discard_bounce_target_response_eligible",
+        "Accepts when own zone maximum is below zero or when opponent eligible-node count is nonzero. It rejects only when neither condition holds. Entry r0 is the response-table record. Evidence: 0x080ba924-0x080ba946."),
+    ("FUN_080ba948", "check_battery_charger_response_eligible",
+        "Accepts when the chain-field match count is nonzero or when a pair slot for INFERNO_RECKLESS_SUMMON_CID is available. Entry r0 is the response-table record. Evidence: 0x080ba948, 0x080ba95a, 0x080ba96e, 0x080ba980."),
+    ("FUN_080ba988", "check_armed_dragon_lv5_response_eligible",
+        "Returns 1 when count_effect_nodes_with_eligible_card for the Armed Dragon LV5 route is nonzero. Entry r0 is the response-table record. Evidence: 0x080ba988, 0x080ba996, 0x080ba9a6."),
+    ("FUN_080ba9a8", "check_armed_dragon_lv7_response_eligible",
+        "Rejects when own ARMED_DRAGON_LV7 valid-pair count is nonzero. Otherwise it accepts when opponent eligible-effect count is nonzero or opponent activation count is greater than 1. Entry r0 is the response-table record. Evidence: 0x080ba9ba-0x080ba9f2."),
+    ("FUN_080ba9f4", "check_armed_dragon_lv10_response_eligible",
+        "Accepts when opponent eligible-effect count is nonzero or opponent activation count is greater than 1; it rejects only when both conditions fail. Entry r0 is the response-table record. Evidence: 0x080baa0c-0x080baa2a."),
+    ("FUN_080baa2c", "check_gaia_soul_target_response_eligible",
+        "Requires the effect-zone gate, queries the equip-zone bitmap, and returns 1 when select_equip_target_slot_full finds a target. Entry r0 is the response-table record. Evidence: 0x080baa2c, 0x080baa36, 0x080baa62, 0x080baa6c, 0x080baa86."),
+    ("FUN_080baa88", "check_zorc_opponent_monster_present_response_eligible",
+        "Returns 1 when the other player has at least one occupied monster zone; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080baa88, 0x080baa94, 0x080baaa4."),
+    ("FUN_080baaa8", "check_super_robolady_opponent_zone_empty_response_eligible",
+        "Returns 1 when the other player has no occupied monster zone; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080baaa8, 0x080baab4, 0x080baac4."),
+    ("FUN_080baac8", "check_gatling_dragon_multiple_opponents_response_eligible",
+        "Returns 1 when the other player has more than one occupied monster zone; otherwise returns 0. Entry r0 is the response-table record. Evidence: 0x080baac8, 0x080baad4, 0x080baae4."),
+    ("FUN_080baae8", "check_hand_of_nephthys_target_response_eligible",
+        "Queries the equip-zone bitmap, selects a full target slot, and returns the normalized positive handler result for that target. Entry r0 is the response-table record. Evidence: 0x080baae8, 0x080baaf6, 0x080bab00, 0x080bab0c, 0x080bab18."),
+    ("FUN_080bab1c", "check_elemental_hero_tempest_whitelist_response_eligible",
+        "Returns 1 when count_equip_slots_matching_whitelist(owner,0,1,0) is nonzero. Entry r0 is the response-table record. Evidence: 0x080bab1c, 0x080bab2a, 0x080bab3a."),
+    ("FUN_080bab3c", "check_raviel_token_pair_response_eligible",
+        "Requires effect-zone and full-slot activation gates, then returns 1 when the required token/card pair count is nonzero. Entry r0 is the response-table record. Evidence: 0x080bab3c, 0x080bab46, 0x080bab74, 0x080bab90, 0x080baba2."),
+    ("FUN_080baba8", "check_archlord_zerato_field_spell_response_eligible",
+        "Reads the side-indexed field slot low-13-bit CID and returns 1 when it equals the packed Archlord Zerato field-spell requirement. Entry r0 is the response-table record. Evidence: 0x080baba8, 0x080babd2."),
+    ('FUN_080baccc', 'check_selected_slot_word12_above_one_response_eligible',
+        'Entry r0 is a response record. Extracts player=record[2]&1 and slot=(record[2]>>1)&31, reads unsigned dword at gDuelFieldSlots+player*0x868+slot*20+12, and returns 1 exactly when it is above 1. Evidence: 080baccc-080bacf2.'),
+    ('FUN_080bb0f8', 'try_activate_equip_from_field_array_for_player',
+        'Inputs r0=player key, r1=mode. Each field-array row needs field5!=0. Extra gates: 1488 needs other hand field5 count 0; 127D..127F/12A5/154A need mode!=0 and slot score!=0; 18B4 handler result>3; 1578 needs other LP<=1000, owner whitelist, or summed score>2999 with owner occupied count 0; 19A5 needs allowed-pair count 0. All rows need target flags!=0. Success writes FieldArray player/ready, target(player,11,index,2), clears EquipLpScore+0x180, returns1; exhaustion returns0.'),
+    ('FUN_080bb2d4', 'dispatch_equip_activation_ai_by_phase',
+        'No APCS input. Uses phase gEquipLpScoreBase+8. In one call, phase0 scans 57 rows; failure increments and falls through phase1. Phase1 runs the full activation sequence; failure increments and falls through phase2. Phase2 calls try_activate_equip_from_field_array_for_player(mode=0); failure increments and returns1. Any success returns0 without incrementing its current phase; earlier increments remain. Invalid phase returns1. Evidence: 080bb2d4-080bb356.'),
 ]
 
 

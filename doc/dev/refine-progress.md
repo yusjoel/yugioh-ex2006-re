@@ -140,7 +140,7 @@
 | 12 | equip_activation_scan | 0x080941c4..0x0809d718 | Seg-1..10 全完成，历史补漏闭合 | ✅ 全模块验收通过；四个§5.1块134B保留 | `doc/dev/p5-refine-12-equip-activation-scan.md` |
 | 13 | equip_placement | 0x0809d718..0x080a78dc | Seg-1..7 ✅，Seg-8..10 已拆 | 🟡 7/10段已验证；下一Seg-8 `[0x080a46a0,0x080a585c)` | `doc/dev/p5-refine-13-equip-placement.md` |
 | 14 | equip_ai_scoring | 0x080a78dc..0x080b5348 | 未拆 | ⬜ | |
-| 15 | equip_target_summon_zoom | 0x080b5348..0x080c1448 | 未拆 | ⬜ | |
+| 15 | equip_target_summon_zoom | 0x080b5348..0x080c1448 | Seg-1..10 全完成 | ✅ 全模块验收通过；自动名/raw 均 0 | `doc/dev/refine/15_equip_target_summon_zoom.md` |
 | 16 | duelfield_zone | 0x080c1448..0x080cbf0c | 未拆 | ⬜ | |
 | 17 | duelfield_pack_frame | 0x080cbf0c..0x080d5e84 | 未拆 | ⬜ | |
 | 18 | pack_card_info | 0x080d5e84..0x080df368 | 未拆 | ⬜ | |

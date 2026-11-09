@@ -14939,7 +14939,7 @@ DAT_080f0cb8:
 PTR_font_jp_base_table_080f0cbc:
     .word  font_jp_base_table             @ 080f0cbc 54f8e509
 
-@ font_jp 模块高频工具函数 (indeg=32). 先调用 setup_line_buf_pos_and_font 完成基础行缓冲区位置和字体设置, 再写入 EWRAM 0x02006ed0 结构体中的两个字节字段: [+0x15] 的 bit1 根据 r2 (align_flag) 决定左/右对齐; [+0x14] 的 bits[7:2] 根据 r3 (color_index & 0x1f) 设置文字颜色索引. 被 render_card_description_text/play_ui_effect_37 等多个文字渲染入口调用, 是行对齐+颜色二合一配置函数.
+@ Line-buffer font/alignment setup. After base setup, ctx[0x15]=(old&0xfe)|(r2&1), so r2 writes bit0. ctx[0x14]=(old&0x83)|((r3&0x1f)<<2), so r3 writes bits6:2 while preserving bit7 and bits1:0. Counterexamples: old15=0,r2=1 gives1; old14=0x80,r3=0 stays0x80. Other initialized fields and ABI remain unchanged.
 setup_line_buf_with_font_and_align:
     push {r4,r5,lr}                          @ 080f0cc0 30b5
     adds r4,r2,#0x0    @ 080f0cc2 141c
@@ -15078,7 +15078,7 @@ setup_line_buf_font_with_char_index:
 DAT_080f0db0:
     .word  0x02006ed0                     @ 080f0db0 d06e0002
 
-@ 被 draw_card_name_to_bg_tile_vram / draw_card_atkdef_label_to_vram 调用, 是 card stats 区域文字渲染的字体初始化路径. 调用 setup_line_buf_pos_and_font (r0=x_pos, r1=font_type) 建立 line buffer 渲染状态, 然后对 EWRAM [0x02006ed0+0x14] bit7 置 1, 标记启用 JP 字体扩展渲染模式. Callsite 固定传入 r0=0xe / r1=0x2. Constants: EWRAM_FONT_CTX=0x02006ed0, FLAG_JP_EXT=0x80.
+@ Initialize line-buffer position/font through setup_line_buf_pos_and_font(r0,r1), then set bit7 at gFontJpCtx+0x14. Called by draw_card_name_to_obj_tile_vram and draw_card_stats_label_to_obj_tile_vram.
 init_line_buf_with_jp_font_flag:
     push {lr}                                @ 080f0db4 00b5
     bl setup_line_buf_pos_and_font           @ 080f0db6 fff7fdfe

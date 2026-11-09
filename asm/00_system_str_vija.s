@@ -146,7 +146,7 @@ game_str_id_remap_count:
 .include "data/boot-ui-gfx.s"
 
 
-@ 由 play_ui_effect_3a (0x080bcbd4) 在需要完全重置显示层时调用 (直接调用者仅此一个; 其地址另登记于函数指针表, 可被间接分派). 执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); (2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); (3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; (4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; (5) gl_state_init 重置 GL 状态结构体; (6) reset_ig2d_load_counters 复位 IG2D 资源加载计数器. Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B.
+@ Resets the Exodia demo display before play_exodia_demo_scene_with_field_restore. Clears gDemoState, writes DISPCNT/BG0CNT-BG3CNT defaults, sets brightness to -16, reinitializes GL state, and resets IG2D load counters. No inputs; display, palette, and demo state are overwritten. Evidence: 08013510 body and caller 080bcc0e.
 reset_display_and_gl_state:
 .thumb
     push {lr}                                @ 08013510 00b5
@@ -1032,7 +1032,7 @@ LAB_08013bca:
 apply_demo_window_fade_out_step_ptr_win0v:
     .word  WIN0V                          @ 08013bd0 44000004
 
-@ Called by play_ui_effect_3a (0x080bcbd4) directly (its address also appears in a function-pointer table for indirect dispatch); drives the demo scene (Exodia animation) per-frame state machine. Reads gDemoState+0x8c bits[22:15] as state_idx (0-9), dispatches via 10-entry jump table: case0 load BG gfx set0+FS+sprites; case1/2 check blend progress and advance fade-in; case3/4 step sprite animation frames; case5 load BG gfx set1; case6/7 fade-out window animation; case8/9 end states. Each case increments state counter and falls through to default (no change). No parameters (void); all inputs from gDemoState EWRAM struct. Side-effects: gDemoState+0x8c state field, DISPCNT/BG3CNT/BLDCNT IO registers.
+@ Per-frame Exodia demo state machine called by play_exodia_demo_scene_with_field_restore. Dispatches ten phases from gDemoState+0x8c bits16:9, loads two graphics sets, advances sprite animation, and runs fade/window transitions. At the common exit it returns1 only when check_blend_transition_done()==0 and low-byte bit0 of that word is set; otherwise it calls tick_blend_transition_step and returns0. Evidence: 08013be8-08014384.
 tick_demo_scene_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 08013bd4 f0b5
     .hword 0x4657    @ 08013bd6 5746
@@ -19360,7 +19360,7 @@ LAB_0801c2a6:
     pop {r1}                                 @ 0801c2a8 02bc
     bx r1                                    @ 0801c2aa 0847
 
-@ Full GL display state reset called at scene transitions. Called by tick_scene_step_by_step_table_b, tick_scene_step_by_step_table_c, and play_ui_effect_3b (0x080bc918). No input params (r0 clobbered at entry). Returns r0=1 (success). Sequence: (1) bios_cpu_set fill-zero EWRAM 0x02029eb0 192 bytes; (2) gl_clear_vram_palram_scroll; (3) DISPCNT(0x04000000)=0x1741, BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; (4) gl_set_brightness(0x3F,-16); (5) gl_state_init; (6) reset_ig2d_load_counters. Side-effects: EWRAM cleared; IO regs written; GL state reset + IG2D load counters reset. Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, ZERO_FILL_CTRL=0x05000030.
+@ Resets the Vija display for play_vija_scene_with_sprite_intro and two table-driven scene wrappers. Clears 0xc0 bytes at gVijaState, resets VRAM/palette scroll state, writes DISPCNT/BG0CNT-BG2CNT defaults, sets brightness to -16, initializes GL state, and resets IG2D load counters. Returns 1. Evidence: direct call 080bcb6e.
 reset_gl_display_state:
     push {lr}                                @ 0801c2ac 00b5
     sub sp,#0x4                              @ 0801c2ae 81b0
@@ -19668,7 +19668,7 @@ load_vija_obj_resource_by_region_gvija_state:
 load_vija_obj_resource_by_region_obj_res_table:
     .word  0x09e3d964                     @ 0801c508 64d9e309  vija OBJ resource table JP/US 8-ptr array (0x09e3d964)
 
-@ vija scene OBJ resource load entry with JP/US region gate. Called by tick_scene_step_by_step_table_b, tick_scene_step_by_step_table_c, and play_ui_effect_3b (0x080bc918). No input params. Returns r0=1 (always). ROM header 0x080000ae u16 high byte: != 0x4a ('J') -> use_us_variant=1. If JP: [0x02006c2c] bits[2:0] != 0 -> use_us_variant=1. Calls load_vija_obj_resource_by_region(use_us_variant). Constants: ROM_REGION_CODE_ADDR=0x080000ae, REGION_CODE_JP=0x4a, REGION_FLAGS_OFFSET=0x6c2c, REGION_FLAGS_MASK=0x7.
+@ Loads the Vija OBJ resource variant used by play_vija_scene_with_sprite_intro. Selects the non-JP resource when ROM region is not J or when the JP settings byte low three bits are nonzero, then calls load_vija_obj_resource_by_region. No inputs; returns 1. Evidence: direct call 080bcb74.
 load_vija_obj_resource_gated:
     push {lr}                                @ 0801c50c 00b5
     movs r2,#0x0    @ 0801c50e 0022
@@ -19893,7 +19893,7 @@ apply_bg2_affine_fixed_angle:
     bx r0                                    @ 0801c690 0047
     .zero  0x2
 
-@ Per-frame BG2 affine rotation tick for play_ui_effect_3b scene. Called by run_vija_scene_state_machine each frame. No input params. Reads IWRAM 0x02029eb0+0x90 frame counter byte, increments (u8 wrap), zero-extends old value -> angle, calls apply_bg2_affine_fixed_angle(angle). Returns void. Side-effects: [0x02029eb0+0x90] incremented; BG2 affine regs written via callee.
+@ Per-frame Vija BG2 affine tick used by play_vija_scene_with_sprite_intro through run_vija_scene_state_machine. Increments gVijaState+0x90 as an 8-bit counter and passes the old value as the affine angle. Returns void and updates BG2 affine registers through the callee.
 tick_bg2_affine_anim_frame:
     push {lr}                                @ 0801c694 00b5
     ldr r1, tick_bg2_affine_anim_frame_gvija_state @ 0801c696 0549
@@ -19909,7 +19909,7 @@ tick_bg2_affine_anim_frame:
 tick_bg2_affine_anim_frame_gvija_state:
     .word  gVijaState                     @ 0801c6ac b09e0202
 
-@ Per-frame BG scroll and tile animation tick for play_ui_effect_3b scene. Called by run_vija_scene_state_machine each frame. r0=u32 tick_count. Updates only when tick_count mod 13 == 0. On trigger: memcpy 4-byte ROM params from 0x09e3d9cf; increments [0x02029eb0+0x91] AND 0x3 (4-frame cycle); calls load_vija_bg_gfx_by_mode(mode=0); writes BG0VOFS(0x04000012)=4. Returns void. Constants: MOD_PERIOD=13, SUB_FRAME_MASK=0x3, BG0VOFS=0x04000012.
+@ Per-frame Vija background tick used by play_vija_scene_with_sprite_intro through run_vija_scene_state_machine. On tick_count modulo 13 equal to zero, advances a four-frame subcounter, loads the next background frame, and writes BG0VOFS=4. Otherwise it returns without an update.
 tick_bg_scroll_anim_frame:
     push {r4,r5,lr}                          @ 0801c6b0 30b5
     sub sp,#0xc                              @ 0801c6b2 83b0
@@ -19999,7 +19999,7 @@ LAB_0801c748:
     ldrb r0,[r2,#0x3]                        @ 0801c748 d078
     bx lr                                    @ 0801c74a 7047
 
-@ Update two ISD cell animation OAM entries simultaneously. Called by tick_vija_obj_anim_slot (play_ui_effect_3b state machine). r0=u8 base_obj_index [0..7], r1=s16 sequence_idx [0..4], r2=s16 x_pos_px, r3=s16 y_pos_px. x -= 0x10, y -= 0x10 (center anchor). Calls drive_vija_obj_cell_anim(obj_index=2, seq_idx, x, y), then drive_vija_obj_cell_anim(obj_index=r0+3, seq_idx, x, y). [sp+0]=0, [sp+4]=0 for both. Returns void. Side-effects: OAM slots [2] and [r0+3] updated via dispatch_isd_cell_anim_oam_setup.
+@ Updates the paired Vija cell-animation OAM entries used by play_vija_scene_with_sprite_intro. Inputs are base object index, sequence index, x, and y. Subtracts 16 from each coordinate, then updates fixed object 2 and object base+3 with the same sequence and position. Returns void.
 update_dual_cell_anim_oam_pos:
     push {r4,r5,r6,lr}                       @ 0801c74c 70b5
     .hword 0x464e    @ 0801c74e 4e46
