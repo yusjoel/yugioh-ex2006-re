@@ -5241,24 +5241,10 @@ RENAMES = [
         "r10 (non-APCS)=u16 target_card_id [0..0x1fff]. "
         "Returns u32 count [0..9]. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_equip_offset=0x8."),
-    ("FUN_080a80a8", "check_slot_equip_target_eligible",
-        "Check whether monster slot (r12=base_slot_idx, non-APCS) is a valid equip target for player (r0). "
-        "Reads gSpellContext+0 (0x0201e4d0) bit0 (player_bit) and extracts equip_card_id; "
-        "gSpellContext+8 == 0: BST on equip_card_id to get expected field7, compare via "
-        "get_card_extended_stat_field7; triple filter: check_slot_zone_bit_eligible + "
-        "count_available_monster_slots + check_slot_placement_blocked_by_field_effect. "
-        "Pass -> return 0x800 (valid flag). "
-        "r0=u32 player_side [0..1]; r12 (non-APCS, caller-set)=u32 base_slot_idx [0..4]. "
-        "Returns u32 (0x800=eligible, 0=not). "
-        "Constants: gSpellContext=0x0201e4d0, gDuelFieldSlots=0x0201c510, valid_return=0x800."),
+    ("FUN_080a80a8", "check_familiar_possessed_summon_slot_eligible",
+        "Familiar-Possessed summon-slot predicate called by init_spell_activation_context. Inputs are r0=player, r1=base slot, r2=slot offset. It maps Familiar-Possessed Aussa, Eria, Hiita, or Wynn to the matching Charmer CID, validates the candidate monster slot, and checks zone capacity plus field-placement blocking. A preloaded exclusion list is honored when state[8] is nonzero. Returns 0x800 for an eligible slot, otherwise 0."),
     ("FUN_080a4058", "init_spell_activation_context",
-        "Initialize spell activation context (gSpellContext=0x0201e4d0) for player (r0). "
-        "Writes player_side to bit0, card_id to bits[22:8], sets bit1 of [+0x12], clears [+0x8]. "
-        "Loops slots 0..4 calling check_slot_equip_target_eligible; any nonzero -> return 1. "
-        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
-        "Returns u32 bool (1=eligible slot found, 0=none). "
-        "Side-effects: gSpellContext fields updated. "
-        "Constants: gSpellContext=0x0201e4d0, player_bit=bit0, slot_range=[0..4]."),
+        "Initializes gEquipZoneRankState for player r0 and card CID r1. It writes the player bit and CID, sets activation bit1, clears the exclusion count, then scans monster slots 0..4 by calling check_familiar_possessed_summon_slot_eligible. Returns 1 when any slot is eligible, otherwise 0. Side effects are limited to the activation context fields. Called at 0x080a4e5c."),
     ("FUN_0804b350", "check_card_id_in_fusion_target_range",
         "Check whether card_id (r0; entry adds r1,r0,#0 captures it) is in fusion target ID ranges. "
         "BST ranges: [0x17c7..0x17c9], single 0x152e, [0x18b2..0x18b3]. "
@@ -7903,16 +7889,7 @@ RENAMES = [
         "sprite_attr_monster=0x8008, sprite_attr_alt=0x8005."),
     # --- batch #38 (campaign-38, 2026-05-10) ---
     ("FUN_080abb90", "reset_sprite_attr_record_flags",
-        "Resets flag fields in the sprite attr record struct at 0x0201e4d0. "
-        "Loads struct ptr from DAT_080abbcc; r0 is overwritten at entry (void input). "
-        "Clears bits in [+0x13] (AND 0x01 keep bit0), clears bit1 in [+0x14] (AND 0xFD), "
-        "applies mask 0xFFFFFE01 to [+0x14] halfword and word, "
-        "applies mask to [+0x16] halfword; then ORs 0x30 (bit4+bit5) into [+0x12] byte "
-        "to mark record as committed/done. Leaf; called by FUN_080954e8 after sprite attr "
-        "sequence processing to prevent double-submission. Returns void. "
-        "Constants: struct_base=0x0201e4d0, keep_mask=0x01, clear_bit1=0xFD, "
-        "wide_mask_0=0xFFFFFE01 (DAT_080abbd0), wide_mask_1=0xFFFE01FF (DAT_080abbd4), "
-        "done_bits=0x30."),
+        "Called at 0x0809562a. Resets gEquipZoneRankState flag fields: keeps byte +0x13 bit0, clears byte +0x14 bit0, applies the two wide clear masks to +0x14/+0x16, then sets +0x12 bits 4 and 5. Returns void; no calls."),
     ("FUN_08085320", "submit_lp_bar_sprite_row_by_type",
         "Submits one LP bar display row to the sprite row queue based on current duel state. "
         "r0=u16 x_coord [0..0xFFFF] (low 16 bits via lsls/lsrs); "
@@ -8870,32 +8847,11 @@ RENAMES = [
         "Callers: FUN_0809457c, check_slot_palette_nonzero. "
         "Constants: monster_slot_base=0x0201e4f0, palette_subarray_offset=0x410 (=0x82<<3)."),
     ("FUN_080ade34", "check_slot_palette_nonzero",
-        "Boolean wrapper around read_slot_palette_index. "
-        "Returns 1 if palette_index > 0 (slot occupied/active), 0 if empty. "
-        "r0=u32 slot_index [0..N-1]. Returns u32 is_active [0..1]. "
-        "Callers: find_first_empty_slot_for_card_type, find_random_empty_slot_excluding_card_id, "
-        "find_slot_by_card_type_and_player, FUN_080ae050."),
-    ("FUN_080ade8c", "find_random_empty_slot_excluding_card_id",
-        "Two-phase scan over monster_slot array (0x0201e4f0). "
-        "Phase 1: iterates all slots; for each slot with check_slot_palette_nonzero==0 (empty), "
-        "reads card_id from 0x0201e500+idx*4 bits[18..0]; if card_id != target, increments r5 (eligible count). "
-        "Phase 2: if r5>0, calls sample_prng_scaled(r5) to pick random offset, "
-        "then re-scans to find the N-th eligible empty slot and returns its index. "
-        "Returns -1 if no eligible slot found. "
-        "r0=u32 card_id [0..0x7ffff] (exclude slots matching this ID). "
-        "Returns i32 slot_index [0..N-1] or -1. "
-        "Callers: FUN_080ae050."),
+        "Called by 18 slot scans. It calls read_slot_palette_index with r0=slot index and returns exactly 1 when the palette index is positive, otherwise 0. It performs no direct memory writes."),
+    ("FUN_080ade8c", "select_empty_slot_preferring_different_card_id",
+        "Called at 0x080ae25e with r0=EXODIA_THE_FORBIDDEN_ONE_CID. It counts palette-empty effect-zone slots whose packed bits12:0 internal CID differs from r0. If that set is nonempty, sample_prng_scaled selects one by rank. If the set is empty, it returns the first palette-empty slot regardless of CID. It returns a slot index, or -1 when no palette-empty slot exists."),
     ("FUN_080adf8c", "check_special_card_activation_eligible",
-        "Activation eligibility check for specific special card IDs. "
-        "Compares r0 (card_id) against hardcoded set {0x1366, 0x137d, 0x15e6}; "
-        "on match reads slot card_id from 0x0201e500+r1*4 bits[18..0], "
-        "then compares against {0x1596, 0x13c3, 0x1914}. "
-        "For 0x1914: calls count_equipped_paired_slots_for_player for both players; "
-        "if either has equipped pair returns 0 (ineligible). "
-        "r0=u32 card_id [0..0x7fff]; r1=u32 slot_index [0..N-1]. "
-        "Returns u32 eligible [0..1]. "
-        "Callers: FUN_080ae050. "
-        "Constants: special_ids={0x1366,0x137d,0x15e6}, pair_ids={0x1596,0x13c3,0x1914}."),
+        "Inputs are r0=source internal CID and r1=candidate effect-slot index. UFO Turtle accepts only a slot containing Gaia Soul. Premature Burial, Call of the Haunted, and Autonomous Action Unit accept Spirit Reaper; Gearfried is rejected only for Call of the Haunted; Giant Kozaky is accepted only when neither player has an equipped Kozaky pair. All other combinations return 0."),
     ("FUN_08032f7c", "count_slot_card_pair_allowed_for_card",
         "Iterates slots 0..10 for player r0, calls check_slot_card_pair_allowed(player, slot_idx, card_id) "
         "for each, and counts allowed slots. Returns count [0..11]. "
@@ -8903,14 +8859,7 @@ RENAMES = [
         "Callers: FUN_080ac584, FUN_080acc30, check_compound_pair_activation_eligible, "
         "check_any_pair_slot_available_for_card, FUN_080b76e4."),
     ("FUN_080af914", "check_any_pair_slot_available_for_card",
-        "Dual slot availability check for a card. "
-        "First calls count_valid_monster_pair_slots(player, card_id & 0xffff); "
-        "if non-zero returns 1. "
-        "Then calls count_slot_card_pair_allowed_for_card(player, card_id); "
-        "if non-zero returns 1. Returns 0 if both are zero. "
-        "r0=u32 player_side [0..1]; r1=u32 card_id_packed (low 16 bits = card_id). "
-        "Returns u32 any_slot_available [0..1]. "
-        "Callers: FUN_080ac584, FUN_080acc30, FUN_080ae050, FUN_080bbf38."),
+        "Inputs: r0=player, r1=internal CID. Checks the two relevant pair-slot paths for an available placement that accepts the card. Returns 1 when either path is available and 0 when neither is. Read-only."),
     ("FUN_080eef9c", "get_card_type_bits_by_internal_id",
         "Converts internal card_id to standard card_id via internal_card_id_to_card_id, "
         "then reads byte at card_attr_table (0x02000006) + card_id*2+1, "
@@ -8929,35 +8878,11 @@ RENAMES = [
         "Callers: FUN_080ae050 (with r1=7). "
         "Constants: player_stride=0x868, monsters_offset=0xc, subarray_offset=0x120 (=0x90<<1)."),
     ("FUN_080af534", "check_card_id_in_eligible_set",
-        "Pure leaf. Binary-search-style comparison tree checking if r0 (card_id) "
-        "belongs to a predefined whitelist including: "
-        "0x14ac, 0x130c, 0x10f4, 0x12ac, 0x1302, 0x140e, 0x134a, 0x1468, 0x147c, "
-        "0x1645, 0x15ee, 0x1636, 0x1770, 0x166c, 0x172c, 0x1855, 0x185c, 0x1992 and others. "
-        "LAB_080af696 path returns 1; LAB_080af68c path returns (r1==0 ? 1 : 0); "
-        "LAB_080af69a returns 0. "
-        "r0=u32 card_id [0..0x7fff]; r1=u32 mode_flag [0..1]. "
-        "Returns u32 eligible [0..1]. "
-        "indeg=7. Callers: FUN_080ae050, FUN_080af6a0, FUN_080af72c, FUN_080b5348, FUN_080b54c0."),
-    ("FUN_080adf40", "find_slot_by_card_type_and_player",
-        "Linear scan over monster_slot array (0x0201e4f0, count at [+0xc]). "
-        "For each slot with check_slot_palette_nonzero==0 (empty): "
-        "reads slot data word from 0x0201e500+idx*4, extracts bits[18..0] as card_type "
-        "and bit[13] (via lsrs#0x12) as player_id; "
-        "if both match r1 (card_type) and r0 (player_id) returns slot index. "
-        "Returns -1 if not found. "
-        "r0=u32 player_id [0..1]; r1=u32 card_type [0..0x7ffff]. "
-        "Returns i32 slot_index [0..N-1] or -1. "
-        "Callers: FUN_080ae050."),
-    ("FUN_080ade48", "find_first_empty_slot_for_card_type",
-        "Linear scan over monster_slot array (0x0201e4f0, count at [+0xc]). "
-        "For each slot with check_slot_palette_nonzero==0 (empty): "
-        "reads slot data from 0x0201e500+idx*4, extracts bits[18..0] card_type; "
-        "if matches r0 returns slot index. "
-        "Returns -1 if not found. "
-        "Differs from find_slot_by_card_type_and_player: no player check. "
-        "r0=u32 card_type [0..0x7ffff]. "
-        "Returns i32 slot_index [0..N-1] or -1. "
-        "Callers: FUN_080ae050."),
+        "Inputs: r0=internal CID, r1=mode flag. Tests the CID against the fixed equip-eligibility set encoded by the comparison tree. A small subset is accepted only when r1 is zero; all other listed members ignore the mode. Returns 1 for an accepted member and 0 otherwise. No memory access or writes."),
+    ("FUN_080adf40", "find_empty_slot_by_card_id_and_player",
+        "Called 23 times inside find_empty_slot_for_card_id_dispatch. Inputs are r0=player bit and r1=internal CID. It scans effect-zone entries up to the current count, considers only slots whose palette index is zero, extracts packed bits12:0 as internal CID and bit13 as player, and returns the first entry matching both inputs. It returns -1 when no entry matches."),
+    ("FUN_080ade48", "find_first_empty_slot_by_card_id",
+        "Called 28 times inside find_empty_slot_for_card_id_dispatch. Input r0 is an internal CID. It scans effect-zone entries up to the current count, considers only slots whose palette index is zero, extracts packed bits12:0 as internal CID, and returns the first slot whose CID equals r0. It returns -1 when no entry matches and performs no writes."),
     ("FUN_08031a84", "count_zone_card_pair_allowed_for_card",
         "Iterates all monster zone cards for player r0 "
         "(count at gP1LifePoints+player*0x868+0x10). "
@@ -8969,32 +8894,9 @@ RENAMES = [
         "Callers: check_compound_pair_activation_eligible. "
         "Constants: player_stride=0x868, zone_count_offset=0x10."),
     ("FUN_080af8cc", "check_compound_pair_activation_eligible",
-        "Four-fold compound pairing activation check; returns 1 if any condition met. "
-        "Sequentially calls: "
-        "(1) count_zone_card_pair_allowed_for_card(player, card_id & 0xffff); "
-        "(2) count_valid_monster_pair_slots(player, card_id & 0xffff); "
-        "(3) count_extra_deck_cards_by_id(player, card_id); "
-        "(4) count_slot_card_pair_allowed_for_card(player, card_id_packed). "
-        "Returns 0 only if all four are zero. "
-        "r0=u32 player_side [0..1]; r1=u32 card_id_packed (low 16 bits = card_id). "
-        "Returns u32 any_condition_met [0..1]. "
-        "Callers: FUN_080a3130, FUN_080acc30, FUN_080ae050."),
+        "Inputs: r0=player, r1=target card identifier; the first three checks use its low 16 bits and the fourth receives the full value. Returns 1 as soon as any of count_zone_card_pair_allowed_for_card, count_valid_monster_pair_slots, count_extra_deck_cards_by_id, or count_slot_card_pair_allowed_for_card returns nonzero; otherwise returns 0. r2 is not consumed. Read-only."),
     ("FUN_080abf64", "eval_zone_slot_score_for_player",
-        "Computes score entry for zone slot r1 of player r0, writing into score_out (r2). "
-        "Slot base = 0x0201c510 + (player_id&1)*0x868 + slot_index*0x14. "
-        "If slot[+0x8] halfword != 0: calls eval_slot_score_entry_full directly. "
-        "Else reads card_id from slot[0], checks slot[+0x11] bit7 (activation flag): "
-        "if active: temporarily writes slot[+0x8], calls eval_slot_score_entry_full, restores; "
-        "if not active: calls get_card_extended_stat_field5; "
-        "field5<=4 -> score_out[0x14]=0x4b0, score_out[0x18]=0x708; "
-        "field5>4 -> score_out[0x14]=0x834. "
-        "Writes score_out[0x00/0x04/0x08/0x10/0x14/0x18]. "
-        "r0=u32 player_bit_field (bit0=player_id [0..1]); r1=u32 card_slot_index [0..N-1]; "
-        "r2=ptr score_out. Returns void. "
-        "Uses non-APCS high registers: r8=base addr (0x0201c510), r12=1 (constant). "
-        "Callers: FUN_080ac004, FUN_080ae050, FUN_080aef1c, FUN_080aefc4, FUN_080af070. "
-        "Constants: zone_base=0x0201c510, player_stride=0x868, slot_stride=0x14, "
-        "score_low_threshold=4, score_A=0x4b0, score_B=0x708, score_C=0x834."),
+        "Scores one player field slot into score_out. Existing slot state calls eval_slot_score_entry_full. A zero state with activation bit7 set is temporarily marked and scored; otherwise card stat field5 selects default score tiers, including EQUIP_SLOT_SCORE_FIELD5_HIGH. Writes the score record and restores temporary slot state."),
 
     # 2026-05-13: campaign-43 batch #43 (topo=856..913, 20 fns)
     ("FUN_08033370", "count_active_cards_in_zone_by_player",
@@ -9004,49 +8906,15 @@ RENAMES = [
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, "
         "active_bit=bit9, loop_count=4."),
     ("FUN_080aec7a", "exit_slot_search_with_result",
-        "Shared epilogue thunk for find_empty_slot_for_card_id_dispatch (FUN_080ae050). "
-        "Body is pure callee-restore epilogue: add sp,#0x2c + pop r8/r9/r10 via .hword 0x46xx "
-        "+ pop {r4..r7} + pop {r1}; bx r1. "
-        "Called by FUN_080ae050 when a valid slot (>=0) is found (5 callsites). "
-        "No independent business logic; mirrors the push/sub-sp prologue of FUN_080ae050."),
+        "Shared epilogue for find_empty_slot_for_card_id_dispatch, not an independent APCS callee. It is reached by 16 BL and 28 B transfers from that function after r0 is set to the slot result. It releases 0x2c stack bytes, restores r8-r10 and r4-r7 from the parent frame, then returns through the restored LR. It has no business-state reads or writes."),
     ("FUN_080ae050", "find_empty_slot_for_card_id_dispatch",
-        "Uses r1 (card_id) as key via multi-range BST + linear search to find an empty field slot. "
-        "Checks [0x0201e4f0+0xc] global activation state; if 0 skips main body. "
-        "Dispatches by card_id range: calls check_compound_pair_activation_eligible, "
-        "find_first_empty_slot_for_card_type, find_slot_by_card_type_and_player, "
-        "find_random_empty_slot_excluding_card_id. "
-        "On slot found (>=0) calls exit_slot_search_with_result (FUN_080aec7a) to return. "
-        "Side effect: [0x0201afe0] = r0 (card_slot_ptr, current card processing ctx). "
-        "r0=ptr card_slot_ptr; r1=u16 card_id; r2=u32 player_side [0..1]. "
-        "Returns s32 slot_index (>=0) or -1."),
+        "Inputs are r0=player bit and r1=internal CID; r2 is not consumed. A card-ID decision tree applies card-specific empty-slot, paired-card, field-count, score, and eligibility rules across the current effect-zone entries. It returns a selected slot index or -1. All 44 transfers to exit_slot_search_with_result share this function frame: 16 BL transfers set LR and 28 B transfers retain the original LR. The body performs no direct RAM writes."),
     ("FUN_080aece4", "fill_effect_slots_up_to_count",
-        "Loops calling find_empty_slot_for_card_id_dispatch (FUN_080ae050) to fill up to "
-        "max_count effect slots, then calls write_effect_ctx_slot_index + set_tile_palette_index_in_buf "
-        "for each found slot (palette index = loop counter r4). "
-        "Triggered by init_effect_slot_display_context (FUN_080941c4) for card effect type [0x7..0x26]. "
-        "Side effects: [gP1LifePoints+0x1d40]=r4 (final slot count); "
-        "[0x0201afe0]=card_slot_ptr (via FUN_080ae050). "
-        "r0=ptr card_slot_ptr; r1=u16 card_id_a; r2=u16 card_id_b; r3=u32 max_count [0..N]. "
-        "Returns u32 actual_filled_count [0..max_count]. "
-        "Constants: gP1LifePoints+0x1d40 = effect_slot_count_field."),
+        "Inputs are r0=player bit, r1=internal CID, r2=effect-handler auxiliary value, and r3=requested count. The handler result is capped to r3. The function stores the player in gEquipLpScoreBase, repeatedly selects effect slots, writes each slot index and a one-based palette index, stores the actual completed count in LP_ACTIVATION_PENDING_OFF, and returns that count."),
     ("FUN_080aec8c", "activate_effect_slot_for_card",
-        "Activates a single effect slot for one card: calls dispatch_effect_handler_by_card_id; "
-        "if non-zero writes [0x0201afe0]=card_slot_ptr, calls find_empty_slot_for_card_id_dispatch "
-        "to get slot r4, then write_effect_ctx_slot_index(r4) + set_tile_palette_index_in_buf(r4,1) "
-        "+ [gP1LifePoints+0x1d40]=1. "
-        "Triggered by init_effect_slot_display_context for card_type==6 or 0x49. "
-        "r0=ptr card_slot_ptr; r1=u16 card_id; r2=u32 context_param. "
-        "Returns s32 slot_index (>=0) or -1. "
-        "Side effects: [0x0201afe0]=card_slot_ptr; [gP1LifePoints+0x1d40]=1."),
+        "Inputs are r0=player bit, r1=internal CID, and r2=effect-handler auxiliary value. It dispatches the card effect; a nonzero handler result stores the player in gEquipLpScoreBase, selects a card-specific empty effect slot, records that slot in the effect context, writes palette index 1, and sets the activation count to 1. It returns the selected slot index, or -1 on handler or slot failure."),
     ("FUN_080aed4c", "fill_effect_slots_up_to_count_with_equip_cap",
-        "Symmetric to fill_effect_slots_up_to_count (FUN_080aece4) but adds special handling "
-        "when r8 (card_id_b) == 0x18e0 (0xc7*0x20): calls count_equip_slots_active_only(1-r7) "
-        "and uses its result to further cap max_count. "
-        "Triggered by init_effect_slot_display_context for card effect type [0x28..0x47]. "
-        "Side effects: [gP1LifePoints+0x1d40]=r4 (final count); [0x0201afe0]=card_slot_ptr. "
-        "r0=ptr card_slot_ptr; r1=u32 player_side_or_ref; r2=u16 card_id_b; r3=u32 max_count. "
-        "Returns u32 actual_filled_count. "
-        "Constants: 0x18e0=special_card_id_threshold; gP1LifePoints+0x1d40=effect_slot_count_field."),
+        "Inputs are r0=player bit, r1=internal CID, r2=effect-handler auxiliary value, and r3=requested count. It caps the handler result to r3. For Infernal Flame Emperor it further caps the limit to the opponent active-equip-slot count, then forces the final limit to at least one. It fills effect slots as the sibling routine does, stores the completed count, and returns it."),
     ("FUN_080941c4", "init_effect_slot_display_context",
         "Effect slot display context init hub (indeg=39). "
         "Saves r0..r3 to r6/r5/r7/r8, loads gEffectDisplayCtx (0x0201e4f0): "
@@ -9115,15 +8983,8 @@ RENAMES = [
         "Constants: gP1LifePoints, gDuelActivation=0x0201e2a0; "
         "offsets 0x1d4c/0x1d7c/0x1d58/0x1d54/0x1d64. "
         "indeg=6; all callers are card_frame+card_ids context."),
-    ("FUN_080af940", "check_effect_zone_available_for_player",
-        "Checks if specified player side has any available effect zone slot. "
-        "Reads gP1LifePoints[player_side&1 * 0x868 + 0xc] (zone count); "
-        "if > 6 returns 1 (full). Otherwise calls count_available_effect_zones(player_side, 0x1387, -1). "
-        "count > 0 -> return 0 (slot available); count == 0 -> return 1 (no slot). "
-        "r0=u32 player_side [0..1]. Returns u32: 0=available, 1=no slot. "
-        "Constants: player_stride=0x868, zone_count_offset=0xc, zone_limit=6, "
-        "zone_id=0x1387, quota=-1. "
-        "Callers: FUN_080b499c, FUN_080baed0, FUN_080bb9b8 (duel_field activation eval)."),
+    ("FUN_080af940", "check_effect_zone_unavailable_for_player",
+        "Input: r0=player. Returns 1 when the effect-zone count exceeds 6 or count_available_effect_zones(player, CID_GAP_1387, excluded=-1) returns zero. Returns 0 when at least one qualifying zone is available. The old name inverted this boolean. No writes."),
     ("FUN_0805bc48", "check_card_normal_summon_eligible_full",
         "Multi-condition normal summon eligibility check for card r1 (card_id), player r0. "
         "Entry: populate_effect_node_snapshot; check_card_is_zone_pair_restricted -> return 0 if restricted. "
@@ -9165,24 +9026,11 @@ RENAMES = [
         "Constants: type_skip=0xe; summon path card_ids: 0x1534/0x133b/0x1449/0x1452/0x19c0 etc."),
     # --- batch #44 (campaign-44) ---
     ("FUN_080b499c", "check_normal_summon_eligible_for_slot",
-        "Full eligibility check for normal summon of a single card slot, with summon target init on pass. "
-        "r0=player_id [0..1]; r1=slot_ptr ([r1+0]=card_id); r2=mode_flag [0..1]. "
-        "Scans gDuelCardMain (0x0201b290+0xc0<<2) for matching card_id+mode_flag entry: "
-        "found -> path B (equip activation via find_zone_slot_idx_allowed_for_card); "
-        "not found -> path A: check_card_field5_is_nonzero + check_card_normal_summon_eligible_full. "
-        "Both paths write [gP1LifePoints+0x1d64]:=player_id and call init_duel_zone_target_slot_refs. "
-        "Returns u32: 1=eligible+initialized, 0=not eligible. "
-        "Constants: gDuelCardMain=0x0201b290+0x300, gDuelEffectZones=0x0201c510, player_stride=0x868."),
+        "Checks one normal-summon response record. r0=player, r1={internal CID,Thumb callback}, r2=context slot or null. It builds a temporary slot context, applies summon gates, invokes the callback, and initializes target refs on acceptance. Returns bool."),
     ('FUN_080bb3dc', 'check_normal_summon_eligible_for_any_effect_zone',
         'Input r0=player. Scans effect-zone response indices 0..0xce inclusive (207 rows, stride 8). For each row, requires check_card_field5_is_nonzero and check_normal_summon_eligible_for_slot(player,row,0). Returns1 on the first eligible row, else0 after all 207. Evidence: 080bb3dc-080bb412.'),
     ("FUN_080b4ba8", "check_normal_summon_eligible_any_slot",
-        "Checks whether player r0 has any card slot or effect zone satisfying normal summon eligibility. "
-        "Writes r0 to [0x0201afe0] (current player ptr). "
-        "Iterates gDuelCardMain (0x09e478d0) up to 0xdd slots (stride=8): "
-        "calls check_normal_summon_eligible_for_slot(player, slot, 0) per slot; returns 1 on first pass. "
-        "Falls back to check_normal_summon_eligible_for_any_effect_zone(player). "
-        "Returns u32: 1=eligible slot exists, 0=none. "
-        "r0=u32 player_id [0..1]. Constants: player_ptr=0x0201afe0, gDuelCardMain=0x09e478d0, max_slots=0xdd."),
+        "Stores the current player and scans at most 222 primary normal-summon response rows with a null context, returning 1 on first acceptance. After exhaustion it calls the any-effect-zone fallback and normalizes any nonzero result to 1. Returns 0 only when both paths fail."),
     ("FUN_08085430", "build_sprite_row_from_zone_state",
         "Builds one sprite row from zone state data and submits it. "
         "r0=player_id [0..1]: selects sprite type (0->0xb, 1->0xc). "
@@ -11389,116 +11237,26 @@ RENAMES = [
         "Side effects: [gP1LifePoints+player*0x868+0x11c]: OR/BIC; OAM sprite 属性缓冲区写入. "
         "Constants: flags_offset=0x11c, oam_y_p0=0x22, oam_y_p1=0x8022, player_stride=0x868."),
     ("FUN_080aba8c", "init_equip_sub_entry_state_with_sprite_submit",
-        "由 equip sprite 处理簇四个对称函数 (0x080abbd8/0x080abcac/0x080abd60/0x080abe54) 调用 (indeg=4). "
-        "加载全局 equip 子条目控制结构体指针 (DAT_080abb74=0x0201e4d0). "
-        "重置结构体标志: AND 0x01 保留 [+0x13] bit0; AND 0xFD 清 [+0x14] bit1; "
-        "掩码 0xFFFFFE01 清 [+0x14]; AND mask 清 [+0x16]; 置位 [+0x12] bit4 (0x10). "
-        "遍历子条目数组 (struct[+0x8] 个条目, 每条目 2 字节, 从 struct+9 起): "
-        "提取 player_bit (bit0) 和 slot_idx (byte1), 查 gDuelFieldSlots 条目, "
-        "提取 face/orient 编码 (bits[23:22]<<1|bit18) 存入子条目 [0]. "
-        "struct[0] bit6 设置时: set_player_state_bit_with_sprite_update(player_bit, 0x10, 1). "
-        "[0x0201e2a0+player*4+8]==2 时: 置位 struct[+0x12] bit5 (0x20); "
-        "submit_sprite_row_data(-1, 0x15, 0x18); 清除 [0x0201b870+0xc00] bits 1:0. "
-        "Side effects: 0x0201e4d0 结构体多字段; via set_player_state_bit_with_sprite_update: player flags; "
-        "via submit_sprite_row_data: sprite row buffer. "
-        "Constants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
-        "SPRITE_BUF=0x0201b870, ROM_DISPLAY_TABLE=0x0201e2a0."),
+        "Called by four equip-entry initializers. Clears and rebuilds gEquipZoneRankState flags, derives selected field-slot orientation from gDuelFieldSlots, updates player sprite state when required, and submits sprite row data when gDuelCardCtxBase[player]+8 equals 2. Writes gEquipZoneRankState and sprite state; returns void."),
     # batch=20 #57 (campaign-57) — equip activation chain + zone slot score + equip target selection cluster
     ("FUN_080abcac", "init_equip_sub_entry_fields_from_slot",
-        "由装备精灵处理簇中的对称函数 (0x080abbd8/0x080abd60/0x080abe54 等) 以及 FUN_08095d44 调用 (indeg=3+). "
-        "入口 r0=player_id, r1=slot_idx; 首先从 gDuelFieldSlots[player*0x868+slot*0x14] 读取装备槽数据, "
-        "提取 face/orient 编码 (bits[23:22]<<1|bit18) 写入 struct[0x0201e4d0+0x2] 高 bit 段; "
-        "提取 card_stat_field8 是否为 6 决定 struct[+0x4] 写 2 或 4; 清零 struct[+0x8]; "
-        "尾调用 init_equip_sub_entry_state_with_sprite_submit 完成精灵提交. "
-        "Side effects: 修改 0x0201e4d0 子条目结构体的 byte[0], hword[2], hword[4], byte[8] 字段; "
-        "通过 init_equip_sub_entry_state_with_sprite_submit 影响精灵行缓冲区. "
-        "Constants: EQUIP_STRUCT=0x0201e4d0, gDuelFieldSlots=0x0201c510, "
-        "player_stride=0x868, slot_stride=0x14, FIELD8_IS_6=0x6."),
+        "Called at 0x08095d5c, 0x080bbe8a, and 0x080bc4a8. Builds gEquipZoneRankState fields from player and slot data in gDuelFieldSlots, copies orientation and card-ID bits, chooses sprite type 2 or 4 from card stat field8, clears the sub-entry field, and calls init_equip_sub_entry_state_with_sprite_submit. Returns void."),
     ("FUN_080ad450", "dispatch_equip_check_by_mode",
-        "由 FUN_080ad464 (装备槽位位图构建) 在内层循环中调用 (indeg>=1). "
-        "入口 r0=player_id, r1=target_slot_idx, r2=equip_slot_idx, r3=mode; "
-        "根据 r3 是否为 0 分派: mode==0 调用 check_slot_card_can_be_equipped; "
-        "mode!=0 调用 check_slot_equip_eligibility. "
-        "3 行 dispatch 包装, 共享 pop {r1}; bx r1 尾调用出口. "
-        "Side effects: 无直接外部写入; 通过 callee 执行查询. "
-        "Constants: mode==0 -> check_slot_card_can_be_equipped; mode!=0 -> check_slot_equip_eligibility."),
+        "Called inside build_equip_eligible_slot_bitmap. It forwards r0=player side, r1=target side, and r2=slot index. When r3 is zero it calls check_slot_card_can_be_equipped; otherwise it calls check_slot_equip_eligibility. It returns the selected callee result and performs no direct writes."),
     ("FUN_080ad464", "build_equip_eligible_slot_bitmap",
-        "由 FUN_080ad510/FUN_080ad4ac/FUN_080ad5ec 调用 (indeg>=3), 为装备目标选择提供位图. "
-        "入口 r0=player_id, 非 APCS r9=equip_card_slot_idx (caller 通过 0x4689/0x4688 注入). "
-        "对每个 target_slot [0..1] x equip_subslot [0..4] 调用 dispatch_equip_check_by_mode; "
-        "检查通过则将 bit(target_slot*16+equip_subslot) 写入累积位图 r6; 结束后返回 r0=r6 位图. "
-        "使用非 APCS r8=player_id, r9=equip_card_slot (caller-set). "
-        "Side effects: 无外部写入. "
-        "Constants: target_slots=[0..1], equip_subslots=[0..4], bitmap_shift=target_slot*16+subslot."),
+        "Inputs are r0=player side and r1=eligibility mode; the entry moves them into r9 and r8. It tests both target sides and slots 0 through 4 through dispatch_equip_check_by_mode. Each accepted pair sets bit target_side*16+slot in the result. It returns the accumulated 32-bit bitmap and performs no direct memory writes."),
     ("FUN_080abf14", "eval_zone_slot_score_for_player_with_activation_guard",
-        "由 FUN_080ac004 (dispatch 包装) 以及 FUN_080ae050/0x080aef1c/0x080aefc4/0x080af070 调用 (indeg=5). "
-        "入口 r0=player_bit_field, r1=card_slot_index, r2=score_out_ptr; "
-        "计算 gDuelFieldSlots[player*0x868+slot*0x14] 槽的得分条目. "
-        "若 slot[+0x8] halfword != 0, 直接调用 eval_slot_score_entry_full; "
-        "否则: 若 slot[+0x11] bit7 (activation flag) 置位, 临时向 slot[+0x8] 写入 r12 (=1), "
-        "调用 eval_slot_score_entry_full 后恢复; "
-        "若未激活, 调用 get_card_extended_stat_field5, field5<=4 写 score_out[0x14]=0x4b0/[0x18]=0x708, "
-        "field5>4 写 score_out[0x14]=0x834, 并清零 score_out[0/4/8]. "
-        "使用非 APCS 寄存器 r12=1 (常量). "
-        "Side effects: 写 score_out (r2 所指) 多字段. "
-        "Constants: zone_base=0x0201c510, player_stride=0x868, slot_stride=0x14, "
-        "score_A=0x4b0, score_B=0x708, score_C=0x834."),
+        "Scores one player field slot into score_out. If slot[+8] is zero, temporarily writes 1, calls eval_slot_score_entry_full, and restores zero; otherwise it calls the scorer directly. Player and slot select gDuelFieldSlots via PLAYER_BLOCK_STRIDE and 0x14-byte entries. Returns void."),
     ("FUN_080ac004", "dispatch_zone_slot_score_by_player_flag",
-        "由 FUN_080b4d08/FUN_080b4e40 等 AI 得分扫描函数调用 (indeg>=2). "
-        "入口 r0=score_out_ptr (包含 player/slot 信息), r1=slot_idx, r2=score_out; "
-        "读 [0x0201afe0] 全局标志字, 若等于 r3 (=r0 入口值) 则调用 "
-        "eval_zone_slot_score_for_player_with_activation_guard (FUN_080abf14); "
-        "否则调用 eval_zone_slot_score_for_player (已命名). "
-        "根据全局当前玩家 ID 标志决定使用哪个得分函数. "
-        "Side effects: 通过被调函数间接写入 score_out 结构体. "
-        "Constants: gCurrentPlayerFlag=0x0201afe0."),
+        "Dispatches zone-slot scoring. It compares r0 with the word at gEquipLpScoreBase; equality calls eval_zone_slot_score_for_player_with_activation_guard, otherwise it calls eval_zone_slot_score_for_player. r1 and r2 are forwarded as slot index and score_out pointer. The selected callee writes the score record."),
     ("FUN_080b4d08", "find_best_scored_slot_from_bitmap",
-        "对 slot_bitmap 中所有置位槽位 [0..4] 进行 Fisher-Yates shuffle 后依次评分, 返回得分最高的槽位索引. "
-        "入口 r0=player_id, r1=slot_bitmap, r2=mode (r9), r3=target_player (r8). "
-        "callee-save: .hword 0x4657/464e/4645=mov r7/r6/r5,r10/r9/r8 保存; "
-        ".hword 0x4691=mov r9,r2 注入 mode; .hword 0x4698=mov r8,r3 注入 target_player; "
-        ".hword 0x466a=mov r2,sp 获取输出缓冲区. "
-        "收集 bitmap 置位 slot 0..4 到栈缓冲区; 若空返回 -1; "
-        "否则做 sample_prng_scaled Fisher-Yates shuffle; "
-        "再遍历每个候选调用 dispatch_zone_slot_score_by_player_flag 获取 (score, mode_flag), "
-        "按 mode (r9) 正负号做 max/min 比较, 记录最优 slot 到 sp[0x54]; "
-        "最终返回最优 slot_idx. 被 FUN_080b5348 (equip target selector) 调用. "
-        "Side effects: 无外部写入. Constants: SLOT_MAX=4, FAIL=-1."),
-    ("FUN_080b5190", "sample_random_monster_slot_with_field9_filter",
-        "从 slot_bitmap 中随机抽取一个怪兽区 (slot [5..10]) 的合格槽位, 并对每个候选槽位做 field9 范围 [2..4] 过滤. "
-        "入口 r0=player_id, r1=slot_bitmap; "
-        "callee-save 高寄存器 (.hword 0x4657/464e/4645 保存 r10/r9/r8); "
-        ".hword 0x466a=mov r2,sp 获取栈输出缓冲区. "
-        "第一遍 (slot 5..10): 收集 bitmap 中置位且 field9 in [2..4] 的 slot 到缓冲区, "
-        "Fisher-Yates shuffle 后选随机一个; 若命中直接返回. "
-        "第二遍: 再扫一次, 过滤 field9>0 (bit0 check) 的 slot; "
-        "第三遍: 收集 hword[+8]!=0 的 slot 并随机返回; 均失败则 sample_prng_scaled(count) 兜底. "
-        "被 FUN_080b5348 作为 fallback 调用. Side effects: 无外部写入. "
-        "Constants: SLOT_START=5, SLOT_MAX=10, FIELD9_MIN=2, FIELD9_MAX=4, GY_BASE=0x0201c510."),
+        "Collects bitmap slots 0..4, shuffles them with sample_prng_scaled, scores each with dispatch_zone_slot_score_by_player_flag, and retains the best candidate according to r2 mode and r3 target player. Returns the selected slot or -1. Sampling advances shared PRNG state."),
+    ("FUN_080b5190", "select_preferred_spell_zone_slot_from_bitmap",
+        "Selects a preferred spell-zone slot from bitmap indices 5..10. It shuffles candidates, then applies successive card field9, slot-state, and activation-status gates; later passes relax the filters and the final fallback samples any candidate. Inputs r0=player and r1=bitmap. Returns slot 5..10 or -1."),
     ("FUN_080b5348", "select_equip_target_slot_with_eligibility_check",
-        "装备目标选择核心函数, 优先选择卡牌在 eligible_set 内的槽位, 失败后多级回退. "
-        "入口 r0=player_id (.hword 0x4680=mov r8,r0), r1=slot_bitmap (sp[0x50]), "
-        "r2=eligible_set 指针 (sp[0x54]). "
-        "第一阶段: 收集 bitmap 中全部 [0..10] 槽位候选, Fisher-Yates shuffle; "
-        "遍历每个候选从 gP1LifePoints slot word 提取 card_icid, "
-        "调用 check_card_id_in_eligible_set 命中则立即返回该 slot_idx. "
-        "第二阶段 (chain=3 特殊逻辑): 检查 [gP1LifePoints+0x1cf4]==3 且 [+0x1ce8]==r8; "
-        "满足时重新扫 bitmap 找可激活槽 (check_slot_card_activatable), "
-        "调用 find_best_scored_slot_from_bitmap 并按 LP 阈值 (0xaf*8=0x578) 判断; "
-        "若分数满足返回. "
-        "第三阶段: 调用 find_best_scored_slot_from_bitmap(mode=1) 再次尝试; "
-        "最终 fallback 调用 sample_random_monster_slot_with_field9_filter. "
-        "Side effects: 无外部写入. "
-        "Constants: CHAIN_LIMIT=3, LP_THRESHOLD=0x578, GY=gP1LifePoints, SLOT_MAX=10."),
+        "Selects an equip target slot from r1 bitmap for r0 player. It first shuffles all slots with sample_prng_scaled, advancing shared PRNG state, and accepts a CID in the r2 eligible set. It then tries field-state and scored-bitmap paths, and finally calls select_preferred_spell_zone_slot_from_bitmap. Returns a slot index or -1."),
     ("FUN_080b5108", "sample_random_slot_from_bitmap",
-        "从 slot_bitmap 中随机抽取一个置位槽位, 覆盖全部 11 个槽位 [0..10]. "
-        "入口 r0=player_id (仅用于 lsls r5,r0,#4 计算 slot 位移基, 实际未用于筛选), r1=slot_bitmap; "
-        "用 .hword 0x466c=mov r4,sp 获得栈上输出缓冲区地址. "
-        "遍历 slot 0..10, 将 bitmap 中置位的 slot_idx 依次写入 sp 栈缓冲区, 记 count; "
-        "若 count==0 返回 -1; 否则调用 sample_prng_scaled(count) 随机选一个下标, "
-        "从缓冲区读回对应 slot_idx 返回. "
-        "是 select_equip_target_slot_by_bitmap 的基础随机采样原语. "
-        "Side effects: 无外部写入. Constants: SLOT_MAX=10, FAIL=-1."),
+        "Collects bitmap slots 0..10 into a stack array and returns one selected by sample_prng_scaled. Returns -1 when the bitmap has no set bits."),
     ("FUN_080b55ac", "select_equip_target_slot_full",
         "装备目标选择完整版本, 对 bitmap 中所有候选槽位执行 4 轮类型/卡牌属性过滤后选出最优槽. "
         "入口 r0=player_id (.hword 0x4682=mov r10,r0), r1=slot_bitmap (sp[0x50]), "
@@ -11516,61 +11274,21 @@ RENAMES = [
         "Constants: SLOT_MAX=10, LP_THR=0x578, "
         "CARD_WL=[0x11e4,0x0fd6,0x14f3,0x163f,0x17e9,0x1521,0x1798,0x1874,0x149d,0x1286,0x13f3,0x14b2]."),
     ("FUN_080ad608", "select_equip_target_slot_by_bitmap_alt",
-        "由 FUN_080ad510/FUN_080ad5ec 调用 (indeg>=2), 是 select_equip_target_slot_by_bitmap (0x080ad4c8) 的对称变体. "
-        "两者结构完全一致, 唯一差异: mode 参数传给 FUN_080b55ac 时本函数使用 r2=0 而 0x080ad4c8 使用 r2=1. "
-        "同样先以对手侧 (1-player) 调用 FUN_080b5348 (mode=0), 成功则编码返回; "
-        "失败则以本方侧调用 FUN_080b55ac (mode=0). "
-        "返回格式与 select_equip_target_slot_by_bitmap 相同: -1=失败, >=0: bits[31:24]=player, bits[7:0]=slot_idx. "
-        "Side effects: 通过 FUN_080b5348/FUN_080b55ac 读取 PRNG. Constants: mode=0 (both calls), FAIL=-1."),
+        "Inputs are r0=player side and r2=eligible bitmap; entry r1 is not consumed. It first searches the opposite side with select_equip_target_slot_with_eligibility_check mode 0. On failure it searches the input side with select_equip_target_slot_full mode 0. Success returns slot in bits 15:8 and player in bits 7:0; failure returns -1."),
     ("FUN_080ad4c8", "select_equip_target_slot_by_bitmap",
-        "由 FUN_080ad510/FUN_080ad4ac 调用 (indeg>=2), 是装备目标槽位选择的核心分派器. "
-        "入口 r0=player_id, r1=slot_bitmap (caller-set). "
-        "首先以 (1-player_id) 作为主玩家, 调用 FUN_080b5348 (装备目标随机候选选择器, mode=0 对手侧); "
-        "若返回 >=0 则将结果编码为 (1-player)<<24|result 返回; "
-        "否则调用 FUN_080b55ac (mode=1, 本方侧) 选择; 若仍失败返回 -1. "
-        "返回值高字节=player_id, 低字节=slot_idx (或 -1 失败). "
-        "Side effects: 通过 FUN_080b5348/FUN_080b55ac 的副作用传播. "
-        "Constants: opponent_first=1-player, FAIL=-1."),
+        "Inputs are r0=player side and r2=eligible bitmap; entry r1 is not consumed. It first searches the opposite side with select_equip_target_slot_with_eligibility_check mode 0. On failure it searches the input side with select_equip_target_slot_full mode 1. Success returns slot in bits 15:8 and player in bits 7:0; failure returns -1."),
     ("FUN_080ad510", "eval_equip_target_slot_with_score",
-        "由 FUN_080ad720 (装备目标迭代主循环) 调用 (indeg=1). "
-        "入口 r0=player_id, r1=equip_slot_idx, r2=exclude_bitmap_ptr, r3=count; "
-        "非 APCS r9=equip_card_slot (caller-set). "
-        "首先调用 build_equip_eligible_slot_bitmap 得到 eligible_bitmap; "
-        "若 count>0 则从 sp[0x40] 读取排除列表, 从 bitmap 中清除已排除槽位; "
-        "随后两路: 先以 mode=0 调用 select_equip_target_slot_by_bitmap (FUN_080ad4c8), "
-        "若未找到则以 mode=1 调用 FUN_080ad608 (对称 alt); "
-        "若两路均失败返回 -1; 成功后调用 eval_slot_score_entry_full 获取得分, "
-        "检查特定卡牌 ID (0x1654/0x1388/0x1688) 做得分修正, 最终返回编码目标槽位或 -1. "
-        "Side effects: 通过 eval_slot_score_entry_full 写 score_out. "
-        "Constants: CARD_IDS=[0x1654, 0x1388, 0x1688], FAIL=-1."),
+        "Inputs are r0=player side, r1=internal card ID, r2=eligibility-mode flag tested only as zero or nonzero, r3=excluded-entry count, and a fifth stack argument pointing to packed exclusions. It builds and filters the eligible bitmap, tries the normal and alternate selectors, scores a selected slot, and applies three card-ID gates. It returns the encoded target or -1; score scratch is written through called scoring routines."),
     ("FUN_080ad650", "score_equip_slot_placement_for_ai",
-        "由 FUN_080ad720/FUN_080bbde8 调用 (indeg>=2), 为 AI 装备放置决策评分. "
-        "入口 r0=player_id, r1=equip_slot_idx, 非 APCS r8=card_id (caller 通过 .hword 0x4690 注入). "
-        "首先从 gP1LifePoints+player*4+0x87*0x20 读 slot hword, 提取 icid (bits[12:0]); "
-        "调用 eval_equip_bonus_for_slot 获取装备加成 r7; "
-        "随后对特定卡牌 ID (0x1725/0x1386..0x1388/0x16ec/0x1729/0x1986) 做二分查找: "
-        "命中则返回 3 (高优先级); 未命中则检查 equip_bonus: bonus<=4 返回 0; "
-        "bonus>4 调用 eval_card_placement_flags_for_ai, "
-        "根据 flags bit6/bit4 和 card_id=0x1864 做修正返回 0/1/2. "
-        "Side effects: 无外部写入. "
-        "Constants: SCORE_HIGH=3, SCORE_MED=2, SCORE_LOW=1, SCORE_SKIP=0, "
-        "bonus_threshold=4, LP_stride=0x868, CARD_IDS=[0x1725,0x1386,0x1388,0x16ec,0x1729,0x1986,0x1864]."),
+        "Inputs are r0=player side, r1=field slot index, and r2=placement mode; the entry moves r2 into r8. It extracts the slot internal card ID from the player field array, evaluates the equip bonus and placement flags, and applies card-ID priority gates. It returns a placement class from 0 through 3 and performs no direct memory writes."),
     ("FUN_080a5e28", "init_equip_zone_rank_state_from_slot",
         "Initializes gEquipZoneRankState from player r0, slot r1, mode r2, and extra flag r3. Copies the slot card field, stores slot<<7, clears phase fields, sets activation bits, and applies mode 0/1/2 behavior. Mode 0 also tests LIGHT_OF_INTERVENTION_CID field presence. It finishes by clearing phase bit fields with DEMO_CLEAR_BITS_8_1 and DEMO_CLEAR_BITS_16_9. Returns void."),
     ("FUN_080a5f38", "init_equip_zone_rank_state_from_lp_context",
         "Initializes gEquipZoneRankState from pending LP context. Loads the callee player and slot arguments from gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and +ACTIVATION_STATE_A_OFF. When mode_flag r1 is zero it uses input r0 as mode; otherwise it uses mode 2. It passes extra flag r2 to init_equip_zone_rank_state_from_slot, clears gP1LifePoints+ELIGIB_STATE_CTRL_OFF, and returns 1."),
     ('FUN_080bbde8', 'execute_field_spell_equip_placement',
         'Inputs r0=player,r1=index,r2=mode. Scores with input mode; strict failure forces effective mode1. Candidate -1 returns-1. A nonzero same-player restriction initializes and returns0. field7 nonzero writes the candidate twice and spends two budget units; others once. Completion caches player twice, writes LP+1d48 from selected word bits22..29 plus bit13, ranks with effective_mode==0, clears scoreBase+0x180, and returns1.'),
-    ("FUN_080acbf0", "check_player_lp_exceeds_toon_world_cost",
-        "由 FUN_080acc30 (大型装备激活判断 hub) 调用 (indeg=1). "
-        "入口 r0=player_id; 加载卡牌 0x132c (Toon World), "
-        "调用 count_field_copies_of_card 得到场上 Toon World 张数 count; "
-        "计算费用 = count * 0x1F4 (count*500; 拆解: count<<5=32c, 32c-c=31c, 31c<<2=124c, 124c+c=125c, 125c<<2=500c); "
-        "读取对应玩家 LP (gP1LifePoints+player*0x868); "
-        "若 LP > cost 则返回 1 (足够), 否则返回 0 (不足). "
-        "纯查询函数, 无外部副作用. "
-        "Constants: CARD_ID=0x132c (Toon World), cost_formula=count*0x1F4, "
-        "gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+    ("FUN_080acbf0", "check_player_lp_exceeds_chain_energy_cost",
+        "Called at 0x080bc1e4, 0x080bc2fa, and 0x080bc39e. Counts field copies of Chain Energy (CID 0x132c), computes cost=count*500, loads player LP from gP1LifePoints+(player&1)*PLAYER_BLOCK_STRIDE, and returns 1 exactly when LP is greater than the cost. No Toon World CID is used."),
     ("FUN_08097190", "check_equip_effect_zone_preconditions",
         "检查玩家能否在装备效果区 (zone=0xb) 发动特定效果的多项前提条件, 返回 0=不满足/1=满足. "
         "入口 r0=player_id. "
@@ -11603,12 +11321,7 @@ RENAMES = [
         "用于检测某卡当前是否作为装备链头部挂接在怪物格上. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14."),
     ("FUN_080ad340", "check_card_id_in_effect_target_whitelist",
-        "以 r0=card_id 为键在特定卡牌白名单上执行 BST 查询. "
-        "card_id 属于白名单集合则返回 1, 否则返回 0. "
-        "纯叶子函数, 无外部状态读写. "
-        "BST 覆盖 card_id 范围 0x133c..0x19c5 (约 15 个特定卡牌 ID). "
-        "被 check_card_activation_eligible_by_id (0x080ac584) 作为激活门控条件之一. "
-        "Constants: return 0=not_in_set, 1=in_set."),
+        "Called at 0x080acbbc and 0x080b5b98. It performs a leaf decision-tree membership test on the low 16-bit internal card ID in r0. IDs in the effect-target whitelist return 1; all other IDs return 0. It has no calls and no memory side effects."),
     ("FUN_08033e30", "count_spell_zone_slots_with_empty_chain",
         "遍历 gDuelFieldSlots 指定玩家侧魔法/陷阱区 5 个格子 (slot 5..9, 偏移 0x64), "
         "统计同时满足: (1) slot[0] bit19 置位 (有卡); "
@@ -11616,38 +11329,15 @@ RENAMES = [
         "count_monster_slots_by_chain_head_id (0x08033334) 的魔法/陷阱区变体. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_zone_offset=0x64."),
     ("FUN_080aee24", "scan_monster_slots_for_max_zone_score",
-        "扫描指定玩家侧怪物区 5 个格子 (slot 0..4), "
-        "对每个有效占用格子调用 dispatch_zone_slot_score_by_player_flag 求得分, "
-        "将两个维度的最大分值写入 *out_max_A, *out_max_B. "
-        "Non-APCS: r8=player_side, r9=extra_param, r10=loop_init. "
-        "被 compare_zone_max_scores_by_player (0x080aedd4) 以正反玩家各调一次. "
-        "Constants: gDuelFieldSlots=0x0201c510, stride=0x868, slots 0..4."),
+        "Inputs are r0=player bit, r1=primary-maximum output, r2=secondary-maximum output, and r3=require-nonzero-slot-field8 flag. Both outputs start at zero. The function scans five monster slots with nonzero packed bits12:0 CID; when r3 is nonzero it also requires slot halfword +8 to be nonzero. dispatch_zone_slot_score_by_player_flag writes two scores, and each output retains its channel maximum."),
     ("FUN_080aedd4", "compare_zone_max_scores_by_player",
-        "以双玩家视角各调用 scan_monster_slots_for_max_zone_score 一次 "
-        "(player=1-r4 和 player=r4), 获取双方怪物区最大区域得分并比较. "
-        "返回 -2=opponent_advantage, 0=equal, +2=player_advantage. "
-        "上层 7 个调用者 (含 duel_field/AI 评分) 依据返回值做分支决策. "
-        "Constants: r0=-2=opponent_advantage, 0=equal, +2=player_advantage."),
+        "Input r0 is the current player bit. It collects primary and secondary maximum monster-zone scores for the opponent and current player. It returns 2 when the current primary maximum strictly exceeds both opponent maxima, -2 when the opponent primary maximum strictly exceeds both current maxima, and 0 otherwise. Output buffers are stack-local; the function performs no direct global writes."),
     ("FUN_080acc30", "check_card_effect_activation_eligible_by_id",
-        "对指定卡牌 (r2 低 16 位=card_id) 执行综合效果激活资格检查, "
-        "结合玩家状态与场地条件返回 0 (不符合) 或 1 (符合). "
-        "入口 .hword 0x4647=mov r7,r8 为 callee-save; r0=player_side, r1=context_ptr, r2=card_id. "
-        "BST 覆盖 0x0fb7..0x16ec, 含 check_compound_pair_activation_eligible "
-        "和 compare_zone_max_scores_by_player 两条特殊路径. "
-        "Constants: return 0=not_eligible, 1=eligible."),
+        "Called by seven placement and hand-scan paths. Inputs are r0=player side, r1=eligibility mode, and r2=internal card ID in the low 16 bits. A card-ID decision tree combines field counts, pair-slot availability, player LP state, and card-specific predicates. Every shared exit returns exactly 0 for rejected or 1 for accepted. The function reads duel state and writes no memory directly."),
     ("FUN_080b4c6c", "scan_spell_zone_for_equip_target_by_id",
-        "扫描指定玩家侧魔法/陷阱区 5 格 (slot 5..9, 偏移 0x64..0xb4), "
-        "查找内部 ID 与 r8 (non-APCS, 入口 .hword 0x4688=mov r8,r1) 匹配的格子. "
-        "若找到则以 player_side+slot_idx+r4 调用 setup_equip_context_for_slot_activation; "
-        "返回非零则返回 1 (成功), 遍历完无命中返回 0. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_zone_start=0x64, slot_entry=0x14."),
+        "Scans spell/trap slots 5..9 for r1 internal CID on the selected player side. Each match calls setup_equip_context_for_slot_activation(player,slot,r4). Returns 1 on first accepted setup, otherwise 0."),
     ("FUN_080ad898", "check_card_id_placement_allowed",
-        "以 r0=card_id 执行多分支 BST 检查, 返回放置许可状态. "
-        "路径 A: r0=((r2!=0)?1:0); 路径 B: 固定返回 1 (允许); "
-        "路径 C: 固定返回 0 (不允许); 路径 D: 依赖 r1 是否非零. "
-        "BST card_id 范围 0x11bc..0x19fe (大量特定怪物卡). "
-        "被 scan_hand_for_best_equip_target_slot 用于筛选手牌可放置卡牌. "
-        "Constants: BST range 0x11bc..0x19fe; return 0=forbidden, 1=allowed."),
+        "Inputs are r0=internal card ID and policy values r1 and r2. A card-ID decision tree selects a fixed allowed result, a fixed rejected result, or a boolean derived from r1 or r2. Every exit returns exactly 0 or 1. The function is a leaf and has no memory side effects."),
     ("FUN_080b58e8", "scan_hand_for_best_equip_target_slot",
         "扫描指定玩家侧手牌 (gP1LifePoints+player*0x868+0xc 读手牌数量), "
         "对每张手牌依次执行多层筛选: (1) FUN_0810e5d4 基本资格; "
@@ -11657,26 +11347,11 @@ RENAMES = [
         "返回最佳候选手牌索引 (r7) 或 -1. "
         "Constants: gP1LifePoints base, hand_count_offset=0xc, player_stride=0x868."),
     ("FUN_080af9c0", "check_hand_equip_target_available",
-        "检查指定玩家侧手牌中是否存在可用装备目标格. "
-        "以固定参数调用 scan_hand_for_best_equip_target_slot; "
-        "若返回值 <0 则无目标返回 0; 否则提取 slot_idx, 读对应格子 card_id (低 13 位), "
-        "调用 check_card_effect_activation_eligible_by_id 最终确认. "
-        "激活资格为 0 则返回 1 (目标可用), 否则返回 0. "
-        "Constants: DAT_080af9fc=0x080af981 (callback ptr), gDuelFieldSlots=0x0201c600."),
+        "Input: r0=player. Calls scan_hand_for_best_equip_target_slot with the unconditional callback at 0x080af980. If no hand candidate exists, returns 0. Otherwise calls check_card_effect_activation_eligible_by_id for the selected card and returns 1 only when that callee returns 0. No persistent writes."),
     ("FUN_080ac4e8", "check_card_normal_summon_restricted",
-        "先调用 get_card_field_summon_restriction 检查场地召唤限制; "
-        "若返回非零 (有限制) 则返回 1 (受限). "
-        "否则对 r4 (入口 r0=card_id) 做 BST 检查 0x13e8/0x1286/0x152e/0x19bd 等; "
-        "命中则返回 1, 未命中返回 0. "
-        "被 check_card_activation_eligible_by_id (0x080ac584) 作为普通召唤资格前置门控. "
-        "Constants: card_id whitelist {0x13e8, 0x1286, 0x152e, 0x19bd, ...}; return 0=not_restricted."),
-    ("FUN_080af070", "scan_monster_slots_for_best_scored_slot",
-        "扫描指定玩家侧怪物区 5 格 (slot 0..4), "
-        "对每个非空格子调用 eval_zone_slot_score_for_player_with_activation_guard "
-        "或 eval_zone_slot_score_for_player (依 r2==r6 选路径), 累积得分至 r4; "
-        "若 r4 大于 non-APCS r8 则更新 r9=最高分格子索引, r10=最高分. "
-        "返回最高分格子索引. "
-        "Non-APCS: r8=score_threshold, r9=output_best_idx, r10=output_best_score."),
+        "Returns 1 when card_id has a nonzero field summon restriction or belongs to the explicit restricted set containing Nuvia the Wicked, Blast Sphere, Guardian Sphinx, and Adhesive Explosive. Returns 0 otherwise. Called by check_card_activation_eligible_by_id; read-only apart from the delegated stat lookup."),
+    ("FUN_080af070", "find_lowest_scored_monster_slot",
+        "Inputs are r0=scoring player, r1=scanned player, r2=excluded slot index, r3=include-primary-score flag, and a fifth stack argument include-secondary-score flag. It scans five occupied monster slots except r2 and selects the guarded scorer when r0 equals r1. Starting from score ceiling 99999, it returns the slot index with the lowest enabled score, or -1 when no candidate is selected."),
     ("FUN_08037974", "count_gy_cards_by_field6",
         "遍历指定玩家侧墓地卡牌数组 (gP1LifePoints+player*0x868+0x120, 数量读自 +0xc), "
         "对每张卡提取低 13 位 card_id, 调用 get_card_extended_stat_field6, "
@@ -11684,14 +11359,7 @@ RENAMES = [
         "返回命中数量. 与 count_hand_cards_by_field6 结构对称 (基址 +0x120 vs +0x418). "
         "Constants: gP1LifePoints base, gy_base_offset=0x120, gy_count_offset=0xc, player_stride=0x868."),
     ("FUN_080ac584", "check_card_activation_eligible_by_id",
-        "以 r5=card_id (r1 入口) 执行大型综合激活资格检查, 覆盖场地/手牌/墓地等多种激活路径. "
-        "入口 .hword 0x464f=mov r7,r9 / .hword 0x4646=mov r6,r8 为 callee-save. "
-        "r0=player_side (mov r8,r0), r1=ctx (r5), r2=card_context (mov r9,r2), r3=extra (r4). "
-        "执行流程: check_value_in_slot_chain + 大型 BST 分派 (含 count_field_copies_of_card, "
-        "check_card_normal_summon_restricted, count_gy_cards_by_field6, "
-        "check_hand_equip_target_available, scan_monster_slots_for_best_scored_slot). "
-        "返回 1=eligible, 0=not_eligible, -1=special. "
-        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+        "Card-ID activation eligibility dispatcher. It applies the shared field-state and Staunch Defender gates, then routes a large card-ID comparison tree to zone, hand, graveyard, pair, LP, and score predicates. Inputs are player_side, card_id, activation_mode, and extra. Returns 0 for eligible, 1 for rejected, or -1 for the deferred score path."),
     ("FUN_0803a980", "get_slot_field6_score",
         "从 eval_slot_score_entry_full 结果数组中提取 sp+0x18 偏移处的 field6 分值. "
         "建立 0x24 字节栈帧; .hword 0x466a=mov r2,sp 将栈顶作为结果 buffer 传入; "
@@ -11704,36 +11372,14 @@ RENAMES = [
         "r0=player_side, r1=slot_idx 直接透传; 取 sp+0x1c (base sp+0x4, 偏移 0x18, field7) 返回. "
         "与 get_slot_field5_score (0x0803a958, sp+0x14), get_slot_field6_score (0x0803a980, sp+0x18) "
         "构成同一编号兄弟簇. indeg=7."),
-    ("FUN_080b0c60", "find_best_placeable_monster_slot",
-        "在已快照的格子缓冲区 (via sp+0x24 从调用帧传入) 中找出最适合放置怪物的格子索引. "
-        "r0=player_side (mov r10,r0), r1=card_context (mov r8,r1), r3=entry_count. "
-        "对每个缓冲区条目调用 get_slot_field7_score 累加得分, "
-        "并调用 zero_fill_by_halfword 清空对应格子临时区. "
-        "再调 get_first_placeable_monster_slot 搜索可放置格, 写入格子条目属性. "
-        "特定 card_id (0x1654, 0x1388, 0x1688) 额外写 slot+0xc. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080b0c60", "prepare_first_placeable_monster_slot",
+        "Prepares the first placeable monster slot in a fixed five-entry priority order. Inputs: r0=player, r1=internal CID, r2=packed slot metadata, r3=excluded-entry count, fifth argument=packed excluded entries. It clears listed slots, calls get_first_placeable_monster_slot, writes the CID while preserving upper slot flags, and writes additional slot state. The special path covers selected internal CIDs including both Maju Garzett IDs and unassigned CID 0x1388. Returns the selected slot 0..4 or -1."),
     ("FUN_080b0b64", "save_field_slots_to_buffer",
-        "将 gDuelFieldSlots 中两个玩家侧前 5 个格子条目 (各 0x64 字节) 复制到 r0 指定缓冲区. "
-        "第一次 copy_bytes_by_halfword(dst=r4, src=gDuelFieldSlots, len=0x64) 拷贝 P1 侧; "
-        "然后 dst+=0x64, src+=0x868; 第二次拷贝 P2 侧. "
-        "与 restore_field_slots_from_buffer (0x080b0b90) 构成保存/恢复对. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, copy_size=0x64 (5 slots*0x14)."),
+        "Copies both players monster-slot blocks from gDuelFieldSlots to the buffer in r0. It always copies two 0x64-byte blocks: player 0 first, then player 1 at PLAYER_BLOCK_STRIDE. Entry r1 is not consumed. Paired with restore_field_slots_from_buffer."),
     ("FUN_080b0b90", "restore_field_slots_from_buffer",
-        "将缓冲区 (r0) 中保存的两个玩家侧格子快照写回 gDuelFieldSlots. "
-        "与 save_field_slots_to_buffer (0x080b0b64) 方向相反: "
-        "第一次 copy_bytes_by_halfword(dst=gDuelFieldSlots, src=r0, len=0x64) 还原 P1 侧; "
-        "然后 src+=0x64, dst+=0x868; 第二次还原 P2 侧. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, copy_size=0x64."),
-    ("FUN_080b135c", "select_optimal_monster_placement_slot",
-        "综合选择怪物卡在场地上的最优放置格. "
-        "流程: (1) save_field_slots_to_buffer 保存快照; "
-        "(2) find_best_placeable_monster_slot 评分选出最优格子索引 r4; "
-        "(3) 若 r4<0 则无可用格跳出; "
-        "(4) eval_slot_score_entry_full 建立完整得分条目; "
-        "(5) 读格子 bit1 (side flag), 将格子索引写入 OAM 记录 strh r3,[r0,#0x6]; "
-        "(6) get_slot_field6_score 取最终分值. "
-        "返回最优格子索引 r4. "
-        "Constants: slot_entry stride 0x868*r4, gDuelFieldSlots=0x0201c510."),
+        "Restores both players monster-slot blocks from the buffer in r0 to gDuelFieldSlots. It always copies two 0x64-byte blocks: player 0 first, then player 1 at PLAYER_BLOCK_STRIDE. Entry r1 is not consumed. Paired with save_field_slots_to_buffer."),
+    ("FUN_080b135c", "populate_optimal_monster_placement_result",
+        "Populates the placement-result structure passed as the fifth argument. Inputs: r0=player, r1=internal CID, r2/r3=placement context. It snapshots slots, calls prepare_first_placeable_monster_slot, fills the result through eval_slot_score_entry_full and get_slot_field6_score, or fills card-stat fallback fields when no slot exists, then restores slots. The selected or fallback value is delivered through result+0x18; callers do not consume r0 as that score."),
     # batch #59
     ("FUN_080909fc", "scan_equip_chain_nodes_for_bitmap_update",
         "被 FUN_08090a78 (equip 激活主循环) 调用 (indeg=6). "
@@ -11775,61 +11421,15 @@ RENAMES = [
         "副作用: 写 [gDuelBattleState+0x2c]=0 (清激活标志); 调用 3 次 enqueue_sprite_attr 更新 OAM. "
         "Constants: gDuelBattleState=0x0201bb90, CARD_GRAVEYARD_REF=0x18f1, chain_ref_0x0fb6, player_stride=0x868."),
     ("FUN_080ac028", "find_best_activatable_slot_score_for_player",
-        "被 FUN_080ac0bc 调用一次 (indeg=1 from 080ac0bc), 也被 0x080a39fa 调用 (indeg>=2). "
-        "入口 r0=player_id [0..1], r1=activation_gate (saved to r9; 0=full eligibility check, 非0=activatable check), r2=loop_limit (saved to r10; slot 扫描上限). "
-        "遍历当前玩家侧 monster 格 slot [0..r2]: 检查 gDuelFieldSlots[player*0x868+slot*0x14].word[0] bits[13..0] 是否非 0 (有卡); "
-        "若 r1 (activation_gate) 非 0, 调用 check_slot_card_activatable; "
-        "若 r1==0, 调用 check_slot_full_activation_eligibility; "
-        "通过则调用 dispatch_zone_slot_score_by_player_flag 获取得分写入 sp[0x14]; "
-        "若 sp[0x14] > r7 (初始 -1) 则更新 r7. 循环结束后返回 r7 (最高分或 -1). "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4, INIT_BEST=-1."),
-    ("FUN_080aef1c", "find_best_scored_slot_for_player_with_gate",
-        "被 FUN_080ac0bc 以两种参数组合各调用一次 (indeg=2 from 080ac0bc, r3=1 或 r3=0). "
-        "入口 r0=caller_player_id [0..1], r1=scan_player_id [0..1], r2=slot_limit [0..4], r3=extra_flag [0..1] (saved to r10 via mov r10,r3). "
-        "遍历 scan_player_id 侧 monster 格 slot [0..r2]: 检查有卡; "
-        "若 r0==r1 (同侧) 调用 eval_zone_slot_score_for_player_with_activation_guard; "
-        "否则调用 eval_zone_slot_score_for_player; "
-        "结果写 sp[0x14] (得分), 比较更新最高分 r8 (non-APCS); 若 r10 (extra_flag) 非零额外比较 sp[0x18]. "
-        "最终返回最高分 slot_idx (r8) 或 -1. "
-        "Non-APCS: r8=best_score(initial=-1), r9=best_slot_idx. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+        "Scans occupied monster slots for one player up to slot index 4. Depending on activation_gate, it calls check_slot_card_activatable or check_slot_full_activation_eligibility, scores passing slots through dispatch_zone_slot_score_by_player_flag, and returns the maximum score. Returns -1 when no slot passes."),
+    ("FUN_080aef1c", "compute_peak_monster_zone_score_with_gates",
+        "Inputs are r0=scoring player, r1=scanned player, r2=excluded slot index, r3=include-primary-score flag, and a fifth stack argument include-secondary-score flag. It scans five occupied monster slots except r2, selects the guarded or unguarded score dispatcher by whether r0 equals r1, and returns the greatest enabled score channel. The initial result is -1; this function returns a score, not a slot index."),
     ("FUN_080ac0bc", "eval_player_activation_score_and_lp_threshold",
-        "被 FUN_080ac4cc / FUN_080ac56e 各调用一次 (indeg=2). "
-        "入口 r0=player_id [0..1], r1=score_context_ptr. "
-        "综合评估当前玩家的激活格得分与 LP 阈值, 返回激活决策 bool. "
-        "函数体: (1) r6=opponent=(1-player), r4=-1(初始阈值); "
-        "(2) 以 r0=opponent, r2=0 调用 find_best_activatable_slot_score_for_player, 得分暂存 r9; "
-        "(3) 以 r0=player, r1=player, r2=-1, r3=1 调用 find_best_scored_slot_for_player_with_gate (activation=1), 返回 sp[0x4]; "
-        "(4) 再以 r3=0 调用同函数, 返回 sp[0x8]; "
-        "(5) sp[0xc]=0x64 (初始比较分); "
-        "(6) 调用 count_occupied_monster_zones (opponent); "
-        "(7) 若为 0: 计算 gP1LifePoints[player*0x868]+0x40 (LP 值), 调用 FUN_080af374 (total slot score), 比较 LP vs score 差值; "
-        "若通过调用 check_equip_effect_zone_preconditions. "
-        "(8) 多层 score/LP 比较判断; 最终返回 0=可激活, 1=不可. "
-        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, LP_THRESHOLD_BASE=0x64=100, 0x13f9, 0x3e7, 0x130c."),
+        "Combines best-slot scores, LP, zone availability, and card-specific gates for one player. It evaluates both players' scored slots, checks Fairy Box and Robbin' Goblin zone paths, applies score thresholds 999, 1500, and 1699, and returns 0 for an accepted activation, 1 for a rejected activation, or -1 for the deferred score path."),
     ("FUN_080b153c", "select_equip_placement_slot_with_score",
-        "被 FUN_080bc388 (try_execute_toon_world_equip_placement) 以 r0=player_id, r1=sp (caller stack frame ptr) 调用 (indeg>=1). "
-        "大型综合选择器: (1) 调用 resolve_equip_target_slot_for_player(player, 1) 确认装备目标格可用性; "
-        "(2) 两次调用 scan_monster_slots_for_max_zone_score (分别扫 opponent 和 self 侧), 结果存 sp[0x30..0x3c]; "
-        "(3) 检查 player LP > 0; "
-        "(4) 遍历 gDuelFieldSlots + player_side (0x0201c600 侧, 约 0x100 条目): "
-        "对每个有效卡牌条目调用 check_card_field5_is_nonzero -> check_card_effect_activation_eligible_by_id -> eval_card_placement_flags_default -> score_equip_slot_placement_for_ai, 累计候选列表; "
-        "(5) 遍历候选列表调用 eval_equip_target_slot_with_score; "
-        "(6) 若有候选, 调用 check_card_activation_eligible_by_id -> select_optimal_monster_placement_slot -> FUN_080ac0bc (LP 阈值) -> FUN_080b1458 (field spell 放置检查); "
-        "(7) 在第二遍 gDuelFieldSlots 扫描中额外调用 eval_equip_bonus_for_slot. "
-        "最终将最优格子索引写入 r1 指向的 caller stack 区域; 返回最优得分 (>=0) 或 -1 (无匹配). "
-        "Constants: gDuelFieldSlots=0x0201c510, gDuelFieldSlots2=0x0201c600, player_stride=0x868, INIT_BEST=-1."),
+        "Large equip-placement selector. It scans eligible card and target candidates, ranks scores, and writes the selected result through the caller output. At 0x080b169c it calls populate_optimal_monster_placement_result with a stack result structure, then applies activation-score and field-spell placement gates. This PLATE rewrite only follows the approved callee rename; the Function name, body, signature, and instructions remain unchanged."),
     ("FUN_080bc388", "try_execute_toon_world_equip_placement",
-        "被 toon world AI 决策入口调用 (indeg 待确认). "
-        "无 APCS 参数: player_id 从 gP1LifePoints[+0x1ce8] 读取 (以 ldr r5,PTR_gP1LifePoints; ldr r1,DAT_0x1ce8; adds r0,r5,r1; ldr r4,[r0] 方式读取). "
-        "函数体: (1) 读 0x0201afe0[+8] (duel battle state 字段); 非 0 则返回 1 (战斗状态下不允许放置); "
-        "(2) 调用 check_player_lp_exceeds_toon_world_cost(player); 不满足则跳到 fail; "
-        "(3) 读 gP1LifePoints[player*0x868+0x11c] bit17 (toon world 相关标志); 若置位则 fail; "
-        "(4) 调用 check_field_spell_card_placeable_strict 或 check_field_spell_group_placeable(player); 至少一个通过才继续; "
-        "(5) 调用 select_equip_placement_slot_with_score(player, sp) 选最优格; 返回 -1 则 fail; "
-        "(6) 调用 execute_field_spell_equip_placement; 失败则 fail; "
-        "(7) fail 路径: [0x0201afe0+8] += 1 (计数器递增); 所有路径返回 0. 成功路径 (execute_field_spell_equip_placement 成功) 也返回 0. 非成功分支 (战斗状态) 返回 1. "
-        "Constants: gP1LifePoints=0x0201c4e0, player_offset_in=0x1ce8, battle_state_ptr=0x0201afe0, player_stride=0x868, toon_flag_bit17_word_offset=0x11c."),
+        "Toon World placement routine. Reads player_side from gP1LifePoints+0x1ce8. If entry gEquipLpScoreBase+8 is nonzero, returns 1 without advancing. With initial state 0, it checks the Chain Energy LP gate, player field flag, field-spell placement, and a selected scored slot. Gate failure, no slot, or nonzero placement result advances state and returns 0. Zero placement result also returns 0 without advancing."),
     ('FUN_080baed0', 'try_activate_equip_for_matching_slot',
         'Inputs r0=player,r1=row. Scan matching-CID slots0..10 with state bits5/1 clear. slot+8!=0 selects eval_equip_activation_for_slot, else check_card_zone_activation_blocked; require result!=0, summon==0, row callback!=0. If no slot commits, fallback needs index>=0, unavailable!=0, blocked!=0, summon==0, callback!=0. Slot commit: gP1LifePoints+0x1d64=player,+0x1d58=1, refs(player,slot,0,3). Fallback: gP1FieldArrayCBase+0x1c44=player,+0x1c38=1, refs(player,11,index,3). Success1, else0.'),
     ('FUN_080bb35c', 'scan_all_effect_zone_entries_for_equip_activation',
@@ -11837,80 +11437,21 @@ RENAMES = [
     ('FUN_080bbf38', 'check_field_spell_equip_placement_eligible',
         'Input r0=player. Requires strict placeability and positive zone count, then scans placement-bit0x10 entries. CID gates decide acceptance. Success caches player twice, stores (((word>>22)&0xff)*2)|((word>>13)&1), initializes rank(1,0,1), and returns1; exhaustion0. The packed field preserves all original bits22..29 plus bit13.'),
     ("FUN_080b0bc0", "prepare_effect_zone_slots_for_field_action",
-        "被 duel AI field action 决策路径调用 (indeg 待确认). "
-        "入口 r0=player_id [0..1]. "
-        "遍历当前玩家侧 gDuelFieldSlots[player*0x868] 的 5 个 monster 格 (slot 0..4): "
-        "(1) 读 slot[0] bits[18..0] 检查有卡; 无卡跳过; "
-        "(2) 读 slot[+8]: 若为 0, 调用 check_field_spell_last_warrior_placeable(player); "
-        "通过后再调用 get_card_field_summon_restriction(card_id); 若有召唤限制 (非 0) 跳过; "
-        "(3) 读 slot[+6]: 若非 0, 调用 check_slot_field_action_eligibility(player, slot); "
-        "(4) 若通过: strh 0 -> [slot+6] (清零 field6 状态), strh 1 -> [slot+8] (设 field8=1). "
-        "写入标志位表明该格已准备好进行 field action. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+        "Prepares monster slots for a field action for player r0. For each occupied slot it extracts the low 13-bit internal CID. If field8 is zero it calls check_field_spell_last_warrior_placeable, reloads field8, and bypasses the card restriction when the reloaded value is nonzero; otherwise it applies the eligibility check. Only a nonzero result from the B0C2E gate clears field6 and sets field8 to 1."),
     ("FUN_080afa60", "check_equip_target_slot_card_eligible_by_id",
-        "被 FUN_080b153c (select_equip_placement_slot_with_score) 调用, 检查指定 monster 格的卡牌 ID 是否符合装备牌放置资格. "
-        "入口 r0=player_id [0..1], r1=slot_idx [0..4], r2=mode [0..1]. "
-        "函数体: 由 slot_idx 和 player_id 计算 gDuelFieldSlots+player*0x868+slot*0x14 地址 (r12 保存基址); "
-        "读 slot[0].bits[12..0] 取出 card_id; 以 card_id 为键进行 BST 分派, "
-        "匹配多个特定 card_id 范围 (0x1524..0x17d8, 0x17df, 0x18f3, 0x1963, 0x19c2 等); "
-        "对应路径: 检查 slot[+8] (field8=equip 关联状态) 是否非 0, 或检查 slot[+6] (field6) 是否非 0 并对符号取位, 返回 bool. "
-        "0x4684=mov r12,r0 保存 gDuelFieldSlots 基址. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+        "Inputs: r0=player, r1=monster slot, r2=equip internal CID. Reads the target monster's bits12:0 CID and evaluates card-specific equip restrictions through the comparison tree. Returns 1 when the target card satisfies the selected equip card's rule and 0 otherwise. Read-only."),
     ("FUN_080af374", "sum_all_slot_scores_for_player",
-        "被 FUN_080b4ccc 调用两次 (r0=self_player/r1=self_player, 再 r0=self_player/r1=1-player), "
-        "用于分别统计同侧和对侧所有 monster 格的累计得分. "
-        "入口 r0=self_player_id [0..1], r1=scan_player_id [0..1]. "
-        "循环 slot 0..4 (共 5 格): 若 r0==r1 (同侧), 调用 eval_zone_slot_score_for_player_with_activation_guard(scan_player, slot); "
-        "否则调用 eval_zone_slot_score_for_player(scan_player, slot); "
-        "将 sp[0x14] 处的得分累加至 r6. 循环结束后返回 r6 (总得分). "
-        "纯聚合器, 无外部写入. 0x466a=mov r2,sp, 用于将栈缓冲区地址传给 callee 写回得分. "
-        "Constants: SLOT_MAX=4."),
+        "Inputs: r0=scoring player, r1=scanned player. Iterates monster slots 0..4 and sums the score written through a stack output buffer. When the players match it uses eval_zone_slot_score_for_player_with_activation_guard; otherwise it uses eval_zone_slot_score_for_player. Returns the signed score sum. Read-only apart from callees writing the local output buffer."),
     ("FUN_080b4ccc", "check_player_score_advantage_exceeds_lp",
-        "被 duel AI 决策路径调用 (indeg 待确认). "
-        "入口 r0=player_id [0..1]. "
-        "逻辑: (1) 调用 sum_all_slot_scores_for_player(player, player) -> r6 (自侧总分); "
-        "(2) 计算 opponent=1-player; "
-        "(3) 调用 sum_all_slot_scores_for_player(player, opponent) -> r0 (对侧总分); "
-        "(4) diff=opponent_score - self_score; "
-        "(5) 读 gP1LifePoints[player*0x868] (当前玩家 LP 值); "
-        "(6) 若 diff >= LP 返回 1 (对手格子优势超过我方 LP), 否则返回 0. "
-        "纯只读查询, 无外部写入. "
-        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868."),
-    ("FUN_080ad270", "check_card_id_in_field_spell_bst",
-        "被 FUN_080b1458 (field spell 放置资格检查) 以 r0=card_id 调用 (indeg=1 from batch context). "
-        "纯叶子 BST 查找: 以 r0=card_id 为键, 在约 20 个特定 field spell 相关 card_id 的白名单集合上执行二叉搜索树查询. "
-        "覆盖范围约 0x0fd6..0x19fe, 包含多个单点和少量连续段. "
-        "card_id 在集合中返回 1, 不在返回 0. 无外部状态读写, 纯叶子函数. "
-        "被 check_field_spell_placeable (FUN_080b1458) 作为 field spell 卡牌 ID 门控条件. "
-        "Constants: id_set 覆盖约 0x0fd6, 0x10dd, 0x1185, 0x11c3, 0x11e4, 0x1309, 0x130b, 0x133c..0x133f, 0x13e3, 0x13e9, 0x19fe 等特定 ID."),
+        "Computes opponent slot-score sum minus own slot-score sum for r0 player and compares the difference with that player LP word. Returns 1 when the score disadvantage is at least the LP value, otherwise 0."),
+    ("FUN_080ad270", "check_card_id_in_field_spell_placement_bypass_set",
+        "Called at 0x080b1460 by check_card_field_spell_equip_placeable. It performs a leaf decision-tree membership test on the low 16-bit internal card ID in r0. A member of the placement-bypass set returns 1; every other ID returns 0. It has no calls and no memory side effects."),
     ("FUN_080b1458", "check_card_field_spell_equip_placeable",
-        "被多个 field spell 放置决策路径调用 (indeg 待确认). "
-        "入口 r0=player_id [0..1], r1=card_id. "
-        "函数体逻辑: (1) 以 r1=card_id 调用 check_card_id_in_field_spell_bst; 若命中 (特定 field spell 系列) 立即返回 1; "
-        "(2) 否则调用 check_field_spell_group_placeable (r0=player_id) 确认场地魔法放置资格; 若失败返回 0; "
-        "(3) 通过 card_id BST 分派: 匹配 0x11c3/0x119b 系列调用 count_occupied_monster_zones; "
-        "匹配 0x100c/0x10dd 系列调用 count_hand_cards_by_field6(field6=0x16/0x17); "
-        "匹配 0x11f5 系列调用 compare_zone_max_scores_by_player; "
-        "匹配 0x1331/0x1369/0x179a 系列也走各自逻辑; 最终返回 bool (1=可放置, 0=不可). "
-        "副作用: 无外部写入. "
-        "Constants: field_spell_bst_ids=[0x100c, 0x10dd, 0x11c3, 0x119b, 0x11f5, 0x1331, 0x1369, 0x179a], gP1LifePoints=0x0201c4e0."),
+        "Called at 0x080b1744 with r0=player side and r1=internal card ID. It first calls check_card_id_in_field_spell_placement_bypass_set and returns 1 for a member. Otherwise it checks field-spell group placement, then applies card-specific occupied-zone, hand-field, and score gates. Every exit returns exactly 0 or 1. The function reads duel state through callees and performs no direct memory writes."),
     ("FUN_080ad4ac", "resolve_equip_target_slot_for_player",
-        "被 FUN_080b153c (equip 目标选择主流程) 以 r0=player_id, r1=1 调用 (indeg=1 from PROGRESS tracking). "
-        "5 指令极简包装器: 以 r0=player_id, r1=slot_bitmap 调用 build_equip_eligible_slot_bitmap, "
-        "得到装备候选位图 r0; 再以 r0=player_id, r1=r1(原), r2=bitmap 调用 select_equip_target_slot_by_bitmap 选出目标格子. "
-        "返回 select_equip_target_slot_by_bitmap 的结果 (高字节=player_id, 低字节=slot_idx, 或 -1 失败). "
-        "无外部写副作用, 仅转发语义. "
-        "Constants: 无独立常量."),
-    ("FUN_080afc24", "find_best_scored_spell_zone_slot",
-        "被 FUN_080affe8/FUN_080b0008/FUN_080b0080/FUN_080b047c 等多处调用 (indeg>=4). "
-        "入口 r0=player_id [0..1], r1=slot_count [0..4] (从 caller r9 传入), r2=activation_mode [0..1]. "
-        "函数体: 以 player_id*0x868 计算 gDuelFieldSlots+player 侧基址 (r8=player_offset); "
-        "r10=slot_count (r1 别名), r9=activation_mode (r2 别名). "
-        "循环 slot 0..r10: 读 slot[0] bits[18..0] 检查有卡; "
-        "若 r9 (activation_mode) 非 0, 调用 check_slot_full_activation_eligibility(player, slot, 1); "
-        "读 0x0201b00c + slot_offset (spell zone 得分表); "
-        "若得分 > r3 (初始 -1 阈值) 则更新 r3. 循环结束返回 r3 (最高得分, -1=无匹配). "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_score_base=0x0201b00c, SLOT_MAX=4, INIT_THRESHOLD=-1."),
+        "Called by three placement paths. Inputs are r0=player side and r1=eligibility mode. It builds the eligible target bitmap, then calls select_equip_target_slot_by_bitmap with the original player and mode plus that bitmap. It returns the encoded target or -1 from the selector and performs no direct writes."),
+    ("FUN_080afc24", "compute_peak_spell_zone_score_excluding_slot",
+        "Inputs: r0=player, r1=excluded spell slot, r2=nonzero activation-check flag. Scans all five spell slots except r1, requires an occupied slot, optionally applies check_slot_full_activation_eligibility, and reads the per-slot score from gEquipSpellZoneScoreBase. Returns the maximum signed score or -1 when no candidate qualifies. It returns a score, not a slot."),
     # --- batch #60 (campaign-60) ---
     ("FUN_0802fff0", "scan_equip_node_pool_for_card_score",
         "被 FUN_08090a78 (equip 激活主循环, 0x0809112e) 及同层上级调用 (共 2 处 callsite). "
@@ -11931,86 +11472,19 @@ RENAMES = [
         "Constants: gDuelBattleState=0x0201bb90, gDuelNodePool=0x0201d9c0, entry_size=0x38, "
         "player_stride=0x868, loop_bound=1."),
     ("FUN_080afcb4", "eval_equip_spell_placement_with_score",
-        "被 FUN_080b04a8 (0x080b05ec) 以 r0=player_side, r1=slot_idx, r2=extra_flag 调用 (indeg=1). "
-        "对目标装备魔法卡进行完整激活评估: r7=r0=player_side, r9=r1=slot_idx, r10=r2=extra_flag, r3->output_ptr. "
-        "清零 output_ptr 多字段; 计算 gDuelFieldSlots[player*0x868+slot*0x14+0x10] bit5 (face-up 标志), 已激活则短路. "
-        "读取 card_id 进行 BST 分派 (覆盖 0x10a6/0x129a/0x13cb/0x1657 等); "
-        "各分支调用 check_value_in_slot_chain/count_active_cards_in_zone_by_player/find_best_scored_spell_zone_slot 等. "
-        "memcpy 备份 gDuelBattleState 至栈缓冲后调用 build_equip_candidate_score_table, 最终 memcpy 恢复. "
-        "Side effects: 写 output_ptr[+4/+10/+14/+18/+1c]; 栈缓冲 sp+0..0x130 = gDuelBattleState 快照. "
-        "Constants: gDuelFieldSlots=0x0201c510, gDuelBattleState=0x0201bb90, player_stride=0x868, "
-        "card_id BST 覆盖 0x10a6..0x16c2."),
+        "Inputs: r0=player, r1=slot, r2=mode, r3=gate flag; the fifth stack argument is the output-structure pointer. Initializes output fields, applies card-specific equip placement branches, snapshots gEquipChainSlotRefs, builds candidate scores, and restores the snapshot. Calls compute_peak_spell_zone_score_excluding_slot where required. Results are carried by the output structure and branch state."),
     ("FUN_080b011c", "eval_monster_spell_placement_eligible_by_card",
-        "被 FUN_080b04a8 (0x080b04f0, r2=5) 和 FUN_080b0fe8 (0x080b05d6) 调用 (indeg=2). "
-        "入口 r8=r0=player_side, r6=r1=slot_idx, r5=r2=zone_type [0..5], r3->sp[0]. "
-        "计算 gDuelFieldSlots[player*0x868+slot*0x14+0x40] bit5 (face-up), 若已激活则跳出. "
-        "读取 slot[+0x30] card_id (bits[12:0]) 进入大型 BST 分派 (~20 个 card_id). "
-        "各分支检查 slot 状态/zone_type/条件, 调用 find_best_scored_spell_zone_slot/"
-        "count_active_cards_in_zone_by_player/check_equip_cards_share_field7. "
-        "返回 r0=u32: 1=可放置, 0=不可. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, zone_type_max=5."),
+        "Inputs: r0=player, r1=slot, r2=zone type, r3=gate flag. Reads the slot's bits12:0 internal CID and applies the card-specific monster/spell placement decision tree, including score and field-state gates. Calls compute_peak_spell_zone_score_excluding_slot in score branches. Returns 1 when placement is eligible and 0 otherwise. Read-only apart from callees' local scoring work."),
     ("FUN_080b04a8", "eval_fieldspell_equip_placement_full",
-        "被 FUN_080b1078 (0x080b0b08/0x080b0b3e) 以 r0=player_side 调用 (indeg=2). "
-        "场地魔法/装备卡完整放置评估: r6=r0=player_side, r9=r1=slot_idx. "
-        "调用 check_player_field_spell_chain_eligible -> eval_slot_fieldspell_activation_full -> count_available_effect_zones. "
-        "满足条件后从 sp[0x158] 读 extra_flag 并调用 eval_monster_spell_placement_eligible_by_card. "
-        "成功路径: memcpy 备份 gDuelBattleState, 写 output_ptr 多字段 (slot_id/player/extra_flag/zone_type=5), "
-        "调用 build_equip_candidate_score_table + count_available_effect_zones + eval_field_equip_activation_candidates, "
-        "写 output_ptr 后 memcpy 恢复. 返回 r0=u32 eligible (1=ok, 0=fail). "
-        "Side effects: 写 output_ptr[+0/+8/+1c/+18..+14]; 栈缓冲 = gDuelBattleState 快照. "
-        "Constants: gDuelBattleState=0x0201bb90, zone_type_5=0x5, player_stride=0x868."),
-    ("FUN_080b06b4", "score_equip_zone_slots_for_all_players",
-        "被 FUN_080b0d54 (0x080b0f6c) 和 FUN_080b0fe8 (0x080b1052) 调用 (indeg=2). "
-        "入口 r8=r0=player_side, r1=sp[0x38]=activation_mode. "
-        "清零 gDuelBattleState (0x0201afe0) 内 offsets 0x1ac/0x1c4/0x1c8/0x1c0/0x1c2. "
-        "外层循环 r5=[0..1] 遍历双方: 调用 eval_slot_activation_guard_full(player, slot, 1); "
-        "若返回非 0: 读 bit22 (lsrs#0x16) -> check_value_in_slot_chain x2 (0x1669/0x14a6 过滤); "
-        "计算 slot card_id 进入 BST (cmp 0x13c3/0x186b 等) -> dispatch_zone_slot_score_by_player_flag. "
-        "返回 r0=u32 累计结果. "
-        "Side effects: 写 gDuelBattleState[+0x1ac/+0x1c4/+0x1c8/+0x1c0/+0x1c2] := 0; "
-        "通过 dispatch_zone_slot_score_by_player_flag 间接写得分表. "
-        "Constants: gDuelBattleState=0x0201afe0, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
-        "bit22_flag=activation_type, slot_loop=[0..4]."),
+        "Evaluates one field-spell/equip placement candidate and writes a 0x20-byte result to r3. Inputs include r0=player, r1=internal CID, r2=placement mode, plus caller stack flags. It checks chain and slot eligibility, scores direct and monster-placement paths, and keeps the stronger result using score and tie-break fields. Returns 1 when a valid result was written, otherwise 0."),
+    ("FUN_080b06b4", "select_fieldspell_equip_placement_result",
+        "Selects a field-spell/equip placement result. r0=player and r1 controls the optional reverse-order retry. It collects eligible monster slots, applies card-specific ordering adjustments, evaluates candidates with eval_fieldspell_equip_placement_full, and copies the selected 0x20-byte result to gEquipFieldSpellPlacementResult. Returns 1 on selection, otherwise 0."),
     ("FUN_080b0d54", "score_equip_zone_slots_for_player",
-        "被 FUN_080b0f98 (0x080b0fbc) 和 FUN_080b1114 (0x080b1280) 调用 (indeg=2). "
-        "入口 r0=player_side [0..1] (sp[0]), r7=player_side alias. "
-        "清零 gDuelBattleState (0x0201afe0) offsets 0x184/0x188; "
-        "外层循环 r6=[0..1], 内层 r5=[0..4] 覆盖 5 个槽位. "
-        "对每个 (player, slot): 读 gDuelFieldSlots[player*0x868+slot*0x14] word, lsls#0x13 检查激活位; "
-        "若激活则调用 dispatch_zone_slot_score_by_player_flag. "
-        "外层循环结束后调用 score_equip_zone_slots_for_all_players (FUN_080b06b4) mode=-1. "
-        "返回 r0 透传自 score_equip_zone_slots_for_all_players. "
-        "Side effects: 写 gDuelBattleState[+0x184/+0x188] := 0; "
-        "通过 dispatch_zone_slot_score_by_player_flag 写得分表; "
-        "通过 score_equip_zone_slots_for_all_players 写多字段. "
-        "Constants: gDuelBattleState=0x0201afe0, gDuelFieldSlots=0x0201c510, "
-        "gDuelNodePool=0x0201aff8, player_stride=0x868, slot_stride=0x14, activation_bit_shift=0x13."),
+        "Scores equip-zone placement state for player r0. It clears per-run counters, scans both players monster slots, dispatches score updates for occupied entries, applies slot flag cleanup, and repeatedly invokes select_fieldspell_equip_placement_result with fallback mode -1. Returns the accumulated signed score after the selector no longer yields a placement."),
     ("FUN_080b0f98", "compute_equip_zone_score_with_cache",
-        "被 FUN_080b1114 (0x080b112c) 和 FUN_080bc168 (0x080bc256/0x080bc2a4/0x080bc5ae) 调用 (indeg>=3). "
-        "入口 r4=r0=player_side. 读取 gDuelBattleState (0x0201afe0) offset 0x180 的 cache_valid 标志; "
-        "若非 0 直接跳至 LAB_080b0fd4 读取缓存值返回. "
-        "若为 0 (缓存失效): .hword 0x4668=mov r0,sp 与 player_side 一起调用 save_field_slots_to_buffer; "
-        "再调用 prepare_effect_zone_slots_for_field_action; "
-        "再调用 score_equip_zone_slots_for_player (FUN_080b0d54), 结果写入 gDuelBattleState[+0x194]; "
-        "设置 cache_valid=1; 再调用 restore_field_slots_from_buffer. "
-        "最终从 gDuelBattleState[+0x194] 读取并返回 r0=u32 score. "
-        "Side effects: [gDuelBattleState+0x180]:=1 (cache_valid); [gDuelBattleState+0x194]: 写 score; "
-        "通过 save/prepare/restore 间接写临时场地状态缓冲. "
-        "Constants: gDuelBattleState=0x0201afe0, cache_flag_offset=0x180, score_result_offset=0x194."),
+        "Returns the cached equip-zone score for player r0. When the cache-valid word is zero it snapshots both players slots, prepares the field action state, calls score_equip_zone_slots_for_player, stores the score and valid flag, then restores the snapshot. Otherwise it reads the existing cached score."),
     ("FUN_080b1114", "find_best_equip_target_slot_for_player",
-        "被 FUN_080bc168 (0x080bc262/0x080bc274) 调用 (indeg=2). "
-        "入口 r6=r0=player_side, r1=sp[0xf8]=mode_flag. "
-        "调用 compute_equip_zone_score_with_cache 得到 equip zone 总分. "
-        "读 gDuelBattleState[+0x188] 候选格计数. 遍历 gDuelFieldSlots+0x100 基址 player monster 槽位 (stride=0x14): "
-        "读 card_id + lsls#0x13 过滤; 调用 eval_card_placement_flags_default 检查 bit4; "
-        "若非 0: check_card_effect_activation_eligible_by_id + check_card_activation_eligible_by_id 双重过滤; "
-        "score_equip_slot_placement_for_ai 获取 AI 评分; 收集满足条件 slot 入候选列表 (sp+4 halfword 数组). "
-        "候选列表非空: save_field_slots_to_buffer + prepare_effect_zone_slots_for_field_action "
-        "+ find_best_placeable_monster_slot + eval_slot_score_entry_full -> score_equip_zone_slots_for_player. "
-        "返回 r0=s32 best_slot_idx (>=0=找到, -1=无). "
-        "Side effects: 通过 score_equip_zone_slots_for_player 写 gDuelBattleState 得分字段; "
-        "通过 save/prepare/restore 写临时场地缓冲. "
-        "Constants: gDuelFieldSlots+0x100=0x0201c600, player_stride=0x868, max_slots=5."),
+        "Finds the best eligible equip target candidate for player r0 under mode r1. It scans entries in the player's gP1FieldArrayCBase candidate array up to gP1ZoneHandCount, checks placement and activation gates, snapshots field slots, calls prepare_first_placeable_monster_slot while evaluating scores and tie-break fields, then restores the snapshot. Returns the selected candidate-array index or -1; execute_field_spell_equip_placement consumes that same array index."),
     ("FUN_08094320", "get_activation_zone_card_type_field",
         "被 FUN_080bb414 (0x080bb454/0x080bb4b8/0x080bb51a) 调用 (indeg=3). 入口 r4=r0=slot_idx. "
         "从 gEffectContext (0x0201e500) 读取 [slot_idx*4] 处卡牌属性 word. "
@@ -12042,16 +11516,7 @@ RENAMES = [
     ('FUN_080bc168', 'dispatch_equip_activation_by_field_state',
         'No input; state=scoreBase+8. state0 clears +0x180; LP+1cec==0 returns1. Other gate failure advances1/returns0; successful context/placement may keep0/return0. state1 signed<0 or cache==0 clears +0xc, advances2, returns0; else1. states2/3: nonzero callee resets0, zero advances; both return0. state4 gate failure advances5/0; no slot or nonzero score=>1; placement0 keeps4/0, positive resets1/0, negative=>1. Other states=>1.'),
     ("FUN_080b0fe8", "eval_equip_monster_zone_score_full",
-        "被 FUN_08097828 (switchD case_1 路径, 0x0809794e) 和 FUN_080bc68c 调用 (indeg=2). "
-        "入口 r10=r0=player_side, r1=sp[0]=activation_mode (spill via r9->sp). "
-        "写 gDuelBattleState[0]=activation_mode. 外层循环 r7=[0..1] 遍历双方, 内层 r4=[0..4] 遍历 5 个 monster 槽位. "
-        "对每个激活 slot: 读 gDuelFieldSlots[player*0x868+slot*0x14] card_id (lsls#0x13); "
-        "若非 0 通过 gDuelNodePool offset (r8 non-APCS) 调用 dispatch_zone_slot_score_by_player_flag. "
-        "双层循环后调用 score_equip_zone_slots_for_all_players (FUN_080b06b4) r1=sp[0] 并透传返回值. "
-        "Side effects: [gDuelBattleState+0x0]:=activation_mode; "
-        "通过 dispatch_zone_slot_score_by_player_flag 写得分表. "
-        "Constants: gDuelBattleState=0x0201afe0, gDuelFieldSlots=0x0201c510, "
-        "gDuelNodePool=0x0201aff8, player_stride=0x868, slot_loop=[0..4]."),
+        "Builds zone-score entries for both players and selects a field-spell/equip placement. Inputs: r0=player and r1=selection mode. It writes r0 to gEquipLpScoreBase[0], scans occupied monster slots using low-13-bit nonzero checks, dispatches per-slot scores through gEquipZoneScoreEntryBase, then returns select_fieldspell_equip_placement_result(r0,r1)."),
     ('FUN_080bb38c', 'try_activate_equip_via_two_tables',
         'Inputs r0=player and r1=retry flag. Scans three rows at equip_activation_three_row_response_table; success returns 1. If that scan fails and retry is zero, scans five secondary rows. Nonzero retry skips the second table. Returns 0 when all enabled scans fail. Evidence: 080bb38c-080bb3d6.'),
     ("FUN_080977a0", "enqueue_frozen_soul_zone_sprite_or_default",
@@ -12205,17 +11670,7 @@ RENAMES = [
         "Constants: SLOT_MAX=10, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
 
     ("FUN_080b4f68", "find_best_slot_from_bitmap_by_comparator",
-        "Filters bitmap candidates, scores each via caller-provided comparator fn, returns highest-scoring slot. "
-        "r0=player_id (-> lsls r4,r0,#4 for bit offset base), r1=slot_bitmap (->r6), "
-        "r2=comparator_fn_ptr (-> r10 via .hword 0x4692=mov r10,r2). "
-        "Phase 1: collect bitmap slots into stack buffer; if count<=0 return -1. "
-        "Phase 2: for each candidate read gDuelFieldSlots+slot card entry, call FUN_0810e5f0 (bx r10), "
-        "track max score (r7) and best slot_idx (r8). indeg=5. "
-        "Params: r0=player_id [0..1], r1=slot_bitmap [0..0x7ff], "
-        "r2=comparator_fn (fn(slot_entry_ptr)->s32 score, stored in r10). "
-        "Returns r0=s32 best_slot_idx [0..10] or -1. "
-        "Side effects: none (stack-local buffer only). "
-        "Constants: SLOT_MAX=10, FAIL=-1, player_stride=0x868, gDuelFieldSlots=0x0201c600."),
+        "Collects bitmap slots 0..10 and calls the r2 comparator with (player, slot_index). It initializes best score to 0 and index to -1; only a strictly positive score can first replace the sentinel. Returns the greatest positive-score slot or -1, including when a nonempty bitmap has no positive score."),
 
     ("FUN_080b706c", "build_slot_bitmap_by_predicate",
         "Enumerates all (player, slot) pairs over 2 players x 11 slots; calls predicate fn for each; "
@@ -12229,19 +11684,7 @@ RENAMES = [
         "Constants: PLAYER_COUNT=2, SLOT_MAX=10, bit_pos=player*16+slot."),
 
     ("FUN_080b4fd8", "eval_best_slot_score_by_lp_and_attr",
-        "Iterates LP check entries for current player (r0 bit0), calls caller-provided slot predicate (r1 -> FUN_0810e5d4=bx r3), "
-        "extracts card_id then queries get_card_extended_stat_field3 and lookup_rom_card_attribute_table_a, "
-        "compares against LP threshold (r9 cumulative) and attribute constraints (r2/r3/r7 three-way conditions), "
-        "tracks best_score (r6) and best_slot (sp[0x8]). Returns best_slot_idx or -1. "
-        "Single caller: FUN_080b70ac (card_ids, duel_field tags). "
-        "Params: r0=player_id [0..1] (bit0 selects gP1LifePoints branch), "
-        "r1=slot_predicate_fn ptr (fn(player,slot_iter,?,fn_ptr)->bool -> sp[0x4]), "
-        "r2=score_upper_enable [0..1] (>0: require score>best_score; callsite movs r2,#0x1), "
-        "r3=score_lower_enable [-1..1] (>0: require score>best; <0: require score<best; callsite movs r3,#0x1). "
-        "Returns r0=s32 best_slot_idx [0..10] or -1. "
-        "Side effects: none (read-only scan of gP1LifePoints LP entries and gDuelFieldSlots). "
-        "Constants: LP_STRIDE=0x868, gDuelFieldSlots_ext=0x0201c600, "
-        "player_stride=0x868, SLOT_ITER_BASE_OFFSET=0xc."),
+        "Scans player LP/field entries accepted by the r1 predicate, queries card field3 and the ROM attribute table, applies r2/r3 score-direction gates, and retains the best candidate. Returns a slot index or -1; read-only."),
 
     ("FUN_080b70ac", "select_equip_target_slot_by_card_id",
         "Dispatches equip target slot selection logic by equip card_id (r1->r5). "
@@ -12591,20 +12034,7 @@ RENAMES = [
         "OAM attr buffer via enqueue_sprite_attr_record(0x1b or 0x801b, slot_idx&0xffff, 1, 1) (cond)."),
 
     ("FUN_080b1078", "eval_fieldspell_placement_with_zone_scores",
-        "Scores all player x equip zone slots then evaluates field spell placement. "
-        "r0=player_side, r1=node_list_ptr, r2=mode_flag. "
-        "Writes player_side to 0x0201afe0 (global player select). "
-        "Outer loop r7=[0..1] players, inner loop r4=[0..4] equip slots: "
-        "indexes 0x0201aff8 score table (stride=0xb4/player, 0x24/slot); "
-        "checks gDuelFieldSlots[player*0x868+slot*0x14] bit9 (slot occupied); "
-        "if occupied: dispatch_zone_slot_score_by_player_flag(player, slot, score_node). "
-        "After loops: calls eval_fieldspell_equip_placement_full "
-        "(player_side, node_list_ptr, 1, mode_flag, score_buf=0x0201b18c). "
-        "Constants: player_select_global=0x0201afe0, zone_score_table=0x0201aff8 (stride=0xb4/player, 0x24/slot), "
-        "fieldspell_score_buf=0x0201b18c, gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4. "
-        "Params: r0=u32 player_side [0..1]; r1=ptr node_list_ptr; r2=u32 mode_flag [0..1] (bit0 extracted). "
-        "Returns r0=u32 score from eval_fieldspell_equip_placement_full. "
-        "Side effects: [0x0201afe0]:=player_side; zone score table via dispatch_zone_slot_score_by_player_flag."),
+        "Builds zone-score entries for both players and evaluates field-spell placement. Inputs: r0=player, r1=candidate context, r2=stack placement flag forwarded as the fifth argument. It writes r0 to gEquipLpScoreBase[0], filters slots by low-13-bit CID nonzero, dispatches scores through gEquipZoneScoreEntryBase, and returns eval_fieldspell_equip_placement_full with gEquipFieldSpellPlacementResult."),
 
     ("FUN_08047f50", "render_slot_card_sprite_from_descriptor",
         "Drives full card sprite render pipeline via packed slot descriptor word (r1). "
@@ -12631,9 +12061,308 @@ RENAMES = [
 
     # NOTE: batch #72+ are handled by RenameFromCSV.py (CSV-driven, avoids Jython method size limit).
     # Data truth source: doc/dev/naming-proposals.csv + doc/dev/eval/<addr>.plate.txt
-    # --- file 15 reviewed registry projections ---
+    # --- file 13 Seg-8 reviewed registry projections ---
+    ("FUN_080a5188", "check_equip_sub_entry_slot_pair_eligible", "Checks player r0 and slot r1+r2 (<=4) against gEquipZoneRankState. Activation flag bit1 selects direct check_slot_card_can_be_equipped. Otherwise it validates stored card-ID whitelists and ranges, active pair variants, chain vacancy, zone capacity, field blocking, and exclusions. Returns 0x800 or 0 and writes no state. Full-ROM scan finds packed Thumb pointers at 0x080a6434 and 0x080a6474; Ghidra has no direct CALL reference."),
+    ("FUN_080a6508", "dispatch_equip_confirm_action_by_phase", "Equip confirmation phase callback using gEquipZoneRankState. State 0 reads player control: value 1 selects a target through check_moth_evolution_slot_requirement; otherwise formats the card name and starts prompt 0x12. State 1 waits for confirmation, dispatches card op 0x28 with LP deltas, stores the result byte at +8 and target bytes at +0x0c, and returns 1; wait returns -1. Other states return 0. Updates phase bytes at +0x13/+0x14."),
+    ("FUN_080a6630", "tick_equip_target_phase_with_lp_confirm_slot_context", "Equip target phase callback. If activation bit1 at gEquipZoneRankState+0x12 is clear, returns dispatch_equip_state_by_combined_phase_index(). With bit1 set, state 0 selects through check_special_summon_slot_requirement_with_pair_exclusions or starts prompt 0x12 and returns 0; state 1 returns 1 after confirmed op 0x28 and target storage, or -1 while waiting; later states return 0."),
+    ("FUN_080a6a20", "tick_vampire_genesis_or_neo_bubbleman_target_phase", "Vampire Genesis/Neo Bubbleman target phase callback, called at 0x080a8f6c. Phase 0 selects through check_vampire_genesis_or_neo_bubbleman_slot_requirement or starts prompt 0x7e. Phase 1 waits for display confirmation, queries the target bitmap with the LP eligibility context, and advances; phase 2 returns complete. No APCS inputs. Returns -1 for pending confirmation, 0 for advance, or 1 for completion. Writes gEquipZoneRankState phase fields."),
+    # --- file 13 Seg-9 reviewed registry projections ---
+    ("FUN_08069e40", "tick_equip_monster_zone_placement_state_machine",
+        "Equip monster-zone placement state machine for the effect slot in r0. It validates the slot and dispatches field states 0x77..0x80. State 0x7f scans equip activation; state 0x7e reads pending LP context and calls init_equip_zone_rank_state_from_lp_context for modes 4 or 6; later states test zone eligibility, enqueue display work, or advance the field state. Returns the next state code or 0."),
+    ("FUN_08097070", "submit_equip_slot_sprite_with_ref_a",
+        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the first of two symmetric table callbacks."),
+    ("FUN_080970a0", "submit_equip_slot_sprite_with_ref_b",
+        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the second of two symmetric table callbacks."),
+    ("FUN_080a585c", "check_gate_guardian_material_slot_requirement",
+        "Gate Guardian material-slot predicate for player r0, zone r1, and offset r2. Requires total slot <=4, an equip-eligible active card whose ID equals SANGA_OF_THUNDER_CID + gEquipZoneRankState[8], and available monster space or an unblocked matching slot. It scans recorded player/slot pairs and then material phases 1..2 across slots 0..4. Returns 0x800 on the first valid material slot, else 0. Read-only."),
+    ("FUN_080a5994", "check_valkyrion_material_slot_requirement",
+        "Valkyrion material-slot predicate for player r0, zone type r1, and offset r2. Loads the required Alpha, Beta, or Gamma Magnet Warrior CID from valkyrion_target_material_cids[gEquipZoneRankState[8]], verifies the requested entity, and scans candidate slots for equip eligibility plus field blocking. Returns 0x800 when the required material slot is valid, else 0. Read-only."),
+    ("FUN_080a5afc", "check_equip_target_slot_eligible_by_extended_stat",
+        "Special-summon target predicate for player r0 and slot r1+r2. Requires the stored player and total slot <=4. Card-specific branches compare the slot state code with the stored card extended-stat field or call check_slot_zone_bit_eligible using an extended-stat field. Covered IDs include Dark Necrofear, the Chaos envoys, Megarock Dragon, and Doom Dozer. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5bc8", "check_masked_beast_des_gardius_material_slot_requirement",
+        "Masked Beast Des Gardius material-slot predicate for player r0 and slot r1+r2. After equip eligibility passes, phase 0 accepts Grand Tiki Elder or Melchid the Four-Face Beast. Later phases reject recorded player/slot duplicates, then require monster space or an unblocked slot. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5cc8", "check_equip_target_slot_eligible_by_monster_space",
+        "Opponent monster-space target predicate for player r0 and slot r1+r2. Requires r0 to be the opponent of the player stored in gEquipZoneRankState and the slot to pass equip eligibility. Phase 0 requires available monster space or an unblocked slot; later phases require a player/slot pair absent from the recorded list. Returns 0x800 on acceptance, else 0. Read-only."),
+    ("FUN_080a5d4c", "check_equip_target_slot_eligible_by_display_code",
+        "Display-code mismatch target predicate. Requires player r0 to match gEquipZoneRankState player, zone type r1 to equal 0xb, and compares the stored display code with the code extracted from the selected slot word. Returns 0x800 only when the codes differ, else 0. Read-only."),
+    ("FUN_080a5da0", "check_ancient_gear_castle_counter_slot_requirement",
+        "Ancient Gear Castle counter-slot predicate for player r0 and spell/trap slot r1+r2 in 5..9. Requires the stored player, no Mask of Restrict on the field, and an active Ancient Gear Castle in the slot. It accepts when the evaluated bonus and the slot counter satisfy either bonus>6 with counter>1 or bonus<=6 with counter!=0. Returns 0x800 or 0. Read-only."),
+    ("FUN_080a5f7c", "dispatch_equip_state_by_combined_phase_index",
+        "Dispatches the 34-case equip phase table selected by ((gEquipZoneRankState[0x14]&1)<<7)|(state[0x13]>>1). It allocates a 512-byte frame, rejects indices above 0x21 through the default case, and executes card, slot, display, and placement handlers for the indexed phase. The table at 0x080a5fb0 remains 34 existing pointer words. Returns each case result; default returns -1."),
+    ("FUN_080a672c", "tick_equip_target_phase_with_lp_confirm_multistep",
+        "Multistep equip confirmation callback. State 0 clears gEquipZoneRankState[8], starts prompt 0x12, advances the combined phase, and returns 0. State 1 commits card op 0x28 after confirmation, increments the substep, and either repeats or advances when the card-specific activation count is reached; a pending confirmation dispatches op 0x29 and returns -1. Later states return 1."),
+    # --- file 13 Seg-10 reviewed registry projections ---
+    ("FUN_080a689c", "tick_metamorphosis_target_phase_with_lp_confirm",
+        "Metamorphosis target phase callback, called by dispatch_equip_phase_by_card_id_range at 0x080a8f66. Phase 0 selects through the Vampire Genesis/Neo Bubbleman predicate when the player context is active, otherwise starts prompt 0x3a. Phase 1 confirms, updates the LP display context, submits the zone sprite, and advances. Returns -1 while confirmation is pending, 0 while advancing, or 1 when complete. Writes gEquipZoneRankState phase fields; uses METAMORPHOSIS_CID."),
+    ("FUN_080a6b38", "tick_gate_guardian_material_phase_with_confirm",
+        "Gate Guardian material phase callback, called at 0x080a8f12. Phase 0 selects the required Sanga, Kazejin, or Suijin material through check_gate_guardian_material_slot_requirement, or formats prompt 0xd2. Phase 1 confirms display op 0x28, records the selected material in gEquipZoneRankState, and repeats until three entries are stored. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 after all materials are recorded."),
+    ("FUN_080a6c8c", "dispatch_equip_state_with_phase_reset",
+        "Phase-reset wrapper called at 0x080a8f7e. When the combined phase index is zero, it preserves gEquipZoneRankState[0x13] bit0, sets bits 2..5, and clears state[0x14] bit1. It then calls dispatch_equip_state_by_combined_phase_index unconditionally. No APCS inputs. Returns the dispatcher result. Direct side effects are limited to the phase-bit reset."),
+    ("FUN_080a6cc8", "tick_valkyrion_material_phase_with_slot_confirm",
+        "Valkyrion material phase callback, called at 0x080a8f2a. Phase 0 selects Alpha, Beta, or Gamma Magnet Warrior through check_valkyrion_material_slot_requirement, or formats prompt 0xd3 from valkyrion_prompt_material_cids. Phase 1 confirms, submits the selected material sprite, records the entry, and repeats until three materials are processed. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 when complete."),
+    ("FUN_080a6e74", "tick_masked_beast_des_gardius_material_phase",
+        "Masked Beast Des Gardius material phase callback, called at 0x080a8f30. It selects Grand Tiki Elder and Melchid the Four-Face Beast through check_masked_beast_des_gardius_material_slot_requirement, formats their names for prompts, commits display op 0x28 results, and advances a four-state material sequence. No APCS inputs. Returns phase status and writes gEquipZoneRankState plus LP display fields."),
+    ("FUN_080a7064", "dispatch_equip_phase_unless_activation_pending",
+        "Activation-pending guard called at 0x080a8f1e. If gEquipZoneRankState[0x12] bit1 is clear, it calls dispatch_equip_state_by_combined_phase_index and returns that result. If the bit is set, it returns 1 without dispatching. No APCS inputs. It has no direct writes."),
+    ("FUN_080a7084", "dispatch_equip_state_by_activation_flag",
+        "Activation-flag wrapper called at 0x080a8f24. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it clears state[0] bits 6..7 and returns 1. No APCS inputs. Direct side effect: mode-bit clear in gEquipZoneRankState."),
+    ("FUN_080a70ac", "tick_equip_sprite_enqueue_by_activation_flag",
+        "Activation sprite callback called at 0x080a8f60. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it extracts the player bit, enqueues sprite attribute value 0x1f4, and returns 1. No APCS inputs. Side effect: sprite queue submission."),
+    ("FUN_080a70d8", "tick_equip_banisher_sprite_phase_by_combined_index",
+        "Banisher-sprite phase callback called at 0x080a8f72. If activation bit1 is clear, it delegates to dispatch_equip_state_by_combined_phase_index. Otherwise phase 0 selects a slot through the display-code predicate or starts prompt 0xeb; phase 1 confirms and submits the banisher sprite with LP eligibility context. No APCS inputs. Returns dispatcher status, 0 while advancing, or 1 when complete; updates gEquipZoneRankState phase fields."),
+    ("FUN_080a71e4", "tick_special_summon_banish_material_phase",
+        "Seven-stage banish-material callback for Dark Necrofear, the Chaos monsters, Megarock Dragon, and Doom Dozer, called at 0x080a8f36. It formats field/graveyard removal prompts, initializes and renders effect-slot candidates, selects through check_equip_target_slot_eligible_by_extended_stat, confirms the bitmap, and advances or backtracks the combined phase. No APCS inputs. Returns phase status; writes gEquipZoneRankState and LP display context."),
+    ("FUN_080a7650", "tick_swift_gaia_summon_placement_phase",
+        "Swift Gaia the Fierce Knight summon-placement callback, selected for CID 0x147b at 0x080a8f3c. Phase 0 evaluates AI placement flags, writes the effect-slot count field, and formats text 0x72 when needed. Phase 1 commits the selected card ID or backtracks to the generic phase dispatcher. No APCS inputs. Returns 0 while advancing or 1 when a placement is accepted; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
+    ("FUN_080a7788", "tick_behemoth_summon_placement_phase",
+        "Behemoth the King of All Animals summon-placement callback, selected for CID 0x1864 at 0x080a8f42. Phase 0 evaluates placement flags, writes the effect-slot count field, and formats tribute-summon text 0x013f or prompt 0x12. Phase 1 commits the card ID and advances, or clears the phase and delegates to the generic dispatcher. No APCS inputs. Returns phase status; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
+    ("FUN_080a8c30", "dispatch_equip_phase_by_card_id_range",
+        "Card-ID phase hub called by dispatch_equip_entry_slot_by_mode. It extracts the card ID from gEquipZoneRankState and routes to card-specific state machines. Updated routes include Metamorphosis, Vampire Genesis/Neo Bubbleman, Gate Guardian, Valkyrion, Masked Beast Des Gardius, special-summon banish materials, Swift Gaia, and Behemoth. The branch at 0x080a8f36 calls tick_special_summon_banish_material_phase. Returns the selected handler result."),
+    ("FUN_0804448c", "dispatch_equip_zone_sprite_banisher_with_spell_check",
+        "Zone-sprite dispatcher called by dispatch_equip_zone_activation_state and tick_valkyrion_material_phase_with_slot_confirm (indeg=2). Inputs: r0=player_id, r1=slot_idx, r2=sub_zone_flag. It counts Banisher of the Light (CID 0x1332) and CID 0x19da, tests the second card for Spell type, and selects zone state 0xc, 0xe, or 0xf. It dispatches sprite/activation updates and enqueues CID 0x14e2 when extended-stat field6 is 1. Returns void; callers ignore r0."),
+    ("FUN_080a7b78", "tick_union_fusion_material_selection_phase",
+        "Union fusion-material selection phase called at 0x080a8f4e for XY-Dragon Cannon, XYZ-Dragon Cannon, XZ-Tank Cannon, and YZ-Tank Dragon. Combined phases 0..3 construct the required material CID list in gDuelPhaseFlags, select eligible field slots through check_equip_target_slot_in_active_table, sort the selected slots, and confirm the result. No APCS inputs. Returns 0 while active, 1 on completion, or the phase fallback status."),
+    # --- file 14 Seg-1 reviewed registry projections ---
+    ("FUN_080a78dc", "tick_lava_golem_tribute_selection_phase",
+        "Lava Golem tribute-selection phase called from the card-ID hub at 0x080a8f48 for CID 0x1578. Combined phases 0..6 dispatch through the table at 0x080a790c. The cases initialize selection state, use check_equip_target_slot_eligible_by_monster_space, collect two opposing monster slots, and run prompt, confirm, and backtrack handling. No APCS inputs. Returns 0 while active or the case result; an out-of-range phase returns 0."),
+    ("FUN_080a7acc", "check_equip_target_slot_in_active_table",
+        "Equip target slot validity check, called via fn-ptr (0x080a7d38 / 0x080a7d44) from equip placement decision dispatch tree. Conditions: r0=player_id, r1+r2=slot_idx (combined), slot<=10 and global struct [0x0201e4d0] byte[0] bit0 == player_id. Logic: compute gDuelFieldSlots[player*0x868 + slot*0x14] card_word, extract card_id (bits[12:0]=r6); if card_id==0 fail. Then check r6 against table@(gDuelActivationTable+0x5ac); if hit return 0x800 (1<<11, slot is in activation table); else return 0.\nConstants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_STRIDE=0x14, ACT_TABLE_BASE=0x0201b290, ACT_TABLE_OFF=0x5ac, HIT_RETURN=0x800 (=0x80<<4)."),
+    ("FUN_080a7f4c", "tick_three_tribute_summon_placement_phase",
+        "Three-tribute summon placement phase called at 0x080a8f54 for Moisture Creature and Gilford the Lightning. Phase 0 clears selection state, applies the Light of Intervention gate, requires more than two valid placements, builds a 0x18-byte placement context, and calls apply_card_equip_activation. Failure displays operation 0x0123. Phase 1 handles prompt 0xea. No APCS inputs. Returns 0 while active or the delegated status."),
+    ("FUN_080a81fc", "tick_familiar_possessed_summon_phase",
+        "Familiar-Possessed summon phase called at 0x080a8e9c for CIDs 0x196b..0x196e. With activation bit1 clear it delegates to the generic phase dispatcher. Otherwise combined phases 0..5 initialize the target context, select a matching Charmer through check_familiar_possessed_summon_slot_eligible, handle confirmation and display state, and complete the summon flow. No APCS inputs. Returns the delegated or case status; out-of-range returns 0."),
+    ("FUN_080a839c", "check_uria_tribute_slot_eligible",
+        "Uria tribute-slot predicate used by the shared Uria/Hamon/Anteatereatingant selector. Inputs: r0=player, r1=base slot, r2=offset. It requires matching owner, slot 0..10, a present active card, extended field6 value 0x17, and the equip whitelist check for monster-zone slots. Returns 0x800 when eligible, otherwise 0. The caller selects this predicate only for Uria CID 0x19a3."),
+    ("FUN_080a840c", "check_hamon_tribute_slot_eligible",
+        "Hamon tribute-slot predicate used by the shared Uria/Hamon/Anteatereatingant selector. Inputs: r0=player, r1=base slot, r2=offset. It restricts candidates to slots 5..10, requires a present active card, extended field9 value 4, and extended field6 value 0x16. Returns 0x800 when eligible, otherwise 0. The caller selects this predicate only for Hamon CID 0x19a4."),
+    ("FUN_080a8478", "check_anteatereatingant_tribute_slot_eligible",
+        "Anteatereatingant tribute-slot predicate used by the shared Uria/Hamon/Anteatereatingant selector. Inputs: r0=player, r1=base slot, r2=offset. It requires matching owner and a present card in slot 0..10; monster-zone slots must pass the equip whitelist, then every candidate must pass check_slot_card_special_activation_eligible. Returns 0x800 when eligible, otherwise 0. The caller selects it only for CID 0x19c8."),
+    ("FUN_080a84e0", "check_uria_hamon_anteatereatingant_tribute_slot_eligible",
+        "Shared tribute-slot predicate for Uria, Hamon, and Anteatereatingant. Inputs: r0=player, r1=base slot, r2=offset. It rejects absent or excluded slots, applies owner and placement checks, then reads the active CID from gEquipZoneRankState: 0x19a3 dispatches to the Uria predicate, 0x19a4 to Hamon, and 0x19c8 to Anteatereatingant. Returns 0x800 from the selected predicate or 0. Used as a Thumb callback by the shared phase machine."),
+    ("FUN_080a85d0", "tick_uria_hamon_anteatereatingant_tribute_phase",
+        "Shared tribute-selection phase for Uria, Hamon, and Anteatereatingant, called at 0x080a8f78 for CIDs 0x19a3, 0x19a4, and 0x19c8. Combined phases 0..11 initialize selection, invoke check_uria_hamon_anteatereatingant_tribute_slot_eligible, collect three tributes for Uria/Hamon or two for Anteatereatingant, and handle prompt, confirmation, and completion. No APCS inputs. Returns the case status; out-of-range returns 0."),
+    ("FUN_080a87ec", "tick_equip_phase_normal_summon_type",
+        "Two-phase normal-summon placement handler called at 0x080a8f92 after check_card_id_is_normal_summon_type succeeds. It derives the combined phase from gEquipZoneRankState. Phase 0 builds and filters placement candidates in a 0x100-byte frame; phase 1 processes confirmation and advances the state. Other phase values use the completion path. No APCS inputs. Returns the phase status and updates gEquipZoneRankState plus placement/display state."),
+    ("FUN_080a89f8", "tick_equip_card_phase_with_summon_type_dispatch",
+        "Fallback special-summon placement handler called at 0x080a8fa6 after check_card_id_is_special_summon_type succeeds and no card-specific route matched. It derives the combined phase from gEquipZoneRankState. Phase 0 builds summon-placement candidates in a 0x100-byte frame, phase 1 handles confirmation, and later values use the completion path. No APCS inputs. Returns the phase status and updates placement, display, and gEquipZoneRankState fields."),
+    # --- file 14 Seg-2 reviewed registry projection ---
+    ("FUN_080a9134", "process_equip_mode1_phase_3_to_7",
+        "Mode-1 combined phases 3..7 handler called only at 0x080a9ba6 with r0=0x1f. It dispatches combined_index-3 through the five-entry table at 0x080a9268, initializes selection state, scans field slots against the three CIDs at 0x09e478c8, submits sprite and activation records, handles backtracking, and advances equip-zone state. The 0x080a94ba path sets r0=0 before 0x080a94bc branches to 0x080a9722. Paths from 0x080a9228 and 0x080a92cc reach 0x080a9720, which sets r0=1."),
+    ("FUN_080a9734", "dispatch_equip_mode1_phase_by_combined_index",
+        "Mode-1 equip sub-entry dispatcher called at 0x080ab2a2. It derives combined_index=(state[0x14]&1)<<7|(state[0x13]>>1), accepts 0..9, and jumps through the ten-entry table at 0x080a9770. Cases 0..2 initialize and submit slot sprites; cases 3..7 call process_equip_mode1_phase_3_to_7 with r0=0x1f; cases 8..9 update the selected slot and run candidate/effect processing. Out-of-range returns 1. The cases share the epilogue at 0x080aa10e."),
+    ("FUN_080aa10c", "exit_equip_phase_oob_epilogue_wide",
+        "Shared mode-1 wide-frame epilogue. Entry 0x080aa10c sets r0=1 for dispatch_equip_mode1_phase_by_combined_index out-of-range input. R4 case paths also branch to 0x080aa10e with their prepared return value. The tail releases 0x3c stack bytes and restores r8, r9, r10, and r4-r7 before returning. The Function entry, ID, body, and signature stay unchanged; only new incoming branches and this PLATE are added."),
+    ("FUN_080aa77c", "dispatch_equip_mode3_phase_by_combined_index",
+        "Mode-3 equip phase dispatcher called by dispatch_equip_entry_slot_by_mode and dispatch_equip_mode4_phase_by_combined_index. It derives combined_index=(state[0x14]&1)<<7|(state[0x13]>>1) and routes 0..9 through table 0x080aa7b4. Cases 0..2 update selection and sprites; 3..7 use exit_equip_phase_oob_epilogue; case 8 renders the selected entry; case 9 scans candidates by card ID. Case code enters shared tails owned by dispatch_equip_entry_slot_by_mode without overlapping Function bodies."),
+    ("FUN_080aaf64", "dispatch_equip_mode4_phase_by_combined_index",
+        "Mode-4 equip phase dispatcher called by dispatch_equip_entry_slot_by_mode. It derives combined_index=(state[0x14]&1)<<7|(state[0x13]>>1) and routes 0..7 through table 0x080aaf90. Cases 0..2 update selection and sprites; phases 3..7 share 0x080ab1a4. Higher indices continue at 0x080ab1ac, call dispatch_equip_mode3_phase_by_combined_index, process its result, and return through the local epilogue at 0x080ab1f6."),
+    ("FUN_080ab200", "dispatch_equip_entry_slot_by_mode",
+        "Equip slot controller called by tick_equip_activation_main_sequence. It reads mode bits[8:6] from gEquipZoneRankState to call dispatch_equip_mode1_phase_by_combined_index, dispatch_equip_mode2_phase_by_combined_index, dispatch_equip_mode3_phase_by_combined_index, or dispatch_equip_mode4_phase_by_combined_index. It owns mode-3 shared tails at 0x080aac1c, 0x080aacbc, 0x080aad20, and 0x080aaef4. Its affected local body range ends at 0x080ab278 before a literal; the Function continues to 0x080aba50."),
+    # --- file 14 Seg-3 reviewed registry projection ---
+    ("FUN_080aa120", "dispatch_equip_mode2_phase_by_combined_index",
+        "Mode-2 equip phase dispatcher called by dispatch_equip_entry_slot_by_mode. It derives combined_index=(state[0x14]&1)<<7|(state[0x13]>>1), accepts 0..9, and jumps through table 0x080aa15c. Cases 0..2 render or validate slots; cases 3..7 share 0x080aa340; case 8 initializes activation state; case 9 scans card-specific candidates. Case paths return through the local epilogue at 0x080aa76a. Out-of-range input returns 1."),
+    ("FUN_080aaf54", "exit_equip_phase_oob_epilogue",
+        "Mode-3 shared epilogue. Function entry 0x080aaf54 sets r0=1 for out-of-range input from dispatch_equip_mode3_phase_by_combined_index. Case paths branch to interior 0x080aaf56 with their prepared return value. The tail releases the 8-byte frame, restores r8, r9, and r4-r7, then returns. Table entries for phases 3..7 target the Function entry."),
+    # --- file 13 Historical-Closure reviewed registry projection ---
+    ("FUN_080a38fc", "tick_equip_score_display_phase", "Three-step card-specific display callback, called by tick_equip_display_row_by_type row type 19. Inputs: r0=player_id, r1=card_id, r2=display_value. Step 0 sets gEquipPhaseDisplayState to 1. Step 1 handles Bark of Dark Ruler (LP-cost texts 301/303), Reasoning (level texts 280/304 or random level 4..7), and Wall of Revealing Light (LP-cost texts 301/302 and a bounded thousands score), then advances. Later steps copy the score to LP card tracking. Returns 0 while active, 1 when complete."),
+    ("FUN_080aba78", "return_zero_from_equip_entry_dispatch",
+        "Called only by dispatch_equip_entry_slot_by_mode at 0x080ab240 when gEquipZoneRankState byte +0x12 bit4 is clear. Sets r0=0 and falls through to exit_equip_subentry_epilogue, which restores that dispatcher's frame and returns directly to tick_equip_activation_main_sequence. The upper caller treats zero as a continue result and runs later update checks. The 2-byte Function writes no phase or entry field."),
+    ("FUN_080aba7a", "exit_equip_subentry_epilogue",
+        "Shared epilogue for dispatch_equip_entry_slot_by_mode and return_zero_from_equip_entry_dispatch. Adds 0x18 to sp, pops r3-r5, restores r8 from r3, r9 from r4, and r10 from r5, then pops r4-r7 and the return address and branches to it. It preserves the predecessor path's r0 and has no memory side effects beyond stack reads."),
+    ("FUN_080abbd8", "init_equip_slot_entry_with_copy_flag_sprite",
+        "Called by dispatch_equip_phase_by_card_id_range at 0x080a9094. Initializes gEquipZoneRankState sprite fields for a selected slot, tags the entry when Light of Intervention is present, copies the slot card ID, renders the field copy count, and calls init_equip_sub_entry_state_with_sprite_submit. A negative sub-slot index exits without initialization."),
+    ("FUN_080abd60", "setup_equip_oam_entry_with_sprite_attr",
+        "High-indegree sprite-entry initializer. Finds a placeable monster slot, builds gEquipZoneRankState attr fields from player, slot, card flags, and the stack extra parameter, tags Light of Intervention copies, sets the zone flag for descriptor type 0xe, and calls init_equip_sub_entry_state_with_sprite_submit. If no slot is placeable, returns without writes."),
+    ("FUN_080abe40", "invoke_setup_equip_oam_with_attr2",
+        "Wrapper with 57 incoming CALL references. Passes r0-r2 through unchanged, stores entry r3 at [sp] as the callee's fifth argument, sets callee r3=2, and calls setup_equip_oam_entry_with_sprite_attr with a normal BL. Returns void; all state and sprite side effects are performed by the callee."),
+    ("FUN_080abe54", "init_equip_slot_entry_with_placement_type_check",
+        "Called by dispatch_equip_phase_by_card_id_range at 0x080a906e. Initializes gEquipZoneRankState from player, slot, sub-slot, copy flag, and placement type; copies the card image ID from the player slot record, renders copy count when the card is present in a zone, then calls init_equip_sub_entry_state_with_sprite_submit. Negative sub-slot index exits."),
+    ("FUN_080ac21c", "check_equip_card_valid_for_target_slot",
+        "Read-only equip-target validator. Inputs: r0=player_side, r1=slot_index; entry r2 is overwritten before use. Reads gDuelFieldSlots+(player_side&1)*PLAYER_BLOCK_STRIDE+slot_index*0x14, extracts the low 19-bit card ID, dispatches card-specific validity predicates, and returns 1 when valid or 0 otherwise."),
+    ("FUN_080ac540", "eval_card_activation_score_with_lp_threshold",
+        "Evaluates one card's activation score. It first calls check_card_activation_eligible_by_id. Any result other than -1 is returned directly. For -1, it loads card stat field3 and ROM attribute A, calls eval_player_activation_score_and_lp_threshold, and returns that score unless it is -1, in which case it returns the caller-supplied fallback value."),
+    ("FUN_080ad5ec", "select_equip_target_slot_by_bitmap_for_player",
+        "This zero-incoming wrapper takes r0=player side and r1=eligibility mode. It builds the eligible target bitmap, then calls select_equip_target_slot_by_bitmap_alt with the original player and mode. It returns that selector result. Full-ROM raw/even and THUMB|1 scans found no stored pointer to this entry."),
+    ("FUN_080ad720", "score_equip_targets_for_monster_slot",
+        "Called at 0x080bb228. Inputs are r0=player side, r1=field slot index, and r2=eligibility-mode flag; entry moves r2 into r9 and forwards it to eval_equip_target_slot_with_score. It extracts the slot internal card ID, obtains a placement count, and repeatedly selects targets while passing its local sp+4 exclusion buffer as the fifth stack argument. It returns 1 after all targets score or 0 when a selector returns -1."),
+    ("FUN_080ad794", "check_effect_zone_or_pair_slot_available",
+        "Called at 0x080b7784 with r0=player side. It checks opponent Bad Reaction to Simochi effect-zone availability, own Fire Princess effect-zone availability, then valid monster pair slots. It returns class 0 for the first or pair-available path, 2 for the Fire Princess path, and 1 when neither zone nor pair is available. It performs no direct writes."),
+    ("FUN_080ad7f0", "find_monster_slot_by_card_id_in_player_zone",
+        "This zero-incoming leaf takes r0=player side and r1=internal card ID. It scans gP1FieldArrayCBase for the selected player using the count at gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x0c. It returns the first matching slot index or -1. Full-ROM raw/even and THUMB|1 scans found no stored pointer to this entry."),
+    ("FUN_080ad844", "find_chain_zone_slot_by_card_id_for_player",
+        "This zero-incoming leaf takes r0=player side and r1=internal card ID. It scans gP1ChainZoneArray for the selected player using the count at gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x18. It returns the first matching chain-zone slot index or -1. Full-ROM raw/even and THUMB|1 scans found no stored pointer to this entry."),
+    ("FUN_080ad974", "dispatch_card_effect_by_card_id",
+        "Called at 0x08056440 with r0 pointing to a card context. It derives the active player from context bytes +2 and +3, stores that side in gEquipLpScoreBase, reads the internal card ID from context +0, and dispatches card-specific eligibility checks. Shared exits return 0 or 1. It reads and writes duel state through explicit globals and called handlers."),
+    ("FUN_080aeeb0", "scan_monster_slots_for_peak_score",
+        "Input r0 is the player bit. The function scans five monster slots whose packed bits12:0 internal CID is nonzero and calls dispatch_zone_slot_score_by_player_flag. It selects the secondary score when slot halfword +6 is nonzero, otherwise the primary score, and returns the maximum selected value with initial value zero. It has no direct global writes and has zero incoming code references or ROM pointer holds."),
+    ("FUN_080aefc4", "scan_zone_slots_for_best_scored_slot",
+        "Inputs are r0=scoring player, r1=scanned player, r2=excluded slot index, r3=include-primary-score flag, and a fifth stack argument include-secondary-score flag. It scans five occupied monster slots except r2 and selects the guarded scorer when r0 equals r1. It returns the slot index whose enabled score channel is greatest, or -1 when no candidate exceeds the initial score -1."),
+    ("FUN_080b67e8", "exec_equip_target_by_field5_score_scan",
+        "Shared case fragment inside its parent equip-target selector. It scans five monster slots for the greatest nonzero field5 score. When that scan yields zero, it calls compute_peak_monster_zone_score_with_gates and uses the returned fallback score, not a slot index. It then clears mask bits 2 through 4 in slot byte +6 and continues the parent bitmap-selection flow through shared success or failure tails."),
+    ("FUN_080af120", "find_best_equip_target_slot_scored",
+        "Selects the highest scored eligible equip target among monster slots 0..4 except r2. Inputs: r0 points to a record whose first halfword is internal CID, r1=player, r2=excluded slot, r3=nonzero fallback scan flag. Each candidate passes occupancy, activation, type, card-specific, and score adjustments. Returns slot 0..4 or -1. If the scored pass finds none and r3 is nonzero, a second eligibility-only pass returns the first candidate."),
+    ("FUN_080af3b0", "check_field_spell_placement_available_by_card_id",
+        "Inputs: r0=player, r1=internal CID. When field9 equals 2, returns 1 only when the player's field slot contains a different CID. Otherwise scans zones 5..9: returns 0 if the same CID is already present, and returns 1 only when no duplicate exists and at least two slots are empty. Caller eval_field_spell_equip_activation_candidate treats nonzero as placement available. No writes."),
+    ("FUN_080af430", "count_monster_slots_in_card_id_range",
+        "Input: r0=player. Scans that player's five monster slots and counts occupied entries whose bits12:0 internal CID are within the inclusive Forbidden One limb range RIGHT_LEG_FORBIDDEN_ONE_CID through EXODIA_THE_FORBIDDEN_ONE_CID. Returns the count. No writes."),
+    ("FUN_080af48c", "count_spell_slots_in_card_id_range",
+        "Input: r0=player. Scans that player's five spell/effect slots and counts occupied entries whose bits12:0 internal CID are within the inclusive Forbidden One limb range RIGHT_LEG_FORBIDDEN_ONE_CID through EXODIA_THE_FORBIDDEN_ONE_CID. Returns the count. No writes."),
+    ("FUN_080af4e8", "count_monster_slots_by_card_id_range_for_player",
+        "Input: r0=player. Scans the player's five monster slots and counts occupied entries whose bits12:0 internal CID fall in the fixed inclusive range RIGHT_LEG_FORBIDDEN_ONE_CID through EXODIA_THE_FORBIDDEN_ONE_CID. Returns the count. r1 and r2 are not inputs. No writes."),
+    ("FUN_080af6a0", "count_effect_nodes_with_eligible_card",
+        "Inputs: r0=callback pointer, r1=player. Iterates the player's five effect nodes, requires the active bit and an eligible internal CID, invokes the callback for each candidate, and counts nonzero callback results. Returns the count. No persistent writes by this function."),
+    ("FUN_080af72c", "count_equip_eligible_cards_across_field_zones",
+        "Input: r0=player. Scans field slots 0..10. Occupied candidates must pass the equip-count or active-state gate and check_card_id_in_eligible_set(mode=1); slots 0..4 also require check_slot_card_is_equip_whitelist. Returns the number of qualifying cards across both monster and non-monster field zones. No writes."),
+    ("FUN_080af7b4", "find_hand_slot_by_card_id_table",
+        "Input: r0=player. Scans hand slots and compares each occupied card's bits12:0 internal CID against the 25-entry table equip_hand_candidate_card_id_table. The table loop is inclusive index 0..24. Returns the first matching hand slot or -1. No writes."),
+    ("FUN_080af824", "select_random_slot_by_callback",
+        "Inputs: r0=player, r1=callback pointer. Scans opponent=1-player slots 0..10 twice. The first pass counts callback-accepted candidates; PRNG selects one ordinal; the second pass returns the corresponding opponent slot. Callback inputs are player, zone code 0xb, and slot. Returns slot or -1 when no candidate is accepted."),
+    ("FUN_080af980", "accept_slot_scan_candidate_unconditionally",
+        "Callback stub used by check_hand_equip_target_available. It ignores r0, r1, and r2 and returns 1 unconditionally. The only ROM pointer source is 0x080af9fc with value accept_slot_scan_candidate_unconditionally+1. Body is exactly [0x080af980,0x080af984), bytes 01207047."),
+    ("FUN_080af984", "check_spell_equip_zone_field6_match",
+        "Callback inputs: r0=player, r1=zone code, r2=slot. Returns 0 unless zone code is 0xb. For zone 0xb, reads the slot's bits12:0 internal CID, calls get_card_extended_stat_field6, and returns 1 only when field6 equals 0x16; otherwise returns 0. No writes. Pointer source 0x080afa4c stores this Function+1."),
+    ("FUN_080afa10", "check_hand_equip_target_available_via_field_check",
+        "Input: r0=player. Calls scan_hand_for_best_equip_target_slot with check_spell_equip_zone_field6_match+1. If no hand candidate exists, returns 0. Otherwise calls check_card_effect_activation_eligible_by_id for the selected card and returns 1 only when that callee returns 0. No persistent writes."),
+    ("FUN_080b7858", "check_opponent_equip_whitelist_cards_present",
+        "Input: r0 points to a zone record whose +2 bit0 is player. Computes opponent=1-player and calls count_equip_eligible_cards_across_field_zones(opponent). Returns 1 when the count is nonzero and 0 otherwise. The callee scans field slots 0..10, not only monster slots."),
+    ("FUN_080b7934", "check_equip_activation_valid_under_level_restriction",
+        "Input: r0 points to a zone record whose +2 bit0 is player. Compares equip-active counts and count_equip_eligible_cards_across_field_zones for both sides, then checks Gravity Bind or Level Limit - Area B and score thresholds. Returns 1 only when the restriction-card activation path passes all count, precondition, LP, and zone-score gates; otherwise returns 0."),
     ('FUN_080bb9b8', 'eval_field_spell_equip_activation_candidate',
         'Phase0 scans70 rows: hit returns0; exhaustion enters phase1. Phase1 needs capacity>1, no-node/unavailable nonzero, <=1 flagged slots5..10. After early gates, primary needs owner==player and (field6!=0x16 or field9==5 or count049C!=0); 131E/10DD force primary,138F forbids it. Else fallback uses last post-gate index>=0 when active count0 and zones>4. Commit refs(player,11,index,7), 0x0201e244=player, 0x0201e238=1 (STR32), return0. Failure/other phase returns1.'),
+    ("FUN_080b1400", "resolve_activation_placement_side",
+        "Resolves an activation placement side. Inputs: r0=player, r1=internal CID, r2/r3 plus fifth and sixth placement arguments. It first calls check_card_activation_eligible_by_id and passes through any result other than -1. On -1 it populates a placement result and calls eval_player_activation_score_and_lp_threshold; if that also returns -1, it returns 0 when result+0x14 is greater than result+0x18, otherwise 1."),
+    ("FUN_080b18e0", "check_mask_of_restrict_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Mask of Restrict 0x13f2. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: XOR player bit with word at gP1LifePoints + P1LP_BLOCK2_OFF_1CE8, then booleanize nonzero. Evidence: arg 18e6-18ea; load/XOR 18ec-18ee; normalize 18f0-18f4."),
+    ("FUN_080b1900", "check_gate_guardian_component_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Sanga of the Thunder 0x1119, Kazejin 0x111a, Suijin 0x111b. Inputs: r0[0x14], r0[0x16], r0[2].bit0; entry r1 unused. Result/work: BOOL: field22 >= opposing LP, or field20 >= field22. Evidence: fields 1904,192c; LP 1908-1918; compares 191a-1920,192e-1934."),
+    ("FUN_080b193c", "check_injection_fairy_lily_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Injection Fairy Lily 0x13a7. Inputs: Neither entry argument; uses globals. Result/work: BOOL: both selected slots' +6 halfwords are zero and recorded players differ. Evidence: globals 193e-1944; field tests 1952-1964; player compare 1966-197a."),
+    ("FUN_080b1998", "check_kuriboh_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Kuriboh 0x0fe0. Inputs: r0[0x14], r0[2].bit0; entry r1 unused. Result/work: BOOL: field20 >= selected-player LP, or field20 >1499. Evidence: 199a-19c2."),
+    ("FUN_080b19d0", "check_collected_power_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Collected Power 0x148d. Inputs: r0[2].bit0 and entry pointer; entry r1 unused. Result/work: BOOL: require nonzero count_effect_node_activations_by_zone(entry,player), then find an opposing nonempty field8 slot accepted by check_slot_card_eligible_for_special_action. Evidence: count 19dc-19e6; scan 19ea-1a48; special-eligibility call 1a4c; result test 1a52-1a54."),
+    ("FUN_080b1a74", "check_time_machine_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Time Machine 0x12ba. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: scan chain entries for type22, resolve zone, then test field5/CID/player conditions. Evidence: type22 compare 1a82-1a86; scan 1a90-1ae2; input-side compare 1ae4-1af0; remaining tests 1af4-1b10."),
+    ("FUN_080b1b24", "check_rope_of_life_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Rope of Life 0x14a7. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: own-zone and hand-target gates, max-score comparison, then matching opposing event record. Evidence: gates 1b2c-1b54; score 1b5a-1b64; event loop 1b6c-1be0."),
+    ("FUN_080b1bf4", "check_skill_drain_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Skill Drain 0x166c. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: field state 3 uses count_occupied_monster_zones(other)>0; other states use count_slots_with_chain_field_match(other,1,0)>0. Evidence: split/calls 1bfc-1c2a; normalize 1c2e-1c36."),
+    ("FUN_080b1c3c", "check_magical_dimension_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Magical Dimension 0x1678. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: opposing occupied zone, nonnegative resolved own target, and positive field5>=4 count. Evidence: 1c44-1c72."),
+    ("FUN_080b1c80", "check_opponent_distinct_field7_pair_summon_response_eligible",
+        "Normal-summon response callback. Bound to internal CID 0x137f. Input: r0[2].bit0; r1 unused. It scans opposing slots with occupied CID and nonzero field8. The first saved field7 must be nonzero; a later field7 succeeds when it differs and signed <= 6, and may be zero. Returns 1 on success, otherwise 0. Evidence: CID/field8 filters 1cb6-1cd4; getters 1cd8,1ce2,1cfe; compares 1cdc,1ce6-1ce8; save 1cfc-1d02; accept 1cea-1cf0."),
+    ("FUN_080b1d24", "check_sebeks_blessing_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Sebek's Blessing 0x138f. Inputs: r0[0x14], r0[2].bit0; entry r1 unused. Result/work: BOOL: pair-slot availability >1, or selected LP <=1000, or field20 >1499. Evidence: 1d2e-1d5c."),
+    ("FUN_080b1d74", "check_regulation_of_tribe_summon_response_eligible",
+        "Normal-summon response callback. Table identity: The Regulation of Tribe 0x1358. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: global player/state gates, nonpositive zone comparison, then nonzero count_slots_with_chain_field_match(other,1,1). Evidence: 1d7a-1dc4."),
+    ("FUN_080b1dd4", "check_blind_destruction_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Blind Destruction 0x1494. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: opposing occupied count > selected-side occupied count. Evidence: calls 1dda-1dee; compare 1df2-1dfe."),
+    ("FUN_080b1e04", "check_graverobbers_retribution_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Graverobber's Retribution 0x1491. Inputs: r0[2].bit0; entry r1 unused. Result/work: COUNT: raw u32 count_zone_slots_with_card_field5(1-player); B4B52/B4B54 only test it for nonzero. Evidence: invert 1e06-1e0e; call 1e10; raw return 1e14-1e16; callee moves the accumulated count to r0 at 0803741e."),
+    ("FUN_080b1e18", "check_mystical_space_typhoon_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Mystical Space Typhoon 0x132d. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: count_available_effect_zones(player,MIRAGE_OF_NIGHTMARE_CID,-1) plus player/field gates. Evidence: call 1e20-1e32; gates 1e38-1e72."),
+    ("FUN_080b1e80", "check_dust_tornado_mind_haxorz_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Dust Tornado 0x137c, Mind Haxorz 0x184d. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: field state 5 and a nonempty opposing slot with tested +0x10 status bit. Evidence: state 1e86-1e92; scan 1e96-1ed6."),
+    ("FUN_080b1ef0", "check_ring_of_destruction_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Ring of Destruction 0x138d. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: two max-zone-score scans, both LP comparisons, and field5 threshold 1499. Evidence: calls 1f08-1f22; comparisons 1f36-1fac."),
+    ("FUN_080b1fb8", "check_battle_scarred_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Battle-Scarred 0x16a2. Inputs: Neither entry argument. Result/work: BOOL: logical NOT of check_card_matches_active_effect_slot(PANDEMONIUM_CID). Evidence: 1fba-1fc8."),
+    ("FUN_080b1fd4", "check_destruction_ring_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Destruction Ring 0x1718. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: LP threshold 1000 and selected-side occupied count >2. Evidence: 1fdc-201a."),
+    ("FUN_080b2028", "check_just_desserts_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Just Desserts 0x1301. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: let opposingOccupied be the opposing side occupied-monster count and opposingLP its LP; accept when 500 * opposingOccupied >= opposingLP or opposingOccupied > 1. Evidence: opposing count 2034-2048; opposing LP 204c-205a; opposing fallback count 205e-2068."),
+    ("FUN_080b207c", "check_gift_of_mystical_elf_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Gift of The Mystical Elf 0x137a. Inputs: r0[2].bit0; entry r1 unused. Result/work: CALLEE_RESULT: after total occupied count across both sides >2, raw check_effect_zone_or_pair_slot_available(player). Evidence: counts 2086-20a0; tail branch 20aa."),
+    ("FUN_080b20b4", "check_eye_of_truth_summon_response_eligible",
+        "Normal-summon response callback. Table identity: The Eye of Truth 0x137b. Inputs: Neither entry argument. Result/work: BOOL: global field-state word >1. Evidence: 20b6-20c4."),
+    ("FUN_080b20d0", "check_reveal_effect_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Ceasefire 0x135c, The Spell Absorbing Life 0x1635. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: two-side five-slot scans plus global field/restriction gates; all exits normalized. Evidence: setup 20da-20e4; scans/gates 20e6-21e6."),
+    ("FUN_080b21f8", "check_aqua_chorus_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Aqua Chorus 0x138e. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: selected-player nonempty field8 slot with positive eval_slot_target_eligibility_full. Evidence: filters 2208-223a; eligibility call 223c; positive-result test 2242-2248."),
+    ("FUN_080b226c", "check_chain_destruction_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Chain Destruction 0x12cd. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: chain types6..8, opposing side, live zone, score <=2000, pair gate. Evidence: 2278-233c."),
+    ("FUN_080b235c", "check_summon_removal_trap_response_eligible",
+        "Normal-summon response callback. Table identity: Chain Disappearance 0x16e0, Bottomless Trap Hole 0x1518. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: return 0 for a qualifying same-side chain entry of type6..8; return 1 after complete scan. Evidence: 2368-23aa."),
+    ("FUN_080b23b4", "check_torrential_tribute_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Torrential Tribute 0x13fa. Inputs: entry r0 passed to 080b235c; entry r1 unused. Result/work: BOOL: if first gate succeeds, sign bit of compare_zone_max_scores_by_player(player). Evidence: 23b6-23ce."),
+    ("FUN_080b23d8", "check_two_pronged_attack_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Two-Pronged Attack 0x12e7. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: selected-side max(field5,field6), then any opposing occupied field5 above that max. Evidence: max loop 23ee-2440; opposing loop 2442-246e."),
+    ("FUN_080b2480", "check_ultimate_offering_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Ultimate Offering 0x12f3. Inputs: r0[0], r0[2], and entry r1; requires r1==NULL. Result/work: BOOL: encoded states18/19/23 with occupied-count, CID-range/blacklist, and restriction gates. Evidence: null 2488-248c; dispatch/gates 248e-25c2."),
+    ("FUN_080b25d4", "check_player_monster_zone_empty_summon_response_eligible",
+        "Invoked through the normal-summon response table. r0 is the temporary zone/effect slot and r1 is the candidate/context slot or NULL. Bound to internal CID 0x131e. It selects the player from slot byte +2 bit0, calls count_occupied_monster_zones, and returns 1 exactly when that player has no occupied monster zone; otherwise 0."),
+    ("FUN_080b25f0", "check_solomons_lawbook_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Solomon's Lawbook 0x137e. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: reject when global player equals selected player; otherwise find an opposing nonzero CID with tested bit clear and positive maintenance LP cost. Evidence: gate 25f8-2610; scan 2614-2670."),
+    ("FUN_080b2694", "check_skull_lair_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Skull Lair 0x1490. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: opposing occupied slot with nonzero eval_equip_chain_score_for_slot no greater than selected hand/card field5 count. Evidence: count 26a2-26b0; scan/score 26b4-2718."),
+    ("FUN_080b2734", "check_time_seal_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Time Seal 0x1378. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: global recorded player equals selected player. Evidence: 2736-2750."),
+    ("FUN_080b27e4", "check_reversal_of_graves_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Reversal of Graves 0x14f0. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: combines both sides' zone/hand counts with available pair-slot gates; all exits normalized. Evidence: 27f0-289c."),
+    ("FUN_080b28ac", "check_fiend_comedian_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Fiend Comedian 0x151d. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: accept when the opposing block +0x14 value is unsigned less than the own block +0x10 value and the opposing count is signed greater than 2. Evidence: address/load sequence 28b6-28c8; unsigned comparison 28d6-28d8; signed count comparison 28ea-28ec."),
+    ("FUN_080b28f8", "check_position_change_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Ready for Intercepting 0x14d3, Book of Moon 0x1538. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: selected slot has nonzero summon restriction and field8, then either global/player action gate passes or field5 score <=1000. Evidence: filters 2918-2952; action 2954-2972; score 2974-2988."),
+    ("FUN_080b29b4", "check_burst_breath_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Burst Breath 0x14e4. Inputs: entry pointer, r0[2], r0[6]; entry r1 unused. Result/work: BOOL with writes: bitmap-select encoded target; update entry byte +6, write selected field5 score to entry halfword +8, then test opposing activation count. Evidence: target 29b8-29ce; writes 29d4-29ee; result 29f0-2a08."),
+    ("FUN_080b2a10", "check_discard_removal_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Raigeki Break 0x15a8, Phoenix Wing Wind Blast 0x1887. Inputs: r0[2].bit0 and entry pointer; entry r1 unused. Result/work: BOOL: hand target and either nonzero count_effect_nodes_with_eligible_card(entry,other,1) or negative selected-player zone comparison. Evidence: 2a14-2a4a."),
+    ("FUN_080b2a54", "check_karma_cut_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Karma Cut 0x19db. Inputs: r0[2].bit0 and entry pointer; entry r1 unused. Result/work: BOOL: same shape as 2a10, using count_effect_nodes_with_eligible_card(entry,other,0). Evidence: 2a58-2a8e."),
+    ("FUN_080b2a98", "check_thunder_of_ruler_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Thunder of Ruler 0x15f0. Inputs: r0[0], r0[2].bit0; entry r1 unused. Result/work: BOOL: reject nonzero check_value_in_slot_chain(other,11,entryCID); otherwise return sign bit of selected-player zone comparison. Evidence: chain 2a9c-2aae; score/sign 2ab2-2abe."),
+    ("FUN_080b2ac8", "check_adhesion_trap_hole_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Adhesion Trap Hole 0x15f8. Inputs: packed target r0[0x14]; entry r1 unused. Result/work: BOOL: resolve target CID and test extended stat field3 >1199. Evidence: decode 2acc-2ade; stat/threshold 2ae0-2aec."),
+    ("FUN_080b2afc", "check_non_aggression_area_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Non Aggression Area 0x15ad. Inputs: r0[2].bit0 and entry pointer; entry r1 unused. Result/work: BOOL: hand target, zero eligible opposing effect nodes, and opposing occupied count <=1. Evidence: 2b00-2b34."),
+    ("FUN_080b2b44", "check_a_hero_emerges_summon_response_eligible",
+        "Normal-summon response callback. Table identity: A Hero Emerges 0x171b. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: 2*count_field_zone_cards_with_field5(player) >= selected-player word at block offset12. Evidence: 2b4a-2b74."),
+    ("FUN_080b2b80", "check_taunt_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Taunt 0x17fc. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: nonnegative zone comparison and selected-player occupied count >1. Evidence: 2b86-2baa."),
+    ("FUN_080b2bb0", "check_field_count_burn_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Cemetary Bomb 0x1804, Secret Barrel 0x15f4, Solar Ray 0x1767. Inputs: entry pointer passed to LP-delta dispatcher; entry r1 unused. Result/work: BOOL: select opposing signed LP delta; fail only when delta >-1000 and resulting LP remains positive. Evidence: dispatch 2bb8-2bc8; select/gates 2bca-2bfe."),
+    ("FUN_080b2c10", "check_spell_trap_cleanup_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Malice Dispersion 0x1848, Spell Purification 0x1851. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: hand target and opposing activation count > selected-side activation count. Evidence: 2c14-2c48."),
+    ("FUN_080b2c50", "check_xing_zhen_hu_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Xing Zhen Hu 0x184a. Inputs: r0[2].bit0 and entry pointer; entry r1 unused. Result/work: BOOL: count_effect_node_activations_by_zone(entry,other)>1. Evidence: 2c52-2c6a."),
+    ("FUN_080b2c70", "check_assault_on_ghq_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Assault on GHQ 0x188a. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: selected-player nonempty field8 slot whose card summon-restriction field is nonzero. Evidence: filters 2c82-2cb4; call 2cba-2cc4."),
+    ("FUN_080b2ce0", "check_same_name_card_summon_response_eligible",
+        "Normal-summon response callback. Table identity: The League of Uniform Nomenclature 0x1978, Next to be Lost 0x19dc. Inputs: r0[0], r0[2].bit0, and entry pointer; entry r1 unused. Result/work: BOOL: slot accepted by invoke_effect_node_handler_3arg, then nonzero card-ID dispatch for entry CID and slot CID. Evidence: 2ce6-2d20."),
+    ("FUN_080b2d38", "check_gateway_zoma_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Gateway to Dark World 0x1973, Skull Zoma 0x172f. Inputs: encoded halfword r0[2]; entry r1 unused. Result/work: CONDITIONAL_RAW: recorded-player equality returns 0; inequality enters state dispatch. States 0x900/0x940 return raw u32 [gEquipChainSlotRefs+8]; other paths return BOOL(fieldState==5). Evidence: compare/branch 2d4a-2d4e; raw 2d72-2d76; bool 2d7c-2d8a."),
+    ("FUN_080b2d98", "check_threatening_roar_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Threatening Roar 0x1886. Inputs: encoded halfword r0[2]; entry r1 unused. Result/work: BOOL: encoded bits &0xfc0 == 0xc0, then nonzero count_slots_matching_card_pair(other,1,0). Evidence: 2d9c-2dc6."),
+    ("FUN_080b2dcc", "check_chthonian_blast_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Chthonian Blast 0x195e. Inputs: r0[2].bit0; entry r1 unused. Result/work: BOOL: minimum active-node field5 score across both sides followed by owner/LP gates. Evidence: scan 2de4-2e2c; gates 2e2e-2e54."),
+    ("FUN_080b2e64", "check_option_hunter_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Option Hunter 0x19e0. Inputs: encoded halfword r0[2], packed target r0[0x14]; entry r1 unused. Result/work: BOOL: require state 0x580, resolve target card, stat field3 >1499. Evidence: 2e68-2ea8."),
+    ("FUN_080b2eb0", "check_inferno_reckless_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Inferno Reckless Summon 0x198e. Inputs: packed target r0[0x14]; entry r1 unused. Result/work: BOOL: resolved card has tested Batteryman type or PROTO_CYBER_DRAGON_CID. Evidence: 2eb2-2ee6."),
+    ("FUN_080b2eec", "dispatch_reactive_summon_response_eligibility_by_card_id",
+        "Normal-summon response dispatcher for Sakuretsu Armor 0x16a7, Magic-Arm Shield 0x12e2, Shift 0x140a, and 44 additional table-bound cards. Inputs: r0 slot, r1 context or NULL. Ordinary paths return BOOL. If the B377A call succeeds, B3782 loads raw u16 [r7+8] and B3784 jumps to shared exit B397A, bypassing B3978 zeroing; B4B52/B4B54 accept any nonzero r0. Seventeen local BLs enter same-frame tails 3854/38bc/3918/3978 with source+4 machine fallthrough and semantic nonreturn."),
+    ("FUN_080b398c", "dispatch_stat_modifier_summon_response_eligibility_by_card_id",
+        "Invoked through the normal-summon response table. r0 is the temporary zone/effect slot and r1 is the candidate/context slot or NULL. Dispatcher for Graceful Dice 0x12cf, Skull Dice 0x12d0, Reinforcements 0x12f1, and 17 additional table-bound cards. It selects card-specific score/stat checks from the slot internal CID and returns 1 when the selected response is eligible, otherwise 0."),
+    ("FUN_080b3fa8", "check_graverobber_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Graverobber 0x1379. Inputs: both args; require r1!=NULL; compare side bits and walk r1 records. Result/work: BOOL with write: qualifying opposite-side type14 record with card stat field6==22 writes resolved zone type to global +0x14, returns1. Evidence: gates 3fac-3fc2; loop 3fd4-4014; write 3fc4-3fca."),
+    ("FUN_080b4030", "check_disappear_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Disappear 0x1515. Inputs: both args; require r1!=NULL; compare side bits and walk r1 records. Result/work: BOOL with write: opposite-side type14 record writes resolved zone type to global +0x14, returns1. Evidence: gates 4034-404a; loop 4060-408c; write 404c-405a."),
+    ("FUN_080b4098", "check_cross_side_summon_response_eligible",
+        "Normal-summon response callback. Table identity: Blue-Eyes Shining Dragon 0x17c2, Horus the Black Flame Dragon LV8 0x17d4, Sorcerer of Dark Magic 0x17c6, and 2 additional table-bound cards. Inputs: both args; require r1!=NULL; read each [2].bit0. Result/work: BOOL: 1 exactly when side bits differ. Evidence: 409c-40b6."),
+    ("FUN_080b4be8", "check_normal_summon_eligible_by_card_tables",
+        "Stores the current player and scans at most 69 secondary rows with r1 context. It enters the at-most-222-row primary scan when the context-side XOR differs from player, the context CID has nonzero field5, or the CID is Fairy Box. Each row uses check_normal_summon_eligible_for_slot. Returns bool."),
+    ("FUN_080b4464", "check_cross_side_effect_slot_with_dual_handler",
+        "Checks cross-side effect-slot eligibility and invokes the handler twice. Requires nonnull r1, opposite sides, bits[17:15] equal 1, decoded type <=10, and decoded side equal to r0[2].bit0. The first handler result must be nonzero. It temporarily writes slot[+8]=0 and slot[+6]=1, invokes again, restores both fields, and returns 1 only when the second result is zero; otherwise 0."),
+    ("FUN_080b46cc", "check_summon_response_slot_compatible",
+        "Checks r1 response context against r0 temporary slot. Category bits[17:15] select the path. A nonzero category extracts independent count bits[20:18], rejects zero, and requires decoded entry 0 side/type to match r0. Category zero instead requires map_card_id_to_anim_type(r1) greater than 3. Null r1 returns 0. Returns bool."),
+    ("FUN_080b4728", "check_opposing_summon_response_slot_eligible",
+        "Checks an opposing-side response context. Calls the count helper with (other,0,1,1). A nonzero count rejects Heavy Storm 0x131b, then the common gate may accept; zero count or a failed common gate enters fallback. Fallback rejects type >10, accepts field9 2/3, accepts field9 4 when signed card type <=2, and otherwise checks the mode-1 CID set. Returns bool."),
+    ("FUN_080b47f4", "check_own_effect_nodes_summon_response_eligible",
+        "Requires nonnull r1 and a positive count_effect_node_activations_by_zone result for r0[2].bit0, then returns check_summon_response_slot_compatible(r0,r1). Returns 0 when either gate fails."),
+    ("FUN_080b4820", "check_opposing_effect_nodes_summon_response_eligible",
+        "Requires nonnull r1 and a positive effect-node activation count for the side opposite r0[2].bit0, then returns check_summon_response_slot_compatible(r0,r1). Returns 0 when either gate fails."),
+    ("FUN_080b4850", "check_effect_handler_summon_response_eligible",
+        "Requires nonnull r1 and a positive check_effect_handler_result_positive(r0) result, then returns check_summon_response_slot_compatible(r0,r1). Returns 0 when either gate fails."),
     ("FUN_080b5bac", "score_slot_by_summon_restriction_without_chain",
         "Comparator for r0 player and r1 slot index. It extracts the slot's low-13-bit card ID and returns 1 only when get_card_field_summon_restriction is nonzero and slot halfword [+8] is zero; otherwise returns 0. Its Thumb pointer is stored at 0x080b6578."),
     ("FUN_080b76a4", "return_true_response_callback",
@@ -12924,66 +12653,6 @@ RENAMES = [
         'Inputs r0=player key, r1=mode. Each field-array row needs field5!=0. Extra gates: 1488 needs other hand field5 count 0; 127D..127F/12A5/154A need mode!=0 and slot score!=0; 18B4 handler result>3; 1578 needs other LP<=1000, owner whitelist, or summed score>2999 with owner occupied count 0; 19A5 needs allowed-pair count 0. All rows need target flags!=0. Success writes FieldArray player/ready, target(player,11,index,2), clears EquipLpScore+0x180, returns1; exhaustion returns0.'),
     ('FUN_080bb2d4', 'dispatch_equip_activation_ai_by_phase',
         'No APCS input. Uses phase gEquipLpScoreBase+8. In one call, phase0 scans 57 rows; failure increments and falls through phase1. Phase1 runs the full activation sequence; failure increments and falls through phase2. Phase2 calls try_activate_equip_from_field_array_for_player(mode=0); failure increments and returns1. Any success returns0 without incrementing its current phase; earlier increments remain. Invalid phase returns1. Evidence: 080bb2d4-080bb356.'),
-    # --- file 13 reviewed registry projections ---
-    ("FUN_080a5188", "check_equip_sub_entry_slot_pair_eligible", "Checks player r0 and slot r1+r2 (<=4) against gEquipZoneRankState. Activation flag bit1 selects direct check_slot_card_can_be_equipped. Otherwise it validates stored card-ID whitelists and ranges, active pair variants, chain vacancy, zone capacity, field blocking, and exclusions. Returns 0x800 or 0 and writes no state. Full-ROM scan finds packed Thumb pointers at 0x080a6434 and 0x080a6474; Ghidra has no direct CALL reference."),
-    ("FUN_080a6508", "dispatch_equip_confirm_action_by_phase", "Equip confirmation phase callback using gEquipZoneRankState. State 0 reads player control: value 1 selects a target through check_moth_evolution_slot_requirement; otherwise formats the card name and starts prompt 0x12. State 1 waits for confirmation, dispatches card op 0x28 with LP deltas, stores the result byte at +8 and target bytes at +0x0c, and returns 1; wait returns -1. Other states return 0. Updates phase bytes at +0x13/+0x14."),
-    ("FUN_080a6630", "tick_equip_target_phase_with_lp_confirm_slot_context", "Equip target phase callback. If activation bit1 at gEquipZoneRankState+0x12 is clear, returns dispatch_equip_state_by_combined_phase_index(). With bit1 set, state 0 selects through check_special_summon_slot_requirement_with_pair_exclusions or starts prompt 0x12 and returns 0; state 1 returns 1 after confirmed op 0x28 and target storage, or -1 while waiting; later states return 0."),
-    ("FUN_080a6a20", "tick_vampire_genesis_or_neo_bubbleman_target_phase", "Vampire Genesis/Neo Bubbleman target phase callback, called at 0x080a8f6c. Phase 0 selects through check_vampire_genesis_or_neo_bubbleman_slot_requirement or starts prompt 0x7e. Phase 1 waits for display confirmation, queries the target bitmap with the LP eligibility context, and advances; phase 2 returns complete. No APCS inputs. Returns -1 for pending confirmation, 0 for advance, or 1 for completion. Writes gEquipZoneRankState phase fields."),
-    ("FUN_08069e40", "tick_equip_monster_zone_placement_state_machine",
-        "Equip monster-zone placement state machine for the effect slot in r0. It validates the slot and dispatches field states 0x77..0x80. State 0x7f scans equip activation; state 0x7e reads pending LP context and calls init_equip_zone_rank_state_from_lp_context for modes 4 or 6; later states test zone eligibility, enqueue display work, or advance the field state. Returns the next state code or 0."),
-    ("FUN_08097070", "submit_equip_slot_sprite_with_ref_a",
-        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the first of two symmetric table callbacks."),
-    ("FUN_080970a0", "submit_equip_slot_sprite_with_ref_b",
-        "Stores slot reference r0 at gP1LifePoints+ELIGIB_SPRITE_CTRL_OFF and extra value r2 at +ACTIVATION_STATE_A_OFF, then calls init_equip_zone_rank_state_from_lp_context(1,1,0). Returns 0. This is the second of two symmetric table callbacks."),
-    ("FUN_080a585c", "check_gate_guardian_material_slot_requirement",
-        "Gate Guardian material-slot predicate for player r0, zone r1, and offset r2. Requires total slot <=4, an equip-eligible active card whose ID equals SANGA_OF_THUNDER_CID + gEquipZoneRankState[8], and available monster space or an unblocked matching slot. It scans recorded player/slot pairs and then material phases 1..2 across slots 0..4. Returns 0x800 on the first valid material slot, else 0. Read-only."),
-    ("FUN_080a5994", "check_valkyrion_material_slot_requirement",
-        "Valkyrion material-slot predicate for player r0, zone type r1, and offset r2. Loads the required Alpha, Beta, or Gamma Magnet Warrior CID from valkyrion_target_material_cids[gEquipZoneRankState[8]], verifies the requested entity, and scans candidate slots for equip eligibility plus field blocking. Returns 0x800 when the required material slot is valid, else 0. Read-only."),
-    ("FUN_080a5afc", "check_equip_target_slot_eligible_by_extended_stat",
-        "Special-summon target predicate for player r0 and slot r1+r2. Requires the stored player and total slot <=4. Card-specific branches compare the slot state code with the stored card extended-stat field or call check_slot_zone_bit_eligible using an extended-stat field. Covered IDs include Dark Necrofear, the Chaos envoys, Megarock Dragon, and Doom Dozer. Returns 0x800 on acceptance, else 0. Read-only."),
-    ("FUN_080a5bc8", "check_masked_beast_des_gardius_material_slot_requirement",
-        "Masked Beast Des Gardius material-slot predicate for player r0 and slot r1+r2. After equip eligibility passes, phase 0 accepts Grand Tiki Elder or Melchid the Four-Face Beast. Later phases reject recorded player/slot duplicates, then require monster space or an unblocked slot. Returns 0x800 on acceptance, else 0. Read-only."),
-    ("FUN_080a5cc8", "check_equip_target_slot_eligible_by_monster_space",
-        "Opponent monster-space target predicate for player r0 and slot r1+r2. Requires r0 to be the opponent of the player stored in gEquipZoneRankState and the slot to pass equip eligibility. Phase 0 requires available monster space or an unblocked slot; later phases require a player/slot pair absent from the recorded list. Returns 0x800 on acceptance, else 0. Read-only."),
-    ("FUN_080a5d4c", "check_equip_target_slot_eligible_by_display_code",
-        "Display-code mismatch target predicate. Requires player r0 to match gEquipZoneRankState player, zone type r1 to equal 0xb, and compares the stored display code with the code extracted from the selected slot word. Returns 0x800 only when the codes differ, else 0. Read-only."),
-    ("FUN_080a5da0", "check_ancient_gear_castle_counter_slot_requirement",
-        "Ancient Gear Castle counter-slot predicate for player r0 and spell/trap slot r1+r2 in 5..9. Requires the stored player, no Mask of Restrict on the field, and an active Ancient Gear Castle in the slot. It accepts when the evaluated bonus and the slot counter satisfy either bonus>6 with counter>1 or bonus<=6 with counter!=0. Returns 0x800 or 0. Read-only."),
-    ("FUN_080a5f7c", "dispatch_equip_state_by_combined_phase_index",
-        "Dispatches the 34-case equip phase table selected by ((gEquipZoneRankState[0x14]&1)<<7)|(state[0x13]>>1). It allocates a 512-byte frame, rejects indices above 0x21 through the default case, and executes card, slot, display, and placement handlers for the indexed phase. The table at 0x080a5fb0 remains 34 existing pointer words. Returns each case result; default returns -1."),
-    ("FUN_080a672c", "tick_equip_target_phase_with_lp_confirm_multistep",
-        "Multistep equip confirmation callback. State 0 clears gEquipZoneRankState[8], starts prompt 0x12, advances the combined phase, and returns 0. State 1 commits card op 0x28 after confirmation, increments the substep, and either repeats or advances when the card-specific activation count is reached; a pending confirmation dispatches op 0x29 and returns -1. Later states return 1."),
-    ("FUN_080a689c", "tick_metamorphosis_target_phase_with_lp_confirm",
-        "Metamorphosis target phase callback, called by dispatch_equip_phase_by_card_id_range at 0x080a8f66. Phase 0 selects through the Vampire Genesis/Neo Bubbleman predicate when the player context is active, otherwise starts prompt 0x3a. Phase 1 confirms, updates the LP display context, submits the zone sprite, and advances. Returns -1 while confirmation is pending, 0 while advancing, or 1 when complete. Writes gEquipZoneRankState phase fields; uses METAMORPHOSIS_CID."),
-    ("FUN_080a6b38", "tick_gate_guardian_material_phase_with_confirm",
-        "Gate Guardian material phase callback, called at 0x080a8f12. Phase 0 selects the required Sanga, Kazejin, or Suijin material through check_gate_guardian_material_slot_requirement, or formats prompt 0xd2. Phase 1 confirms display op 0x28, records the selected material in gEquipZoneRankState, and repeats until three entries are stored. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 after all materials are recorded."),
-    ("FUN_080a6c8c", "dispatch_equip_state_with_phase_reset",
-        "Phase-reset wrapper called at 0x080a8f7e. When the combined phase index is zero, it preserves gEquipZoneRankState[0x13] bit0, sets bits 2..5, and clears state[0x14] bit1. It then calls dispatch_equip_state_by_combined_phase_index unconditionally. No APCS inputs. Returns the dispatcher result. Direct side effects are limited to the phase-bit reset."),
-    ("FUN_080a6cc8", "tick_valkyrion_material_phase_with_slot_confirm",
-        "Valkyrion material phase callback, called at 0x080a8f2a. Phase 0 selects Alpha, Beta, or Gamma Magnet Warrior through check_valkyrion_material_slot_requirement, or formats prompt 0xd3 from valkyrion_prompt_material_cids. Phase 1 confirms, submits the selected material sprite, records the entry, and repeats until three materials are processed. No APCS inputs. Returns -1 while pending, 0 while advancing, or 1 when complete."),
-    ("FUN_080a6e74", "tick_masked_beast_des_gardius_material_phase",
-        "Masked Beast Des Gardius material phase callback, called at 0x080a8f30. It selects Grand Tiki Elder and Melchid the Four-Face Beast through check_masked_beast_des_gardius_material_slot_requirement, formats their names for prompts, commits display op 0x28 results, and advances a four-state material sequence. No APCS inputs. Returns phase status and writes gEquipZoneRankState plus LP display fields."),
-    ("FUN_080a7064", "dispatch_equip_phase_unless_activation_pending",
-        "Activation-pending guard called at 0x080a8f1e. If gEquipZoneRankState[0x12] bit1 is clear, it calls dispatch_equip_state_by_combined_phase_index and returns that result. If the bit is set, it returns 1 without dispatching. No APCS inputs. It has no direct writes."),
-    ("FUN_080a7084", "dispatch_equip_state_by_activation_flag",
-        "Activation-flag wrapper called at 0x080a8f24. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it clears state[0] bits 6..7 and returns 1. No APCS inputs. Direct side effect: mode-bit clear in gEquipZoneRankState."),
-    ("FUN_080a70ac", "tick_equip_sprite_enqueue_by_activation_flag",
-        "Activation sprite callback called at 0x080a8f60. With gEquipZoneRankState[0x12] bit1 clear, it returns dispatch_equip_state_by_combined_phase_index. With the bit set, it extracts the player bit, enqueues sprite attribute value 0x1f4, and returns 1. No APCS inputs. Side effect: sprite queue submission."),
-    ("FUN_080a70d8", "tick_equip_banisher_sprite_phase_by_combined_index",
-        "Banisher-sprite phase callback called at 0x080a8f72. If activation bit1 is clear, it delegates to dispatch_equip_state_by_combined_phase_index. Otherwise phase 0 selects a slot through the display-code predicate or starts prompt 0xeb; phase 1 confirms and submits the banisher sprite with LP eligibility context. No APCS inputs. Returns dispatcher status, 0 while advancing, or 1 when complete; updates gEquipZoneRankState phase fields."),
-    ("FUN_080a71e4", "tick_special_summon_banish_material_phase",
-        "Seven-stage banish-material callback for Dark Necrofear, the Chaos monsters, Megarock Dragon, and Doom Dozer, called at 0x080a8f36. It formats field/graveyard removal prompts, initializes and renders effect-slot candidates, selects through check_equip_target_slot_eligible_by_extended_stat, confirms the bitmap, and advances or backtracks the combined phase. No APCS inputs. Returns phase status; writes gEquipZoneRankState and LP display context."),
-    ("FUN_080a7650", "tick_swift_gaia_summon_placement_phase",
-        "Swift Gaia the Fierce Knight summon-placement callback, selected for CID 0x147b at 0x080a8f3c. Phase 0 evaluates AI placement flags, writes the effect-slot count field, and formats text 0x72 when needed. Phase 1 commits the selected card ID or backtracks to the generic phase dispatcher. No APCS inputs. Returns 0 while advancing or 1 when a placement is accepted; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
-    ("FUN_080a7788", "tick_behemoth_summon_placement_phase",
-        "Behemoth the King of All Animals summon-placement callback, selected for CID 0x1864 at 0x080a8f42. Phase 0 evaluates placement flags, writes the effect-slot count field, and formats tribute-summon text 0x013f or prompt 0x12. Phase 1 commits the card ID and advances, or clears the phase and delegates to the generic dispatcher. No APCS inputs. Returns phase status; writes gEquipZoneRankState and gP1LifePoints+0x1d40."),
-    ("FUN_080a8c30", "dispatch_equip_phase_by_card_id_range",
-        "Card-ID phase hub called by dispatch_equip_entry_slot_by_mode. It extracts the card ID from gEquipZoneRankState and routes to card-specific state machines. Updated routes include Metamorphosis, Vampire Genesis/Neo Bubbleman, Gate Guardian, Valkyrion, Masked Beast Des Gardius, special-summon banish materials, Swift Gaia, and Behemoth. The branch at 0x080a8f36 calls tick_special_summon_banish_material_phase. Returns the selected handler result."),
-    ("FUN_0804448c", "dispatch_equip_zone_sprite_banisher_with_spell_check",
-        "Zone-sprite dispatcher called by dispatch_equip_zone_activation_state and tick_valkyrion_material_phase_with_slot_confirm (indeg=2). Inputs: r0=player_id, r1=slot_idx, r2=sub_zone_flag. It counts Banisher of the Light (CID 0x1332) and CID 0x19da, tests the second card for Spell type, and selects zone state 0xc, 0xe, or 0xf. It dispatches sprite/activation updates and enqueues CID 0x14e2 when extended-stat field6 is 1. Returns void; callers ignore r0."),
-    ("FUN_080a7b78", "tick_equip_phase_by_lp_index_range_c",
-        "Four-state equip phase callback called by dispatch_equip_phase_by_card_id_range at 0x080a8f4e (indeg=1). It derives combined_index from gEquipZoneRankState bytes 0x13 and 0x14, then routes values 0..3 to case entries 0x080a7bba, 0x080a7d10, 0x080a7d48, and 0x080a7e30; larger values use 0x080a7f38. Case 0 writes the status word at gEquipZoneRankState+0x5a0. No APCS inputs. Returns phase status and updates equip-selection state."),
-    ("FUN_080a38fc", "tick_equip_score_display_phase", "Three-step card-specific display callback, called by tick_equip_display_row_by_type row type 19. Inputs: r0=player_id, r1=card_id, r2=display_value. Step 0 sets gEquipPhaseDisplayState to 1. Step 1 handles Bark of Dark Ruler (LP-cost texts 301/303), Reasoning (level texts 280/304 or random level 4..7), and Wall of Revealing Light (LP-cost texts 301/302 and a bounded thousands score), then advances. Later steps copy the score to LP card tracking. Returns 0 while active, 1 when complete."),
 ]
 
 

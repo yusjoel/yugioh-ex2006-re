@@ -2108,23 +2108,113 @@
 .equ PYRAMID_OF_LIGHT_CID,                   0x000017bf
 .equ FUSILIER_DRAGON_CID,                    0x00001838
 .equ CID_GAP_1986,                           0x00001986
+
+@ =============================================================================
+@ file 14 Seg-2 additions: mode-1 equip card IDs
+@ Source: doc/dev/refine/F14-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ HORN_OF_HEAVEN_CID,                     0x00001300
+.equ MOISTURE_CREATURE_CID,                  0x000013b5
+.equ MAJU_GARZETT_CID,                       0x00001654
+.equ OCEAN_DRAGON_LORD_NEO_DAEDALUS_CID,     0x000018e8
+.equ CID_GAP_1985,                           0x00001985
 .equ PETIT_MOTH_CID_SHIFTED,                 0x85e00000
 .equ COCOON_OF_EVOLUTION_CID_SHIFTED,        0x7f700000
 
-@ Existing definitions used by file 15.
+@ =============================================================================
+@ file 14 Seg-1 additions: Familiar-Possessed and Charmer card IDs
+@ Source: doc/dev/refine/F14-Seg-1.proposal.md (review PASS)
+@ =============================================================================
+.equ FAMILIAR_POSSESSED_ERIA_CID, 0x0000196c
+.equ FAMILIAR_POSSESSED_HIITA_CID, 0x0000196d
 .equ AUSSA_THE_EARTH_CHARMER_CID, 0x000018bf
-.equ CYBER_JAR_CID,                          0x00001331  @ password 34124316
-.equ DARK_SPIRIT_OF_THE_SILENT_CID,                  0x0000146b
-.equ DREAM_CLOWN_CID,                0x0000101e
-.equ EXILED_FORCE_CID,                       0x000014cb  @ password 74131780
-.equ GILFORD_THE_LIGHTNING_CID,                      0x0000154b
-.equ GRAVITY_BIND_CID,               0x0000140e
-.equ HAND_OF_NEPHTHYS_CID,                   0x0000185d  @ password 98446407
-.equ KING_TIGER_WANGHU_CID,         0x00001398
-.equ MESSENGER_OF_PEACE_CID,                      0x0000134a  @ password 44656491
-.equ MOISTURE_CREATURE_CID,                  0x000013b5
-.equ OCEAN_DRAGON_LORD_NEO_DAEDALUS_CID,     0x000018e8
+.equ HIITA_THE_FIRE_CHARMER_CID, 0x000018c1
+
+@ =============================================================================
+@ file 14 Seg-3 additions: mode-2/3/4 equip card IDs
+@ Source: doc/dev/refine/F14-Seg-3.proposal.md (review PASS)
+@ =============================================================================
+.equ CID_GAP_1255,                  0x00001255
 .equ SWARM_OF_LOCUSTS_CID,          0x0000152b
+.equ GOLEM_SENTRY_CID,              0x0000186e
+.equ CID_GAP_133D,                  0x0000133d
+.equ CID_GAP_1387,                  0x00001387
+.equ KING_TIGER_WANGHU_CID,         0x00001398
+.equ BYSER_SHOCK_CID,               0x000014b4
+.equ DARK_JEROID_CID,               0x0000157b
+.equ DARK_MAGICIAN_KNIGHT_CID,      0x0000167c
+.equ STUMBLING_CID,                 0x000016d0
+.equ SACRED_CRANE_CID,              0x000016fb
+
+@ =============================================================================
+@ file 14 Seg-4 additions: equip activation card IDs
+@ Source: doc/dev/refine/F14-Seg-4.proposal.md (review PASS)
+@ =============================================================================
+.equ DREAM_CLOWN_CID,                0x0000101e
+.equ CANNON_SOLDIER_CID,             0x000011a6
+.equ THOUSAND_EYES_RESTRICT_CID,     0x00001284
+.equ GRAVITY_BIND_CID,               0x0000140e
+.equ GORA_TURTLE_CID,                0x00001523
+.equ TRICKY_TOKEN_CID,               0x0000180d
+.equ PROTO_CYBER_DRAGON_CID,         0x000019bc
+@ =============================================================================
+@ file 14 Seg-5 additions: equip predicate card IDs
+@ Source: doc/dev/refine/F14-Seg-5.proposal.md (review PASS)
+@ =============================================================================
+.equ CID_GAP_1129,                           0x00001129
+.equ CID_GAP_1134,                           0x00001134
+.equ CID_GAP_1221,                           0x00001221
+.equ SWORD_OF_DEEP_SEATED_CID,               0x00001309  @ password 98495314
+.equ UNHAPPY_MAIDEN_CID,                     0x0000130b  @ password 51275027
+.equ MIRROR_FORCE_CID,                       0x00001317  @ password 44095762
+.equ HEAVY_STORM_CID,                        0x0000131b  @ password 19613556
+.equ EXILED_FORCE_CID,                       0x000014cb  @ password 74131780
+.equ ZABORG_THE_THUNDER_MONARCH_CID,         0x0000174d  @ password 51945556
+.equ HAND_OF_NEPHTHYS_CID,                   0x0000185d  @ password 98446407
+@ =============================================================================
+@ file 14 Seg-6 additions: equip scoring card IDs and packed CID field
+@ Source: doc/dev/refine/F14-Seg-6.proposal.md (review PASS)
+@ =============================================================================
+.equ CYBER_JAR_CID,                          0x00001331  @ password 34124316
+.equ EXCAVATION_OF_MAGE_STONES_CID,          0x00001638  @ password 98494543
+.equ UNSHAVEN_ANGLER_CID,                    0x000017e8  @ password 92084010
+.equ WHIRLWIND_PRODIGY_CID,                  0x00001873  @ password 15090429
+.equ CYBER_TWIN_DRAGON_CID,                  0x000018fc  @ password 74157028
+.equ GAIA_SOUL_PACKED_CID_FIELD,             (GAIA_SOUL_CID << 19)
+@ =============================================================================
+@ file 14 Seg-7 card IDs and hand-candidate table IDs
+@ Source: doc/dev/refine/F14-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ DIMENSIONAL_WARRIOR_CID,                     0x000010a6  @ password 37043180
+.equ PANTHER_WARRIOR_CID,                         0x0000128f  @ password 42035044
+.equ MESSENGER_OF_PEACE_CID,                      0x0000134a  @ password 44656491
+.equ OBNOXIOUS_CELTIC_GUARD_CID,                  0x0000147c  @ password 52077741
+.equ SASUKE_SAMURAI_CID,                          0x00001524  @ password 16222645
+.equ MAGIC_JAMMER_CID,                            0x000012fe  @ password 77414722
+.equ GEMINI_ELF_CID,                              0x000011ba  @ password 69140098
+.equ VORSE_RAIDER_CID,                            0x0000138c  @ password 14898066
+.equ CYBER_TECH_ALLIGATOR_CID,                    0x000012b6  @ password 48766543
+@ =============================================================================
+@ file 14 Seg-8 card ID
+@ Source: doc/dev/refine/F14-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ KA_2_DES_SCISSORS_CID,                          0x0000174a  @ password 52768103
+@ =============================================================================
+@ file 14 Seg-9 normal-summon response constants
+@ Source: doc/dev/refine/F14-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ STONE_STATUE_OF_THE_AZTECS_CID,                 0x00001292
+.equ RUSH_RECKLESSLY_CID,                            0x00001329
+.equ SNAKE_FANG_CID,                                 0x00001330
+.equ MASK_OF_WEAKNESS_CID,                           0x000013ee
+.equ JAM_DEFENDER_CID,                               0x00001402
+.equ DARK_SPIRIT_OF_THE_SILENT_CID,                  0x0000146b
+.equ GILFORD_THE_LIGHTNING_CID,                      0x0000154b
+.equ CALAMITY_OF_THE_WICKED_CID,                     0x00001575
+.equ STONE_STATUE_OF_THE_AZTECS_CID_SHIFT19,         STONE_STATUE_OF_THE_AZTECS_CID << 19
+.equ CYBER_TWIN_DRAGON_CID_SHIFT19,                  CYBER_TWIN_DRAGON_CID << 19
+.equ CARD_FIELD3_THRESHOLD_1199,                     0x000004af
+.equ CARD_DESTRUCTION_CID, 0x000012d5
 
 @ =============================================================================
 @ file 15 Seg-1 equip-target constants

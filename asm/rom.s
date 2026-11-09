@@ -69,15 +69,6 @@
 @ PRNG LCG constants (advance_prng_state LCG multiplier/increment; asm/12 Seg-1)
 	.include "constants/prng.inc"
 
-@ F15 uses the reviewed names for these existing entries in file 14.
-	.equ check_player_lp_exceeds_chain_energy_cost, check_player_lp_exceeds_toon_world_cost
-	.equ check_card_id_in_field_spell_placement_bypass_set, check_card_id_in_field_spell_bst
-	.equ compute_peak_monster_zone_score_with_gates, find_best_scored_slot_for_player_with_gate
-	.equ check_field_spell_placement_available_by_card_id, check_dual_field_slot_owner_mismatch
-	.equ count_equip_eligible_cards_across_field_zones, count_equip_whitelist_cards_in_monster_zone
-	.equ check_effect_zone_unavailable_for_player, check_effect_zone_available_for_player
-	.equ select_preferred_spell_zone_slot_from_bitmap, sample_random_monster_slot_with_field9_filter
-
 @ file 08 THUMB fn-ptr +1 aliases -- GAS .equ for _cb_1 symbols
 @ (asm/08 literal pool slots reference these _1 names; function label + GAS auto-|1 for THUMB)
 	.equ check_activation_ctx_zone11_match_cb_1, check_activation_ctx_zone11_match_cb+1
@@ -103,9 +94,9 @@
 
 
 @ file 13 Seg-7 THUMB function-pointer +1 aliases
-	.equ check_equip_target_slot_eligible_by_field6_eq17_1, check_equip_target_slot_eligible_by_field6_eq17+1
-	.equ check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_1, check_equip_target_slot_eligible_by_field9_eq4_field6_eq16+1
-	.equ check_equip_target_slot_eligible_by_whitelist_or_special_1, check_equip_target_slot_eligible_by_whitelist_or_special+1
+	.equ check_uria_tribute_slot_eligible_1, check_uria_tribute_slot_eligible+1
+	.equ check_hamon_tribute_slot_eligible_1, check_hamon_tribute_slot_eligible+1
+	.equ check_anteatereatingant_tribute_slot_eligible_1, check_anteatereatingant_tribute_slot_eligible+1
 
 @ file 13 Seg-8 THUMB function-pointer +1 alias
 	.equ check_card_is_archfiend_type_1, check_card_is_archfiend_type+1
@@ -123,6 +114,15 @@
 	.equ check_vampire_genesis_or_neo_bubbleman_slot_requirement_1, check_vampire_genesis_or_neo_bubbleman_slot_requirement+1
 	.equ check_equip_target_slot_eligible_by_display_code_1, check_equip_target_slot_eligible_by_display_code+1
 	.equ check_equip_target_slot_eligible_by_extended_stat_1, check_equip_target_slot_eligible_by_extended_stat+1
+
+@ file 14 Seg-1 THUMB function-pointer +1 aliases
+	.equ check_equip_target_slot_in_active_table_1, check_equip_target_slot_in_active_table+1
+	.equ check_equip_target_slot_eligible_by_monster_space_1, check_equip_target_slot_eligible_by_monster_space+1
+	.equ check_familiar_possessed_summon_slot_eligible_1, check_familiar_possessed_summon_slot_eligible+1
+	.equ check_uria_hamon_anteatereatingant_tribute_slot_eligible_1, check_uria_hamon_anteatereatingant_tribute_slot_eligible+1
+@ file 14 Seg-7 THUMB function-pointer +1 aliases
+	.equ accept_slot_scan_candidate_unconditionally_1, accept_slot_scan_candidate_unconditionally+1
+	.equ check_spell_equip_zone_field6_match_1, check_spell_equip_zone_field6_match+1
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 
@@ -1558,7 +1558,12 @@ valkyrion_prompt_material_cids:
     .word ALPHA_MAGNET_WARRIOR_CID
     .word BETA_MAGNET_WARRIOR_CID
     .word GAMMA_MAGNET_WARRIOR_CID
-	.incbin "roms/2343.gba", 0x1e478c8, 0x920
+equip_mode1_counter_trap_cids:
+    .hword HORN_OF_HEAVEN_CID
+    .hword SOLEMN_JUDGMENT_CID
+    .hword TRIAGE_CID
+	.incbin "roms/2343.gba", 0x1e478ce, 0x2
+	.include "asm/normal_summon_response_tables.inc"
 	.include "asm/equip_activation_response_tables.inc"
 	.incbin "roms/2343.gba", 0x1e491c0, 0xb4c
 assert_pdst_null:
@@ -2032,7 +2037,34 @@ aob_phase_table:                                @ 0x09E59DB4: AOB phase dispatch
 deck_type_table:                                @ 0x09E59DC4: 8-entry u16 deck_type->sprite_tile_offset lookup (f02 Seg-2 carve)
 	.incbin "roms/2343.gba", 0x1E59DC4, 0x10   @ deck_type_table (8 halfwords)
 scene_scroll_table:                             @ 0x09E59DD4: 0x20-entry u16 symmetric scroll position table (f02 Seg-2 carve)
-	.incbin "roms/2343.gba", 0x1E59DD4, 0xD88  @ scene_scroll_table + tail to F15 callback table
+	.incbin "roms/2343.gba", 0x1E59DD4, 0xD54  @ scene_scroll_table + prefix to 0x1E5AB28
+equip_hand_candidate_card_id_table:             @ 0x09E5AB28: 25 internal CIDs used by equip hand-candidate scans
+	.hword CHANGE_OF_HEART_CID                   @ 0x09e5ab28
+	.hword MIRROR_FORCE_CID                      @ 0x09e5ab2a
+	.hword RAIGEKI_CID                           @ 0x09e5ab2c
+	.hword MONSTER_REBORN_CID                    @ 0x09e5ab2e
+	.hword SNATCH_STEAL_CID                      @ 0x09e5ab30
+	.hword JINZO_CID                             @ 0x09e5ab32
+	.hword DARK_HOLE_CID                         @ 0x09e5ab34
+	.hword HARPIES_FEATHER_DUSTER_CID            @ 0x09e5ab36
+	.hword POT_OF_GREED_CID                      @ 0x09e5ab38
+	.hword PENGUIN_SOLDIER_CID                   @ 0x09e5ab3a
+	.hword MAN_EATER_BUG_CID                     @ 0x09e5ab3c
+	.hword MAGICIAN_OF_FAITH_CID                 @ 0x09e5ab3e
+	.hword WALL_OF_ILLUSION_CID                  @ 0x09e5ab40
+	.hword NEEDLE_WORM_CID                       @ 0x09e5ab42
+	.hword HANE_HANE_CID                         @ 0x09e5ab44
+	.hword ROYAL_DECREE_CID                      @ 0x09e5ab46
+	.hword IMPERIAL_ORDER_CID                    @ 0x09e5ab48
+	.hword MAGIC_JAMMER_CID                      @ 0x09e5ab4a
+	.hword SEVEN_TOOLS_OF_THE_BANDIT_CID         @ 0x09e5ab4c
+	.hword GEMINI_ELF_CID                        @ 0x09e5ab4e
+	.hword VORSE_RAIDER_CID                      @ 0x09e5ab50
+	.hword SUMMONED_SKULL_CID                    @ 0x09e5ab52
+	.hword CYBER_TECH_ALLIGATOR_CID              @ 0x09e5ab54
+	.hword WITCH_OF_THE_BLACK_FOREST_CID         @ 0x09e5ab56
+	.hword SANGAN_CID                            @ 0x09e5ab58
+	.incbin "roms/2343.gba", 0x1E5AB5A, 0x2
 duel_field_ai_state_callback_table:
     .word dispatch_equip_activation_ai_by_phase+1
     .word dispatch_equip_activation_by_field_state+1
@@ -2045,7 +2077,7 @@ duel_field_ai_state_callback_table:
     .word eval_field_spell_equip_activation_candidate+1
 duel_field_ai_state_callback_table_end:
     .word 0
-	.incbin "roms/2343.gba", 0x1E5AB84, 0x78
+.incbin "roms/2343.gba", 0x1E5AB84, 0x78
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

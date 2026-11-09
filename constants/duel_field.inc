@@ -674,10 +674,61 @@
 @ =============================================================================
 .equ EQUIP_SLOT_CARD_ID_RANGE_MIN,         0x00001386
 
-@ Existing definitions used by file 15.
+@ =============================================================================
+@ file 14 Seg-1 additions: equip selection display and slot-array offsets
+@ Source: doc/dev/refine/F14-Seg-1.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_CRITERIA_DISPLAY_THIRD_OFF, 0x000005b4
+.equ EQUIP_SELECTED_SLOT_ARRAY_OFF,    0x000005c4
+
+@ =============================================================================
+@ file 14 Seg-2 additions: mode-1 equip-state masks
+@ Source: doc/dev/refine/F14-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_STATE_CLEAR_BITS_8_1_MASK,  0xfffffe01
+.equ EQUIP_STATE_CLEAR_BITS_16_9_MASK, 0xfffe01ff
+
+@ file 14 Seg-3: Harpies' Hunting Ground equip activation attributes
+.equ HARPIES_HUNTING_GROUND_EQUIP_ATTR_FLAGGED, 0x012a183f
+.equ HARPIES_HUNTING_GROUND_EQUIP_ATTR_BASE,    0x002a183f
+
+@ =============================================================================
+@ file 14 Seg-4 additions: equip activation masks and score thresholds
+@ Source: doc/dev/refine/F14-Seg-4.proposal.md (review PASS)
+@ =============================================================================
+.equ EQUIP_STATE_CLEAR_BITS_8_6_MASK,            0xfffffe3f
+.equ EQUIP_SLOT_SCORE_FIELD5_HIGH,               0x00000834
+.equ EQUIP_SCORE_THRESHOLD_1500,                 0x000005dc
 .equ EQUIP_SCORE_THRESHOLD_999,                  0x000003e7
+.equ EQUIP_SCORE_THRESHOLD_1699,                 0x000006a3
+.equ EQUIP_ACTIVATION_LP_THRESHOLD_3999,         0x00000f9f
+.equ EQUIP_ACTIVATION_SCORE_RANGE_NEG_1101,      0xfffffbb3
+.equ EQUIP_ACTIVATION_SCORE_RANGE_WIDTH_798,     0x0000031e
+@ file 14 Seg-6 score scan ceiling.
+.equ ZONE_SCORE_CEILING_99999, 0x0001869f
+@ =============================================================================
+@ file 14 Seg-7 equip score deltas and thresholds
+@ Source: doc/dev/refine/F14-Seg-7.proposal.md (review PASS)
+@ =============================================================================
 .equ SCORE_DELTA_NEG_1000,                        0xfffffc18  @ signed score -1000
+.equ SCORE_DELTA_NEG_1001,                        0xfffffc17  @ signed score -1001
+.equ ZONE_SCORE_THRESHOLD_898,                    0x00000382  @ zone score threshold 898
+.equ ZONE_SCORE_THRESHOLD_299,                    0x0000012b  @ zone score threshold 299
+@ =============================================================================
+@ file 14 Seg-8 placement and zone-score constants
+@ Source: doc/dev/refine/F14-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ FIELD_PLACEMENT_SCORE_SENTINEL_NEG_65536,       0xffff0000  @ signed placement score -65536
+.equ SLOT_CARD_SET_CODE_CLEAR_MASK,                  0xffffe000  @ clear low 13-bit slot CID/set-code field
+.equ ZONE_SCORE_THRESHOLD_899,                       0x00000383  @ zone score threshold 899
+@ =============================================================================
+@ file 14 Seg-9 normal-summon response constants
+@ Source: doc/dev/refine/F14-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ SCORE_DIFFERENCE_THRESHOLD_1499,                0x000005db
 .equ TARGET_SCORE_THRESHOLD_1799,                    0x00000707
+.equ SCORE_DELTA_NEG_4000,                           0xfffff060
+.equ EQUIP_ELIGIBILITY_LP_THRESHOLD_2500, 0x000009c4
 .equ RESPONSE_OPPONENT_LP_THRESHOLD_2900, 0x00000b54
 .equ VIJA_INTRO_WIN0H_BOUNDS, 0x000028f0
 .equ VIJA_INTRO_AOB_PACKED_INIT, 0x01c00003

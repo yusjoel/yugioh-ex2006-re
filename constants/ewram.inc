@@ -666,7 +666,26 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gEquipPhaseDisplayState, 0x0201e274  @ u32 equip phase-display state; gP1LifePoints+EQUIP_PHASE_DISPLAY_STATE_OFF.
 .equ gLpCardTrackNext, 0x0201e28a  @ u16 next LP-card tracking field; gP1LifePoints+0x1daa.
 
-@ Existing definitions used by file 15.
+@ file 14 Seg-3: direct LP-bar display-counter global
+.equ gLpBarDisplayCounter, gDuelPhaseFlags + LP_BAR_DISPLAY_CTR_OFF
+@ =============================================================================
+@ file 14 Seg-7 spell-zone score RAM base
+@ Source: doc/dev/refine/F14-Seg-7.proposal.md (review PASS)
+@ =============================================================================
+.equ gEquipSpellZoneScoreBase,                    0x0201b00c  @ signed spell-zone score entry array base
+@ =============================================================================
+@ file 14 Seg-8 equip placement RAM fields
+@ Source: doc/dev/refine/F14-Seg-8.proposal.md (review PASS)
+@ =============================================================================
+.equ gEquipZoneScoreEntryBase,                       0x0201aff8  @ equip zone score entry array base
+.equ gEquipSpellZoneScoreValueBase,                  0x0201b010  @ equip spell-zone score value base
+.equ gEquipPlacementOccupiedZoneCount,               0x0201b16c  @ equip placement occupied-zone count
+.equ gEquipFieldSpellPlacementResult,                0x0201b18c  @ field-spell/equip placement result
+@ =============================================================================
+@ file 14 Seg-9 normal-summon response constants
+@ Source: doc/dev/refine/F14-Seg-9.proposal.md (review PASS)
+@ =============================================================================
+.equ gDuelSpriteRowEntryCount,                       gDuelPhaseFlags + LP_BAR_ANIM_STATE_OFF
 .equ NORMAL_SUMMON_PLAYER_CACHE_OFF, 0x00001c44
 .equ EQUIP_ACTIVATION_READY_FLAG_OFF, 0x00001c38
 .equ gEquipActivationStateA,    gP1LifePoints + ACTIVATION_STATE_A_OFF

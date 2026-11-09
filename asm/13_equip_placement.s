@@ -14054,14 +14054,14 @@ LAB_080a3ca8:
     b LAB_080a3cc4                           @ 080a3cac 0ae0
     .zero  0x2
 check_equip_target_slot_eligible_by_field6_eq17_callback_ptr_080a3cb0:
-    .word  check_equip_target_slot_eligible_by_field6_eq17_1 @ 080a3cb0 9d830a08  check_equip_target_slot_eligible_by_field6_eq17_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
+    .word  check_uria_tribute_slot_eligible_1 @ 080a3cb0 9d830a08  check_uria_tribute_slot_eligible_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
 LAB_080a3cb4:
     ldr r7, check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_callback_ptr_080a3cbc @ 080a3cb4 014f
     movs r6,#0x3    @ 080a3cb6 0326
     b LAB_080a3cc4                           @ 080a3cb8 04e0
     .zero  0x2
 check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_callback_ptr_080a3cbc:
-    .word  check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_1 @ 080a3cbc 0d840a08  check_equip_target_slot_eligible_by_field9_eq4_field6_eq16_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
+    .word  check_hamon_tribute_slot_eligible_1 @ 080a3cbc 0d840a08  check_hamon_tribute_slot_eligible_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
 LAB_080a3cc0:
     ldr r7, check_equip_target_slot_eligible_by_whitelist_or_special_callback_ptr_080a3cfc @ 080a3cc0 0e4f
     movs r6,#0x2    @ 080a3cc2 0226
@@ -14097,7 +14097,7 @@ LAB_080a3cf8:
     movs r0,#0x0    @ 080a3cf8 0020
     b LAB_080a3d02                           @ 080a3cfa 02e0
 check_equip_target_slot_eligible_by_whitelist_or_special_callback_ptr_080a3cfc:
-    .word  check_equip_target_slot_eligible_by_whitelist_or_special_1 @ 080a3cfc 79840a08  check_equip_target_slot_eligible_by_whitelist_or_special_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
+    .word  check_anteatereatingant_tribute_slot_eligible_1 @ 080a3cfc 79840a08  check_anteatereatingant_tribute_slot_eligible_1: Thumb callback pointer equate (even Function + 1); no DATA reference.
 LAB_080a3d00:
     movs r0,#0x1    @ 080a3d00 0120
 LAB_080a3d02:
@@ -14557,7 +14557,7 @@ LAB_080a4048:
     pop {r1}                                 @ 080a4054 02bc
     bx r1                                    @ 080a4056 0847
 
-@ Initialize spell activation context (gSpellContext=0x0201e4d0) for player (r0). Writes player_side to bit0, card_id to bits[22:8], sets bit1 of [+0x12], clears [+0x8]. Loops slots 0..4 calling check_slot_equip_target_eligible; any nonzero -> return 1. r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. Returns u32 bool (1=eligible slot found, 0=none). Side-effects: gSpellContext fields updated. Constants: gSpellContext=0x0201e4d0, player_bit=bit0, slot_range=[0..4].
+@ Initializes gEquipZoneRankState for player r0 and card CID r1. It writes the player bit and CID, sets activation bit1, clears the exclusion count, then scans monster slots 0..4 by calling check_familiar_possessed_summon_slot_eligible. Returns 1 when any slot is eligible, otherwise 0. Side effects are limited to the activation context fields. Called at 0x080a4e5c.
 init_spell_activation_context:
     push {r4,r5,lr}                          @ 080a4058 30b5
     adds r5,r0,#0x0    @ 080a405a 051c
@@ -14590,7 +14590,7 @@ LAB_080a408e:
     adds r0,r5,#0x0    @ 080a408e 281c
     adds r1,r4,#0x0    @ 080a4090 211c
     movs r2,#0x0    @ 080a4092 0022
-    bl check_slot_equip_target_eligible      @ 080a4094 04f008f8
+    bl check_familiar_possessed_summon_slot_eligible @ 080a4094 04f008f8
     cmp r0,#0x0                              @ 080a4098 0028
     beq LAB_080a40ac                         @ 080a409a 07d0
     movs r0,#0x1    @ 080a409c 0120

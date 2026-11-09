@@ -266,11 +266,25 @@
 .equ OAM_EQUIP_SPRITE_P2_0D, 0x0000800d  @ Equip display sprite code 0x0d with player-side bit15 set.
 
 @ =============================================================================
+@ file 14 Seg-2 additions: mode-1 equip sprite values
+@ Source: doc/dev/refine/F14-Seg-2.proposal.md (review PASS)
+@ =============================================================================
+.equ OAM_SPRITE_ATTR_CLR_BITS19_18,                0xfff3ffff
+.equ EQUIP_MODE1_CASE2_SPRITE_CODE_SIDE1,          0x0000802c
+.equ EQUIP_MODE1_CASE8_SPRITE_CODE_SIDE1,          0x00008044
+.equ EQUIP_MODE1_LIST_ENTRY_SPRITE_CODE_SIDE1,     0x00008049
+.equ EQUIP_MODE1_RESULT_SPRITE_CODE_SIDE1,         0x0000804e
+.equ EQUIP_MODE1_PRIMARY_SPRITE_CODE_SIDE1,        0x0000805f
+
+@ =============================================================================
 @ file 13 Seg-4 additions: equip reroll display P2 sprites
 @ Source: doc/dev/refine/F13-Seg-4.proposal.md (review PASS)
 @ =============================================================================
 .equ OAM_COIN_REROLL_SPRITE_P2_5B, 0x0000805b  @ P2-side coin-reroll sprite code; P1 uses inline 0x5b.
 .equ OAM_DICE_REROLL_SPRITE_P2_5C, 0x0000805c  @ P2-side dice-reroll sprite code; P1 uses inline 0x5c.
+
+@ file 14 Seg-3: mode-3 equip card sprite value
+.equ EQUIP_MODE3_CARD_SPRITE_CODE_SIDE1, 0x00008047
 .equ BANNER_OAM_TILE_ATTR_3208, 0x00003208
 .equ BANNER_OAM_TILE_ATTR_3210, 0x00003210
 .equ VIJA_INTRO_OAM_PACKED_POS, 0x0028006d

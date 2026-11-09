@@ -8,9 +8,13 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件** `14_equip_ai_scoring.s`（`0x080a78dc..0x080b5348`）。
-> **下一项待纳入 Git 的模块** F14。F15 已有独立提交。
-> **本次续接**: 2026-10-28完成F13-Seg-10及Historical-Closure，模块13全模块独立验收通过：214Fn/1530words/41412B覆盖，自动名/旧注释/非ASCII注释均0，仅保留两项无有效外部引用的§5.1共36B。总进度14/25模块闭合；继续file14。证据 `output/refine-run-20261028-105948/`，ROM33554432B逐字节一致，未stage/commit。
+> **当前文件** `16_duelfield_zone.s`（`0x080c1448..0x080cbf0c`），尚未初始化活动文档或划分段。
+> **下一任务** 模块 16 待初始化活动文档并按函数结束边界划分约 10 段，之后从 Seg-1 开始；当前尚未完成模块 16 的分析或落地。
+> **本次续接** 2026-11-06 完成 F15-Seg-10，模块 15 的 10/10 段全部关闭。主序完成 16/25 个模块，历史正引用补漏 1 项仍保留。
+> **file 15 Seg-10结果**: `[0x080c00f0,0x080c1448)` 共 4952 字节；47EQ/30REF_ADD/49REF_PRESERVE/26PRESERVE，126源标签/EOL、7目标、11函数改名、18条PLATE写入及3条上下文保留、22 GNU定义、94有效GAS投影（81+13）与152表达式断言。v1真实只读演练POST FAIL=3，未保存且未形成rollback PASS；v2仅修四条`0201fec5`派生显示名后，完整后态和同Program回滚前态均0FAIL，再依唯一授权保存一次。apply`60a8d089ac455eaef88a36c8ff51d0a3ab931e56cfa28310fe49a3e57f7e6ed4`、新进程check`f3fe8a0a86fc97ed0b74c3058692f7fb62a519a39d2561b413bcb16b602ea209`及独立后验全部通过，覆盖422实际Function、10092主状态+5offcut、144primary、2476全局Equate/12643绑定；源码仅14批准路径、18现存registry和11个name cell变化。49/49资产、构建和33554432B整ROM逐字节相等；Root最终门禁`6d20d4d9833cc7d6bf8f3eb9eaef9f371a62ecca9655fc3d43e10c9557421877`，流水线`ba0fcdda982089b6e12246ea1852ab141efbd75ff06b62fea256cff421618afe`，ELF`cc2ed74397bc1e93d559df05f09a1252693cdaa477f8685025e09b7461fc7b09`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+> **file 15 Seg-9结果**: `[0x080bede4,0x080c00f0)` 共 4876 字节；45EQ/104REF_ADD/32REF_PRESERVE/59PRESERVE，11目标标签、15 GNU 定义、81 GAS 投影，源码精确15路径且越界变化0。104新入站/49目标、91旧DATA source保持、415实际Function/10079完整状态/198primary图均通过独立核验。真实8G完整后态及同Program强制回滚均0FAIL后唯一保存，新进程和独立Java后态核验通过。12现存registry更新、BEDE4缺席保持、CSV仅6个name cell。49/49资产及33554432B整ROM逐字节相等；Root最终门禁`9afef7510c67193ffd23b65e0aeae2e23672686fa1373d367ebd6adf6329ceed`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+> **file 15 Seg-8结果**: `[0x080bda7c,0x080bede4)` 共 4968 字节；41EQ/79REF_ADD/45REF_PRESERVE/28PRESERVE，27目标标签、34 GNU 定义、60 GAS 投影，source批准14路径且越界变化0。registry为7个现存tuple/1个缺席`BE9BC`，`BDFAC`只对齐现存tuple注释而非新增tuple或Ghidra PLATE写入。v4只读运行在DTO/OOM核验阶段终止且未保存、未形成rollback PASS，物理DB/source全等；v5真实回滚及最终审计通过后唯一保存。Root最终门禁`ba097698fcaa858d9d72639455a4857f85d6b853429551ea01e2644c1e8af8c1`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+> **跨文件正引用补漏** `[0x0804becc,0x0804bf20)` 共 84 字节，现有调用来自 04D374，本轮新增 B9E0A。旧 F05-Seg-4b §5.1 登记须重新分类。主序 25 模块完成后按地址闭合此清单，清单清零后判定总目标完成。
 > **上轮结果**: 2026-10-11完成F13-Seg-8和Seg-9，266槽、10函数改名、32 PLATE及12B carve全部验收；证据目录`output/refine-run-20261011-103530/`。上轮按用户指令在Seg-9完成后停止，本轮新指令恢复。
 > **本轮执行**: 2026-08-31～2026-09-06 从 file 12 Seg-6 恢复，Seg-6..10共685槽及历史补漏8槽完成；file 13 Seg-1..7已完成。全部通过正式review、落地和保存后检查；file 12已闭合，file 13完成7/10段，00..12共13/25模块完成。Seg-7 landing的全量导出、49步资产导出、构建与byte-identical门禁通过。
 > **模块12收尾结果**: F12-Historical-Closure 第二轮 review PASS，8槽（6 RENAME / 2 REF）、19 PLATE、8 EOL、8字节3指令完成；全模块自动数据名/旧自动名注释/裸 `.byte` 均0，仅保留四个无有效引用 §5.1 块共134B。dry/apply/保存后check及主线程 WORD+ELF+ROM/范围/函数/槽引用后态核验全部通过。ROM全字节一致，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。详见活动文档 §4.11 和 `doc/dev/refine/F12-Historical-Closure.review.md`。
@@ -132,7 +136,7 @@
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-04-card-zone-sprite.md` |
-| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
+| 05 | equip_eligibility_a | 0x08049014..0x080537c0 | Seg-1..10 主序完成 | 🟡 正引用补漏 84B 待闭合 | `doc/dev/p5-refine-05-equip-eligibility-a.md` |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-06-equip-eligibility-b.md` |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-07-equip-effect-chain.md` |
 | 08 | equip_oam_neodaed | 0x080643e0..0x0806e76c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-08-equip-oam-neodaed.md` |
@@ -141,7 +145,7 @@
 | 11 | effect_slot_puzzletext | 0x080850d8..0x080941c4 | Seg-1..10 全完成 (Seg-4=巨块拆 4a..4g) | ✅ 全 10 段完成，池槽补清完成 | `doc/dev/p5-refine-11-effect-slot-puzzletext.md` |
 | 12 | equip_activation_scan | 0x080941c4..0x0809d718 | Seg-1..10 全完成，历史补漏闭合 | ✅ 全模块验收通过；四个§5.1块134B保留 | `doc/dev/p5-refine-12-equip-activation-scan.md` |
 | 13 | equip_placement | 0x0809d718..0x080a78dc | Seg-1..10及历史收尾完成 | ✅ 全模块验收通过；两项§5.1共36B保留 | `doc/dev/p5-refine-13-equip-placement.md` |
-| 14 | equip_ai_scoring | 0x080a78dc..0x080b5348 | 未拆 | ⬜ | |
+| 14 | equip_ai_scoring | 0x080a78dc..0x080b5348 | Seg-1..10，10/10 完成 | ✅ 全部通过，§5.1 一项 140B | `doc/dev/refine/14_equip_ai_scoring.md` |
 | 15 | equip_target_summon_zoom | 0x080b5348..0x080c1448 | Seg-1..10 全完成 | ✅ 全模块验收通过；自动名/raw 均 0 | `doc/dev/refine/15_equip_target_summon_zoom.md` |
 | 16 | duelfield_zone | 0x080c1448..0x080cbf0c | 未拆 | ⬜ | |
 | 17 | duelfield_pack_frame | 0x080cbf0c..0x080d5e84 | 未拆 | ⬜ | |
@@ -250,7 +254,7 @@
       写入新 doc §五 路线图 (每段地址范围 + 内含 ROM_INCBIN + 旧覆盖列留空)
    3) **再逐批处理**: 从 Seg-1 起, executor → reviewer → fixer 逐段推进
    4) 更新本表该文件 doc 列 + 状态, 更新顶部"当前文件/下一任务"
-全 25 文件 ✅ → refine 总目标达成
+全 25 文件主序完成 → 按地址闭合正引用补漏清单 → 清单清零后 refine 总目标达成
 ```
 
 > 跨文件注意: 符号化时**优先复用**已建的 `constants/*.inc` (gSettings / OBJ_PALRAM_BASE / FourCC tag /

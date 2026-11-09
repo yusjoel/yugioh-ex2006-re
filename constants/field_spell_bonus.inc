@@ -14,3 +14,5 @@
 .equ ZONE_EFFECT_ATK_PENALTY_500, 0xfffffe70  @ -500 (s32): ATK/DEF score penalty for opponent
                                                @ Necrovalley / Harpies' Hunting Ground zone effects;
                                                @ 4 ROM refs (compute_zone_effect_atk_delta)
+@ file 14 Seg-5 signed score adjustment; distinct semantics from the legacy name.
+.equ ZONE_EFFECT_ATK_PENALTY_400, 0xfffffe70  @ -400 signed score adjustment
