@@ -5080,13 +5080,13 @@ switchD_0801efa4__caseD_21:
     bl play_zone_card_display_window_effect  @ 0801f1cc a1f0b4fe
     b LAB_0801f234                           @ 0801f1d0 30e0
 switchD_0801efa4__caseD_23:
-    bl play_ui_effect_23                     @ 0801f1d2 a2f0fffa
+    bl play_card_count_increment_window_effect @ 0801f1d2 a2f0fffa
     b LAB_0801f234                           @ 0801f1d6 2de0
 switchD_0801efa4__caseD_25:
-    bl play_ui_effect_25                     @ 0801f1d8 a2f036f9
+    bl play_card_effect_count_delta_window_effect @ 0801f1d8 a2f036f9
     b LAB_0801f234                           @ 0801f1dc 2ae0
 switchD_0801efa4__caseD_13:
-    bl play_ui_effect_13                     @ 0801f1de a2f077fc
+    bl play_hand_shuffle_display_effect      @ 0801f1de a2f077fc
     b LAB_0801f234                           @ 0801f1e2 27e0
 switchD_0801efa4__caseD_c:
     bl play_ui_effect_0c                     @ 0801f1e4 a3f04cff
@@ -5119,10 +5119,10 @@ switchD_0801efa4__caseD_17:
     bl play_zone_card_display_transition     @ 0801f21a 9ff0d1fe
     b LAB_0801f234                           @ 0801f21e 09e0
 switchD_0801efa4__caseD_2f:
-    bl play_ui_effect_2f                     @ 0801f220 a2f03cfe
+    bl play_attack_flip_card_display_effect  @ 0801f220 a2f03cfe
     b LAB_0801f234                           @ 0801f224 06e0
 switchD_0801efa4__caseD_2e:
-    bl play_ui_effect_2e                     @ 0801f226 a2f01bfd
+    bl play_normal_summon_card_display_effect @ 0801f226 a2f01bfd
     b LAB_0801f234                           @ 0801f22a 03e0
 switchD_0801efa4__caseD_3d:
     bl play_ui_effect_3d                     @ 0801f22c a3f08af9

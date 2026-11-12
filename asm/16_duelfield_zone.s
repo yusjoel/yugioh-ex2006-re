@@ -1,15 +1,15 @@
 @ ==== 16_duelfield_zone.s ====
 @ UI 音效 + zone OAM 光标解码 + duel 场地区域信息
 .thumb
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x25 子状态机, 待详细分析.
-play_ui_effect_25:
+@ UI effect 0x25 card-effect count window. Reads side/slot, signed delta and style from gBannerState; gets the zone count. Spark Blaster maps count to3-count and negates delta. Phase0 loads card/panel tiles and enables WIN0. Phase2 draws count-delta for17 calls; phase3 steps toward count using ++u16counter>>4; phase4 holds count for17 calls. Phases1/5 write five BLDY steps. Phase6 disables WIN0 and refreshes UI, returning1. Default clears banner bit0 and field+0x215 bit2, returning0.
+play_card_effect_count_delta_window_effect:
     push {r4,r5,r6,r7,lr}                    @ 080c1448 f0b5
     .hword 0x4657    @ 080c144a 5746
     .hword 0x464e    @ 080c144c 4e46
     .hword 0x4645    @ 080c144e 4546
     push {r5,r6,r7}                          @ 080c1450 e0b4
     sub sp,#0xc                              @ 080c1452 83b0
-    ldr r6, DAT_080c14b0                     @ 080c1454 164e
+    ldr r6, ptr_g_banner_state_080c14b0      @ 080c1454 164e
     ldrb r7,[r6,#0x4]                        @ 080c1456 3779
     ldrb r0,[r6,#0x5]                        @ 080c1458 7079
     .hword 0x4681    @ 080c145a 8146
@@ -21,10 +21,10 @@ play_ui_effect_25:
     lsls r2,r0,#0x2    @ 080c1466 8200
     add r2,r9                                @ 080c1468 4a44
     lsls r2,r2,#0x2    @ 080c146a 9200
-    ldr r0, DAT_080c14b4                     @ 080c146c 1148
+    ldr r0, player_block_stride_080c14b4     @ 080c146c 1148
     muls r0,r1    @ 080c146e 4843
     adds r2,r2,r0    @ 080c1470 1218
-    ldr r0, DAT_080c14b8                     @ 080c1472 1148
+    ldr r0, ptr_g_duel_field_slots_080c14b8  @ 080c1472 1148
     adds r2,r2,r0    @ 080c1474 1218
     ldr r3,[r2,#0x0]                         @ 080c1476 1368
     lsls r1,r3,#0x2    @ 080c1478 9900
@@ -37,7 +37,7 @@ play_ui_effect_25:
     ldrh r2,[r2,#0xc]                        @ 080c1486 9289
     .hword 0x4690    @ 080c1488 9046
     lsls r3,r3,#0x13    @ 080c148a db04
-    ldr r0, DAT_080c14bc                     @ 080c148c 0b48
+    ldr r0, spark_blaster_packed_cid_field_080c14bc @ 080c148c 0b48
     adds r4,r6,#0x0    @ 080c148e 341c
     cmp r3,r0                                @ 080c1490 8342
     bne LAB_080c149c                         @ 080c1492 03d1
@@ -53,22 +53,22 @@ switchD_080c14ac__default:
     b LAB_080c17a0                           @ 080c14a2 7de1
 LAB_080c14a4:
     lsls r0,r0,#0x2    @ 080c14a4 8000
-    ldr r1, DAT_080c14c0                     @ 080c14a6 0649
+    ldr r1, ptr_switch_d_080c14ac_switchdata_d_080c14c4_080c14c0 @ 080c14a6 0649
     adds r0,r0,r1    @ 080c14a8 4018
     ldr r0,[r0,#0x0]                         @ 080c14aa 0068
 switchD_080c14ac__switchD:
     .hword 0x4687    @ 080c14ac 8746
     .zero  0x2
-DAT_080c14b0:
-    .word  gBannerState                   @ 080c14b0 c0fe0102
-DAT_080c14b4:
-    .word  0x00000868                     @ 080c14b4 68080000
-DAT_080c14b8:
-    .word  0x0201c510                     @ 080c14b8 10c50102
-DAT_080c14bc:
-    .word  0xc8480000                     @ 080c14bc 000048c8
-DAT_080c14c0:
-    .word  0x080c14c4                     @ 080c14c0 c4140c08
+ptr_g_banner_state_080c14b0:
+    .word  gBannerState                   @ 080c14b0 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+player_block_stride_080c14b4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c14b4 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_slots_080c14b8:
+    .word  gDuelFieldSlots                @ 080c14b8 10c50102  gDuelFieldSlots: add reviewed operand-0 DATA reference.
+spark_blaster_packed_cid_field_080c14bc:
+    .word  SPARK_BLASTER_PACKED_CID_FIELD @ 080c14bc 000048c8  SPARK_BLASTER_PACKED_CID_FIELD: named scalar literal.
+ptr_switch_d_080c14ac_switchdata_d_080c14c4_080c14c0:
+    .word  switchD_080c14ac__switchdataD_080c14c4                     @ 080c14c0 c4140c08  switchD_080c14ac__switchdataD_080c14c4: add reviewed operand-0 DATA reference.
 switchD_080c14ac__switchdataD_080c14c4:
     .word  0x080c14e0                     @ 080c14c4 e0140c08
     .word  0x080c160a                     @ 080c14c8 0a160c08
@@ -85,31 +85,31 @@ switchD_080c14ac__caseD_0:
     movs r1,#0x80    @ 080c14ea 8021
     lsls r1,r1,#0x2    @ 080c14ec 8900
     bl blit_card_frame_tile_row_to_vram      @ 080c14ee 01f019fc
-    ldr r1, DAT_080c1570                     @ 080c14f2 1f49
+    ldr r1, ptr_card_effect_count_panel_frame_tiles_a_080c1570 @ 080c14f2 1f49
     .hword 0x4653    @ 080c14f4 5346
     cmp r3,#0x0                              @ 080c14f6 002b
     bne LAB_080c14fc                         @ 080c14f8 00d1
-    ldr r1, DAT_080c1574                     @ 080c14fa 1e49
+    ldr r1, ptr_card_effect_count_panel_frame_tiles_b_080c1574 @ 080c14fa 1e49
 LAB_080c14fc:
-    ldr r0, DAT_080c1578                     @ 080c14fc 1e48
+    ldr r0, ptr_card_effect_count_panel_tile_vram_a_080c1578 @ 080c14fc 1e48
     movs r2,#0x2    @ 080c14fe 0222
     movs r3,#0x2    @ 080c1500 0223
     bl tile_2d_row_copy                      @ 080c1502 35f0e7ff
-    ldr r0, DAT_080c157c                     @ 080c1506 1d48
-    ldr r1, DAT_080c1580                     @ 080c1508 1d49
+    ldr r0, ptr_card_effect_count_panel_tile_vram_b_080c157c @ 080c1506 1d48
+    ldr r1, ptr_card_count_panel_label_tiles_080c1580 @ 080c1508 1d49
     movs r2,#0x4    @ 080c150a 0422
     movs r3,#0x1    @ 080c150c 0123
     bl tile_2d_row_copy                      @ 080c150e 35f0e1ff
-    ldr r0, DAT_080c1584                     @ 080c1512 1c48
-    ldr r1, DAT_080c1588                     @ 080c1514 1c49
+    ldr r0, ptr_card_effect_count_digits_tile_vram_080c1584 @ 080c1512 1c48
+    ldr r1, ptr_lp_digit_tile_rows_080c1588  @ 080c1514 1c49
     movs r2,#0x18    @ 080c1516 1822
     movs r3,#0x2    @ 080c1518 0223
     bl tile_2d_row_copy                      @ 080c151a 35f0dbff
-    ldr r1, PTR_WIN0H_080c158c               @ 080c151e 1b49
-    ldr r2, DAT_080c1590                     @ 080c1520 1b4a
+    ldr r1, ptr_win0_h_080c158c              @ 080c151e 1b49
+    ldr r2, vija_intro_win0h_bounds_080c1590 @ 080c1520 1b4a
     adds r0,r2,#0x0    @ 080c1522 101c
     strh r0,[r1,#0x0]                        @ 080c1524 0880
-    ldr r2, PTR_WIN0V_080c1594               @ 080c1526 1b4a
+    ldr r2, ptr_win0_v_080c1594              @ 080c1526 1b4a
     movs r1,#0x2c    @ 080c1528 2c21
     adds r1,#0x40    @ 080c152a 4031
     movs r0,#0x2c    @ 080c152c 2c20
@@ -118,7 +118,7 @@ LAB_080c14fc:
     lsrs r0,r0,#0x10    @ 080c1532 000c
     orrs r1,r0    @ 080c1534 0143
     strh r1,[r2,#0x0]                        @ 080c1536 1180
-    ldr r1, PTR_WININ_080c1598               @ 080c1538 1749
+    ldr r1, ptr_winin_080c1598               @ 080c1538 1749
     movs r0,#0x3f    @ 080c153a 3f20
     strh r0,[r1,#0x0]                        @ 080c153c 0880
     adds r1,#0x2    @ 080c153e 0231
@@ -141,36 +141,36 @@ LAB_080c14fc:
     cmp r0,#0xa                              @ 080c1560 0a28
     bhi switchD_080c156c__default            @ 080c1562 3cd8
     lsls r0,r0,#0x2    @ 080c1564 8000
-    ldr r1, DAT_080c159c                     @ 080c1566 0d49
+    ldr r1, ptr_switch_d_080c156c_switchdata_d_080c15a0_080c159c @ 080c1566 0d49
     adds r0,r0,r1    @ 080c1568 4018
     ldr r0,[r0,#0x0]                         @ 080c156a 0068
 switchD_080c156c__switchD:
     .hword 0x4687    @ 080c156c 8746
     .zero  0x2
-DAT_080c1570:
-    .word  0x09908224                     @ 080c1570 24829009
-DAT_080c1574:
-    .word  0x099081a4                     @ 080c1574 a4819009
-DAT_080c1578:
-    .word  0x06014300                     @ 080c1578 00430106
-DAT_080c157c:
-    .word  0x06014340                     @ 080c157c 40430106
-DAT_080c1580:
-    .word  0x099082a4                     @ 080c1580 a4829009
-DAT_080c1584:
-    .word  0x06014900                     @ 080c1584 00490106
-DAT_080c1588:
-    .word  0x09851ffc                     @ 080c1588 fc1f8509
-PTR_WIN0H_080c158c:
-    .word  WIN0H                          @ 080c158c 40000004
-DAT_080c1590:
-    .word  0x000028f0                     @ 080c1590 f0280000
-PTR_WIN0V_080c1594:
-    .word  WIN0V                          @ 080c1594 44000004
-PTR_WININ_080c1598:
-    .word  WININ                          @ 080c1598 48000004
-DAT_080c159c:
-    .word  0x080c15a0                     @ 080c159c a0150c08
+ptr_card_effect_count_panel_frame_tiles_a_080c1570:
+    .word  card_effect_count_panel_frame_tiles_a @ 080c1570 24829009  card_effect_count_panel_frame_tiles_a: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_panel_frame_tiles_b_080c1574:
+    .word  card_effect_count_panel_frame_tiles_b @ 080c1574 a4819009  card_effect_count_panel_frame_tiles_b: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_panel_tile_vram_a_080c1578:
+    .word  card_effect_count_panel_tile_vram_a                     @ 080c1578 00430106  card_effect_count_panel_tile_vram_a: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_panel_tile_vram_b_080c157c:
+    .word  card_effect_count_panel_tile_vram_b                     @ 080c157c 40430106  card_effect_count_panel_tile_vram_b: add reviewed operand-0 DATA reference.
+ptr_card_count_panel_label_tiles_080c1580:
+    .word  card_count_panel_label_tiles   @ 080c1580 a4829009  card_count_panel_label_tiles: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_digits_tile_vram_080c1584:
+    .word  card_effect_count_digits_tile_vram                     @ 080c1584 00490106  card_effect_count_digits_tile_vram: add reviewed operand-0 DATA reference.
+ptr_lp_digit_tile_rows_080c1588:
+    .word  lp_digit_tile_rows             @ 080c1588 fc1f8509  lp_digit_tile_rows: add reviewed operand-0 DATA reference.
+ptr_win0_h_080c158c:
+    .word  WIN0H                          @ 080c158c 40000004  WIN0H: preserve existing operand-0 DATA reference.
+vija_intro_win0h_bounds_080c1590:
+    .word  VIJA_INTRO_WIN0H_BOUNDS        @ 080c1590 f0280000  VIJA_INTRO_WIN0H_BOUNDS: named scalar literal.
+ptr_win0_v_080c1594:
+    .word  WIN0V                          @ 080c1594 44000004  WIN0V: preserve existing operand-0 DATA reference.
+ptr_winin_080c1598:
+    .word  WININ                          @ 080c1598 48000004  WININ: preserve existing operand-0 DATA reference.
+ptr_switch_d_080c156c_switchdata_d_080c15a0_080c159c:
+    .word  switchD_080c156c__switchdataD_080c15a0                     @ 080c159c a0150c08  switchD_080c156c__switchdataD_080c15a0: add reviewed operand-0 DATA reference.
 switchD_080c156c__switchdataD_080c15a0:
     .word  0x080c15cc                     @ 080c15a0 cc150c08
     .word  0x080c15cc                     @ 080c15a4 cc150c08
@@ -219,7 +219,7 @@ LAB_080c15e2:
     bl render_large_card_display_by_mode     @ 080c1604 09f0e2fd
     b LAB_080c178c                           @ 080c1608 c0e0
 switchD_080c14ac__caseD_1:
-    ldr r1, PTR_BLDY_080c1630                @ 080c160a 0949
+    ldr r1, ptr_bldy_080c1630                @ 080c160a 0949
     ldrb r2,[r4,#0x11]                       @ 080c160c 627c
     lsls r0,r2,#0x1    @ 080c160e 5000
     strh r0,[r1,#0x0]                        @ 080c1610 0880
@@ -239,8 +239,8 @@ LAB_080c1622:
     strb r0,[r4,#0x11]                       @ 080c162a 6074
     b LAB_080c1794                           @ 080c162c b2e0
     .zero  0x2
-PTR_BLDY_080c1630:
-    .word  BLDY                           @ 080c1630 54000004
+ptr_bldy_080c1630:
+    .word  BLDY                           @ 080c1630 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c14ac__caseD_2:
     .hword 0x4640    @ 080c1634 4046
     subs r3,r0,r5    @ 080c1636 431b
@@ -255,7 +255,7 @@ switchD_080c14ac__caseD_2:
     movs r1,#0x74    @ 080c1648 7421
     movs r2,#0x2c    @ 080c164a 2c22
     bl render_card_count_panel_oam           @ 080c164c fff7fefd
-    ldr r1, DAT_080c1668                     @ 080c1650 0549
+    ldr r1, ptr_g_banner_state_080c1668      @ 080c1650 0549
     ldrb r0,[r1,#0x11]                       @ 080c1652 487c
     adds r0,#0x1    @ 080c1654 0130
     strb r0,[r1,#0x11]                       @ 080c1656 4874
@@ -268,12 +268,12 @@ LAB_080c1662:
     strb r4,[r1,#0x11]                       @ 080c1662 4c74
     b LAB_080c178e                           @ 080c1664 93e0
     .zero  0x2
-DAT_080c1668:
-    .word  gBannerState                   @ 080c1668 c0fe0102
+ptr_g_banner_state_080c1668:
+    .word  gBannerState                   @ 080c1668 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c14ac__caseD_3:
     .hword 0x4642    @ 080c166c 4246
     subs r4,r2,r5    @ 080c166e 541b
-    ldr r2, DAT_080c16a0                     @ 080c1670 0b4a
+    ldr r2, ptr_g_banner_state_080c16a0      @ 080c1670 0b4a
     ldrh r0,[r2,#0x12]                       @ 080c1672 508a
     adds r0,#0x1    @ 080c1674 0130
     strh r0,[r2,#0x12]                       @ 080c1676 5082
@@ -297,23 +297,23 @@ LAB_080c1684:
     bl sync_state_and_init_sprite            @ 080c1698 38f00cfa
     b LAB_080c16aa                           @ 080c169c 05e0
     .zero  0x2
-DAT_080c16a0:
-    .word  gBannerState                   @ 080c16a0 c0fe0102
+ptr_g_banner_state_080c16a0:
+    .word  gBannerState                   @ 080c16a0 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c16a4:
     movs r0,#0x25    @ 080c16a4 2520
     bl sync_state_and_init_sprite            @ 080c16a6 38f005fa
 LAB_080c16aa:
     cmp r5,#0x0                              @ 080c16aa 002d
     ble LAB_080c16bc                         @ 080c16ac 06dd
-    ldr r0, DAT_080c16b8                     @ 080c16ae 0248
+    ldr r0, ptr_g_banner_state_080c16b8      @ 080c16ae 0248
     ldrh r0,[r0,#0x12]                       @ 080c16b0 408a
     lsrs r0,r0,#0x4    @ 080c16b2 0009
     adds r4,r4,r0    @ 080c16b4 2418
     b LAB_080c16c4                           @ 080c16b6 05e0
-DAT_080c16b8:
-    .word  gBannerState                   @ 080c16b8 c0fe0102
+ptr_g_banner_state_080c16b8:
+    .word  gBannerState                   @ 080c16b8 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c16bc:
-    ldr r0, DAT_080c1714                     @ 080c16bc 1548
+    ldr r0, ptr_g_banner_state_080c1714      @ 080c16bc 1548
     ldrh r0,[r0,#0x12]                       @ 080c16be 408a
     lsrs r0,r0,#0x4    @ 080c16c0 0009
     subs r4,r4,r0    @ 080c16c2 241a
@@ -330,7 +330,7 @@ LAB_080c16c4:
     movs r2,#0x2c    @ 080c16d6 2c22
     bl render_card_count_panel_oam           @ 080c16d8 fff7b8fd
 LAB_080c16dc:
-    ldr r6, DAT_080c1714                     @ 080c16dc 0d4e
+    ldr r6, ptr_g_banner_state_080c1714      @ 080c16dc 0d4e
     ldrh r2,[r6,#0x12]                       @ 080c16de 728a
     lsrs r1,r2,#0x4    @ 080c16e0 1109
     adds r0,r5,#0x0    @ 080c16e2 281c
@@ -358,8 +358,8 @@ LAB_080c16ea:
     strb r0,[r6,#0x10]                       @ 080c170e 3074
     b LAB_080c1794                           @ 080c1710 40e0
     .zero  0x2
-DAT_080c1714:
-    .word  gBannerState                   @ 080c1714 c0fe0102
+ptr_g_banner_state_080c1714:
+    .word  gBannerState                   @ 080c1714 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c14ac__caseD_4:
     .hword 0x4642    @ 080c1718 4246
     lsls r3,r2,#0x10    @ 080c171a 1304
@@ -373,7 +373,7 @@ switchD_080c14ac__caseD_4:
     movs r1,#0x74    @ 080c172a 7421
     movs r2,#0x2c    @ 080c172c 2c22
     bl render_card_count_panel_oam           @ 080c172e fff78dfd
-    ldr r1, DAT_080c1748                     @ 080c1732 0549
+    ldr r1, ptr_g_banner_state_080c1748      @ 080c1732 0549
     ldrb r0,[r1,#0x11]                       @ 080c1734 487c
     adds r0,#0x1    @ 080c1736 0130
     strb r0,[r1,#0x11]                       @ 080c1738 4874
@@ -384,10 +384,10 @@ switchD_080c14ac__caseD_4:
     strb r4,[r1,#0x11]                       @ 080c1742 4c74
     b LAB_080c178e                           @ 080c1744 23e0
     .zero  0x2
-DAT_080c1748:
-    .word  gBannerState                   @ 080c1748 c0fe0102
+ptr_g_banner_state_080c1748:
+    .word  gBannerState                   @ 080c1748 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c14ac__caseD_5:
-    ldr r2, PTR_BLDY_080c1774                @ 080c174c 094a
+    ldr r2, ptr_bldy_080c1774                @ 080c174c 094a
     ldrb r3,[r4,#0x11]                       @ 080c174e 637c
     lsls r1,r3,#0x1    @ 080c1750 5900
     movs r0,#0x8    @ 080c1752 0820
@@ -407,19 +407,19 @@ switchD_080c14ac__caseD_5:
     strb r0,[r4,#0x11]                       @ 080c176e 6074
     b LAB_080c1794                           @ 080c1770 10e0
     .zero  0x2
-PTR_BLDY_080c1774:
-    .word  BLDY                           @ 080c1774 54000004
+ptr_bldy_080c1774:
+    .word  BLDY                           @ 080c1774 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c14ac__caseD_6:
     movs r2,#0x80    @ 080c1778 8022
     lsls r2,r2,#0x13    @ 080c177a d204
     ldrh r1,[r2,#0x0]                        @ 080c177c 1188
-    ldr r0, DAT_080c1798                     @ 080c177e 0648
+    ldr r0, dispcnt_win0_clear_mask_080c1798 @ 080c177e 0648
     ands r0,r1    @ 080c1780 0840
     strh r0,[r2,#0x0]                        @ 080c1782 1080
     bl disable_blend_and_clear_step          @ 080c1784 33f026ff
     bl refresh_duel_field_zone_info          @ 080c1788 0af0c0fb
 LAB_080c178c:
-    ldr r1, DAT_080c179c                     @ 080c178c 0349
+    ldr r1, ptr_g_banner_state_080c179c      @ 080c178c 0349
 LAB_080c178e:
     ldrb r0,[r1,#0x10]                       @ 080c178e 087c
     adds r0,#0x1    @ 080c1790 0130
@@ -427,18 +427,18 @@ LAB_080c178e:
 LAB_080c1794:
     movs r0,#0x1    @ 080c1794 0120
     b LAB_080c17bc                           @ 080c1796 11e0
-DAT_080c1798:
-    .word  0x0000dfff                     @ 080c1798 ffdf0000
-DAT_080c179c:
-    .word  gBannerState                   @ 080c179c c0fe0102
+dispcnt_win0_clear_mask_080c1798:
+    .word  DISPCNT_WIN0_CLEAR_MASK        @ 080c1798 ffdf0000  DISPCNT_WIN0_CLEAR_MASK: named scalar literal.
+ptr_g_banner_state_080c179c:
+    .word  gBannerState                   @ 080c179c c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c17a0:
     movs r0,#0x2    @ 080c17a0 0220
     rsbs r0,r0,#0    @ 080c17a2 4042
     ldrb r1,[r6,#0x0]                        @ 080c17a4 3178
     ands r0,r1    @ 080c17a6 0840
     strb r0,[r6,#0x0]                        @ 080c17a8 3070
-    ldr r1, DAT_080c17cc                     @ 080c17aa 0849
-    ldr r2, DAT_080c17d0                     @ 080c17ac 084a
+    ldr r1, ptr_g_duel_field_state_080c17cc  @ 080c17aa 0849
+    ldr r2, duel_field_ui_effect_flags_off_080c17d0 @ 080c17ac 084a
     adds r1,r1,r2    @ 080c17ae 8918
     movs r0,#0x5    @ 080c17b0 0520
     rsbs r0,r0,#0    @ 080c17b2 4042
@@ -455,20 +455,20 @@ LAB_080c17bc:
     pop {r4,r5,r6,r7}                        @ 080c17c6 f0bc
     pop {r1}                                 @ 080c17c8 02bc
     bx r1                                    @ 080c17ca 0847
-DAT_080c17cc:
-    .word  0x02023130                     @ 080c17cc 30310202
-DAT_080c17d0:
-    .word  0x00000215                     @ 080c17d0 15020000
+ptr_g_duel_field_state_080c17cc:
+    .word  gDuelFieldState                @ 080c17cc 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c17d0:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c17d0 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x23 子状态机, 待详细分析.
-play_ui_effect_23:
+@ UI effect 0x23 card-count increment window. Let b=gBannerState. b+8 supplies count; b+0xc feeds the card cache. Phase0 loads panel/card tiles, selects the slot bucket and enables WIN0. Phase2 draws count-1 for17 calls. Phase3 holds count-1 for31 calls then draws count on call32; phase4 holds count for17 calls. Phases1/5 each write five BLDY steps. Phase6 clears WIN0 and refreshes UI. Phases0..6 return1; default clears banner bit0 and field+0x215 bit2, returning0.
+play_card_count_increment_window_effect:
     push {r4,r5,r6,r7,lr}                    @ 080c17d4 f0b5
     .hword 0x4657    @ 080c17d6 5746
     .hword 0x464e    @ 080c17d8 4e46
     .hword 0x4645    @ 080c17da 4546
     push {r5,r6,r7}                          @ 080c17dc e0b4
     sub sp,#0x8                              @ 080c17de 82b0
-    ldr r4, DAT_080c180c                     @ 080c17e0 0a4c
+    ldr r4, ptr_g_banner_state_080c180c      @ 080c17e0 0a4c
     ldrb r5,[r4,#0x4]                        @ 080c17e2 2579
     ldrb r6,[r4,#0x5]                        @ 080c17e4 6679
     ldr r7,[r4,#0x8]                         @ 080c17e6 a768
@@ -487,15 +487,15 @@ switchD_080c180a__default:
     b LAB_080c1a9c                           @ 080c1800 4ce1
 LAB_080c1802:
     lsls r0,r0,#0x2    @ 080c1802 8000
-    ldr r1, DAT_080c1810                     @ 080c1804 0249
+    ldr r1, ptr_switch_d_080c180a_switchdata_d_080c1814_080c1810 @ 080c1804 0249
     adds r0,r0,r1    @ 080c1806 4018
     ldr r0,[r0,#0x0]                         @ 080c1808 0068
 switchD_080c180a__switchD:
     .hword 0x4687    @ 080c180a 8746
-DAT_080c180c:
-    .word  gBannerState                   @ 080c180c c0fe0102
-DAT_080c1810:
-    .word  0x080c1814                     @ 080c1810 14180c08
+ptr_g_banner_state_080c180c:
+    .word  gBannerState                   @ 080c180c c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_switch_d_080c180a_switchdata_d_080c1814_080c1810:
+    .word  switchD_080c180a__switchdataD_080c1814                     @ 080c1810 14180c08  switchD_080c180a__switchdataD_080c1814: add reviewed operand-0 DATA reference.
 switchD_080c180a__switchdataD_080c1814:
     .word  0x080c1830                     @ 080c1814 30180c08
     .word  0x080c1944                     @ 080c1818 44190c08
@@ -510,26 +510,26 @@ switchD_080c180a__caseD_0:
     movs r1,#0x80    @ 080c1834 8021
     lsls r1,r1,#0x2    @ 080c1836 8900
     bl blit_card_frame_tile_row_to_vram      @ 080c1838 01f074fa
-    ldr r0, DAT_080c18b0                     @ 080c183c 1c48
-    ldr r1, DAT_080c18b4                     @ 080c183e 1d49
+    ldr r0, ptr_card_effect_count_panel_tile_vram_a_080c18b0 @ 080c183c 1c48
+    ldr r1, ptr_dual_list_count_panel_frame_tiles_080c18b4 @ 080c183e 1d49
     movs r2,#0x2    @ 080c1840 0222
     movs r3,#0x2    @ 080c1842 0223
     bl tile_2d_row_copy                      @ 080c1844 35f046fe
-    ldr r0, DAT_080c18b8                     @ 080c1848 1b48
-    ldr r1, DAT_080c18bc                     @ 080c184a 1c49
+    ldr r0, ptr_card_effect_count_panel_tile_vram_b_080c18b8 @ 080c1848 1b48
+    ldr r1, ptr_card_count_panel_label_tiles_080c18bc @ 080c184a 1c49
     movs r2,#0x4    @ 080c184c 0422
     movs r3,#0x1    @ 080c184e 0123
     bl tile_2d_row_copy                      @ 080c1850 35f040fe
-    ldr r0, DAT_080c18c0                     @ 080c1854 1a48
-    ldr r1, DAT_080c18c4                     @ 080c1856 1b49
+    ldr r0, ptr_card_effect_count_digits_tile_vram_080c18c0 @ 080c1854 1a48
+    ldr r1, ptr_lp_digit_tile_rows_080c18c4  @ 080c1856 1b49
     movs r2,#0x18    @ 080c1858 1822
     movs r3,#0x2    @ 080c185a 0223
     bl tile_2d_row_copy                      @ 080c185c 35f03afe
-    ldr r1, PTR_WIN0H_080c18c8               @ 080c1860 1949
-    ldr r3, DAT_080c18cc                     @ 080c1862 1a4b
+    ldr r1, ptr_win0_h_080c18c8              @ 080c1860 1949
+    ldr r3, vija_intro_win0h_bounds_080c18cc @ 080c1862 1a4b
     adds r0,r3,#0x0    @ 080c1864 181c
     strh r0,[r1,#0x0]                        @ 080c1866 0880
-    ldr r2, PTR_WIN0V_080c18d0               @ 080c1868 194a
+    ldr r2, ptr_win0_v_080c18d0              @ 080c1868 194a
     .hword 0x4649    @ 080c186a 4946
     adds r1,#0x40    @ 080c186c 4031
     .hword 0x4648    @ 080c186e 4846
@@ -538,7 +538,7 @@ switchD_080c180a__caseD_0:
     lsrs r0,r0,#0x10    @ 080c1874 000c
     orrs r1,r0    @ 080c1876 0143
     strh r1,[r2,#0x0]                        @ 080c1878 1180
-    ldr r1, PTR_WININ_080c18d4               @ 080c187a 1649
+    ldr r1, ptr_winin_080c18d4               @ 080c187a 1649
     movs r0,#0x3f    @ 080c187c 3f20
     strh r0,[r1,#0x0]                        @ 080c187e 0880
     adds r1,#0x2    @ 080c1880 0231
@@ -560,34 +560,34 @@ switchD_080c180a__caseD_0:
     cmp r6,#0xa                              @ 080c18a0 0a2e
     bhi switchD_080c18ac__default            @ 080c18a2 39d8
     lsls r0,r6,#0x2    @ 080c18a4 b000
-    ldr r1, DAT_080c18d8                     @ 080c18a6 0c49
+    ldr r1, ptr_switch_d_080c18ac_switchdata_d_080c18dc_080c18d8 @ 080c18a6 0c49
     adds r0,r0,r1    @ 080c18a8 4018
     ldr r0,[r0,#0x0]                         @ 080c18aa 0068
 switchD_080c18ac__switchD:
     .hword 0x4687    @ 080c18ac 8746
     .zero  0x2
-DAT_080c18b0:
-    .word  0x06014300                     @ 080c18b0 00430106
-DAT_080c18b4:
-    .word  0x09908124                     @ 080c18b4 24819009
-DAT_080c18b8:
-    .word  0x06014340                     @ 080c18b8 40430106
-DAT_080c18bc:
-    .word  0x099082a4                     @ 080c18bc a4829009
-DAT_080c18c0:
-    .word  0x06014900                     @ 080c18c0 00490106
-DAT_080c18c4:
-    .word  0x09851ffc                     @ 080c18c4 fc1f8509
-PTR_WIN0H_080c18c8:
-    .word  WIN0H                          @ 080c18c8 40000004
-DAT_080c18cc:
-    .word  0x000028f0                     @ 080c18cc f0280000
-PTR_WIN0V_080c18d0:
-    .word  WIN0V                          @ 080c18d0 44000004
-PTR_WININ_080c18d4:
-    .word  WININ                          @ 080c18d4 48000004
-DAT_080c18d8:
-    .word  0x080c18dc                     @ 080c18d8 dc180c08
+ptr_card_effect_count_panel_tile_vram_a_080c18b0:
+    .word  card_effect_count_panel_tile_vram_a                     @ 080c18b0 00430106  card_effect_count_panel_tile_vram_a: add reviewed operand-0 DATA reference.
+ptr_dual_list_count_panel_frame_tiles_080c18b4:
+    .word  dual_list_count_panel_frame_tiles @ 080c18b4 24819009  dual_list_count_panel_frame_tiles: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_panel_tile_vram_b_080c18b8:
+    .word  card_effect_count_panel_tile_vram_b                     @ 080c18b8 40430106  card_effect_count_panel_tile_vram_b: add reviewed operand-0 DATA reference.
+ptr_card_count_panel_label_tiles_080c18bc:
+    .word  card_count_panel_label_tiles   @ 080c18bc a4829009  card_count_panel_label_tiles: add reviewed operand-0 DATA reference.
+ptr_card_effect_count_digits_tile_vram_080c18c0:
+    .word  card_effect_count_digits_tile_vram                     @ 080c18c0 00490106  card_effect_count_digits_tile_vram: add reviewed operand-0 DATA reference.
+ptr_lp_digit_tile_rows_080c18c4:
+    .word  lp_digit_tile_rows             @ 080c18c4 fc1f8509  lp_digit_tile_rows: add reviewed operand-0 DATA reference.
+ptr_win0_h_080c18c8:
+    .word  WIN0H                          @ 080c18c8 40000004  WIN0H: preserve existing operand-0 DATA reference.
+vija_intro_win0h_bounds_080c18cc:
+    .word  VIJA_INTRO_WIN0H_BOUNDS        @ 080c18cc f0280000  VIJA_INTRO_WIN0H_BOUNDS: named scalar literal.
+ptr_win0_v_080c18d0:
+    .word  WIN0V                          @ 080c18d0 44000004  WIN0V: preserve existing operand-0 DATA reference.
+ptr_winin_080c18d4:
+    .word  WININ                          @ 080c18d4 48000004  WININ: preserve existing operand-0 DATA reference.
+ptr_switch_d_080c18ac_switchdata_d_080c18dc_080c18d8:
+    .word  switchD_080c18ac__switchdataD_080c18dc                     @ 080c18d8 dc180c08  switchD_080c18ac__switchdataD_080c18dc: add reviewed operand-0 DATA reference.
 switchD_080c18ac__switchdataD_080c18dc:
     .word  0x080c1908                     @ 080c18dc 08190c08
     .word  0x080c1908                     @ 080c18e0 08190c08
@@ -635,8 +635,8 @@ LAB_080c191c:
     bl render_large_card_display_by_mode     @ 080c193e 09f045fc
     b LAB_080c1a88                           @ 080c1942 a1e0
 switchD_080c180a__caseD_1:
-    ldr r1, PTR_BLDY_080c196c                @ 080c1944 0949
-    ldr r2, DAT_080c1970                     @ 080c1946 0a4a
+    ldr r1, ptr_bldy_080c196c                @ 080c1944 0949
+    ldr r2, ptr_g_banner_state_080c1970      @ 080c1946 0a4a
     ldrb r3,[r2,#0x11]                       @ 080c1948 537c
     lsls r0,r3,#0x1    @ 080c194a 5800
     strh r0,[r1,#0x0]                        @ 080c194c 0880
@@ -656,10 +656,10 @@ LAB_080c195e:
     strb r0,[r2,#0x11]                       @ 080c1966 5074
     b LAB_080c1a90                           @ 080c1968 92e0
     .zero  0x2
-PTR_BLDY_080c196c:
-    .word  BLDY                           @ 080c196c 54000004
-DAT_080c1970:
-    .word  gBannerState                   @ 080c1970 c0fe0102
+ptr_bldy_080c196c:
+    .word  BLDY                           @ 080c196c 54000004  BLDY: preserve existing operand-0 DATA reference.
+ptr_g_banner_state_080c1970:
+    .word  gBannerState                   @ 080c1970 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c180a__caseD_2:
     subs r3,r7,#0x1    @ 080c1974 7b1e
     lsls r3,r3,#0x10    @ 080c1976 1b04
@@ -673,7 +673,7 @@ switchD_080c180a__caseD_2:
     .hword 0x4641    @ 080c1986 4146
     .hword 0x464a    @ 080c1988 4a46
     bl render_card_count_panel_oam           @ 080c198a fff75ffc
-    ldr r1, DAT_080c19a4                     @ 080c198e 0549
+    ldr r1, ptr_g_banner_state_080c19a4      @ 080c198e 0549
     ldrb r0,[r1,#0x11]                       @ 080c1990 487c
     adds r0,#0x1    @ 080c1992 0130
     strb r0,[r1,#0x11]                       @ 080c1994 4874
@@ -684,10 +684,10 @@ switchD_080c180a__caseD_2:
     strb r4,[r1,#0x11]                       @ 080c199e 4c74
     b LAB_080c1a8a                           @ 080c19a0 73e0
     .zero  0x2
-DAT_080c19a4:
-    .word  gBannerState                   @ 080c19a4 c0fe0102
+ptr_g_banner_state_080c19a4:
+    .word  gBannerState                   @ 080c19a4 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c180a__caseD_3:
-    ldr r1, DAT_080c1a10                     @ 080c19a8 1949
+    ldr r1, ptr_g_banner_state_080c1a10      @ 080c19a8 1949
     ldrh r0,[r1,#0x12]                       @ 080c19aa 488a
     adds r0,#0x1    @ 080c19ac 0130
     strh r0,[r1,#0x12]                       @ 080c19ae 4882
@@ -716,7 +716,7 @@ LAB_080c19c8:
     .hword 0x464a    @ 080c19dc 4a46
     bl render_card_count_panel_oam           @ 080c19de fff735fc
 LAB_080c19e2:
-    ldr r6, DAT_080c1a10                     @ 080c19e2 0b4e
+    ldr r6, ptr_g_banner_state_080c1a10      @ 080c19e2 0b4e
     ldrh r1,[r6,#0x12]                       @ 080c19e4 718a
     lsrs r0,r1,#0x4    @ 080c19e6 0809
     cmp r0,#0x1                              @ 080c19e8 0128
@@ -738,8 +738,8 @@ LAB_080c19e2:
     strb r0,[r6,#0x10]                       @ 080c1a0a 3074
     b LAB_080c1a90                           @ 080c1a0c 40e0
     .zero  0x2
-DAT_080c1a10:
-    .word  gBannerState                   @ 080c1a10 c0fe0102
+ptr_g_banner_state_080c1a10:
+    .word  gBannerState                   @ 080c1a10 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c180a__caseD_4:
     lsls r3,r7,#0x10    @ 080c1a14 3b04
     lsrs r3,r3,#0x10    @ 080c1a16 1b0c
@@ -752,7 +752,7 @@ switchD_080c180a__caseD_4:
     .hword 0x4641    @ 080c1a24 4146
     .hword 0x464a    @ 080c1a26 4a46
     bl render_card_count_panel_oam           @ 080c1a28 fff710fc
-    ldr r1, DAT_080c1a40                     @ 080c1a2c 0449
+    ldr r1, ptr_g_banner_state_080c1a40      @ 080c1a2c 0449
     ldrb r0,[r1,#0x11]                       @ 080c1a2e 487c
     adds r0,#0x1    @ 080c1a30 0130
     strb r0,[r1,#0x11]                       @ 080c1a32 4874
@@ -762,11 +762,11 @@ switchD_080c180a__caseD_4:
     bls LAB_080c1a90                         @ 080c1a3a 29d9
     strb r4,[r1,#0x11]                       @ 080c1a3c 4c74
     b LAB_080c1a8a                           @ 080c1a3e 24e0
-DAT_080c1a40:
-    .word  gBannerState                   @ 080c1a40 c0fe0102
+ptr_g_banner_state_080c1a40:
+    .word  gBannerState                   @ 080c1a40 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c180a__caseD_5:
-    ldr r2, PTR_BLDY_080c1a6c                @ 080c1a44 094a
-    ldr r3, DAT_080c1a70                     @ 080c1a46 0a4b
+    ldr r2, ptr_bldy_080c1a6c                @ 080c1a44 094a
+    ldr r3, ptr_g_banner_state_080c1a70      @ 080c1a46 0a4b
     ldrb r0,[r3,#0x11]                       @ 080c1a48 587c
     lsls r1,r0,#0x1    @ 080c1a4a 4100
     movs r0,#0x8    @ 080c1a4c 0820
@@ -785,21 +785,21 @@ switchD_080c180a__caseD_5:
     movs r0,#0x0    @ 080c1a66 0020
     strb r0,[r3,#0x11]                       @ 080c1a68 5874
     b LAB_080c1a90                           @ 080c1a6a 11e0
-PTR_BLDY_080c1a6c:
-    .word  BLDY                           @ 080c1a6c 54000004
-DAT_080c1a70:
-    .word  gBannerState                   @ 080c1a70 c0fe0102
+ptr_bldy_080c1a6c:
+    .word  BLDY                           @ 080c1a6c 54000004  BLDY: preserve existing operand-0 DATA reference.
+ptr_g_banner_state_080c1a70:
+    .word  gBannerState                   @ 080c1a70 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c180a__caseD_6:
     movs r2,#0x80    @ 080c1a74 8022
     lsls r2,r2,#0x13    @ 080c1a76 d204
     ldrh r1,[r2,#0x0]                        @ 080c1a78 1188
-    ldr r0, DAT_080c1a94                     @ 080c1a7a 0648
+    ldr r0, dispcnt_win0_clear_mask_080c1a94 @ 080c1a7a 0648
     ands r0,r1    @ 080c1a7c 0840
     strh r0,[r2,#0x0]                        @ 080c1a7e 1080
     bl disable_blend_and_clear_step          @ 080c1a80 33f0a8fd
     bl refresh_duel_field_zone_info          @ 080c1a84 0af042fa
 LAB_080c1a88:
-    ldr r1, DAT_080c1a98                     @ 080c1a88 0349
+    ldr r1, ptr_g_banner_state_080c1a98      @ 080c1a88 0349
 LAB_080c1a8a:
     ldrb r0,[r1,#0x10]                       @ 080c1a8a 087c
     adds r0,#0x1    @ 080c1a8c 0130
@@ -807,18 +807,18 @@ LAB_080c1a8a:
 LAB_080c1a90:
     movs r0,#0x1    @ 080c1a90 0120
     b LAB_080c1ab8                           @ 080c1a92 11e0
-DAT_080c1a94:
-    .word  0x0000dfff                     @ 080c1a94 ffdf0000
-DAT_080c1a98:
-    .word  gBannerState                   @ 080c1a98 c0fe0102
+dispcnt_win0_clear_mask_080c1a94:
+    .word  DISPCNT_WIN0_CLEAR_MASK        @ 080c1a94 ffdf0000  DISPCNT_WIN0_CLEAR_MASK: named scalar literal.
+ptr_g_banner_state_080c1a98:
+    .word  gBannerState                   @ 080c1a98 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c1a9c:
     movs r0,#0x2    @ 080c1a9c 0220
     rsbs r0,r0,#0    @ 080c1a9e 4042
     ldrb r1,[r4,#0x0]                        @ 080c1aa0 2178
     ands r0,r1    @ 080c1aa2 0840
     strb r0,[r4,#0x0]                        @ 080c1aa4 2070
-    ldr r1, DAT_080c1ac8                     @ 080c1aa6 0849
-    ldr r2, DAT_080c1acc                     @ 080c1aa8 084a
+    ldr r1, ptr_g_duel_field_state_080c1ac8  @ 080c1aa6 0849
+    ldr r2, duel_field_ui_effect_flags_off_080c1acc @ 080c1aa8 084a
     adds r1,r1,r2    @ 080c1aaa 8918
     movs r0,#0x5    @ 080c1aac 0520
     rsbs r0,r0,#0    @ 080c1aae 4042
@@ -835,19 +835,19 @@ LAB_080c1ab8:
     pop {r4,r5,r6,r7}                        @ 080c1ac2 f0bc
     pop {r1}                                 @ 080c1ac4 02bc
     bx r1                                    @ 080c1ac6 0847
-DAT_080c1ac8:
-    .word  0x02023130                     @ 080c1ac8 30310202
-DAT_080c1acc:
-    .word  0x00000215                     @ 080c1acc 15020000
+ptr_g_duel_field_state_080c1ac8:
+    .word  gDuelFieldState                @ 080c1ac8 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1acc:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1acc 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x13 子状态机, 待详细分析.
-play_ui_effect_13:
+@ UI effect 0x13 hand-shuffle display. Phase 0 selects the side-dependent position, uploads the hand-shuffle palette and tiles, initializes the AOB context, sets the duel-field UI flag, and redraws the hand slot. Phase 1 renders and advances the AOB and later clears that flag. Phase 2 redraws the field-zone card tile. Other phases clear banner and UI flags and return 0; phases 0-2 return 1.
+play_hand_shuffle_display_effect:
     push {r4,r5,r6,r7,lr}                    @ 080c1ad0 f0b5
     .hword 0x4647    @ 080c1ad2 4746
     push {r7}                                @ 080c1ad4 80b4
-    ldr r0, DAT_080c1b08                     @ 080c1ad6 0c48
+    ldr r0, ptr_g_banner_state_080c1b08      @ 080c1ad6 0c48
     ldr r4,[r0,#0x4]                         @ 080c1ad8 4468
-    ldr r1, DAT_080c1b0c                     @ 080c1ada 0c49
+    ldr r1, ptr_g_duel_card_ctx_base_080c1b0c @ 080c1ada 0c49
     .hword 0x4688    @ 080c1adc 8846
     ldr r2,[r1,#0x4]                         @ 080c1ade 4a68
     movs r7,#0x1    @ 080c1ae0 0127
@@ -872,28 +872,28 @@ LAB_080c1af6:
     beq LAB_080c1b16                         @ 080c1b02 08d0
     b LAB_080c1c30                           @ 080c1b04 94e0
     .zero  0x2
-DAT_080c1b08:
-    .word  gBannerState                   @ 080c1b08 c0fe0102
-DAT_080c1b0c:
-    .word  0x0201e2a0                     @ 080c1b0c a0e20102
+ptr_g_banner_state_080c1b08:
+    .word  gBannerState                   @ 080c1b08 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c1b0c:
+    .word  gDuelCardCtxBase               @ 080c1b0c a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c1b10:
     cmp r2,#0x2                              @ 080c1b10 022a
     beq LAB_080c1c04                         @ 080c1b12 77d0
     b LAB_080c1c30                           @ 080c1b14 8ce0
 LAB_080c1b16:
-    ldr r0, DAT_080c1b78                     @ 080c1b16 1848
-    ldr r1, DAT_080c1b7c                     @ 080c1b18 1849
+    ldr r0, ptr_obj_palram_slot_5_080c1b78   @ 080c1b16 1848
+    ldr r1, ptr_hand_shuffle_palette_080c1b7c @ 080c1b18 1849
     movs r2,#0x20    @ 080c1b1a 2022
     bl copy_bytes_by_halfword                @ 080c1b1c 33f0c2f9
-    ldr r0, DAT_080c1b80                     @ 080c1b20 1748
-    ldr r1, DAT_080c1b84                     @ 080c1b22 1849
+    ldr r0, ptr_aob_card_tile_vram_080c1b80  @ 080c1b20 1748
+    ldr r1, ptr_hand_shuffle_card_tile_rows_080c1b84 @ 080c1b22 1849
     movs r2,#0x10    @ 080c1b24 1022
     movs r3,#0x8    @ 080c1b26 0823
     bl tile_2d_row_copy                      @ 080c1b28 35f0d4fc
     adds r6,r5,#0x0    @ 080c1b2c 2e1c
     adds r6,#0x1c    @ 080c1b2e 1c36
-    ldr r1, DAT_080c1b88                     @ 080c1b30 1549
-    ldr r2, DAT_080c1b8c                     @ 080c1b32 164a
+    ldr r1, ptr_hand_shuffle_ptnsect_080c1b88 @ 080c1b30 1549
+    ldr r2, aob_mode_tile_base_512_pal5_080c1b8c @ 080c1b32 164a
     adds r0,r6,#0x0    @ 080c1b34 301c
     movs r3,#0x1    @ 080c1b36 0123
     bl init_aob_ctx_from_ptnsect             @ 080c1b38 36f034f9
@@ -912,8 +912,8 @@ LAB_080c1b52:
     adds r0,r6,#0x0    @ 080c1b52 301c
     movs r2,#0x0    @ 080c1b54 0022
     bl init_aob_ctx_with_anm_entry           @ 080c1b56 36f077f9
-    ldr r1, DAT_080c1b90                     @ 080c1b5a 0d49
-    ldr r0, DAT_080c1b94                     @ 080c1b5c 0d48
+    ldr r1, ptr_g_duel_field_state_080c1b90  @ 080c1b5a 0d49
+    ldr r0, duel_field_ui_effect_flags_off_080c1b94 @ 080c1b5c 0d48
     adds r1,r1,r0    @ 080c1b5e 0918
     movs r0,#0x8    @ 080c1b60 0820
     ldrb r2,[r1,#0x0]                        @ 080c1b62 0a78
@@ -926,22 +926,22 @@ LAB_080c1b52:
     bl update_field_slot_tile_display        @ 080c1b70 01f086fe
     b LAB_080c1c1c                           @ 080c1b74 52e0
     .zero  0x2
-DAT_080c1b78:
-    .word  0x050002a0                     @ 080c1b78 a0020005
-DAT_080c1b7c:
-    .word  0x09909324                     @ 080c1b7c 24939009
-DAT_080c1b80:
-    .word  0x06014000                     @ 080c1b80 00400106
-DAT_080c1b84:
-    .word  0x09908324                     @ 080c1b84 24839009
-DAT_080c1b88:
-    .word  0x09909344                     @ 080c1b88 44939009
-DAT_080c1b8c:
-    .word  0x02000005                     @ 080c1b8c 05000002
-DAT_080c1b90:
-    .word  0x02023130                     @ 080c1b90 30310202
-DAT_080c1b94:
-    .word  0x00000215                     @ 080c1b94 15020000
+ptr_obj_palram_slot_5_080c1b78:
+    .word  OBJ_PALRAM_SLOT_5                     @ 080c1b78 a0020005  OBJ_PALRAM_SLOT_5: add reviewed operand-0 DATA reference.
+ptr_hand_shuffle_palette_080c1b7c:
+    .word  hand_shuffle_palette           @ 080c1b7c 24939009  hand_shuffle_palette: add reviewed operand-0 DATA reference.
+ptr_aob_card_tile_vram_080c1b80:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c1b80 00400106  AOB_CARD_TILE_VRAM: add reviewed operand-0 DATA reference.
+ptr_hand_shuffle_card_tile_rows_080c1b84:
+    .word  hand_shuffle_card_tile_rows    @ 080c1b84 24839009  hand_shuffle_card_tile_rows: add reviewed operand-0 DATA reference.
+ptr_hand_shuffle_ptnsect_080c1b88:
+    .word  hand_shuffle_ptnsect           @ 080c1b88 44939009  hand_shuffle_ptnsect: add reviewed operand-0 DATA reference.
+aob_mode_tile_base_512_pal5_080c1b8c:
+    .word  AOB_MODE_TILE_BASE_512_PAL5    @ 080c1b8c 05000002  AOB_MODE_TILE_BASE_512_PAL5: named scalar literal.
+ptr_g_duel_field_state_080c1b90:
+    .word  gDuelFieldState                @ 080c1b90 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1b94:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1b94 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 LAB_080c1b98:
     adds r6,r5,#0x0    @ 080c1b98 2e1c
     adds r6,#0x1c    @ 080c1b9a 1c36
@@ -972,12 +972,12 @@ LAB_080c1bc2:
     adds r0,#0x1    @ 080c1bd2 0130
     strb r0,[r5,#0x11]                       @ 080c1bd4 6874
 LAB_080c1bd6:
-    ldr r2, DAT_080c1bf8                     @ 080c1bd6 084a
+    ldr r2, ptr_g_banner_state_080c1bf8      @ 080c1bd6 084a
     ldrb r0,[r2,#0x11]                       @ 080c1bd8 507c
     cmp r0,#0x4                              @ 080c1bda 0428
     bls LAB_080c1c22                         @ 080c1bdc 21d9
-    ldr r0, DAT_080c1bfc                     @ 080c1bde 0748
-    ldr r1, DAT_080c1c00                     @ 080c1be0 0749
+    ldr r0, ptr_g_duel_field_state_080c1bfc  @ 080c1bde 0748
+    ldr r1, duel_field_ui_effect_flags_off_080c1c00 @ 080c1be0 0749
     adds r0,r0,r1    @ 080c1be2 4018
     movs r1,#0x9    @ 080c1be4 0921
     rsbs r1,r1,#0    @ 080c1be6 4942
@@ -989,18 +989,18 @@ LAB_080c1bd6:
     strb r0,[r2,#0x10]                       @ 080c1bf2 1074
     b LAB_080c1c22                           @ 080c1bf4 15e0
     .zero  0x2
-DAT_080c1bf8:
-    .word  gBannerState                   @ 080c1bf8 c0fe0102
-DAT_080c1bfc:
-    .word  0x02023130                     @ 080c1bfc 30310202
-DAT_080c1c00:
-    .word  0x00000215                     @ 080c1c00 15020000
+ptr_g_banner_state_080c1bf8:
+    .word  gBannerState                   @ 080c1bf8 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c1bfc:
+    .word  gDuelFieldState                @ 080c1bfc 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1c00:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1c00 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 LAB_080c1c04:
     lsls r0,r4,#0x10    @ 080c1c04 2004
     lsrs r0,r0,#0x10    @ 080c1c06 000c
-    ldr r2, PTR_gP1LifePoints_080c1c28       @ 080c1c08 074a
+    ldr r2, ptr_g_p1_life_points_080c1c28    @ 080c1c08 074a
     ands r4,r7    @ 080c1c0a 3c40
-    ldr r1, DAT_080c1c2c                     @ 080c1c0c 0749
+    ldr r1, player_block_stride_080c1c2c     @ 080c1c0c 0749
     muls r1,r4    @ 080c1c0e 6143
     adds r2,#0x10    @ 080c1c10 1032
     adds r1,r1,r2    @ 080c1c12 8918
@@ -1015,18 +1015,18 @@ LAB_080c1c22:
     movs r0,#0x1    @ 080c1c22 0120
     b LAB_080c1c4c                           @ 080c1c24 12e0
     .zero  0x2
-PTR_gP1LifePoints_080c1c28:
-    .word  gP1LifePoints                  @ 080c1c28 e0c40102
-DAT_080c1c2c:
-    .word  0x00000868                     @ 080c1c2c 68080000
+ptr_g_p1_life_points_080c1c28:
+    .word  gP1LifePoints                  @ 080c1c28 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+player_block_stride_080c1c2c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c1c2c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
 LAB_080c1c30:
     movs r0,#0x2    @ 080c1c30 0220
     rsbs r0,r0,#0    @ 080c1c32 4042
     ldrb r1,[r5,#0x0]                        @ 080c1c34 2978
     ands r0,r1    @ 080c1c36 0840
     strb r0,[r5,#0x0]                        @ 080c1c38 2870
-    ldr r1, DAT_080c1c58                     @ 080c1c3a 0749
-    ldr r2, DAT_080c1c5c                     @ 080c1c3c 074a
+    ldr r1, ptr_g_duel_field_state_080c1c58  @ 080c1c3a 0749
+    ldr r2, duel_field_ui_effect_flags_off_080c1c5c @ 080c1c3c 074a
     adds r1,r1,r2    @ 080c1c3e 8918
     movs r0,#0x5    @ 080c1c40 0520
     rsbs r0,r0,#0    @ 080c1c42 4042
@@ -1041,15 +1041,15 @@ LAB_080c1c4c:
     pop {r1}                                 @ 080c1c52 02bc
     bx r1                                    @ 080c1c54 0847
     .zero  0x2
-DAT_080c1c58:
-    .word  0x02023130                     @ 080c1c58 30310202
-DAT_080c1c5c:
-    .word  0x00000215                     @ 080c1c5c 15020000
+ptr_g_duel_field_state_080c1c58:
+    .word  gDuelFieldState                @ 080c1c58 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1c5c:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1c5c 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x2e 子状态机, 待详细分析.
-play_ui_effect_2e:
+@ UI effect 0x2e normal-summon display. Let b=gBannerState and f=gDuelFieldState. Phase0 loads language-selected tiles/palette and enables alpha blending. Phases1..3 each attempt two OAM writes per call, for9/33/9 calls. Phase3's last call clears f+0x215 bit2. Phase4 increments u8 f+0xa and stores (u8(b+4)<<8)|u8(b+8) at f+0xc+4*(b+0xc-1). Phases0..4 return1; default clears banner bit0 and field bit2, returning0.
+play_normal_summon_card_display_effect:
     push {r4,r5,r6,r7,lr}                    @ 080c1c60 f0b5
-    ldr r1, DAT_080c1c84                     @ 080c1c62 0849
+    ldr r1, ptr_g_banner_state_080c1c84      @ 080c1c62 0849
     ldr r2,[r1,#0x4]                         @ 080c1c64 4a68
     ldr r6,[r1,#0x8]                         @ 080c1c66 8e68
     ldr r3,[r1,#0xc]                         @ 080c1c68 cb68
@@ -1063,16 +1063,16 @@ switchD_080c1c80__default:
     b LAB_080c1e70                           @ 080c1c76 fbe0
 LAB_080c1c78:
     lsls r0,r0,#0x2    @ 080c1c78 8000
-    ldr r1, DAT_080c1c88                     @ 080c1c7a 0349
+    ldr r1, ptr_switch_d_080c1c80_switchdata_d_080c1c8c_080c1c88 @ 080c1c7a 0349
     adds r0,r0,r1    @ 080c1c7c 4018
     ldr r0,[r0,#0x0]                         @ 080c1c7e 0068
 switchD_080c1c80__switchD:
     .hword 0x4687    @ 080c1c80 8746
     .zero  0x2
-DAT_080c1c84:
-    .word  gBannerState                   @ 080c1c84 c0fe0102
-DAT_080c1c88:
-    .word  0x080c1c8c                     @ 080c1c88 8c1c0c08
+ptr_g_banner_state_080c1c84:
+    .word  gBannerState                   @ 080c1c84 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_switch_d_080c1c80_switchdata_d_080c1c8c_080c1c88:
+    .word  switchD_080c1c80__switchdataD_080c1c8c                     @ 080c1c88 8c1c0c08  switchD_080c1c80__switchdataD_080c1c8c: add reviewed operand-0 DATA reference.
 switchD_080c1c80__switchdataD_080c1c8c:
     .word  0x080c1ca0                     @ 080c1c8c a01c0c08
     .word  0x080c1d04                     @ 080c1c90 041d0c08
@@ -1080,23 +1080,23 @@ switchD_080c1c80__switchdataD_080c1c8c:
     .word  0x080c1dc4                     @ 080c1c98 c41d0c08
     .word  0x080c1e48                     @ 080c1c9c 481e0c08
 switchD_080c1c80__caseD_0:
-    ldr r0, DAT_080c1ce4                     @ 080c1ca0 1048
-    ldr r1, DAT_080c1ce8                     @ 080c1ca2 1149
-    ldr r2, DAT_080c1cec                     @ 080c1ca4 114a
+    ldr r0, ptr_aob_card_tile_vram_080c1ce4  @ 080c1ca0 1048
+    ldr r1, ptr_ewram_base_080c1ce8          @ 080c1ca2 1149
+    ldr r2, gsettings_offset_080c1cec        @ 080c1ca4 114a
     adds r1,r1,r2    @ 080c1ca6 8918
     ldrb r1,[r1,#0x0]                        @ 080c1ca8 0978
     lsls r1,r1,#0x1d    @ 080c1caa 4907
     lsrs r1,r1,#0x12    @ 080c1cac 890c
-    ldr r2, DAT_080c1cf0                     @ 080c1cae 104a
+    ldr r2, ptr_normal_summon_tile_rows_080c1cf0 @ 080c1cae 104a
     adds r1,r1,r2    @ 080c1cb0 8918
     movs r2,#0x10    @ 080c1cb2 1022
     movs r3,#0x4    @ 080c1cb4 0423
     bl tile_2d_row_copy                      @ 080c1cb6 35f00dfc
-    ldr r0, DAT_080c1cf4                     @ 080c1cba 0e48
-    ldr r1, DAT_080c1cf8                     @ 080c1cbc 0e49
+    ldr r0, ptr_obj_palram_slot_3_080c1cf4   @ 080c1cba 0e48
+    ldr r1, ptr_normal_summon_palette_080c1cf8 @ 080c1cbc 0e49
     movs r2,#0x20    @ 080c1cbe 2022
     bl copy_bytes_by_halfword                @ 080c1cc0 33f0f0f8
-    ldr r1, PTR_BLDALPHA_080c1cfc            @ 080c1cc4 0d49
+    ldr r1, ptr_bldalpha_080c1cfc            @ 080c1cc4 0d49
     movs r3,#0x80    @ 080c1cc6 8023
     lsls r3,r3,#0x5    @ 080c1cc8 5b01
     adds r0,r3,#0x0    @ 080c1cca 181c
@@ -1106,31 +1106,31 @@ switchD_080c1c80__caseD_0:
     lsls r2,r2,#0x6    @ 080c1cd2 9201
     adds r0,r2,#0x0    @ 080c1cd4 101c
     strh r0,[r1,#0x0]                        @ 080c1cd6 0880
-    ldr r1, DAT_080c1d00                     @ 080c1cd8 0949
+    ldr r1, ptr_g_banner_state_080c1d00      @ 080c1cd8 0949
     ldrb r0,[r1,#0x10]                       @ 080c1cda 087c
     adds r0,#0x1    @ 080c1cdc 0130
     strb r0,[r1,#0x10]                       @ 080c1cde 0874
 LAB_080c1ce0:
     movs r0,#0x1    @ 080c1ce0 0120
     b LAB_080c1e8c                           @ 080c1ce2 d3e0
-DAT_080c1ce4:
-    .word  0x06014000                     @ 080c1ce4 00400106
-DAT_080c1ce8:
-    .word  0x02000000                     @ 080c1ce8 00000002
-DAT_080c1cec:
-    .word  0x00006c2c                     @ 080c1cec 2c6c0000
-DAT_080c1cf0:
-    .word  0x0990942c                     @ 080c1cf0 2c949009
-DAT_080c1cf4:
-    .word  0x05000260                     @ 080c1cf4 60020005
-DAT_080c1cf8:
-    .word  0x0990940c                     @ 080c1cf8 0c949009
-PTR_BLDALPHA_080c1cfc:
-    .word  BLDALPHA                       @ 080c1cfc 52000004
-DAT_080c1d00:
-    .word  gBannerState                   @ 080c1d00 c0fe0102
+ptr_aob_card_tile_vram_080c1ce4:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c1ce4 00400106  AOB_CARD_TILE_VRAM: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c1ce8:
+    .word  EWRAM_BASE                     @ 080c1ce8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c1cec:
+    .word  GSETTINGS_OFFSET               @ 080c1cec 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_normal_summon_tile_rows_080c1cf0:
+    .word  normal_summon_tile_rows        @ 080c1cf0 2c949009  normal_summon_tile_rows: add reviewed operand-0 DATA reference.
+ptr_obj_palram_slot_3_080c1cf4:
+    .word  OBJ_PALRAM_SLOT_3                     @ 080c1cf4 60020005  OBJ_PALRAM_SLOT_3: add reviewed operand-0 DATA reference.
+ptr_normal_summon_palette_080c1cf8:
+    .word  normal_summon_palette          @ 080c1cf8 0c949009  normal_summon_palette: add reviewed operand-0 DATA reference.
+ptr_bldalpha_080c1cfc:
+    .word  BLDALPHA                       @ 080c1cfc 52000004  BLDALPHA: preserve existing operand-0 DATA reference.
+ptr_g_banner_state_080c1d00:
+    .word  gBannerState                   @ 080c1d00 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1c80__caseD_1:
-    ldr r3, PTR_BLDALPHA_080c1d68            @ 080c1d04 184b
+    ldr r3, ptr_bldalpha_080c1d68            @ 080c1d04 184b
     ldrb r1,[r4,#0x11]                       @ 080c1d06 617c
     lsls r2,r1,#0x1    @ 080c1d08 4a00
     lsls r1,r1,#0x19    @ 080c1d0a 4906
@@ -1157,13 +1157,13 @@ LAB_080c1d20:
     orrs r2,r1    @ 080c1d32 0a43
     lsls r2,r2,#0x10    @ 080c1d34 1204
     lsrs r2,r2,#0x10    @ 080c1d36 120c
-    ldr r1, DAT_080c1d6c                     @ 080c1d38 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_pri1_080c1d6c @ 080c1d38 0c49
     bl write_oam_entry_from_packed_args      @ 080c1d3a 34f017fa
     adds r5,#0x40    @ 080c1d3e 4035
     adds r4,#0x1    @ 080c1d40 0134
     cmp r4,#0x1                              @ 080c1d42 012c
     ble LAB_080c1d20                         @ 080c1d44 ecdd
-    ldr r1, DAT_080c1d70                     @ 080c1d46 0a49
+    ldr r1, ptr_g_banner_state_080c1d70      @ 080c1d46 0a49
     ldrb r0,[r1,#0x11]                       @ 080c1d48 487c
     adds r0,#0x1    @ 080c1d4a 0130
     strb r0,[r1,#0x11]                       @ 080c1d4c 4874
@@ -1179,12 +1179,12 @@ LAB_080c1d20:
     movs r0,#0x12    @ 080c1d60 1220
     bl sync_state_and_init_sprite            @ 080c1d62 37f0a7fe
     b LAB_080c1ce0                           @ 080c1d66 bbe7
-PTR_BLDALPHA_080c1d68:
-    .word  BLDALPHA                       @ 080c1d68 52000004
-DAT_080c1d6c:
-    .word  0x000044c0                     @ 080c1d6c c0440000
-DAT_080c1d70:
-    .word  gBannerState                   @ 080c1d70 c0fe0102
+ptr_bldalpha_080c1d68:
+    .word  BLDALPHA                       @ 080c1d68 52000004  BLDALPHA: preserve existing operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri1_080c1d6c:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI1    @ 080c1d6c c0440000  OAM_ATTR2_TILE_C0_PAL4_PRI1: named scalar literal.
+ptr_g_banner_state_080c1d70:
+    .word  gBannerState                   @ 080c1d70 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1c80__caseD_2:
     movs r4,#0x0    @ 080c1d74 0024
     lsls r6,r5,#0x10    @ 080c1d76 2e04
@@ -1202,13 +1202,13 @@ LAB_080c1d7a:
     orrs r2,r1    @ 080c1d8c 0a43
     lsls r2,r2,#0x10    @ 080c1d8e 1204
     lsrs r2,r2,#0x10    @ 080c1d90 120c
-    ldr r1, DAT_080c1dbc                     @ 080c1d92 0a49
+    ldr r1, oam_attr2_tile_c0_pal4_080c1dbc  @ 080c1d92 0a49
     bl write_oam_entry_from_packed_args      @ 080c1d94 34f0eaf9
     adds r5,#0x40    @ 080c1d98 4035
     adds r4,#0x1    @ 080c1d9a 0134
     cmp r4,#0x1                              @ 080c1d9c 012c
     ble LAB_080c1d7a                         @ 080c1d9e ecdd
-    ldr r1, DAT_080c1dc0                     @ 080c1da0 0749
+    ldr r1, ptr_g_banner_state_080c1dc0      @ 080c1da0 0749
     ldrb r0,[r1,#0x11]                       @ 080c1da2 487c
     adds r0,#0x1    @ 080c1da4 0130
     strb r0,[r1,#0x11]                       @ 080c1da6 4874
@@ -1222,12 +1222,12 @@ LAB_080c1d7a:
     movs r0,#0x0    @ 080c1db6 0020
     strb r0,[r1,#0x11]                       @ 080c1db8 4874
     b LAB_080c1ce0                           @ 080c1dba 91e7
-DAT_080c1dbc:
-    .word  0x000040c0                     @ 080c1dbc c0400000
-DAT_080c1dc0:
-    .word  gBannerState                   @ 080c1dc0 c0fe0102
+oam_attr2_tile_c0_pal4_080c1dbc:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c1dbc c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c1dc0:
+    .word  gBannerState                   @ 080c1dc0 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1c80__caseD_3:
-    ldr r3, PTR_BLDALPHA_080c1e34            @ 080c1dc4 1b4b
+    ldr r3, ptr_bldalpha_080c1e34            @ 080c1dc4 1b4b
     ldrb r1,[r4,#0x11]                       @ 080c1dc6 617c
     lsls r2,r1,#0x1    @ 080c1dc8 4a00
     movs r0,#0x10    @ 080c1dca 1020
@@ -1254,13 +1254,13 @@ LAB_080c1de0:
     orrs r2,r1    @ 080c1df2 0a43
     lsls r2,r2,#0x10    @ 080c1df4 1204
     lsrs r2,r2,#0x10    @ 080c1df6 120c
-    ldr r1, DAT_080c1e38                     @ 080c1df8 0f49
+    ldr r1, oam_attr2_tile_c0_pal4_pri1_080c1e38 @ 080c1df8 0f49
     bl write_oam_entry_from_packed_args      @ 080c1dfa 34f0b7f9
     adds r5,#0x40    @ 080c1dfe 4035
     adds r4,#0x1    @ 080c1e00 0134
     cmp r4,#0x1                              @ 080c1e02 012c
     ble LAB_080c1de0                         @ 080c1e04 ecdd
-    ldr r2, DAT_080c1e3c                     @ 080c1e06 0d4a
+    ldr r2, ptr_g_banner_state_080c1e3c      @ 080c1e06 0d4a
     ldrb r0,[r2,#0x11]                       @ 080c1e08 507c
     adds r0,#0x1    @ 080c1e0a 0130
     strb r0,[r2,#0x11]                       @ 080c1e0c 5074
@@ -1270,8 +1270,8 @@ LAB_080c1de0:
     bhi LAB_080c1e18                         @ 080c1e14 00d8
     b LAB_080c1ce0                           @ 080c1e16 63e7
 LAB_080c1e18:
-    ldr r1, DAT_080c1e40                     @ 080c1e18 0949
-    ldr r0, DAT_080c1e44                     @ 080c1e1a 0a48
+    ldr r1, ptr_g_duel_field_state_080c1e40  @ 080c1e18 0949
+    ldr r0, duel_field_ui_effect_flags_off_080c1e44 @ 080c1e1a 0a48
     adds r1,r1,r0    @ 080c1e1c 0918
     movs r0,#0x5    @ 080c1e1e 0520
     rsbs r0,r0,#0    @ 080c1e20 4042
@@ -1284,18 +1284,18 @@ LAB_080c1e18:
     movs r0,#0x0    @ 080c1e2e 0020
     strb r0,[r2,#0x11]                       @ 080c1e30 5074
     b LAB_080c1ce0                           @ 080c1e32 55e7
-PTR_BLDALPHA_080c1e34:
-    .word  BLDALPHA                       @ 080c1e34 52000004
-DAT_080c1e38:
-    .word  0x000044c0                     @ 080c1e38 c0440000
-DAT_080c1e3c:
-    .word  gBannerState                   @ 080c1e3c c0fe0102
-DAT_080c1e40:
-    .word  0x02023130                     @ 080c1e40 30310202
-DAT_080c1e44:
-    .word  0x00000215                     @ 080c1e44 15020000
+ptr_bldalpha_080c1e34:
+    .word  BLDALPHA                       @ 080c1e34 52000004  BLDALPHA: preserve existing operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri1_080c1e38:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI1    @ 080c1e38 c0440000  OAM_ATTR2_TILE_C0_PAL4_PRI1: named scalar literal.
+ptr_g_banner_state_080c1e3c:
+    .word  gBannerState                   @ 080c1e3c c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c1e40:
+    .word  gDuelFieldState                @ 080c1e40 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1e44:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1e44 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 switchD_080c1c80__caseD_4:
-    ldr r0, DAT_080c1e6c                     @ 080c1e48 0848
+    ldr r0, ptr_g_duel_field_state_080c1e6c  @ 080c1e48 0848
     ldrb r1,[r0,#0xa]                        @ 080c1e4a 817a
     adds r1,#0x1    @ 080c1e4c 0131
     strb r1,[r0,#0xa]                        @ 080c1e4e 8172
@@ -1313,16 +1313,16 @@ switchD_080c1c80__caseD_4:
     adds r0,#0x1    @ 080c1e66 0130
     strb r0,[r4,#0x10]                       @ 080c1e68 2074
     b LAB_080c1ce0                           @ 080c1e6a 39e7
-DAT_080c1e6c:
-    .word  0x02023130                     @ 080c1e6c 30310202
+ptr_g_duel_field_state_080c1e6c:
+    .word  gDuelFieldState                @ 080c1e6c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
 LAB_080c1e70:
     movs r0,#0x2    @ 080c1e70 0220
     rsbs r0,r0,#0    @ 080c1e72 4042
     ldrb r2,[r1,#0x0]                        @ 080c1e74 0a78
     ands r0,r2    @ 080c1e76 1040
     strb r0,[r1,#0x0]                        @ 080c1e78 0870
-    ldr r1, DAT_080c1e94                     @ 080c1e7a 0649
-    ldr r3, DAT_080c1e98                     @ 080c1e7c 064b
+    ldr r1, ptr_g_duel_field_state_080c1e94  @ 080c1e7a 0649
+    ldr r3, duel_field_ui_effect_flags_off_080c1e98 @ 080c1e7c 064b
     adds r1,r1,r3    @ 080c1e7e c918
     movs r0,#0x5    @ 080c1e80 0520
     rsbs r0,r0,#0    @ 080c1e82 4042
@@ -1335,23 +1335,23 @@ LAB_080c1e8c:
     pop {r1}                                 @ 080c1e8e 02bc
     bx r1                                    @ 080c1e90 0847
     .zero  0x2
-DAT_080c1e94:
-    .word  0x02023130                     @ 080c1e94 30310202
-DAT_080c1e98:
-    .word  0x00000215                     @ 080c1e98 15020000
+ptr_g_duel_field_state_080c1e94:
+    .word  gDuelFieldState                @ 080c1e94 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1e98:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1e98 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x2f 子状态机, 待详细分析.
-play_ui_effect_2f:
+@ UI effect 0x2f attack-flip display. Phase0 calls suppress_display_output with the debug format, then return_void_noop; it decrements u8 gDuelFieldState+0xa, clears the u32 entry at +0xc+4*(gBannerState+0xc-1), advances phase and returns1. Later calls clear gBannerState bit0 with AND0xfe and gDuelFieldState+0x215 bit2 with AND0xfb, preserving field bit0, and return0.
+play_attack_flip_card_display_effect:
     push {r4,r5,r6,lr}                       @ 080c1e9c 70b5
-    ldr r4, DAT_080c1ed0                     @ 080c1e9e 0c4c
+    ldr r4, ptr_g_banner_state_080c1ed0      @ 080c1e9e 0c4c
     ldr r1,[r4,#0x4]                         @ 080c1ea0 6168
     ldr r2,[r4,#0x8]                         @ 080c1ea2 a268
     ldr r5,[r4,#0xc]                         @ 080c1ea4 e568
     ldrb r6,[r4,#0x10]                       @ 080c1ea6 267c
     cmp r6,#0x0                              @ 080c1ea8 002e
     beq LAB_080c1edc                         @ 080c1eaa 17d0
-    ldr r2, DAT_080c1ed4                     @ 080c1eac 094a
-    ldr r0, DAT_080c1ed8                     @ 080c1eae 0a48
+    ldr r2, ptr_g_duel_field_state_080c1ed4  @ 080c1eac 094a
+    ldr r0, duel_field_ui_effect_flags_off_080c1ed8 @ 080c1eae 0a48
     adds r2,r2,r0    @ 080c1eb0 1218
     movs r3,#0x5    @ 080c1eb2 0523
     rsbs r3,r3,#0    @ 080c1eb4 5b42
@@ -1368,18 +1368,18 @@ play_ui_effect_2f:
     movs r0,#0x0    @ 080c1eca 0020
     b LAB_080c1f02                           @ 080c1ecc 19e0
     .zero  0x2
-DAT_080c1ed0:
-    .word  gBannerState                   @ 080c1ed0 c0fe0102
-DAT_080c1ed4:
-    .word  0x02023130                     @ 080c1ed4 30310202
-DAT_080c1ed8:
-    .word  0x00000215                     @ 080c1ed8 15020000
+ptr_g_banner_state_080c1ed0:
+    .word  gBannerState                   @ 080c1ed0 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c1ed4:
+    .word  gDuelFieldState                @ 080c1ed4 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c1ed8:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c1ed8 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 LAB_080c1edc:
-    ldr r0, DAT_080c1f08                     @ 080c1edc 0a48
+    ldr r0, ptr_attack_flip_debug_format_080c1f08 @ 080c1edc 0a48
     adds r3,r5,#0x0    @ 080c1ede 2b1c
     bl suppress_display_output               @ 080c1ee0 38f0f4fa
     bl return_void_noop                      @ 080c1ee4 38f0f8fa
-    ldr r1, DAT_080c1f0c                     @ 080c1ee8 0849
+    ldr r1, ptr_g_duel_field_state_080c1f0c  @ 080c1ee8 0849
     ldrb r0,[r1,#0xa]                        @ 080c1eea 887a
     subs r0,#0x1    @ 080c1eec 0138
     strb r0,[r1,#0xa]                        @ 080c1eee 8872
@@ -1396,10 +1396,10 @@ LAB_080c1f02:
     pop {r4,r5,r6}                           @ 080c1f02 70bc
     pop {r1}                                 @ 080c1f04 02bc
     bx r1                                    @ 080c1f06 0847
-DAT_080c1f08:
-    .word  0x09e491fc                     @ 080c1f08 fc91e409
-DAT_080c1f0c:
-    .word  0x02023130                     @ 080c1f0c 30310202
+ptr_attack_flip_debug_format_080c1f08:
+    .word  attack_flip_debug_format       @ 080c1f08 fc91e409  attack_flip_debug_format: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c1f0c:
+    .word  gDuelFieldState                @ 080c1f0c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
 
 @ Pack-banner 3D state machine. Phase0 loads resources and configures OBJ-window state. Phase1 only advances BLDY. Phases2/3 run forward/reverse palette ramps and each append six OAM entries as three pairs; phase4 also appends six paired entries. Phase5 only advances BLDY. Phase6 disables blend, applies DISPCNT&0x7fff, advances to7, and returns1. Phases0..6 return1; phase>6 returns0 without cleanup.
 tick_pack_banner_3d_state_machine:
@@ -1408,7 +1408,7 @@ tick_pack_banner_3d_state_machine:
     push {r7}                                @ 080c1f14 80b4
     movs r5,#0x18    @ 080c1f16 1825
     movs r4,#0x40    @ 080c1f18 4024
-    ldr r0, DAT_080c1f30                     @ 080c1f1a 0548
+    ldr r0, ptr_g_banner_state_080c1f30      @ 080c1f1a 0548
     ldrb r1,[r0,#0x11]                       @ 080c1f1c 417c
     adds r3,r0,#0x0    @ 080c1f1e 031c
     cmp r1,#0x6                              @ 080c1f20 0629
@@ -1417,15 +1417,15 @@ switchD_080c1f2e__default:
     b LAB_080c2194                           @ 080c1f24 36e1
 LAB_080c1f26:
     lsls r0,r1,#0x2    @ 080c1f26 8800
-    ldr r1, DAT_080c1f34                     @ 080c1f28 0249
+    ldr r1, ptr_switch_d_080c1f2e_switchdata_d_080c1f38_080c1f34 @ 080c1f28 0249
     adds r0,r0,r1    @ 080c1f2a 4018
     ldr r0,[r0,#0x0]                         @ 080c1f2c 0068
 switchD_080c1f2e__switchD:
     .hword 0x4687    @ 080c1f2e 8746
-DAT_080c1f30:
-    .word  gBannerState                   @ 080c1f30 c0fe0102
-DAT_080c1f34:
-    .word  0x080c1f38                     @ 080c1f34 381f0c08
+ptr_g_banner_state_080c1f30:
+    .word  gBannerState                   @ 080c1f30 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_switch_d_080c1f2e_switchdata_d_080c1f38_080c1f34:
+    .word  switchD_080c1f2e__switchdataD_080c1f38                     @ 080c1f34 381f0c08  switchD_080c1f2e__switchdataD_080c1f38: add reviewed operand-0 DATA reference.
 switchD_080c1f2e__switchdataD_080c1f38:
     .word  0x080c1f54                     @ 080c1f38 541f0c08
     .word  0x080c1fc8                     @ 080c1f3c c81f0c08
@@ -1435,13 +1435,13 @@ switchD_080c1f2e__switchdataD_080c1f38:
     .word  0x080c2148                     @ 080c1f4c 48210c08
     .word  0x080c2170                     @ 080c1f50 70210c08
 switchD_080c1f2e__caseD_0:
-    ldr r0, DAT_080c1fa8                     @ 080c1f54 1448
-    ldr r1, DAT_080c1fac                     @ 080c1f56 1549
+    ldr r0, ptr_obj_palram_slot_3_080c1fa8   @ 080c1f54 1448
+    ldr r1, ptr_pack_banner_palette_a_080c1fac @ 080c1f56 1549
     movs r2,#0x20    @ 080c1f58 2022
     bl copy_bytes_by_halfword                @ 080c1f5a 32f0a3ff
-    ldr r0, DAT_080c1fb0                     @ 080c1f5e 1448
-    ldr r1, DAT_080c1fb4                     @ 080c1f60 1449
-    ldr r2, DAT_080c1fb8                     @ 080c1f62 154a
+    ldr r0, ptr_aob_card_tile_vram_080c1fb0  @ 080c1f5e 1448
+    ldr r1, ptr_ewram_base_080c1fb4          @ 080c1f60 1449
+    ldr r2, gsettings_offset_080c1fb8        @ 080c1f62 154a
     adds r1,r1,r2    @ 080c1f64 8918
     ldrb r1,[r1,#0x0]                        @ 080c1f66 0978
     lsls r2,r1,#0x1d    @ 080c1f68 4a07
@@ -1449,14 +1449,14 @@ switchD_080c1f2e__caseD_0:
     lsls r1,r2,#0x1    @ 080c1f6c 5100
     adds r1,r1,r2    @ 080c1f6e 8918
     lsls r1,r1,#0xa    @ 080c1f70 8902
-    ldr r2, DAT_080c1fbc                     @ 080c1f72 124a
+    ldr r2, ptr_pack_banner_tile_rows_a_080c1fbc @ 080c1f72 124a
     adds r1,r1,r2    @ 080c1f74 8918
     movs r2,#0x18    @ 080c1f76 1822
     movs r3,#0x4    @ 080c1f78 0423
     bl tile_2d_row_copy                      @ 080c1f7a 35f0abfa
     bl disable_blend_and_clear_step          @ 080c1f7e 33f029fb
-    ldr r1, PTR_WINOUT_080c1fc0              @ 080c1f82 0f49
-    ldr r3, DAT_080c1fc4                     @ 080c1f84 0f4b
+    ldr r1, ptr_winout_080c1fc0              @ 080c1f82 0f49
+    ldr r3, winout_outside_all_objwin_no_effects_080c1fc4 @ 080c1f84 0f4b
     adds r0,r3,#0x0    @ 080c1f86 181c
     strh r0,[r1,#0x0]                        @ 080c1f88 0880
     adds r1,#0xa    @ 080c1f8a 0a31
@@ -1474,24 +1474,24 @@ switchD_080c1f2e__caseD_0:
     orrs r0,r1    @ 080c1fa2 0843
     b LAB_080c217e                           @ 080c1fa4 ebe0
     .zero  0x2
-DAT_080c1fa8:
-    .word  0x05000260                     @ 080c1fa8 60020005
-DAT_080c1fac:
-    .word  0x09912e3c                     @ 080c1fac 3c2e9109
-DAT_080c1fb0:
-    .word  0x06014000                     @ 080c1fb0 00400106
-DAT_080c1fb4:
-    .word  0x02000000                     @ 080c1fb4 00000002
-DAT_080c1fb8:
-    .word  0x00006c2c                     @ 080c1fb8 2c6c0000
-DAT_080c1fbc:
-    .word  0x09912e5c                     @ 080c1fbc 5c2e9109
-PTR_WINOUT_080c1fc0:
-    .word  WINOUT                         @ 080c1fc0 4a000004
-DAT_080c1fc4:
-    .word  0x00001f3f                     @ 080c1fc4 3f1f0000
+ptr_obj_palram_slot_3_080c1fa8:
+    .word  OBJ_PALRAM_SLOT_3                     @ 080c1fa8 60020005  OBJ_PALRAM_SLOT_3: add reviewed operand-0 DATA reference.
+ptr_pack_banner_palette_a_080c1fac:
+    .word  pack_banner_palette_a          @ 080c1fac 3c2e9109  pack_banner_palette_a: add reviewed operand-0 DATA reference.
+ptr_aob_card_tile_vram_080c1fb0:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c1fb0 00400106  AOB_CARD_TILE_VRAM: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c1fb4:
+    .word  EWRAM_BASE                     @ 080c1fb4 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c1fb8:
+    .word  GSETTINGS_OFFSET               @ 080c1fb8 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_pack_banner_tile_rows_a_080c1fbc:
+    .word  pack_banner_tile_rows_a        @ 080c1fbc 5c2e9109  pack_banner_tile_rows_a: add reviewed operand-0 DATA reference.
+ptr_winout_080c1fc0:
+    .word  WINOUT                         @ 080c1fc0 4a000004  WINOUT: preserve existing operand-0 DATA reference.
+winout_outside_all_objwin_no_effects_080c1fc4:
+    .word  WINOUT_OUTSIDE_ALL_OBJWIN_NO_EFFECTS @ 080c1fc4 3f1f0000  WINOUT_OUTSIDE_ALL_OBJWIN_NO_EFFECTS: named scalar literal.
 switchD_080c1f2e__caseD_1:
-    ldr r1, PTR_BLDY_080c1fe8                @ 080c1fc8 0749
+    ldr r1, ptr_bldy_080c1fe8                @ 080c1fc8 0749
     ldrh r0,[r3,#0x12]                       @ 080c1fca 588a
     strh r0,[r1,#0x0]                        @ 080c1fcc 0880
     adds r0,#0x1    @ 080c1fce 0130
@@ -1508,10 +1508,10 @@ LAB_080c1fdc:
     movs r0,#0x0    @ 080c1fe2 0020
     strh r0,[r3,#0x12]                       @ 080c1fe4 5882
     b LAB_080c2188                           @ 080c1fe6 cfe0
-PTR_BLDY_080c1fe8:
-    .word  BLDY                           @ 080c1fe8 54000004
+ptr_bldy_080c1fe8:
+    .word  BLDY                           @ 080c1fe8 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c1f2e__caseD_2:
-    ldr r0, DAT_080c2054                     @ 080c1fec 1948
+    ldr r0, ptr_pack_banner_palette_a_080c2054 @ 080c1fec 1948
     ldrh r2,[r3,#0x12]                       @ 080c1fee 5a8a
     movs r1,#0x3    @ 080c1ff0 0321
     bl blend_palette_block_toward_white      @ 080c1ff2 faf7f5fb
@@ -1534,18 +1534,18 @@ LAB_080c1ffe:
     lsls r4,r4,#0x10    @ 080c2014 2404
     lsrs r4,r4,#0x10    @ 080c2016 240c
     adds r0,r5,#0x0    @ 080c2018 281c
-    ldr r1, DAT_080c2058                     @ 080c201a 0f49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c2058 @ 080c201a 0f49
     adds r2,r4,#0x0    @ 080c201c 221c
     bl write_oam_entry_from_packed_args      @ 080c201e 34f0a5f8
     adds r0,r5,#0x0    @ 080c2022 281c
-    ldr r1, DAT_080c205c                     @ 080c2024 0d49
+    ldr r1, oam_attr2_tile_c0_pal4_080c205c  @ 080c2024 0d49
     adds r2,r4,#0x0    @ 080c2026 221c
     bl write_oam_entry_from_packed_args      @ 080c2028 34f0a0f8
     adds r7,#0x40    @ 080c202c 4037
     adds r6,#0x1    @ 080c202e 0136
     cmp r6,#0x2                              @ 080c2030 022e
     ble LAB_080c1ffe                         @ 080c2032 e4dd
-    ldr r1, DAT_080c2060                     @ 080c2034 0a49
+    ldr r1, ptr_g_banner_state_080c2060      @ 080c2034 0a49
     ldrh r0,[r1,#0x12]                       @ 080c2036 488a
     adds r0,#0x1    @ 080c2038 0130
     strh r0,[r1,#0x12]                       @ 080c203a 4882
@@ -1562,16 +1562,16 @@ LAB_080c2046:
     strh r0,[r1,#0x12]                       @ 080c204e 4882
     b LAB_080c2188                           @ 080c2050 9ae0
     .zero  0x2
-DAT_080c2054:
-    .word  0x09912e3c                     @ 080c2054 3c2e9109
-DAT_080c2058:
-    .word  0x000048c0                     @ 080c2058 c0480000
-DAT_080c205c:
-    .word  0x000040c0                     @ 080c205c c0400000
-DAT_080c2060:
-    .word  gBannerState                   @ 080c2060 c0fe0102
+ptr_pack_banner_palette_a_080c2054:
+    .word  pack_banner_palette_a          @ 080c2054 3c2e9109  pack_banner_palette_a: add reviewed operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri2_080c2058:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c2058 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c205c:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c205c c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c2060:
+    .word  gBannerState                   @ 080c2060 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1f2e__caseD_3:
-    ldr r0, DAT_080c20d0                     @ 080c2064 1a48
+    ldr r0, ptr_pack_banner_palette_a_080c20d0 @ 080c2064 1a48
     movs r2,#0x10    @ 080c2066 1022
     ldrh r3,[r3,#0x12]                       @ 080c2068 5b8a
     subs r2,r2,r3    @ 080c206a d21a
@@ -1598,18 +1598,18 @@ LAB_080c207e:
     lsls r4,r4,#0x10    @ 080c2094 2404
     lsrs r4,r4,#0x10    @ 080c2096 240c
     adds r0,r5,#0x0    @ 080c2098 281c
-    ldr r1, DAT_080c20d4                     @ 080c209a 0e49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c20d4 @ 080c209a 0e49
     adds r2,r4,#0x0    @ 080c209c 221c
     bl write_oam_entry_from_packed_args      @ 080c209e 34f065f8
     adds r0,r5,#0x0    @ 080c20a2 281c
-    ldr r1, DAT_080c20d8                     @ 080c20a4 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_080c20d8  @ 080c20a4 0c49
     adds r2,r4,#0x0    @ 080c20a6 221c
     bl write_oam_entry_from_packed_args      @ 080c20a8 34f060f8
     adds r7,#0x40    @ 080c20ac 4037
     adds r6,#0x1    @ 080c20ae 0136
     cmp r6,#0x2                              @ 080c20b0 022e
     ble LAB_080c207e                         @ 080c20b2 e4dd
-    ldr r1, DAT_080c20dc                     @ 080c20b4 0949
+    ldr r1, ptr_g_banner_state_080c20dc      @ 080c20b4 0949
     ldrh r0,[r1,#0x12]                       @ 080c20b6 488a
     adds r0,#0x1    @ 080c20b8 0130
     strh r0,[r1,#0x12]                       @ 080c20ba 4882
@@ -1623,14 +1623,14 @@ LAB_080c207e:
     movs r0,#0x0    @ 080c20ca 0020
     strh r0,[r1,#0x12]                       @ 080c20cc 4882
     b LAB_080c2188                           @ 080c20ce 5be0
-DAT_080c20d0:
-    .word  0x09912e3c                     @ 080c20d0 3c2e9109
-DAT_080c20d4:
-    .word  0x000048c0                     @ 080c20d4 c0480000
-DAT_080c20d8:
-    .word  0x000040c0                     @ 080c20d8 c0400000
-DAT_080c20dc:
-    .word  gBannerState                   @ 080c20dc c0fe0102
+ptr_pack_banner_palette_a_080c20d0:
+    .word  pack_banner_palette_a          @ 080c20d0 3c2e9109  pack_banner_palette_a: add reviewed operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri2_080c20d4:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c20d4 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c20d8:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c20d8 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c20dc:
+    .word  gBannerState                   @ 080c20dc c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1f2e__caseD_4:
     movs r6,#0x0    @ 080c20e0 0026
     lsls r4,r4,#0x10    @ 080c20e2 2404
@@ -1651,18 +1651,18 @@ LAB_080c20e8:
     lsls r4,r4,#0x10    @ 080c20fe 2404
     lsrs r4,r4,#0x10    @ 080c2100 240c
     adds r0,r5,#0x0    @ 080c2102 281c
-    ldr r1, DAT_080c213c                     @ 080c2104 0d49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c213c @ 080c2104 0d49
     adds r2,r4,#0x0    @ 080c2106 221c
     bl write_oam_entry_from_packed_args      @ 080c2108 34f030f8
     adds r0,r5,#0x0    @ 080c210c 281c
-    ldr r1, DAT_080c2140                     @ 080c210e 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_080c2140  @ 080c210e 0c49
     adds r2,r4,#0x0    @ 080c2110 221c
     bl write_oam_entry_from_packed_args      @ 080c2112 34f02bf8
     adds r7,#0x40    @ 080c2116 4037
     adds r6,#0x1    @ 080c2118 0136
     cmp r6,#0x2                              @ 080c211a 022e
     ble LAB_080c20e8                         @ 080c211c e4dd
-    ldr r1, DAT_080c2144                     @ 080c211e 0949
+    ldr r1, ptr_g_banner_state_080c2144      @ 080c211e 0949
     ldrh r0,[r1,#0x12]                       @ 080c2120 488a
     adds r0,#0x1    @ 080c2122 0130
     strh r0,[r1,#0x12]                       @ 080c2124 4882
@@ -1677,14 +1677,14 @@ LAB_080c20e8:
     strh r0,[r1,#0x12]                       @ 080c2136 4882
     b LAB_080c2188                           @ 080c2138 26e0
     .zero  0x2
-DAT_080c213c:
-    .word  0x000048c0                     @ 080c213c c0480000
-DAT_080c2140:
-    .word  0x000040c0                     @ 080c2140 c0400000
-DAT_080c2144:
-    .word  gBannerState                   @ 080c2144 c0fe0102
+oam_attr2_tile_c0_pal4_pri2_080c213c:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c213c c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c2140:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c2140 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c2144:
+    .word  gBannerState                   @ 080c2144 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c1f2e__caseD_5:
-    ldr r2, PTR_BLDY_080c216c                @ 080c2148 084a
+    ldr r2, ptr_bldy_080c216c                @ 080c2148 084a
     ldrh r1,[r3,#0x12]                       @ 080c214a 598a
     movs r0,#0x8    @ 080c214c 0820
     subs r0,r0,r1    @ 080c214e 401a
@@ -1702,28 +1702,28 @@ switchD_080c1f2e__caseD_5:
     strh r0,[r3,#0x12]                       @ 080c2166 5882
     b LAB_080c2188                           @ 080c2168 0ee0
     .zero  0x2
-PTR_BLDY_080c216c:
-    .word  BLDY                           @ 080c216c 54000004
+ptr_bldy_080c216c:
+    .word  BLDY                           @ 080c216c 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c1f2e__caseD_6:
     bl disable_blend_and_clear_step          @ 080c2170 33f030fa
     movs r2,#0x80    @ 080c2174 8022
     lsls r2,r2,#0x13    @ 080c2176 d204
     ldrh r1,[r2,#0x0]                        @ 080c2178 1188
-    ldr r0, DAT_080c218c                     @ 080c217a 0448
+    ldr r0, dispcnt_objwin_clear_mask_080c218c @ 080c217a 0448
     ands r0,r1    @ 080c217c 0840
 LAB_080c217e:
     strh r0,[r2,#0x0]                        @ 080c217e 1080
-    ldr r1, DAT_080c2190                     @ 080c2180 0349
+    ldr r1, ptr_g_banner_state_080c2190      @ 080c2180 0349
     ldrb r0,[r1,#0x11]                       @ 080c2182 487c
     adds r0,#0x1    @ 080c2184 0130
     strb r0,[r1,#0x11]                       @ 080c2186 4874
 LAB_080c2188:
     movs r0,#0x1    @ 080c2188 0120
     b LAB_080c2196                           @ 080c218a 04e0
-DAT_080c218c:
-    .word  0x00007fff                     @ 080c218c ff7f0000
-DAT_080c2190:
-    .word  gBannerState                   @ 080c2190 c0fe0102
+dispcnt_objwin_clear_mask_080c218c:
+    .word  DISPCNT_OBJWIN_CLEAR_MASK      @ 080c218c ff7f0000  DISPCNT_OBJWIN_CLEAR_MASK: named scalar literal.
+ptr_g_banner_state_080c2190:
+    .word  gBannerState                   @ 080c2190 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c2194:
     movs r0,#0x0    @ 080c2194 0020
 LAB_080c2196:
@@ -1742,13 +1742,13 @@ tick_pack_banner_3d_state_machine_alt:
     push {r5,r6,r7}                          @ 080c21a8 e0b4
     movs r5,#0x18    @ 080c21aa 1825
     movs r7,#0x40    @ 080c21ac 4027
-    ldr r0, DAT_080c21d4                     @ 080c21ae 0948
+    ldr r0, ptr_g_banner_state_080c21d4      @ 080c21ae 0948
     ldr r1,[r0,#0x4]                         @ 080c21b0 4168
     adds r6,r0,#0x0    @ 080c21b2 061c
     cmp r1,#0x1                              @ 080c21b4 0129
     bne LAB_080c21e8                         @ 080c21b6 17d1
-    ldr r0, DAT_080c21d8                     @ 080c21b8 0748
-    ldr r1, DAT_080c21dc                     @ 080c21ba 0849
+    ldr r0, ptr_ewram_base_080c21d8          @ 080c21b8 0748
+    ldr r1, gsettings_offset_080c21dc        @ 080c21ba 0849
     adds r0,r0,r1    @ 080c21bc 4018
     ldrb r0,[r0,#0x0]                        @ 080c21be 0078
     lsls r0,r0,#0x1d    @ 080c21c0 4007
@@ -1756,24 +1756,24 @@ tick_pack_banner_3d_state_machine_alt:
     lsls r1,r0,#0x1    @ 080c21c4 4100
     adds r1,r1,r0    @ 080c21c6 0918
     lsls r1,r1,#0xa    @ 080c21c8 8902
-    ldr r0, DAT_080c21e0                     @ 080c21ca 0548
+    ldr r0, ptr_pack_banner_alt_a_tile_rows_080c21e0 @ 080c21ca 0548
     adds r4,r1,r0    @ 080c21cc 0c18
-    ldr r3, DAT_080c21e4                     @ 080c21ce 054b
+    ldr r3, ptr_pack_banner_alt_a_palette_080c21e4 @ 080c21ce 054b
     b LAB_080c2200                           @ 080c21d0 16e0
     .zero  0x2
-DAT_080c21d4:
-    .word  gBannerState                   @ 080c21d4 c0fe0102
-DAT_080c21d8:
-    .word  0x02000000                     @ 080c21d8 00000002
-DAT_080c21dc:
-    .word  0x00006c2c                     @ 080c21dc 2c6c0000
-DAT_080c21e0:
-    .word  0x0991767c                     @ 080c21e0 7c769109
-DAT_080c21e4:
-    .word  0x0991765c                     @ 080c21e4 5c769109
+ptr_g_banner_state_080c21d4:
+    .word  gBannerState                   @ 080c21d4 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+ptr_ewram_base_080c21d8:
+    .word  EWRAM_BASE                     @ 080c21d8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c21dc:
+    .word  GSETTINGS_OFFSET               @ 080c21dc 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_pack_banner_alt_a_tile_rows_080c21e0:
+    .word  pack_banner_alt_a_tile_rows    @ 080c21e0 7c769109  pack_banner_alt_a_tile_rows: add reviewed operand-0 DATA reference.
+ptr_pack_banner_alt_a_palette_080c21e4:
+    .word  pack_banner_alt_a_palette      @ 080c21e4 5c769109  pack_banner_alt_a_palette: add reviewed operand-0 DATA reference.
 LAB_080c21e8:
-    ldr r0, DAT_080c2214                     @ 080c21e8 0a48
-    ldr r2, DAT_080c2218                     @ 080c21ea 0b4a
+    ldr r0, ptr_ewram_base_080c2214          @ 080c21e8 0a48
+    ldr r2, gsettings_offset_080c2218        @ 080c21ea 0b4a
     adds r0,r0,r2    @ 080c21ec 8018
     ldrb r0,[r0,#0x0]                        @ 080c21ee 0078
     lsls r0,r0,#0x1d    @ 080c21f0 4007
@@ -1781,9 +1781,9 @@ LAB_080c21e8:
     lsls r1,r0,#0x1    @ 080c21f4 4100
     adds r1,r1,r0    @ 080c21f6 0918
     lsls r1,r1,#0xa    @ 080c21f8 8902
-    ldr r0, DAT_080c221c                     @ 080c21fa 0848
+    ldr r0, ptr_pack_banner_alt_b_tile_rows_080c221c @ 080c21fa 0848
     adds r4,r1,r0    @ 080c21fc 0c18
-    ldr r3, DAT_080c2220                     @ 080c21fe 084b
+    ldr r3, ptr_pack_banner_alt_b_palette_080c2220 @ 080c21fe 084b
 LAB_080c2200:
     ldrb r0,[r6,#0x11]                       @ 080c2200 707c
     cmp r0,#0x6                              @ 080c2202 0628
@@ -1792,22 +1792,22 @@ switchD_080c2210__default:
     b LAB_080c2534                           @ 080c2206 95e1
 LAB_080c2208:
     lsls r0,r0,#0x2    @ 080c2208 8000
-    ldr r1, DAT_080c2224                     @ 080c220a 0649
+    ldr r1, ptr_switch_d_080c2210_switchdata_d_080c2228_080c2224 @ 080c220a 0649
     adds r0,r0,r1    @ 080c220c 4018
     ldr r0,[r0,#0x0]                         @ 080c220e 0068
 switchD_080c2210__switchD:
     .hword 0x4687    @ 080c2210 8746
     .zero  0x2
-DAT_080c2214:
-    .word  0x02000000                     @ 080c2214 00000002
-DAT_080c2218:
-    .word  0x00006c2c                     @ 080c2218 2c6c0000
-DAT_080c221c:
-    .word  0x0991be9c                     @ 080c221c 9cbe9109
-DAT_080c2220:
-    .word  0x0991be7c                     @ 080c2220 7cbe9109
-DAT_080c2224:
-    .word  0x080c2228                     @ 080c2224 28220c08
+ptr_ewram_base_080c2214:
+    .word  EWRAM_BASE                     @ 080c2214 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c2218:
+    .word  GSETTINGS_OFFSET               @ 080c2218 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_pack_banner_alt_b_tile_rows_080c221c:
+    .word  pack_banner_alt_b_tile_rows    @ 080c221c 9cbe9109  pack_banner_alt_b_tile_rows: add reviewed operand-0 DATA reference.
+ptr_pack_banner_alt_b_palette_080c2220:
+    .word  pack_banner_alt_b_palette      @ 080c2220 7cbe9109  pack_banner_alt_b_palette: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c2210_switchdata_d_080c2228_080c2224:
+    .word  switchD_080c2210__switchdataD_080c2228                     @ 080c2224 28220c08  switchD_080c2210__switchdataD_080c2228: add reviewed operand-0 DATA reference.
 switchD_080c2210__switchdataD_080c2228:
     .word  0x080c2244                     @ 080c2228 44220c08
     .word  0x080c2290                     @ 080c222c 90220c08
@@ -1817,17 +1817,17 @@ switchD_080c2210__switchdataD_080c2228:
     .word  0x080c2478                     @ 080c223c 78240c08
     .word  0x080c2510                     @ 080c2240 10250c08
 switchD_080c2210__caseD_0:
-    ldr r0, DAT_080c2280                     @ 080c2244 0e48
+    ldr r0, ptr_obj_palram_slot_3_080c2280   @ 080c2244 0e48
     adds r1,r3,#0x0    @ 080c2246 191c
     movs r2,#0x20    @ 080c2248 2022
     bl copy_bytes_by_halfword                @ 080c224a 32f02bfe
-    ldr r0, DAT_080c2284                     @ 080c224e 0d48
+    ldr r0, ptr_aob_card_tile_vram_080c2284  @ 080c224e 0d48
     adds r1,r4,#0x0    @ 080c2250 211c
     movs r2,#0x18    @ 080c2252 1822
     movs r3,#0x4    @ 080c2254 0423
     bl tile_2d_row_copy                      @ 080c2256 35f03df9
-    ldr r1, PTR_WINOUT_080c2288              @ 080c225a 0b49
-    ldr r3, DAT_080c228c                     @ 080c225c 0b4b
+    ldr r1, ptr_winout_080c2288              @ 080c225a 0b49
+    ldr r3, winout_outside_all_objwin_no_effects_080c228c @ 080c225c 0b4b
     adds r0,r3,#0x0    @ 080c225e 181c
     strh r0,[r1,#0x0]                        @ 080c2260 0880
     adds r1,#0xa    @ 080c2262 0a31
@@ -1845,16 +1845,16 @@ switchD_080c2210__caseD_0:
     orrs r0,r1    @ 080c227a 0843
     b LAB_080c251e                           @ 080c227c 4fe1
     .zero  0x2
-DAT_080c2280:
-    .word  0x05000260                     @ 080c2280 60020005
-DAT_080c2284:
-    .word  0x06014000                     @ 080c2284 00400106
-PTR_WINOUT_080c2288:
-    .word  WINOUT                         @ 080c2288 4a000004
-DAT_080c228c:
-    .word  0x00001f3f                     @ 080c228c 3f1f0000
+ptr_obj_palram_slot_3_080c2280:
+    .word  OBJ_PALRAM_SLOT_3                     @ 080c2280 60020005  OBJ_PALRAM_SLOT_3: add reviewed operand-0 DATA reference.
+ptr_aob_card_tile_vram_080c2284:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c2284 00400106  AOB_CARD_TILE_VRAM: add reviewed operand-0 DATA reference.
+ptr_winout_080c2288:
+    .word  WINOUT                         @ 080c2288 4a000004  WINOUT: preserve existing operand-0 DATA reference.
+winout_outside_all_objwin_no_effects_080c228c:
+    .word  WINOUT_OUTSIDE_ALL_OBJWIN_NO_EFFECTS @ 080c228c 3f1f0000  WINOUT_OUTSIDE_ALL_OBJWIN_NO_EFFECTS: named scalar literal.
 switchD_080c2210__caseD_1:
-    ldr r0, DAT_080c2310                     @ 080c2290 1f48
+    ldr r0, ptr_g_banner_state_080c2310      @ 080c2290 1f48
     .hword 0x4682    @ 080c2292 8246
     movs r1,#0x80    @ 080c2294 8021
     lsls r1,r1,#0x2    @ 080c2296 8900
@@ -1879,7 +1879,7 @@ LAB_080c22a2:
     orrs r4,r1    @ 080c22ba 0c43
     lsls r4,r4,#0x10    @ 080c22bc 2404
     lsrs r4,r4,#0x10    @ 080c22be 240c
-    ldr r1, DAT_080c2314                     @ 080c22c0 1449
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c2314 @ 080c22c0 1449
     adds r2,r4,#0x0    @ 080c22c2 221c
     bl write_oam_entry_from_packed_args      @ 080c22c4 33f052ff
     .hword 0x4653    @ 080c22c8 5346
@@ -1890,7 +1890,7 @@ LAB_080c22a2:
     subs r0,r5,r0    @ 080c22d2 281a
     add r0,r9                                @ 080c22d4 4844
     orrs r0,r7    @ 080c22d6 3843
-    ldr r1, DAT_080c2318                     @ 080c22d8 0f49
+    ldr r1, oam_attr2_tile_c0_pal4_080c2318  @ 080c22d8 0f49
     adds r2,r4,#0x0    @ 080c22da 221c
     bl write_oam_entry_from_packed_args      @ 080c22dc 33f046ff
     movs r2,#0x8    @ 080c22e0 0822
@@ -1899,8 +1899,8 @@ LAB_080c22a2:
     subs r6,#0x1    @ 080c22e6 013e
     cmp r6,#0x0                              @ 080c22e8 002e
     bge LAB_080c22a2                         @ 080c22ea dada
-    ldr r1, PTR_BLDY_080c231c                @ 080c22ec 0b49
-    ldr r2, DAT_080c2310                     @ 080c22ee 084a
+    ldr r1, ptr_bldy_080c231c                @ 080c22ec 0b49
+    ldr r2, ptr_g_banner_state_080c2310      @ 080c22ee 084a
     ldrh r0,[r2,#0x12]                       @ 080c22f0 508a
     strh r0,[r1,#0x0]                        @ 080c22f2 0880
     adds r0,#0x1    @ 080c22f4 0130
@@ -1918,14 +1918,14 @@ LAB_080c2302:
     strh r0,[r2,#0x12]                       @ 080c230a 5082
     b LAB_080c2528                           @ 080c230c 0ce1
     .zero  0x2
-DAT_080c2310:
-    .word  gBannerState                   @ 080c2310 c0fe0102
-DAT_080c2314:
-    .word  0x000048c0                     @ 080c2314 c0480000
-DAT_080c2318:
-    .word  0x000040c0                     @ 080c2318 c0400000
-PTR_BLDY_080c231c:
-    .word  BLDY                           @ 080c231c 54000004
+ptr_g_banner_state_080c2310:
+    .word  gBannerState                   @ 080c2310 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri2_080c2314:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c2314 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c2318:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c2318 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_bldy_080c231c:
+    .word  BLDY                           @ 080c231c 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c2210__caseD_2:
     ldrh r2,[r6,#0x12]                       @ 080c2320 728a
     adds r0,r3,#0x0    @ 080c2322 181c
@@ -1950,18 +1950,18 @@ LAB_080c2332:
     lsls r4,r4,#0x10    @ 080c2348 2404
     lsrs r4,r4,#0x10    @ 080c234a 240c
     adds r0,r5,#0x0    @ 080c234c 281c
-    ldr r1, DAT_080c2388                     @ 080c234e 0e49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c2388 @ 080c234e 0e49
     adds r2,r4,#0x0    @ 080c2350 221c
     bl write_oam_entry_from_packed_args      @ 080c2352 33f00bff
     adds r0,r5,#0x0    @ 080c2356 281c
-    ldr r1, DAT_080c238c                     @ 080c2358 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_080c238c  @ 080c2358 0c49
     adds r2,r4,#0x0    @ 080c235a 221c
     bl write_oam_entry_from_packed_args      @ 080c235c 33f006ff
     adds r7,#0x40    @ 080c2360 4037
     adds r6,#0x1    @ 080c2362 0136
     cmp r6,#0x2                              @ 080c2364 022e
     ble LAB_080c2332                         @ 080c2366 e4dd
-    ldr r1, DAT_080c2390                     @ 080c2368 0949
+    ldr r1, ptr_g_banner_state_080c2390      @ 080c2368 0949
     ldrh r0,[r1,#0x12]                       @ 080c236a 488a
     adds r0,#0x1    @ 080c236c 0130
     strh r0,[r1,#0x12]                       @ 080c236e 4882
@@ -1978,12 +1978,12 @@ LAB_080c237a:
     strh r0,[r1,#0x12]                       @ 080c2382 4882
     b LAB_080c2528                           @ 080c2384 d0e0
     .zero  0x2
-DAT_080c2388:
-    .word  0x000048c0                     @ 080c2388 c0480000
-DAT_080c238c:
-    .word  0x000040c0                     @ 080c238c c0400000
-DAT_080c2390:
-    .word  gBannerState                   @ 080c2390 c0fe0102
+oam_attr2_tile_c0_pal4_pri2_080c2388:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c2388 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c238c:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c238c c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c2390:
+    .word  gBannerState                   @ 080c2390 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c2210__caseD_3:
     movs r2,#0x10    @ 080c2394 1022
     ldrh r6,[r6,#0x12]                       @ 080c2396 768a
@@ -2012,18 +2012,18 @@ LAB_080c23ae:
     lsls r4,r4,#0x10    @ 080c23c4 2404
     lsrs r4,r4,#0x10    @ 080c23c6 240c
     adds r0,r5,#0x0    @ 080c23c8 281c
-    ldr r1, DAT_080c2404                     @ 080c23ca 0e49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c2404 @ 080c23ca 0e49
     adds r2,r4,#0x0    @ 080c23cc 221c
     bl write_oam_entry_from_packed_args      @ 080c23ce 33f0cdfe
     adds r0,r5,#0x0    @ 080c23d2 281c
-    ldr r1, DAT_080c2408                     @ 080c23d4 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_080c2408  @ 080c23d4 0c49
     adds r2,r4,#0x0    @ 080c23d6 221c
     bl write_oam_entry_from_packed_args      @ 080c23d8 33f0c8fe
     adds r7,#0x40    @ 080c23dc 4037
     adds r6,#0x1    @ 080c23de 0136
     cmp r6,#0x2                              @ 080c23e0 022e
     ble LAB_080c23ae                         @ 080c23e2 e4dd
-    ldr r1, DAT_080c240c                     @ 080c23e4 0949
+    ldr r1, ptr_g_banner_state_080c240c      @ 080c23e4 0949
     ldrh r0,[r1,#0x12]                       @ 080c23e6 488a
     adds r0,#0x1    @ 080c23e8 0130
     strh r0,[r1,#0x12]                       @ 080c23ea 4882
@@ -2040,12 +2040,12 @@ LAB_080c23f6:
     strh r0,[r1,#0x12]                       @ 080c23fe 4882
     b LAB_080c2528                           @ 080c2400 92e0
     .zero  0x2
-DAT_080c2404:
-    .word  0x000048c0                     @ 080c2404 c0480000
-DAT_080c2408:
-    .word  0x000040c0                     @ 080c2408 c0400000
-DAT_080c240c:
-    .word  gBannerState                   @ 080c240c c0fe0102
+oam_attr2_tile_c0_pal4_pri2_080c2404:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c2404 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c2408:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c2408 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c240c:
+    .word  gBannerState                   @ 080c240c c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c2210__caseD_4:
     movs r6,#0x0    @ 080c2410 0026
     lsls r7,r7,#0x10    @ 080c2412 3f04
@@ -2066,18 +2066,18 @@ LAB_080c2418:
     lsls r4,r4,#0x10    @ 080c242e 2404
     lsrs r4,r4,#0x10    @ 080c2430 240c
     adds r0,r5,#0x0    @ 080c2432 281c
-    ldr r1, DAT_080c246c                     @ 080c2434 0d49
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c246c @ 080c2434 0d49
     adds r2,r4,#0x0    @ 080c2436 221c
     bl write_oam_entry_from_packed_args      @ 080c2438 33f098fe
     adds r0,r5,#0x0    @ 080c243c 281c
-    ldr r1, DAT_080c2470                     @ 080c243e 0c49
+    ldr r1, oam_attr2_tile_c0_pal4_080c2470  @ 080c243e 0c49
     adds r2,r4,#0x0    @ 080c2440 221c
     bl write_oam_entry_from_packed_args      @ 080c2442 33f093fe
     adds r7,#0x40    @ 080c2446 4037
     adds r6,#0x1    @ 080c2448 0136
     cmp r6,#0x2                              @ 080c244a 022e
     ble LAB_080c2418                         @ 080c244c e4dd
-    ldr r1, DAT_080c2474                     @ 080c244e 0949
+    ldr r1, ptr_g_banner_state_080c2474      @ 080c244e 0949
     ldrh r0,[r1,#0x12]                       @ 080c2450 488a
     adds r0,#0x1    @ 080c2452 0130
     strh r0,[r1,#0x12]                       @ 080c2454 4882
@@ -2092,12 +2092,12 @@ LAB_080c2418:
     strh r0,[r1,#0x12]                       @ 080c2466 4882
     b LAB_080c2528                           @ 080c2468 5ee0
     .zero  0x2
-DAT_080c246c:
-    .word  0x000048c0                     @ 080c246c c0480000
-DAT_080c2470:
-    .word  0x000040c0                     @ 080c2470 c0400000
-DAT_080c2474:
-    .word  gBannerState                   @ 080c2474 c0fe0102
+oam_attr2_tile_c0_pal4_pri2_080c246c:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c246c c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c2470:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c2470 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_g_banner_state_080c2474:
+    .word  gBannerState                   @ 080c2474 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 switchD_080c2210__caseD_5:
     movs r2,#0x8    @ 080c2478 0822
     .hword 0x4692    @ 080c247a 9246
@@ -2111,7 +2111,7 @@ switchD_080c2210__caseD_5:
     movs r6,#0x2    @ 080c248a 0226
 LAB_080c248c:
     .hword 0x4652    @ 080c248c 5246
-    ldr r1, DAT_080c2500                     @ 080c248e 1c49
+    ldr r1, ptr_g_banner_state_080c2500      @ 080c248e 1c49
     ldrh r1,[r1,#0x12]                       @ 080c2490 498a
     subs r0,r2,r1    @ 080c2492 501a
     movs r2,#0x1b    @ 080c2494 1b22
@@ -2126,11 +2126,11 @@ LAB_080c248c:
     orrs r4,r1    @ 080c24a6 0c43
     lsls r4,r4,#0x10    @ 080c24a8 2404
     lsrs r4,r4,#0x10    @ 080c24aa 240c
-    ldr r1, DAT_080c2504                     @ 080c24ac 1549
+    ldr r1, oam_attr2_tile_c0_pal4_pri2_080c2504 @ 080c24ac 1549
     adds r2,r4,#0x0    @ 080c24ae 221c
     bl write_oam_entry_from_packed_args      @ 080c24b0 33f05cfe
     .hword 0x4652    @ 080c24b4 5246
-    ldr r1, DAT_080c2500                     @ 080c24b6 1249
+    ldr r1, ptr_g_banner_state_080c2500      @ 080c24b6 1249
     ldrh r1,[r1,#0x12]                       @ 080c24b8 498a
     subs r0,r2,r1    @ 080c24ba 501a
     movs r2,#0x1b    @ 080c24bc 1b22
@@ -2138,7 +2138,7 @@ LAB_080c248c:
     adds r0,r0,r5    @ 080c24c0 4019
     add r0,r9                                @ 080c24c2 4844
     orrs r0,r7    @ 080c24c4 3843
-    ldr r1, DAT_080c2508                     @ 080c24c6 1049
+    ldr r1, oam_attr2_tile_c0_pal4_080c2508  @ 080c24c6 1049
     adds r2,r4,#0x0    @ 080c24c8 221c
     bl write_oam_entry_from_packed_args      @ 080c24ca 33f04ffe
     movs r3,#0x8    @ 080c24ce 0823
@@ -2147,8 +2147,8 @@ LAB_080c248c:
     subs r6,#0x1    @ 080c24d4 013e
     cmp r6,#0x0                              @ 080c24d6 002e
     bge LAB_080c248c                         @ 080c24d8 d8da
-    ldr r2, PTR_BLDY_080c250c                @ 080c24da 0c4a
-    ldr r3, DAT_080c2500                     @ 080c24dc 084b
+    ldr r2, ptr_bldy_080c250c                @ 080c24da 0c4a
+    ldr r3, ptr_g_banner_state_080c2500      @ 080c24dc 084b
     ldrh r1,[r3,#0x12]                       @ 080c24de 598a
     movs r0,#0x8    @ 080c24e0 0820
     subs r0,r0,r1    @ 080c24e2 401a
@@ -2166,34 +2166,34 @@ LAB_080c248c:
     strh r0,[r3,#0x12]                       @ 080c24fa 5882
     b LAB_080c2528                           @ 080c24fc 14e0
     .zero  0x2
-DAT_080c2500:
-    .word  gBannerState                   @ 080c2500 c0fe0102
-DAT_080c2504:
-    .word  0x000048c0                     @ 080c2504 c0480000
-DAT_080c2508:
-    .word  0x000040c0                     @ 080c2508 c0400000
-PTR_BLDY_080c250c:
-    .word  BLDY                           @ 080c250c 54000004
+ptr_g_banner_state_080c2500:
+    .word  gBannerState                   @ 080c2500 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
+oam_attr2_tile_c0_pal4_pri2_080c2504:
+    .word  OAM_ATTR2_TILE_C0_PAL4_PRI2    @ 080c2504 c0480000  OAM_ATTR2_TILE_C0_PAL4_PRI2: named scalar literal.
+oam_attr2_tile_c0_pal4_080c2508:
+    .word  OAM_ATTR2_TILE_C0_PAL4         @ 080c2508 c0400000  OAM_ATTR2_TILE_C0_PAL4: named scalar literal.
+ptr_bldy_080c250c:
+    .word  BLDY                           @ 080c250c 54000004  BLDY: preserve existing operand-0 DATA reference.
 switchD_080c2210__caseD_6:
     bl disable_blend_and_clear_step          @ 080c2510 33f060f8
     movs r2,#0x80    @ 080c2514 8022
     lsls r2,r2,#0x13    @ 080c2516 d204
     ldrh r1,[r2,#0x0]                        @ 080c2518 1188
-    ldr r0, DAT_080c252c                     @ 080c251a 0448
+    ldr r0, dispcnt_objwin_clear_mask_080c252c @ 080c251a 0448
     ands r0,r1    @ 080c251c 0840
 LAB_080c251e:
     strh r0,[r2,#0x0]                        @ 080c251e 1080
-    ldr r1, DAT_080c2530                     @ 080c2520 0349
+    ldr r1, ptr_g_banner_state_080c2530      @ 080c2520 0349
     ldrb r0,[r1,#0x11]                       @ 080c2522 487c
     adds r0,#0x1    @ 080c2524 0130
     strb r0,[r1,#0x11]                       @ 080c2526 4874
 LAB_080c2528:
     movs r0,#0x1    @ 080c2528 0120
     b LAB_080c2536                           @ 080c252a 04e0
-DAT_080c252c:
-    .word  0x00007fff                     @ 080c252c ff7f0000
-DAT_080c2530:
-    .word  gBannerState                   @ 080c2530 c0fe0102
+dispcnt_objwin_clear_mask_080c252c:
+    .word  DISPCNT_OBJWIN_CLEAR_MASK      @ 080c252c ff7f0000  DISPCNT_OBJWIN_CLEAR_MASK: named scalar literal.
+ptr_g_banner_state_080c2530:
+    .word  gBannerState                   @ 080c2530 c0fe0102  gBannerState: preserve existing operand-0 DATA reference.
 LAB_080c2534:
     movs r0,#0x0    @ 080c2534 0020
 LAB_080c2536:

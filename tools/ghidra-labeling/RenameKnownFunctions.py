@@ -255,8 +255,8 @@ RENAMES = [
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x10 子状态机, 待详细分析."),
     ('FUN_080bf228', 'play_zone_info_palette_cycle_effect',
         'Zone-info palette-cycle effect for UI effect0x11. It computes the zone-type0xb count delta and clamps it to0..6. Phase0 renders the zone and falls through to the first palette update. Phase1 performs the remaining 63 updates; counter%3 selects the attr2 palette while coordinates stay fixed. Completion clears banner bit0 and field+0x215 bit2 and returns0; active phases return1.'),
-    ("FUN_080c1ad0", "play_ui_effect_13",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x13 子状态机, 待详细分析."),
+    ('FUN_080c1ad0', 'play_hand_shuffle_display_effect',
+        'UI effect 0x13 hand-shuffle display. Phase 0 selects the side-dependent position, uploads the hand-shuffle palette and tiles, initializes the AOB context, sets the duel-field UI flag, and redraws the hand slot. Phase 1 renders and advances the AOB and later clears that flag. Phase 2 redraws the field-zone card tile. Other phases clear banner and UI flags and return 0; phases 0-2 return 1.'),
     ('FUN_080bea94', 'play_zone_type_13_card_reveal_effect',
         'Zone13 card reveal. Phase0 loads two small-card images, toggles field+0x215 bit6, prepares tile data and sprite3. Phase1 makes five single-OAM-entry calls at counter0..4, using LUT[0,1,8,15,16] through sin[(4*v)&127] to scale offsets. Phase2 draws zone13 and its large card if bit6 is set. Phase3 waits32 calls. Phases0..3 return1; phase>3 clears banner bit0 and field bit2, then returns0.'),
     ('FUN_080befc0', 'play_zone_card_display_transition',
@@ -265,14 +265,14 @@ RENAMES = [
         'Run effect0x20 as a seven-phase card window sequence. Phase0 resolves the cached card or fallback ID, uploads tiles, initializes the AOB from ptnsect data, and enables WIN0. Phase1 writes five BLDY steps. Phases2/4 attempt two card OAM writes for17 calls each. Phase3 renders the AOB plus those two writes and advances only when its tick returns0. Phase5 writes five closing BLDY steps. Phase6 clears WIN0 and refreshes UI, returning1; default clears both UI flags and returns0.'),
     ('FUN_080c0f38', 'play_zone_card_display_window_effect',
         'Run effect0x21 as a seven-phase zone-card window sequence. Phase0 resolves zone/card references, uploads/remaps label pixels, and enables WIN0. Phase1 opens with five BLDY steps. Phase2 attempts two card OAM writes per call; phase3 adds one affine entry; phase4 adds one normal entry instead. Each runs17 calls. Phase5 closes with five BLDY steps. Phase6 clears WIN0 and refreshes UI, returning1; default clears banner bit0 and field+0x215 bit2 and returns0.'),
-    ("FUN_080c17d4", "play_ui_effect_23",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x23 子状态机, 待详细分析."),
-    ("FUN_080c1448", "play_ui_effect_25",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x25 子状态机, 待详细分析."),
-    ("FUN_080c1c60", "play_ui_effect_2e",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x2e 子状态机, 待详细分析."),
-    ("FUN_080c1e9c", "play_ui_effect_2f",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x2f 子状态机, 待详细分析."),
+    ('FUN_080c17d4', 'play_card_count_increment_window_effect',
+        'UI effect 0x23 card-count increment window. Let b=gBannerState. b+8 supplies count; b+0xc feeds the card cache. Phase0 loads panel/card tiles, selects the slot bucket and enables WIN0. Phase2 draws count-1 for17 calls. Phase3 holds count-1 for31 calls then draws count on call32; phase4 holds count for17 calls. Phases1/5 each write five BLDY steps. Phase6 clears WIN0 and refreshes UI. Phases0..6 return1; default clears banner bit0 and field+0x215 bit2, returning0.'),
+    ('FUN_080c1448', 'play_card_effect_count_delta_window_effect',
+        'UI effect 0x25 card-effect count window. Reads side/slot, signed delta and style from gBannerState; gets the zone count. Spark Blaster maps count to3-count and negates delta. Phase0 loads card/panel tiles and enables WIN0. Phase2 draws count-delta for17 calls; phase3 steps toward count using ++u16counter>>4; phase4 holds count for17 calls. Phases1/5 write five BLDY steps. Phase6 disables WIN0 and refreshes UI, returning1. Default clears banner bit0 and field+0x215 bit2, returning0.'),
+    ('FUN_080c1c60', 'play_normal_summon_card_display_effect',
+        "UI effect 0x2e normal-summon display. Let b=gBannerState and f=gDuelFieldState. Phase0 loads language-selected tiles/palette and enables alpha blending. Phases1..3 each attempt two OAM writes per call, for9/33/9 calls. Phase3's last call clears f+0x215 bit2. Phase4 increments u8 f+0xa and stores (u8(b+4)<<8)|u8(b+8) at f+0xc+4*(b+0xc-1). Phases0..4 return1; default clears banner bit0 and field bit2, returning0."),
+    ('FUN_080c1e9c', 'play_attack_flip_card_display_effect',
+        'UI effect 0x2f attack-flip display. Phase0 calls suppress_display_output with the debug format, then return_void_noop; it decrements u8 gDuelFieldState+0xa, clears the u32 entry at +0xc+4*(gBannerState+0xc-1), advances phase and returns1. Later calls clear gBannerState bit0 with AND0xfe and gDuelFieldState+0x215 bit2 with AND0xfb, preserving field bit0, and return0.'),
     ('FUN_080bd870', 'play_three_sprite_banner_blend',
         'UI effect 0x30. Phases0..4 load a palette/tile set, emit exactly three fixed OAM entries, run a 9-tick alpha ramp, hold65 ticks, and run a 9-tick reverse ramp. Returns1 while active. Completion disables blend, clears gBannerState bit0 with AND0xfe and gDuelFieldState+0x215 bit2 with AND0xfb, then returns0. No sine-motion helper is called. Evidence: 080bd870-080bda70.'),
     ('FUN_080c07e4', 'play_card_display_sine_reveal_effect',
@@ -6283,22 +6283,10 @@ RENAMES = [
     # 2026-05-09: BATCH-28 落地 (campaign-28, topo=626..647)
     ('FUN_080bf2d0', 'draw_number_digits_to_oam',
         'Draws decimal magnitude r1 to OAM for player key r0; r2 is the header kind4 delta-display mode (current callers use0/1). Zero emits one digit. Nonzero values also emit a leading prefix: mode0 tile0x202, mode1 tile0x200, attr2 palette=(2-mode)<<12. Digits use tile0x204+2*digit with12-pixel right-to-left spacing. Used by play_life_point_change_effect.'),
-    ("FUN_080fa4d8", "return_void_noop",
-        "发布版空操作占位函数. 函数体仅一条 bx lr 指令, 不接受任何参数, 无任何副作用, 无返回值. "
-        "在所有 4 个调用点均紧跟在 suppress_display_output (0x080fa4cc) 之后, "
-        "两次 bl 连续出现于 play_ui_effect_2f (0x080c1e9c), "
-        "FUN_080eda30 (sio), FUN_080f4c14 (dma/sys/display), FUN_080f7708 (display/palette). "
-        "调用前未见 r0..r3 专门设置, 属于 Type B 零参数页面处理器占位 "
-        "(区别于 suppress_assert_report 0x080fa4dc 的 4 参数消音器). "
-        "与地址相邻的 return_void_handler (0x080fa4d4) 及 suppress_assert_report (0x080fa4dc) 构成同簇."),
-    ("FUN_080fa4cc", "suppress_display_output",
-        "发布版 4 参数空输出函数. 函数体: push {r0,r1,r2,r3} 将所有 APCS 入参压栈, "
-        "add sp,#0x10 立即弹出, bx lr 返回. 等效于接收 4 个参数后立即丢弃, 无任何输出或副作用. "
-        "调用方包括 banlist/settings 初始化 (0x08017a24, r0=ptr, r1=pixel_offset), "
-        "play_ui_effect_2f (0x080c1e9c, r0=ptr, r3=context), "
-        "FUN_080eb4d4 / FUN_080ed550 (游戏各模块循环内 r0=ptr 传入). "
-        "用于在 release build 中消音调试输出 (类似 printf/log stub). "
-        "与 suppress_assert_report (0x080fa4dc) 同为发布版 noop 族."),
+    ('FUN_080fa4d8', 'return_void_noop',
+        'Release-build zero-argument no-op. Executes only bx lr. Four call sites invoke it immediately after suppress_display_output: play_attack_flip_card_display_effect, tick_sio_deck_sync_session, init_system_hardware_and_drivers, and init_anim_state_with_ptnsect. Unlike suppress_assert_report, it has no prepared arguments.'),
+    ('FUN_080fa4cc', 'suppress_display_output',
+        'Release-build four-argument display-output stub. Pushes r0-r3, immediately restores sp, and returns without output or side effects. Callers include banlist/settings setup, play_attack_flip_card_display_effect, dump_nclr_palette_entries, and tick_sio_deck_sync_round. This is the parameter-taking output-suppression member of the adjacent no-op cluster.'),
     ("FUN_080f5928", "start_blend_fade_with_evy",
         "启动 alpha 混合淡入/淡出序列并推进一步. r0 = delta (带符号偏移量, 每帧步进值). "
         "函数入口: 写入 BLDCNT = 0x3fbf (所有层参与 B 混合模式), 设置混合效果启动条件. "

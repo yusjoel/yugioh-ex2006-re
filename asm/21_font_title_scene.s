@@ -14758,7 +14758,7 @@ return_void_stub_a:
     bx lr                                    @ 080fa4c0 7047
     .byte  0x00, 0x00, 0x70, 0x47, 0x00, 0x00, 0x70, 0x47, 0x00, 0x00
 
-@ 发布版 4 参数空输出函数. 函数体: push {r0,r1,r2,r3} 将所有 APCS 入参压栈, add sp,#0x10 立即弹出, bx lr 返回. 等效于接收 4 个参数后立即丢弃, 无任何输出或副作用. 调用方包括 banlist/settings 初始化 (0x08017a24, r0=ptr, r1=pixel_offset), play_ui_effect_2f (0x080c1e9c, r0=ptr, r3=context), FUN_080eb4d4 / FUN_080ed550 (游戏各模块循环内 r0=ptr 传入). 用于在 release build 中消音调试输出 (类似 printf/log stub). 与 suppress_assert_report (0x080fa4dc) 同为发布版 noop 族.
+@ Release-build four-argument display-output stub. Pushes r0-r3, immediately restores sp, and returns without output or side effects. Callers include banlist/settings setup, play_attack_flip_card_display_effect, dump_nclr_palette_entries, and tick_sio_deck_sync_round. This is the parameter-taking output-suppression member of the adjacent no-op cluster.
 suppress_display_output:
     push {r0,r1,r2,r3}                       @ 080fa4cc 0fb4
     add sp,#0x10                             @ 080fa4ce 04b0
@@ -14770,7 +14770,7 @@ return_void_handler:
     bx lr                                    @ 080fa4d4 7047
     .zero  0x2
 
-@ 发布版空操作占位函数. 函数体仅一条 bx lr 指令, 不接受任何参数, 无任何副作用, 无返回值. 在所有 4 个调用点均紧跟在 suppress_display_output (0x080fa4cc) 之后, 两次 bl 连续出现于 play_ui_effect_2f (0x080c1e9c), FUN_080eda30 (sio), FUN_080f4c14 (dma/sys/display), FUN_080f7708 (display/palette). 调用前未见 r0..r3 专门设置, 属于 Type B 零参数页面处理器占位 (区别于 suppress_assert_report 0x080fa4dc 的 4 参数消音器). 与地址相邻的 return_void_handler (0x080fa4d4) 及 suppress_assert_report (0x080fa4dc) 构成同簇.
+@ Release-build zero-argument no-op. Executes only bx lr. Four call sites invoke it immediately after suppress_display_output: play_attack_flip_card_display_effect, tick_sio_deck_sync_session, init_system_hardware_and_drivers, and init_anim_state_with_ptnsect. Unlike suppress_assert_report, it has no prepared arguments.
 return_void_noop:
     bx lr                                    @ 080fa4d8 7047
     .zero  0x2

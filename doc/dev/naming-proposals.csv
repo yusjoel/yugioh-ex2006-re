@@ -3564,11 +3564,11 @@ address,name,proposed_name,score,tags
 0x080c0c70,play_card_display_window_effect,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
 0x080c0f38,play_zone_card_display_window_effect,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
 0x080c124c,render_card_count_panel_oam,,,
-0x080c1448,play_ui_effect_25,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
-0x080c17d4,play_ui_effect_23,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
-0x080c1ad0,play_ui_effect_13,,,palette;vram;card_frame;card_ids
-0x080c1c60,play_ui_effect_2e,,,blend;palette;vram;settings
-0x080c1e9c,play_ui_effect_2f,,,
+0x080c1448,play_card_effect_count_delta_window_effect,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
+0x080c17d4,play_card_count_increment_window_effect,,,display;blend;window;vram;card_frame;card_ids;card_stats;duel_field;font_jp;frame_counter;game_str
+0x080c1ad0,play_hand_shuffle_display_effect,,,palette;vram;card_frame;card_ids
+0x080c1c60,play_normal_summon_card_display_effect,,,blend;palette;vram;settings
+0x080c1e9c,play_attack_flip_card_display_effect,,,
 0x080c1f10,tick_pack_banner_3d_state_machine,,,blend;display;palette;window;vram;scene_pack;frame_counter;settings
 0x080c21a0,tick_pack_banner_3d_state_machine_alt,,,blend;display;palette;window;vram;scene_pack;frame_counter;settings
 0x080c2544,play_ui_effect_3d,,,scene_pack;frame_counter;settings

@@ -8,9 +8,11 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件** `16_duelfield_zone.s`（`0x080c1448..0x080cbf0c`），尚未初始化活动文档或划分段。
-> **下一任务** 模块 16 待初始化活动文档并按函数结束边界划分约 10 段，之后从 Seg-1 开始；当前尚未完成模块 16 的分析或落地。
-> **本次续接** 2026-11-06 完成 F15-Seg-10，模块 15 的 10/10 段全部关闭。主序完成 16/25 个模块，历史正引用补漏 1 项仍保留。
+> **当前文件** `16_duelfield_zone.s`（`0x080c1448..0x080cbf0c`），1/10 段，活动文档 `doc/dev/refine/16_duelfield_zone.md`。
+> **下一任务** F16-Seg-2 `[0x080c2544,0x080c36a8)`，15 个 Function、145 个池字、无 raw 块。按分析、独立复核、落地、ROM 验证和单段提交的顺序继续。
+> **模块16建档** 10段连续覆盖43716B；独立只读核112个Function完整body，无跨段函数；1580word、1136自动数据名、8个未分类原始块3410B。原始块分布Seg4/5/7，分类由所属段全ROM扫描与消费者证据确定。
+> **本次续接** 2026-11-12 完成 F16-Seg-1。模块 16 当前 1/10 段，主序已完成 16/25 个模块，历史正引用补漏 1 项。每段最终验收后单独提交并持续推进。
+> **file 16 Seg-1结果** `[0x080c1448,0x080c2544)` 共4348B，210槽为43EQ/58REF_ADD/54REF_PRESERVE/55PRESERVE，155源标签及EOL、19新目标、5函数改名、7PLATE；实际全后态和同Program回滚前态均0FAIL后唯一保存，新进程与117Fn/2181state及16172指令保护属性独立后验全部通过。22GNU、189native、115pins和210表达式断言通过；源码许可15路径内精确13变化，49/49资产、构建及33554432B整ROM逐字节相等，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。剩余自动名981，8块3410B仍由后续所属段分类。流水线门禁 `cce5422c21da99ec5073cfd6ba4a95e3075faac1533fd623c4460d8539fdfa61`。
 > **file 15 Seg-10结果**: `[0x080c00f0,0x080c1448)` 共 4952 字节；47EQ/30REF_ADD/49REF_PRESERVE/26PRESERVE，126源标签/EOL、7目标、11函数改名、18条PLATE写入及3条上下文保留、22 GNU定义、94有效GAS投影（81+13）与152表达式断言。v1真实只读演练POST FAIL=3，未保存且未形成rollback PASS；v2仅修四条`0201fec5`派生显示名后，完整后态和同Program回滚前态均0FAIL，再依唯一授权保存一次。apply`60a8d089ac455eaef88a36c8ff51d0a3ab931e56cfa28310fe49a3e57f7e6ed4`、新进程check`f3fe8a0a86fc97ed0b74c3058692f7fb62a519a39d2561b413bcb16b602ea209`及独立后验全部通过，覆盖422实际Function、10092主状态+5offcut、144primary、2476全局Equate/12643绑定；源码仅14批准路径、18现存registry和11个name cell变化。49/49资产、构建和33554432B整ROM逐字节相等；Root最终门禁`6d20d4d9833cc7d6bf8f3eb9eaef9f371a62ecca9655fc3d43e10c9557421877`，流水线`ba0fcdda982089b6e12246ea1852ab141efbd75ff06b62fea256cff421618afe`，ELF`cc2ed74397bc1e93d559df05f09a1252693cdaa477f8685025e09b7461fc7b09`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
 > **file 15 Seg-9结果**: `[0x080bede4,0x080c00f0)` 共 4876 字节；45EQ/104REF_ADD/32REF_PRESERVE/59PRESERVE，11目标标签、15 GNU 定义、81 GAS 投影，源码精确15路径且越界变化0。104新入站/49目标、91旧DATA source保持、415实际Function/10079完整状态/198primary图均通过独立核验。真实8G完整后态及同Program强制回滚均0FAIL后唯一保存，新进程和独立Java后态核验通过。12现存registry更新、BEDE4缺席保持、CSV仅6个name cell。49/49资产及33554432B整ROM逐字节相等；Root最终门禁`9afef7510c67193ffd23b65e0aeae2e23672686fa1373d367ebd6adf6329ceed`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
 > **file 15 Seg-8结果**: `[0x080bda7c,0x080bede4)` 共 4968 字节；41EQ/79REF_ADD/45REF_PRESERVE/28PRESERVE，27目标标签、34 GNU 定义、60 GAS 投影，source批准14路径且越界变化0。registry为7个现存tuple/1个缺席`BE9BC`，`BDFAC`只对齐现存tuple注释而非新增tuple或Ghidra PLATE写入。v4只读运行在DTO/OOM核验阶段终止且未保存、未形成rollback PASS，物理DB/source全等；v5真实回滚及最终审计通过后唯一保存。Root最终门禁`ba097698fcaa858d9d72639455a4857f85d6b853429551ea01e2644c1e8af8c1`，ROM SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
@@ -147,7 +149,7 @@
 | 13 | equip_placement | 0x0809d718..0x080a78dc | Seg-1..10及历史收尾完成 | ✅ 全模块验收通过；两项§5.1共36B保留 | `doc/dev/p5-refine-13-equip-placement.md` |
 | 14 | equip_ai_scoring | 0x080a78dc..0x080b5348 | Seg-1..10，10/10 完成 | ✅ 全部通过，§5.1 一项 140B | `doc/dev/refine/14_equip_ai_scoring.md` |
 | 15 | equip_target_summon_zoom | 0x080b5348..0x080c1448 | Seg-1..10 全完成 | ✅ 全模块验收通过；自动名/raw 均 0 | `doc/dev/refine/15_equip_target_summon_zoom.md` |
-| 16 | duelfield_zone | 0x080c1448..0x080cbf0c | 未拆 | ⬜ | |
+| 16 | duelfield_zone | 0x080c1448..0x080cbf0c | Seg-1 完成，1/10 段 | 🟡 下一 Seg-2 `[0x080c2544,0x080c36a8)` | `doc/dev/refine/16_duelfield_zone.md` |
 | 17 | duelfield_pack_frame | 0x080cbf0c..0x080d5e84 | 未拆 | ⬜ | |
 | 18 | pack_card_info | 0x080d5e84..0x080df368 | 未拆 | ⬜ | |
 | 19 | pack_eligibility_anim | 0x080df368..0x080e90a0 | 未拆 | ⬜ | |
