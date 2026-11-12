@@ -1454,7 +1454,7 @@ init_duel_field_vram_layout:
 LAB_080cc9be:
     movs r0,#0x0    @ 080cc9be 0020
     strh r0,[r4,#0x8]                        @ 080cc9c0 2081
-    bl write_palette_tile_row_to_vram        @ 080cc9c2 f6f771fe
+    bl initialize_duel_field_slot_tilemap    @ 080cc9c2 f6f771fe
     bl init_duel_field_tile_indices          @ 080cc9c6 fdf791ff
     bl redraw_all_field_slot_tiles           @ 080cc9ca f8f79bf9
     ldrh r0,[r5,#0x0]                        @ 080cc9ce 2888
@@ -2007,18 +2007,7 @@ LAB_080ccdee:
     pop {r1}                                 @ 080ccdf0 02bc
     bx r1                                    @ 080ccdf2 0847
 
-@ Called by tick_duel_field_main_frame (0x0801e984). Top-level dispatch for duel field OAM rendering. Reads [0x02023130+0x215] bits 1 and 0: if bit1 nonzero and bit0 zero, checks bit4 to conditionally call render_field_aob_slot_oam_row (FUN_080c8e6c). Reads [0x02023130+0x215] bit0 and 0x0201ff30 bit0 as dual guard; if both zero continues. Reads gP1LifePoints+0x1cf4: if==3 calls render_aob_zone_slot_oam (FUN_080c8c58). Unconditionally calls render_duel_field_zone_oam_grid (FUN_080c8d68) and render_lp_zone_oam_full (FUN_080ca42c). Checks bit0 on two flags: if both zero calls render_field_zone_mini_card_tiles. Checks bit3: if zero calls render_player_zone_active_oam (FUN_080c8870). Exit: void (push {lr} only).
-@ 
-@ Constants:
-@ - BASE=0x02023130 (IWRAM duel field state)
-@ - RENDER_FLAG_OFFSET=0x215 (multi-purpose flag byte)
-@ - BIT0=mask LP/AOB render
-@ - BIT1=mask LP render
-@ - BIT2=mask AOB zone
-@ - BIT3=mask player zone active indicator
-@ - BIT4=enable AOB slot row render
-@ - SECOND_GUARD=0x0201ff30 (bit0=global mask)
-@ - LP_STATE_FIELD=gP1LifePoints+0x1cf4 (value==3 -> AOB zone)
+@ Render duel-field OAM only when gDuelFieldState+0x215 bit1 is set. Render the slot-row AOB when bit4 is set and bit0 at0x0201f440/0x0201ff30 is clear. A field phase value3 renders zone AOB. With field bit2 clear and count+0xa nonzero, draw the deck count. Always draw the zone grid and LP. Call render_zone_list_scroll_arrows when bit0 at0x0201f440/0x020230b1 is clear; bit3 clear draws player activation OAM.
 render_duel_field_oam_all:
     push {lr}                                @ 080ccdf4 00b5
     ldr r0, DAT_080cce98                     @ 080ccdf6 2848
@@ -2086,7 +2075,7 @@ LAB_080cce56:
     ands r0,r1    @ 080cce76 0840
     cmp r0,#0x0                              @ 080cce78 0028
     bne LAB_080cce80                         @ 080cce7a 01d1
-    bl render_field_zone_mini_card_tiles     @ 080cce7c f6f768fe
+    bl render_zone_list_scroll_arrows        @ 080cce7c f6f768fe
 LAB_080cce80:
     ldr r1, DAT_080cce98                     @ 080cce80 0549
     ldr r0, DAT_080cce9c                     @ 080cce82 0648

@@ -63,7 +63,7 @@ RENAMES = [
     ("FUN_080f0210", "char_width_wide_10_or_12",
         "p2: 宽字宽度 10 或 12px"),
     ('FUN_080c33bc', 'load_card_list_small_image',
-        'Upload a small card image into OBJ VRAM at0x06010000+32*u16(r3). If r1 is nonzero, use card_image_index with the region/language variant and1152-byte records; r2 selects the second576-byte half start. If r1 is0, use one of two fallback576-byte starts selected by r2&1. Clear four0x200-byte rows at stride0x400, then scatter576 source bytes into tiled destinations, adding0x70 modulo256 to each nonzero byte.'),
+        'Upload a small card image into OBJ VRAM at0x06010000+32*u16(r3). If r1 is nonzero, use card_image_index with the region/language variant and1152-byte records; r2 selects the second576-byte half start. If r1 is0, use one of two fallback576-byte starts selected by r2&1. Clear four0x100-byte rows at stride0x400, then scatter576 source bytes into tiled destinations, adding0x70 modulo256 to each nonzero byte.'),
     ("FUN_080f2e4c", "commit_line_buffer_to_sprite_vram",
         "p2: line buffer -> 0x06010040+ sprite tile"),
     # --- TG.4-next 轮（2026-04-15） ---
@@ -222,19 +222,8 @@ RENAMES = [
         'Per-frame UI-effect dispatcher for IDs0..0x3d. Case2 returns1 early if gFontState bit0 or duel-context zone-state bit0 is set; otherwise gBannerState+4 values1/2/3 select three banner state machines. Case0x31 returns the OR of two flag bit0 values; case0x32 returns zone bit0. Cases0x30/0x3a/0x3b/0x3c call play_three_sprite_banner_blend, play_exodia_demo_scene_with_field_restore, play_vija_scene_with_sprite_intro, and play_demo_shuen. Invalid/default returns0.'),
 
     # 2026-04-30: 卡牌小图→大图缩放/旋转过渡动画 (play_ui_effect case 0x1a)
-    ("FUN_080c3d20", "play_card_zoom_in",
-        "卡牌小图→大图缩放/旋转过渡动画 (5-step on gUIEffectState[+0x0]). "
-        "读 packed card_ref @ gUIEffectState[+0x4] (bit 0=side / [5:1]=row(5b) / "
-        "[13:6]=col(8b) / bit 16,17=mode flag). 索引 EWRAM 卡牌信息数组 "
-        "0x0201c510 + (row+col)*0x14 + side*0x868. step 0 = "
-        "load_card_list_small_image x2 装载小图. step 1 = 起始帧 (FUN_080f6ccc + "
-        "FUN_080c3880 stats overlay). step 2 = 4-tick affine 过渡: 用 "
-        "rom_sin_table_q8 算 PA/PB/PC/PD, angle index ∈ rom_card_zoom_anim_curve "
-        "{0,1,8,15}, scale = sin*5 + 0x100, 提交 OAM affine 矩阵 via FUN_080f72e8; "
-        "sub_tick @ gUIEffectState[+0x18] 满 4 后主 step++. step 3 = 装第二张图 + "
-        "FUN_080c38cc 全 bit-field stats. step 4 = 切大图模式 (FUN_080cb1cc, "
-        "BG VRAM/palette 重磅上传). 返回 1=busy / 0=done. 唯一 caller: "
-        "play_ui_effect (FUN_0801ef94) case 0x1a (effect_id=0x1a)."),
+    ('FUN_080c3d20', 'play_card_zoom_in',
+        'Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_large_card_display_by_mode. Steps0..4 return1; other steps return0.'),
 
     # 2026-04-30: play_ui_effect 子 handler 占位名 (按 case_id hex 编号, 待详细分析)
     ("FUN_080cca80", "play_ui_effect_03",
@@ -4615,13 +4604,8 @@ RENAMES = [
         "r0: card_type [0..N]; r1: card_attribute [0..N]. Returns void. "
         "Side effects: OBJ tile VRAM and OBJ palette written for icon display. "
         "Constants: icon_tile_table_base in ROM; OBJ_VRAM_BASE=0x06010000."),
-    ("FUN_080c3b50", "render_field_zone_mini_card_tiles",
-        "Render mini card tile data for a duel field zone slot into BG tile VRAM. "
-        "Reads zone slot card_id, looks up mini card tile source from ROM table, "
-        "copies tile data to BG VRAM at the zone position. "
-        "r0: player_side [0..1]; r1: zone_slot_idx [0..9]; r2: bg_tile_dest ptr. "
-        "Returns void. Side effects: BG tile VRAM written with mini card tile data. "
-        "Constants: mini_card_tile_table_base in ROM."),
+    ('FUN_080c3b50', 'render_zone_list_scroll_arrows',
+        'Draw zone-list scroll-arrow OAM for both players when their zone/hand count exceeds7. Omit the backward arrow at origin0 and the forward arrow when origin>=count-7. Read the visible origin from gDuelFieldState+0x4c+2*player. Use tile0x20, side-dependent positions/flip, phase jitter from u16(0x0300024c), and palette cycling0..2 when the selected type11 list has the matching held direction key. This renderer reads no card tile data and writes no BG VRAM.'),
     ("FUN_080c9eb8", "write_decimal_digits_to_oam",
         "Write decimal digit OAM entries for a numeric value (LP/ATK/DEF) to OAM buffer. "
         "Decomposes r0 into decimal digits, looks up digit tile indices, "
@@ -4635,20 +4619,12 @@ RENAMES = [
         "r0: player_side [0..1]; r1: slot_idx [0..9]. "
         "Returns 1 if condition bit set, 0 otherwise. Pure read-only. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes."),
-    ("FUN_080c3790", "get_field_slot_tile_vram_addr",
-        "Compute the BG tile VRAM address for a duel field zone slot position. "
-        "r0: player_side [0..1]; r1: zone_slot_idx [0..9]. "
-        "Returns ptr to BG tile VRAM position for the slot. Pure address compute; no side effects. "
-        "Constants: field_tile_map_base, slot_x/y layout table in ROM."),
+    ('FUN_080c3790', 'get_field_slot_tile_vram_addr',
+        'Return the BG tile-data address for u16 player r0, zone type r1 and subindex r2. Treat subindex0xff as0. Types0..9 use the type as index; types12..15 use type+6; type16 uses16; other types use type+subindex. Return base+576*index, with base0x060031c0 when player equals gDuelCardCtxBase+4 XOR1, else0x06000040. The17-entry switch and all case aliases are preserved.'),
 
     # --- batch #17 (campaign-17, 2026-05-08) duel field placement/equip activation chain ---
-    ("FUN_080c3840", "blit_field_slot_tile_with_palette_hi",
-        "Blit field slot tile VRAM with high-palette data. "
-        "Calls get_field_slot_tile_vram_addr(player_id,row,col); if addr==0 returns. "
-        "Reads ROM palette table 0x09854df0 (0x90 halfwords), OR-merges hi/lo bytes, writes to VRAM. "
-        "r0=u16 player_id [0..1], r1=u16 row, r2=u16 col. Returns void. "
-        "Side-effects: VRAM [tile_addr..+0x120] overwritten. "
-        "Constants: palette_table=0x09854df0, tile_count=0x90."),
+    ('FUN_080c3840', 'copy_field_slot_bg_tile_pattern',
+        'Copy576 bytes of field_slot_bg_tile_pattern into the address from get_field_slot_tile_vram_addr(r0,r1,r2), if nonzero. The loop count is0x120 halfwords. Its ldrh/ldrb/OR sequence reconstructs each original halfword unchanged; it does not alter a palette field. All three input selectors are truncated to u16.'),
     ("FUN_080333ac", "check_slot_placement_blocked_by_field_effect",
         "Returns 0 if slot placement is blocked by active field effect node (indeg=40), 1 if allowed. "
         "Monster zone path (slot 0..4): traverses gDuelNodePool field-spell chain, checks field6 low bits, "
@@ -4656,15 +4632,8 @@ RENAMES = [
         "Spell/trap path (slot 5..9): uses check_slot_card_is_equip_whitelist + get_node_entity_id_in_slot. "
         "r0=u8 player_id [0..1], r1=u8 slot_idx [0..9]. Returns u32 bool (0=blocked, 1=allowed). "
         "Constants: player_stride=0x868, slot_entry=0x14, Yami_id=0x1432, Sanctuary_id=0x17ee."),
-    ("FUN_080c3880", "update_field_slot_tile_display",
-        "Update field slot tile display: blit palette or zero-fill based on placement block check. "
-        "Calls get_field_slot_tile_vram_addr, stores addr in r7. "
-        "slot_idx [0..0xa] and check_slot_placement_blocked_by_field_effect==0: "
-        "calls blit_field_slot_tile_with_palette_hi. "
-        "slot_idx > 0xa or blocked: if VRAM addr valid, calls zero_fill_by_halfword (0x90 halfwords). "
-        "r0=u16 player_id [0..1], r1=u16 slot_idx [0..0xa], r2=u16 extra. Returns void. "
-        "Side-effects: VRAM [tile_addr..+0x120] written or zeroed. "
-        "Constants: slot_range_max=0xa, tile_size=0x120."),
+    ('FUN_080c3880', 'update_field_slot_tile_display',
+        'Refresh one BG slot using u16 player/type/subindex r0-r2. Compute its tile address. If type<=10 and check_slot_placement_blocked_by_field_effect(player,type+subindex) returns0, call copy_field_slot_bg_tile_pattern. Otherwise clear576 bytes at the computed address when nonzero. The zero-fill helper takes a byte count, while the pattern-copy loop counts halfwords.'),
     ("FUN_0803b960", "check_zone_has_no_field_spell_node",
         "Returns 1 if field spell zone has no effect node for card 0x1679 (zone type 0xb), 0 if blocked. "
         "Calls find_effect_node_in_zone(player_id, zone_type=0xb, card_id=0x1679, mode=2); "
@@ -5758,46 +5727,14 @@ RENAMES = [
         "Constants: gDuelZoneDisplay=0x0202317c, FLAG_SLOT_ACTIVATABLE_BIT=0x800 (bit11), "
         "slot_count=[0..6]."),
 
-    ("FUN_080c38cc", "render_field_slot_card_tile",
-        "当 duel field 需要在 BG tile map 上渲染一个卡槽的卡牌小图标时调用 (indeg=5, class D). "
-        "函数参数通过非 APCS 高寄存器传递 (r8=player_side 等), "
-        "栈 sp[0x24]=card_mini_frame_flag, sp[0x28]=use_card_image_flag. "
-        "首先调用 get_field_slot_tile_vram_addr 取目标 VRAM 地址. "
-        "若 use_card_image_flag==0, 调用 update_field_slot_tile_display 直接清空槽. "
-        "否则按 card_mini_frame_flag 决定数据源; "
-        "读取 tile_data 后循环以 halfword 形式复制 0x120 字节 (144 个 halfword = 卡牌缩略图) 到 VRAM 目标地址. "
-        "Constants: tile_copy_count=0x90=144 halfwords, ROM_VERSION_BYTE_ADDR=0x080000ae, "
-        "EWRAM_FLAGS=0x02000000+0x6c2c."),
+    ('FUN_080c38cc', 'render_field_slot_card_tile',
+        'Render BG slot tiles using r0=player,r1=zone type,r2=subindex,r3=face flag, stack0=half selector,stack1=cached card ID; all are truncated to u16. Card ID0 refreshes the empty slot. A zero face flag selects a fallback half; otherwise select the first or second576-byte half of a1152-byte mini-card record through the region/language index. Copy576 bytes to the slot if its address is nonzero. Inputs use r0-r3 plus two stack words, not high-register arguments.'),
 
-    ("FUN_080c4220", "refresh_player_field_slot_tiles",
-        "当 duel field 场地需要整体刷新某玩家所有卡槽的 BG tile 显示时调用 (indeg=6, class D). "
-        "函数接受 player_side (r0) 和一个 halfword (r1, 传入槽 header 值), "
-        "首先读取 gP1LifePoints[player*0x868+0xc] 的 zone count (max 7). "
-        "外层循环 r4=0..r8 (max slot count), 对每槽: "
-        "检查 gDuelState[+0x4] (对侧 player) 或调 get_player_deck_flag_bit1 确认是否对侧; "
-        "若是对侧则 r6=1 (有卡), 否则从 gDuelZoneSlotData (0x02023180) 读 zone halfword 判断是否有卡. "
-        "然后调用 render_field_slot_card_tile (FUN_080c38cc) 渲染每槽. "
-        "内层结束后继续对 slot [4..6] 调 update_field_slot_tile_display 清空魔法/陷阱槽. "
-        "最后写入 gDuelZoneSlotHeader (0x02023130+0x4c+player*2) 一个 halfword, "
-        "并调用 query_player_slot_activation_bitmask (FUN_080c89a8) 取激活掩码写入辅助区域. "
-        "Constants: gDuelState=0x0201e2a0, gP1LifePoints LP_ZONE_COUNT_OFFSET=0xc, "
-        "gDuelZoneSlotData=0x02023180, gDuelZoneSlotHeader=0x02023130, "
-        "gDuelFieldSlots=0x0201c600, player_stride=0x868, ACTIVATABLE_MASK_SHIFT=5."),
+    ('FUN_080c4220', 'refresh_player_field_slot_tiles',
+        'Refresh a player zone/hand list from r0=player,r1=visible origin. Cap count at7. For each visible slot, choose face visibility from current-player/deck flags or gDuelZoneSlotData, read the4-byte card word from gP1FieldArrayCBase+player*0x868+4*(origin+i), cache its ID, and render type11 slot i. Refresh remaining slots through6. Store origin at field+0x4c+2*player, then replace activation bits11..17 of the control word at gDuelZoneActivationState+0x30+4*player while preserving low11 bits.'),
 
-    ("FUN_080c39fc", "render_field_zone_card_tile_by_type",
-        "当需要根据 zone_type (slot_idx r1 = 0xc/0xd/0xe/0xf 的特殊 zone) "
-        "渲染对应的卡牌小图标 tile 时调用 (indeg=4, tags: card_frame card_ids). "
-        "函数获取 get_field_slot_tile_vram_addr 定位 VRAM 目标; 然后按 zone_type 分支: "
-        "zone 0xc -> 若 card_id (r4) 非零从 gDuelFieldSlots[player][FUSION_ZONE?] 读卡属性 "
-        "(含 JP flag 检查) 后确定 tile 源; "
-        "zone 0xd -> 若有卡读 gDuelSpecialZone_0x0201c740 (magic slot 数组) 确定 mini frame tile; "
-        "zone 0xe -> 与 0xd 类似, 读 gDuelSpecialZone2_0x0201c8f4; "
-        "zone 0xf -> 先调 get_zone_card_attribute_by_type 取属性, 再读 gDuelSpecialZone3_0x0201caac; "
-        "若无卡(r4==0)则调 update_field_slot_tile_display 清空. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
-        "gDuelSpecialZone_0xc=0x0201c740, gDuelSpecialZone_0xe=0x0201c8f4, "
-        "gDuelSpecialZone_0xf=0x0201caac, ROM_VERSION_BYTE=0x080000ae, "
-        "EWRAM_FLAGS=0x02000000+0x6c2c, JP_FLAG_BYTE=0x4a."),
+    ('FUN_080c39fc', 'render_field_zone_card_tile_by_type',
+        'Render BG tiles for u16 player r0, special zone type r1 and presence/index r2. Type12 with nonzero input uses fallback tiles. Type13 checks the field reveal flag or zone attribute before reading gP1SlotSetCodeArray; type14 reads its4-byte word base at index r2; type15 first checks the attribute at r2-1 then reads its word base at r2. Decode the card word through ensure_card_id_cache_entry and region/language index. Copy576 bytes, or refresh the empty slot when no source is selected.'),
 
     ("FUN_080c4d04", "redraw_all_field_slot_tiles",
         "当 duel field 场地需要完整重绘所有 zone 和 slot 的卡牌 tile 时调用 (indeg=1, class D). "
@@ -5813,19 +5750,8 @@ RENAMES = [
         "Constants: gDuelAnimState=0x0202334e, gDuelAnimFlags=0x02023350, "
         "player_stride=0x868, gDuelFieldSlots=0x0201c510."),
 
-    ("FUN_080c36a8", "write_palette_tile_row_to_vram",
-        "当 duel field 显示初始化或场地 BG 重建时调用 (indeg=1, tags: vram palette scene_duel_field). "
-        "函数从 ROM 数据表 (0x09e49254/0x09e49258) 和 VRAM base 0x0600e800 开始, "
-        "以 r7=0..1 (两行或两层) / r2=0..0x15 (列, 22 列) 的双层循环, "
-        "每次读取两个 ROM word (palette_index 和 tile_index), "
-        "将 tile_index<<5 | palette_offset 合成 halfword 写入 VRAM BG tile map. "
-        "外层 r7==1 时, tile_index 在 0..8 范围内加 0xC00 以选择第二套 tile 集. "
-        "循环结束后以 copy_bytes_by_halfword 将 palette 数据 (0x100 halfwords, 0x200 bytes) "
-        "从 ROM (0x08510460) 复制到 BG palette (0x05000020). "
-        "Constants: VRAM_BG_TILE_MAP=0x0600e800, BG_PALETTE_VRAM=0x05000020, "
-        "ROM_PALETTE_SRC=0x08510460, ROM_TILE_TABLE_A=0x09e49254, ROM_TILE_TABLE_B=0x09e49258, "
-        "TILE_SET_MASK=0xC00, col_count=0x15 (22 cols), row_count=2, "
-        "palette_copy_size=0x100 halfwords=0x200 bytes."),
+    ('FUN_080c36a8', 'initialize_duel_field_slot_tilemap',
+        'Initialize the two-player field-slot BG tilemap at BG_SCREENBLOCK_29_BASE. For each player and22 coordinate pairs, write a3x3 tile block using x+32*y from duel_field_zone_tile_coords and its y field. Player0 advances tile numbers; player1 reverses each block and ORs0xc00 for horizontal/vertical flip. Copy256 bytes from shared_ui_palette_256 to BG_PALRAM_SLOT_1. No inputs.'),
 
     ("FUN_080ee3a8", "apply_palette_offset_to_tile_row",
         "当 scene_duel_field 需要对一段 BG tile 数据按调色板偏移进行修改时调用 (indeg=5, class D). "
@@ -7688,13 +7614,8 @@ RENAMES = [
         "Constants: submit count=6, stride=r2+2, AND masks DAT_080953bc/DAT_080953c0."),
     ('FUN_080c2880', 'init_zone_display_pair_aob_context',
         'Initialize gZoneDisplayState pair AOB context. Store u8(r1) in hword+4 bits10:3, r0 at+8 and r2 at+c. Initialize AOB at+0x48 from zone_display_pair_marker_ptnsect, tilebase0x80/palette2, then choose animation2/3 by current-player comparison. Set state bit1 and AOB+0x13 bit0. Clear phase bits10:3, subphase bits18:11 and timer hword+2 bits10:3. Dispatcher opcode0x0b; r1 is a packed descriptor, not a palette slot.'),
-    ("FUN_080c3d00", "init_field_slot_ctx_zoom",
-        "Initialises duel_field card zoom display context (DAT_080c3d1c, 0x1c halfwords=0x38 bytes) "
-        "for dispatch_card_display_op case 0x1a (card zoom-in scene). "
-        "Calls zero_fill_by_halfword(base, 0x1c), then writes r0 to [base+4] and r1 to [base+8]. "
-        "r0=ptr ctx_src (zoom source descriptor); r1=ptr ctx_dst (zoom target descriptor). "
-        "Returns void. "
-        "Constants: base_struct=DAT_080c3d1c, zero_len=0x1c halfwords (0x38 bytes)."),
+    ('FUN_080c3d00', 'init_field_slot_ctx_zoom',
+        'Initialize the zoom context at gUIEffectState. Clear28 bytes, then store r0 at+4 and r1 at+8. These are interpreter arguments: the zoom renderer decodes the first as a packed slot reference. Called by dispatch_card_display_op opcode0x1a. zero_fill_by_halfword receives bytes, so0x1c clears28 bytes.'),
     ("FUN_080c8904", "refresh_all_zone_slot_tile_display",
         "Iterates all duel field zone slots for both players and refreshes tile display state; "
         "called as final sub-step of dispatch_card_display_op case 0x24. "
@@ -7715,17 +7636,10 @@ RENAMES = [
         "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
         "r0=ptr arg_data; r1=ptr arg_target. Returns void. "
         "Constants: base_struct=DAT_080c4ed0, zero_len=0x1c halfwords, init_flag=0x2."),
-    ("FUN_080c412c", "render_field_slot_card_tile_by_id",
-        "Decodes packed slot descriptor (r0) to player_id/zone_type/sub_idx, "
-        "calls get_field_slot_tile_vram_addr to find VRAM slot, reads cached card_id at +0x120. "
-        "If cache empty: calls internal_card_id_to_card_id(r1) and writes result to cache, "
-        "then calls ensure_card_id_cache_entry. Finally calls render_field_slot_card_tile. "
-        "Corresponds to dispatch_card_display_op case 0x1b. "
-        "r0=u32 slot_descriptor (bit0=player_id, bits[5:1]=zone_type, bits[13:6]=sub_idx); "
-        "r1=u16 card_id_raw [0..0x1fff]. Returns void. "
-        "Constants: VRAM_cache_offset=0x120 (0x90*2)."),
+    ('FUN_080c412c', 'render_field_slot_card_tile_by_id',
+        'Decode packed r0: player bit0,type bits5:1,subindex bits13:6,flags14/15. r1 is an internal card ID and r2 a card-cache index. Compute the BG slot and inspect its halfword at+0x120. If zero, convert/store the ID in gCardIdCache and render the slot; if nonzero, rerender only when gP1LifePoints+0x1d08 is nonzero, using current zone attributes. A valid-slot path then refreshes buff and activation caches. The tested VRAM halfword is separate from the EWRAM card-ID cache.'),
     ('FUN_080c2840', 'reset_zone_display_state_from_packed_key',
-        'Reset gZoneDisplayState by clearing0x5c halfwords. Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.'),
+        'Reset gZoneDisplayState by clearing0x5c bytes (92). Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.'),
     ("FUN_080c8f48", "init_card_effect_aob_ctx",
         "Initialises card-effect AOB context (DAT_080c8fb4, 0x4c halfwords=0x98 bytes) "
         "for dispatch_card_display_op case 0x06. "
@@ -7766,14 +7680,8 @@ RENAMES = [
         "+ eval_slot_score_entry_full; reads ATK/DEF/level from card_stats_table via ldmia/stmia. "
         "r0=u8 zone_descriptor [0..0xff]. Returns void. "
         "Constants: gDuelZoneState=0x02020160, gDuelActivation=0x0201e2a0, zero_len=0x2f5c halfwords."),
-    ("FUN_080c40e0", "init_field_slot_aob_ctx_d",
-        "Initialises fourth variant of duel_field slot AOB context (DAT_080c4120, 0x1c halfwords=0x38 bytes) "
-        "for dispatch_card_display_op case 0x18. "
-        "Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8], "
-        "r2 (via mov r8,r2 / mov r0,r8)->[base+c]. Sets [base+0x19] bit0 (init_flag=0x1). "
-        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
-        "r0=ptr arg_data; r1=ptr arg_target; r2=ptr arg_extra (three-arg variant via r8). Returns void. "
-        "Constants: base_struct=DAT_080c4120, zero_len=0x1c halfwords, init_flag=0x1."),
+    ('FUN_080c40e0', 'init_field_slot_render_request',
+        'Initialize a three-argument field-slot render request in gUIEffectState. Clear28 bytes, store r0/r1/r2 at+4/+8/+c, set byte+0x19 bit0 and gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op opcode0x18. No AOB initializer is called. The zero-fill argument0x1c is a byte count.'),
     ("FUN_080c89e8", "update_zone_activation_display_state",
         "Updates per-player zone activation display state for all 11 slot types; "
         "called in dispatch_card_display_op case 0x03 after write_zone_slot_oam_descriptor. "

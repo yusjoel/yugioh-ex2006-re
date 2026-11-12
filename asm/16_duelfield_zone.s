@@ -2602,7 +2602,7 @@ ptr_g_duel_field_state_080c2838:
 duel_field_ui_effect_flags_off_080c283c:
     .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c283c 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Reset gZoneDisplayState by clearing0x5c halfwords. Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.
+@ Reset gZoneDisplayState by clearing0x5c bytes (92). Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.
 reset_zone_display_state_from_packed_key:
     push {r4,r5,lr}                          @ 080c2840 30b5
     adds r4,r0,#0x0    @ 080c2842 041c
@@ -4148,7 +4148,7 @@ ptr_g_duel_field_state_080c33b4:
 duel_field_ui_effect_flags_off_080c33b8:
     .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c33b8 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Upload a small card image into OBJ VRAM at0x06010000+32*u16(r3). If r1 is nonzero, use card_image_index with the region/language variant and1152-byte records; r2 selects the second576-byte half start. If r1 is0, use one of two fallback576-byte starts selected by r2&1. Clear four0x200-byte rows at stride0x400, then scatter576 source bytes into tiled destinations, adding0x70 modulo256 to each nonzero byte.
+@ Upload a small card image into OBJ VRAM at0x06010000+32*u16(r3). If r1 is nonzero, use card_image_index with the region/language variant and1152-byte records; r2 selects the second576-byte half start. If r1 is0, use one of two fallback576-byte starts selected by r2&1. Clear four0x100-byte rows at stride0x400, then scatter576 source bytes into tiled destinations, adding0x70 modulo256 to each nonzero byte.
 load_card_list_small_image:
     push {r4,r5,r6,r7,lr}                    @ 080c33bc f0b5
     .hword 0x4657    @ 080c33be 5746
@@ -4547,14 +4547,14 @@ ptr_g_duel_field_state_080c36a0:
 ptr_duel_field_zone_tile_coords_080c36a4:
     .word  duel_field_zone_tile_coords    @ 080c36a4 5492e409  duel_field_zone_tile_coords: add reviewed operand-0 DATA reference.
 
-@ 当 duel field 显示初始化或场地 BG 重建时调用 (indeg=1, tags: vram palette scene_duel_field). 函数从 ROM 数据表 (0x09e49254/0x09e49258) 和 VRAM base 0x0600e800 开始, 以 r7=0..1 (两行或两层) / r2=0..0x15 (列, 22 列) 的双层循环, 每次读取两个 ROM word (palette_index 和 tile_index), 将 tile_index<<5 | palette_offset 合成 halfword 写入 VRAM BG tile map. 外层 r7==1 时, tile_index 在 0..8 范围内加 0xC00 以选择第二套 tile 集. 循环结束后以 copy_bytes_by_halfword 将 palette 数据 (0x100 halfwords, 0x200 bytes) 从 ROM (0x08510460) 复制到 BG palette (0x05000020). Constants: VRAM_BG_TILE_MAP=0x0600e800, BG_PALETTE_VRAM=0x05000020, ROM_PALETTE_SRC=0x08510460, ROM_TILE_TABLE_A=0x09e49254, ROM_TILE_TABLE_B=0x09e49258, TILE_SET_MASK=0xC00, col_count=0x15 (22 cols), row_count=2, palette_copy_size=0x100 halfwords=0x200 bytes.
-write_palette_tile_row_to_vram:
+@ Initialize the two-player field-slot BG tilemap at BG_SCREENBLOCK_29_BASE. For each player and22 coordinate pairs, write a3x3 tile block using x+32*y from duel_field_zone_tile_coords and its y field. Player0 advances tile numbers; player1 reverses each block and ORs0xc00 for horizontal/vertical flip. Copy256 bytes from shared_ui_palette_256 to BG_PALRAM_SLOT_1. No inputs.
+initialize_duel_field_slot_tilemap:
     push {r4,r5,r6,r7,lr}                    @ 080c36a8 f0b5
     .hword 0x4657    @ 080c36aa 5746
     .hword 0x464e    @ 080c36ac 4e46
     .hword 0x4645    @ 080c36ae 4546
     push {r5,r6,r7}                          @ 080c36b0 e0b4
-    ldr r0, DAT_080c36f8                     @ 080c36b2 1148
+    ldr r0, ptr_bg_screenblock_29_base_080c36f8 @ 080c36b2 1148
     .hword 0x4681    @ 080c36b4 8146
     movs r5,#0x1    @ 080c36b6 0125
     movs r7,#0x0    @ 080c36b8 0027
@@ -4567,10 +4567,10 @@ LAB_080c36c0:
     movs r1,#0xb0    @ 080c36c2 b021
     muls r1,r7    @ 080c36c4 7943
     adds r0,r0,r1    @ 080c36c6 4018
-    ldr r3, DAT_080c36fc                     @ 080c36c8 0c4b
+    ldr r3, ptr_duel_field_zone_tile_coords_080c36fc @ 080c36c8 0c4b
     adds r1,r0,r3    @ 080c36ca c118
     ldr r1,[r1,#0x0]                         @ 080c36cc 0968
-    ldr r3, DAT_080c3700                     @ 080c36ce 0c4b
+    ldr r3, ptr_duel_field_zone_tile_y_coords_080c3700 @ 080c36ce 0c4b
     adds r0,r0,r3    @ 080c36d0 c018
     ldr r0,[r0,#0x0]                         @ 080c36d2 0068
     lsls r0,r0,#0x5    @ 080c36d4 4001
@@ -4593,12 +4593,12 @@ LAB_080c36ee:
     cmp r7,#0x1                              @ 080c36f2 012f
     beq LAB_080c371a                         @ 080c36f4 11d0
     b LAB_080c373c                           @ 080c36f6 21e0
-DAT_080c36f8:
-    .word  0x0600e800                     @ 080c36f8 00e80006
-DAT_080c36fc:
-    .word  0x09e49254                     @ 080c36fc 5492e409
-DAT_080c3700:
-    .word  0x09e49258                     @ 080c3700 5892e409
+ptr_bg_screenblock_29_base_080c36f8:
+    .word  BG_SCREENBLOCK_29_BASE                     @ 080c36f8 00e80006  BG_SCREENBLOCK_29_BASE: add reviewed operand-0 DATA reference.
+ptr_duel_field_zone_tile_coords_080c36fc:
+    .word  duel_field_zone_tile_coords    @ 080c36fc 5492e409  duel_field_zone_tile_coords: add reviewed operand-0 DATA reference.
+ptr_duel_field_zone_tile_y_coords_080c3700:
+    .word  duel_field_zone_tile_y_coords  @ 080c3700 5892e409  duel_field_zone_tile_y_coords: add reviewed operand-0 DATA reference.
 LAB_080c3704:
     adds r0,r6,#0x0    @ 080c3704 301c
     movs r1,#0x3    @ 080c3706 0321
@@ -4655,10 +4655,10 @@ LAB_080c3762:
     .hword 0x4657    @ 080c3768 5746
     cmp r7,#0x1                              @ 080c376a 012f
     ble LAB_080c36ba                         @ 080c376c a5dd
-    ldr r0, DAT_080c3788                     @ 080c376e 0648
+    ldr r0, ptr_bg_palram_slot_1_080c3788    @ 080c376e 0648
     movs r2,#0x80    @ 080c3770 8022
     lsls r2,r2,#0x1    @ 080c3772 5200
-    ldr r1, DAT_080c378c                     @ 080c3774 0549
+    ldr r1, ptr_shared_ui_palette_256_080c378c @ 080c3774 0549
     bl copy_bytes_by_halfword                @ 080c3776 31f095fb
     pop {r3,r4,r5}                           @ 080c377a 38bc
     .hword 0x4698    @ 080c377c 9846
@@ -4667,12 +4667,12 @@ LAB_080c3762:
     pop {r4,r5,r6,r7}                        @ 080c3782 f0bc
     pop {r0}                                 @ 080c3784 01bc
     bx r0                                    @ 080c3786 0047
-DAT_080c3788:
-    .word  0x05000020                     @ 080c3788 20000005
-DAT_080c378c:
-    .word  0x08510460                     @ 080c378c 60045108
+ptr_bg_palram_slot_1_080c3788:
+    .word  BG_PALRAM_SLOT_1                     @ 080c3788 20000005  BG_PALRAM_SLOT_1: add reviewed operand-0 DATA reference.
+ptr_shared_ui_palette_256_080c378c:
+    .word  shared_ui_palette_256          @ 080c378c 60045108  shared_ui_palette_256: add reviewed operand-0 DATA reference.
 
-@ Compute the BG tile VRAM address for a duel field zone slot position. r0: player_side [0..1]; r1: zone_slot_idx [0..9]. Returns ptr to BG tile VRAM position for the slot. Pure address compute; no side effects. Constants: field_tile_map_base, slot_x/y layout table in ROM.
+@ Return the BG tile-data address for u16 player r0, zone type r1 and subindex r2. Treat subindex0xff as0. Types0..9 use the type as index; types12..15 use type+6; type16 uses16; other types use type+subindex. Return base+576*index, with base0x060031c0 when player equals gDuelCardCtxBase+4 XOR1, else0x06000040. The17-entry switch and all case aliases are preserved.
 get_field_slot_tile_vram_addr:
     push {r4,r5,lr}                          @ 080c3790 30b5
     lsls r0,r0,#0x10    @ 080c3792 0004
@@ -4689,13 +4689,13 @@ LAB_080c37a6:
     cmp r3,#0x10                             @ 080c37a6 102b
     bhi switchD_080c37b2__caseD_a            @ 080c37a8 31d8
     lsls r0,r3,#0x2    @ 080c37aa 9800
-    ldr r1, DAT_080c37b4                     @ 080c37ac 0149
+    ldr r1, ptr_switch_d_080c37b2_switchdata_d_080c37b8_080c37b4 @ 080c37ac 0149
     adds r0,r0,r1    @ 080c37ae 4018
     ldr r0,[r0,#0x0]                         @ 080c37b0 0068
 switchD_080c37b2__switchD:
     .hword 0x4687    @ 080c37b2 8746
-DAT_080c37b4:
-    .word  0x080c37b8                     @ 080c37b4 b8370c08
+ptr_switch_d_080c37b2_switchdata_d_080c37b8_080c37b4:
+    .word  switchD_080c37b2__switchdataD_080c37b8                     @ 080c37b4 b8370c08  switchD_080c37b2__switchdataD_080c37b8: add reviewed operand-0 DATA reference.
 switchD_080c37b2__switchdataD_080c37b8:
     .word  0x080c37fc                     @ 080c37b8 fc370c08
     .word  0x080c37fc                     @ 080c37bc fc370c08
@@ -4732,32 +4732,32 @@ switchD_080c37b2__caseD_a:
     lsls r0,r1,#0x3    @ 080c3810 c800
     adds r0,r0,r1    @ 080c3812 4018
     lsls r2,r0,#0x1    @ 080c3814 4200
-    ldr r0, DAT_080c3828                     @ 080c3816 0448
+    ldr r0, ptr_g_duel_card_ctx_base_080c3828 @ 080c3816 0448
     ldr r0,[r0,#0x4]                         @ 080c3818 4068
     movs r1,#0x1    @ 080c381a 0121
     eors r0,r1    @ 080c381c 4840
     cmp r5,r0                                @ 080c381e 8542
     bne LAB_080c3830                         @ 080c3820 06d1
     lsls r0,r2,#0x5    @ 080c3822 5001
-    ldr r1, DAT_080c382c                     @ 080c3824 0149
+    ldr r1, ptr_duel_field_opp_slot_tile_vram_080c382c @ 080c3824 0149
     b LAB_080c3834                           @ 080c3826 05e0
-DAT_080c3828:
-    .word  0x0201e2a0                     @ 080c3828 a0e20102
-DAT_080c382c:
-    .word  0x060031c0                     @ 080c382c c0310006
+ptr_g_duel_card_ctx_base_080c3828:
+    .word  gDuelCardCtxBase               @ 080c3828 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_duel_field_opp_slot_tile_vram_080c382c:
+    .word  DUEL_FIELD_OPP_SLOT_TILE_VRAM                     @ 080c382c c0310006  DUEL_FIELD_OPP_SLOT_TILE_VRAM: add reviewed operand-0 DATA reference.
 LAB_080c3830:
     lsls r0,r2,#0x5    @ 080c3830 5001
-    ldr r1, DAT_080c383c                     @ 080c3832 0249
+    ldr r1, ptr_bg_screen_row1_off_080c383c  @ 080c3832 0249
 LAB_080c3834:
     adds r0,r0,r1    @ 080c3834 4018
     pop {r4,r5}                              @ 080c3836 30bc
     pop {r1}                                 @ 080c3838 02bc
     bx r1                                    @ 080c383a 0847
-DAT_080c383c:
-    .word  0x06000040                     @ 080c383c 40000006
+ptr_bg_screen_row1_off_080c383c:
+    .word  BG_SCREEN_ROW1_OFF                     @ 080c383c 40000006  BG_SCREEN_ROW1_OFF: add reviewed operand-0 DATA reference.
 
-@ Blit field slot tile VRAM with high-palette data. Calls get_field_slot_tile_vram_addr(player_id,row,col); if addr==0 returns. Reads ROM palette table 0x09854df0 (0x90 halfwords), OR-merges hi/lo bytes, writes to VRAM. r0=u16 player_id [0..1], r1=u16 row, r2=u16 col. Returns void. Side-effects: VRAM [tile_addr..+0x120] overwritten. Constants: palette_table=0x09854df0, tile_count=0x90.
-blit_field_slot_tile_with_palette_hi:
+@ Copy576 bytes of field_slot_bg_tile_pattern into the address from get_field_slot_tile_vram_addr(r0,r1,r2), if nonzero. The loop count is0x120 halfwords. Its ldrh/ldrb/OR sequence reconstructs each original halfword unchanged; it does not alter a palette field. All three input selectors are truncated to u16.
+copy_field_slot_bg_tile_pattern:
     push {r4,lr}                             @ 080c3840 10b5
     lsls r0,r0,#0x10    @ 080c3842 0004
     lsrs r0,r0,#0x10    @ 080c3844 000c
@@ -4766,7 +4766,7 @@ blit_field_slot_tile_with_palette_hi:
     lsls r2,r2,#0x10    @ 080c384a 1204
     lsrs r2,r2,#0x10    @ 080c384c 120c
     bl get_field_slot_tile_vram_addr         @ 080c384e fff79fff
-    ldr r1, DAT_080c387c                     @ 080c3852 0a49
+    ldr r1, ptr_field_slot_bg_tile_pattern_080c387c @ 080c3852 0a49
     cmp r0,#0x0                              @ 080c3854 0028
     beq LAB_080c3874                         @ 080c3856 0dd0
     adds r2,r0,#0x0    @ 080c3858 021c
@@ -4789,10 +4789,10 @@ LAB_080c3874:
     pop {r0}                                 @ 080c3876 01bc
     bx r0                                    @ 080c3878 0047
     .zero  0x2
-DAT_080c387c:
-    .word  0x09854df0                     @ 080c387c f04d8509
+ptr_field_slot_bg_tile_pattern_080c387c:
+    .word  field_slot_bg_tile_pattern     @ 080c387c f04d8509  field_slot_bg_tile_pattern: add reviewed operand-0 DATA reference.
 
-@ Update field slot tile display: blit palette or zero-fill based on placement block check. Calls get_field_slot_tile_vram_addr, stores addr in r7. slot_idx [0..0xa] and check_slot_placement_blocked_by_field_effect==0: calls blit_field_slot_tile_with_palette_hi. slot_idx > 0xa or blocked: if VRAM addr valid, calls zero_fill_by_halfword (0x90 halfwords). r0=u16 player_id [0..1], r1=u16 slot_idx [0..0xa], r2=u16 extra. Returns void. Side-effects: VRAM [tile_addr..+0x120] written or zeroed. Constants: slot_range_max=0xa, tile_size=0x120.
+@ Refresh one BG slot using u16 player/type/subindex r0-r2. Compute its tile address. If type<=10 and check_slot_placement_blocked_by_field_effect(player,type+subindex) returns0, call copy_field_slot_bg_tile_pattern. Otherwise clear576 bytes at the computed address when nonzero. The zero-fill helper takes a byte count, while the pattern-copy loop counts halfwords.
 update_field_slot_tile_display:
     push {r4,r5,r6,r7,lr}                    @ 080c3880 f0b5
     lsls r0,r0,#0x10    @ 080c3882 0004
@@ -4816,7 +4816,7 @@ update_field_slot_tile_display:
     adds r0,r6,#0x0    @ 080c38aa 301c
     adds r1,r4,#0x0    @ 080c38ac 211c
     adds r2,r5,#0x0    @ 080c38ae 2a1c
-    bl blit_field_slot_tile_with_palette_hi  @ 080c38b0 fff7c6ff
+    bl copy_field_slot_bg_tile_pattern       @ 080c38b0 fff7c6ff
     b LAB_080c38c4                           @ 080c38b4 06e0
 LAB_080c38b6:
     cmp r7,#0x0                              @ 080c38b6 002f
@@ -4831,7 +4831,7 @@ LAB_080c38c4:
     bx r0                                    @ 080c38c8 0047
     .zero  0x2
 
-@ 当 duel field 需要在 BG tile map 上渲染一个卡槽的卡牌小图标时调用 (indeg=5, class D). 函数参数通过非 APCS 高寄存器传递 (r8=player_side 等), 栈 sp[0x24]=card_mini_frame_flag, sp[0x28]=use_card_image_flag. 首先调用 get_field_slot_tile_vram_addr 取目标 VRAM 地址. 若 use_card_image_flag==0, 调用 update_field_slot_tile_display 直接清空槽. 否则按 card_mini_frame_flag 决定数据源; 读取 tile_data 后循环以 halfword 形式复制 0x120 字节 (144 个 halfword = 卡牌缩略图) 到 VRAM 目标地址. Constants: tile_copy_count=0x90=144 halfwords, ROM_VERSION_BYTE_ADDR=0x080000ae, EWRAM_FLAGS=0x02000000+0x6c2c.
+@ Render BG slot tiles using r0=player,r1=zone type,r2=subindex,r3=face flag, stack0=half selector,stack1=cached card ID; all are truncated to u16. Card ID0 refreshes the empty slot. A zero face flag selects a fallback half; otherwise select the first or second576-byte half of a1152-byte mini-card record through the region/language index. Copy576 bytes to the slot if its address is nonzero. Inputs use r0-r3 plus two stack words, not high-register arguments.
 render_field_slot_card_tile:
     push {r4,r5,r6,r7,lr}                    @ 080c38cc f0b5
     .hword 0x4657    @ 080c38ce 5746
@@ -4874,16 +4874,16 @@ LAB_080c3916:
     beq LAB_080c39b4                         @ 080c391a 4bd0
     cmp r4,#0x0                              @ 080c391c 002c
     beq LAB_080c3968                         @ 080c391e 23d0
-    ldr r3, PTR_card_image_index_080c3954    @ 080c3920 0c4b
+    ldr r3, ptr_card_image_index_080c3954    @ 080c3920 0c4b
     lsls r5,r5,#0x1    @ 080c3922 6d00
     movs r2,#0x0    @ 080c3924 0022
-    ldr r0, DAT_080c3958                     @ 080c3926 0c48
+    ldr r0, ptr_rom_region_code_addr_080c3958 @ 080c3926 0c48
     ldrh r0,[r0,#0x0]                        @ 080c3928 0088
     lsrs r0,r0,#0x8    @ 080c392a 000a
     cmp r0,#0x4a                             @ 080c392c 4a28
     bne LAB_080c3940                         @ 080c392e 07d1
-    ldr r1, DAT_080c395c                     @ 080c3930 0a49
-    ldr r4, DAT_080c3960                     @ 080c3932 0b4c
+    ldr r1, ptr_ewram_base_080c395c          @ 080c3930 0a49
+    ldr r4, gsettings_offset_080c3960        @ 080c3932 0b4c
     adds r1,r1,r4    @ 080c3934 0919
     movs r0,#0x7    @ 080c3936 0720
     ldrb r1,[r1,#0x0]                        @ 080c3938 0978
@@ -4900,30 +4900,30 @@ LAB_080c3942:
     lsls r1,r2,#0x3    @ 080c394a d100
     adds r1,r1,r2    @ 080c394c 8918
     lsls r1,r1,#0x7    @ 080c394e c901
-    ldr r0, DAT_080c3964                     @ 080c3950 0448
+    ldr r0, ptr_card_mini_frame_second_half_tile_data_080c3964 @ 080c3950 0448
     b LAB_080c39c2                           @ 080c3952 36e0
-PTR_card_image_index_080c3954:
-    .word  card_image_index               @ 080c3954 005c5b09
-DAT_080c3958:
-    .word  0x080000ae                     @ 080c3958 ae000008
-DAT_080c395c:
-    .word  0x02000000                     @ 080c395c 00000002
-DAT_080c3960:
-    .word  0x00006c2c                     @ 080c3960 2c6c0000
-DAT_080c3964:
-    .word  0x093264c0                     @ 080c3964 c0643209
+ptr_card_image_index_080c3954:
+    .word  card_image_index               @ 080c3954 005c5b09  card_image_index: preserve existing operand-0 DATA reference.
+ptr_rom_region_code_addr_080c3958:
+    .word  ROM_REGION_CODE_ADDR           @ 080c3958 ae000008  ROM_REGION_CODE_ADDR: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c395c:
+    .word  EWRAM_BASE                     @ 080c395c 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c3960:
+    .word  GSETTINGS_OFFSET               @ 080c3960 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_card_mini_frame_second_half_tile_data_080c3964:
+    .word  card_mini_frame_second_half_tile_data @ 080c3964 c0643209  card_mini_frame_second_half_tile_data: add reviewed operand-0 DATA reference.
 LAB_080c3968:
-    ldr r4, PTR_card_image_index_080c39a0    @ 080c3968 0d4c
+    ldr r4, ptr_card_image_index_080c39a0    @ 080c3968 0d4c
     .hword 0x4648    @ 080c396a 4846
     lsls r2,r0,#0x1    @ 080c396c 4200
     movs r3,#0x0    @ 080c396e 0023
-    ldr r0, DAT_080c39a4                     @ 080c3970 0c48
+    ldr r0, ptr_rom_region_code_addr_080c39a4 @ 080c3970 0c48
     ldrh r0,[r0,#0x0]                        @ 080c3972 0088
     lsrs r0,r0,#0x8    @ 080c3974 000a
     cmp r0,#0x4a                             @ 080c3976 4a28
     bne LAB_080c398a                         @ 080c3978 07d1
-    ldr r1, DAT_080c39a8                     @ 080c397a 0b49
-    ldr r0, DAT_080c39ac                     @ 080c397c 0b48
+    ldr r1, ptr_ewram_base_080c39a8          @ 080c397a 0b49
+    ldr r0, gsettings_offset_080c39ac        @ 080c397c 0b48
     adds r1,r1,r0    @ 080c397e 0918
     movs r0,#0x7    @ 080c3980 0720
     ldrb r1,[r1,#0x0]                        @ 080c3982 0978
@@ -4940,19 +4940,19 @@ LAB_080c398c:
     lsls r1,r2,#0x3    @ 080c3994 d100
     adds r1,r1,r2    @ 080c3996 8918
     lsls r1,r1,#0x7    @ 080c3998 c901
-    ldr r0, PTR_card_mini_frame_tile_data_080c39b0 @ 080c399a 0548
+    ldr r0, ptr_card_mini_frame_tile_data_080c39b0 @ 080c399a 0548
     b LAB_080c39c2                           @ 080c399c 11e0
     .zero  0x2
-PTR_card_image_index_080c39a0:
-    .word  card_image_index               @ 080c39a0 005c5b09
-DAT_080c39a4:
-    .word  0x080000ae                     @ 080c39a4 ae000008
-DAT_080c39a8:
-    .word  0x02000000                     @ 080c39a8 00000002
-DAT_080c39ac:
-    .word  0x00006c2c                     @ 080c39ac 2c6c0000
-PTR_card_mini_frame_tile_data_080c39b0:
-    .word  card_mini_frame_tile_data      @ 080c39b0 80623209
+ptr_card_image_index_080c39a0:
+    .word  card_image_index               @ 080c39a0 005c5b09  card_image_index: preserve existing operand-0 DATA reference.
+ptr_rom_region_code_addr_080c39a4:
+    .word  ROM_REGION_CODE_ADDR           @ 080c39a4 ae000008  ROM_REGION_CODE_ADDR: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c39a8:
+    .word  EWRAM_BASE                     @ 080c39a8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c39ac:
+    .word  GSETTINGS_OFFSET               @ 080c39ac 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_card_mini_frame_tile_data_080c39b0:
+    .word  card_mini_frame_tile_data      @ 080c39b0 80623209  card_mini_frame_tile_data: preserve existing operand-0 DATA reference.
 LAB_080c39b4:
     movs r0,#0x1    @ 080c39b4 0120
     ldr r4,[sp,#0x0]                         @ 080c39b6 009c
@@ -4960,7 +4960,7 @@ LAB_080c39b4:
     lsls r1,r0,#0x3    @ 080c39ba c100
     adds r1,r1,r0    @ 080c39bc 0918
     lsls r1,r1,#0x6    @ 080c39be 8901
-    ldr r0, DAT_080c39f8                     @ 080c39c0 0d48
+    ldr r0, ptr_card_mini_frame_fallback_tile_data_080c39f8 @ 080c39c0 0d48
 LAB_080c39c2:
     adds r0,r1,r0    @ 080c39c2 0818
     .hword 0x4661    @ 080c39c4 6146
@@ -4991,10 +4991,10 @@ LAB_080c39e8:
     pop {r4,r5,r6,r7}                        @ 080c39f2 f0bc
     pop {r0}                                 @ 080c39f4 01bc
     bx r0                                    @ 080c39f6 0047
-DAT_080c39f8:
-    .word  0x0984fbcc                     @ 080c39f8 ccfb8409
+ptr_card_mini_frame_fallback_tile_data_080c39f8:
+    .word  card_mini_frame_fallback_tile_data @ 080c39f8 ccfb8409  card_mini_frame_fallback_tile_data: add reviewed operand-0 DATA reference.
 
-@ 当需要根据 zone_type (slot_idx r1 = 0xc/0xd/0xe/0xf 的特殊 zone) 渲染对应的卡牌小图标 tile 时调用 (indeg=4, tags: card_frame card_ids). 函数获取 get_field_slot_tile_vram_addr 定位 VRAM 目标; 然后按 zone_type 分支: zone 0xc -> 若 card_id (r4) 非零从 gDuelFieldSlots[player][FUSION_ZONE?] 读卡属性 (含 JP flag 检查) 后确定 tile 源; zone 0xd -> 若有卡读 gDuelSpecialZone_0x0201c740 (magic slot 数组) 确定 mini frame tile; zone 0xe -> 与 0xd 类似, 读 gDuelSpecialZone2_0x0201c8f4; zone 0xf -> 先调 get_zone_card_attribute_by_type 取属性, 再读 gDuelSpecialZone3_0x0201caac; 若无卡(r4==0)则调 update_field_slot_tile_display 清空. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, gDuelSpecialZone_0xc=0x0201c740, gDuelSpecialZone_0xe=0x0201c8f4, gDuelSpecialZone_0xf=0x0201caac, ROM_VERSION_BYTE=0x080000ae, EWRAM_FLAGS=0x02000000+0x6c2c, JP_FLAG_BYTE=0x4a.
+@ Render BG tiles for u16 player r0, special zone type r1 and presence/index r2. Type12 with nonzero input uses fallback tiles. Type13 checks the field reveal flag or zone attribute before reading gP1SlotSetCodeArray; type14 reads its4-byte word base at index r2; type15 first checks the attribute at r2-1 then reads its word base at r2. Decode the card word through ensure_card_id_cache_entry and region/language index. Copy576 bytes, or refresh the empty slot when no source is selected.
 render_field_zone_card_tile_by_type:
     push {r4,r5,r6,r7,lr}                    @ 080c39fc f0b5
     lsls r0,r0,#0x10    @ 080c39fe 0004
@@ -5026,15 +5026,15 @@ LAB_080c3a30:
     cmp r4,#0x0                              @ 080c3a30 002c
     beq LAB_080c3b00                         @ 080c3a32 65d0
 LAB_080c3a34:
-    ldr r0, DAT_080c3a38                     @ 080c3a34 0048
+    ldr r0, ptr_card_mini_frame_fallback_tile_data_080c3a38 @ 080c3a34 0048
     b LAB_080c3b00                           @ 080c3a36 63e0
-DAT_080c3a38:
-    .word  0x0984fbcc                     @ 080c3a38 ccfb8409
+ptr_card_mini_frame_fallback_tile_data_080c3a38:
+    .word  card_mini_frame_fallback_tile_data @ 080c3a38 ccfb8409  card_mini_frame_fallback_tile_data: add reviewed operand-0 DATA reference.
 LAB_080c3a3c:
     cmp r4,#0x0                              @ 080c3a3c 002c
     beq LAB_080c3b00                         @ 080c3a3e 5fd0
-    ldr r1, DAT_080c3a6c                     @ 080c3a40 0a49
-    ldr r0, DAT_080c3a70                     @ 080c3a42 0b48
+    ldr r1, ptr_g_duel_field_state_080c3a6c  @ 080c3a40 0a49
+    ldr r0, duel_field_ui_effect_flags_off_080c3a70 @ 080c3a42 0b48
     adds r1,r1,r0    @ 080c3a44 0918
     movs r0,#0x40    @ 080c3a46 4020
     ldrb r1,[r1,#0x0]                        @ 080c3a48 0978
@@ -5050,34 +5050,34 @@ LAB_080c3a3c:
 LAB_080c3a5e:
     movs r0,#0x1    @ 080c3a5e 0120
     ands r0,r6    @ 080c3a60 3040
-    ldr r1, DAT_080c3a74                     @ 080c3a62 0449
+    ldr r1, player_block_stride_080c3a74     @ 080c3a62 0449
     muls r0,r1    @ 080c3a64 4843
-    ldr r1, DAT_080c3a78                     @ 080c3a66 0449
+    ldr r1, ptr_g_p1_slot_set_code_array_080c3a78 @ 080c3a66 0449
     b LAB_080c3ab8                           @ 080c3a68 26e0
     .zero  0x2
-DAT_080c3a6c:
-    .word  0x02023130                     @ 080c3a6c 30310202
-DAT_080c3a70:
-    .word  0x00000215                     @ 080c3a70 15020000
-DAT_080c3a74:
-    .word  0x00000868                     @ 080c3a74 68080000
-DAT_080c3a78:
-    .word  0x0201c740                     @ 080c3a78 40c70102
+ptr_g_duel_field_state_080c3a6c:
+    .word  gDuelFieldState                @ 080c3a6c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c3a70:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c3a70 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
+player_block_stride_080c3a74:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c3a74 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_slot_set_code_array_080c3a78:
+    .word  gP1SlotSetCodeArray            @ 080c3a78 40c70102  gP1SlotSetCodeArray: add reviewed operand-0 DATA reference.
 LAB_080c3a7c:
     cmp r4,#0x0                              @ 080c3a7c 002c
     beq LAB_080c3b00                         @ 080c3a7e 3fd0
     movs r0,#0x1    @ 080c3a80 0120
     ands r0,r6    @ 080c3a82 3040
-    ldr r1, DAT_080c3a90                     @ 080c3a84 0249
+    ldr r1, player_block_stride_080c3a90     @ 080c3a84 0249
     muls r0,r1    @ 080c3a86 4843
     lsls r1,r4,#0x2    @ 080c3a88 a100
     adds r0,r0,r1    @ 080c3a8a 4018
-    ldr r1, DAT_080c3a94                     @ 080c3a8c 0149
+    ldr r1, ptr_g_p1_zone14_card_word_base_080c3a94 @ 080c3a8c 0149
     b LAB_080c3ab8                           @ 080c3a8e 13e0
-DAT_080c3a90:
-    .word  0x00000868                     @ 080c3a90 68080000
-DAT_080c3a94:
-    .word  0x0201c8f4                     @ 080c3a94 f4c80102
+player_block_stride_080c3a90:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c3a90 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_zone14_card_word_base_080c3a94:
+    .word  gP1Zone14CardWordBase          @ 080c3a94 f4c80102  gP1Zone14CardWordBase: add reviewed operand-0 DATA reference.
 LAB_080c3a98:
     cmp r4,#0x0                              @ 080c3a98 002c
     beq LAB_080c3b00                         @ 080c3a9a 31d0
@@ -5089,11 +5089,11 @@ LAB_080c3a98:
     beq LAB_080c3a34                         @ 080c3aa8 c4d0
     movs r0,#0x1    @ 080c3aaa 0120
     ands r0,r6    @ 080c3aac 3040
-    ldr r1, DAT_080c3b24                     @ 080c3aae 1d49
+    ldr r1, player_block_stride_080c3b24     @ 080c3aae 1d49
     muls r0,r1    @ 080c3ab0 4843
     lsls r1,r4,#0x2    @ 080c3ab2 a100
     adds r0,r0,r1    @ 080c3ab4 4018
-    ldr r1, DAT_080c3b28                     @ 080c3ab6 1c49
+    ldr r1, ptr_g_p1_zone15_card_word_base_080c3b28 @ 080c3ab6 1c49
 LAB_080c3ab8:
     adds r0,r0,r1    @ 080c3ab8 4018
     ldr r1,[r0,#0x0]                         @ 080c3aba 0168
@@ -5104,16 +5104,16 @@ LAB_080c3ab8:
     lsrs r1,r1,#0x1f    @ 080c3ac4 c90f
     adds r0,r0,r1    @ 080c3ac6 4018
     bl ensure_card_id_cache_entry            @ 080c3ac8 08f0fefe
-    ldr r4, PTR_card_image_index_080c3b2c    @ 080c3acc 174c
+    ldr r4, ptr_card_image_index_080c3b2c    @ 080c3acc 174c
     lsls r2,r0,#0x1    @ 080c3ace 4200
     movs r3,#0x0    @ 080c3ad0 0023
-    ldr r0, DAT_080c3b30                     @ 080c3ad2 1748
+    ldr r0, ptr_rom_region_code_addr_080c3b30 @ 080c3ad2 1748
     ldrh r0,[r0,#0x0]                        @ 080c3ad4 0088
     lsrs r0,r0,#0x8    @ 080c3ad6 000a
     cmp r0,#0x4a                             @ 080c3ad8 4a28
     bne LAB_080c3aec                         @ 080c3ada 07d1
-    ldr r1, DAT_080c3b34                     @ 080c3adc 1549
-    ldr r0, DAT_080c3b38                     @ 080c3ade 1648
+    ldr r1, ptr_ewram_base_080c3b34          @ 080c3adc 1549
+    ldr r0, gsettings_offset_080c3b38        @ 080c3ade 1648
     adds r1,r1,r0    @ 080c3ae0 0918
     movs r0,#0x7    @ 080c3ae2 0720
     ldrb r1,[r1,#0x0]                        @ 080c3ae4 0978
@@ -5130,7 +5130,7 @@ LAB_080c3aee:
     lsls r1,r2,#0x3    @ 080c3af6 d100
     adds r1,r1,r2    @ 080c3af8 8918
     lsls r1,r1,#0x7    @ 080c3afa c901
-    ldr r0, PTR_card_mini_frame_tile_data_080c3b3c @ 080c3afc 0f48
+    ldr r0, ptr_card_mini_frame_tile_data_080c3b3c @ 080c3afc 0f48
     adds r0,r1,r0    @ 080c3afe 0818
 LAB_080c3b00:
     cmp r0,#0x0                              @ 080c3b00 0028
@@ -5152,20 +5152,20 @@ LAB_080c3b0c:
     cmp r3,#0x0                              @ 080c3b1e 002b
     bne LAB_080c3b0c                         @ 080c3b20 f4d1
     b LAB_080c3b4a                           @ 080c3b22 12e0
-DAT_080c3b24:
-    .word  0x00000868                     @ 080c3b24 68080000
-DAT_080c3b28:
-    .word  0x0201caac                     @ 080c3b28 acca0102
-PTR_card_image_index_080c3b2c:
-    .word  card_image_index               @ 080c3b2c 005c5b09
-DAT_080c3b30:
-    .word  0x080000ae                     @ 080c3b30 ae000008
-DAT_080c3b34:
-    .word  0x02000000                     @ 080c3b34 00000002
-DAT_080c3b38:
-    .word  0x00006c2c                     @ 080c3b38 2c6c0000
-PTR_card_mini_frame_tile_data_080c3b3c:
-    .word  card_mini_frame_tile_data      @ 080c3b3c 80623209
+player_block_stride_080c3b24:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c3b24 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_zone15_card_word_base_080c3b28:
+    .word  gP1Zone15CardWordBase          @ 080c3b28 acca0102  gP1Zone15CardWordBase: add reviewed operand-0 DATA reference.
+ptr_card_image_index_080c3b2c:
+    .word  card_image_index               @ 080c3b2c 005c5b09  card_image_index: preserve existing operand-0 DATA reference.
+ptr_rom_region_code_addr_080c3b30:
+    .word  ROM_REGION_CODE_ADDR           @ 080c3b30 ae000008  ROM_REGION_CODE_ADDR: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c3b34:
+    .word  EWRAM_BASE                     @ 080c3b34 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c3b38:
+    .word  GSETTINGS_OFFSET               @ 080c3b38 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_card_mini_frame_tile_data_080c3b3c:
+    .word  card_mini_frame_tile_data      @ 080c3b3c 80623209  card_mini_frame_tile_data: preserve existing operand-0 DATA reference.
 LAB_080c3b40:
     adds r0,r6,#0x0    @ 080c3b40 301c
     adds r1,r5,#0x0    @ 080c3b42 291c
@@ -5176,15 +5176,15 @@ LAB_080c3b4a:
     pop {r0}                                 @ 080c3b4c 01bc
     bx r0                                    @ 080c3b4e 0047
 
-@ Render mini card tile data for a duel field zone slot into BG tile VRAM. Reads zone slot card_id, looks up mini card tile source from ROM table, copies tile data to BG VRAM at the zone position. r0: player_side [0..1]; r1: zone_slot_idx [0..9]; r2: bg_tile_dest ptr. Returns void. Side effects: BG tile VRAM written with mini card tile data. Constants: mini_card_tile_table_base in ROM.
-render_field_zone_mini_card_tiles:
+@ Draw zone-list scroll-arrow OAM for both players when their zone/hand count exceeds7. Omit the backward arrow at origin0 and the forward arrow when origin>=count-7. Read the visible origin from gDuelFieldState+0x4c+2*player. Use tile0x20, side-dependent positions/flip, phase jitter from u16(0x0300024c), and palette cycling0..2 when the selected type11 list has the matching held direction key. This renderer reads no card tile data and writes no BG VRAM.
+render_zone_list_scroll_arrows:
     push {r4,r5,r6,r7,lr}                    @ 080c3b50 f0b5
     .hword 0x4657    @ 080c3b52 5746
     .hword 0x464e    @ 080c3b54 4e46
     .hword 0x4645    @ 080c3b56 4546
     push {r5,r6,r7}                          @ 080c3b58 e0b4
     sub sp,#0x18                             @ 080c3b5a 86b0
-    ldr r0, DAT_080c3c38                     @ 080c3b5c 3648
+    ldr r0, ptr_g_duel_field_state_080c3c38  @ 080c3b5c 3648
     movs r1,#0x84    @ 080c3b5e 8421
     lsls r1,r1,#0x2    @ 080c3b60 8900
     adds r0,r0,r1    @ 080c3b62 4018
@@ -5200,7 +5200,7 @@ render_field_zone_mini_card_tiles:
     movs r0,#0x0    @ 080c3b76 0020
     str r0,[sp,#0x0]                         @ 080c3b78 0090
 LAB_080c3b7a:
-    ldr r0, DAT_080c3c3c                     @ 080c3b7a 3048
+    ldr r0, ptr_g_duel_card_ctx_base_080c3c3c @ 080c3b7a 3048
     ldr r5,[r0,#0x4]                         @ 080c3b7c 4568
     ldr r1,[sp,#0x0]                         @ 080c3b7e 0099
     cmp r1,r5                                @ 080c3b80 a942
@@ -5210,9 +5210,9 @@ LAB_080c3b7a:
 LAB_080c3b88:
     movs r0,#0x1    @ 080c3b88 0120
     ands r0,r5    @ 080c3b8a 2840
-    ldr r1, DAT_080c3c40                     @ 080c3b8c 2c49
+    ldr r1, player_block_stride_080c3c40     @ 080c3b8c 2c49
     muls r0,r1    @ 080c3b8e 4843
-    ldr r2, DAT_080c3c44                     @ 080c3b90 2c4a
+    ldr r2, ptr_g_p1_zone_hand_count_080c3c44 @ 080c3b90 2c4a
     adds r0,r0,r2    @ 080c3b92 8018
     ldr r0,[r0,#0x0]                         @ 080c3b94 0068
     ldr r1,[sp,#0x0]                         @ 080c3b96 0099
@@ -5225,7 +5225,7 @@ LAB_080c3ba2:
     movs r4,#0x0    @ 080c3ba2 0024
     lsls r2,r5,#0x1    @ 080c3ba4 6a00
     str r2,[sp,#0x10]                        @ 080c3ba6 0492
-    ldr r0, DAT_080c3c48                     @ 080c3ba8 2748
+    ldr r0, ptr_tick_campaign_card_selector_oam_attr_buf_080c3c48 @ 080c3ba8 2748
     .hword 0x4681    @ 080c3baa 8146
 LAB_080c3bac:
     .hword 0x4649    @ 080c3bac 4946
@@ -5237,7 +5237,7 @@ LAB_080c3bac:
     .hword 0x4680    @ 080c3bb8 8046
     movs r7,#0x0    @ 080c3bba 0027
     movs r6,#0x0    @ 080c3bbc 0026
-    ldr r0, DAT_080c3c38                     @ 080c3bbe 1e48
+    ldr r0, ptr_g_duel_field_state_080c3c38  @ 080c3bbe 1e48
     adds r0,#0x4c    @ 080c3bc0 4c30
     ldr r2,[sp,#0x10]                        @ 080c3bc2 049a
     adds r3,r2,r0    @ 080c3bc4 1318
@@ -5251,9 +5251,9 @@ LAB_080c3bd2:
     movs r2,#0x1    @ 080c3bd2 0122
     adds r0,r5,#0x0    @ 080c3bd4 281c
     ands r0,r2    @ 080c3bd6 1040
-    ldr r1, DAT_080c3c40                     @ 080c3bd8 1949
+    ldr r1, player_block_stride_080c3c40     @ 080c3bd8 1949
     muls r0,r1    @ 080c3bda 4843
-    ldr r1, DAT_080c3c44                     @ 080c3bdc 1949
+    ldr r1, ptr_g_p1_zone_hand_count_080c3c44 @ 080c3bdc 1949
     adds r0,r0,r1    @ 080c3bde 4018
     ldr r0,[r0,#0x0]                         @ 080c3be0 0068
     subs r0,#0x7    @ 080c3be2 0738
@@ -5263,7 +5263,7 @@ LAB_080c3bd2:
     cmp r4,#0x1                              @ 080c3bea 012c
     beq LAB_080c3cda                         @ 080c3bec 75d0
 LAB_080c3bee:
-    ldr r0, DAT_080c3c3c                     @ 080c3bee 1348
+    ldr r0, ptr_g_duel_card_ctx_base_080c3c3c @ 080c3bee 1348
     ldr r0,[r0,#0x4]                         @ 080c3bf0 4068
     eors r0,r2    @ 080c3bf2 5040
     ldr r2,[sp,#0x0]                         @ 080c3bf4 009a
@@ -5293,7 +5293,7 @@ LAB_080c3c10:
     cmp r4,#0x1                              @ 080c3c20 012c
     bne LAB_080c3cae                         @ 080c3c22 44d1
     movs r0,#0x20    @ 080c3c24 2020
-    ldr r2, DAT_080c3c4c                     @ 080c3c26 094a
+    ldr r2, ptr_g_key_input_held_080c3c4c    @ 080c3c26 094a
     ldrh r2,[r2,#0x0]                        @ 080c3c28 1288
     ands r0,r2    @ 080c3c2a 1040
     cmp r0,#0x0                              @ 080c3c2c 0028
@@ -5302,21 +5302,21 @@ LAB_080c3c10:
     ldrh r0,[r1,#0x0]                        @ 080c3c32 0888
     b LAB_080c3ca4                           @ 080c3c34 36e0
     .zero  0x2
-DAT_080c3c38:
-    .word  0x02023130                     @ 080c3c38 30310202
-DAT_080c3c3c:
-    .word  0x0201e2a0                     @ 080c3c3c a0e20102
-DAT_080c3c40:
-    .word  0x00000868                     @ 080c3c40 68080000
-DAT_080c3c44:
-    .word  0x0201c4ec                     @ 080c3c44 ecc40102
-DAT_080c3c48:
-    .word  0x0300024c                     @ 080c3c48 4c020003
-DAT_080c3c4c:
-    .word  0x03000186                     @ 080c3c4c 86010003
+ptr_g_duel_field_state_080c3c38:
+    .word  gDuelFieldState                @ 080c3c38 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c3c3c:
+    .word  gDuelCardCtxBase               @ 080c3c3c a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+player_block_stride_080c3c40:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c3c40 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_zone_hand_count_080c3c44:
+    .word  gP1ZoneHandCount               @ 080c3c44 ecc40102  gP1ZoneHandCount: add reviewed operand-0 DATA reference.
+ptr_tick_campaign_card_selector_oam_attr_buf_080c3c48:
+    .word  tick_campaign_card_selector_oam_attr_buf @ 080c3c48 4c020003  tick_campaign_card_selector_oam_attr_buf: add reviewed operand-0 DATA reference.
+ptr_g_key_input_held_080c3c4c:
+    .word  gKeyInputHeld                  @ 080c3c4c 86010003  gKeyInputHeld: add reviewed operand-0 DATA reference.
 LAB_080c3c50:
     movs r0,#0x10    @ 080c3c50 1020
-    ldr r2, DAT_080c3c64                     @ 080c3c52 044a
+    ldr r2, ptr_g_key_input_held_080c3c64    @ 080c3c52 044a
     ldrh r2,[r2,#0x0]                        @ 080c3c54 1288
     ands r0,r2    @ 080c3c56 1040
     cmp r0,#0x0                              @ 080c3c58 0028
@@ -5325,8 +5325,8 @@ LAB_080c3c50:
     ldrh r0,[r1,#0x0]                        @ 080c3c5e 0888
     b LAB_080c3ca4                           @ 080c3c60 20e0
     .zero  0x2
-DAT_080c3c64:
-    .word  0x03000186                     @ 080c3c64 86010003
+ptr_g_key_input_held_080c3c64:
+    .word  gKeyInputHeld                  @ 080c3c64 86010003  gKeyInputHeld: add reviewed operand-0 DATA reference.
 LAB_080c3c68:
     movs r2,#0x2d    @ 080c3c68 2d22
     .hword 0x4692    @ 080c3c6a 9246
@@ -5355,7 +5355,7 @@ LAB_080c3c90:
 LAB_080c3c94:
     movs r0,#0x10    @ 080c3c94 1020
 LAB_080c3c96:
-    ldr r1, DAT_080c3cfc                     @ 080c3c96 1949
+    ldr r1, ptr_g_key_input_held_080c3cfc    @ 080c3c96 1949
     ldrh r1,[r1,#0x0]                        @ 080c3c98 0988
     ands r0,r1    @ 080c3c9a 0840
     cmp r0,#0x0                              @ 080c3c9c 0028
@@ -5410,15 +5410,15 @@ LAB_080c3cec:
     pop {r4,r5,r6,r7}                        @ 080c3cf6 f0bc
     pop {r0}                                 @ 080c3cf8 01bc
     bx r0                                    @ 080c3cfa 0047
-DAT_080c3cfc:
-    .word  0x03000186                     @ 080c3cfc 86010003
+ptr_g_key_input_held_080c3cfc:
+    .word  gKeyInputHeld                  @ 080c3cfc 86010003  gKeyInputHeld: add reviewed operand-0 DATA reference.
 
-@ Initialises duel_field card zoom display context (DAT_080c3d1c, 0x1c halfwords=0x38 bytes) for dispatch_card_display_op case 0x1a (card zoom-in scene). Calls zero_fill_by_halfword(base, 0x1c), then writes r0 to [base+4] and r1 to [base+8]. r0=ptr ctx_src (zoom source descriptor); r1=ptr ctx_dst (zoom target descriptor). Returns void. Constants: base_struct=DAT_080c3d1c, zero_len=0x1c halfwords (0x38 bytes).
+@ Initialize the zoom context at gUIEffectState. Clear28 bytes, then store r0 at+4 and r1 at+8. These are interpreter arguments: the zoom renderer decodes the first as a packed slot reference. Called by dispatch_card_display_op opcode0x1a. zero_fill_by_halfword receives bytes, so0x1c clears28 bytes.
 init_field_slot_ctx_zoom:
     push {r4,r5,r6,lr}                       @ 080c3d00 70b5
     adds r4,r0,#0x0    @ 080c3d02 041c
     adds r6,r1,#0x0    @ 080c3d04 0e1c
-    ldr r5, DAT_080c3d1c                     @ 080c3d06 054d
+    ldr r5, ptr_g_ui_effect_state_080c3d1c   @ 080c3d06 054d
     adds r0,r5,#0x0    @ 080c3d08 281c
     movs r1,#0x1c    @ 080c3d0a 1c21
     bl zero_fill_by_halfword                 @ 080c3d0c 31f0b2f8
@@ -5428,10 +5428,10 @@ init_field_slot_ctx_zoom:
     pop {r0}                                 @ 080c3d16 01bc
     bx r0                                    @ 080c3d18 0047
     .zero  0x2
-DAT_080c3d1c:
-    .word  gUIEffectState                 @ 080c3d1c 10310202
+ptr_g_ui_effect_state_080c3d1c:
+    .word  gUIEffectState                 @ 080c3d1c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 
-@ 卡牌小图→大图缩放/旋转过渡动画 (5-step on gUIEffectState[+0x0]). 读 packed card_ref @ gUIEffectState[+0x4] (bit 0=side / [5:1]=row(5b) / [13:6]=col(8b) / bit 16,17=mode flag). 索引 EWRAM 卡牌信息数组 0x0201c510 + (row+col)*0x14 + side*0x868. step 0 = load_card_list_small_image x2 装载小图. step 1 = 起始帧 (FUN_080f6ccc + FUN_080c3880 stats overlay). step 2 = 4-tick affine 过渡: 用 rom_sin_table_q8 算 PA/PB/PC/PD, angle index ∈ rom_card_zoom_anim_curve {0,1,8,15}, scale = sin*5 + 0x100, 提交 OAM affine 矩阵 via FUN_080f72e8; sub_tick @ gUIEffectState[+0x18] 满 4 后主 step++. step 3 = 装第二张图 + FUN_080c38cc 全 bit-field stats. step 4 = 切大图模式 (FUN_080cb1cc, BG VRAM/palette 重磅上传). 返回 1=busy / 0=done. 唯一 caller: play_ui_effect (FUN_0801ef94) case 0x1a (effect_id=0x1a).
+@ Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_large_card_display_by_mode. Steps0..4 return1; other steps return0.
 play_card_zoom_in:
     push {r4,r5,r6,r7,lr}                    @ 080c3d20 f0b5
     .hword 0x4657    @ 080c3d22 5746
@@ -5439,29 +5439,29 @@ play_card_zoom_in:
     .hword 0x4645    @ 080c3d26 4546
     push {r5,r6,r7}                          @ 080c3d28 e0b4
     sub sp,#0x24                             @ 080c3d2a 89b0
-    ldr r7, DAT_080c3e04                     @ 080c3d2c 354f  -- r7 = &gUIEffectState+0x4 (0x02023114, packed card_ref)
-    ldr r0, DAT_080c3e08                     @ 080c3d2e 3648  -- r0 = &gUIEffectState (0x02023110)
+    ldr r7, ptr_g_ui_effect_args_080c3e04    @ 080c3d2c 354f  -- r7 = gUIEffectArgs, the first interpreter argument at state+4.
+    ldr r0, ptr_g_ui_effect_state_080c3e08   @ 080c3d2e 3648  -- r0 = gUIEffectState.
     ldr r0,[r0,#0x8]                         @ 080c3d30 8068
-    str r0,[sp,#0x14]                        @ 080c3d32 0590  -- [sp+0x14] = gUIEffectState[+0x8] (mode flag, 后用)
-    ldr r3,[r7,#0x0]                         @ 080c3d34 3b68  -- r3 = packed card_ref @ gUIEffectState[+0x4]
-    lsls r5,r3,#0x1f    @ 080c3d36 dd07  -- r2 = bit 0 (side 0/1)
+    str r0,[sp,#0x14]                        @ 080c3d32 0590  -- Save state+8 mode argument for later flag selection.
+    ldr r3,[r7,#0x0]                         @ 080c3d34 3b68  -- Load the packed slot reference from arg0.
+    lsls r5,r3,#0x1f    @ 080c3d36 dd07  -- Begin extracting packed bit0, the player selector.
     lsrs r2,r5,#0x1f    @ 080c3d38 ea0f
     lsls r4,r3,#0x1a    @ 080c3d3a 9c06
-    lsrs r1,r4,#0x1b    @ 080c3d3c e10e  -- r1 = bits [5:1] (5b row, 0..31)
+    lsrs r1,r4,#0x1b    @ 080c3d3c e10e  -- r1 = packed bits5:1, the zone type.
     lsls r3,r3,#0x12    @ 080c3d3e 9b04
-    lsrs r0,r3,#0x18    @ 080c3d40 180e  -- r0 = bits [13:6] (8b col, 0..255)
+    lsrs r0,r3,#0x18    @ 080c3d40 180e  -- r0 = packed bits13:6, the subindex.
     adds r1,r1,r0    @ 080c3d42 0918
     lsls r0,r1,#0x2    @ 080c3d44 8800
     adds r0,r0,r1    @ 080c3d46 4018
-    lsls r0,r0,#0x2    @ 080c3d48 8000  -- r0 = (row+col) * 0x14 (entry stride)
-    ldr r1, DAT_080c3e0c                     @ 080c3d4a 3049  -- r1 = 0x868 (per-side 偏移)
+    lsls r0,r0,#0x2    @ 080c3d48 8000  -- r0 = 20*(zone type+subindex).
+    ldr r1, player_block_stride_080c3e0c     @ 080c3d4a 3049  -- r1 = PLAYER_BLOCK_STRIDE.
     .hword 0x4688    @ 080c3d4c 8846
     .hword 0x4641    @ 080c3d4e 4146
-    muls r1,r2    @ 080c3d50 5143  -- r1 = 0x868 * side (0 或 0x868)
+    muls r1,r2    @ 080c3d50 5143  -- r1 = 0x868*player.
     adds r0,r0,r1    @ 080c3d52 4018
-    ldr r6, DAT_080c3e10                     @ 080c3d54 2e4e  -- r6 = 0x0201c510 (卡牌信息数组基址)
-    adds r0,r0,r6    @ 080c3d56 8019  -- r0 = 0x0201c510 + (row+col)*0x14 + side*0x868
-    ldr r2,[r0,#0x0]                         @ 080c3d58 0268  -- r2 = entry[+0]: dword 含尺寸编码
+    ldr r6, ptr_g_duel_field_slots_080c3e10  @ 080c3d54 2e4e  -- r6 = gDuelFieldSlots.
+    adds r0,r0,r6    @ 080c3d56 8019  -- Address the20-byte slot record for player and type+subindex.
+    ldr r2,[r0,#0x0]                         @ 080c3d58 0268  -- Read the packed card word; following shifts extract its cache key.
     lsls r2,r2,#0x2    @ 080c3d5a 9200
     lsrs r2,r2,#0x18    @ 080c3d5c 120e
     lsls r2,r2,#0x1    @ 080c3d5e 5200
@@ -5476,11 +5476,11 @@ play_card_zoom_in:
     muls r1,r5    @ 080c3d70 6943
     adds r0,r0,r1    @ 080c3d72 4018
     adds r0,r0,r6    @ 080c3d74 8019
-    ldr r0,[r0,#0x0]                         @ 080c3d76 0068  -- r0 = entry[+0] dword (重新读)
+    ldr r0,[r0,#0x0]                         @ 080c3d76 0068  -- Reload the packed card word to extract bit13.
     lsls r0,r0,#0x12    @ 080c3d78 8004
     lsrs r0,r0,#0x1f    @ 080c3d7a c00f
-    orrs r0,r2    @ 080c3d7c 1043  -- r0 |= 高位标志 (合成 card_id 输入)
-    bl ensure_card_id_cache_entry            @ 080c3d7e 08f0a3fd  -- r0 = card_ids_080cc8c8(combined_param) (解析 card_id)
+    orrs r0,r2    @ 080c3d7c 1043  -- Combine card-word bits29:22 shifted by1 with bit13.
+    bl ensure_card_id_cache_entry            @ 080c3d7e 08f0a3fd  -- Resolve the packed key with ensure_card_id_cache_entry.
     lsls r0,r0,#0x10    @ 080c3d82 0004
     lsrs r0,r0,#0x10    @ 080c3d84 000c
     .hword 0x4681    @ 080c3d86 8146
@@ -5491,16 +5491,16 @@ play_card_zoom_in:
     lsrs r1,r1,#0x1b    @ 080c3d90 c90e
     lsls r2,r2,#0x12    @ 080c3d92 9204
     lsrs r2,r2,#0x18    @ 080c3d94 120e
-    bl resolve_zone_oam_base_coords_by_type  @ 080c3d96 fff709fc  -- r0 = FUN_080c35ac(side, row, col) (帧/尺寸计算)
+    bl resolve_zone_oam_base_coords_by_type  @ 080c3d96 fff709fc  -- Resolve packed pixel x/y for the player/type/subindex.
     subs r1,r0,#0x4    @ 080c3d9a 011f
     lsls r1,r1,#0x10    @ 080c3d9c 0904
     lsrs r1,r1,#0x10    @ 080c3d9e 090c
-    str r1,[sp,#0x1c]                        @ 080c3da0 0791  -- [sp+0x1c] = (r0-4) & 0xffff (width-4)
+    str r1,[sp,#0x1c]                        @ 080c3da0 0791  -- Save u16(x-4), not a width.
     lsrs r0,r0,#0x10    @ 080c3da2 000c
     subs r0,#0x4    @ 080c3da4 0438
     lsls r0,r0,#0x10    @ 080c3da6 0004
     lsrs r0,r0,#0x10    @ 080c3da8 000c
-    str r0,[sp,#0x20]                        @ 080c3daa 0890  -- [sp+0x20] = (r0-4) & 0xffff (height-4)
+    str r0,[sp,#0x20]                        @ 080c3daa 0890  -- Save u16(y-4), not a height.
     ldr r5,[r7,#0x0]                         @ 080c3dac 3d68
     lsls r3,r5,#0x1f    @ 080c3dae eb07
     lsrs r4,r3,#0x1f    @ 080c3db0 dc0f
@@ -5513,7 +5513,7 @@ play_card_zoom_in:
     muls r1,r4    @ 080c3dbe 6143
     adds r0,r0,r1    @ 080c3dc0 4018
     adds r0,r0,r6    @ 080c3dc2 8019
-    ldrh r0,[r0,#0x6]                        @ 080c3dc4 c088  -- r0 = entry[+6] hword
+    ldrh r0,[r0,#0x6]                        @ 080c3dc4 c088  -- Read slot-record halfword+6 for transition flag comparison.
     .hword 0x4682    @ 080c3dc6 8246
     movs r4,#0x1    @ 080c3dc8 0124
     str r4,[sp,#0x18]                        @ 080c3dca 0694
@@ -5526,38 +5526,38 @@ play_card_zoom_in:
     muls r1,r3    @ 080c3dd8 5943
     adds r0,r0,r1    @ 080c3dda 4018
     adds r0,r0,r6    @ 080c3ddc 8019
-    ldrh r4,[r0,#0x8]                        @ 080c3dde 0489  -- r4 = entry[+8] hword (默认 OAM attr)
+    ldrh r4,[r0,#0x8]                        @ 080c3dde 0489  -- r4 = slot-record halfword+8, the initial face selector.
     movs r6,#0x0    @ 080c3de0 0026
     ldr r0,[sp,#0x14]                        @ 080c3de2 0598
-    cmp r0,#0x0                              @ 080c3de4 0028  -- if mode flag (gUIEffectState[+0x8]) == 0 -> 跳过 r4 修正
+    cmp r0,#0x0                              @ 080c3de4 0028  -- Test the state+8 mode argument before overriding the face selector.
     beq LAB_080c3df0                         @ 080c3de6 03d0
     lsls r0,r5,#0x11    @ 080c3de8 6804
     lsrs r0,r0,#0x1f    @ 080c3dea c00f
     ldr r1,[sp,#0x18]                        @ 080c3dec 0699
-    subs r4,r1,r0    @ 080c3dee 0c1a  -- r4 = 1 - bit17 (mode 修正)
+    subs r4,r1,r0    @ 080c3dee 0c1a  -- When mode is nonzero, face selector = 1-packed bit14.
 LAB_080c3df0:
-    ldr r2, DAT_080c3e08                     @ 080c3df0 054a  -- r2 = &gUIEffectState
-    ldrh r0,[r2,#0x0]                        @ 080c3df2 1088  -- r0 = step @ gUIEffectState[+0x0] (u16)
-    cmp r0,#0x4                              @ 080c3df4 0428  -- step > 4 -> default (r0 = 0, 完成)
+    ldr r2, ptr_g_ui_effect_state_080c3e08   @ 080c3df0 054a  -- r2 = gUIEffectState.
+    ldrh r0,[r2,#0x0]                        @ 080c3df2 1088  -- r0 = u16 main step.
+    cmp r0,#0x4                              @ 080c3df4 0428  -- Only steps0..4 dispatch; other steps return0.
     bls LAB_080c3dfa                         @ 080c3df6 00d9
     b switchD_080c3e02__default              @ 080c3df8 68e1
 LAB_080c3dfa:
-    lsls r0,r0,#0x2    @ 080c3dfa 8000  -- r0 = step * 4 (jump_table 偏移)
-    ldr r1, DAT_080c3e14                     @ 080c3dfc 0549  -- r1 = jump_table @ 0x080c3e18 (5 entries)
+    lsls r0,r0,#0x2    @ 080c3dfa 8000  -- r0 = 4*step.
+    ldr r1, ptr_switch_d_080c3e02_switchdata_d_080c3e18_080c3e14 @ 080c3dfc 0549  -- r1 = the preserved five-entry step table.
     adds r0,r0,r1    @ 080c3dfe 4018
     ldr r0,[r0,#0x0]                         @ 080c3e00 0068
 switchD_080c3e02__switchD:
-    .hword 0x4687    @ 080c3e02 8746  -- switch dispatch: bx jump_table[step]
-DAT_080c3e04:
-    .word  0x02023114                     @ 080c3e04 14310202
-DAT_080c3e08:
-    .word  gUIEffectState                 @ 080c3e08 10310202
-DAT_080c3e0c:
-    .word  0x00000868                     @ 080c3e0c 68080000
-DAT_080c3e10:
-    .word  0x0201c510                     @ 080c3e10 10c50102
-DAT_080c3e14:
-    .word  0x080c3e18                     @ 080c3e14 183e0c08
+    .hword 0x4687    @ 080c3e02 8746  -- Load PC from the selected even-address THUMB switch target.
+ptr_g_ui_effect_args_080c3e04:
+    .word  gUIEffectArgs                  @ 080c3e04 14310202  gUIEffectArgs: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c3e08:
+    .word  gUIEffectState                 @ 080c3e08 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+player_block_stride_080c3e0c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c3e0c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_slots_080c3e10:
+    .word  gDuelFieldSlots                @ 080c3e10 10c50102  gDuelFieldSlots: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c3e02_switchdata_d_080c3e18_080c3e14:
+    .word  switchD_080c3e02__switchdataD_080c3e18                     @ 080c3e14 183e0c08  switchD_080c3e02__switchdataD_080c3e18: add reviewed operand-0 DATA reference.
 switchD_080c3e02__switchdataD_080c3e18:
     .word  0x080c3e2c                     @ 080c3e18 2c3e0c08
     .word  0x080c3e5c                     @ 080c3e1c 5c3e0c08
@@ -5565,44 +5565,44 @@ switchD_080c3e02__switchdataD_080c3e18:
     .word  0x080c4030                     @ 080c3e24 30400c08
     .word  0x080c40a8                     @ 080c3e28 a8400c08
 switchD_080c3e02__caseD_0:
-    movs r3,#0x80    @ 080c3e2c 8023  -- case 0: 装小卡图 (双侧/双 size)
+    movs r3,#0x80    @ 080c3e2c 8023  -- Step0 loads the source OBJ mini-card image.
     lsls r3,r3,#0x2    @ 080c3e2e 9b00
     .hword 0x4648    @ 080c3e30 4846
     adds r1,r4,#0x0    @ 080c3e32 211c
     movs r2,#0x0    @ 080c3e34 0022
-    bl load_card_list_small_image            @ 080c3e36 fff7c1fa  -- load_card_list_small_image(0x200, r4=card_id, 0)
-    ldr r0,[r7,#0x0]                         @ 080c3e3a 3868  -- r0 = packed[bit16] (flag_a)
+    bl load_card_list_small_image            @ 080c3e36 fff7c1fa  -- load_card_list_small_image(cached ID,face selector,0,0x200).
+    ldr r0,[r7,#0x0]                         @ 080c3e3a 3868  -- Reload packed arg0; the next shifts extract bit14.
     lsls r0,r0,#0x11    @ 080c3e3c 4004
     lsrs r0,r0,#0x1f    @ 080c3e3e c00f
-    cmp r4,r0                                @ 080c3e40 8442  -- if r4 == flag_a -> 跳过第二次装载, 直接收尾
+    cmp r4,r0                                @ 080c3e40 8442  -- Compare the face selector with packed bit14.
     bne LAB_080c3e46                         @ 080c3e42 00d1
     b LAB_080c40bc                           @ 080c3e44 3ae1
 LAB_080c3e46:
     movs r1,#0x0    @ 080c3e46 0021
     cmp r4,#0x0                              @ 080c3e48 002c
     bne LAB_080c3e4e                         @ 080c3e4a 00d1
-    movs r1,#0x1    @ 080c3e4c 0121  -- r1 = (r4 == 0) ? 1 : 0 (alt card_id)
+    movs r1,#0x1    @ 080c3e4c 0121  -- Choose the opposite binary face selector when another image is needed.
 LAB_080c3e4e:
     movs r3,#0x82    @ 080c3e4e 8223
     lsls r3,r3,#0x2    @ 080c3e50 9b00
     .hword 0x4648    @ 080c3e52 4846
     movs r2,#0x0    @ 080c3e54 0022
-    bl load_card_list_small_image            @ 080c3e56 fff7b1fa  -- load_card_list_small_image(0x208, alt_id, 0) (第二张)
-    b LAB_080c40bc                           @ 080c3e5a 2fe1  -- → 收尾推进 step++
+    bl load_card_list_small_image            @ 080c3e56 fff7b1fa  -- Load the opposite-face OBJ image at tile destination0x208.
+    b LAB_080c40bc                           @ 080c3e5a 2fe1  -- Advance the main step through the common exit.
 switchD_080c3e02__caseD_1:
-    ldr r2,[r7,#0x0]                         @ 080c3e5c 3a68  -- case 1: 起始帧渲染 (OBJ blit + stats overlay)
+    ldr r2,[r7,#0x0]                         @ 080c3e5c 3a68  -- Step1 draws the initial source-card OAM.
     lsls r2,r2,#0x1f    @ 080c3e5e d207
     lsrs r2,r2,#0x1f    @ 080c3e60 d20f
-    ldr r0, DAT_080c3ec8                     @ 080c3e62 1948
+    ldr r0, ptr_g_duel_card_ctx_base_080c3ec8 @ 080c3e62 1948
     ldr r0,[r0,#0x4]                         @ 080c3e64 4068
     movs r1,#0x1    @ 080c3e66 0121
     eors r0,r1    @ 080c3e68 4840
     cmp r2,r0                                @ 080c3e6a 8242
     bne LAB_080c3e70                         @ 080c3e6c 00d1
-    adds r6,#0x40    @ 080c3e6e 4036  -- if side != gPlayer[+4]^1 -> r6 += 0x40 (OAM Y 微调)
+    adds r6,#0x40    @ 080c3e6e 4036  -- Add0x40 to the orientation parameter when player==current player XOR1.
 LAB_080c3e70:
     .hword 0x4655    @ 080c3e70 5546
-    cmp r5,#0x0                              @ 080c3e72 002d  -- if r5 (bit0) != 0 -> r6 += 0x20 (OAM X 微调)
+    cmp r5,#0x0                              @ 080c3e72 002d  -- Test slot-record halfword+6 before adding0x20 to orientation.
     beq LAB_080c3e78                         @ 080c3e74 00d0
     adds r6,#0x20    @ 080c3e76 2036
 LAB_080c3e78:
@@ -5617,11 +5617,11 @@ LAB_080c3e78:
     orrs r6,r1    @ 080c3e88 0e43
     movs r1,#0x80    @ 080c3e8a 8021
     adds r3,r6,#0x0    @ 080c3e8c 331c
-    bl write_pack_obj_attr_by_dir_stacked    @ 080c3e8e 32f01dff  -- FUN_080f6ccc(0x80, w|h, 0x100, oam_combined) (OBJ blit)
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c3e8e 32f01dff  -- Draw via write_pack_obj_attr_by_dir_stacked using saved x/y.
     ldr r2,[r7,#0x0]                         @ 080c3e92 3a68
     lsls r1,r2,#0x1a    @ 080c3e94 9106
     lsrs r0,r1,#0x1b    @ 080c3e96 c80e
-    cmp r0,#0xa                              @ 080c3e98 0a28  -- r0 = bits [5:1] (row), > 10 -> default
+    cmp r0,#0xa                              @ 080c3e98 0a28  -- Zone types above10 take the completion exit after this draw.
     ble LAB_080c3e9e                         @ 080c3e9a 00dd
     b switchD_080c3e02__default              @ 080c3e9c 16e1
 LAB_080c3e9e:
@@ -5634,54 +5634,54 @@ LAB_080c3ea4:
     lsrs r1,r1,#0x1b    @ 080c3ea8 c90e
     lsls r2,r2,#0x12    @ 080c3eaa 9204
     lsrs r2,r2,#0x18    @ 080c3eac 120e
-    bl update_field_slot_tile_display        @ 080c3eae fff7e7fc  -- FUN_080c3880(side, row, col) (card stats overlay)
+    bl update_field_slot_tile_display        @ 080c3eae fff7e7fc  -- Refresh the BG slot pattern/clear state for player,type,subindex.
     ldr r0,[r7,#0x0]                         @ 080c3eb2 3868
     lsls r0,r0,#0x11    @ 080c3eb4 4004
     lsrs r0,r0,#0x1f    @ 080c3eb6 c00f
-    cmp r4,r0                                @ 080c3eb8 8442  -- if r4 == flag_a -> 跳过 stats, 直接收尾
+    cmp r4,r0                                @ 080c3eb8 8442  -- If face selector equals packed bit14, advance without the event call.
     bne LAB_080c3ebe                         @ 080c3eba 00d1
     b LAB_080c40bc                           @ 080c3ebc fee0
 LAB_080c3ebe:
     movs r0,#0x3    @ 080c3ebe 0320
-    bl sync_state_and_init_sprite            @ 080c3ec0 35f0f8fd  -- FUN_080f9ab4(3) (TODO: 推测 sound/sfx 触发)
+    bl sync_state_and_init_sprite            @ 080c3ec0 35f0f8fd  -- Call sync_state_and_init_sprite with event argument3.
     b LAB_080c40bc                           @ 080c3ec4 fae0
     .zero  0x2
-DAT_080c3ec8:
-    .word  0x0201e2a0                     @ 080c3ec8 a0e20102
+ptr_g_duel_card_ctx_base_080c3ec8:
+    .word  gDuelCardCtxBase               @ 080c3ec8 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 switchD_080c3e02__caseD_2:
-    ldr r2,[r7,#0x0]                         @ 080c3ecc 3a68  -- case 2: 4-tick affine (旋转+缩放) 过渡
+    ldr r2,[r7,#0x0]                         @ 080c3ecc 3a68  -- Step2 performs the five-call transition.
     lsls r0,r2,#0x11    @ 080c3ece 5004
     lsrs r0,r0,#0x1f    @ 080c3ed0 c00f
-    cmp r4,r0                                @ 080c3ed2 8442  -- if r4 == flag_a -> 走 LAB_080c3f30 (无第二图, 仅 affine)
+    cmp r4,r0                                @ 080c3ed2 8442  -- Compare face with bit14; BNE selects the affine path, equality slides.
     bne LAB_080c3f30                         @ 080c3ed4 2cd1
     lsls r2,r2,#0x1f    @ 080c3ed6 d207
     lsrs r2,r2,#0x1f    @ 080c3ed8 d20f
-    ldr r0, DAT_080c3f00                     @ 080c3eda 0948
+    ldr r0, ptr_g_duel_card_ctx_base_080c3f00 @ 080c3eda 0948
     ldr r0,[r0,#0x4]                         @ 080c3edc 4068
     movs r1,#0x1    @ 080c3ede 0121
     eors r0,r1    @ 080c3ee0 4840
     cmp r2,r0                                @ 080c3ee2 8242
     bne LAB_080c3ee8                         @ 080c3ee4 00d1
-    adds r6,#0x40    @ 080c3ee6 4036  -- r6 += 0x40 (player turn 修正)
+    adds r6,#0x40    @ 080c3ee6 4036  -- Add0x40 to orientation for player==current player XOR1.
 LAB_080c3ee8:
     movs r0,#0x80    @ 080c3ee8 8020
     ldrb r7,[r7,#0x1]                        @ 080c3eea 7f78
     ands r0,r7    @ 080c3eec 3840
-    cmp r0,#0x0                              @ 080c3eee 0028  -- if !(packed[bit15] aka byte+1 bit7) -> r6 += 0x20 - shift*8
+    cmp r0,#0x0                              @ 080c3eee 0028  -- Test packed bit15 to select the slide direction.
     bne LAB_080c3f08                         @ 080c3ef0 0ad1
     adds r6,#0x20    @ 080c3ef2 2036
-    ldr r0, DAT_080c3f04                     @ 080c3ef4 0348
+    ldr r0, ptr_g_ui_effect_state_080c3f04   @ 080c3ef4 0348
     ldrb r0,[r0,#0x18]                       @ 080c3ef6 007e
     lsls r0,r0,#0x3    @ 080c3ef8 c000
     subs r6,r6,r0    @ 080c3efa 361a
     b LAB_080c3f10                           @ 080c3efc 08e0
     .zero  0x2
-DAT_080c3f00:
-    .word  0x0201e2a0                     @ 080c3f00 a0e20102
-DAT_080c3f04:
-    .word  gUIEffectState                 @ 080c3f04 10310202
+ptr_g_duel_card_ctx_base_080c3f00:
+    .word  gDuelCardCtxBase               @ 080c3f00 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c3f04:
+    .word  gUIEffectState                 @ 080c3f04 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 LAB_080c3f08:
-    ldr r0, DAT_080c3f2c                     @ 080c3f08 0848  -- else -> r6 += shift*8 (相反方向)
+    ldr r0, ptr_g_ui_effect_state_080c3f2c   @ 080c3f08 0848  -- The set-bit15 slide path adds8*old tick to orientation.
     ldrb r0,[r0,#0x18]                       @ 080c3f0a 007e
     lsls r0,r0,#0x3    @ 080c3f0c c000
     adds r6,r6,r0    @ 080c3f0e 3618
@@ -5697,21 +5697,21 @@ LAB_080c3f10:
     orrs r6,r1    @ 080c3f20 0e43
     movs r1,#0x80    @ 080c3f22 8021
     adds r3,r6,#0x0    @ 080c3f24 331c
-    bl write_pack_obj_attr_by_dir_stacked    @ 080c3f26 32f0d1fe  -- FUN_080f6ccc(0x80, w|h, 0x100, oam) (双侧 OBJ blit)
-    b LAB_080c4010                           @ 080c3f2a 71e0  -- → 进入 LAB_080c4010 (推 sub_tick)
-DAT_080c3f2c:
-    .word  gUIEffectState                 @ 080c3f2c 10310202
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c3f26 32f0d1fe  -- Draw the sliding sprite using the adjusted orientation.
+    b LAB_080c4010                           @ 080c3f2a 71e0  -- Advance the shared transition tick.
+ptr_g_ui_effect_state_080c3f2c:
+    .word  gUIEffectState                 @ 080c3f2c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 LAB_080c3f30:
-    movs r0,#0x80    @ 080c3f30 8020  -- LAB_080c3f30: 单侧 affine 过渡主体
+    movs r0,#0x80    @ 080c3f30 8020  -- The unequal-face path starts from tile destination0x200.
     lsls r0,r0,#0x2    @ 080c3f32 8000
     .hword 0x4681    @ 080c3f34 8146
-    ldr r1, DAT_080c3f84                     @ 080c3f36 1349
+    ldr r1, ptr_rom_card_zoom_anim_curve_080c3f84 @ 080c3f36 1349
     add r0,sp,#0x8                           @ 080c3f38 02a8
     movs r2,#0xa    @ 080c3f3a 0a22
-    bl memcpy                                @ 080c3f3c 4af00efd  -- memcpy(sp+0x8, rom_card_zoom_anim_curve, 10) (4-tick angle 曲线)
-    ldr r4, DAT_080c3f88                     @ 080c3f40 114c
-    ldrb r1,[r4,#0x18]                       @ 080c3f42 217e  -- r1 = sub_tick @ gUIEffectState[+0x18]
-    cmp r1,#0x1                              @ 080c3f44 0129  -- if sub_tick > 1 -> r2 = 0x208 (后两 tick 用大尺寸)
+    bl memcpy                                @ 080c3f3c 4af00efd  -- Copy all five u16 curve entries, ten bytes, to the stack.
+    ldr r4, ptr_g_ui_effect_state_080c3f88   @ 080c3f40 114c
+    ldrb r1,[r4,#0x18]                       @ 080c3f42 217e  -- r1 = u8 transition tick at state+0x18.
+    cmp r1,#0x1                              @ 080c3f44 0129  -- Ticks2..4 select tile destination0x208; ticks0..1 use0x200.
     bls LAB_080c3f4e                         @ 080c3f46 02d9
     movs r2,#0x82    @ 080c3f48 8222
     lsls r2,r2,#0x2    @ 080c3f4a 9200
@@ -5720,7 +5720,7 @@ LAB_080c3f4e:
     ldr r3,[r7,#0x0]                         @ 080c3f4e 3b68
     lsls r2,r3,#0x1f    @ 080c3f50 da07
     lsrs r2,r2,#0x1f    @ 080c3f52 d20f
-    ldr r0, DAT_080c3f8c                     @ 080c3f54 0d48
+    ldr r0, ptr_g_duel_card_ctx_base_080c3f8c @ 080c3f54 0d48
     ldr r0,[r0,#0x4]                         @ 080c3f56 4068
     movs r1,#0x1    @ 080c3f58 0121
     eors r0,r1    @ 080c3f5a 4840
@@ -5746,54 +5746,54 @@ LAB_080c3f6a:
     lsls r0,r4,#0x3    @ 080c3f7e e000
     subs r6,r6,r0    @ 080c3f80 361a
     b LAB_080c3f96                           @ 080c3f82 08e0
-DAT_080c3f84:
-    .word  rom_card_zoom_anim_curve       @ 080c3f84 b493e409
-DAT_080c3f88:
-    .word  gUIEffectState                 @ 080c3f88 10310202
-DAT_080c3f8c:
-    .word  0x0201e2a0                     @ 080c3f8c a0e20102
+ptr_rom_card_zoom_anim_curve_080c3f84:
+    .word  rom_card_zoom_anim_curve       @ 080c3f84 b493e409  rom_card_zoom_anim_curve: preserve existing operand-0 DATA reference.
+ptr_g_ui_effect_state_080c3f88:
+    .word  gUIEffectState                 @ 080c3f88 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c3f8c:
+    .word  gDuelCardCtxBase               @ 080c3f8c a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c3f90:
     ldrb r4,[r4,#0x18]                       @ 080c3f90 247e
     lsls r0,r4,#0x3    @ 080c3f92 e000
     adds r6,r6,r0    @ 080c3f94 3618
 LAB_080c3f96:
-    ldr r0, DAT_080c4028                     @ 080c3f96 2448  -- r8 = rom_sin_table_q8 (0x09e5f8f0, 128-entry Q8 sin)
+    ldr r0, ptr_rom_sin_table_q8_080c4028    @ 080c3f96 2448  -- Load the signed Q8 sine table base.
     .hword 0x4680    @ 080c3f98 8046
-    ldr r0, DAT_080c402c                     @ 080c3f9a 2448
+    ldr r0, ptr_g_ui_effect_state_080c402c   @ 080c3f9a 2448
     ldrb r0,[r0,#0x18]                       @ 080c3f9c 007e
     lsls r0,r0,#0x1    @ 080c3f9e 4000
     add r0,sp                                @ 080c3fa0 6844
     adds r0,#0x8    @ 080c3fa2 0830
-    ldrh r0,[r0,#0x0]                        @ 080c3fa4 0088  -- r0 = anim_curve[sub_tick] (∈ {0,1,8,15})
+    ldrh r0,[r0,#0x0]                        @ 080c3fa4 0088  -- Read curve[tick], whose five values are0,1,8,15,16.
     lsls r0,r0,#0x2    @ 080c3fa6 8000
     movs r4,#0x7f    @ 080c3fa8 7f24
-    ands r0,r4    @ 080c3faa 2040  -- angle_idx = (anim*4) & 0x7f (7-bit, sin table 索引)
+    ands r0,r4    @ 080c3faa 2040  -- angle index = (curve[tick]*4)&0x7f.
     lsls r0,r0,#0x1    @ 080c3fac 4000
     add r0,r8                                @ 080c3fae 4044
-    ldrh r2,[r0,#0x0]                        @ 080c3fb0 0288  -- r2 = sin[angle_idx]
+    ldrh r2,[r0,#0x0]                        @ 080c3fb0 0288  -- Read the curve-selected sine sample as u16.
     lsls r1,r2,#0x2    @ 080c3fb2 9100
     adds r1,r2,r1    @ 080c3fb4 5118
     movs r5,#0x80    @ 080c3fb6 8025
     lsls r5,r5,#0x1    @ 080c3fb8 6d00
-    adds r1,r1,r5    @ 080c3fba 4919  -- scale = sin*5 + 0x100 (Q8, 1.0~7×)
+    adds r1,r1,r5    @ 080c3fba 4919  -- Scale parameter = 5*sine sample+0x100.
     adds r0,r6,#0x0    @ 080c3fbc 301c
     ands r0,r4    @ 080c3fbe 2040
     lsls r0,r0,#0x1    @ 080c3fc0 4000
     add r0,r8                                @ 080c3fc2 4044
     movs r2,#0x0    @ 080c3fc4 0022
-    ldrsh r0,[r0,r2]                         @ 080c3fc6 805e  -- r0 = sin[(r6 & 0x7f)]  → 此处作 cos 入口?
+    ldrsh r0,[r0,r2]                         @ 080c3fc6 805e  -- Read signed sine[orientation&0x7f].
     adds r2,r0,#0x0    @ 080c3fc8 021c
-    muls r2,r1    @ 080c3fca 4a43  -- PA = cos × scale (affine 矩阵)
+    muls r2,r1    @ 080c3fca 4a43  -- Multiply the signed orientation sample by the scale parameter.
     adds r0,r6,#0x0    @ 080c3fcc 301c
     adds r0,#0x20    @ 080c3fce 2030
     ands r0,r4    @ 080c3fd0 2040
     lsls r0,r0,#0x1    @ 080c3fd2 4000
     add r0,r8                                @ 080c3fd4 4044
     movs r5,#0x0    @ 080c3fd6 0025
-    ldrsh r3,[r0,r5]                         @ 080c3fd8 435f  -- r3 = sin[(r6+0x20) & 0x7f] (90° 偏移 = cos→sin)
+    ldrsh r3,[r0,r5]                         @ 080c3fd8 435f  -- Read signed sine[(orientation+0x20)&0x7f].
     adds r5,r3,#0x0    @ 080c3fda 1d1c
-    muls r5,r1    @ 080c3fdc 4d43  -- PB = sin × scale
-    adds r6,#0x40    @ 080c3fde 4036  -- r6 += 0x40 (180° 偏移, 用于 PC/PD)
+    muls r5,r1    @ 080c3fdc 4d43  -- Multiply the quarter-period sample by the scale parameter.
+    adds r6,#0x40    @ 080c3fde 4036  -- Advance orientation by0x40 before the final sample.
     ands r6,r4    @ 080c3fe0 2640
     lsls r6,r6,#0x1    @ 080c3fe2 7600
     add r6,r8                                @ 080c3fe4 4644
@@ -5813,29 +5813,29 @@ LAB_080c3f96:
     orrs r2,r5    @ 080c4000 2a43
     lsls r3,r3,#0x10    @ 080c4002 1b04
     lsrs r3,r3,#0x10    @ 080c4004 1b0c
-    ldrh r6,[r6,#0x0]                        @ 080c4006 3688  -- r6 = sin[(r6+0x40) & 0x7f] (-cos)
+    ldrh r6,[r6,#0x0]                        @ 080c4006 3688  -- Read the opposite-phase sine sample for the packed draw arguments.
     lsls r4,r6,#0x10    @ 080c4008 3404
     orrs r3,r4    @ 080c400a 2343
-    bl write_oam_sprite_entry_by_flip_mode   @ 080c400c 33f06cf9  -- FUN_080f72e8(...) (提交 OAM affine 矩阵)
+    bl write_oam_sprite_entry_by_flip_mode   @ 080c400c 33f06cf9  -- Draw via write_oam_sprite_entry_by_flip_mode with packed coefficients.
 LAB_080c4010:
-    ldr r2, DAT_080c402c                     @ 080c4010 064a  -- LAB_080c4010: sub_tick 推进逻辑
-    ldrb r0,[r2,#0x18]                       @ 080c4012 107e  -- r0 = gUIEffectState[+0x18] (sub_tick byte)
-    adds r1,r0,#0x1    @ 080c4014 411c  -- gUIEffectState[+0x18] = sub_tick + 1
+    ldr r2, ptr_g_ui_effect_state_080c402c   @ 080c4010 064a  -- Load the state base for shared tick advancement.
+    ldrb r0,[r2,#0x18]                       @ 080c4012 107e  -- r0 = the old u8 transition tick.
+    adds r1,r0,#0x1    @ 080c4014 411c  -- Form old tick+1; the following strb stores it.
     strb r1,[r2,#0x18]                       @ 080c4016 1176
     lsls r0,r0,#0x18    @ 080c4018 0006
     lsrs r0,r0,#0x18    @ 080c401a 000e
     cmp r0,#0x3                              @ 080c401c 0328
-    bls LAB_080c40c4                         @ 080c401e 51d9  -- if old_sub_tick <= 3 -> 仍在 4-tick 内, r0 = 1 返回
-    ldrh r0,[r2,#0x0]                        @ 080c4020 1088  -- old_sub_tick > 3 -> 主 step++ (gUIEffectState[+0x0])
+    bls LAB_080c40c4                         @ 080c401e 51d9  -- Old ticks0..3 remain in step2; old tick4 advances, giving five calls.
+    ldrh r0,[r2,#0x0]                        @ 080c4020 1088  -- After the old tick exceeds3, load the main step for increment.
     adds r0,#0x1    @ 080c4022 0130
     strh r0,[r2,#0x0]                        @ 080c4024 1080
     b LAB_080c40c4                           @ 080c4026 4de0
-DAT_080c4028:
-    .word  rom_sin_table_q8               @ 080c4028 f0f8e509
-DAT_080c402c:
-    .word  gUIEffectState                 @ 080c402c 10310202
+ptr_rom_sin_table_q8_080c4028:
+    .word  rom_sin_table_q8               @ 080c4028 f0f8e509  rom_sin_table_q8: preserve existing operand-0 DATA reference.
+ptr_g_ui_effect_state_080c402c:
+    .word  gUIEffectState                 @ 080c402c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 switchD_080c3e02__caseD_3:
-    ldr r0,[r7,#0x0]                         @ 080c4030 3868  -- case 3: 装第二张图 + 完整 stats overlay
+    ldr r0,[r7,#0x0]                         @ 080c4030 3868  -- Step3 restores the BG card image and conditionally reloads OBJ tiles.
     lsls r1,r0,#0x11    @ 080c4032 4104
     lsrs r0,r1,#0x1f    @ 080c4034 c80f
     cmp r4,r0                                @ 080c4036 8442
@@ -5845,12 +5845,12 @@ switchD_080c3e02__caseD_3:
     lsls r3,r3,#0x2    @ 080c403e 9b00
     .hword 0x4648    @ 080c4040 4846
     movs r2,#0x0    @ 080c4042 0022
-    bl load_card_list_small_image            @ 080c4044 fff7baf9  -- load_card_list_small_image (条件性)
+    bl load_card_list_small_image            @ 080c4044 fff7baf9  -- Reload OBJ image0x200 when the chosen face differs from bit14.
 LAB_080c4048:
     ldr r2,[r7,#0x0]                         @ 080c4048 3a68
     lsls r2,r2,#0x1f    @ 080c404a d207
     lsrs r2,r2,#0x1f    @ 080c404c d20f
-    ldr r0, DAT_080c40a4                     @ 080c404e 1548
+    ldr r0, ptr_g_duel_card_ctx_base_080c40a4 @ 080c404e 1548
     ldr r0,[r0,#0x4]                         @ 080c4050 4068
     movs r1,#0x1    @ 080c4052 0121
     eors r0,r1    @ 080c4054 4840
@@ -5876,7 +5876,7 @@ LAB_080c4068:
     orrs r6,r1    @ 080c4078 0e43
     movs r1,#0x80    @ 080c407a 8021
     adds r3,r6,#0x0    @ 080c407c 331c
-    bl write_pack_obj_attr_by_dir_stacked    @ 080c407e 32f025fe  -- FUN_080f6ccc(...) (OBJ blit)
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c407e 32f025fe  -- Draw the final card OAM at the saved x/y.
     ldr r4,[r7,#0x0]                         @ 080c4082 3c68
     lsls r0,r4,#0x1f    @ 080c4084 e007
     lsrs r0,r0,#0x1f    @ 080c4086 c00f
@@ -5891,35 +5891,35 @@ LAB_080c4068:
     str r4,[sp,#0x0]                         @ 080c4098 0094
     .hword 0x464c    @ 080c409a 4c46
     str r4,[sp,#0x4]                         @ 080c409c 0194
-    bl render_field_slot_card_tile           @ 080c409e fff715fc  -- FUN_080c38cc(side, row, col, flag_a, flag_b) 全 bit-field stats
+    bl render_field_slot_card_tile           @ 080c409e fff715fc  -- Render BG card tiles with face bit14,half bit15 and the cached ID.
     b LAB_080c40bc                           @ 080c40a2 0be0
-DAT_080c40a4:
-    .word  0x0201e2a0                     @ 080c40a4 a0e20102
+ptr_g_duel_card_ctx_base_080c40a4:
+    .word  gDuelCardCtxBase               @ 080c40a4 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 switchD_080c3e02__caseD_4:
-    ldr r0,[r7,#0x0]                         @ 080c40a8 3868  -- case 4: 切大图模式
+    ldr r0,[r7,#0x0]                         @ 080c40a8 3868  -- Step4 conditionally refreshes the large card display.
     lsls r0,r0,#0x11    @ 080c40aa 4004
     lsrs r0,r0,#0x1f    @ 080c40ac c00f
-    cmp r4,r0                                @ 080c40ae 8442  -- if r4 == flag_a -> 跳过 (单侧时不重渲)
+    cmp r4,r0                                @ 080c40ae 8442  -- Equality of face selector and bit14 skips the large-display refresh.
     beq LAB_080c40bc                         @ 080c40b0 04d0
     .hword 0x4648    @ 080c40b2 4846
     adds r1,r7,#0x0    @ 080c40b4 391c
     movs r2,#0x0    @ 080c40b6 0022
-    bl render_large_card_display_by_mode     @ 080c40b8 07f088f8  -- FUN_080cb1cc(side, &gUIEffectState+0x4, 0) (BG VRAM+palette 大图)
+    bl render_large_card_display_by_mode     @ 080c40b8 07f088f8  -- render_large_card_display_by_mode(cached ID,gUIEffectArgs,0).
 LAB_080c40bc:
-    ldr r1, DAT_080c40c8                     @ 080c40bc 0249  -- LAB_080c40bc: 共用收尾 (主 step++)
+    ldr r1, ptr_g_ui_effect_state_080c40c8   @ 080c40bc 0249  -- Common main-step advancement.
     ldrh r0,[r1,#0x0]                        @ 080c40be 0888
     adds r0,#0x1    @ 080c40c0 0130
-    strh r0,[r1,#0x0]                        @ 080c40c2 0880  -- gUIEffectState[+0x0] (u16) = step + 1
+    strh r0,[r1,#0x0]                        @ 080c40c2 0880  -- Store main step+1 as a halfword.
 LAB_080c40c4:
-    movs r0,#0x1    @ 080c40c4 0120  -- LAB_080c40c4: 返回 r0 = 1 (busy)
+    movs r0,#0x1    @ 080c40c4 0120  -- Return1 for an active dispatched step.
     b LAB_080c40ce                           @ 080c40c6 02e0
-DAT_080c40c8:
-    .word  gUIEffectState                 @ 080c40c8 10310202
+ptr_g_ui_effect_state_080c40c8:
+    .word  gUIEffectState                 @ 080c40c8 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 switchD_080c3e02__default:
-    movs r0,#0x0    @ 080c40cc 0020  -- default: r0 = 0 (done)
+    movs r0,#0x0    @ 080c40cc 0020  -- Return0 for the default/completed path.
 LAB_080c40ce:
     add sp,#0x24                             @ 080c40ce 09b0
-    pop {r3,r4,r5}                           @ 080c40d0 38bc  -- epilogue: 返回 r0 (1=busy / 0=done)
+    pop {r3,r4,r5}                           @ 080c40d0 38bc  -- Restore preserved registers without changing the return value.
     .hword 0x4698    @ 080c40d2 9846
     .hword 0x46a1    @ 080c40d4 a146
     .hword 0x46aa    @ 080c40d6 aa46
@@ -5928,15 +5928,15 @@ LAB_080c40ce:
     bx r1                                    @ 080c40dc 0847
     .zero  0x2
 
-@ Initialises fourth variant of duel_field slot AOB context (DAT_080c4120, 0x1c halfwords=0x38 bytes) for dispatch_card_display_op case 0x18. Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8], r2 (via mov r8,r2 / mov r0,r8)->[base+c]. Sets [base+0x19] bit0 (init_flag=0x1). Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. r0=ptr arg_data; r1=ptr arg_target; r2=ptr arg_extra (three-arg variant via r8). Returns void. Constants: base_struct=DAT_080c4120, zero_len=0x1c halfwords, init_flag=0x1.
-init_field_slot_aob_ctx_d:
+@ Initialize a three-argument field-slot render request in gUIEffectState. Clear28 bytes, store r0/r1/r2 at+4/+8/+c, set byte+0x19 bit0 and gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op opcode0x18. No AOB initializer is called. The zero-fill argument0x1c is a byte count.
+init_field_slot_render_request:
     push {r4,r5,r6,lr}                       @ 080c40e0 70b5
     .hword 0x4646    @ 080c40e2 4646
     push {r6}                                @ 080c40e4 40b4
     adds r5,r0,#0x0    @ 080c40e6 051c
     adds r6,r1,#0x0    @ 080c40e8 0e1c
     .hword 0x4690    @ 080c40ea 9046
-    ldr r4, DAT_080c4120                     @ 080c40ec 0c4c
+    ldr r4, ptr_g_ui_effect_state_080c4120   @ 080c40ec 0c4c
     adds r0,r4,#0x0    @ 080c40ee 201c
     movs r1,#0x1c    @ 080c40f0 1c21
     bl zero_fill_by_halfword                 @ 080c40f2 30f0bffe
@@ -5948,8 +5948,8 @@ init_field_slot_aob_ctx_d:
     ldrb r1,[r4,#0x19]                       @ 080c4100 617e
     orrs r0,r1    @ 080c4102 0843
     strb r0,[r4,#0x19]                       @ 080c4104 6076
-    ldr r1, DAT_080c4124                     @ 080c4106 0749
-    ldr r2, DAT_080c4128                     @ 080c4108 074a
+    ldr r1, ptr_g_duel_field_state_080c4124  @ 080c4106 0749
+    ldr r2, duel_field_ui_effect_flags_off_080c4128 @ 080c4108 074a
     adds r1,r1,r2    @ 080c410a 8918
     movs r0,#0x4    @ 080c410c 0420
     ldrb r2,[r1,#0x0]                        @ 080c410e 0a78
@@ -5961,14 +5961,14 @@ init_field_slot_aob_ctx_d:
     pop {r0}                                 @ 080c411a 01bc
     bx r0                                    @ 080c411c 0047
     .zero  0x2
-DAT_080c4120:
-    .word  gUIEffectState                 @ 080c4120 10310202
-DAT_080c4124:
-    .word  0x02023130                     @ 080c4124 30310202
-DAT_080c4128:
-    .word  0x00000215                     @ 080c4128 15020000
+ptr_g_ui_effect_state_080c4120:
+    .word  gUIEffectState                 @ 080c4120 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c4124:
+    .word  gDuelFieldState                @ 080c4124 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4128:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4128 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Decodes packed slot descriptor (r0) to player_id/zone_type/sub_idx, calls get_field_slot_tile_vram_addr to find VRAM slot, reads cached card_id at +0x120. If cache empty: calls internal_card_id_to_card_id(r1) and writes result to cache, then calls ensure_card_id_cache_entry. Finally calls render_field_slot_card_tile. Corresponds to dispatch_card_display_op case 0x1b. r0=u32 slot_descriptor (bit0=player_id, bits[5:1]=zone_type, bits[13:6]=sub_idx); r1=u16 card_id_raw [0..0x1fff]. Returns void. Constants: VRAM_cache_offset=0x120 (0x90*2).
+@ Decode packed r0: player bit0,type bits5:1,subindex bits13:6,flags14/15. r1 is an internal card ID and r2 a card-cache index. Compute the BG slot and inspect its halfword at+0x120. If zero, convert/store the ID in gCardIdCache and render the slot; if nonzero, rerender only when gP1LifePoints+0x1d08 is nonzero, using current zone attributes. A valid-slot path then refreshes buff and activation caches. The tested VRAM halfword is separate from the EWRAM card-ID cache.
 render_field_slot_card_tile_by_id:
     push {r4,r5,r6,r7,lr}                    @ 080c412c f0b5
     .hword 0x464f    @ 080c412e 4f46
@@ -5997,7 +5997,7 @@ render_field_slot_card_tile_by_id:
     lsls r0,r5,#0x10    @ 080c415e 2804
     lsrs r0,r0,#0x10    @ 080c4160 000c
     bl internal_card_id_to_card_id           @ 080c4162 2af003fb
-    ldr r2, DAT_080c4198                     @ 080c4166 0c4a
+    ldr r2, ptr_g_card_id_cache_080c4198     @ 080c4166 0c4a
     .hword 0x464b    @ 080c4168 4b46
     lsls r1,r3,#0x1    @ 080c416a 5900
     adds r1,r1,r2    @ 080c416c 8918
@@ -6020,11 +6020,11 @@ render_field_slot_card_tile_by_id:
     bl render_field_slot_card_tile           @ 080c4190 fff79cfb
     b LAB_080c41fc                           @ 080c4194 32e0
     .zero  0x2
-DAT_080c4198:
-    .word  0x0201ff60                     @ 080c4198 60ff0102
+ptr_g_card_id_cache_080c4198:
+    .word  gCardIdCache                   @ 080c4198 60ff0102  gCardIdCache: add reviewed operand-0 DATA reference.
 LAB_080c419c:
-    ldr r0, PTR_gP1LifePoints_080c4214       @ 080c419c 1d48
-    ldr r1, DAT_080c4218                     @ 080c419e 1e49
+    ldr r0, ptr_g_p1_life_points_080c4214    @ 080c419c 1d48
+    ldr r1, p1lp_block2_off_080c4218         @ 080c419e 1e49
     adds r0,r0,r1    @ 080c41a0 4018
     ldr r0,[r0,#0x0]                         @ 080c41a2 0068
     cmp r0,#0x0                              @ 080c41a4 0028
@@ -6032,7 +6032,7 @@ LAB_080c419c:
     lsls r0,r5,#0x10    @ 080c41a8 2804
     lsrs r0,r0,#0x10    @ 080c41aa 000c
     bl internal_card_id_to_card_id           @ 080c41ac 2af0defa
-    ldr r2, DAT_080c421c                     @ 080c41b0 1a4a
+    ldr r2, ptr_g_card_id_cache_080c421c     @ 080c41b0 1a4a
     .hword 0x464b    @ 080c41b2 4b46
     lsls r1,r3,#0x1    @ 080c41b4 5900
     adds r1,r1,r2    @ 080c41b6 8918
@@ -6078,14 +6078,14 @@ LAB_080c4204:
     pop {r0}                                 @ 080c420e 01bc
     bx r0                                    @ 080c4210 0047
     .zero  0x2
-PTR_gP1LifePoints_080c4214:
-    .word  gP1LifePoints                  @ 080c4214 e0c40102
-DAT_080c4218:
-    .word  0x00001d08                     @ 080c4218 081d0000
-DAT_080c421c:
-    .word  0x0201ff60                     @ 080c421c 60ff0102
+ptr_g_p1_life_points_080c4214:
+    .word  gP1LifePoints                  @ 080c4214 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+p1lp_block2_off_080c4218:
+    .word  P1LP_BLOCK2_OFF                @ 080c4218 081d0000  P1LP_BLOCK2_OFF: named scalar literal.
+ptr_g_card_id_cache_080c421c:
+    .word  gCardIdCache                   @ 080c421c 60ff0102  gCardIdCache: add reviewed operand-0 DATA reference.
 
-@ 当 duel field 场地需要整体刷新某玩家所有卡槽的 BG tile 显示时调用 (indeg=6, class D). 函数接受 player_side (r0) 和一个 halfword (r1, 传入槽 header 值), 首先读取 gP1LifePoints[player*0x868+0xc] 的 zone count (max 7). 外层循环 r4=0..r8 (max slot count), 对每槽: 检查 gDuelState[+0x4] (对侧 player) 或调 get_player_deck_flag_bit1 确认是否对侧; 若是对侧则 r6=1 (有卡), 否则从 gDuelZoneSlotData (0x02023180) 读 zone halfword 判断是否有卡. 然后调用 render_field_slot_card_tile (FUN_080c38cc) 渲染每槽. 内层结束后继续对 slot [4..6] 调 update_field_slot_tile_display 清空魔法/陷阱槽. 最后写入 gDuelZoneSlotHeader (0x02023130+0x4c+player*2) 一个 halfword, 并调用 query_player_slot_activation_bitmask (FUN_080c89a8) 取激活掩码写入辅助区域. Constants: gDuelState=0x0201e2a0, gP1LifePoints LP_ZONE_COUNT_OFFSET=0xc, gDuelZoneSlotData=0x02023180, gDuelZoneSlotHeader=0x02023130, gDuelFieldSlots=0x0201c600, player_stride=0x868, ACTIVATABLE_MASK_SHIFT=5.
+@ Refresh a player zone/hand list from r0=player,r1=visible origin. Cap count at7. For each visible slot, choose face visibility from current-player/deck flags or gDuelZoneSlotData, read the4-byte card word from gP1FieldArrayCBase+player*0x868+4*(origin+i), cache its ID, and render type11 slot i. Refresh remaining slots through6. Store origin at field+0x4c+2*player, then replace activation bits11..17 of the control word at gDuelZoneActivationState+0x30+4*player while preserving low11 bits.
 refresh_player_field_slot_tiles:
     push {r4,r5,r6,r7,lr}                    @ 080c4220 f0b5
     .hword 0x4657    @ 080c4222 5746
@@ -6097,10 +6097,10 @@ refresh_player_field_slot_tiles:
     lsls r1,r1,#0x10    @ 080c422e 0904
     lsrs r1,r1,#0x10    @ 080c4230 090c
     .hword 0x4689    @ 080c4232 8946
-    ldr r1, PTR_gP1LifePoints_080c427c       @ 080c4234 1149
+    ldr r1, ptr_g_p1_life_points_080c427c    @ 080c4234 1149
     movs r2,#0x1    @ 080c4236 0122
     ands r2,r7    @ 080c4238 3a40
-    ldr r0, DAT_080c4280                     @ 080c423a 1148
+    ldr r0, player_block_stride_080c4280     @ 080c423a 1148
     muls r0,r2    @ 080c423c 5043
     adds r1,#0xc    @ 080c423e 0c31
     adds r0,r0,r1    @ 080c4240 4018
@@ -6124,7 +6124,7 @@ LAB_080c424e:
     lsls r2,r7,#0x10    @ 080c4262 3a04
     str r2,[sp,#0xc]                         @ 080c4264 0392
 LAB_080c4266:
-    ldr r0, DAT_080c4284                     @ 080c4266 0748
+    ldr r0, ptr_g_duel_card_ctx_base_080c4284 @ 080c4266 0748
     ldr r0,[r0,#0x4]                         @ 080c4268 4068
     cmp r7,r0                                @ 080c426a 8742
     beq LAB_080c4278                         @ 080c426c 04d0
@@ -6135,18 +6135,18 @@ LAB_080c4266:
 LAB_080c4278:
     movs r6,#0x1    @ 080c4278 0126
     b LAB_080c429c                           @ 080c427a 0fe0
-PTR_gP1LifePoints_080c427c:
-    .word  gP1LifePoints                  @ 080c427c e0c40102
-DAT_080c4280:
-    .word  0x00000868                     @ 080c4280 68080000
-DAT_080c4284:
-    .word  0x0201e2a0                     @ 080c4284 a0e20102
+ptr_g_p1_life_points_080c427c:
+    .word  gP1LifePoints                  @ 080c427c e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+player_block_stride_080c4280:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4280 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_card_ctx_base_080c4284:
+    .word  gDuelCardCtxBase               @ 080c4284 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c4288:
     .hword 0x4651    @ 080c4288 5146
     adds r0,r1,r7    @ 080c428a c819
     lsls r0,r0,#0x5    @ 080c428c 4001
     adds r0,r5,r0    @ 080c428e 2818
-    ldr r2, DAT_080c4338                     @ 080c4290 294a
+    ldr r2, ptr_g_duel_zone_slot_data_080c4338 @ 080c4290 294a
     adds r0,r0,r2    @ 080c4292 8018
     ldrh r2,[r0,#0x0]                        @ 080c4294 0288
     rsbs r1,r2,#0    @ 080c4296 5142
@@ -6156,11 +6156,11 @@ LAB_080c429c:
     .hword 0x4648    @ 080c429c 4846
     adds r1,r0,r4    @ 080c429e 0119
     lsls r1,r1,#0x2    @ 080c42a0 8900
-    ldr r0, DAT_080c433c                     @ 080c42a2 2648
+    ldr r0, player_block_stride_080c433c     @ 080c42a2 2648
     ldr r2,[sp,#0x8]                         @ 080c42a4 029a
     muls r0,r2    @ 080c42a6 5043
     adds r1,r1,r0    @ 080c42a8 0918
-    ldr r0, DAT_080c4340                     @ 080c42aa 2548
+    ldr r0, ptr_g_p1_field_array_c_base_080c4340 @ 080c42aa 2548
     adds r1,r1,r0    @ 080c42ac 0918
     ldr r1,[r1,#0x0]                         @ 080c42ae 0968
     lsls r0,r1,#0x2    @ 080c42b0 8800
@@ -6200,17 +6200,17 @@ LAB_080c42e8:
     cmp r4,#0x6                              @ 080c42f6 062c
     ble LAB_080c42e8                         @ 080c42f8 f6dd
 LAB_080c42fa:
-    ldr r0, DAT_080c4344                     @ 080c42fa 1248
+    ldr r0, ptr_g_duel_field_state_080c4344  @ 080c42fa 1248
     adds r0,#0x4c    @ 080c42fc 4c30
     ldr r2,[sp,#0x10]                        @ 080c42fe 049a
     adds r0,r2,r0    @ 080c4300 1018
     .hword 0x4649    @ 080c4302 4946
     strh r1,[r0,#0x0]                        @ 080c4304 0180
-    ldr r5, DAT_080c4348                     @ 080c4306 104d
+    ldr r5, ptr_g_duel_zone_activation_state_080c4348 @ 080c4306 104d
     adds r5,#0x30    @ 080c4308 3035
     add r5,r10                               @ 080c430a 5544
     ldr r4,[r5,#0x0]                         @ 080c430c 2c68
-    ldr r6, DAT_080c434c                     @ 080c430e 0f4e
+    ldr r6, duel_zone_activation_low11_mask_080c434c @ 080c430e 0f4e
     ands r4,r6    @ 080c4310 3440
     adds r0,r7,#0x0    @ 080c4312 381c
     bl query_player_slot_activation_bitmask  @ 080c4314 04f048fb
@@ -6230,18 +6230,18 @@ LAB_080c42fa:
     pop {r4,r5,r6,r7}                        @ 080c4332 f0bc
     pop {r0}                                 @ 080c4334 01bc
     bx r0                                    @ 080c4336 0047
-DAT_080c4338:
-    .word  0x02023180                     @ 080c4338 80310202
-DAT_080c433c:
-    .word  0x00000868                     @ 080c433c 68080000
-DAT_080c4340:
-    .word  0x0201c600                     @ 080c4340 00c60102
-DAT_080c4344:
-    .word  0x02023130                     @ 080c4344 30310202
-DAT_080c4348:
-    .word  0x020230c0                     @ 080c4348 c0300202
-DAT_080c434c:
-    .word  0x000007ff                     @ 080c434c ff070000
+ptr_g_duel_zone_slot_data_080c4338:
+    .word  gDuelZoneSlotData              @ 080c4338 80310202  gDuelZoneSlotData: add reviewed operand-0 DATA reference.
+player_block_stride_080c433c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c433c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_field_array_c_base_080c4340:
+    .word  gP1FieldArrayCBase             @ 080c4340 00c60102  gP1FieldArrayCBase: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c4344:
+    .word  gDuelFieldState                @ 080c4344 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_duel_zone_activation_state_080c4348:
+    .word  gDuelZoneActivationState       @ 080c4348 c0300202  gDuelZoneActivationState: add reviewed operand-0 DATA reference.
+duel_zone_activation_low11_mask_080c434c:
+    .word  DUEL_ZONE_ACTIVATION_LOW11_MASK @ 080c434c ff070000  DUEL_ZONE_ACTIVATION_LOW11_MASK: named scalar literal.
 
 @ 读取 gUIEffectState[+0x4] halfword (当前卡牌 slot_ref), 调用 ensure_card_id_cache_entry 确保卡牌信息已缓存, 再读 gUIEffectState[+0x6] halfword 作为第二个卡牌引用. 若 [+0x0] 类型字段 > 4, 调用 clear_ui_effect_state_flags 后返回; 否则以类型值 [0..4] 为 key 通过 switch-dispatch 分发到 5 个卡牌展示子状态机 (地址表 PTR_DAT_080c4390: case 0..4 分别指向 0x080c43a4/0x080c462c/0x080c48a2/0x080c4a24/0x080c4c58). 返回值转发子状态机 r0: 0=完成, 1=继续/进行中. 被 play_ui_effect (0x0801ef94) 作为某一 UI effect case 调用, 是卡牌展示动画的顶层 dispatcher. Constants: gUIEffectState=0x02023110, card_type_max=4, dispatch_table=PTR_DAT_080c4390.
 dispatch_ui_effect_by_card_type:
@@ -12465,7 +12465,7 @@ switchD_080c7ebe__caseD_2:
     beq LAB_080c7f90                         @ 080c7f8a 01d0
     bl render_card_view_scene_by_lp_time     @ 080c7f8c 01f0e0ff
 LAB_080c7f90:
-    bl render_field_zone_mini_card_tiles     @ 080c7f90 fbf7defd
+    bl render_zone_list_scroll_arrows        @ 080c7f90 fbf7defd
     movs r1,#0x84    @ 080c7f94 8421
     lsls r1,r1,#0x2    @ 080c7f96 8900
     adds r0,r4,r1    @ 080c7f98 6018

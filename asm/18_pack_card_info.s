@@ -2335,7 +2335,7 @@ init_pack_card_info_bg_and_vram:
     lsls r5,r5,#0x5    @ 080d7096 6d01
     adds r1,r5,#0x0    @ 080d7098 291c
     bl zero_fill_halfword_wrapper            @ 080d709a 1df0fdfe
-    ldr r0, PTR_DAT_080d70d4                 @ 080d709e 0d48
+    ldr r0, PTR_BG_SCREENBLOCK_29_BASE_080d70d4 @ 080d709e 0d48
     adds r1,r4,#0x0    @ 080d70a0 211c
     bl zero_fill_halfword_wrapper            @ 080d70a2 1df0f9fe
     ldr r0, PTR_DAT_080d70d8                 @ 080d70a6 0c48
@@ -2358,7 +2358,7 @@ PTR_DAT_080d70cc:
     .word  0x0600e000                     @ 080d70cc 00e00006
 PTR_DAT_080d70d0:
     .word  0x0600d000                     @ 080d70d0 00d00006
-PTR_DAT_080d70d4:
+PTR_BG_SCREENBLOCK_29_BASE_080d70d4:
     .word  0x0600e800                     @ 080d70d4 00e80006
 PTR_DAT_080d70d8:
     .word  0x06008000                     @ 080d70d8 00800006

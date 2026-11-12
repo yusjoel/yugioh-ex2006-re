@@ -3871,3 +3871,5 @@
 .equ zone_display_pair_marker_ptnsect, 0x09889b80
 .equ zone_display_number_jitter_offsets, 0x09e4922c
 .equ duel_field_zone_tile_coords, 0x09e49254
+.equ duel_field_zone_tile_y_coords, 0x09e49258
+.equ field_slot_bg_tile_pattern, 0x09854df0

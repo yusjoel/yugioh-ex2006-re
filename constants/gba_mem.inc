@@ -89,3 +89,6 @@
 .equ card_effect_count_panel_tile_vram_b, 0x06014340
 .equ card_effect_count_digits_tile_vram, 0x06014900
 .equ ZONE_DISPLAY_DIGIT_TILE_VRAM, 0x06017800
+.equ BG_SCREENBLOCK_29_BASE, 0x0600e800
+.equ BG_PALRAM_SLOT_1, 0x05000020
+.equ DUEL_FIELD_OPP_SLOT_TILE_VRAM, 0x060031c0

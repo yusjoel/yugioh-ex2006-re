@@ -4606,7 +4606,7 @@ switchD_0801ecbc__caseD_18:
     adds r0,r6,#0x0    @ 0801edb8 301c
     adds r1,r7,#0x0    @ 0801edba 391c
     adds r2,r4,#0x0    @ 0801edbc 221c
-    bl init_field_slot_aob_ctx_d             @ 0801edbe a5f08ff9
+    bl init_field_slot_render_request        @ 0801edbe a5f08ff9
 switchD_0801ecbc__caseD_a:
     movs r0,#0x1    @ 0801edc2 0120
     b LAB_0801ef86                           @ 0801edc4 dfe0

@@ -700,3 +700,7 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gZoneDisplayNumberAobCtx, 0x0201fe80
 .equ gDuelZoneFirstVisibleSlotByPlayer, 0x0202317c
 .equ gDuelZoneSlotData, 0x02023180
+.equ gP1Zone14CardWordBase, 0x0201c8f4
+.equ gP1Zone15CardWordBase, 0x0201caac
+.equ gUIEffectArgs, 0x02023114
+.equ gDuelZoneActivationState, 0x020230c0
