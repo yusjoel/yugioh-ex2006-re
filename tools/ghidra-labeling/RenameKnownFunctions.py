@@ -62,8 +62,8 @@ RENAMES = [
         "p2: 窄字宽度 5px"),
     ("FUN_080f0210", "char_width_wide_10_or_12",
         "p2: 宽字宽度 10 或 12px"),
-    ("FUN_080c33bc", "load_card_list_small_image",
-        "P1 findings: 卡列表小图 (OBJ 8bpp, 1152 B/条)"),
+    ('FUN_080c33bc', 'load_card_list_small_image',
+        'Upload a small card image into OBJ VRAM at0x06010000+32*u16(r3). If r1 is nonzero, use card_image_index with the region/language variant and1152-byte records; r2 selects the second576-byte half start. If r1 is0, use one of two fallback576-byte starts selected by r2&1. Clear four0x200-byte rows at stride0x400, then scatter576 source bytes into tiled destinations, adding0x70 modulo256 to each nonzero byte.'),
     ("FUN_080f2e4c", "commit_line_buffer_to_sprite_vram",
         "p2: line buffer -> 0x06010040+ sprite tile"),
     # --- TG.4-next 轮（2026-04-15） ---
@@ -245,14 +245,14 @@ RENAMES = [
         'LP-timer AOB effect. If gP1LifePoints+0x1cec is0, it clears banner bit0 and field+0x215 bit2 and returns0 without aux init or masking. Otherwise phase0 loads resources and uses anm1 when player==ctx+4; phase1 renders, advances when tick returns0, and still returns1. Final aux init uses anm1 when player==(ctx+4 XOR1), applies u32[0x03000254]&=0x80000000, clears both flags, and returns0.'),
     ("FUN_080c91e0", "play_ui_effect_06",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析."),
-    ("FUN_080c2acc", "play_ui_effect_0b",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0b 子状态机, 待详细分析."),
-    ("FUN_080c3080", "play_ui_effect_0c",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0c 子状态机, 待详细分析."),
+    ('FUN_080c2acc', 'play_zone_pair_oam_transition_effect',
+        'UI effect0x0b zone-pair OAM transition. Decode phase/subphase/timer from gZoneDisplayState. Phase0 saves descriptors and clears the first zone slot. Phase1 draws the pair, advances an8-call interpolation, runs a pack-banner submachine, then holds until timer24 and clears field bit2. A second slot of-1 bypasses phase1. Phase2 redraws the second slot when <=4. Active phases return1; other phases clear packed counters and return0.'),
+    ('FUN_080c3080', 'play_card_pair_number_window_effect',
+        'UI effect0x0c card-pair number window using gZoneDisplayState. Phase0 uploads two medium card images, digits/panel palette/tiles, initializes two AOBs, and enables WIN0. Phase1 writes BLDY8. Phase2 renders both columns while subphases hold8/24/16 calls; the middle hold triggers sync_state_and_init_sprite(7). Phase3 writes BLDY0. Phase4 disables WIN0 and blending. Active phases return1; default rebuilds the activation mask, clears state bits0..2 and field bit2, and returns0.'),
     ('FUN_080bf394', 'play_life_point_change_effect',
         'Life-point delta effect. Exit on abs(banner+8)==0 or banner+0xc!=0. Phase0 positions/draws the delta and sets countdown0x20; phase1 redraws until ++u16counter>2. Phase2 selects0x25/0x26 and advances progress at banner+0x18 by a decimal-scale step>=10, capped at delta. It sends LP+progress (mode1) or max(LP-progress,0) (mode0) to the VRAM digit writer and redraws the original delta. Phase3 decrements u8 countdown to0xff; cleanup clears both flags and returns0.'),
-    ("FUN_080c25ac", "play_ui_effect_10",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x10 子状态机, 待详细分析."),
+    ('FUN_080c25ac', 'play_player_zone_card_refresh_effect',
+        'UI effect0x10 player-zone card refresh. Read player from gBannerState+4 and cap its zone count at7. Phases0..4 draw zone-type11 slot OAM; phase1 updates slot tiles; phases2/3 hold using an up/down byte counter. Phase4 clears the zone-slot data buffer, refreshes player tiles and count tags. Phase5 refreshes zone info. Return1 for these phases; default clears banner bit0 and field+0x215 bit2, then returns0.'),
     ('FUN_080bf228', 'play_zone_info_palette_cycle_effect',
         'Zone-info palette-cycle effect for UI effect0x11. It computes the zone-type0xb count delta and clamps it to0..6. Phase0 renders the zone and falls through to the first palette update. Phase1 performs the remaining 63 updates; counter%3 selects the attr2 palette while coordinates stay fixed. Completion clears banner bit0 and field+0x215 bit2 and returns0; active phases return1.'),
     ('FUN_080c1ad0', 'play_hand_shuffle_display_effect',
@@ -287,8 +287,8 @@ RENAMES = [
         'UI effect 0x3a. Phases 0..5 run field fade-in, display reset, Exodia load/tick, field restore, and fade-out. Nonzero callee results advance; restore advances unconditionally. Returns 1 while active. Completion clears gBannerState bit0 with AND 0xfe and gDuelFieldState+0x215 bit2 with AND 0xfb, then returns 0. Evidence: 080bcbd4-080bcc62.'),
     ('FUN_080bc918', 'play_vija_scene_with_sprite_intro',
         'UI effect 0x3b. Phase0 with gBannerState+0xd nonzero jumps to phase6 and returns1. Otherwise phases0..4 load regional Vija-intro assets and animate two AOB contexts. Phase5 disables blend/window, advances to6, clears banner bit0 and field+0x215 bit2, and returns0. Phases6..11 fade in, reset/load/run Vija, restore field, and fade out; nonzero results advance, restore/refresh advance unconditionally, returning1. Above11 cleans up and returns0.'),
-    ("FUN_080c2544", "play_ui_effect_3d",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3d 子状态机, 待详细分析."),
+    ('FUN_080c2544', 'play_pack_banner_display_effect',
+        'UI effect0x3d pack-banner display. While gBannerState+0x10 is0, select tick_pack_banner_3d_state_machine for argument0 or its alt variant for arguments1/2; advance phase after it returns0. Return1 while active. Later calls clear banner bit0 and gDuelFieldState+0x215 bit2, preserving its bit0, and return0.'),
 
     # 2026-05-01: zone 光标单步推进函数 (按 RIGHT 时被 FUN_080c7ea0 反复调用,
     # 形成 10 步序列推进 gPageState[+0x210] packed cursor + 每次 render 一次).
@@ -5954,20 +5954,14 @@ RENAMES = [
         "Advance AOB frame counter (aob+0xc/0xd/0x12/0x13), resolve new ptn entry on frame change. "
         "Returns 0 if uninitialized (bit5 of aob+0x12), 1 on normal tick. "
         "Shared by same 11 callers as render_aob_frame_to_oam."),
-    ("FUN_080c2ddc", "write_digit_oam_column_with_scroll",
-        "Decimal decompose r4 via __modsi3/__divsi3 (base 10), write each digit OAM entry. "
-        "Digit tile base 0x70, x step -0xc per digit (right to left). "
-        "Optional gPrng+0x20c bit1 x-jitter via r3 scroll_flag. Caller: render_decimal_number_to_oam."),
-    ("FUN_080c2e58", "render_decimal_number_to_oam",
-        "Count decimal digits of r1, compute OAM x_base (r5*100+digit_count*6+0x52), "
-        "then call write_digit_oam_column_with_scroll. Caller: render_card_number_oam_by_player."),
-    ("FUN_080c2eac", "render_card_number_oam_by_player",
-        "Select OAM tile orientation by player side comparison (0x0201fe60+3/4 vs 0x0201e2a0+4^1). "
-        "flip_sign: 0xae (flip) or 0x4a (normal). Calls render_decimal_number_to_oam. "
-        "r0=oam_x_base [0x200..0x208], r1=oam_y_base. Caller: render_dual_card_number_oam_columns."),
-    ("FUN_080c305c", "render_dual_card_number_oam_columns",
-        "Call render_card_number_oam_by_player twice with r0=0x200 then r0=0x208 (two digit columns). "
-        "r1=oam_y same for both calls. Caller: play_ui_effect_0c."),
+    ('FUN_080c2ddc', 'write_decimal_oam_column_with_nonzero_marker',
+        'Write decimal OAM digits at r0=x,r1=y with palette r3. Render at least one digit from abs(r2), advancing x by-12 per digit; attr2 is0x3c4+2*digit OR palette<<12. For every nonzero original r2, including positive values, draw the extra0x3c2 marker after the digits. No PRNG or scroll input is read. The sole caller negates its displayed value before this call.'),
+    ('FUN_080c2e58', 'render_decimal_number_to_oam',
+        'Render one decimal number column: r0 selects column, r1 supplies value, r2 enables palette flicker. Count positive decimal divisions; x=100*column+6*digits+0x52 and y=0x40. Palette is2, or2-((u16(gPrng+0x20c)>>2)&1) when enabled. Call write_decimal_oam_column_with_nonzero_marker with the negated value. Nonpositive input counts as one digit in the positioning loop.'),
+    ('FUN_080c2eac', 'render_card_number_oam_by_player',
+        'Render a card-number column selected by OBJ tile destination0x200 or0x208. Read paired values/flags from gZoneDisplayState; choose x by player side and draw the number in active subphases. Subphase1 ticks the marker AOB and adds signed x/y jitter from zone_display_number_jitter_offsets using PRNG modulo10. A second AOB flickers on PRNG bit2. Draw the two card-image halves unless the selected flag/subphase suppresses the column. r1 is the packed per-column draw flags.'),
+    ('FUN_080c305c', 'render_dual_card_number_oam_columns',
+        'Render both card-number columns for play_card_pair_number_window_effect. Preserve r0 as packed draw flags and call render_card_number_oam_by_player with tile destinations0x200 and0x208, passing the same flags as r1. No y-coordinate is supplied to either column.'),
     ("FUN_08096e14", "init_duel_zone_target_slot_refs",
         "Init duel_field zone slot ref cache in gP1LifePoints+0x1d68 area. "
         "Calls get_zone_slot_ptr 3x; extracts card_id bits[12:0]; sets active flag at +0x1d54=1. "
@@ -5977,7 +5971,7 @@ RENAMES = [
         "Returns packed (y<<16|x). Pure calc, no external writes. "
         "Callers: render_duel_field_slot_oam_grid, compute_card_sprite_oam_coords_by_zone."),
     ('FUN_080c35ac', 'resolve_zone_oam_base_coords_by_type',
-        'Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. 16-case switch; returns packed (y<<16|x). Pure query. 11 callers including play_zone_type_13_card_reveal_effect/10/play_card_zoom_in.'),
+        'Resolve packed pixel coordinates (y<<16)|x for player r0, zone type r1 and subindex r2; subindex0xff becomes0. Read s32 tile-coordinate pairs from duel_field_zone_tile_coords at player stride0xb0, then multiply x/y by8. Types0..10 index type+subindex, types12..15 index type+6. Type11 subtracts the player-oriented field+0x4c scroll origin and clamps indices<=10 to11. Out-of-range types return0. The16 switch words and all case aliases remain intact.'),
     ("FUN_080c8aa8", "render_duel_field_slot_oam_grid",
         "Iterate all duel_field zone slots (type 0..10 + b..f), compute OAM coords via "
         "resolve_zone_oam_base_coords_by_type + transform_zone_oam_coords_by_player, "
@@ -6389,40 +6383,10 @@ RENAMES = [
         "返回值: 0=停止/中性待定, 1=正向, 2=反向, 3=中性激活."),
     ('FUN_080bd0a8', 'dispatch_banner_scene_tick_by_state',
         'Outer banner scene dispatcher. Phase1 runs 8 motion ticks; phases2/3 run 17 white-ramp ticks each; phase4 waits 65 ticks, then gPrng+0x23f bit0 and duel-zone direction(1) in {1,2} route to phase8 and store +8, else phase5. Phases5/6 advance on nonzero blend results; phase7 or invalid cleans up and returns0. Phase8 calls the inner renderer; inner0 advances outer but this call returns1. It does not advance PRNG.'),
-    ("FUN_080c678c", "update_zone_oam_card_count_tag",
-        "根据玩家场地区域卡牌数量更新 OAM entry 中的 tag/count 字段. "
-        "无 APCS 参数 (r0 入口立即被内部 ldr 覆盖). "
-        "读取 0x02023130 + 0x84*4 = 0x02023340 处的 OAM 区域 byte (r6=ldrb at offset). "
-        "提取 bit[6:0] 检查是否 == 0xb (zone_type_deck 或特定区域代码); 若否跳转 (不操作). "
-        "若是 (zone_type==0xb): 读 gP1LifePoints 基址, 用 player_id (0 or 1) * 0x868 + 0xc "
-        "索引玩家 zone 牌数子结构; 读 [r5+0]=当前区域卡牌数 (0..6 范围); 若 > 6 则退出; "
-        "若 == 0: 将 bit7 of player_id 构成高位 attr0 组合 (player_flag | 0x0b), strh 写回 OAM entry. "
-        "调用 resolve_zone_data_ptr_by_oam_word: 将 OAM word 解析为 zone_data 指针, "
-        "确认 bit13==0 后再次更新 attr (lsls r1,r4,#7 | 0xb | (count-1)<<8) strh 写回 OAM entry. "
-        "3 个 caller: FUN_0801ec9c (card_frame/duel_field), "
-        "FUN_080bede4 (palette/vram/duel_field), play_ui_effect_10. "
-        "Constants: DAT_0x02023130: OAM 影子缓冲区 (duel_field 区域 OAM 基址); "
-        "0x84*4=0x210: OAM entry 索引偏移; "
-        "gP1LifePoints (0x0201c4e0): 玩家结构基址; 0x868: 玩家 stride; 0xc: zone 子结构偏移; "
-        "0xb: zone_type 枚举 (卡组/特定决斗区域); [0..6]: 区域最大卡牌数."),
-    ("FUN_080f64dc", "write_obj_attr_256color_affine",
-        "将 OBJ sprite 属性写入 OAM 影子缓冲区 (256 色调色板模式 + affine 旋转缩放). "
-        "r0 低 16 bit = x [0..239], 高 16 bit = y [0..159] (packed 屏幕坐标); "
-        "r1 = obj_size_attr 字节 [0..0xff] (bit7 映射 attr1 size 字段, callsite=0x80 表 64x64); "
-        "r2 低 16 bit = tile_idx [0..1023]; r3 = affine_slot_idx [0..31] (attr1[13:9] affine 参数组). "
-        "通过 gPrng+0x1bc 取 OBJ 影子缓冲区基址, 以 slot_idx 字节 (gPrng+0x400 区域) 定位 entry. "
-        "若 slot 不可用 (0x80), 直接返回. 可用时: "
-        "attr0 = y[7:0] | (r1 & 0xff00) | 0x2000 (bit13=256色模式); "
-        "attr1 = x[8:0] | r1_size_flag | affine_slot_idx; attr2 = r6 (tile_idx); "
-        "写入 entry 偏移 0x0/0x2/0x4. 递增 entry 的使用计数字节 (entry+0x400). "
-        "与 write_obj_attr_packed (0x080f61e4) 和 write_obj_attr_with_priority (0x080f6578) 同簇. "
-        "本函数在 attr0 ORs 0x2000 (256-color), 其他变体使用 16-color 或不同 mode 位. "
-        "唯一 caller: play_ui_effect_10 (0x080c25ac, card_ids/duel_field, "
-        "作为 effect 10 的 OBJ 写入). "
-        "Constants: gPrng+0x1bc (0xde<<1): OBJ 影子缓冲区链表头; "
-        "gPrng+0x400+slot: slot 使用计数 (0x80=满); "
-        "DAT_080f656c = 0xfffffe00: X 坐标 attr1 掩码 (~0x1ff); "
-        "0x2000 = bit13: OBJ 256-color palette 模式标志."),
+    ('FUN_080c678c', 'update_zone_oam_card_count_tag',
+        'Refresh the zone-type11 count tag in gDuelFieldState+0x210. Decode player from bit7 and read its zone count at gP1LifePoints+player*0x868+0xc. Ignore other zone types or counts above6. Count0 stores only player<<7. Otherwise resolve the descriptor to zone data; when its first word has low13 bits zero, store (player<<7)|11|((count-1)<<8). Called by dispatch_card_display_op, field refresh and play_player_zone_card_refresh_effect.'),
+    ('FUN_080f64dc', 'write_obj_attr_256color_affine',
+        'Emit256-color OBJ attributes for play_player_zone_card_refresh_effect. r0 packs x/y; r1 supplies shape/size flags, r2 tile/priority and r3 attr1 flags. Get OAM base through gPrng+0x1bc; exit when its slot byte at+0x400 is0x80. attr0=(y&0xff)|(r1&0xff00)|0x2000; attr1=(x&0x1ff)|((r1<<8)&0xfe00)|u16(r3); attr2=(r2&0xc00)|((r2&0x1ff)<<1). Write the selected8-byte entry and increment the slot byte.'),
     # --- batch #29 (campaign-29) ---
     ("FUN_0803b3a8", "get_zone_slot_entity_ref_by_type",
         "根据 zone_type_code (r1) 通过 switch-dispatch 读取指定区域格的 entity_ref 字段, 并提取关键位段后返回. "
@@ -6450,15 +6414,8 @@ RENAMES = [
         "OAM_entry_size=8, attr0_mask=0xfffffe00, attr1_mask=0x000001ff."),
     ('FUN_080c124c', 'render_card_count_panel_oam',
         'Render a card-count panel. r3 low16 is an unsigned value clamped to999; signed high16 selects the label palette via style<=1 versus>1. r0 selects the digit palette relative to the display player. r1+8 anchors two card pieces and r2 supplies Y offsets; panel/digit X positions are centered from digit count. Draw endcaps/fill and the label, then1..3 decimal digits including0. This routine does not take a signed delta or infer its sign.'),
-    ("FUN_080c2990", "write_zone_pair_oam_with_coords",
-        "解包两个 zone OAM 描述字, 分别调用 resolve_zone_oam_base_coords_by_type 获取各自基础坐标, "
-        "再计算相对位移后调用 write_oam_entry_with_slot_check (FUN_080f67f4) 写入 OAM. "
-        "函数处理'一对 zone 指示器'的 OAM 布局: zone0 和 zone1 各有 player/zone_type/sub_idx 三字段 (分别从 r0/r1/r2 解包). "
-        "坐标后处理: 双向各加 4, 再根据 gDuelActivation[+4] 与 player_id 比较结果决定 y 偏移 +24 或 -24 "
-        "(配合 OAM attr 0x2488/0x248c 选择 flip 模式). "
-        "被 play_ui_effect_0b 和 FUN_080c8c58 调用, 是 duel zone 动画配对高亮的核心写入函数. "
-        "Constants: gDuelActivation=0x0201e2a0, OAM_attr_normal=0x2488, OAM_attr_flip=0x248c, "
-        "OAM_y_offset=0x18, coord_x_pad=4."),
+    ('FUN_080c2990', 'write_zone_pair_oam_with_coords',
+        'Draw a pair of zone OAM entries. Decode two u16 descriptors as player bit7, zone type bits6:0, and subindex bits14:8. Resolve each position, add4, and adjust the second y by24 for zone types above4. Interpolate the first entry toward the second using signed progress r2/8; the second remains at the first position. Choose flip by player side; tile attrs change at progress8. Two callers supply progress0..8.'),
     ('FUN_080bdbb4', 'tick_pack_banner_state_machine_b',
         'Pack-banner state machine B. Phase0 initializes regional assets. Phases1/3 advance phase and clear gBannerState+0x11; phase4 only advances. Phase2 starts at0 and runs exactly32 calls: counts0..8 use step=2*c, 9..16 use 32-2*c, and 17..31 draw two OAM entries without a palette step. Phases0..4 return1. Only phase>4 disables blend and returns0. Palette ramps call blend_palette_block_toward_white.'),
     ('FUN_080bda7c', 'tick_pack_banner_state_machine_a',
@@ -7729,16 +7686,8 @@ RENAMES = [
         "r2=u16 palette_or_stride [0..0xffff]; r3=u16 flags_or_tile [0..0xffff]; "
         "sp+4=u32 base_attr_word. Returns void (submit_sprite_row_data return transparent). "
         "Constants: submit count=6, stride=r2+2, AND masks DAT_080953bc/DAT_080953c0."),
-    ("FUN_080c2880", "init_field_slot_aob_ctx_b",
-        "Initialises duel_field slot AOB (animation object) context structure at 0x0201fe60 "
-        "for dispatch_card_display_op case 0x0b. "
-        "Writes r1[7:0]<<3 into [base+4][10:3] (palette field), r0 to [base+8], r2 to [base+c]. "
-        "Calls init_aob_ctx_from_ptnsect([base+0x48], ptnsect_id, r1_dat, 1), then sets "
-        "[base+0x5b] bit0 (init done). Reads gP1LifePoints[0x1ce8] vs (gDuelActivation[4]^player_id) "
-        "to select anm_entry param (2 or 3) for init_aob_ctx_with_anm_entry. "
-        "Clears high bits of [base+0]/[base+2] via AND mask. "
-        "r0=ptr arg0 [0..0x03ffffff]; r1=u8 palette_slot [0..0xff]; r2=ptr arg2. Returns void. "
-        "Constants: base_struct=0x0201fe60, mask=0xfffff807, gDuelActivation=0x0201e2a0."),
+    ('FUN_080c2880', 'init_zone_display_pair_aob_context',
+        'Initialize gZoneDisplayState pair AOB context. Store u8(r1) in hword+4 bits10:3, r0 at+8 and r2 at+c. Initialize AOB at+0x48 from zone_display_pair_marker_ptnsect, tilebase0x80/palette2, then choose animation2/3 by current-player comparison. Set state bit1 and AOB+0x13 bit0. Clear phase bits10:3, subphase bits18:11 and timer hword+2 bits10:3. Dispatcher opcode0x0b; r1 is a packed descriptor, not a palette slot.'),
     ("FUN_080c3d00", "init_field_slot_ctx_zoom",
         "Initialises duel_field card zoom display context (DAT_080c3d1c, 0x1c halfwords=0x38 bytes) "
         "for dispatch_card_display_op case 0x1a (card zoom-in scene). "
@@ -7756,14 +7705,8 @@ RENAMES = [
         "Constants: gDuelZoneDisplay=0x02023130, slot_type_lo=[0..4], slot_type_hi=[5..10]."),
     ('FUN_080bc794', 'init_banner_state',
         'Initializes gBannerState. Clears 0xd8 bytes, stores r0/r1/r2 at +4/+8/+0xc, sets gBannerState byte0 bit0, and sets gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op at 0801ef3e and 0801ef66; returns void. It does not write a field-slot AOB context. Evidence: 080bc794-080bc7d0.'),
-    ("FUN_080c291c", "write_zone_oam_entry_with_flip",
-        "Reads zone_type[2:0] and sub_idx[7:3] from slot struct (0x0201fe60), "
-        "forms zone_oam_key = sub_idx<<5 | zone_type. "
-        "If key nonzero selects r1 as flip param, else r0; writes to [base+0x10] and [base+0x14]. "
-        "Reconstructs OAM coord from two bytes and writes to [base+0x18]. "
-        "Sets ctrl bit2 at 0x02023345. Corresponds to dispatch_card_display_op case 0x0c. "
-        "r0=u32 oam_param_a; r1=u32 oam_param_b; r2=u8 sub_packed [0..0xff]. Returns void. "
-        "Constants: base_struct=0x0201fe60, ctrl_byte=0x02023345, zone_key_mask=sub_idx<<5|zone_type[2:0]."),
+    ('FUN_080c291c', 'set_zone_display_pair_values',
+        'Set pair values for dispatcher opcode0x0c. Rebuild key=(state[3]>>3)|((state[4]&7)<<5). If key is0 store r0/r1 at+0x10/+0x14 and r2 at+0x18. Otherwise swap the two values and store ((r2&0xff)<<8)|((r2>>8)&0xff) at+0x18. Set gDuelFieldState+0x215 bit2. This setter updates gZoneDisplayState and does not emit OAM entries.'),
     ("FUN_080c4ea0", "init_field_slot_aob_ctx_c",
         "Initialises third variant of duel_field slot AOB context (DAT_080c4ed0, 0x1c halfwords=0x38 bytes) "
         "for dispatch_card_display_op case 0x19. "
@@ -7781,14 +7724,8 @@ RENAMES = [
         "r0=u32 slot_descriptor (bit0=player_id, bits[5:1]=zone_type, bits[13:6]=sub_idx); "
         "r1=u16 card_id_raw [0..0x1fff]. Returns void. "
         "Constants: VRAM_cache_offset=0x120 (0x90*2)."),
-    ("FUN_080c2840", "write_field_slot_activation_mask",
-        "Zero-fills field slot activation state structure (DAT_080c287c, 0x5c halfwords=0xb8 bytes) "
-        "then writes two bit-fields from r0: r0[4:0]<<3 -> [base+3][5:3], r0[21:19]&0x7 -> [base+4][2:0]. "
-        "Called in dispatch_card_display_op case 0x09 after build_slot_activation_mask_for_player. "
-        "r0=u32 packed_slot_data (output of build_slot_activation_mask_for_player, "
-        "effective bits [4:0] and [21:19]). Returns void. "
-        "Constants: base_struct=DAT_080c287c, zero_len=0x5c halfwords=0xb8 bytes, "
-        "mask_lo=0x1f (bit[4:0]), mask_hi=0x7 (bit[21:19])."),
+    ('FUN_080c2840', 'reset_zone_display_state_from_packed_key',
+        'Reset gZoneDisplayState by clearing0x5c halfwords. Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.'),
     ("FUN_080c8f48", "init_card_effect_aob_ctx",
         "Initialises card-effect AOB context (DAT_080c8fb4, 0x4c halfwords=0x98 bytes) "
         "for dispatch_card_display_op case 0x06. "

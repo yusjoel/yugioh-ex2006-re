@@ -1,6 +1,6 @@
 # 函数和数据细化计划 · `asm/16_duelfield_zone.s`
 
-> 范围 `[0x080c1448,0x080cbf0c)`，共 43716 字节。主序已完成 16/25 个模块，历史正引用补漏 1 项。当前模块完成 1/10 段，下一任务为 F16-Seg-2 `[0x080c2544,0x080c36a8)`。
+> 范围 `[0x080c1448,0x080cbf0c)`，共 43716 字节。主序已完成 16/25 个模块，历史正引用补漏 1 项。当前模块完成 2/10 段，下一任务为 F16-Seg-3 `[0x080c36a8,0x080c4350)`。
 
 ## 一、规则
 
@@ -12,7 +12,7 @@
 
 ## 三、当前进度
 
-Seg-1 已完成独立复核、实际落地、保存后核验和整 ROM 逐字节验证。当前完成 1/10 段，保留 112 个 Function、1580 个池字；剩余自动数据名 981 个（DAT 776、DWORD 90、PTR 115）。初始测绘的 1136 个自动名保留在 §4.00 的历史材料中。下一段为 Seg-2。
+Seg-1、Seg-2 均已完成独立复核、实际落地、保存后核验和整 ROM 逐字节验证。当前完成 2/10 段，保留 112 个 Function、1580 个池字；剩余自动数据名 863 个（DAT 673、DWORD 90、PTR 100）。初始测绘的 1136 个自动名保留在 §4.00 的历史材料中。下一段为 Seg-3。
 
 8 个原始块共 3410 字节均未分类。当前 §5.1 登记为 0；这些块由其所属段扫描并读取消费者后决定处理方式。
 
@@ -48,12 +48,37 @@ Root 逐字节核对 ROM 与采集的 code unit，并逐项核对全部 112 个 
 
 Root 最终收束留痕为 `root-f16-seg1-final-gates-v3.json`。下一任务为 F16-Seg-2 `[0x080c2544,0x080c36a8)`。
 
+### 4.02 Seg-2（2026-11-13）
+
+范围 `[0x080c2544,0x080c36a8)`，共 4452 字节、15 个既有 Function 和 145 个池字。完成 39 EQ_ADD、57 REF_ADD、22 REF_PRESERVE、27 PRESERVE，118 个源标签及 EOL、12 个新目标、8 个函数改名和 16 个 PLATE（段内 14、必要上下文 2）；另保留 1 个段内 PLATE。段内 raw、carve、disasm 和新增 §5.1 均为 0。
+
+初版真实 owned 演练的 POST 在两个 Function 报 2 项差异，定位为 4 条既有 ANALYSIS 引用的 DEFAULT offcut 显示名：基址 `0x093264c0` 标记为 `card_mini_frame_second_half_tile_data` 后，`0x093264c2` 显示名从 `DWORD_093264c0+2` 派生为 `card_mini_frame_second_half_tile_data+2`。该轮强制回滚且物理 DB15/source202 不变，但未形成完整回滚恢复 PASS，旧证据独立归档。全项目 378 地址读取确认只有这 4 条 offcut 引用；相邻 `0x093264c4` 为独立 dword，保留其 2 条引用。R5 只修 3 个模型产物的 8 处 after 名称副本，所有 before 保持，另 27 条 DEFAULT `+` 引用保持；不增加写入动作。
+
+R5 原生辅助读取完整保护 c2 的 4 字节、虚拟 ID、DEFAULT/Label、namespace/dynamic 和全部引用身份，并保留 c4 的完整数据边界及来源 Function。真实 prestate、dry 和 owned fullrollback 依次通过：119 个 Function、3097 个核心状态、1580 个模块池字、43716 个模块单位、48 个外部保护单位及 16452 个指令位置。transaction 1242 的完整 post 和 end(False) 后同 Program 核心与辅助前态恢复均为 0 FAIL，三模式物理 DB15/source202 前后逐字节一致。
+
+独立最终审查通过后唯一保存一次，新进程 check 和独立原生采集全部通过。130 个新 USER 标签、8 个函数改名及 138 个 primary 节点精确核对；全局 Equate 2487 个、绑定 12725 条。16452 个指令位置仅投影 1086 个批准 owner 名字段，控制流类型及 override 精确保持。c2 的 4 条派生引用与 c4 独立边界后验通过。
+
+全范围原生重导、mode 注入和模块拆分通过；137 个 native 表达式、8 个新增 fallback、123 个有效 pins（115 继承加 8 新增）及 145 个表达式断言通过。20 个 GNU 定义、16 个既有 registry tuple 和 8 个 CSV name cell 精确同步。源码仅在 15 项许可范围内改变 13 个路径。49/49 资产导出、构建和 33554432 字节整 ROM 逐字节比较通过，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`，ELF SHA256 `b1a8cbb9cf2dd7ef2e791998771858bf0289238aca064c4b51332e2628023964`。剩余自动名 863；8 个原始块 3410 字节继续由其所属段处理。
+
+证据目录 `output/refine-run-20261028-105948/`。
+
+| 核验 | 文件 | SHA256 |
+|---|---|---|
+| 实际 Phase1 独审 | `f16-seg2-phase1-static-review-v1.json` | `0d18ac3059f1f25b367e2517d498729c231dc3fc2a781beb2bd676474a09115b` |
+| 唯一保存 | `f16-seg2-apply-v1.json` | `60cdea828622405d0fdbfbdd82e0b96b0e85fe822079ab62ae23b51610d26c6f` |
+| 新进程 check | `f16-seg2-persisted-check-v1.json` | `7ece3c3c4807a2cf7fe88d76354330afb01e8cc4bf9169e3f27f1a93d8bd725b` |
+| 独立数据库与辅助后态 | `root-f16-seg2-saved-db-gate-v3.json` | `de1563b3b4a554b44a1d6a6339193503d31507b697fdfad5277bae8cadac2967` |
+| 指令保护属性 | `root-f16-seg2-saved-properties-gate-v3.json` | `37555c0a596e75ca262940b9a3cde1b1301007bd6c9fba0d44d237e143ff6b99` |
+| 源码与整 ROM | `f16-seg2-source-landing-final-v1.json` | `7c8a2c9612f3712778e34825bc50f83b561285ff27aad6ceb3268b9dd63df8ad` |
+
+下一任务为 F16-Seg-3 `[0x080c36a8,0x080c4350)`，12 个 Function、98 个池字、76 个自动名、无 raw 块。
+
 ## 五、地址序路线图
 
 | 段 | 范围 | 字节 | 既有 Function | word | 自动数据名 | raw 块/字节 | 状态 |
 |---|---|---:|---:|---:|---:|---:|---|
 | 1 | `0x080c1448..0x080c2544` | 4348 | 7 | 210 | 155 | 0/0 | ✅ root 验收通过，单段提交 |
-| 2 | `0x080c2544..0x080c36a8` | 4452 | 15 | 145 | 118 | 0/0 | 未开始 |
+| 2 | `0x080c2544..0x080c36a8` | 4452 | 15 | 145 | 118 | 0/0 | ✅ root 验收通过，单段提交 |
 | 3 | `0x080c36a8..0x080c4350` | 3240 | 12 | 98 | 76 | 0/0 | 未开始 |
 | 4 | `0x080c4350..0x080c57c4` | 5236 | 8 | 139 | 61 | 4/2128 | 未开始 |
 | 5 | `0x080c57c4..0x080c699c` | 4568 | 11 | 139 | 79 | 3/1224 | 未开始 |

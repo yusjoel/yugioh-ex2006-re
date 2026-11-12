@@ -3864,3 +3864,10 @@
 .equ pack_banner_alt_b_palette, 0x0991be7c
 .equ pack_banner_alt_b_tile_rows, 0x0991be9c
 .equ attack_flip_debug_format, 0x09e491fc
+.equ card_mini_frame_second_half_tile_data, 0x093264c0
+.equ zone_display_number_panel_tiles, 0x098533dc
+.equ zone_display_number_panel_palette, 0x098543dc
+.equ zone_display_number_ptnsect, 0x098543fc
+.equ zone_display_pair_marker_ptnsect, 0x09889b80
+.equ zone_display_number_jitter_offsets, 0x09e4922c
+.equ duel_field_zone_tile_coords, 0x09e49254

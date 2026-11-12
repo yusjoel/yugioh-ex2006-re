@@ -5348,7 +5348,7 @@ PTR_gPrng_080f64d4:
 DAT_080f64d8:
     .word  0x000001ff                     @ 080f64d8 ff010000
 
-@ 将 OBJ sprite 属性写入 OAM 影子缓冲区 (256 色调色板模式 + affine 旋转缩放). r0 低 16 bit = x [0..239], 高 16 bit = y [0..159] (packed 屏幕坐标); r1 = obj_size_attr 字节 [0..0xff] (bit7 映射 attr1 size 字段, callsite=0x80 表 64x64); r2 低 16 bit = tile_idx [0..1023]; r3 = affine_slot_idx [0..31] (attr1[13:9] affine 参数组). 通过 gPrng+0x1bc 取 OBJ 影子缓冲区基址, 以 slot_idx 字节 (gPrng+0x400 区域) 定位 entry. 若 slot 不可用 (0x80), 直接返回. 可用时: attr0 = y[7:0] | (r1 & 0xff00) | 0x2000 (bit13=256色模式); attr1 = x[8:0] | r1_size_flag | affine_slot_idx; attr2 = r6 (tile_idx); 写入 entry 偏移 0x0/0x2/0x4. 递增 entry 的使用计数字节 (entry+0x400). 与 write_obj_attr_packed (0x080f61e4) 和 write_obj_attr_with_priority (0x080f6578) 同簇. 本函数在 attr0 ORs 0x2000 (256-color), 其他变体使用 16-color 或不同 mode 位. 唯一 caller: play_ui_effect_10 (0x080c25ac, card_ids/duel_field, 作为 effect 10 的 OBJ 写入). Constants: gPrng+0x1bc (0xde<<1): OBJ 影子缓冲区链表头; gPrng+0x400+slot: slot 使用计数 (0x80=满); DAT_080f656c = 0xfffffe00: X 坐标 attr1 掩码 (~0x1ff); 0x2000 = bit13: OBJ 256-color palette 模式标志.
+@ Emit256-color OBJ attributes for play_player_zone_card_refresh_effect. r0 packs x/y; r1 supplies shape/size flags, r2 tile/priority and r3 attr1 flags. Get OAM base through gPrng+0x1bc; exit when its slot byte at+0x400 is0x80. attr0=(y&0xff)|(r1&0xff00)|0x2000; attr1=(x&0x1ff)|((r1<<8)&0xfe00)|u16(r3); attr2=(r2&0xc00)|((r2&0x1ff)<<1). Write the selected8-byte entry and increment the slot byte.
 write_obj_attr_256color_affine:
     push {r4,r5,r6,r7,lr}                    @ 080f64dc f0b5
     .hword 0x4647    @ 080f64de 4746

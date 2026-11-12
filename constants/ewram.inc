@@ -696,3 +696,7 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ SLOT_SET_CODE_TO_COUNT_NEG_OFF, 0xfffffdb0
 .equ gDuelFieldAuxAobCtx, 0x020230f8
 .equ gBannerEffectArgs, 0x0201fec4
+.equ gZoneDisplayState, 0x0201fe60
+.equ gZoneDisplayNumberAobCtx, 0x0201fe80
+.equ gDuelZoneFirstVisibleSlotByPlayer, 0x0202317c
+.equ gDuelZoneSlotData, 0x02023180

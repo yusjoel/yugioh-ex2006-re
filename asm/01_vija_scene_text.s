@@ -4644,19 +4644,19 @@ switchD_0801ecbc__caseD_14:
 switchD_0801ecbc__caseD_9:
     bl build_slot_activation_mask_for_player @ 0801ee06 a9f0f3fe
     adds r0,r6,#0x0    @ 0801ee0a 301c
-    bl write_field_slot_activation_mask      @ 0801ee0c a3f018fd
+    bl reset_zone_display_state_from_packed_key @ 0801ee0c a3f018fd
     b switchD_0801ecbc__caseD_a              @ 0801ee10 d7e7
 switchD_0801ecbc__caseD_c:
     adds r0,r6,#0x0    @ 0801ee12 301c
     adds r1,r7,#0x0    @ 0801ee14 391c
     adds r2,r4,#0x0    @ 0801ee16 221c
-    bl write_zone_oam_entry_with_flip        @ 0801ee18 a3f080fd
+    bl set_zone_display_pair_values          @ 0801ee18 a3f080fd
     b switchD_0801ecbc__caseD_a              @ 0801ee1c d1e7
 switchD_0801ecbc__caseD_b:
     adds r0,r6,#0x0    @ 0801ee1e 301c
     adds r1,r7,#0x0    @ 0801ee20 391c
     adds r2,r4,#0x0    @ 0801ee22 221c
-    bl init_field_slot_aob_ctx_b             @ 0801ee24 a3f02cfd
+    bl init_zone_display_pair_aob_context    @ 0801ee24 a3f02cfd
     b switchD_0801ecbc__caseD_a              @ 0801ee28 cbe7
 switchD_0801ecbc__caseD_31:
     adds r0,r6,#0x0    @ 0801ee2a 301c
@@ -4949,7 +4949,7 @@ switchD_0801efa4__caseD_15:
     bl play_zone_type_13_card_reveal_effect  @ 0801f0d2 9ff0dffc
     b LAB_0801f234                           @ 0801f0d6 ade0
 switchD_0801efa4__caseD_10:
-    bl play_ui_effect_10                     @ 0801f0d8 a3f068fa
+    bl play_player_zone_card_refresh_effect  @ 0801f0d8 a3f068fa
     b LAB_0801f234                           @ 0801f0dc aae0
 switchD_0801efa4__caseD_11:
     bl play_zone_info_palette_cycle_effect   @ 0801f0de a0f0a3f8
@@ -5089,10 +5089,10 @@ switchD_0801efa4__caseD_13:
     bl play_hand_shuffle_display_effect      @ 0801f1de a2f077fc
     b LAB_0801f234                           @ 0801f1e2 27e0
 switchD_0801efa4__caseD_c:
-    bl play_ui_effect_0c                     @ 0801f1e4 a3f04cff
+    bl play_card_pair_number_window_effect   @ 0801f1e4 a3f04cff
     b LAB_0801f234                           @ 0801f1e8 24e0
 switchD_0801efa4__caseD_b:
-    bl play_ui_effect_0b                     @ 0801f1ea a3f06ffc
+    bl play_zone_pair_oam_transition_effect  @ 0801f1ea a3f06ffc
     b LAB_0801f234                           @ 0801f1ee 21e0
 switchD_0801efa4__caseD_33:
     bl play_card_display_sine_reveal_effect  @ 0801f1f0 a1f0f8fa
@@ -5125,7 +5125,7 @@ switchD_0801efa4__caseD_2e:
     bl play_normal_summon_card_display_effect @ 0801f226 a2f01bfd
     b LAB_0801f234                           @ 0801f22a 03e0
 switchD_0801efa4__caseD_3d:
-    bl play_ui_effect_3d                     @ 0801f22c a3f08af9
+    bl play_pack_banner_display_effect       @ 0801f22c a3f08af9
     b LAB_0801f234                           @ 0801f230 00e0
 switchD_0801efa4__caseD_7:
     movs r0,#0x0    @ 0801f232 0020
