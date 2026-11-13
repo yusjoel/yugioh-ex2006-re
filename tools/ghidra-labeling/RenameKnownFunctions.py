@@ -283,22 +283,8 @@ RENAMES = [
     # 形成 10 步序列推进 gPageState[+0x210] packed cursor + 每次 render 一次).
     # GDB hbreak 验证: 单 caller 行 0x080c751f 命中 10 次跨多帧, mode/sub_idx
     # 序列 (0,3)→(0,4)→(0xE,0)→(0xF,0)→(0xA,0)→(0,0)→(0,1..4).
-    ("FUN_080c716c", "apply_zone_cursor_step",
-        "zone 光标单步推进 + 渲染. 入参 r0 = 当前 gPageState[+0x210] 的 u16 "
-        "packed (bit7=player, 低7=mode, 高7=sub_idx). 流程: 解包 → 按 mode/input "
-        "flag 决策新 packed (mode==0xd 走 gPrng+0x14e, 其他走 gPrng+0x146; "
-        "mode==0xb 时 sub_idx 经 gPageState[+0x4c+player*2] 重映射) → 6-way "
-        "switch on gP1[+0x1cf4] 选择 case 0/1/3 的 active-zone 决策路径 → "
-        "可能走 LAB_080c7458 mode-bit 修正 (gPageState[+0x148] bit 0x10/20/40/80 "
-        "→ FUN_080c6b04/6e9c). finalize 块: 写 gPageState[+0x210]=新packed → "
-        "FUN_080c699c (zone state setter) → 若 packed 与 lookup 都未变则 return "
-        "无 render, 否则 bl render_duel_field_zone_info(player,mode,sub_idx) "
-        "(mode==0xb 时 sub_idx 用重映射值). 特殊路径: r4!=0 + FUN_080c707c!=0 "
-        "时取 FUN_080c6638 entry → card_ids_080cc8c8 → 写 gPageState[+0x21c] "
-        "card_id + 设 gPageState[+0x215] |= 4 (dirty), 不 render. 单次调用只 "
-        "render 一次. caller: FUN_080c7ea0 内 0x080c7f9c (主决斗场显示统筹) + "
-        "0x080ccbb2 (switchD case). runtime 验证: 按 RIGHT 触发 caller 反复调 "
-        "本函数 10 次形成 cursor 推进序列."),
+    ('FUN_080c716c', 'apply_zone_cursor_step',
+        'Apply input to a packed zone cursor. Confirmation can write a card ID at gDuelFieldState+0x21c and set UI-effect flag 4. Otherwise use selection-state and directional-input paths, including vertical and horizontal cursor moves. Store the new cursor at +0x210 and draw its OAM. Redraw zone information only when the cursor or hand-window base changes. Input fields are gPrng+0x146/+0x148, or +0x14e for zone 0xd.'),
 
     # 2026-05-01: 主菜单 / 主调度循环命名族 (game_str_id_to_row 上溯链)
     # GDB 实测: 在 ss4 主菜单 Options 子页按 A, 触发 4 个 game_str_id_to_row hit
@@ -4473,13 +4459,8 @@ RENAMES = [
         "writes tiles to dest. Handles sign (negative prefix tile). "
         "Returns void. Side effects: dest_ptr region written with digit tiles. "
         "Constants: JP digit tile base index in glyph tile set."),
-    ("FUN_080c7894", "init_bg_vram_for_card_display",
-        "Initialize BG VRAM regions for card display screen. "
-        "Clears BG tile/map regions, sets palette entries, configures BG control registers "
-        "for card image and text display layers. "
-        "No APCS params; all addresses from global display state. "
-        "Returns void. Side effects: BG VRAM, palette, DISPCNT regs written. "
-        "Constants: BG control regs 0x04000008/0x0400000a/0x0400000c/0x0400000e."),
+    ('FUN_080c7894', 'clear_card_display_obj_tiles_mode_12',
+        'Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0c. The helper count is in bytes. No input parameters.'),
     ("FUN_080c9a10", "write_oam_card_icon_strip",
         "Write OAM entries for card type/attribute icon strip in card display. "
         "r0: oam_base ptr; r1: icon_count [1..N]; r2: start_x [0..239]; r3: start_y [0..159]. "
@@ -4519,12 +4500,8 @@ RENAMES = [
         "Returns 1 if char_code is in the kinsoku tail set (e.g. closing brackets, punctuation), 0 otherwise. "
         "Pure read-only leaf; no side effects. "
         "Constants: kinsoku_tail_table in ROM."),
-    ("FUN_080c76c0", "render_jp_string_to_tile_line",
-        "Render a JP-encoded string into a BG tile line buffer. "
-        "Iterates over characters in the string, calls glyph rasterizer per character, "
-        "accumulates glyph nibble rows into the tile line buffer. "
-        "r0: str_ptr (JP encoded string); r1: tile_line_buf_ptr; r2: x_start [0..N]; r3: color_attr. "
-        "Returns void. Side effects: tile_line_buf written with glyph nibble rows."),
+    ('FUN_080c76c0', 'render_jp_string_to_tile_line',
+        'Render or measure localized text at (r0,r1): r2=text, r3=cell advance, stack arg=measure-only. gSettings language bits select single-byte or two-byte decoding. Handle newline, @ ink control, digit conversion and 184-pixel wrapping with kinsoku checks. When drawing, call the matching glyph renderer twice for shadow and foreground. Store final x at gFontState+0xa16; return next line y in r0.'),
     ("FUN_080f370c", "write_glyph_nibble_rows_to_vram",
         "Write 4bpp glyph nibble rows from a line buffer into BG tile VRAM. "
         "r0: line_buf_ptr (source nibble rows); r1: vram_tile_dest ptr; r2: row_count [1..8]. "
@@ -4598,12 +4575,8 @@ RENAMES = [
         "calls render_jp_string_to_tile_line then write_line_buf_to_bg_tile_vram. "
         "r0: card_id [0..0x19b7]; r1: bg_tile_dest ptr; r2: x_col [0..29]; r3: y_row [0..23]. "
         "Returns void. Side effects: BG tile VRAM name row written."),
-    ("FUN_080c78bc", "init_card_icon_tile_and_palette",
-        "Initialize OBJ tile VRAM and palette for card type/attribute icon display. "
-        "Copies icon tile data from ROM to OBJ VRAM, writes palette entries for icon colors. "
-        "r0: card_type [0..N]; r1: card_attribute [0..N]. Returns void. "
-        "Side effects: OBJ tile VRAM and OBJ palette written for icon display. "
-        "Constants: icon_tile_table_base in ROM; OBJ_VRAM_BASE=0x06010000."),
+    ('FUN_080c78bc', 'init_card_selection_panel_mode_13',
+        'Set UI-effect flag 0x10 at gDuelFieldState+0x215. Store the low8 initial selection index in bits11:4 of gFontState+0xa0e, preserving other bits. Clear 0x4000 OBJ bytes at AOB_CARD_TILE_VRAM, copy four label tiles and one overlay tile, then copy 0x20 palette bytes to OBJ palette slot3. Set gFontState display mode to 0x0d. Only r0 is an input.'),
     ('FUN_080c3b50', 'render_zone_list_scroll_arrows',
         'Draw zone-list scroll-arrow OAM for both players when their zone/hand count exceeds7. Omit the backward arrow at origin0 and the forward arrow when origin>=count-7. Read the visible origin from gDuelFieldState+0x4c+2*player. Use tile0x20, side-dependent positions/flip, phase jitter from u16(0x0300024c), and palette cycling0..2 when the selected type11 list has the matching held direction key. This renderer reads no card tile data and writes no BG VRAM.'),
     ("FUN_080c9eb8", "write_decimal_digits_to_oam",
@@ -6056,30 +6029,14 @@ RENAMES = [
         "Side effects: DISPCNT=0, BG0CNT=0x5, BG1CNT=0x104, BG2CNT=0x8208, BG3CNT=0x407, VRAM/PAL. "
         "Constants: DISPCNT=0x04000000, card_id_adjust=-0x2711, max_adjusted=0x33, "
         "gPrng_slot_offset=0x174, VRAM_BG=0x06004000, PAL_BASE=0x05000220."),
-    ("FUN_080c6e9c", "decode_zone_oam_word_to_cursor_fields",
-        "Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch "
-        "to the matching zone cursor-position handler via 16-entry switchD. "
-        "r0=packed_oam_word (low16: bit7=player_id, bits[6:0]=zone_type; bits[31:24]=sub_idx). "
-        "r1=secondary_param (saved to r8, passed to switchD cases). "
-        "Reads gDuelFieldCtx[0x0201e2a0+4] for player-flip flag; may swap r8. "
-        "Tail-jumps into switchD; no direct return. "
-        "Called by apply_zone_cursor_step (0x080c716c) on mode_flag bit path. "
-        "Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, "
-        "duel_field_ctx=0x0201e2a0, zone_type_max=0xf, jump_table=DAT_080c6ef8."),
+    ('FUN_080c6e9c', 'move_zone_cursor_horizontal',
+        'Move a packed zone cursor horizontally. Decode player bit7, zone bits6:0 and sub-index bits14:8 from low16. r1 selects left(0) or right(1), relative to gDuelCardCtxBase+4. Wrap field groups and update the seven-card hand window through refresh_player_field_slot_tiles when required. Return the repacked cursor in r0.'),
     ('FUN_080c4cd4', 'classify_player_hand_count_threshold',
-        'Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from decode_zone_oam_word_to_slot_fields.'),
-    ('FUN_080c6b04', 'decode_zone_oam_word_to_slot_fields',
-        'Decode a packed zone descriptor: player bit7, zone bits6:0 and sub-index bits31:24. Save r1 as secondary control and use gDuelCardCtxBase+4 for the player-flip flag. Dispatch over16 zone cases to compute slot fields. Seven branches call classify_player_hand_count_threshold with zone-specific thresholds. Other branches read the corresponding slot records and flags. Keep the existing Function body, ABI and return behavior.'),
-    ("FUN_080c707c", "check_zone_card_id_cache_valid",
-        "Check whether the card-ID cache for the zone described by the OAM word is valid (non-empty). "
-        "r0=packed_oam_word (same format as decode_zone_oam_word_to_cursor_fields). "
-        "Steps: resolve_zone_data_ptr_by_oam_word, unpack player/zone_type/tile fields, "
-        "check gDuelFieldCtx flip, handle special zone 0xd (LP word check), "
-        "call get_zone_card_attribute_by_type and ensure_card_id_cache_entry. "
-        "Returns 1 if valid card ID cached, 0 otherwise. "
-        "Side effects: ensure_card_id_cache_entry may write EWRAM card-ID cache. "
-        "Constants: player_bit=0x80, zone_type_mask=0x7f, tile_shift=24, "
-        "player_stride=0x868, lp_offset=0x10, gDuelFieldCtx=0x0201e2a0."),
+        'Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from move_zone_cursor_vertical.'),
+    ('FUN_080c6b04', 'move_zone_cursor_vertical',
+        'Move a packed zone cursor vertically. The low16 input contains player bit7, zone bits6:0 and sub-index bits14:8. r1 selects up(0) or down(1), relative to gDuelCardCtxBase+4. Dispatch 16 zone cases; hand transitions use classify_player_hand_count_threshold and player hand counts. Return the repacked cursor in r0.'),
+    ('FUN_080c707c', 'check_zone_card_id_cache_valid',
+        'Test whether the packed zone can supply a visible nonzero card ID. Decode player bit7, zone bits6:0 and sub-index bits14:8. Resolve the slot, adjust indices for hand and count-based zones, enforce the active-player or card-attribute guard, then call ensure_card_id_cache_entry with the slot record cache key. Return 1 for an eligible nonzero ID, else 0.'),
     ("FUN_080cc618", "sort_zone_oam_entries_to_vram",
         "Collect active zone OAM sprite entries from gPrng sprite table into a stack buffer, "
         "sort them with qsort, then write back to OAM mirror at 0x030001fc. "
@@ -6091,15 +6048,8 @@ RENAMES = [
         "Constants: gPrng_sprite_table=gPrng+0x1bc, count_offset=0x400, "
         "entry_copy_size=9, qsort_stride=0xc, oam_target=0x030001fc, write_bytes=6, "
         "sp_frame=0x600."),
-    ("FUN_080c699c", "set_zone_oam_coords_by_player",
-        "Transform zone OAM coordinates via transform_zone_oam_coords_by_player and write the "
-        "result into the OAM sprite entry, then refresh the OAM sort buffer. "
-        "r0=src_x, r1=src_y, r2=zone_type [0..0xF], r3=extra_flags. "
-        "write_mode: r2==0 -> mode=0x6 (player 0), else mode=0x2. "
-        "Combines transformed x/y + mode + (r3<<0xc) + 0x2300 (OAM type base) into strh. "
-        "Calls sort_zone_oam_entries_to_vram to flush OAM mirror. "
-        "Side effects: via callee writes OAM sprite table and OAM mirror. "
-        "Constants: mode_player0=0x6, mode_default=0x2, oam_type_base=0x2300."),
+    ('FUN_080c699c', 'render_zone_cursor_oam',
+        'Draw the zone cursor at transform_zone_oam_coords_by_player(player, zone_type, sub_index). Select attr2 base 0x806 for zone 0, otherwise 0x802, and OR palette_bank<<12. Use OAM shape control 0x80. Refresh sorting only for the active player when both display gates are clear and zone is hand-end or zone 0xd.'),
     ("FUN_08096974", "get_lp_display_anim_counter",
         "Return the LP display animation counter value from gP1LifePoints+0x1d4c. "
         "4-instruction leaf: load gP1LifePoints (0x0201C4E0), add offset 0x1d4c, ldr word, bx lr. "
@@ -6273,19 +6223,8 @@ RENAMES = [
         'Pack-banner state machine B. Phase0 initializes regional assets. Phases1/3 advance phase and clear gBannerState+0x11; phase4 only advances. Phase2 starts at0 and runs exactly32 calls: counts0..8 use step=2*c, 9..16 use 32-2*c, and 17..31 draw two OAM entries without a palette step. Phases0..4 return1. Only phase>4 disables blend and returns0. Palette ramps call blend_palette_block_toward_white.'),
     ('FUN_080bda7c', 'tick_pack_banner_state_machine_a',
         'Pack-banner state machine A. Phase0 initializes and configures the effect. Phase1 only advances phase. Phase2 starts at0 and runs exactly32 calls: counts0..8 use step=2*c, 9..16 use 32-2*c, and 17..31 draw two OAM entries without a palette step. Phases3/4 only advance phase. Phases0..4 return1. Only phase>4 disables blend and returns0. Palette ramps call blend_palette_block_toward_white; counters use gBannerState+0x10/+0x11.'),
-    ("FUN_080c6a20", "write_zone_slot_oam_descriptor",
-        "根据 zone_type_code 更新 gDuelFieldCtx (0x02023130) 中对应 slot 的 OAM 描述字段, "
-        "并调用 render_duel_field_zone_info 重绘区域信息. "
-        "入口: r0=player_bit (bit0 用于 player) [0..1], r1=zone_type_code [0..0xf]; "
-        "r2 由内部 ldr DAT 加载 gDuelFieldCtx 基址, 非外部参数. "
-        "switch 覆盖 zone_type [0..0xf]: "
-        "case 0..4 (type 0..4) -> r5=0, r4=zone_type; "
-        "case 5..9 (type 5..9) -> r5=5, r4=zone_type-5; "
-        "case 0xa (type 0xa) -> r5=zone_type, r4=0; "
-        "case 0xb (type 0xb) -> 额外读取 gDuelFieldCtx[+0x4c+player*2] 更新 LP counter halfword, 再调 refresh_player_field_slot_tiles. "
-        "default 路径: 从 r8 读 player_bit, 拼接 player/zone/sub_idx 位字段写入 gDuelFieldCtx[+0x84*4=0x210] halfword, "
-        "再调 render_duel_field_zone_info (r0=packed, r1=zone_type, r2=lp_count). "
-        "Constants: gDuelFieldCtx=0x02023130, slot_lp_offset=0x4c, zone_flag_offset=0x84*4=0x210."),
+    ('FUN_080c6a20', 'select_zone_cursor_and_render_info',
+        'Normalize zones 0..4 to group 0 and zones 5..9 to group 5. Keep r2 as the absolute sub-index; for hand zone 0xb, adjust the first visible index to retain a seven-card window and refresh tiles. Store player bit7, zone bits6:0 and visible sub-index bits15:8 at gDuelFieldState+0x210, then render_duel_field_zone_info(player, original_zone, absolute_sub_index).'),
     ('FUN_080c4ca0', 'clear_ui_effect_state_flags',
         'Shared-frame cleanup for run_ui_effect_card_render_state_machine. With r4=UI state, clear UI+0x19 bit0 and field+0x215 bit2. Entry4ca0 sets r0=2 for the mask;4cba sets return0;4cbc releases12 local bytes, restores r8-r10 and r4-r7, then returns through the saved caller PC. This tail consumes the parent frame rather than the BL link register. Keep the existing Function body and flags; local CALL_RETURN is set at the two parent BL sites.'),
     ('FUN_080c4350', 'run_ui_effect_card_render_state_machine',
@@ -6475,18 +6414,8 @@ RENAMES = [
         "CARD_ENTRY_TABLE=0x0201e4f0, ENTRY_FLAG_OFF=0x11, STR_ID_MASK=0x1fff."),
 
     # 2026-05-10: campaign-31 batch #31 (topo=695-708)
-    ("FUN_080c7530", "write_card_list_oam_row_strip",
-        "indeg=10 (8 card-list display callers). "
-        "Writes one row of card icon OAM entries into the sprite table. "
-        "r0=oam_start_slot [0..255], r1=y_pixel, r2=x_start_pixel, r3=card_row_count (lo16). "
-        "Inner loop: 7 sub-slots (r7=0..6) per row, each calls write_oam_entry_from_packed_args; "
-        "X offset accumulated per slot (+2 or +4 px step). "
-        "r4=width flag (1/2/4, from remaining row count); "
-        "r6=palette/attr word (0x8040/0x8080/0x4040 etc, from slot r7 and width r4). "
-        "After each row of 7 slots, updates X origin r5 and decrements row count. "
-        "Returns void; all side-effects via write_oam_entry_from_packed_args. "
-        "Constants: STRIP_SLOTS=7; WIDTH_4=0x4, WIDTH_2=0x2, WIDTH_1=0x1; "
-        "PAL_0x8040=0x00008040, PAL_0x8080=0x00008080, PAL_0x4040=0x00004040."),
+    ('FUN_080c7530', 'render_card_display_text_panel_oam',
+        'Draw a 184-pixel-wide text panel as seven OAM entries per vertical chunk. r0=x, r1=y, r2=starting attr2, r3=tile-row count. Process count-2 rows in chunks of 4, 2 or 1 tiles; use 32-pixel columns followed by 16- and 8-pixel right edges. Encode OAM shape/size in r1 of write_oam_entry_from_packed_args and advance attr2 across each chunk. No draw when count<=2.'),
     ("FUN_080c7ea0", "dispatch_card_display_state_by_mode",
         "indeg=1, caller: FUN_080c82e4 (card all-tag display master tick). "
         "Reads gFontState (0x0201f440) + 0x0a1a offset (16-bit word); "
@@ -6529,59 +6458,14 @@ RENAMES = [
         "VRAM_TILE_A=0x06013000; VRAM_TILE_B=0x06013800; "
         "ROM_PAL_A=0x09850c5c; ROM_PAL_B=0x0984e30c; ROM_TILE=0x0984de8c; "
         "DONE_FLAG=6; FONT_ID=0x17."),
-    ("FUN_080cd138", "render_card_list_oam_row_by_lp_counter",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Computes OAM Y from gFontState+0x0a03 card_row_count byte: Y=(10-count/2)*8. "
-        "Calls write_card_list_oam_row_strip(r0=0x30, r1=Y, r2=0x1fc, r3=count). "
-        "Reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch: "
-        "(0) checks gPrng+0x148 bits[7:6] (mask 0xc0): if nonzero, decrements "
-        "gFontState+0x0a14 halfword by 1, calls sync_state_and_init_sprite(0); "
-        "(1) checks gPrng+0x148 bit0: if nonzero, reads LP from gP1LifePoints+0x3d40, "
-        "writes gFontState+0x0a14 halfword (1-LP_val), calls sync_state_and_init_sprite(0x24); "
-        "bit1 nonzero: calls sync_state_and_init_sprite(2); "
-        "(2) state>=2: nibble loop increment on gFontState+0x0a1b/0x0a1c byte pair; "
-        "returns 1 if nibble>0x1f else 0. "
-        "Constants: OAM_SLOT=0x30; Y_BASE=10; OAM_ATTR=0x1fc; "
-        "STATE_OFFSET=0x0a18; LP_OFFSET=0x0a14; NIBBLE_A=0x0a1b; NIBBLE_B=0x0a1c; "
-        "LP_ADDR=gP1LifePoints+0x3d40; BITS_LP=0xc0."),
-    ("FUN_080cd5ec", "render_card_list_oam_row_by_nibble_rotate",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip. "
-        "Reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch. "
-        "state=0: reads gPrng+0x148, tests bit5(0x20)/bit4(0x10)/bit0 in sequence; "
-        "each path executes nibble-decrement mod-16 loop on gFontState+0x0a0e byte "
-        "until corresponding bit in gFontState+0x0a02 is hit; "
-        "on success writes gFontState+0x0a14 halfword -1 or +1, calls sync_state_and_init_sprite(0). "
-        "state=1: reads gPrng+0x148 bit0 -> LP update (gP1LifePoints+0x3d40, strh 1-halfword). "
-        "state>=2: nibble loop increment on 0x0a1b/0x0a1c (same logic as 080cd138). "
-        "Key difference from 080cd138: state=0 uses nibble rotation (0x0a0e nibble mask 0xf, "
-        "subs #1 & 0xf) rather than LP counter decrement. "
-        "Constants: OAM_SLOT=0x30; Y_BASE=10; NIBBLE_OFFSET=0x0a0e; "
-        "MASK_BIT5=0x20; MASK_BIT4=0x10; MASK_BIT0=0x01."),
-    ("FUN_080cd94c", "render_card_list_oam_row_by_flag_check",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Shortest of the 8 sibling functions: no nibble rotate, no LP write. "
-        "Computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip. "
-        "Reads gPrng+0x148 (=gPrng+0xa4*2) low 2 bits: "
-        "if bit0=1 or bit1=1, calls sync_state_and_init_sprite(0x24), returns 1; "
-        "else returns 0. "
-        "Constants: OAM_SLOT=0x30; Y_BASE=10; OAM_ATTR=0x1fc; "
-        "FLAG_OFFSET=gPrng+0x148; MASK_BITS12=0x3; SYNC_OP=0x24."),
-    ("FUN_080cdd70", "render_card_list_oam_row_by_lp_nibble",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip. "
-        "Reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch. "
-        "state=0: reads gPrng+0x148; bit5=0x20: nibble-decrement on gFontState+0x0a0e (mod 16), "
-        "on hit writes gFontState+0x0a14 halfword-1, sync_state_and_init_sprite(0); "
-        "bit4=0x10: nibble-increment, writes halfword+1; "
-        "bit0=0x1: writes gFontState+0x0a0e bits[3:0] (nibble) to gP1LifePoints+0x3d40, "
-        "increments gFontState+0x0a18 bits[9:16], sync_state_and_init_sprite(0x24); "
-        "bit1=0x2: compares gP1LifePoints+0x1cf4 word, on match sync_state_and_init_sprite(1) "
-        "returns 1, else sync_state_and_init_sprite(2). "
-        "state=1: nibble increment on 0x0a1b/0x0a1c, may also increment 0x0a18 bits[23:16]. "
-        "state>=2: returns 0. "
-        "Constants: OAM_SLOT=0x30; NIBBLE_OFFSET=0x0a0e; LP_FIELD=0x0a02; "
-        "LP_ADDR=gP1LifePoints+0x3d40; CMP_ADDR=gP1LifePoints+0x1cf4."),
+    ('FUN_080cd138', 'render_card_list_oam_row_by_lp_counter',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Navigation uses gPrng+0x148 mask0xc0; confirmation updates gFontState+0xa14, and later states advance the +0xa1b/+0xa1c counter pair.'),
+    ('FUN_080cd5ec', 'render_card_list_oam_row_by_nibble_rotate',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Navigation rotates the low nibble at gFontState+0xa0e until a permitted slot is found; later paths confirm or advance transition counters.'),
+    ('FUN_080cd94c', 'render_card_list_oam_row_by_flag_check',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Test bits0/1 of gPrng+0x148. If either is set, call sync_state_and_init_sprite(0x24) and return1; otherwise return0.'),
+    ('FUN_080cdd70', 'render_card_list_oam_row_by_lp_nibble',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. State0 handles low-nibble selection, confirmation and cancellation from gPrng+0x148; state1 advances transition counters.'),
     ("FUN_080cdf6c", "find_next_occupied_slot_in_main_list",
         "indeg=1, caller: FUN_080ce428 (card list OAM row by slot advance). "
         "Searches card main slot list (gFontState+0x0a06 halfword array) for next occupied slot. "
@@ -6605,89 +6489,18 @@ RENAMES = [
         "(roles swapped relative to main-list variant). "
         "Constants: SLOT_COUNT=6; FLAG_WORD_OFFSET=0x0a10; "
         "SEC_TABLE_OFFSET=0x0a0e; CMP_LIST_OFFSET=0x0a06."),
-    ("FUN_080ce428", "render_card_list_oam_row_by_slot_advance",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Differs from the other 7 sibling functions: adds extra Y offset from "
-        "gFontState+0x0a04 halfword on top of base Y=(10-count/2)*8, then calls "
-        "write_card_list_oam_row_strip. "
-        "After the icon row: 5-iteration loop writes cursor sprites via "
-        "write_oam_entry_from_packed_args (OAM slot base 0x32, x=0x32 stepped). "
-        "Then reads gPrng+0x148 flags for four-way dispatch: "
-        "(1) bit4=1: calls find_next_occupied_slot_in_main_list, "
-        "strh result to gFontState+0x0a14, sets gFontState+0x0a18 bit9, "
-        "sync_state_and_init_sprite(0); "
-        "(2) bit5=1: calls find_next_occupied_slot_in_secondary_list, same state update; "
-        "(3) bit0=1: increments gFontState+0x0a0e nibble (bits[23:16]+1 & 0xff), "
-        "copy_bytes_by_halfword ROM 0x0984e30c -> OBJ pal 0x05000280 (0x20 hw), "
-        "builds LP bit-set from gFontState+0x0a06, writes to gP1LifePoints+0x3d40, "
-        "sync_state_and_init_sprite(0x24); (4) else: no-op. "
-        "Constants: Y_EXTRA_OFFSET=0x0a04; OAM_CURSOR_LOOP=5; OAM_CURSOR_X=0x32; "
-        "FLAG_MAIN=0x10; FLAG_SEC=0x20; FLAG_LP=0x01; "
-        "ROM_PAL=0x0984e30c; OBJ_PAL=0x05000280."),
-    ("FUN_080cf52c", "render_card_list_oam_row_by_stat_display",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip. "
-        "Reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch. "
-        "state=0: reads gPrng+0x148; "
-        "bit5=0x20: increments gFontState+0x0a0e halfword bits[23:16] nibble (mod 256), "
-        "calls render_card_numeric_stat_to_bg, sync_state_and_init_sprite(0); "
-        "bit1=0x2: sync_state_and_init_sprite(2); "
-        "bit0=0x1: reads LP offset from gFontState+0x0a0e/0x0a06, "
-        "writes to gP1LifePoints+0x3d40, increments gFontState+0x0a18 bits[9:16] nibble, "
-        "sync_state_and_init_sprite(0x24). "
-        "state=1: nibble increment on gFontState+0x0a1b/0x0a1c, "
-        "if >0x1f also increments gFontState+0x0a18 bits[23:16], writes back. "
-        "state>=2: returns 1. "
-        "Key distinguisher: only sibling containing render_card_numeric_stat_to_bg callee "
-        "(card ATK/DEF stat refresh path). "
-        "Constants: OAM_SLOT=0x30; STATE_OFFSET=0x0a18; "
-        "NIBBLE_B_OFFSET=0x0a1b; NIBBLE_C_OFFSET=0x0a1c; STAT_NIBBLE_OFFSET=0x0a0e."),
-    ("FUN_080d029c", "render_card_list_oam_row_by_lp_init",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Nearly identical structure to render_card_list_oam_row_by_lp_counter (0x080cd138). "
-        "Computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip. "
-        "Reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch. "
-        "state=0: reads gPrng+0x148 with mask 0x30 (bit4/5, vs 0xc0 in 080cd138); "
-        "nonzero: decrements gFontState+0x0a14 halfword by 1, calls sync_state_and_init_sprite(0). "
-        "state=1: reads LP from gP1LifePoints+0x3d40, writes gFontState+0x0a14 halfword (1-LP_val), "
-        "sets state word bit9, calls sync_state_and_init_sprite(0x24) or (2). "
-        "state>=2: nibble loop on 0x0a1b/0x0a1c; returns 1 if >0x1f else 0. "
-        "Key difference from 080cd138: gPrng+0x148 check mask=0x30 (bit4/5) not 0xc0. "
-        "Constants: OAM_SLOT=0x30; Y_BASE=10; OAM_ATTR=0x1fc; "
-        "STATE_OFFSET=0x0a18; LP_OFFSET=0x0a14; NIBBLE_A=0x0a1b; NIBBLE_B=0x0a1c; LP_MASK=0x30."),
-    ("FUN_080d0640", "render_card_list_oam_row_by_slot_nibble",
-        "indeg=1, caller: FUN_080c82e4 (card display master tick). "
-        "Same skeleton as render_card_list_oam_row_by_lp_init (0x080d029c): "
-        "computes OAM Y from gFontState+0x0a03, calls write_card_list_oam_row_strip; "
-        "reads gFontState+0x0a18 bits[23:16]=slot_state, three-way dispatch. "
-        "state=0: reads gPrng+0x148 bits[7:6] (mask 0xc0). "
-        "state=1: LP counter update (gP1LifePoints+0x3d40). "
-        "state>=2: reads nibble pair from gFontState+0x0a1b (nibble_A, byte) "
-        "and +0x0a1c (nibble_B, byte), increments nibble_A; "
-        "if nibble_A>0x1f returns 1 else 0. "
-        "Key difference from 080cd138: after nibble_A increment, "
-        "applies OR bit1 to nibble_B (flag nibble B logic). "
-        "Constants: OAM_SLOT=0x30; Y_BASE=10; OAM_ATTR=0x1fc; "
-        "STATE_OFFSET=0x0a18; NIBBLE_A=0x0a1b; NIBBLE_B=0x0a1c; LP_MASK=0xc0."),
+    ('FUN_080ce428', 'render_card_list_oam_row_by_slot_advance',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Add the gFontState+0xa04 Y offset, draw five cursor sprites, then handle occupied-slot navigation or confirmation from gPrng+0x148.'),
+    ('FUN_080cf52c', 'render_card_list_oam_row_by_stat_display',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Navigation updates the selection field and calls render_card_numeric_stat_to_bg. Other states handle confirmation, cancellation and transition counters.'),
+    ('FUN_080d029c', 'render_card_list_oam_row_by_lp_init',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Navigation uses gPrng+0x148 mask0x30, confirmation updates gFontState+0xa14 and sprite state, and later states advance transition counters.'),
+    ('FUN_080d0640', 'render_card_list_oam_row_by_slot_nibble',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Navigation uses gPrng+0x148 mask0xc0. Later states advance gFontState+0xa1b/+0xa1c, updating counter bit0 and preserving bit1.'),
 
     # 2026-05-10: campaign-32 batch #32 (topo=709-722)
-    ("FUN_080c7638", "dispatch_card_list_oam_row_by_card_type",
-        "Card-list OAM row render dispatcher; 10-case jump table keyed on "
-        "gFontState[0x0a01]-1 (range [0..9]). Reads card_type byte, subtracts 1, "
-        "bounds-checks against 9, then branches via table at 0x080c7660. "
-        "case 1 -> render_card_list_oam_row_by_pack_slot; "
-        "case 3 -> render_card_list_oam_row_by_cursor_slot; "
-        "case 4 -> render_card_list_oam_row_by_dual_slot; "
-        "case 5 -> render_card_list_oam_row_by_rarity_flag; "
-        "case 6 -> render_card_list_oam_row_by_type_icon; "
-        "case 7 -> render_card_list_oam_row_by_pack_column; "
-        "case 8 -> render_card_list_oam_row_by_cost_bar; "
-        "case 9 -> render_card_list_oam_row_by_single_slot; "
-        "case 10 -> render_card_list_oam_row_by_anim_frame. "
-        "Out-of-range -> default exit. No direct IO writes; side effects in callees. "
-        "caller: FUN_080c82e4 (card display master tick). "
-        "Constants: FONT_STATE_BASE=0x0201f440; CARD_TYPE_OFFSET=0x0a01; "
-        "JUMP_TABLE=0x080c7660 (10 entries)."),
+    ('FUN_080c7638', 'dispatch_card_display_oam_by_mode',
+        'Dispatch the current gFontState display mode at +0xa01 after subtracting 1. Accept indices 0..9 for modes 1..10; mode 2 and out-of-range values return without a renderer. The remaining nine modes call their existing OAM row renderers. Preserve switch case numbering and all existing Function boundaries.'),
     ("FUN_080cf6d8", "find_next_occupied_slot_forward",
         "Forward circular search for next occupied slot in card-list slot bitmap. "
         "r0=start_slot_idx [0..9]; returns r0=found_slot_idx. "
@@ -6721,148 +6534,30 @@ RENAMES = [
         "[gFontState+0x0a18] state bits updated; [gP1LifePoints+0x148] written (state=0 bit0). "
         "Constants: SLOT_NIBBLE_OFFSET=0x0a0e; STATE_OFFSET=0x0a18; "
         "OAM_STRIP_COUNT=4; ATTR0_STRIP=0x32; OAM_SLOT=0x60; WRAP_MODULO=0x14."),
-    ("FUN_080cedd0", "render_card_list_oam_row_by_jp_type",
-        "Card-list OAM row render branch for JP font row type. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) for a matching case. "
-        "Reads gFontState[0x0a03] JP row count; OAM Y = (10 - row/2) * 8. "
-        "Checks gFontState[0x0a17] bit0 (active flag); if 0 branches to shared exit LAB_080cf0b0. "
-        "When active: reads gFontState[0x0a02] strip index; calls write_card_list_oam_row_strip "
-        "(slot=0x30, x=0x1fc). Reads gFontState[0x0a18] bits[23:16]=state_val; "
-        "four-way dispatch (state 0/1/2/3) for JP card name render frame phases. "
-        "No APCS inputs; all values loaded from DAT addresses internally. "
-        "Constants: FONT_STATE_BASE=0x0201f440; ROW_OFFSET=0x0a03; FLAG_OFFSET=0x0a17; "
-        "STRIP_IDX_OFFSET=0x0a02; STATE_OFFSET=0x0a18; OAM_SLOT=0x30; X_BASE=0x1fc."),
-    ("FUN_080d05e4", "render_card_list_oam_row_by_pack_slot",
-        "Card-list OAM row render branch for pack_slot variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 1. "
-        "Reads gFontState[0x0a03] JP row count; OAM Y = (10-row/2)*8. "
-        "Reads gFontState[0x0a1b] bits[1:0] pack_slot state [0..1]; if >1 skips write. "
-        "For state 0..1: reads gFontState[0x0a0e] halfword*2 as x_base, "
-        "subtracts 0x17, adds gFontState[0x0a04] halfword for Y. "
-        "Calls write_oam_entry_from_packed_args (slot=0x60, attr0=0x34). "
-        "No APCS inputs. "
-        "Constants: FONT_STATE_BASE=0x0201f440; ROW_OFFSET=0x0a03; "
-        "SLOT_STATE_OFFSET=0x0a1b [0..1]; X_BASE_OFFSET=0x0a0e; "
-        "Y_ADJ_OFFSET=0x0a04; ATTR0=0x34; OAM_SLOT=0x60."),
-    ("FUN_080cdba8", "render_card_list_oam_row_by_dual_slot",
-        "Card-list OAM row render branch for dual_slot variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 4. "
-        "Uses two __divsi3 calls (divisor=0xc8=200) to convert gFontState[0x0201fe4e] "
-        "halfword bits[23:16] into x_div/y_div coordinates. "
-        "OAM Y base = y_coord+0x1c. Reads gFontState[0x0a1b] bits[1:0] slot_state. "
-        "slot_state<=1: extracts gPrng[0x148] bit4 flip_bit; calls "
-        "write_oam_entry_from_packed_args (slot=0x60) and write_oam_entry_with_slot_check "
-        "(attr2=0x1000/0x2000/0x3000) for 3 OAM entries. "
-        "slot_state>1: extended path with up to 6 extra OAM entries. "
-        "No APCS inputs; gFontState base loaded internally via r10. "
-        "Sibling of render_card_list_oam_row_by_single_slot (divisor=0xb8, Y+0x2a). "
-        "Constants: CARD_REG_OFFSET=0x0201fe4e; DIVISOR=0xc8; OAM_Y_BASE=+0x1c; "
-        "SLOT_STATE_OFFSET=0x0a1b; OAM_SLOT=0x60; FLIP_BIT=bit4 of gPrng[0x148]; "
-        "ATTR2_A=0x1000; ATTR2_B=0x2000; ATTR2_C=0x3000."),
-    ("FUN_080ced0c", "render_card_list_oam_row_by_cursor_slot",
-        "Card-list OAM row render branch for cursor_slot variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 3. "
-        "Reads gFontState[0x0a03] row count; OAM Y = (10-row/2)*8. "
-        "Reads gFontState[0x0a1b] bits[1:0] slot_state; if >1 exits. "
-        "Checks gFontState[0x0a1c] bit0 cursor active flag; if 0 checks cursor max. "
-        "When active: reads gFontState[0x0a0e] halfword+r5 as Y coord (attr0=0x88); "
-        "calls write_oam_entry_from_packed_args (slot=0x60). "
-        "If cursor Y exceeds max: calls write_oam_entry_with_slot_check (attr2=0x4000) for overflow row. "
-        "No APCS inputs. "
-        "Constants: FONT_STATE_BASE=0x0201f440; ROW_OFFSET=0x0a03; "
-        "SLOT_STATE_OFFSET=0x0a1b [0..1]; ACTIVE_FLAG_OFFSET=0x0a1c bit0; "
-        "CURSOR_MAX_OFFSET=0x0a10; ATTR0_CURSOR=0x88; ATTR2_OVERFLOW=0x4000; OAM_SLOT=0x60."),
-    ("FUN_080cf490", "render_card_list_oam_row_by_anim_frame",
-        "Card-list OAM row render branch for animation frame variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 10 (last case). "
-        "Reads gFontState[0x0a03] row count; gFontState[0x0a04] halfword as x_base. "
-        "Loop r4=0..5: calls write_oam_entry_from_packed_args 6 times for strip OAM "
-        "(attr0 incremented by 0x20 per step, attr1=0xe0<<0x11+tile_col, attr2=0x81<<7=0x4080). "
-        "After loop: checks gFontState[0x0a1b] bits[1:0]; if <=1 extracts "
-        "gPrng[0x148] bits[3:2] (range [0..3]) as delta, computes anim frame Y=0x58-delta, "
-        "calls write_oam_entry_with_slot_check (attr2=0x1000). "
-        "Writes one trailing write_oam_entry_from_packed_args (attr2=0). "
-        "No APCS inputs. "
-        "Constants: ROW_OFFSET=0x0a03; X_BASE_OFFSET=0x0a04; STRIP_COUNT=6; "
-        "SLOT_STATE_OFFSET=0x0a1b; PRNG_DELTA_MASK=bits[3:2] of gPrng[0x148] [0..3]; "
-        "ATTR2_ANIM=0x1000; OAM_SLOT=0x60."),
-    ("FUN_080cfad0", "render_card_list_oam_row_by_rarity_flag",
-        "Card-list OAM row render branch for rarity_flag variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 5. "
-        "Reads gFontState[0x0a03] row count; gFontState[0x0a04] halfword x_base. "
-        "Reads gFontState[0x0a18] word bits[23:8] (mask=0xff<<9): "
-        "0x200 -> rarity_level=3; 0x400 -> rarity_level=4; default -> 4. "
-        "Calls write_card_list_oam_row_strip (slot=0x30). "
-        "Main loop r6=0..19 (20 iterations): calls write_oam_entry_from_packed_args; "
-        "uses __modsi3 (mod 10) and __divsi3 (div 10) for column wrap coordinates. "
-        "No APCS inputs. "
-        "Constants: ROW_OFFSET=0x0a03; X_BASE_OFFSET=0x0a04; "
-        "RARITY_FIELD_OFFSET=0x0a18 bits[23:8]; "
-        "RARITY_A=0x200 r7=3; RARITY_B=0x400 r7=4; STRIP_LOOP_COUNT=20; "
-        "OAM_SLOT_STRIP=0x30; DIVISOR_COLS=10."),
-    ("FUN_080d0150", "render_card_list_oam_row_by_pack_column",
-        "Card-list OAM row render branch for pack_column variant (scene_pack). "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 7. "
-        "Reads gPrng[0x148] as frame count r6; reads gFontState[0x0a18] bits[23:16] "
-        "as pack_col_count [0..2]; divisor = 2-pack_col_count [1..2]. "
-        "First __divsi3: col_offset = r6 / (2-pack_col_count). "
-        "Checks col_offset against threshold 3 (cmp r0,#3; bgt) for mod-8 check. "
-        "Second __divsi3: computes second-dimension column coordinate. "
-        "Outputs OAM row position via shared tail. No direct OAM write in body. "
-        "No APCS inputs; r8 loaded internally from DAT. "
-        "Constants: PACK_COL_OFFSET=0x0a18 bits[23:16] [0..2]; "
-        "PRNG_FRAME_OFFSET=gPrng+0x148; DIVISOR_MAX=2; MOD_THRESHOLD=3."),
-    ("FUN_080ce2f4", "render_card_list_oam_row_by_type_icon",
-        "Card-list OAM row render branch for type_icon variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 6. "
-        "Reads gFontState[0x0a03] row count; gFontState[0x0a04] halfword x_base. "
-        "Reads gFontState[0x0a18] bits[23:8] (mask 0xff<<9): 0 -> icon_base=4; nonzero -> 3. "
-        "Reads gFontState[0x0a1b] bits[1:0] slot_state. "
-        "slot_state<=1: iterates up to slot_count (gFontState[0x0a10] halfword bits[23:16]) "
-        "icons; each icon: calls write_oam_entry_from_packed_args "
-        "(slot=0x40, attr0=0x1e, tile_x=(slot_idx+1)*2+x_base). "
-        "slot_state>1: writes extra OAM entry (attr1=0xc0<<1). "
-        "No APCS inputs. "
-        "Constants: ROW_OFFSET=0x0a03; X_BASE_OFFSET=0x0a04; "
-        "TYPE_FIELD_OFFSET=0x0a18 bits[23:8]; SLOT_COUNT_OFFSET=0x0a10 bits[23:16]; "
-        "SLOT_STATE_OFFSET=0x0a1b [0..1]; ATTR0_ICON=0x1e; OAM_SLOT=0x40."),
-    ("FUN_080cd454", "render_card_list_oam_row_by_single_slot",
-        "Card-list OAM row render branch for single_slot variant. "
-        "Sibling of render_card_list_oam_row_by_dual_slot (0x080cdba8); "
-        "called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 9. "
-        "Same callee set (__divsi3 x2, write_oam_entry_from_packed_args x2, "
-        "write_oam_entry_with_slot_check x3+). "
-        "Key differences from dual_slot: divisor=0xb8=184 (vs 0xc8=200); "
-        "OAM Y base = y_coord+0x2a=42 (vs +0x1c=28); "
-        "extra condition fields at DAT+0x0a14/0x0a18/0x0a1c determine 4th OAM entry "
-        "(write_oam_entry_from_packed_args attr2=0x80). "
-        "gFontState base loaded internally into r10; no APCS inputs. "
-        "Constants: CARD_REG_OFFSET=0x0201fe4e; DIVISOR=0xb8; OAM_Y_BASE=+0x2a; "
-        "SLOT_STATE_OFFSET=0x0a1b; ATTR2_EXTRA=0x80; OAM_SLOT=0x60."),
-    ("FUN_080cd0dc", "render_card_list_oam_row_by_cost_bar",
-        "Card-list OAM row render branch for cost_bar variant. "
-        "Called by dispatch_card_list_oam_row_by_card_type (0x080c7638) case 8. "
-        "Nearly byte-identical to render_card_list_oam_row_by_pack_slot (0x080d05e4); "
-        "differs only in literal pool constants (different DAT offsets). "
-        "Reads gFontState[0x0a03] row count; OAM Y=(10-row/2)*8. "
-        "Reads gFontState[0x0a1b] bits[1:0] slot_state [0..1]; if >1 skips. "
-        "For state 0..1: reads gFontState[0x0a0e] halfword*2 as x_index (lsls #1); "
-        "subtracts 0x17, adds gFontState[0x0a04] halfword for Y adjust. "
-        "Calls write_oam_entry_from_packed_args (slot=0x60, attr0=0x34). No APCS inputs. "
-        "Constants: ROW_OFFSET=0x0a03; SLOT_STATE_OFFSET=0x0a1b [0..1]; "
-        "X_INDEX_OFFSET=0x0a0e; Y_ADJUST_OFFSET=0x0a04; ATTR0=0x34; OAM_SLOT=0x60."),
+    ('FUN_080cedd0', 'render_card_list_oam_row_by_jp_type',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. The gFontState+0xa17 bit0 gate controls drawing. Then dispatch the state at +0xa18 through the four existing transition cases.'),
+    ('FUN_080d05e4', 'render_card_list_oam_row_by_pack_slot',
+        'Render display mode1 for dispatch_card_display_oam_by_mode. Return if bits2:1 of gFontState+0xa1b exceed1. Form an eight-pixel row offset from gFontState+0xa03. Add u16[gFontState+0xa04+2*u16(gFontState+0xa14)] and1 to obtain Y. Call write_oam_entry_from_packed_args with X=0x34, shape/size0 and attr2=0x60.'),
+    ('FUN_080cdba8', 'render_card_list_oam_row_by_dual_slot',
+        'Render display mode4 for dispatch_card_display_oam_by_mode. Let n=(u16[gFontState+0xa0e]>>4)&0xff. Compute Xbase=0x1c+__divsi3(200,2*n) and Xspacing=__divsi3(200,n). Bits2:1 at +0xa1b gate one packed and three checked cursor OBJ writes. Then test six occupancy bits at +0xa02; each set bit emits four entries through write_oam_entry_from_packed_args.'),
+    ('FUN_080ced0c', 'render_card_list_oam_row_by_cursor_slot',
+        'Render display mode3 for dispatch_card_display_oam_by_mode. Form an eight-pixel Y base from gFontState+0xa03. Return if bits2:1 at +0xa1b exceed1. Bit0 at +0xa17 selects the cursor path, which can call packed and checked OAM writers. The alternate path reads the coordinate at +0xa04+2*u16(gFontState+0xa14) and calls write_oam_entry_from_packed_args once.'),
+    ('FUN_080cf490', 'render_card_list_oam_row_by_anim_frame',
+        'Render display mode10 for dispatch_card_display_oam_by_mode. Draw six strip entries through write_oam_entry_from_packed_args, advancing X by0x20. If bits2:1 of gFontState+0xa1b are0 or1, extract bits3:2 of the halfword at gPrng+0x20c and draw one checked OAM entry plus one packed entry. The row count and Y offset at gFontState+0xa03/+0xa04 position the strip.'),
+    ('FUN_080cfad0', 'render_card_list_oam_row_by_rarity_flag',
+        'Render the card text panel through render_card_display_text_panel_oam using the global row count and tile attributes. Decode the gFontState+0xa18 state flags and draw 20 additional icon entries; division and remainder by10 select row/column coordinates.'),
+    ('FUN_080d0150', 'render_card_list_oam_row_by_pack_column',
+        'Render display mode7 for dispatch_card_display_oam_by_mode. Read the halfword at gPrng+0x20c. Use __divsi3 and modulo8 arithmetic to form an oscillating Q8 affine scale from this value and the state word at gFontState+0xa18. The halfword at +0xa14 selects between two draw paths. Each calls write_oam_entry_with_tile_inc and write_pack_obj_attr_by_dir_stacked, applying the scale to opposite entries.'),
+    ('FUN_080ce2f4', 'render_card_list_oam_row_by_type_icon',
+        'Render display mode6 for dispatch_card_display_oam_by_mode. Form Y from gFontState+0xa03/+0xa04. Mask0x1fe00 in u32[gFontState+0xa18] selects palette bank4 when zero, otherwise3. Bits2:1 at +0xa1b gate the upper indexed-icon loop. Always draw six lower-row entries, using the selected bank when the index equals u16[gFontState+0xa14], and bank3 otherwise. All entries use write_oam_entry_from_packed_args.'),
+    ('FUN_080cd454', 'render_card_list_oam_row_by_single_slot',
+        'Render display mode9 for dispatch_card_display_oam_by_mode. Let n=(u16[gFontState+0xa0e]>>4)&0xff. Compute Xbase=0x2a+__divsi3(184,2*n) and Xspacing=__divsi3(184,n). Bits2:1 at +0xa1b gate one packed and three checked cursor OBJ writes. Other state fields can add a marker. Then test bits1..6 at +0xa02 and draw one OBJ for each occupied entry.'),
+    ('FUN_080cd0dc', 'render_card_list_oam_row_by_cost_bar',
+        'Render display mode8 for dispatch_card_display_oam_by_mode. Return if bits2:1 of gFontState+0xa1b exceed1. Form an eight-pixel row offset from gFontState+0xa03. Add u16[gFontState+0xa04+2*u16(gFontState+0xa14)] and1 to obtain Y. Call write_oam_entry_from_packed_args with X=0x34, shape/size0 and attr2=0x60.'),
 
     # 2026-05-10: campaign-33 batch #33 (topo=723-736)
-    ("FUN_080c82e4", "tick_card_list_display_master",
-        "Card-list display master tick; called once per frame by tick_card_list_scene_frame (0x080c8688). "
-        "Reads gFontState+0x0a17 byte, combines bits to form mode index r4=(bit0<<7)|(bits[7:1]). "
-        "r4=0: call dispatch_card_list_oam_row_by_card_type (10-case card-type OAM row dispatch); "
-        "r4=1: call dispatch_card_display_state_by_mode (7-case display mode dispatch); "
-        "r4>=2: read gFontState+0x0a01 card_type byte, enter 14-entry switchD table at 0x080c8384, "
-        "call corresponding render_card_list_oam_row_by_* sibling. "
-        "No direct IO/VRAM writes; all side effects in callees. "
-        "Constants: FONT_STATE_BASE=0x0201f440; STATE_BYTE_OFFSET=0x0a17; "
-        "CARD_TYPE_OFFSET=0x0a01; SWITCH_TABLE=0x080c8384 (14 entries)."),
+    ('FUN_080c82e4', 'tick_card_list_display_master',
+        'Tick the card display from gFontState+0xa17/+0xa18 state flags. The zero-state path calls dispatch_card_display_oam_by_mode; state1 calls dispatch_card_display_state_by_mode. Within the zero-state path, read gFontState+0xa01 as the display mode and dispatch through the 14-entry table at 0x080c8384 after input checks. Input and callee results can update the state flags.'),
     ("FUN_080c7ba8", "render_card_list_face_row_by_mode",
         "Card-list face tile row renderer; called by tick_card_list_scene_frame (0x080c8688). "
         "Reads gFontState+0x0a18 word; extracts bits[24:15] via lsls #0xf/lsrs #0x18 -> mode [0..2]. "
@@ -7543,19 +7238,10 @@ RENAMES = [
         "r0=u16 card_id [0..0x1fff]. Returns void. "
         "Constants: base_struct=DAT_080c8fb4, zero_len=0x4c halfwords=0x98 bytes, "
         "gDuelActivation=0x0201e2a0, category_mask=0xff."),
-    ("FUN_080c786c", "zero_card_name_vram_buf",
-        "Clears 32KB card name VRAM buffer (DAT_080c7888) via zero_fill_by_halfword(base, 0x4000). "
-        "Called by copy_game_text_to_card_name_vram before writing text tiles. "
-        "Writes ctrl ready flag 0x0b to external ctrl byte after clearing. "
-        "No APCS params (all addresses loaded from DAT). Returns void. "
-        "Constants: vram_buf=DAT_080c7888, zero_len=0x4000 halfwords=0x8000 bytes (32KB), ctrl_val=0x0b."),
-    ("FUN_080c7950", "copy_game_text_to_card_name_vram",
-        "Writes game string to card name VRAM buffer for dispatch_card_display_op case 0x31. "
-        "Calls zero_card_name_vram_buf to clear 32KB, then resolve_game_str_ptr(r1) twice "
-        "(validity check and pointer fetch); if valid calls copy_cstr_to_buf(vram_base+1, str_ptr). "
-        "r0=u32 zone_descriptor [0..0xffffffff]; r1=u16 game_str_id [0..0xd7ea]; "
-        "r2=u32 extra_flags [0..2]. Returns void. "
-        "Constants: vram_base=DAT_080c7984, vram_offset=+1 (skip first halfword)."),
+    ('FUN_080c786c', 'clear_card_display_obj_tiles_mode_11',
+        'Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0b. The helper count is in bytes. No input parameters.'),
+    ('FUN_080c7950', 'init_card_display_mode_with_game_text',
+        'Clear 0xa20 bytes at gFontState and copy a resolved game string to gFontState+1, or write an empty string. Set font-state flag1 and UI-effect flag4, then dispatch display modes 0..13 using the mode-specific r2 argument. Mode2 additionally checks input before falling back to mode1. Mode11 clears the request flags after its initializer; invalid modes clear them directly. Text is staged in EWRAM, not VRAM.'),
     ("FUN_08094314", "get_duel_activation_zone_id",
         "Three-instruction leaf: ldr ptr from DAT_0809431c, ldr [ptr+0xc], bx lr. "
         "Returns current activated zone ID from global duel activation state structure. "
@@ -7575,16 +7261,8 @@ RENAMES = [
         "Constants: gDuelZoneState=0x02020160, gDuelActivation=0x0201e2a0, zero_len=0x2f5c halfwords."),
     ('FUN_080c40e0', 'init_field_slot_render_request',
         'Initialize a three-argument field-slot render request in gUIEffectState. Clear28 bytes, store r0/r1/r2 at+4/+8/+c, set byte+0x19 bit0 and gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op opcode0x18. No AOB initializer is called. The zero-fill argument0x1c is a byte count.'),
-    ("FUN_080c89e8", "update_zone_activation_display_state",
-        "Updates per-player zone activation display state for all 11 slot types; "
-        "called in dispatch_card_display_op case 0x03 after write_zone_slot_oam_descriptor. "
-        "Outer loop r6=[0..1] (player_id); inner slot_type [0..10]: "
-        "calls dispatch_zone_activation_by_state(is_active, slot_type, 0); "
-        "if return bit11 (0x800) set, accumulates bit into r5 bitmask. "
-        "Writes final bitmask to gDuelZoneCtrl (0x020230c0) [+0x30+player*4]; "
-        "calls query_player_slot_activation_bitmask to refresh related fields. "
-        "No APCS params (all from globals). Returns void. "
-        "Constants: gDuelZoneCtrl=0x020230c0, FLAG_ACTIVATABLE=0x800, slot_type_range=[0..10]."),
+    ('FUN_080c89e8', 'update_zone_activation_display_state',
+        'Update activation display flags for both players and 11 field slot types. dispatch_card_display_op invokes this after select_zone_cursor_and_render_info. Accumulate bit11 results from dispatch_zone_activation_by_state into gDuelZoneCtrl+0x30+player*4 and refresh the player activation bitmask.'),
     ("FUN_08094678", "get_player_lp_by_field_type",
         "Reads player LP/stat value from gP1LifePoints by player_id and field_type code. "
         "r0=u32 player_bit_packed (bit0=player_id); r1=u8 field_type [0xc..0xf]. "

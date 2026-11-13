@@ -4662,7 +4662,7 @@ switchD_0801ecbc__caseD_31:
     adds r0,r6,#0x0    @ 0801ee2a 301c
     adds r1,r7,#0x0    @ 0801ee2c 391c
     adds r2,r4,#0x0    @ 0801ee2e 221c
-    bl copy_game_text_to_card_name_vram      @ 0801ee30 a8f08efd
+    bl init_card_display_mode_with_game_text @ 0801ee30 a8f08efd
     b switchD_0801ecbc__caseD_a              @ 0801ee34 c5e7
 switchD_0801ecbc__caseD_d:
     adds r0,r6,#0x0    @ 0801ee36 301c
@@ -4804,7 +4804,7 @@ switchD_0801ecbc__caseD_7:
     adds r1,r7,#0x0    @ 0801ef44 391c
     adds r2,r4,#0x0    @ 0801ef46 221c
 LAB_0801ef48:
-    bl write_zone_slot_oam_descriptor        @ 0801ef48 a7f06afd
+    bl select_zone_cursor_and_render_info    @ 0801ef48 a7f06afd
     b switchD_0801ecbc__caseD_a              @ 0801ef4c 39e7
 switchD_0801ecbc__caseD_24:
     bl refresh_duel_field_zone_info          @ 0801ef4e acf0ddff
@@ -4828,7 +4828,7 @@ LAB_0801ef74:
     movs r1,#0xb    @ 0801ef76 0b21
     adds r2,r4,#0x0    @ 0801ef78 221c
 LAB_0801ef7a:
-    bl write_zone_slot_oam_descriptor        @ 0801ef7a a7f051fd
+    bl select_zone_cursor_and_render_info    @ 0801ef7a a7f051fd
     bl update_zone_activation_display_state  @ 0801ef7e a9f033fd
     b switchD_0801ecbc__caseD_a              @ 0801ef82 1ee7
 switchD_0801ecbc__caseD_8:

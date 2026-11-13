@@ -3035,7 +3035,7 @@ LAB_080c2b3a:
     orrs r0,r1    @ 080c2b66 0843
     ldr r1,[r6,#0x8]                         @ 080c2b68 b168
     movs r2,#0x0    @ 080c2b6a 0022
-    bl write_zone_slot_oam_descriptor        @ 080c2b6c 03f058ff
+    bl select_zone_cursor_and_render_info    @ 080c2b6c 03f058ff
 LAB_080c2b70:
     movs r0,#0x1    @ 080c2b70 0120
     b LAB_080c2d16                           @ 080c2b72 d0e0
@@ -3229,7 +3229,7 @@ LAB_080c2ccc:
     lsls r0,r3,#0x15    @ 080c2cd4 5805
     lsrs r0,r0,#0x18    @ 080c2cd6 000e
     movs r2,#0x0    @ 080c2cd8 0022
-    bl write_zone_slot_oam_descriptor        @ 080c2cda 03f0a1fe
+    bl select_zone_cursor_and_render_info    @ 080c2cda 03f0a1fe
 LAB_080c2cde:
     ldrh r2,[r6,#0x0]                        @ 080c2cde 3288
     lsls r1,r2,#0x15    @ 080c2ce0 5105
@@ -7368,7 +7368,7 @@ ui_card_render_update_destination_oam:
     lsrs r1,r1,#0x1b    @ 080c4c2e c90e
     lsls r2,r2,#0x12    @ 080c4c30 9204
     lsrs r2,r2,#0x18    @ 080c4c32 120e
-    bl write_zone_slot_oam_descriptor        @ 080c4c34 01f0f4fe
+    bl select_zone_cursor_and_render_info    @ 080c4c34 01f0f4fe
     b ui_card_render_advance_phase           @ 080c4c38 06e0
     .zero  0x2
 ptr_g_ui_effect_arg2_080c4c3c:
@@ -7454,7 +7454,7 @@ ptr_g_duel_field_state_080c4ccc:
 duel_field_ui_effect_flags_off_080c4cd0:
     .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4cd0 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from decode_zone_oam_word_to_slot_fields.
+@ Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from move_zone_cursor_vertical.
 classify_player_hand_count_threshold:
     lsls r1,r1,#0x10    @ 080c4cd4 0904
     lsrs r3,r1,#0x10    @ 080c4cd6 0b0c
@@ -11288,8 +11288,8 @@ switchD_080c6834__caseD_1:
     pop {r1}                                 @ 080c6998 02bc
     bx r1                                    @ 080c699a 0847
 
-@ Transform zone OAM coordinates via transform_zone_oam_coords_by_player and write the result into the OAM sprite entry, then refresh the OAM sort buffer. r0=src_x, r1=src_y, r2=zone_type [0..0xF], r3=extra_flags. write_mode: r2==0 -> mode=0x6 (player 0), else mode=0x2. Combines transformed x/y + mode + (r3<<0xc) + 0x2300 (OAM type base) into strh. Calls sort_zone_oam_entries_to_vram to flush OAM mirror. Side effects: via callee writes OAM sprite table and OAM mirror. Constants: mode_player0=0x6, mode_default=0x2, oam_type_base=0x2300.
-set_zone_oam_coords_by_player:
+@ Draw the zone cursor at transform_zone_oam_coords_by_player(player, zone_type, sub_index). Select attr2 base 0x806 for zone 0, otherwise 0x802, and OR palette_bank<<12. Use OAM shape control 0x80. Refresh sorting only for the active player when both display gates are clear and zone is hand-end or zone 0xd.
+render_zone_cursor_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c699c f0b5
     adds r6,r0,#0x0    @ 080c699e 061c
     adds r4,r1,#0x0    @ 080c69a0 0c1c
@@ -11317,22 +11317,22 @@ LAB_080c69b4:
     lsrs r2,r2,#0x10    @ 080c69cc 120c
     movs r1,#0x80    @ 080c69ce 8021
     bl write_oam_entry_from_packed_args      @ 080c69d0 2ff0ccfb
-    ldr r1, DAT_080c6a10                     @ 080c69d4 0e49
+    ldr r1, ptr_gfontstate_080c6a10          @ 080c69d4 0e49
     movs r2,#0x1    @ 080c69d6 0122
     adds r0,r2,#0x0    @ 080c69d8 101c
     ldrb r1,[r1,#0x0]                        @ 080c69da 0978
     ands r0,r1    @ 080c69dc 0840
     cmp r0,#0x0                              @ 080c69de 0028
     bne LAB_080c6a0a                         @ 080c69e0 13d1
-    ldr r1, DAT_080c6a14                     @ 080c69e2 0c49
-    ldr r0, DAT_080c6a18                     @ 080c69e4 0c48
+    ldr r1, ptr_gduelctx_080c6a14            @ 080c69e2 0c49
+    ldr r0, value_duel_ctx_zone_state_off_080c6a18 @ 080c69e4 0c48
     adds r1,r1,r0    @ 080c69e6 0918
     adds r0,r2,#0x0    @ 080c69e8 101c
     ldrb r1,[r1,#0x0]                        @ 080c69ea 0978
     ands r0,r1    @ 080c69ec 0840
     cmp r0,#0x0                              @ 080c69ee 0028
     bne LAB_080c6a0a                         @ 080c69f0 0bd1
-    ldr r0, DAT_080c6a1c                     @ 080c69f2 0a48
+    ldr r0, ptr_gduelcardctxbase_080c6a1c    @ 080c69f2 0a48
     ldr r0,[r0,#0x4]                         @ 080c69f4 4068
     cmp r6,r0                                @ 080c69f6 8642
     bne LAB_080c6a0a                         @ 080c69f8 07d1
@@ -11349,17 +11349,17 @@ LAB_080c6a0a:
     pop {r4,r5,r6,r7}                        @ 080c6a0a f0bc
     pop {r0}                                 @ 080c6a0c 01bc
     bx r0                                    @ 080c6a0e 0047
-DAT_080c6a10:
-    .word  0x0201f440                     @ 080c6a10 40f40102
-DAT_080c6a14:
-    .word  0x02020160                     @ 080c6a14 60010202
-DAT_080c6a18:
-    .word  0x00002f51                     @ 080c6a18 512f0000
-DAT_080c6a1c:
-    .word  0x0201e2a0                     @ 080c6a1c a0e20102
+ptr_gfontstate_080c6a10:
+    .word  gFontState                     @ 080c6a10 40f40102  Base address of gFontState.
+ptr_gduelctx_080c6a14:
+    .word  gDuelCtx                       @ 080c6a14 60010202  Base address of gDuelCtx.
+value_duel_ctx_zone_state_off_080c6a18:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 080c6a18 512f0000  gDuelCtx byte offset 0x2f51; bit0 gates zone sorting/navigation.
+ptr_gduelcardctxbase_080c6a1c:
+    .word  gDuelCardCtxBase               @ 080c6a1c a0e20102  Base address of gDuelCardCtxBase.
 
-@ 根据 zone_type_code 更新 gDuelFieldCtx (0x02023130) 中对应 slot 的 OAM 描述字段, 并调用 render_duel_field_zone_info 重绘区域信息. 入口: r0=player_bit (bit0 用于 player) [0..1], r1=zone_type_code [0..0xf]; r2 由内部 ldr DAT 加载 gDuelFieldCtx 基址, 非外部参数. switch 覆盖 zone_type [0..0xf]: case 0..4 (type 0..4) -> r5=0, r4=zone_type; case 5..9 (type 5..9) -> r5=5, r4=zone_type-5; case 0xa (type 0xa) -> r5=zone_type, r4=0; case 0xb (type 0xb) -> 额外读取 gDuelFieldCtx[+0x4c+player*2] 更新 LP counter halfword, 再调 refresh_player_field_slot_tiles. default 路径: 从 r8 读 player_bit, 拼接 player/zone/sub_idx 位字段写入 gDuelFieldCtx[+0x84*4=0x210] halfword, 再调 render_duel_field_zone_info (r0=packed, r1=zone_type, r2=lp_count). Constants: gDuelFieldCtx=0x02023130, slot_lp_offset=0x4c, zone_flag_offset=0x84*4=0x210.
-write_zone_slot_oam_descriptor:
+@ Normalize zones 0..4 to group 0 and zones 5..9 to group 5. Keep r2 as the absolute sub-index; for hand zone 0xb, adjust the first visible index to retain a seven-card window and refresh tiles. Store player bit7, zone bits6:0 and visible sub-index bits15:8 at gDuelFieldState+0x210, then render_duel_field_zone_info(player, original_zone, absolute_sub_index).
+select_zone_cursor_and_render_info:
     push {r4,r5,r6,r7,lr}                    @ 080c6a20 f0b5
     .hword 0x4647    @ 080c6a22 4746
     push {r7}                                @ 080c6a24 80b4
@@ -11368,19 +11368,19 @@ write_zone_slot_oam_descriptor:
     adds r7,r2,#0x0    @ 080c6a2a 171c
     adds r5,r6,#0x0    @ 080c6a2c 351c
     adds r4,r7,#0x0    @ 080c6a2e 3c1c
-    ldr r2, DAT_080c6a40                     @ 080c6a30 034a
+    ldr r2, ptr_gduelfieldstate_080c6a40     @ 080c6a30 034a
     cmp r6,#0xf                              @ 080c6a32 0f2e
     bhi switchD_080c6a3e__default            @ 080c6a34 4bd8
     lsls r0,r6,#0x2    @ 080c6a36 b000
-    ldr r1, DAT_080c6a44                     @ 080c6a38 0249
+    ldr r1, ptr_switchd_080c6a3e__switchdatad_080c6a48_080c6a44 @ 080c6a38 0249
     adds r0,r0,r1    @ 080c6a3a 4018
     ldr r0,[r0,#0x0]                         @ 080c6a3c 0068
 switchD_080c6a3e__switchD:
     .hword 0x4687    @ 080c6a3e 8746
-DAT_080c6a40:
-    .word  0x02023130                     @ 080c6a40 30310202
-DAT_080c6a44:
-    .word  0x080c6a48                     @ 080c6a44 486a0c08
+ptr_gduelfieldstate_080c6a40:
+    .word  gDuelFieldState                @ 080c6a40 30310202  Base address of gDuelFieldState.
+ptr_switchd_080c6a3e__switchdatad_080c6a48_080c6a44:
+    .word  switchD_080c6a3e__switchdataD_080c6a48                     @ 080c6a44 486a0c08  Base address of switchD_080c6a3e__switchdataD_080c6a48.
 switchD_080c6a3e__switchdataD_080c6a48:
     .word  0x080c6a88                     @ 080c6a48 886a0c08
     .word  0x080c6a88                     @ 080c6a4c 886a0c08
@@ -11432,7 +11432,7 @@ LAB_080c6abc:
     movs r4,#0x0    @ 080c6abc 0024
     strh r7,[r3,#0x0]                        @ 080c6abe 1f80
 LAB_080c6ac0:
-    ldr r0, DAT_080c6b00                     @ 080c6ac0 0f48
+    ldr r0, ptr_gduelfieldstate_080c6b00     @ 080c6ac0 0f48
     adds r0,#0x4c    @ 080c6ac2 4c30
     adds r0,r1,r0    @ 080c6ac4 0818
     ldrh r1,[r0,#0x0]                        @ 080c6ac6 0188
@@ -11449,7 +11449,7 @@ switchD_080c6a3e__default:
     lsls r1,r4,#0x18    @ 080c6adc 2106
     lsrs r1,r1,#0x10    @ 080c6ade 090c
     orrs r1,r0    @ 080c6ae0 0143
-    ldr r0, DAT_080c6b00                     @ 080c6ae2 0748
+    ldr r0, ptr_gduelfieldstate_080c6b00     @ 080c6ae2 0748
     movs r2,#0x84    @ 080c6ae4 8422
     lsls r2,r2,#0x2    @ 080c6ae6 9200
     adds r0,r0,r2    @ 080c6ae8 8018
@@ -11463,11 +11463,11 @@ switchD_080c6a3e__default:
     pop {r4,r5,r6,r7}                        @ 080c6afa f0bc
     pop {r0}                                 @ 080c6afc 01bc
     bx r0                                    @ 080c6afe 0047
-DAT_080c6b00:
-    .word  0x02023130                     @ 080c6b00 30310202
+ptr_gduelfieldstate_080c6b00:
+    .word  gDuelFieldState                @ 080c6b00 30310202  Base address of gDuelFieldState.
 
-@ Decode a packed zone descriptor: player bit7, zone bits6:0 and sub-index bits31:24. Save r1 as secondary control and use gDuelCardCtxBase+4 for the player-flip flag. Dispatch over16 zone cases to compute slot fields. Seven branches call classify_player_hand_count_threshold with zone-specific thresholds. Other branches read the corresponding slot records and flags. Keep the existing Function body, ABI and return behavior.
-decode_zone_oam_word_to_slot_fields:
+@ Move a packed zone cursor vertically. The low16 input contains player bit7, zone bits6:0 and sub-index bits14:8. r1 selects up(0) or down(1), relative to gDuelCardCtxBase+4. Dispatch 16 zone cases; hand transitions use classify_player_hand_count_threshold and player hand counts. Return the repacked cursor in r0.
+move_zone_cursor_vertical:
     push {r4,r5,r6,r7,lr}                    @ 080c6b04 f0b5
     .hword 0x4647    @ 080c6b06 4746
     push {r7}                                @ 080c6b08 80b4
@@ -11486,7 +11486,7 @@ decode_zone_oam_word_to_slot_fields:
     movs r0,#0x7f    @ 080c6b22 7f20
     ands r4,r0    @ 080c6b24 0440
     adds r6,r5,#0x0    @ 080c6b26 2e1c
-    ldr r0, DAT_080c6b5c                     @ 080c6b28 0c48
+    ldr r0, ptr_gduelcardctxbase_080c6b5c    @ 080c6b28 0c48
     ldr r0,[r0,#0x4]                         @ 080c6b2a 4068
     cmp r0,#0x0                              @ 080c6b2c 0028
     beq LAB_080c6b3c                         @ 080c6b2e 05d0
@@ -11511,16 +11511,16 @@ LAB_080c6b4a:
     b switchD_080c6b58__caseD_1              @ 080c6b4e 91e1
 LAB_080c6b50:
     lsls r0,r7,#0x2    @ 080c6b50 b800
-    ldr r1, DAT_080c6b60                     @ 080c6b52 0349
+    ldr r1, ptr_switchd_080c6b58__switchdatad_080c6b64_080c6b60 @ 080c6b52 0349
     adds r0,r0,r1    @ 080c6b54 4018
     ldr r0,[r0,#0x0]                         @ 080c6b56 0068
 switchD_080c6b58__switchD:
     .hword 0x4687    @ 080c6b58 8746
     .zero  0x2
-DAT_080c6b5c:
-    .word  0x0201e2a0                     @ 080c6b5c a0e20102
-DAT_080c6b60:
-    .word  0x080c6b64                     @ 080c6b60 646b0c08
+ptr_gduelcardctxbase_080c6b5c:
+    .word  gDuelCardCtxBase               @ 080c6b5c a0e20102  Base address of gDuelCardCtxBase.
+ptr_switchd_080c6b58__switchdatad_080c6b64_080c6b60:
+    .word  switchD_080c6b58__switchdataD_080c6b64                     @ 080c6b60 646b0c08  Base address of switchD_080c6b58__switchdataD_080c6b64.
 switchD_080c6b58__switchdataD_080c6b64:
     .word  0x080c6ba4                     @ 080c6b64 a46b0c08
     .word  0x080c6e74                     @ 080c6b68 746e0c08
@@ -11578,23 +11578,23 @@ LAB_080c6be4:
     adds r0,r4,#0x1    @ 080c6be4 601c
     b LAB_080c6e66                           @ 080c6be6 3ee1
 LAB_080c6be8:
-    ldr r2, PTR_gP1LifePoints_080c6bfc       @ 080c6be8 044a
+    ldr r2, ptr_gp1lifepoints_080c6bfc       @ 080c6be8 044a
     .hword 0x4640    @ 080c6bea 4046
     cmp r0,#0x0                              @ 080c6bec 0028
     beq LAB_080c6c04                         @ 080c6bee 09d0
     ands r6,r1    @ 080c6bf0 0e40
-    ldr r0, DAT_080c6c00                     @ 080c6bf2 0348
+    ldr r0, value_player_block_stride_080c6c00 @ 080c6bf2 0348
     adds r1,r6,#0x0    @ 080c6bf4 311c
     muls r1,r0    @ 080c6bf6 4143
     b LAB_080c6c0a                           @ 080c6bf8 07e0
     .zero  0x2
-PTR_gP1LifePoints_080c6bfc:
-    .word  gP1LifePoints                  @ 080c6bfc e0c40102
-DAT_080c6c00:
-    .word  0x00000868                     @ 080c6c00 68080000
+ptr_gp1lifepoints_080c6bfc:
+    .word  gP1LifePoints                  @ 080c6bfc e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c6c00:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6c00 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6c04:
     ands r1,r5    @ 080c6c04 2940
-    ldr r0, DAT_080c6c18                     @ 080c6c06 0448
+    ldr r0, value_player_block_stride_080c6c18 @ 080c6c06 0448
     muls r1,r0    @ 080c6c08 4143
 LAB_080c6c0a:
     adds r0,r2,#0x0    @ 080c6c0a 101c
@@ -11604,8 +11604,8 @@ LAB_080c6c0a:
     subs r0,#0x1    @ 080c6c12 0138
     b LAB_080c6e66                           @ 080c6c14 27e1
     .zero  0x2
-DAT_080c6c18:
-    .word  0x00000868                     @ 080c6c18 68080000
+value_player_block_stride_080c6c18:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6c18 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6c1c:
     .hword 0x4641    @ 080c6c1c 4146
     cmp r1,#0x0                              @ 080c6c1e 0029
@@ -11639,7 +11639,7 @@ LAB_080c6c4e:
     subs r0,r0,r4    @ 080c6c50 001b
     b LAB_080c6e2e                           @ 080c6c52 ece0
 LAB_080c6c54:
-    ldr r0, PTR_gP1LifePoints_080c6c68       @ 080c6c54 0448
+    ldr r0, ptr_gp1lifepoints_080c6c68       @ 080c6c54 0448
     .hword 0x4641    @ 080c6c56 4146
     cmp r1,#0x0                              @ 080c6c58 0029
     beq LAB_080c6c6c                         @ 080c6c5a 07d0
@@ -11650,18 +11650,18 @@ LAB_080c6c54:
 LAB_080c6c64:
     b LAB_080c6c74                           @ 080c6c64 06e0
     .zero  0x2
-PTR_gP1LifePoints_080c6c68:
-    .word  gP1LifePoints                  @ 080c6c68 e0c40102
+ptr_gp1lifepoints_080c6c68:
+    .word  gP1LifePoints                  @ 080c6c68 e0c40102  Base address of gP1LifePoints.
 LAB_080c6c6c:
     movs r1,#0x0    @ 080c6c6c 0021
     cmp r5,#0x0                              @ 080c6c6e 002d
     beq LAB_080c6c74                         @ 080c6c70 00d0
     b LAB_080c6e26                           @ 080c6c72 d8e0
 LAB_080c6c74:
-    ldr r1, DAT_080c6c78                     @ 080c6c74 0049
+    ldr r1, value_player_block_stride_080c6c78 @ 080c6c74 0049
     b LAB_080c6e26                           @ 080c6c76 d6e0
-DAT_080c6c78:
-    .word  0x00000868                     @ 080c6c78 68080000
+value_player_block_stride_080c6c78:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6c78 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6c7c:
     movs r5,#0x0    @ 080c6c7c 0025
     movs r7,#0x5    @ 080c6c7e 0527
@@ -11733,7 +11733,7 @@ LAB_080c6cec:
     movs r5,#0x0    @ 080c6cee 0025
     b switchD_080c6b58__caseD_1              @ 080c6cf0 c0e0
 LAB_080c6cf2:
-    ldr r0, PTR_gP1LifePoints_080c6d04       @ 080c6cf2 0448
+    ldr r0, ptr_gp1lifepoints_080c6d04       @ 080c6cf2 0448
     .hword 0x4641    @ 080c6cf4 4146
     cmp r1,#0x0                              @ 080c6cf6 0029
     beq LAB_080c6d08                         @ 080c6cf8 06d0
@@ -11743,18 +11743,18 @@ LAB_080c6cf2:
     b LAB_080c6e26                           @ 080c6d00 91e0
 LAB_080c6d02:
     b LAB_080c6d10                           @ 080c6d02 05e0
-PTR_gP1LifePoints_080c6d04:
-    .word  gP1LifePoints                  @ 080c6d04 e0c40102
+ptr_gp1lifepoints_080c6d04:
+    .word  gP1LifePoints                  @ 080c6d04 e0c40102  Base address of gP1LifePoints.
 LAB_080c6d08:
     movs r1,#0x0    @ 080c6d08 0021
     cmp r5,#0x0                              @ 080c6d0a 002d
     beq LAB_080c6d10                         @ 080c6d0c 00d0
     b LAB_080c6e26                           @ 080c6d0e 8ae0
 LAB_080c6d10:
-    ldr r1, DAT_080c6d14                     @ 080c6d10 0049
+    ldr r1, value_player_block_stride_080c6d14 @ 080c6d10 0049
     b LAB_080c6e26                           @ 080c6d12 88e0
-DAT_080c6d14:
-    .word  0x00000868                     @ 080c6d14 68080000
+value_player_block_stride_080c6d14:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6d14 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6d18:
     movs r5,#0x0    @ 080c6d18 0025
     b LAB_080c6e70                           @ 080c6d1a a9e0
@@ -11789,23 +11789,23 @@ LAB_080c6d4c:
     movs r4,#0x6    @ 080c6d4c 0624
     b switchD_080c6b58__caseD_1              @ 080c6d4e 91e0
 LAB_080c6d50:
-    ldr r2, PTR_gP1LifePoints_080c6d64       @ 080c6d50 044a
+    ldr r2, ptr_gp1lifepoints_080c6d64       @ 080c6d50 044a
     .hword 0x4640    @ 080c6d52 4046
     cmp r0,#0x0                              @ 080c6d54 0028
     beq LAB_080c6d6c                         @ 080c6d56 09d0
     ands r6,r1    @ 080c6d58 0e40
-    ldr r0, DAT_080c6d68                     @ 080c6d5a 0348
+    ldr r0, value_player_block_stride_080c6d68 @ 080c6d5a 0348
     adds r1,r6,#0x0    @ 080c6d5c 311c
     muls r1,r0    @ 080c6d5e 4143
     b LAB_080c6d72                           @ 080c6d60 07e0
     .zero  0x2
-PTR_gP1LifePoints_080c6d64:
-    .word  gP1LifePoints                  @ 080c6d64 e0c40102
-DAT_080c6d68:
-    .word  0x00000868                     @ 080c6d68 68080000
+ptr_gp1lifepoints_080c6d64:
+    .word  gP1LifePoints                  @ 080c6d64 e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c6d68:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6d68 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6d6c:
     ands r1,r5    @ 080c6d6c 2940
-    ldr r0, DAT_080c6d80                     @ 080c6d6e 0448
+    ldr r0, value_player_block_stride_080c6d80 @ 080c6d6e 0448
     muls r1,r0    @ 080c6d70 4143
 LAB_080c6d72:
     adds r0,r2,#0x0    @ 080c6d72 101c
@@ -11815,8 +11815,8 @@ LAB_080c6d72:
     subs r0,#0x1    @ 080c6d7a 0138
     b LAB_080c6e66                           @ 080c6d7c 73e0
     .zero  0x2
-DAT_080c6d80:
-    .word  0x00000868                     @ 080c6d80 68080000
+value_player_block_stride_080c6d80:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6d80 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6d84:
     .hword 0x4641    @ 080c6d84 4146
     cmp r1,#0x0                              @ 080c6d86 0029
@@ -11890,23 +11890,23 @@ LAB_080c6df8:
     subs r0,r0,r4    @ 080c6dfe 001b
     b LAB_080c6e2e                           @ 080c6e00 15e0
 LAB_080c6e02:
-    ldr r2, PTR_gP1LifePoints_080c6e14       @ 080c6e02 044a
+    ldr r2, ptr_gp1lifepoints_080c6e14       @ 080c6e02 044a
     .hword 0x4640    @ 080c6e04 4046
     cmp r0,#0x0                              @ 080c6e06 0028
     beq LAB_080c6e1c                         @ 080c6e08 08d0
     ands r5,r1    @ 080c6e0a 0d40
-    ldr r0, DAT_080c6e18                     @ 080c6e0c 0248
+    ldr r0, value_player_block_stride_080c6e18 @ 080c6e0c 0248
     adds r1,r5,#0x0    @ 080c6e0e 291c
     muls r1,r0    @ 080c6e10 4143
     b LAB_080c6e24                           @ 080c6e12 07e0
-PTR_gP1LifePoints_080c6e14:
-    .word  gP1LifePoints                  @ 080c6e14 e0c40102
-DAT_080c6e18:
-    .word  0x00000868                     @ 080c6e18 68080000
+ptr_gp1lifepoints_080c6e14:
+    .word  gP1LifePoints                  @ 080c6e14 e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c6e18:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6e18 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6e1c:
     subs r0,r1,r5    @ 080c6e1c 481b
     ands r0,r1    @ 080c6e1e 0840
-    ldr r1, DAT_080c6e38                     @ 080c6e20 0549
+    ldr r1, value_player_block_stride_080c6e38 @ 080c6e20 0549
     muls r1,r0    @ 080c6e22 4143
 LAB_080c6e24:
     adds r0,r2,#0x0    @ 080c6e24 101c
@@ -11921,8 +11921,8 @@ LAB_080c6e2e:
     movs r5,#0x0    @ 080c6e32 0025
     b switchD_080c6b58__caseD_1              @ 080c6e34 1ee0
     .zero  0x2
-DAT_080c6e38:
-    .word  0x00000868                     @ 080c6e38 68080000
+value_player_block_stride_080c6e38:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6e38 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c6e3c:
     cmp r4,#0x0                              @ 080c6e3c 002c
     beq LAB_080c6e4e                         @ 080c6e3e 06d0
@@ -11982,8 +11982,8 @@ LAB_080c6e82:
     bx r1                                    @ 080c6e98 0847
     .zero  0x2
 
-@ Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch to the matching zone cursor-position handler via 16-entry switchD. r0=packed_oam_word (low16: bit7=player_id, bits[6:0]=zone_type; bits[31:24]=sub_idx). r1=secondary_param (saved to r8, passed to switchD cases). Reads gDuelFieldCtx[0x0201e2a0+4] for player-flip flag; may swap r8. Tail-jumps into switchD; no direct return. Called by apply_zone_cursor_step (0x080c716c) on mode_flag bit path. Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, duel_field_ctx=0x0201e2a0, zone_type_max=0xf, jump_table=DAT_080c6ef8.
-decode_zone_oam_word_to_cursor_fields:
+@ Move a packed zone cursor horizontally. Decode player bit7, zone bits6:0 and sub-index bits14:8 from low16. r1 selects left(0) or right(1), relative to gDuelCardCtxBase+4. Wrap field groups and update the seven-card hand window through refresh_player_field_slot_tiles when required. Return the repacked cursor in r0.
+move_zone_cursor_horizontal:
     push {r4,r5,r6,r7,lr}                    @ 080c6e9c f0b5
     .hword 0x4647    @ 080c6e9e 4746
     push {r7}                                @ 080c6ea0 80b4
@@ -12002,7 +12002,7 @@ decode_zone_oam_word_to_cursor_fields:
     movs r0,#0x7f    @ 080c6eba 7f20
     ands r4,r0    @ 080c6ebc 0440
     adds r7,r6,#0x0    @ 080c6ebe 371c
-    ldr r0, DAT_080c6ef4                     @ 080c6ec0 0c48
+    ldr r0, ptr_gduelcardctxbase_080c6ef4    @ 080c6ec0 0c48
     ldr r0,[r0,#0x4]                         @ 080c6ec2 4068
     cmp r0,#0x0                              @ 080c6ec4 0028
     beq LAB_080c6ed4                         @ 080c6ec6 05d0
@@ -12027,16 +12027,16 @@ LAB_080c6ee2:
     b switchD_080c6ef0__caseD_1              @ 080c6ee6 b6e0
 LAB_080c6ee8:
     lsls r0,r5,#0x2    @ 080c6ee8 a800
-    ldr r1, DAT_080c6ef8                     @ 080c6eea 0349
+    ldr r1, ptr_switchd_080c6ef0__switchdatad_080c6efc_080c6ef8 @ 080c6eea 0349
     adds r0,r0,r1    @ 080c6eec 4018
     ldr r0,[r0,#0x0]                         @ 080c6eee 0068
 switchD_080c6ef0__switchD:
     .hword 0x4687    @ 080c6ef0 8746
     .zero  0x2
-DAT_080c6ef4:
-    .word  0x0201e2a0                     @ 080c6ef4 a0e20102
-DAT_080c6ef8:
-    .word  0x080c6efc                     @ 080c6ef8 fc6e0c08
+ptr_gduelcardctxbase_080c6ef4:
+    .word  gDuelCardCtxBase               @ 080c6ef4 a0e20102  Base address of gDuelCardCtxBase.
+ptr_switchd_080c6ef0__switchdatad_080c6efc_080c6ef8:
+    .word  switchD_080c6ef0__switchdataD_080c6efc                     @ 080c6ef8 fc6e0c08  Base address of switchD_080c6ef0__switchdataD_080c6efc.
 switchD_080c6ef0__switchdataD_080c6efc:
     .word  0x080c6f3c                     @ 080c6efc 3c6f0c08
     .word  0x080c7056                     @ 080c6f00 56700c08
@@ -12130,8 +12130,8 @@ LAB_080c6faa:
 switchD_080c6ef0__caseD_b:
     cmp r6,#0x0                              @ 080c6fb0 002e
     beq LAB_080c7004                         @ 080c6fb2 27d0
-    ldr r0, PTR_gP1LifePoints_080c6fe4       @ 080c6fb4 0b48
-    ldr r1, DAT_080c6fe8                     @ 080c6fb6 0c49
+    ldr r0, ptr_gp1lifepoints_080c6fe4       @ 080c6fb4 0b48
+    ldr r1, value_player_block_stride_080c6fe8 @ 080c6fb6 0c49
     muls r1,r7    @ 080c6fb8 7943
     adds r0,#0xc    @ 080c6fba 0c30
     adds r1,r1,r0    @ 080c6fbc 0918
@@ -12140,7 +12140,7 @@ switchD_080c6ef0__caseD_b:
     bls LAB_080c6ffa                         @ 080c6fc2 1ad9
     cmp r4,#0x6                              @ 080c6fc4 062c
     bne LAB_080c6ff6                         @ 080c6fc6 16d1
-    ldr r0, DAT_080c6fec                     @ 080c6fc8 0848
+    ldr r0, ptr_gduelfieldstate_080c6fec     @ 080c6fc8 0848
     lsls r1,r7,#0x1    @ 080c6fca 7900
     adds r0,#0x4c    @ 080c6fcc 4c30
     adds r3,r1,r0    @ 080c6fce 0b18
@@ -12153,12 +12153,12 @@ switchD_080c6ef0__caseD_b:
     movs r1,#0x0    @ 080c6fdc 0021
     bl refresh_player_field_slot_tiles       @ 080c6fde fdf71ff9
     b switchD_080c6ef0__caseD_1              @ 080c6fe2 38e0
-PTR_gP1LifePoints_080c6fe4:
-    .word  gP1LifePoints                  @ 080c6fe4 e0c40102
-DAT_080c6fe8:
-    .word  0x00000868                     @ 080c6fe8 68080000
-DAT_080c6fec:
-    .word  0x02023130                     @ 080c6fec 30310202
+ptr_gp1lifepoints_080c6fe4:
+    .word  gP1LifePoints                  @ 080c6fe4 e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c6fe8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6fe8 68080000  Value PLAYER_BLOCK_STRIDE.
+ptr_gduelfieldstate_080c6fec:
+    .word  gDuelFieldState                @ 080c6fec 30310202  Base address of gDuelFieldState.
 LAB_080c6ff0:
     adds r1,#0x1    @ 080c6ff0 0131
     strh r1,[r3,#0x0]                        @ 080c6ff2 1980
@@ -12173,8 +12173,8 @@ LAB_080c6ffa:
     movs r4,#0x0    @ 080c7000 0024
     b switchD_080c6ef0__caseD_1              @ 080c7002 28e0
 LAB_080c7004:
-    ldr r0, PTR_gP1LifePoints_080c702c       @ 080c7004 0948
-    ldr r1, DAT_080c7030                     @ 080c7006 0a49
+    ldr r0, ptr_gp1lifepoints_080c702c       @ 080c7004 0948
+    ldr r1, value_player_block_stride_080c7030 @ 080c7006 0a49
     muls r1,r7    @ 080c7008 7943
     adds r0,#0xc    @ 080c700a 0c30
     adds r1,r1,r0    @ 080c700c 0918
@@ -12183,7 +12183,7 @@ LAB_080c7004:
     bls LAB_080c7048                         @ 080c7012 19d9
     cmp r4,#0x0                              @ 080c7014 002c
     bne LAB_080c7050                         @ 080c7016 1bd1
-    ldr r0, DAT_080c7034                     @ 080c7018 0648
+    ldr r0, ptr_gduelfieldstate_080c7034     @ 080c7018 0648
     lsls r1,r7,#0x1    @ 080c701a 7900
     adds r0,#0x4c    @ 080c701c 4c30
     adds r0,r1,r0    @ 080c701e 0818
@@ -12193,12 +12193,12 @@ LAB_080c7004:
     movs r4,#0x6    @ 080c7026 0624
     subs r1,r2,#0x7    @ 080c7028 d11f
     b LAB_080c703c                           @ 080c702a 07e0
-PTR_gP1LifePoints_080c702c:
-    .word  gP1LifePoints                  @ 080c702c e0c40102
-DAT_080c7030:
-    .word  0x00000868                     @ 080c7030 68080000
-DAT_080c7034:
-    .word  0x02023130                     @ 080c7034 30310202
+ptr_gp1lifepoints_080c702c:
+    .word  gP1LifePoints                  @ 080c702c e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c7030:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c7030 68080000  Value PLAYER_BLOCK_STRIDE.
+ptr_gduelfieldstate_080c7034:
+    .word  gDuelFieldState                @ 080c7034 30310202  Base address of gDuelFieldState.
 LAB_080c7038:
     subs r1,#0x1    @ 080c7038 0139
     strh r1,[r0,#0x0]                        @ 080c703a 0180
@@ -12240,7 +12240,7 @@ LAB_080c7064:
     pop {r1}                                 @ 080c7078 02bc
     bx r1                                    @ 080c707a 0847
 
-@ Check whether the card-ID cache for the zone described by the OAM word is valid (non-empty). r0=packed_oam_word (same format as decode_zone_oam_word_to_cursor_fields). Steps: resolve_zone_data_ptr_by_oam_word, unpack player/zone_type/tile fields, check gDuelFieldCtx flip, handle special zone 0xd (LP word check), call get_zone_card_attribute_by_type and ensure_card_id_cache_entry. Returns 1 if valid card ID cached, 0 otherwise. Side effects: ensure_card_id_cache_entry may write EWRAM card-ID cache. Constants: player_bit=0x80, zone_type_mask=0x7f, tile_shift=24, player_stride=0x868, lp_offset=0x10, gDuelFieldCtx=0x0201e2a0.
+@ Test whether the packed zone can supply a visible nonzero card ID. Decode player bit7, zone bits6:0 and sub-index bits14:8. Resolve the slot, adjust indices for hand and count-based zones, enforce the active-player or card-attribute guard, then call ensure_card_id_cache_entry with the slot record cache key. Return 1 for an eligible nonzero ID, else 0.
 check_zone_card_id_cache_valid:
     push {r4,r5,r6,r7,lr}                    @ 080c707c f0b5
     adds r5,r0,#0x0    @ 080c707e 051c
@@ -12259,13 +12259,13 @@ check_zone_card_id_cache_valid:
     lsrs r2,r5,#0x18    @ 080c709a 2a0e
     movs r0,#0x7f    @ 080c709c 7f20
     ands r2,r0    @ 080c709e 0240
-    ldr r0, DAT_080c70cc                     @ 080c70a0 0a48
+    ldr r0, ptr_gduelfieldstate_080c70cc     @ 080c70a0 0a48
     lsls r1,r3,#0x1    @ 080c70a2 5900
     adds r0,#0x4c    @ 080c70a4 4c30
     adds r1,r1,r0    @ 080c70a6 0918
     ldrh r5,[r1,#0x0]                        @ 080c70a8 0d88
     movs r6,#0x0    @ 080c70aa 0026
-    ldr r0, DAT_080c70d0                     @ 080c70ac 0848
+    ldr r0, ptr_gduelcardctxbase_080c70d0    @ 080c70ac 0848
     ldr r0,[r0,#0x4]                         @ 080c70ae 4068
     cmp r3,r0                                @ 080c70b0 8342
     bne LAB_080c70b6                         @ 080c70b2 00d1
@@ -12273,8 +12273,8 @@ check_zone_card_id_cache_valid:
 LAB_080c70b6:
     cmp r4,#0xd                              @ 080c70b6 0d2c
     bne LAB_080c70dc                         @ 080c70b8 10d1
-    ldr r1, PTR_gP1LifePoints_080c70d4       @ 080c70ba 0649
-    ldr r0, DAT_080c70d8                     @ 080c70bc 0648
+    ldr r1, ptr_gp1lifepoints_080c70d4       @ 080c70ba 0649
+    ldr r0, value_player_block_stride_080c70d8 @ 080c70bc 0648
     muls r0,r3    @ 080c70be 5843
     adds r1,#0x10    @ 080c70c0 1031
     adds r0,r0,r1    @ 080c70c2 4018
@@ -12282,14 +12282,14 @@ LAB_080c70b6:
     cmp r0,#0x0                              @ 080c70c6 0028
     bne LAB_080c70f4                         @ 080c70c8 14d1
     b LAB_080c7164                           @ 080c70ca 4be0
-DAT_080c70cc:
-    .word  0x02023130                     @ 080c70cc 30310202
-DAT_080c70d0:
-    .word  0x0201e2a0                     @ 080c70d0 a0e20102
-PTR_gP1LifePoints_080c70d4:
-    .word  gP1LifePoints                  @ 080c70d4 e0c40102
-DAT_080c70d8:
-    .word  0x00000868                     @ 080c70d8 68080000
+ptr_gduelfieldstate_080c70cc:
+    .word  gDuelFieldState                @ 080c70cc 30310202  Base address of gDuelFieldState.
+ptr_gduelcardctxbase_080c70d0:
+    .word  gDuelCardCtxBase               @ 080c70d0 a0e20102  Base address of gDuelCardCtxBase.
+ptr_gp1lifepoints_080c70d4:
+    .word  gP1LifePoints                  @ 080c70d4 e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c70d8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c70d8 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c70dc:
     cmp r4,#0xd                              @ 080c70dc 0d2c
     bgt LAB_080c70e6                         @ 080c70de 02dc
@@ -12309,19 +12309,19 @@ LAB_080c70f4:
     movs r6,#0x0    @ 080c70f4 0026
     b LAB_080c711e                           @ 080c70f6 12e0
 LAB_080c70f8:
-    ldr r1, PTR_gP1LifePoints_080c7104       @ 080c70f8 0249
-    ldr r0, DAT_080c7108                     @ 080c70fa 0348
+    ldr r1, ptr_gp1lifepoints_080c7104       @ 080c70f8 0249
+    ldr r0, value_player_block_stride_080c7108 @ 080c70fa 0348
     muls r0,r3    @ 080c70fc 5843
     adds r1,#0x14    @ 080c70fe 1431
     b LAB_080c7114                           @ 080c7100 08e0
     .zero  0x2
-PTR_gP1LifePoints_080c7104:
-    .word  gP1LifePoints                  @ 080c7104 e0c40102
-DAT_080c7108:
-    .word  0x00000868                     @ 080c7108 68080000
+ptr_gp1lifepoints_080c7104:
+    .word  gP1LifePoints                  @ 080c7104 e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c7108:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c7108 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c710c:
-    ldr r1, PTR_gP1LifePoints_080c715c       @ 080c710c 1349
-    ldr r0, DAT_080c7160                     @ 080c710e 1448
+    ldr r1, ptr_gp1lifepoints_080c715c       @ 080c710c 1349
+    ldr r0, value_player_block_stride_080c7160 @ 080c710e 1448
     muls r0,r3    @ 080c7110 5843
     adds r1,#0x1c    @ 080c7112 1c31
 LAB_080c7114:
@@ -12341,7 +12341,7 @@ LAB_080c711e:
     bl get_zone_card_attribute_by_type       @ 080c712a 74f775fa
     cmp r0,#0x0                              @ 080c712e 0028
     bne LAB_080c7140                         @ 080c7130 06d1
-    ldr r0, PTR_gP1LifePoints_080c715c       @ 080c7132 0a48
+    ldr r0, ptr_gp1lifepoints_080c715c       @ 080c7132 0a48
     movs r1,#0xe8    @ 080c7134 e821
     lsls r1,r1,#0x5    @ 080c7136 4901
     adds r0,r0,r1    @ 080c7138 4018
@@ -12362,10 +12362,10 @@ LAB_080c7140:
     movs r0,#0x1    @ 080c7156 0120
     b LAB_080c7166                           @ 080c7158 05e0
     .zero  0x2
-PTR_gP1LifePoints_080c715c:
-    .word  gP1LifePoints                  @ 080c715c e0c40102
-DAT_080c7160:
-    .word  0x00000868                     @ 080c7160 68080000
+ptr_gp1lifepoints_080c715c:
+    .word  gP1LifePoints                  @ 080c715c e0c40102  Base address of gP1LifePoints.
+value_player_block_stride_080c7160:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c7160 68080000  Value PLAYER_BLOCK_STRIDE.
 LAB_080c7164:
     movs r0,#0x0    @ 080c7164 0020
 LAB_080c7166:
@@ -12373,7 +12373,7 @@ LAB_080c7166:
     pop {r1}                                 @ 080c7168 02bc
     bx r1                                    @ 080c716a 0847
 
-@ zone 光标单步推进 + 渲染. 入参 r0 = 当前 gPageState[+0x210] 的 u16 packed (bit7=player, 低7=mode, 高7=sub_idx). 流程: 解包 → 按 mode/input flag 决策新 packed (mode==0xd 走 gPrng+0x14e, 其他走 gPrng+0x146; mode==0xb 时 sub_idx 经 gPageState[+0x4c+player*2] 重映射) → 6-way switch on gP1[+0x1cf4] 选择 case 0/1/3 的 active-zone 决策路径 → 可能走 LAB_080c7458 mode-bit 修正 (gPageState[+0x148] bit 0x10/20/40/80 → FUN_080c6b04/6e9c). finalize 块: 写 gPageState[+0x210]=新packed → FUN_080c699c (zone state setter) → 若 packed 与 lookup 都未变则 return 无 render, 否则 bl render_duel_field_zone_info(player,mode,sub_idx) (mode==0xb 时 sub_idx 用重映射值). 特殊路径: r4!=0 + FUN_080c707c!=0 时取 FUN_080c6638 entry → card_ids_080cc8c8 → 写 gPageState[+0x21c] card_id + 设 gPageState[+0x215] |= 4 (dirty), 不 render. 单次调用只 render 一次. caller: FUN_080c7ea0 内 0x080c7f9c (主决斗场显示统筹) + 0x080ccbb2 (switchD case). runtime 验证: 按 RIGHT 触发 caller 反复调 本函数 10 次形成 cursor 推进序列.
+@ Apply input to a packed zone cursor. Confirmation can write a card ID at gDuelFieldState+0x21c and set UI-effect flag 4. Otherwise use selection-state and directional-input paths, including vertical and horizontal cursor moves. Store the new cursor at +0x210 and draw its OAM. Redraw zone information only when the cursor or hand-window base changes. Input fields are gPrng+0x146/+0x148, or +0x14e for zone 0xd.
 apply_zone_cursor_step:
     push {r4,r5,r6,r7,lr}                    @ 080c716c f0b5
     .hword 0x4657    @ 080c716e 5746
@@ -12381,71 +12381,71 @@ apply_zone_cursor_step:
     .hword 0x4645    @ 080c7172 4546
     push {r5,r6,r7}                          @ 080c7174 e0b4
     sub sp,#0xc                              @ 080c7176 83b0
-    lsls r0,r0,#0x10    @ 080c7178 0004  -- r0 = (u16)packed_cursor (清高 16 位)
+    lsls r0,r0,#0x10    @ 080c7178 0004  -- Truncate the packed cursor to low16 before decoding.
     lsrs r6,r0,#0x10    @ 080c717a 060c
-    str r6,[sp,#0x0]                         @ 080c717c 0096  -- [sp+0x0] = r6 = packed_cursor (保存原始)
+    str r6,[sp,#0x0]                         @ 080c717c 0096  -- Save the original packed cursor at stack+0.
     movs r2,#0x80    @ 080c717e 8022
     adds r1,r6,#0x0    @ 080c7180 311c
     ands r1,r2    @ 080c7182 1140
     lsls r1,r1,#0x18    @ 080c7184 0906
-    lsrs r1,r1,#0x1f    @ 080c7186 c90f  -- [sp+0x4] = player_flag (bit 7)
+    lsrs r1,r1,#0x1f    @ 080c7186 c90f  -- Extract packed cursor player bit7.
     str r1,[sp,#0x4]                         @ 080c7188 0191
     movs r1,#0x7f    @ 080c718a 7f21
     adds r5,r6,#0x0    @ 080c718c 351c
-    ands r5,r1    @ 080c718e 0d40  -- r5 = mode = packed & 0x7f (低 7 位)
+    ands r5,r1    @ 080c718e 0d40  -- r5 = packed cursor zone code, bits6:0.
     lsrs r7,r0,#0x18    @ 080c7190 070e
     movs r0,#0x7f    @ 080c7192 7f20
-    ands r7,r0    @ 080c7194 0740  -- r7 = sub_idx = (packed >> 8) & 0x7f (高 7 位)
-    ldr r2, DAT_080c71bc                     @ 080c7196 094a  -- r2 = &gPageState (0x02023130)
+    ands r7,r0    @ 080c7194 0740  -- r7 = packed cursor sub-index, bits14:8.
+    ldr r2, ptr_gduelfieldstate_080c71bc     @ 080c7196 094a  -- r2 = gDuelFieldState.
     ldr r1,[sp,#0x4]                         @ 080c7198 0199
     lsls r0,r1,#0x1    @ 080c719a 4800
     adds r1,r2,#0x0    @ 080c719c 111c
     adds r1,#0x4c    @ 080c719e 4c31
     adds r0,r0,r1    @ 080c71a0 4018
     ldrh r0,[r0,#0x0]                        @ 080c71a2 0088
-    str r0,[sp,#0x8]                         @ 080c71a4 0290  -- [sp+0x8] = gPageState[+0x4c + player*2] (mode==0xb 重映射 lookup base)
+    str r0,[sp,#0x8]                         @ 080c71a4 0290  -- Save the first visible hand index from gDuelFieldState+0x4c+player*2.
     adds r3,r2,#0x0    @ 080c71a6 131c
-    cmp r5,#0xd                              @ 080c71a8 0d2d  -- if mode == 0xd: 走特殊 input source
+    cmp r5,#0xd                              @ 080c71a8 0d2d  -- Zone0xd uses the alternate confirmation input field.
     bne LAB_080c71c4                         @ 080c71aa 0bd1
-    ldr r1, PTR_gPrng_080c71c0               @ 080c71ac 0449
+    ldr r1, ptr_gprng_080c71c0               @ 080c71ac 0449
     movs r2,#0xa7    @ 080c71ae a722
     lsls r2,r2,#0x1    @ 080c71b0 5200
     adds r4,r1,r2    @ 080c71b2 8c18
     movs r0,#0x80    @ 080c71b4 8020
-    lsls r0,r0,#0x1    @ 080c71b6 4000  -- r0 = 0x100 (mask)
-    b LAB_080c71ce                           @ 080c71b8 09e0  -- r4 = gPrng + 0x14e (hword input flag)
+    lsls r0,r0,#0x1    @ 080c71b6 4000  -- Zone0xd confirmation mask = 0x100.
+    b LAB_080c71ce                           @ 080c71b8 09e0  -- r4 points to the halfword input field gPrng+0x14e.
     .zero  0x2
-DAT_080c71bc:
-    .word  0x02023130                     @ 080c71bc 30310202
-PTR_gPrng_080c71c0:
-    .word  gPrng                          @ 080c71c0 40000003
+ptr_gduelfieldstate_080c71bc:
+    .word  gDuelFieldState                @ 080c71bc 30310202  Base address of gDuelFieldState.
+ptr_gprng_080c71c0:
+    .word  gPrng                          @ 080c71c0 40000003  Base address of gPrng.
 LAB_080c71c4:
-    ldr r1, PTR_gPrng_080c7224               @ 080c71c4 1749  -- default: r4 = gPrng + 0x146 (byte input flag)
+    ldr r1, ptr_gprng_080c7224               @ 080c71c4 1749  -- Other zones use the halfword input field gPrng+0x146.
     movs r0,#0xa3    @ 080c71c6 a320
     lsls r0,r0,#0x1    @ 080c71c8 4000
     adds r4,r1,r0    @ 080c71ca 0c18
-    subs r0,#0x46    @ 080c71cc 4638  -- r0 = 0x40 (mask for non-d mode)
+    subs r0,#0x46    @ 080c71cc 4638  -- Confirmation mask for other zones = 0x100.
 LAB_080c71ce:
-    ldrh r4,[r4,#0x0]                        @ 080c71ce 2488  -- r4 = ldrh [r4]; r4 &= mask (input flag bit set?)
+    ldrh r4,[r4,#0x0]                        @ 080c71ce 2488  -- Read the input halfword; the next AND selects its confirmation bit.
     ands r0,r4    @ 080c71d0 2040
     lsls r0,r0,#0x10    @ 080c71d2 0004
     lsrs r4,r0,#0x10    @ 080c71d4 040c
     adds r2,r1,#0x0    @ 080c71d6 0a1c
-    cmp r5,#0xb                              @ 080c71d8 0b2d  -- if mode == 0xb: sub_idx += lookup_base (重映射)
+    cmp r5,#0xb                              @ 080c71d8 0b2d  -- Hand zone0xb maps the visible sub-index through the first visible index.
     bne LAB_080c71e4                         @ 080c71da 03d1
     ldr r1,[sp,#0x8]                         @ 080c71dc 0299
     adds r0,r7,r1    @ 080c71de 7818
     lsls r0,r0,#0x10    @ 080c71e0 0004
     lsrs r7,r0,#0x10    @ 080c71e2 070c
 LAB_080c71e4:
-    cmp r4,#0x0                              @ 080c71e4 002c  -- if r4 == 0 (无 input flag): 跳 LAB_080c724e (mode 决策)
+    cmp r4,#0x0                              @ 080c71e4 002c  -- No confirmation bit: continue to selection-state and direction handling.
     beq LAB_080c724e                         @ 080c71e6 32d0
     adds r0,r6,#0x0    @ 080c71e8 301c
-    bl check_zone_card_id_cache_valid        @ 080c71ea fff747ff  -- FUN_080c707c(packed) 检查 zone 是否处于特殊状态
+    bl check_zone_card_id_cache_valid        @ 080c71ea fff747ff  -- check_zone_card_id_cache_valid(packed_cursor).
     cmp r0,#0x0                              @ 080c71ee 0028
-    beq LAB_080c7230                         @ 080c71f0 1ed0  -- if FUN_080c707c == 0: 跳 LAB_080c7230 (zone state setter only)
+    beq LAB_080c7230                         @ 080c71f0 1ed0  -- An ineligible zone draws its cursor without redrawing information.
     adds r0,r6,#0x0    @ 080c71f2 301c
-    bl resolve_zone_data_ptr_by_oam_word     @ 080c71f4 fff720fa  -- FUN_080c6638(packed) 取 zone entry 指针
+    bl resolve_zone_data_ptr_by_oam_word     @ 080c71f4 fff720fa  -- resolve_zone_data_ptr_by_oam_word(packed_cursor) returns the slot record.
     ldr r1,[r0,#0x0]                         @ 080c71f8 0168
     lsls r0,r1,#0x2    @ 080c71fa 8800
     lsrs r0,r0,#0x18    @ 080c71fc 000e
@@ -12453,28 +12453,28 @@ LAB_080c71e4:
     lsls r1,r1,#0x12    @ 080c7200 8904
     lsrs r1,r1,#0x1f    @ 080c7202 c90f
     adds r0,r0,r1    @ 080c7204 4018
-    bl ensure_card_id_cache_entry            @ 080c7206 05f05ffb  -- card_ids_080cc8c8(combined) 拿 card_id
-    ldr r1, DAT_080c7228                     @ 080c720a 0749
+    bl ensure_card_id_cache_entry            @ 080c7206 05f05ffb  -- ensure_card_id_cache_entry(cache_key) returns the display card ID.
+    ldr r1, ptr_gduelfieldstate_080c7228     @ 080c720a 0749
     movs r3,#0x87    @ 080c720c 8723
     lsls r3,r3,#0x2    @ 080c720e 9b00
     adds r2,r1,r3    @ 080c7210 ca18
-    strh r0,[r2,#0x0]                        @ 080c7212 1080  -- gPageState[+0x21c] = card_id (hword)
-    ldr r0, DAT_080c722c                     @ 080c7214 0548
+    strh r0,[r2,#0x0]                        @ 080c7212 1080  -- Store the selected card ID at gDuelFieldState+0x21c.
+    ldr r0, value_duel_field_ui_effect_flags_off_080c722c @ 080c7214 0548
     adds r1,r1,r0    @ 080c7216 0918
     movs r0,#0x4    @ 080c7218 0420
     ldrb r2,[r1,#0x0]                        @ 080c721a 0a78
     orrs r0,r2    @ 080c721c 1043
-    strb r0,[r1,#0x0]                        @ 080c721e 0870  -- gPageState[+0x215] |= 0x4 (dirty bit)
-    b LAB_080c751e                           @ 080c7220 7de1  -- → return (不调 render)
+    strb r0,[r1,#0x0]                        @ 080c721e 0870  -- Set UI-effect flag4 at gDuelFieldState+0x215.
+    b LAB_080c751e                           @ 080c7220 7de1  -- Return after recording the card request.
     .zero  0x2
-PTR_gPrng_080c7224:
-    .word  gPrng                          @ 080c7224 40000003
-DAT_080c7228:
-    .word  0x02023130                     @ 080c7228 30310202
-DAT_080c722c:
-    .word  0x00000215                     @ 080c722c 15020000
+ptr_gprng_080c7224:
+    .word  gPrng                          @ 080c7224 40000003  Base address of gPrng.
+ptr_gduelfieldstate_080c7228:
+    .word  gDuelFieldState                @ 080c7228 30310202  Base address of gDuelFieldState.
+value_duel_field_ui_effect_flags_off_080c722c:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c722c 15020000  Value DUEL_FIELD_UI_EFFECT_FLAGS_OFF.
 LAB_080c7230:
-    movs r1,#0x80    @ 080c7230 8021  -- LAB_080c7230: 调 zone state setter 不 render
+    movs r1,#0x80    @ 080c7230 8021  -- Decode the unchanged cursor for its OAM draw.
     adds r0,r6,#0x0    @ 080c7232 301c
     ands r0,r1    @ 080c7234 0840
     lsls r0,r0,#0x18    @ 080c7236 0006
@@ -12486,10 +12486,10 @@ LAB_080c7230:
     movs r3,#0x7f    @ 080c7242 7f23
     ands r2,r3    @ 080c7244 1a40
     movs r3,#0x0    @ 080c7246 0023
-    bl set_zone_oam_coords_by_player         @ 080c7248 fff7a8fb  -- FUN_080c699c(player, mode, sub_idx, 0)
-    b LAB_080c751e                           @ 080c724c 67e1  -- → return
+    bl render_zone_cursor_oam                @ 080c7248 fff7a8fb  -- render_zone_cursor_oam(player, zone, sub_index, palette0).
+    b LAB_080c751e                           @ 080c724c 67e1  -- Return after the cursor-only draw.
 LAB_080c724e:
-    movs r0,#0xa4    @ 080c724e a420  -- LAB_080c724e: 检查 gPageState[+0x148] bit 0xb8 (mode-bit handler 触发)
+    movs r0,#0xa4    @ 080c724e a420  -- Test input bit0x200 in gPrng+0x148.
     lsls r0,r0,#0x1    @ 080c7250 4000
     adds r1,r2,r0    @ 080c7252 1118
     adds r0,#0xb8    @ 080c7254 b830
@@ -12497,9 +12497,9 @@ LAB_080c724e:
     ands r0,r1    @ 080c7258 0840
     cmp r0,#0x0                              @ 080c725a 0028
     bne LAB_080c7260                         @ 080c725c 00d1
-    b LAB_080c7458                           @ 080c725e fbe0  -- 若 bit set: 跳 LAB_080c7458 走 mode-bit 修正
+    b LAB_080c7458                           @ 080c725e fbe0  -- No input bit0x200: enter the ordinary directional move path.
 LAB_080c7260:
-    ldr r1, DAT_080c729c                     @ 080c7260 0e49  -- 检查 0x0201f440 bit 0 (input/menu flag)
+    ldr r1, ptr_gfontstate_080c729c          @ 080c7260 0e49  -- gFontState bit0 gates the special selection-state path.
     movs r4,#0x1    @ 080c7262 0124
     adds r0,r4,#0x0    @ 080c7264 201c
     ldrb r1,[r1,#0x0]                        @ 080c7266 0978
@@ -12508,8 +12508,8 @@ LAB_080c7260:
     beq LAB_080c7270                         @ 080c726c 00d0
     b LAB_080c7458                           @ 080c726e f3e0
 LAB_080c7270:
-    ldr r1, DAT_080c72a0                     @ 080c7270 0b49  -- 检查 [0x02020160 + 0x2f51] bit 0 (input/menu flag)
-    ldr r0, DAT_080c72a4                     @ 080c7272 0c48
+    ldr r1, ptr_gduelctx_080c72a0            @ 080c7270 0b49  -- gDuelCtx+0x2f51 bit0 also gates the special selection-state path.
+    ldr r0, value_duel_ctx_zone_state_off_080c72a4 @ 080c7272 0c48
     adds r1,r1,r0    @ 080c7274 0918
     adds r0,r4,#0x0    @ 080c7276 201c
     ldrb r1,[r1,#0x0]                        @ 080c7278 0978
@@ -12518,33 +12518,33 @@ LAB_080c7270:
     beq LAB_080c7282                         @ 080c727e 00d0
     b LAB_080c7458                           @ 080c7280 eae0
 LAB_080c7282:
-    ldr r1, PTR_gP1LifePoints_080c72a8       @ 080c7282 0949
-    ldr r2, DAT_080c72ac                     @ 080c7284 094a
+    ldr r1, ptr_gp1lifepoints_080c72a8       @ 080c7282 0949
+    ldr r2, value_duel_field_cursor_state_off_080c72ac @ 080c7284 094a
     adds r0,r1,r2    @ 080c7286 8818
     ldr r0,[r0,#0x0]                         @ 080c7288 0068
     adds r4,r1,#0x0    @ 080c728a 0c1c
-    cmp r0,#0x5                              @ 080c728c 0528  -- switch on gP1Player[+0x1cf4] (6 cases: 0..5)
+    cmp r0,#0x5                              @ 080c728c 0528  -- Dispatch u32 gP1FieldState over states0..5.
     bls LAB_080c7292                         @ 080c728e 00d9
     b switchD_080c729a__default              @ 080c7290 0de1
 LAB_080c7292:
     lsls r0,r0,#0x2    @ 080c7292 8000
-    ldr r1, DAT_080c72b0                     @ 080c7294 0649
+    ldr r1, ptr_switchd_080c729a__switchdatad_080c72b4_080c72b0 @ 080c7294 0649
     adds r0,r0,r1    @ 080c7296 4018
     ldr r0,[r0,#0x0]                         @ 080c7298 0068
 switchD_080c729a__switchD:
     .hword 0x4687    @ 080c729a 8746
-DAT_080c729c:
-    .word  0x0201f440                     @ 080c729c 40f40102
-DAT_080c72a0:
-    .word  0x02020160                     @ 080c72a0 60010202
-DAT_080c72a4:
-    .word  0x00002f51                     @ 080c72a4 512f0000
-PTR_gP1LifePoints_080c72a8:
-    .word  gP1LifePoints                  @ 080c72a8 e0c40102
-DAT_080c72ac:
-    .word  0x00001cf4                     @ 080c72ac f41c0000
-DAT_080c72b0:
-    .word  0x080c72b4                     @ 080c72b0 b4720c08
+ptr_gfontstate_080c729c:
+    .word  gFontState                     @ 080c729c 40f40102  Base address of gFontState.
+ptr_gduelctx_080c72a0:
+    .word  gDuelCtx                       @ 080c72a0 60010202  Base address of gDuelCtx.
+value_duel_ctx_zone_state_off_080c72a4:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 080c72a4 512f0000  gDuelCtx byte offset 0x2f51; bit0 gates zone sorting/navigation.
+ptr_gp1lifepoints_080c72a8:
+    .word  gP1LifePoints                  @ 080c72a8 e0c40102  Base address of gP1LifePoints.
+value_duel_field_cursor_state_off_080c72ac:
+    .word  DUEL_FIELD_CURSOR_STATE_OFF    @ 080c72ac f41c0000  Offset from gP1LifePoints to gP1FieldState; u32 selection-state switch 0..5.
+ptr_switchd_080c729a__switchdatad_080c72b4_080c72b0:
+    .word  switchD_080c729a__switchdataD_080c72b4                     @ 080c72b0 b4720c08  Base address of switchD_080c729a__switchdataD_080c72b4.
 switchD_080c729a__switchdataD_080c72b4:
     .word  0x080c72cc                     @ 080c72b4 cc720c08
     .word  0x080c72e0                     @ 080c72b8 e0720c08
@@ -12553,18 +12553,18 @@ switchD_080c729a__switchdataD_080c72b4:
     .word  0x080c72e0                     @ 080c72c4 e0720c08
     .word  0x080c72e0                     @ 080c72c8 e0720c08
 switchD_080c729a__caseD_0:
-    ldr r0, DAT_080c72dc                     @ 080c72cc 0348  -- case 0: 读 gP2[+0x4] turn_flag bit 0
+    ldr r0, ptr_gduelcardctxbase_080c72dc    @ 080c72cc 0348  -- State0 reads the active player from gDuelCardCtxBase+4.
     ldr r0,[r0,#0x4]                         @ 080c72ce 4068
     movs r1,#0x1    @ 080c72d0 0121
     ands r0,r1    @ 080c72d2 0840
-    lsls r6,r0,#0x7    @ 080c72d4 c601  -- r6 = (turn<<7) | 0xd (强制 mode=0xd)
+    lsls r6,r0,#0x7    @ 080c72d4 c601  -- Prepare active-player bit7 for zone0xd.
     movs r0,#0xd    @ 080c72d6 0d20
     orrs r6,r0    @ 080c72d8 0643
     b switchD_080c729a__default              @ 080c72da e8e0
-DAT_080c72dc:
-    .word  0x0201e2a0                     @ 080c72dc a0e20102
+ptr_gduelcardctxbase_080c72dc:
+    .word  gDuelCardCtxBase               @ 080c72dc a0e20102  Base address of gDuelCardCtxBase.
 switchD_080c729a__caseD_1:
-    ldr r0, DAT_080c7398                     @ 080c72e0 2d48  -- case 1: 操作 gPageState[+0x212] byte + 双 loop 找有效卡
+    ldr r0, value_duel_field_cursor_group_toggle_off_080c7398 @ 080c72e0 2d48  -- Toggle gDuelFieldState+0x212 bit0 and search for a nonempty card.
     adds r3,r3,r0    @ 080c72e2 1b18
     ldrb r2,[r3,#0x0]                        @ 080c72e4 1a78
     lsls r0,r2,#0x1f    @ 080c72e6 d007
@@ -12577,18 +12577,18 @@ switchD_080c729a__caseD_1:
     rsbs r0,r0,#0    @ 080c72f4 4042
     ands r0,r2    @ 080c72f6 1040
     orrs r0,r1    @ 080c72f8 0843
-    strb r0,[r3,#0x0]                        @ 080c72fa 1870  -- gPageState[+0x212] = 修正后 byte
+    strb r0,[r3,#0x0]                        @ 080c72fa 1870  -- Store the toggled group-selection flag.
     movs r1,#0x1    @ 080c72fc 0121
     ands r0,r1    @ 080c72fe 0840
     cmp r0,#0x0                              @ 080c7300 0028
     beq LAB_080c73a0                         @ 080c7302 4dd0
     movs r5,#0x0    @ 080c7304 0025
-    ldr r7, DAT_080c739c                     @ 080c7306 254f
+    ldr r7, ptr_gduelcardctxbase_080c739c    @ 080c7306 254f
     .hword 0x4688    @ 080c7308 8846
     movs r1,#0x80    @ 080c730a 8021
     .hword 0x4689    @ 080c730c 8946
 LAB_080c730e:
-    ldr r0,[r7,#0x4]                         @ 080c730e 7868  -- loop A: sub_idx 0..4 用 FUN_080c6638 + card_ids_080cc8c8 找有效卡
+    ldr r0,[r7,#0x4]                         @ 080c730e 7868  -- Search sub-indices0..4 in zone group0 through the card-ID cache.
     .hword 0x4642    @ 080c7310 4246
     ands r0,r2    @ 080c7312 1040
     lsls r0,r0,#0x7    @ 080c7314 c001
@@ -12619,7 +12619,7 @@ LAB_080c730e:
     b switchD_080c729a__default              @ 080c734a b0e0
 LAB_080c734c:
     movs r5,#0x0    @ 080c734c 0025
-    ldr r7, DAT_080c739c                     @ 080c734e 134f
+    ldr r7, ptr_gduelcardctxbase_080c739c    @ 080c734e 134f
     movs r0,#0x1    @ 080c7350 0120
     .hword 0x4680    @ 080c7352 8046
     movs r1,#0x80    @ 080c7354 8021
@@ -12628,7 +12628,7 @@ LAB_080c734c:
     movs r2,#0x5    @ 080c735a 0522
     .hword 0x4692    @ 080c735c 9246
 LAB_080c735e:
-    ldr r0,[r7,#0x4]                         @ 080c735e 7868  -- loop B: 同上但用不同 mode 编码
+    ldr r0,[r7,#0x4]                         @ 080c735e 7868  -- Search sub-indices0..4 in zone group5 through the card-ID cache.
     .hword 0x4643    @ 080c7360 4346
     ands r0,r3    @ 080c7362 1840
     lsls r0,r0,#0x7    @ 080c7364 c001
@@ -12655,15 +12655,15 @@ LAB_080c735e:
     ble LAB_080c735e                         @ 080c7392 e4dd
     b switchD_080c729a__default              @ 080c7394 8be0
     .zero  0x2
-DAT_080c7398:
-    .word  0x00000212                     @ 080c7398 12020000
-DAT_080c739c:
-    .word  0x0201e2a0                     @ 080c739c a0e20102
+value_duel_field_cursor_group_toggle_off_080c7398:
+    .word  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF @ 080c7398 12020000  gDuelFieldState byte offset 0x212; bit0 toggles searched zone group.
+ptr_gduelcardctxbase_080c739c:
+    .word  gDuelCardCtxBase               @ 080c739c a0e20102  Base address of gDuelCardCtxBase.
 LAB_080c73a0:
-    ldr r0, DAT_080c73c0                     @ 080c73a0 0748  -- LAB_080c73a0: 用 [gP1+0xc] entry + sub_idx 重映射
+    ldr r0, ptr_gduelcardctxbase_080c73c0    @ 080c73a0 0748  -- Use the active player's hand count to decide zone0xb selection.
     ldr r2,[r0,#0x4]                         @ 080c73a2 4268
     ands r2,r1    @ 080c73a4 0a40
-    ldr r0, DAT_080c73c4                     @ 080c73a6 0748
+    ldr r0, value_player_block_stride_080c73c4 @ 080c73a6 0748
     muls r0,r2    @ 080c73a8 5043
     adds r1,r4,#0x0    @ 080c73aa 211c
     adds r1,#0xc    @ 080c73ac 0c31
@@ -12673,19 +12673,19 @@ LAB_080c73a0:
     beq switchD_080c729a__default            @ 080c73b4 7bd0
     lsls r6,r2,#0x7    @ 080c73b6 d601
     movs r0,#0xb    @ 080c73b8 0b20
-    orrs r6,r0    @ 080c73ba 0643  -- r6 = (lookup<<7) | 0xb (强制 mode=0xb)
+    orrs r6,r0    @ 080c73ba 0643  -- Select zone0xb for the active player.
     b switchD_080c729a__default              @ 080c73bc 77e0
     .zero  0x2
-DAT_080c73c0:
-    .word  0x0201e2a0                     @ 080c73c0 a0e20102
-DAT_080c73c4:
-    .word  0x00000868                     @ 080c73c4 68080000
+ptr_gduelcardctxbase_080c73c0:
+    .word  gDuelCardCtxBase               @ 080c73c0 a0e20102  Base address of gDuelCardCtxBase.
+value_player_block_stride_080c73c4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c73c4 68080000  Value PLAYER_BLOCK_STRIDE.
 switchD_080c729a__caseD_3:
-    ldr r4, DAT_080c73fc                     @ 080c73c8 0c4c  -- case 3: FUN_0803495c input check + sub_idx loop
+    ldr r4, ptr_gduelcardctxbase_080c73fc    @ 080c73c8 0c4c  -- State3 searches for a slot accepted by eval_slot_activation_guard_full.
     ldr r0,[r4,#0x4]                         @ 080c73ca 6068
     adds r1,r7,#0x0    @ 080c73cc 391c
     movs r2,#0x1    @ 080c73ce 0122
-    bl eval_slot_activation_guard_full       @ 080c73d0 6df7c4fa  -- FUN_0803495c(turn, sub_idx, 1) 检查 input
+    bl eval_slot_activation_guard_full       @ 080c73d0 6df7c4fa  -- eval_slot_activation_guard_full(active_player, sub_index, 1).
     cmp r0,#0x0                              @ 080c73d4 0028
     beq LAB_080c7400                         @ 080c73d6 13d0
     adds r4,r7,#0x0    @ 080c73d8 3c1c
@@ -12696,7 +12696,7 @@ LAB_080c73dc:
     ble LAB_080c73e4                         @ 080c73e0 00dd
     movs r4,#0x0    @ 080c73e2 0024
 LAB_080c73e4:
-    ldr r7, DAT_080c73fc                     @ 080c73e4 054f
+    ldr r7, ptr_gduelcardctxbase_080c73fc    @ 080c73e4 054f
     ldr r0,[r7,#0x4]                         @ 080c73e6 7868
     adds r1,r4,#0x0    @ 080c73e8 211c
     movs r2,#0x1    @ 080c73ea 0122
@@ -12707,8 +12707,8 @@ LAB_080c73e4:
     cmp r5,#0x4                              @ 080c73f6 042d
     ble LAB_080c73dc                         @ 080c73f8 f0dd
     b switchD_080c729a__default              @ 080c73fa 58e0
-DAT_080c73fc:
-    .word  0x0201e2a0                     @ 080c73fc a0e20102
+ptr_gduelcardctxbase_080c73fc:
+    .word  gDuelCardCtxBase               @ 080c73fc a0e20102  Base address of gDuelCardCtxBase.
 LAB_080c7400:
     movs r5,#0x0    @ 080c7400 0025
 LAB_080c7402:
@@ -12760,60 +12760,60 @@ LAB_080c7452:
     orrs r6,r0    @ 080c7454 0643
     b switchD_080c729a__default              @ 080c7456 2ae0
 LAB_080c7458:
-    movs r1,#0xa4    @ 080c7458 a421  -- LAB_080c7458: 4 个 mode-bit 修正块
+    movs r1,#0xa4    @ 080c7458 a421  -- Read gPrng+0x148 and apply up/down/left/right in sequence.
     lsls r1,r1,#0x1    @ 080c745a 4900
     adds r4,r2,r1    @ 080c745c 5418
     movs r0,#0x40    @ 080c745e 4020
     ldrh r2,[r4,#0x0]                        @ 080c7460 2288
     ands r0,r2    @ 080c7462 1040
-    cmp r0,#0x0                              @ 080c7464 0028  -- if bit 0x40: r6 = FUN_080c6b04(packed, 0)
+    cmp r0,#0x0                              @ 080c7464 0028  -- UP: move_zone_cursor_vertical(packed_cursor, 0).
     beq LAB_080c7472                         @ 080c7466 04d0
     adds r0,r6,#0x0    @ 080c7468 301c
     movs r1,#0x0    @ 080c746a 0021
-    bl decode_zone_oam_word_to_slot_fields   @ 080c746c fff74afb
+    bl move_zone_cursor_vertical             @ 080c746c fff74afb
     adds r6,r0,#0x0    @ 080c7470 061c
 LAB_080c7472:
     movs r0,#0x80    @ 080c7472 8020
     ldrh r3,[r4,#0x0]                        @ 080c7474 2388
     ands r0,r3    @ 080c7476 1840
-    cmp r0,#0x0                              @ 080c7478 0028  -- if bit 0x80: r6 = FUN_080c6b04(packed, 1)
+    cmp r0,#0x0                              @ 080c7478 0028  -- DOWN: move_zone_cursor_vertical(packed_cursor, 1).
     beq LAB_080c7486                         @ 080c747a 04d0
     adds r0,r6,#0x0    @ 080c747c 301c
     movs r1,#0x1    @ 080c747e 0121
-    bl decode_zone_oam_word_to_slot_fields   @ 080c7480 fff740fb
+    bl move_zone_cursor_vertical             @ 080c7480 fff740fb
     adds r6,r0,#0x0    @ 080c7484 061c
 LAB_080c7486:
     movs r0,#0x20    @ 080c7486 2020
     ldrh r1,[r4,#0x0]                        @ 080c7488 2188
     ands r0,r1    @ 080c748a 0840
-    cmp r0,#0x0                              @ 080c748c 0028  -- if bit 0x20: r6 = FUN_080c6e9c(packed, 0)
+    cmp r0,#0x0                              @ 080c748c 0028  -- LEFT: move_zone_cursor_horizontal(packed_cursor, 0).
     beq LAB_080c749a                         @ 080c748e 04d0
     adds r0,r6,#0x0    @ 080c7490 301c
     movs r1,#0x0    @ 080c7492 0021
-    bl decode_zone_oam_word_to_cursor_fields @ 080c7494 fff702fd
+    bl move_zone_cursor_horizontal           @ 080c7494 fff702fd
     adds r6,r0,#0x0    @ 080c7498 061c
 LAB_080c749a:
     movs r0,#0x10    @ 080c749a 1020
     ldrh r4,[r4,#0x0]                        @ 080c749c 2488
     ands r0,r4    @ 080c749e 2040
-    cmp r0,#0x0                              @ 080c74a0 0028  -- if bit 0x10: r6 = FUN_080c6e9c(packed, 1)
+    cmp r0,#0x0                              @ 080c74a0 0028  -- RIGHT: move_zone_cursor_horizontal(packed_cursor, 1).
     beq switchD_080c729a__default            @ 080c74a2 04d0
     adds r0,r6,#0x0    @ 080c74a4 301c
     movs r1,#0x1    @ 080c74a6 0121
-    bl decode_zone_oam_word_to_cursor_fields @ 080c74a8 fff7f8fc
+    bl move_zone_cursor_horizontal           @ 080c74a8 fff7f8fc
     adds r6,r0,#0x0    @ 080c74ac 061c
 switchD_080c729a__default:
-    ldr r2, DAT_080c7510                     @ 080c74ae 184a  -- switchD_default (finalize): 写 gPageState[+0x210] = 新 packed
+    ldr r2, ptr_gduelfieldstate_080c7510     @ 080c74ae 184a  -- Finalize the selected packed cursor.
     .hword 0x4690    @ 080c74b0 9046
     movs r0,#0x84    @ 080c74b2 8420
     lsls r0,r0,#0x2    @ 080c74b4 8000
     add r0,r8                                @ 080c74b6 4044
-    strh r6,[r0,#0x0]                        @ 080c74b8 0680  -- gPageState[+0x210] = r6
+    strh r6,[r0,#0x0]                        @ 080c74b8 0680  -- Write the packed cursor at gDuelFieldState+0x210.
     movs r1,#0x80    @ 080c74ba 8021
     adds r0,r6,#0x0    @ 080c74bc 301c
     ands r0,r1    @ 080c74be 0840
     lsls r0,r0,#0x18    @ 080c74c0 0006
-    lsrs r7,r0,#0x1f    @ 080c74c2 c70f  -- 解包 r6: r7=player, r4=mode, r5=sub_idx
+    lsrs r7,r0,#0x1f    @ 080c74c2 c70f  -- Decode player, zone and visible sub-index from the new packed cursor.
     movs r0,#0x7f    @ 080c74c4 7f20
     adds r4,r6,#0x0    @ 080c74c6 341c
     ands r4,r0    @ 080c74c8 0440
@@ -12824,9 +12824,9 @@ switchD_080c729a__default:
     adds r1,r4,#0x0    @ 080c74d2 211c
     adds r2,r5,#0x0    @ 080c74d4 2a1c
     movs r3,#0x0    @ 080c74d6 0023
-    bl set_zone_oam_coords_by_player         @ 080c74d8 fff760fa  -- FUN_080c699c(player, mode, sub_idx, 0) zone state setter
+    bl render_zone_cursor_oam                @ 080c74d8 fff760fa  -- render_zone_cursor_oam(player, zone, sub_index, palette0).
     ldr r3,[sp,#0x0]                         @ 080c74dc 009b
-    cmp r6,r3                                @ 080c74de 9e42  -- 比较 r6 vs sp+0 (新 packed == 旧 packed?)
+    cmp r6,r3                                @ 080c74de 9e42  -- Compare the new and saved packed cursors.
     bne LAB_080c74f4                         @ 080c74e0 08d1
     ldr r1,[sp,#0x4]                         @ 080c74e2 0199
     lsls r0,r1,#0x1    @ 080c74e4 4800
@@ -12835,31 +12835,31 @@ switchD_080c729a__default:
     adds r0,r0,r1    @ 080c74ea 4018
     ldr r2,[sp,#0x8]                         @ 080c74ec 029a
     ldrh r0,[r0,#0x0]                        @ 080c74ee 0088
-    cmp r2,r0                                @ 080c74f0 8242  -- 比较 lookup vs sp+0x8 (lookup 也未变?)
-    beq LAB_080c751e                         @ 080c74f2 14d0  -- 都未变 → 跳 epilogue, 不 render
+    cmp r2,r0                                @ 080c74f0 8242  -- Compare current and saved first visible hand indices.
+    beq LAB_080c751e                         @ 080c74f2 14d0  -- Neither cursor nor hand-window base changed: return without information redraw.
 LAB_080c74f4:
-    cmp r4,#0xb                              @ 080c74f4 0b2c  -- if mode == 0xb: 走重映射 render 路径
+    cmp r4,#0xb                              @ 080c74f4 0b2c  -- Hand zone0xb maps its visible index to the absolute hand index.
     bne LAB_080c7514                         @ 080c74f6 0dd1
     lsls r0,r7,#0x1    @ 080c74f8 7800
     .hword 0x4641    @ 080c74fa 4146
     adds r1,#0x4c    @ 080c74fc 4c31
     adds r0,r0,r1    @ 080c74fe 4018
     ldrh r0,[r0,#0x0]                        @ 080c7500 0088
-    adds r2,r0,r5    @ 080c7502 4219  -- r2 = lookup + sub_idx (重映射 sub_idx)
+    adds r2,r0,r5    @ 080c7502 4219  -- r2 = first visible hand index + visible sub-index.
     adds r0,r7,#0x0    @ 080c7504 381c
     movs r1,#0xb    @ 080c7506 0b21
-    bl render_duel_field_zone_info           @ 080c7508 04f046fa  -- render_duel_field_zone_info(player, 0xb, lookup_remapped)
+    bl render_duel_field_zone_info           @ 080c7508 04f046fa  -- render_duel_field_zone_info(player, 0xb, absolute_hand_index).
     b LAB_080c751e                           @ 080c750c 07e0
     .zero  0x2
-DAT_080c7510:
-    .word  0x02023130                     @ 080c7510 30310202
+ptr_gduelfieldstate_080c7510:
+    .word  gDuelFieldState                @ 080c7510 30310202  Base address of gDuelFieldState.
 LAB_080c7514:
-    adds r0,r7,#0x0    @ 080c7514 381c  -- LAB_080c7514: mode != 0xb 普通 render
+    adds r0,r7,#0x0    @ 080c7514 381c  -- Other zones render with the decoded sub-index directly.
     adds r1,r4,#0x0    @ 080c7516 211c
     adds r2,r5,#0x0    @ 080c7518 2a1c
-    bl render_duel_field_zone_info           @ 080c751a 04f03dfa  -- render_duel_field_zone_info(player, mode, sub_idx)
+    bl render_duel_field_zone_info           @ 080c751a 04f03dfa  -- render_duel_field_zone_info(player, zone, sub_index).
 LAB_080c751e:
-    add sp,#0xc                              @ 080c751e 03b0  -- LAB_080c751e: epilogue, 恢复 r4-r10 + 返回
+    add sp,#0xc                              @ 080c751e 03b0  -- Restore locals and saved registers, then return.
     pop {r3,r4,r5}                           @ 080c7520 38bc
     .hword 0x4698    @ 080c7522 9846
     .hword 0x46a1    @ 080c7524 a146
@@ -12869,8 +12869,8 @@ LAB_080c751e:
     bx r0                                    @ 080c752c 0047
     .zero  0x2
 
-@ indeg=10 (8 card-list display callers). Writes one row of card icon OAM entries into the sprite table. r0=oam_start_slot [0..255], r1=y_pixel, r2=x_start_pixel, r3=card_row_count (lo16). Inner loop: 7 sub-slots (r7=0..6) per row, each calls write_oam_entry_from_packed_args; X offset accumulated per slot (+2 or +4 px step). r4=width flag (1/2/4, from remaining row count); r6=palette/attr word (0x8040/0x8080/0x4040 etc, from slot r7 and width r4). After each row of 7 slots, updates X origin r5 and decrements row count. Returns void; all side-effects via write_oam_entry_from_packed_args. Constants: STRIP_SLOTS=7; WIDTH_4=0x4, WIDTH_2=0x2, WIDTH_1=0x1; PAL_0x8040=0x00008040, PAL_0x8080=0x00008080, PAL_0x4040=0x00004040.
-write_card_list_oam_row_strip:
+@ Draw a 184-pixel-wide text panel as seven OAM entries per vertical chunk. r0=x, r1=y, r2=starting attr2, r3=tile-row count. Process count-2 rows in chunks of 4, 2 or 1 tiles; use 32-pixel columns followed by 16- and 8-pixel right edges. Encode OAM shape/size in r1 of write_oam_entry_from_packed_args and advance attr2 across each chunk. No draw when count<=2.
+render_card_display_text_panel_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c7530 f0b5
     .hword 0x4657    @ 080c7532 5746
     .hword 0x464e    @ 080c7534 4e46
@@ -12920,11 +12920,11 @@ LAB_080c756c:
 LAB_080c7586:
     cmp r4,#0x4                              @ 080c7586 042c
     bne LAB_080c759c                         @ 080c7588 08d1
-    ldr r6, DAT_080c7590                     @ 080c758a 014e
+    ldr r6, value_obj_shape_size_vertical_8x32_080c7590 @ 080c758a 014e
     b LAB_080c759c                           @ 080c758c 06e0
     .zero  0x2
-DAT_080c7590:
-    .word  0x00008040                     @ 080c7590 40800000
+value_obj_shape_size_vertical_8x32_080c7590:
+    .word  OBJ_SHAPE_SIZE_VERTICAL_8X32   @ 080c7590 40800000  Value OBJ_SHAPE_SIZE_VERTICAL_8X32.
 LAB_080c7594:
     movs r6,#0x80    @ 080c7594 8026
     lsls r6,r6,#0x8    @ 080c7596 3602
@@ -12947,11 +12947,11 @@ LAB_080c75a0:
 LAB_080c75b2:
     cmp r4,#0x4                              @ 080c75b2 042c
     bne LAB_080c75ee                         @ 080c75b4 1bd1
-    ldr r6, DAT_080c75bc                     @ 080c75b6 014e
+    ldr r6, value_card_image_right_column_obj_attr_080c75bc @ 080c75b6 014e
     b LAB_080c75ee                           @ 080c75b8 19e0
     .zero  0x2
-DAT_080c75bc:
-    .word  0x00008080                     @ 080c75bc 80800000
+value_card_image_right_column_obj_attr_080c75bc:
+    .word  CARD_IMAGE_RIGHT_COLUMN_OBJ_ATTR @ 080c75bc 80800000  Value CARD_IMAGE_RIGHT_COLUMN_OBJ_ATTR.
 LAB_080c75c0:
     movs r6,#0x40    @ 080c75c0 4026
     b LAB_080c75ee                           @ 080c75c2 14e0
@@ -12980,7 +12980,7 @@ LAB_080c75e6:
     lsls r6,r6,#0x7    @ 080c75e8 f601
     b LAB_080c75ee                           @ 080c75ea 00e0
 LAB_080c75ec:
-    ldr r6, DAT_080c7634                     @ 080c75ec 114e
+    ldr r6, value_obj_shape_size_horizontal_32x8_080c7634 @ 080c75ec 114e
 LAB_080c75ee:
     adds r5,#0x4    @ 080c75ee 0435
 LAB_080c75f0:
@@ -13018,32 +13018,32 @@ LAB_080c7624:
     pop {r4,r5,r6,r7}                        @ 080c762e f0bc
     pop {r0}                                 @ 080c7630 01bc
     bx r0                                    @ 080c7632 0047
-DAT_080c7634:
-    .word  0x00004040                     @ 080c7634 40400000
+value_obj_shape_size_horizontal_32x8_080c7634:
+    .word  OBJ_SHAPE_SIZE_HORIZONTAL_32X8 @ 080c7634 40400000  Value OBJ_SHAPE_SIZE_HORIZONTAL_32X8.
 
-@ Card-list OAM row render dispatcher; 10-case jump table keyed on gFontState[0x0a01]-1 (range [0..9]). Reads card_type byte, subtracts 1, bounds-checks against 9, then branches via table at 0x080c7660. case 1 -> render_card_list_oam_row_by_pack_slot; case 3 -> render_card_list_oam_row_by_cursor_slot; case 4 -> render_card_list_oam_row_by_dual_slot; case 5 -> render_card_list_oam_row_by_rarity_flag; case 6 -> render_card_list_oam_row_by_type_icon; case 7 -> render_card_list_oam_row_by_pack_column; case 8 -> render_card_list_oam_row_by_cost_bar; case 9 -> render_card_list_oam_row_by_single_slot; case 10 -> render_card_list_oam_row_by_anim_frame. Out-of-range -> default exit. No direct IO writes; side effects in callees. caller: FUN_080c82e4 (card display master tick). Constants: FONT_STATE_BASE=0x0201f440; CARD_TYPE_OFFSET=0x0a01; JUMP_TABLE=0x080c7660 (10 entries).
-dispatch_card_list_oam_row_by_card_type:
+@ Dispatch the current gFontState display mode at +0xa01 after subtracting 1. Accept indices 0..9 for modes 1..10; mode 2 and out-of-range values return without a renderer. The remaining nine modes call their existing OAM row renderers. Preserve switch case numbering and all existing Function boundaries.
+dispatch_card_display_oam_by_mode:
     push {lr}                                @ 080c7638 00b5
-    ldr r0, DAT_080c7654                     @ 080c763a 0648
-    ldr r1, DAT_080c7658                     @ 080c763c 0649
+    ldr r0, ptr_gfontstate_080c7654          @ 080c763a 0648
+    ldr r1, value_font_state_display_mode_off_080c7658 @ 080c763c 0649
     adds r0,r0,r1    @ 080c763e 4018
     ldrb r0,[r0,#0x0]                        @ 080c7640 0078
     subs r0,#0x1    @ 080c7642 0138
     cmp r0,#0x9                              @ 080c7644 0928
     bhi switchD_080c7650__caseD_2            @ 080c7646 39d8
     lsls r0,r0,#0x2    @ 080c7648 8000
-    ldr r1, DAT_080c765c                     @ 080c764a 0449
+    ldr r1, ptr_switchd_080c7650__switchdatad_080c7660_080c765c @ 080c764a 0449
     adds r0,r0,r1    @ 080c764c 4018
     ldr r0,[r0,#0x0]                         @ 080c764e 0068
 switchD_080c7650__switchD:
     .hword 0x4687    @ 080c7650 8746
     .zero  0x2
-DAT_080c7654:
-    .word  0x0201f440                     @ 080c7654 40f40102
-DAT_080c7658:
-    .word  0x00000a01                     @ 080c7658 010a0000
-DAT_080c765c:
-    .word  0x080c7660                     @ 080c765c 60760c08
+ptr_gfontstate_080c7654:
+    .word  gFontState                     @ 080c7654 40f40102  Base address of gFontState.
+value_font_state_display_mode_off_080c7658:
+    .word  FONT_STATE_DISPLAY_MODE_OFF    @ 080c7658 010a0000  Value FONT_STATE_DISPLAY_MODE_OFF.
+ptr_switchd_080c7650__switchdatad_080c7660_080c765c:
+    .word  switchD_080c7650__switchdataD_080c7660                     @ 080c765c 60760c08  Base address of switchD_080c7650__switchdataD_080c7660.
 switchD_080c7650__switchdataD_080c7660:
     .word  0x080c7688                     @ 080c7660 88760c08
     .word  0x080c76bc                     @ 080c7664 bc760c08
@@ -13085,7 +13085,7 @@ switchD_080c7650__caseD_2:
     pop {r0}                                 @ 080c76bc 01bc
     bx r0                                    @ 080c76be 0047
 
-@ Render a JP-encoded string into a BG tile line buffer. Iterates over characters in the string, calls glyph rasterizer per character, accumulates glyph nibble rows into the tile line buffer. r0: str_ptr (JP encoded string); r1: tile_line_buf_ptr; r2: x_start [0..N]; r3: color_attr. Returns void. Side effects: tile_line_buf written with glyph nibble rows.
+@ Render or measure localized text at (r0,r1): r2=text, r3=cell advance, stack arg=measure-only. gSettings language bits select single-byte or two-byte decoding. Handle newline, @ ink control, digit conversion and 184-pixel wrapping with kinsoku checks. When drawing, call the matching glyph renderer twice for shadow and foreground. Store final x at gFontState+0xa16; return next line y in r0.
 render_jp_string_to_tile_line:
     push {r4,r5,r6,r7,lr}                    @ 080c76c0 f0b5
     .hword 0x4657    @ 080c76c2 5746
@@ -13118,8 +13118,8 @@ LAB_080c76f0:
     beq LAB_080c7730                         @ 080c76f4 1cd0
     cmp r2,#0x40                             @ 080c76f6 402a
     beq LAB_080c773c                         @ 080c76f8 20d0
-    ldr r1, DAT_080c7728                     @ 080c76fa 0b49
-    ldr r6, DAT_080c772c                     @ 080c76fc 0b4e
+    ldr r1, render_text_ewram_base_080c7728  @ 080c76fa 0b49
+    ldr r6, render_text_gsettings_offset_080c772c @ 080c76fc 0b4e
     adds r1,r1,r6    @ 080c76fe 8919
     movs r0,#0x7    @ 080c7700 0720
     ldrb r1,[r1,#0x0]                        @ 080c7702 0978
@@ -13140,10 +13140,10 @@ LAB_080c76f0:
     cmp r0,r1                                @ 080c7722 8842
     ble LAB_080c7750                         @ 080c7724 14dd
     b LAB_080c7746                           @ 080c7726 0ee0
-DAT_080c7728:
-    .word  0x02000000                     @ 080c7728 00000002
-DAT_080c772c:
-    .word  0x00006c2c                     @ 080c772c 2c6c0000
+render_text_ewram_base_080c7728:
+    .word  EWRAM_BASE                     @ 080c7728 00000002  Base address of EWRAM_BASE.
+render_text_gsettings_offset_080c772c:
+    .word  GSETTINGS_OFFSET               @ 080c772c 2c6c0000  gSettings - EWRAM_BASE; added to render_text_ewram_base_080c7728.
 LAB_080c7730:
     .hword 0x4655    @ 080c7730 5546
     .hword 0x4640    @ 080c7732 4046
@@ -13216,7 +13216,7 @@ LAB_080c7796:
     lsrs r0,r0,#0x18    @ 080c77ae 000e
     cmp r0,#0x9                              @ 080c77b0 0928
     bhi LAB_080c77c4                         @ 080c77b2 07d8
-    ldr r1, DAT_080c7860                     @ 080c77b4 2a49
+    ldr r1, value_jp_ascii_digit_to_fullwidth_delta_080c7860 @ 080c77b4 2a49
     adds r0,r2,r1    @ 080c77b6 5018
     lsls r0,r0,#0x10    @ 080c77b8 0004
     lsrs r6,r0,#0x10    @ 080c77ba 060c
@@ -13290,8 +13290,8 @@ LAB_080c7836:
     beq LAB_080c7840                         @ 080c783c 00d0
     b LAB_080c76f0                           @ 080c783e 57e7
 LAB_080c7840:
-    ldr r0, DAT_080c7864                     @ 080c7840 0848
-    ldr r6, DAT_080c7868                     @ 080c7842 094e
+    ldr r0, ptr_gfontstate_080c7864          @ 080c7840 0848
+    ldr r6, value_font_state_final_text_x_off_080c7868 @ 080c7842 094e
     adds r0,r0,r6    @ 080c7844 8019
     strb r5,[r0,#0x0]                        @ 080c7846 0570
     .hword 0x4640    @ 080c7848 4046
@@ -13306,139 +13306,139 @@ LAB_080c7840:
     pop {r1}                                 @ 080c785a 02bc
     bx r1                                    @ 080c785c 0847
     .zero  0x2
-DAT_080c7860:
-    .word  0x0000821f                     @ 080c7860 1f820000
-DAT_080c7864:
-    .word  0x0201f440                     @ 080c7864 40f40102
-DAT_080c7868:
-    .word  0x00000a16                     @ 080c7868 160a0000
+value_jp_ascii_digit_to_fullwidth_delta_080c7860:
+    .word  JP_ASCII_DIGIT_TO_FULLWIDTH_DELTA @ 080c7860 1f820000  ASCII digit + 0x821f maps 0x30..0x39 to fullwidth glyph codes 0x824f..0x8258.
+ptr_gfontstate_080c7864:
+    .word  gFontState                     @ 080c7864 40f40102  Base address of gFontState.
+value_font_state_final_text_x_off_080c7868:
+    .word  FONT_STATE_FINAL_TEXT_X_OFF    @ 080c7868 160a0000  Value FONT_STATE_FINAL_TEXT_X_OFF.
 
-@ Clears 32KB card name VRAM buffer (DAT_080c7888) via zero_fill_by_halfword(base, 0x4000). Called by copy_game_text_to_card_name_vram before writing text tiles. Writes ctrl ready flag 0x0b to external ctrl byte after clearing. No APCS params (all addresses loaded from DAT). Returns void. Constants: vram_buf=DAT_080c7888, zero_len=0x4000 halfwords=0x8000 bytes (32KB), ctrl_val=0x0b.
-zero_card_name_vram_buf:
+@ Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0b. The helper count is in bytes. No input parameters.
+clear_card_display_obj_tiles_mode_11:
     push {lr}                                @ 080c786c 00b5
-    ldr r0, DAT_080c7888                     @ 080c786e 0648
+    ldr r0, ptr_aob_card_tile_vram_080c7888  @ 080c786e 0648
     movs r1,#0x80    @ 080c7870 8021
     lsls r1,r1,#0x7    @ 080c7872 c901
     bl zero_fill_by_halfword                 @ 080c7874 2df0fefa
-    ldr r0, DAT_080c788c                     @ 080c7878 0448
-    ldr r1, DAT_080c7890                     @ 080c787a 0549
+    ldr r0, ptr_gfontstate_080c788c          @ 080c7878 0448
+    ldr r1, value_font_state_display_mode_off_080c7890 @ 080c787a 0549
     adds r0,r0,r1    @ 080c787c 4018
     movs r1,#0xb    @ 080c787e 0b21
     strb r1,[r0,#0x0]                        @ 080c7880 0170
     pop {r0}                                 @ 080c7882 01bc
     bx r0                                    @ 080c7884 0047
     .zero  0x2
-DAT_080c7888:
-    .word  0x06014000                     @ 080c7888 00400106
-DAT_080c788c:
-    .word  0x0201f440                     @ 080c788c 40f40102
-DAT_080c7890:
-    .word  0x00000a01                     @ 080c7890 010a0000
+ptr_aob_card_tile_vram_080c7888:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c7888 00400106  Base address of AOB_CARD_TILE_VRAM.
+ptr_gfontstate_080c788c:
+    .word  gFontState                     @ 080c788c 40f40102  Base address of gFontState.
+value_font_state_display_mode_off_080c7890:
+    .word  FONT_STATE_DISPLAY_MODE_OFF    @ 080c7890 010a0000  Value FONT_STATE_DISPLAY_MODE_OFF.
 
-@ Initialize BG VRAM regions for card display screen. Clears BG tile/map regions, sets palette entries, configures BG control registers for card image and text display layers. No APCS params; all addresses from global display state. Returns void. Side effects: BG VRAM, palette, DISPCNT regs written. Constants: BG control regs 0x04000008/0x0400000a/0x0400000c/0x0400000e.
-init_bg_vram_for_card_display:
+@ Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0c. The helper count is in bytes. No input parameters.
+clear_card_display_obj_tiles_mode_12:
     push {lr}                                @ 080c7894 00b5
-    ldr r0, DAT_080c78b0                     @ 080c7896 0648
+    ldr r0, ptr_aob_card_tile_vram_080c78b0  @ 080c7896 0648
     movs r1,#0x80    @ 080c7898 8021
     lsls r1,r1,#0x7    @ 080c789a c901
     bl zero_fill_by_halfword                 @ 080c789c 2df0eafa
-    ldr r0, DAT_080c78b4                     @ 080c78a0 0448
-    ldr r1, DAT_080c78b8                     @ 080c78a2 0549
+    ldr r0, ptr_gfontstate_080c78b4          @ 080c78a0 0448
+    ldr r1, value_font_state_display_mode_off_080c78b8 @ 080c78a2 0549
     adds r0,r0,r1    @ 080c78a4 4018
     movs r1,#0xc    @ 080c78a6 0c21
     strb r1,[r0,#0x0]                        @ 080c78a8 0170
     pop {r0}                                 @ 080c78aa 01bc
     bx r0                                    @ 080c78ac 0047
     .zero  0x2
-DAT_080c78b0:
-    .word  0x06014000                     @ 080c78b0 00400106
-DAT_080c78b4:
-    .word  0x0201f440                     @ 080c78b4 40f40102
-DAT_080c78b8:
-    .word  0x00000a01                     @ 080c78b8 010a0000
+ptr_aob_card_tile_vram_080c78b0:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c78b0 00400106  Base address of AOB_CARD_TILE_VRAM.
+ptr_gfontstate_080c78b4:
+    .word  gFontState                     @ 080c78b4 40f40102  Base address of gFontState.
+value_font_state_display_mode_off_080c78b8:
+    .word  FONT_STATE_DISPLAY_MODE_OFF    @ 080c78b8 010a0000  Value FONT_STATE_DISPLAY_MODE_OFF.
 
-@ Initialize OBJ tile VRAM and palette for card type/attribute icon display. Copies icon tile data from ROM to OBJ VRAM, writes palette entries for icon colors. r0: card_type [0..N]; r1: card_attribute [0..N]. Returns void. Side effects: OBJ tile VRAM and OBJ palette written for icon display. Constants: icon_tile_table_base in ROM; OBJ_VRAM_BASE=0x06010000.
-init_card_icon_tile_and_palette:
+@ Set UI-effect flag 0x10 at gDuelFieldState+0x215. Store the low8 initial selection index in bits11:4 of gFontState+0xa0e, preserving other bits. Clear 0x4000 OBJ bytes at AOB_CARD_TILE_VRAM, copy four label tiles and one overlay tile, then copy 0x20 palette bytes to OBJ palette slot3. Set gFontState display mode to 0x0d. Only r0 is an input.
+init_card_selection_panel_mode_13:
     push {r4,lr}                             @ 080c78bc 10b5
-    ldr r2, DAT_080c791c                     @ 080c78be 174a
-    ldr r1, DAT_080c7920                     @ 080c78c0 1749
+    ldr r2, ptr_gduelfieldstate_080c791c     @ 080c78be 174a
+    ldr r1, value_duel_field_ui_effect_flags_off_080c7920 @ 080c78c0 1749
     adds r2,r2,r1    @ 080c78c2 5218
     movs r1,#0x10    @ 080c78c4 1021
     ldrb r3,[r2,#0x0]                        @ 080c78c6 1378
     orrs r1,r3    @ 080c78c8 1943
     strb r1,[r2,#0x0]                        @ 080c78ca 1170
-    ldr r4, DAT_080c7924                     @ 080c78cc 154c
-    ldr r1, DAT_080c7928                     @ 080c78ce 1649
+    ldr r4, ptr_gfontstate_080c7924          @ 080c78cc 154c
+    ldr r1, value_font_state_selection_index_off_080c7928 @ 080c78ce 1649
     adds r2,r4,r1    @ 080c78d0 6218
     movs r1,#0xff    @ 080c78d2 ff21
     ands r0,r1    @ 080c78d4 0840
     lsls r0,r0,#0x4    @ 080c78d6 0001
-    ldr r1, DAT_080c792c                     @ 080c78d8 1449
+    ldr r1, value_font_state_selection_index_clear_mask_080c792c @ 080c78d8 1449
     ldrh r3,[r2,#0x0]                        @ 080c78da 1388
     ands r1,r3    @ 080c78dc 1940
     orrs r1,r0    @ 080c78de 0143
     strh r1,[r2,#0x0]                        @ 080c78e0 1180
-    ldr r0, DAT_080c7930                     @ 080c78e2 1348
+    ldr r0, ptr_aob_card_tile_vram_080c7930  @ 080c78e2 1348
     movs r1,#0x80    @ 080c78e4 8021
     lsls r1,r1,#0x7    @ 080c78e6 c901
     bl zero_fill_by_halfword                 @ 080c78e8 2df0c4fa
-    ldr r0, DAT_080c7934                     @ 080c78ec 1148
-    ldr r1, DAT_080c7938                     @ 080c78ee 1249
+    ldr r0, ptr_card_selection_panel_label_obj_tiles_080c7934 @ 080c78ec 1148
+    ldr r1, ptr_card_count_panel_label_tiles_080c7938 @ 080c78ee 1249
     movs r2,#0x4    @ 080c78f0 0422
     movs r3,#0x1    @ 080c78f2 0123
     bl tile_2d_row_copy                      @ 080c78f4 2ff0eefd
-    ldr r0, DAT_080c793c                     @ 080c78f8 1048
-    ldr r1, DAT_080c7940                     @ 080c78fa 1149
+    ldr r0, ptr_card_selection_panel_overlay_obj_tile_080c793c @ 080c78f8 1048
+    ldr r1, ptr_card_overlay_tile_src_080c7940 @ 080c78fa 1149
     movs r2,#0x1    @ 080c78fc 0122
     movs r3,#0x1    @ 080c78fe 0123
     bl tile_2d_row_copy                      @ 080c7900 2ff0e8fd
-    ldr r0, DAT_080c7944                     @ 080c7904 0f48
-    ldr r1, DAT_080c7948                     @ 080c7906 1049
+    ldr r0, ptr_obj_palram_slot_3_080c7944   @ 080c7904 0f48
+    ldr r1, ptr_duel_field_shared_obj_palette_080c7948 @ 080c7906 1049
     movs r2,#0x20    @ 080c7908 2022
     bl copy_bytes_by_halfword                @ 080c790a 2df0cbfa
-    ldr r0, DAT_080c794c                     @ 080c790e 0f48
+    ldr r0, value_font_state_display_mode_off_080c794c @ 080c790e 0f48
     adds r4,r4,r0    @ 080c7910 2418
     movs r0,#0xd    @ 080c7912 0d20
     strb r0,[r4,#0x0]                        @ 080c7914 2070
     pop {r4}                                 @ 080c7916 10bc
     pop {r0}                                 @ 080c7918 01bc
     bx r0                                    @ 080c791a 0047
-DAT_080c791c:
-    .word  0x02023130                     @ 080c791c 30310202
-DAT_080c7920:
-    .word  0x00000215                     @ 080c7920 15020000
-DAT_080c7924:
-    .word  0x0201f440                     @ 080c7924 40f40102
-DAT_080c7928:
-    .word  0x00000a0e                     @ 080c7928 0e0a0000
-DAT_080c792c:
-    .word  0xfffff00f                     @ 080c792c 0ff0ffff
-DAT_080c7930:
-    .word  0x06014000                     @ 080c7930 00400106
-DAT_080c7934:
-    .word  0x06013400                     @ 080c7934 00340106
-DAT_080c7938:
-    .word  0x099082a4                     @ 080c7938 a4829009
-DAT_080c793c:
-    .word  0x06010800                     @ 080c793c 00080106
-DAT_080c7940:
-    .word  0x09ccd2d0                     @ 080c7940 d0d2cc09
-DAT_080c7944:
-    .word  0x05000260                     @ 080c7944 60020005
-DAT_080c7948:
-    .word  0x09850c5c                     @ 080c7948 5c0c8509
-DAT_080c794c:
-    .word  0x00000a01                     @ 080c794c 010a0000
+ptr_gduelfieldstate_080c791c:
+    .word  gDuelFieldState                @ 080c791c 30310202  Base address of gDuelFieldState.
+value_duel_field_ui_effect_flags_off_080c7920:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c7920 15020000  Value DUEL_FIELD_UI_EFFECT_FLAGS_OFF.
+ptr_gfontstate_080c7924:
+    .word  gFontState                     @ 080c7924 40f40102  Base address of gFontState.
+value_font_state_selection_index_off_080c7928:
+    .word  FONT_STATE_SELECTION_INDEX_OFF @ 080c7928 0e0a0000  Value FONT_STATE_SELECTION_INDEX_OFF.
+value_font_state_selection_index_clear_mask_080c792c:
+    .word  FONT_STATE_SELECTION_INDEX_CLEAR_MASK @ 080c792c 0ff0ffff  Value FONT_STATE_SELECTION_INDEX_CLEAR_MASK.
+ptr_aob_card_tile_vram_080c7930:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c7930 00400106  Base address of AOB_CARD_TILE_VRAM.
+ptr_card_selection_panel_label_obj_tiles_080c7934:
+    .word  card_selection_panel_label_obj_tiles                     @ 080c7934 00340106  Base address of card_selection_panel_label_obj_tiles.
+ptr_card_count_panel_label_tiles_080c7938:
+    .word  card_count_panel_label_tiles   @ 080c7938 a4829009  Base address of card_count_panel_label_tiles.
+ptr_card_selection_panel_overlay_obj_tile_080c793c:
+    .word  card_selection_panel_overlay_obj_tile                     @ 080c793c 00080106  Base address of card_selection_panel_overlay_obj_tile.
+ptr_card_overlay_tile_src_080c7940:
+    .word  CARD_OVERLAY_TILE_SRC          @ 080c7940 d0d2cc09  Base address of CARD_OVERLAY_TILE_SRC.
+ptr_obj_palram_slot_3_080c7944:
+    .word  OBJ_PALRAM_SLOT_3                     @ 080c7944 60020005  Base address of OBJ_PALRAM_SLOT_3.
+ptr_duel_field_shared_obj_palette_080c7948:
+    .word  duel_field_shared_obj_palette  @ 080c7948 5c0c8509  Base address of duel_field_shared_obj_palette.
+value_font_state_display_mode_off_080c794c:
+    .word  FONT_STATE_DISPLAY_MODE_OFF    @ 080c794c 010a0000  Value FONT_STATE_DISPLAY_MODE_OFF.
 
-@ Writes game string to card name VRAM buffer for dispatch_card_display_op case 0x31. Calls zero_card_name_vram_buf to clear 32KB, then resolve_game_str_ptr(r1) twice (validity check and pointer fetch); if valid calls copy_cstr_to_buf(vram_base+1, str_ptr). r0=u32 zone_descriptor [0..0xffffffff]; r1=u16 game_str_id [0..0xd7ea]; r2=u32 extra_flags [0..2]. Returns void. Constants: vram_base=DAT_080c7984, vram_offset=+1 (skip first halfword).
-copy_game_text_to_card_name_vram:
+@ Clear 0xa20 bytes at gFontState and copy a resolved game string to gFontState+1, or write an empty string. Set font-state flag1 and UI-effect flag4, then dispatch display modes 0..13 using the mode-specific r2 argument. Mode2 additionally checks input before falling back to mode1. Mode11 clears the request flags after its initializer; invalid modes clear them directly. Text is staged in EWRAM, not VRAM.
+init_card_display_mode_with_game_text:
     push {r4,r5,r6,r7,lr}                    @ 080c7950 f0b5
     .hword 0x4647    @ 080c7952 4746
     push {r7}                                @ 080c7954 80b4
     adds r7,r0,#0x0    @ 080c7956 071c
     adds r6,r1,#0x0    @ 080c7958 0e1c
     adds r5,r2,#0x0    @ 080c795a 151c
-    ldr r4, DAT_080c7984                     @ 080c795c 094c
+    ldr r4, ptr_gfontstate_080c7984          @ 080c795c 094c
     movs r1,#0xa2    @ 080c795e a221
     lsls r1,r1,#0x4    @ 080c7960 0901
     adds r0,r4,#0x0    @ 080c7962 201c
@@ -13454,18 +13454,18 @@ copy_game_text_to_card_name_vram:
     adds r0,r4,#0x0    @ 080c797c 201c
     bl copy_cstr_to_buf                      @ 080c797e 2df069fb
     b LAB_080c798a                           @ 080c7982 02e0
-DAT_080c7984:
-    .word  0x0201f440                     @ 080c7984 40f40102
+ptr_gfontstate_080c7984:
+    .word  gFontState                     @ 080c7984 40f40102  Base address of gFontState.
 LAB_080c7988:
     strb r0,[r4,#0x1]                        @ 080c7988 6070
 LAB_080c798a:
-    ldr r4, DAT_080c79b8                     @ 080c798a 0b4c
+    ldr r4, ptr_gfontstate_080c79b8          @ 080c798a 0b4c
     movs r0,#0x1    @ 080c798c 0120
     ldrb r3,[r4,#0x0]                        @ 080c798e 2378
     orrs r3,r0    @ 080c7990 0343
     strb r3,[r4,#0x0]                        @ 080c7992 2370
-    ldr r1, DAT_080c79bc                     @ 080c7994 0949
-    ldr r0, DAT_080c79c0                     @ 080c7996 0a48
+    ldr r1, ptr_gduelfieldstate_080c79bc     @ 080c7994 0949
+    ldr r0, value_duel_field_ui_effect_flags_off_080c79c0 @ 080c7996 0a48
     adds r6,r1,r0    @ 080c7998 0e18
     movs r0,#0x4    @ 080c799a 0420
     ldrb r2,[r6,#0x0]                        @ 080c799c 3278
@@ -13479,20 +13479,20 @@ switchD_080c79b4__default:
     b LAB_080c7ade                           @ 080c79aa 98e0
 LAB_080c79ac:
     lsls r0,r7,#0x2    @ 080c79ac b800
-    ldr r1, DAT_080c79c4                     @ 080c79ae 0549
+    ldr r1, ptr_switchd_080c79b4__switchdatad_080c79c8_080c79c4 @ 080c79ae 0549
     adds r0,r0,r1    @ 080c79b0 4018
     ldr r0,[r0,#0x0]                         @ 080c79b2 0068
 switchD_080c79b4__switchD:
     .hword 0x4687    @ 080c79b4 8746
     .zero  0x2
-DAT_080c79b8:
-    .word  0x0201f440                     @ 080c79b8 40f40102
-DAT_080c79bc:
-    .word  0x02023130                     @ 080c79bc 30310202
-DAT_080c79c0:
-    .word  0x00000215                     @ 080c79c0 15020000
-DAT_080c79c4:
-    .word  0x080c79c8                     @ 080c79c4 c8790c08
+ptr_gfontstate_080c79b8:
+    .word  gFontState                     @ 080c79b8 40f40102  Base address of gFontState.
+ptr_gduelfieldstate_080c79bc:
+    .word  gDuelFieldState                @ 080c79bc 30310202  Base address of gDuelFieldState.
+value_duel_field_ui_effect_flags_off_080c79c0:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c79c0 15020000  Value DUEL_FIELD_UI_EFFECT_FLAGS_OFF.
+ptr_switchd_080c79b4__switchdatad_080c79c8_080c79c4:
+    .word  switchD_080c79b4__switchdataD_080c79c8                     @ 080c79c4 c8790c08  Base address of switchD_080c79b4__switchdataD_080c79c8.
 switchD_080c79b4__switchdataD_080c79c8:
     .word  0x080c7a00                     @ 080c79c8 007a0c08
     .word  0x080c7a32                     @ 080c79cc 327a0c08
@@ -13509,15 +13509,15 @@ switchD_080c79b4__switchdataD_080c79c8:
     .word  0x080c7ad0                     @ 080c79f8 d07a0c08
     .word  0x080c7ad6                     @ 080c79fc d67a0c08
 switchD_080c79b4__caseD_0:
-    ldr r0, DAT_080c7a0c                     @ 080c7a00 0248
+    ldr r0, ptr_aob_card_tile_vram_080c7a0c  @ 080c7a00 0248
     movs r1,#0x80    @ 080c7a02 8021
     lsls r1,r1,#0x7    @ 080c7a04 c901
     bl zero_fill_by_halfword                 @ 080c7a06 2df035fa
     b LAB_080c7aec                           @ 080c7a0a 6fe0
-DAT_080c7a0c:
-    .word  0x06014000                     @ 080c7a0c 00400106
+ptr_aob_card_tile_vram_080c7a0c:
+    .word  AOB_CARD_TILE_VRAM                     @ 080c7a0c 00400106  Base address of AOB_CARD_TILE_VRAM.
 switchD_080c79b4__caseD_2:
-    ldr r0, PTR_gPrng_080c7a38               @ 080c7a10 0948
+    ldr r0, ptr_gprng_080c7a38               @ 080c7a10 0948
     movs r1,#0xa3    @ 080c7a12 a321
     lsls r1,r1,#0x1    @ 080c7a14 4900
     adds r0,r0,r1    @ 080c7a16 4018
@@ -13538,10 +13538,10 @@ LAB_080c7a26:
 switchD_080c79b4__caseD_1:
     bl init_choice_label_vram_case1          @ 080c7a32 08f0bdfc
     b LAB_080c7aec                           @ 080c7a36 59e0
-PTR_gPrng_080c7a38:
-    .word  gPrng                          @ 080c7a38 40000003
+ptr_gprng_080c7a38:
+    .word  gPrng                          @ 080c7a38 40000003  Base address of gPrng.
 LAB_080c7a3c:
-    ldr r0, PTR_gP1LifePoints_080c7a5c       @ 080c7a3c 0748
+    ldr r0, ptr_gp1lifepoints_080c7a5c       @ 080c7a3c 0748
     movs r2,#0xea    @ 080c7a3e ea22
     lsls r2,r2,#0x5    @ 080c7a40 5201
     adds r0,r0,r2    @ 080c7a42 8018
@@ -13554,13 +13554,13 @@ LAB_080c7a3c:
     ands r0,r1    @ 080c7a50 0840
     .hword 0x4662    @ 080c7a52 6246
     strb r0,[r2,#0x0]                        @ 080c7a54 1070
-    ldr r1, DAT_080c7a60                     @ 080c7a56 0249
+    ldr r1, value_duel_field_ui_effect_flags_off_080c7a60 @ 080c7a56 0249
     add r1,r8                                @ 080c7a58 4144
     b LAB_080c7ab6                           @ 080c7a5a 2ce0
-PTR_gP1LifePoints_080c7a5c:
-    .word  gP1LifePoints                  @ 080c7a5c e0c40102
-DAT_080c7a60:
-    .word  0x00000215                     @ 080c7a60 15020000
+ptr_gp1lifepoints_080c7a5c:
+    .word  gP1LifePoints                  @ 080c7a5c e0c40102  Base address of gP1LifePoints.
+value_duel_field_ui_effect_flags_off_080c7a60:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c7a60 15020000  Value DUEL_FIELD_UI_EFFECT_FLAGS_OFF.
 switchD_080c79b4__caseD_3:
     bl zero_fill_card_label_vram_if_ready    @ 080c7a64 06f0c4fe
     b LAB_080c7aec                           @ 080c7a68 40e0
@@ -13592,15 +13592,15 @@ switchD_080c79b4__caseD_a:
     bl init_card_stat_tile_and_scroll        @ 080c7a9a 07f049fc
     b LAB_080c7aec                           @ 080c7a9e 25e0
 switchD_080c79b4__caseD_b:
-    bl zero_card_name_vram_buf               @ 080c7aa0 fff7e4fe
-    ldr r1, DAT_080c7ac4                     @ 080c7aa4 0749
+    bl clear_card_display_obj_tiles_mode_11  @ 080c7aa0 fff7e4fe
+    ldr r1, ptr_gfontstate_080c7ac4          @ 080c7aa4 0749
     movs r0,#0x2    @ 080c7aa6 0220
     rsbs r0,r0,#0    @ 080c7aa8 4042
     ldrb r2,[r1,#0x0]                        @ 080c7aaa 0a78
     ands r0,r2    @ 080c7aac 1040
     strb r0,[r1,#0x0]                        @ 080c7aae 0870
-    ldr r1, DAT_080c7ac8                     @ 080c7ab0 0549
-    ldr r0, DAT_080c7acc                     @ 080c7ab2 0648
+    ldr r1, ptr_gduelfieldstate_080c7ac8     @ 080c7ab0 0549
+    ldr r0, value_duel_field_ui_effect_flags_off_080c7acc @ 080c7ab2 0648
     adds r1,r1,r0    @ 080c7ab4 0918
 LAB_080c7ab6:
     movs r0,#0x5    @ 080c7ab6 0520
@@ -13610,18 +13610,18 @@ LAB_080c7ab6:
     strb r0,[r1,#0x0]                        @ 080c7abe 0870
     b LAB_080c7aec                           @ 080c7ac0 14e0
     .zero  0x2
-DAT_080c7ac4:
-    .word  0x0201f440                     @ 080c7ac4 40f40102
-DAT_080c7ac8:
-    .word  0x02023130                     @ 080c7ac8 30310202
-DAT_080c7acc:
-    .word  0x00000215                     @ 080c7acc 15020000
+ptr_gfontstate_080c7ac4:
+    .word  gFontState                     @ 080c7ac4 40f40102  Base address of gFontState.
+ptr_gduelfieldstate_080c7ac8:
+    .word  gDuelFieldState                @ 080c7ac8 30310202  Base address of gDuelFieldState.
+value_duel_field_ui_effect_flags_off_080c7acc:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c7acc 15020000  Value DUEL_FIELD_UI_EFFECT_FLAGS_OFF.
 switchD_080c79b4__caseD_c:
-    bl init_bg_vram_for_card_display         @ 080c7ad0 fff7e0fe
+    bl clear_card_display_obj_tiles_mode_12  @ 080c7ad0 fff7e0fe
     b LAB_080c7aec                           @ 080c7ad4 0ae0
 switchD_080c79b4__caseD_d:
     adds r0,r5,#0x0    @ 080c7ad6 281c
-    bl init_card_icon_tile_and_palette       @ 080c7ad8 fff7f0fe
+    bl init_card_selection_panel_mode_13     @ 080c7ad8 fff7f0fe
     b LAB_080c7aec                           @ 080c7adc 06e0
 LAB_080c7ade:
     movs r0,#0x2    @ 080c7ade 0220
@@ -14418,11 +14418,11 @@ switchD_080c806a__caseD_a:
     bl init_card_stat_tile_and_scroll        @ 080c8100 07f016f9
     b LAB_080c8130                           @ 080c8104 14e0
 switchD_080c806a__caseD_c:
-    bl init_bg_vram_for_card_display         @ 080c8106 fff7c5fb
+    bl clear_card_display_obj_tiles_mode_12  @ 080c8106 fff7c5fb
     b LAB_080c8130                           @ 080c810a 11e0
 switchD_080c806a__caseD_d:
     movs r0,#0x0    @ 080c810c 0020
-    bl init_card_icon_tile_and_palette       @ 080c810e fff7d5fb
+    bl init_card_selection_panel_mode_13     @ 080c810e fff7d5fb
     b LAB_080c8130                           @ 080c8112 0de0
 switchD_080c806a__caseD_b:
     ldr r1, DAT_080c8158                     @ 080c8114 1049
@@ -14659,7 +14659,7 @@ DAT_080c82dc:
 DAT_080c82e0:
     .word  0xfffffe01                     @ 080c82e0 01feffff
 
-@ Card-list display master tick; called once per frame by tick_card_list_scene_frame (0x080c8688). Reads gFontState+0x0a17 byte, combines bits to form mode index r4=(bit0<<7)|(bits[7:1]). r4=0: call dispatch_card_list_oam_row_by_card_type (10-case card-type OAM row dispatch); r4=1: call dispatch_card_display_state_by_mode (7-case display mode dispatch); r4>=2: read gFontState+0x0a01 card_type byte, enter 14-entry switchD table at 0x080c8384, call corresponding render_card_list_oam_row_by_* sibling. No direct IO/VRAM writes; all side effects in callees. Constants: FONT_STATE_BASE=0x0201f440; STATE_BYTE_OFFSET=0x0a17; CARD_TYPE_OFFSET=0x0a01; SWITCH_TABLE=0x080c8384 (14 entries).
+@ Tick the card display from gFontState+0xa17/+0xa18 state flags. The zero-state path calls dispatch_card_display_oam_by_mode; state1 calls dispatch_card_display_state_by_mode. Within the zero-state path, read gFontState+0xa01 as the display mode and dispatch through the 14-entry table at 0x080c8384 after input checks. Input and callee results can update the state flags.
 tick_card_list_display_master:
     push {r4,r5,r6,r7,lr}                    @ 080c82e4 f0b5
     .hword 0x4647    @ 080c82e6 4746
@@ -14688,7 +14688,7 @@ DAT_080c8310:
 DAT_080c8314:
     .word  0x00000a17                     @ 080c8314 170a0000
 LAB_080c8318:
-    bl dispatch_card_list_oam_row_by_card_type @ 080c8318 fff78ef9
+    bl dispatch_card_display_oam_by_mode     @ 080c8318 fff78ef9
     ldr r1, DAT_080c8330                     @ 080c831c 0449
     ldr r0, DAT_080c8334                     @ 080c831e 0548
     adds r1,r1,r0    @ 080c8320 0918
@@ -15609,7 +15609,7 @@ LAB_080c89d6:
 DAT_080c89e4:
     .word  0x0202317c                     @ 080c89e4 7c310202
 
-@ Updates per-player zone activation display state for all 11 slot types; called in dispatch_card_display_op case 0x03 after write_zone_slot_oam_descriptor. Outer loop r6=[0..1] (player_id); inner slot_type [0..10]: calls dispatch_zone_activation_by_state(is_active, slot_type, 0); if return bit11 (0x800) set, accumulates bit into r5 bitmask. Writes final bitmask to gDuelZoneCtrl (0x020230c0) [+0x30+player*4]; calls query_player_slot_activation_bitmask to refresh related fields. No APCS params (all from globals). Returns void. Constants: gDuelZoneCtrl=0x020230c0, FLAG_ACTIVATABLE=0x800, slot_type_range=[0..10].
+@ Update activation display flags for both players and 11 field slot types. dispatch_card_display_op invokes this after select_zone_cursor_and_render_info. Accumulate bit11 results from dispatch_zone_activation_by_state into gDuelZoneCtrl+0x30+player*4 and refresh the player activation bitmask.
 update_zone_activation_display_state:
     push {r4,r5,r6,r7,lr}                    @ 080c89e8 f0b5
     .hword 0x464f    @ 080c89ea 4f46

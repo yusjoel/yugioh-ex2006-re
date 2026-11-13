@@ -709,3 +709,5 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gDuelFieldChainRenderBitsPackedLo, 0x0202334e
 .equ gDuelFieldChainRenderBitsPackedHi, 0x02023350
 .equ gDuelActionMenuAnimStep, 0x0201ff5a
+.equ DUEL_FIELD_CURSOR_STATE_OFF, 0x00001cf4
+.equ DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF, 0x00000212

@@ -21462,7 +21462,7 @@ switchD_080bf13c__default:
     adds r0,r5,#0x0    @ 080bf1ce 281c
     adds r1,r6,#0x0    @ 080bf1d0 311c
     adds r2,r4,#0x0    @ 080bf1d2 221c
-    bl set_zone_oam_coords_by_player         @ 080bf1d4 07f0e2fb
+    bl render_zone_cursor_oam                @ 080bf1d4 07f0e2fb
     ldrh r0,[r7,#0x12]                       @ 080bf1d8 788a
     adds r0,#0x1    @ 080bf1da 0130
     strh r0,[r7,#0x12]                       @ 080bf1dc 7882
@@ -21575,7 +21575,7 @@ LAB_080bf294:
     adds r0,r6,#0x0    @ 080bf2a4 301c
     movs r1,#0xb    @ 080bf2a6 0b21
     adds r2,r7,#0x0    @ 080bf2a8 3a1c
-    bl set_zone_oam_coords_by_player         @ 080bf2aa 07f077fb
+    bl render_zone_cursor_oam                @ 080bf2aa 07f077fb
     ldrh r0,[r4,#0x12]                       @ 080bf2ae 608a
     adds r0,#0x1    @ 080bf2b0 0130
     strh r0,[r4,#0x12]                       @ 080bf2b2 6082

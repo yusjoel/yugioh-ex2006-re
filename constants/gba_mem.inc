@@ -92,3 +92,5 @@
 .equ BG_SCREENBLOCK_29_BASE, 0x0600e800
 .equ BG_PALRAM_SLOT_1, 0x05000020
 .equ DUEL_FIELD_OPP_SLOT_TILE_VRAM, 0x060031c0
+.equ card_selection_panel_label_obj_tiles, 0x06013400
+.equ card_selection_panel_overlay_obj_tile, 0x06010800
