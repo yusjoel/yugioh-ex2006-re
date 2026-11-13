@@ -3598,11 +3598,11 @@ address,name,proposed_name,score,tags
 0x080c40e0,init_field_slot_render_request,,,
 0x080c412c,render_field_slot_card_tile_by_id,,,card_ids;duel_field
 0x080c4220,refresh_player_field_slot_tiles,,,card_ids;duel_field
-0x080c4350,dispatch_ui_effect_by_card_type,,,card_ids
+0x080c4350,run_ui_effect_card_render_state_machine,,,card_ids
 0x080c4ca0,clear_ui_effect_state_flags,,,
-0x080c4cd4,check_lp_threshold_for_zone_slot,,,
+0x080c4cd4,classify_player_hand_count_threshold,,,
 0x080c4d04,redraw_all_field_slot_tiles,,,card_frame;card_ids;duel_field
-0x080c4ea0,init_field_slot_aob_ctx_c,,,
+0x080c4ea0,init_ui_effect_card_pair_request,,,
 0x080c4edc,run_ui_effect_card_pair_state_machine,,,card_ids;card_stats;duel_field;font_jp;game_str
 0x080c5444,setup_zone_oam_entry_by_field_slot,,,duel_field
 0x080c55dc,init_zone_oam_ctx_by_type,,,duel_field

@@ -4613,7 +4613,7 @@ switchD_0801ecbc__caseD_a:
 switchD_0801ecbc__caseD_19:
     adds r0,r7,#0x0    @ 0801edc6 381c
     adds r1,r4,#0x0    @ 0801edc8 211c
-    bl init_field_slot_aob_ctx_c             @ 0801edca a6f069f8
+    bl init_ui_effect_card_pair_request      @ 0801edca a6f069f8
     b switchD_0801ecbc__caseD_a              @ 0801edce f8e7
 switchD_0801ecbc__caseD_1b:
     adds r0,r6,#0x0    @ 0801edd0 301c
@@ -4940,7 +4940,7 @@ LAB_0801f0bc:
     bne LAB_0801f0c6                         @ 0801f0c2 00d1
     b switchD_0801efa4__caseD_7              @ 0801f0c4 b5e0
 LAB_0801f0c6:
-    bl dispatch_ui_effect_by_card_type       @ 0801f0c6 a5f043f9
+    bl run_ui_effect_card_render_state_machine @ 0801f0c6 a5f043f9
     b LAB_0801f234                           @ 0801f0ca b3e0
 switchD_0801efa4__caseD_3:
     bl play_ui_effect_03                     @ 0801f0cc adf0d8fc

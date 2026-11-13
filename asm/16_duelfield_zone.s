@@ -6243,15 +6243,15 @@ ptr_g_duel_zone_activation_state_080c4348:
 duel_zone_activation_low11_mask_080c434c:
     .word  DUEL_ZONE_ACTIVATION_LOW11_MASK @ 080c434c ff070000  DUEL_ZONE_ACTIVATION_LOW11_MASK: named scalar literal.
 
-@ 读取 gUIEffectState[+0x4] halfword (当前卡牌 slot_ref), 调用 ensure_card_id_cache_entry 确保卡牌信息已缓存, 再读 gUIEffectState[+0x6] halfword 作为第二个卡牌引用. 若 [+0x0] 类型字段 > 4, 调用 clear_ui_effect_state_flags 后返回; 否则以类型值 [0..4] 为 key 通过 switch-dispatch 分发到 5 个卡牌展示子状态机 (地址表 PTR_DAT_080c4390: case 0..4 分别指向 0x080c43a4/0x080c462c/0x080c48a2/0x080c4a24/0x080c4c58). 返回值转发子状态机 r0: 0=完成, 1=继续/进行中. 被 play_ui_effect (0x0801ef94) 作为某一 UI effect case 调用, 是卡牌展示动画的顶层 dispatcher. Constants: gUIEffectState=0x02023110, card_type_max=4, dispatch_table=PTR_DAT_080c4390.
-dispatch_ui_effect_by_card_type:
+@ Run the single-card UI render request selected by UI flag0. Cache the card at UI+4; UI+6 is mode. Phase0 prepares masks, images and AOB graphics; phase1 draws the source; phase2 advances AOB or five interpolation steps; phase3 draws the destination; phase4 refreshes the field and advances. Active phases return1. Out-of-range phase calls the shared frame cleanup and returns0. Packed refs are UI+8 and UI+0xc. BL at437a and4424 exits through the original saved frame.
+run_ui_effect_card_render_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080c4350 f0b5
     .hword 0x4657    @ 080c4352 5746
     .hword 0x464e    @ 080c4354 4e46
     .hword 0x4645    @ 080c4356 4546
     push {r5,r6,r7}                          @ 080c4358 e0b4
     sub sp,#0xc                              @ 080c435a 83b0
-    ldr r4, DAT_080c4388                     @ 080c435c 0a4c
+    ldr r4, ptr_g_ui_effect_state_080c4388   @ 080c435c 0a4c
     ldrh r0,[r4,#0x4]                        @ 080c435e a088
     bl ensure_card_id_cache_entry            @ 080c4360 08f0b2fa
     lsls r0,r0,#0x10    @ 080c4364 0004
@@ -6265,93 +6265,1182 @@ dispatch_ui_effect_by_card_type:
     ldrh r0,[r4,#0x0]                        @ 080c4374 2088
     cmp r0,#0x4                              @ 080c4376 0428
     bls LAB_080c437e                         @ 080c4378 01d9
-    bl clear_ui_effect_state_flags           @ 080c437a 00f091fc
+    bl clear_ui_effect_state_flags           @ 080c437a 00f091fc  -- Shared-frame cleanup terminates this parent path; keep direct BL ref UNCONDITIONAL_CALL.
 LAB_080c437e:
     lsls r0,r0,#0x2    @ 080c437e 8000
-    ldr r1, DAT_080c438c                     @ 080c4380 0249
+    ldr r1, ptr_ui_card_render_phase_table_080c438c @ 080c4380 0249
     adds r0,r0,r1    @ 080c4382 4018
     ldr r0,[r0,#0x0]                         @ 080c4384 0068
     .hword 0x4687    @ 080c4386 8746
-DAT_080c4388:
-    .word  gUIEffectState                 @ 080c4388 10310202
-DAT_080c438c:
-    .word  0x080c4390                     @ 080c438c 90430c08
-PTR_DAT_080c4390:
-    .word  0x080c43a4                     @ 080c4390 a4430c08
-    .word  0x080c462c                     @ 080c4394 2c460c08
-    .word  0x080c48a2                     @ 080c4398 a2480c08
-    .word  0x080c4a24                     @ 080c439c 244a0c08
-    .word  0x080c4c58                     @ 080c43a0 584c0c08
-DAT_080c43a4:
-    ROM_INCBIN 0xc43a4, 0x110
-    .word  0x080c44b8                     @ 080c44b4 b8440c08
-PTR_DAT_080c44b8:
-    .word  0x080c44dc                     @ 080c44b8 dc440c08
-    .word  0x080c4508                     @ 080c44bc 08450c08
-    .word  0x080c4508                     @ 080c44c0 08450c08
-    .word  0x080c4508                     @ 080c44c4 08450c08
-    .word  0x080c4508                     @ 080c44c8 08450c08
-    .word  0x080c4574                     @ 080c44cc 74450c08
-    .word  0x080c4508                     @ 080c44d0 08450c08
-    .word  0x080c4574                     @ 080c44d4 74450c08
-    .word  0x080c4574                     @ 080c44d8 74450c08
-DAT_080c44dc:
-    ROM_INCBIN 0xc44dc, 0x210
-    .word  0x080c472c                     @ 080c46ec 2c470c08
-    .word  0x080c472c                     @ 080c46f0 2c470c08
-    .word  0x080c472c                     @ 080c46f4 2c470c08
-    .word  0x080c472c                     @ 080c46f8 2c470c08
-    .word  0x080c472c                     @ 080c46fc 2c470c08
-    .word  0x080c472c                     @ 080c4700 2c470c08
-    .word  0x080c472c                     @ 080c4704 2c470c08
-    .word  0x080c472c                     @ 080c4708 2c470c08
-    .word  0x080c472c                     @ 080c470c 2c470c08
-    .word  0x080c472c                     @ 080c4710 2c470c08
-    .word  0x080c472c                     @ 080c4714 2c470c08
-    .word  0x080c47e4                     @ 080c4718 e4470c08
-    .word  0x080c473e                     @ 080c471c 3e470c08
-    .word  0x080c4760                     @ 080c4720 60470c08
-    .word  0x080c479c                     @ 080c4724 9c470c08
-    .word  0x080c47c0                     @ 080c4728 c0470c08
-DAT_080c472c:
-    ROM_INCBIN 0xc472c, 0x3ac
-    .word  0x080c4adc                     @ 080c4ad8 dc4a0c08
-PTR_DAT_080c4adc:
-    .word  0x080c4b1c                     @ 080c4adc 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4ae0 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4ae4 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4ae8 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4aec 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4af0 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4af4 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4af8 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4afc 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4b00 1c4b0c08
-    .word  0x080c4b1c                     @ 080c4b04 1c4b0c08
-    .word  0x080c4bec                     @ 080c4b08 ec4b0c08
-    .word  0x080c4b44                     @ 080c4b0c 444b0c08
-    .word  0x080c4b70                     @ 080c4b10 704b0c08
-    .word  0x080c4b94                     @ 080c4b14 944b0c08
-    .word  0x080c4bc0                     @ 080c4b18 c04b0c08
-DAT_080c4b1c:
-    ROM_INCBIN 0xc4b1c, 0x184
+ptr_g_ui_effect_state_080c4388:
+    .word  gUIEffectState                 @ 080c4388 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_ui_card_render_phase_table_080c438c:
+    .word  ui_card_render_phase_table     @ 080c438c 90430c08  ui_card_render_phase_table: add reviewed operand-0 DATA reference.
+ui_card_render_phase_table:
+    .word  ui_card_render_phase0_prepare  @ 080c4390 a4430c08
+    .word  ui_card_render_phase1_draw_source @ 080c4394 2c460c08
+    .word  ui_card_render_phase2_interpolate @ 080c4398 a2480c08
+    .word  ui_card_render_phase3_draw_destination @ 080c439c 244a0c08
+    .word  ui_card_render_phase4_finish   @ 080c43a0 584c0c08
+ui_card_render_phase0_prepare:
+    movs r1,#0xff    @ 080c43a4 ff21
+    lsls r1,r1,#0x6    @ 080c43a6 8901
+    adds r0,r1,#0x0    @ 080c43a8 081c
+    ldr r2, ptr_g_ui_effect_arg2_080c4428    @ 080c43aa 1f4a
+    ldrh r2,[r2,#0x0]                        @ 080c43ac 1288
+    ands r0,r2    @ 080c43ae 1040
+    cmp r0,r1                                @ 080c43b0 8842
+    bne ui_card_render_check_source_ref      @ 080c43b2 43d1
+    ldr r5, ptr_g_duel_field_state_080c442c  @ 080c43b4 1d4d
+    ldr r3, duel_field_fadein_flag_off_080c4430 @ 080c43b6 1e4b
+    adds r3,r3,r5    @ 080c43b8 5b19
+    .hword 0x4699    @ 080c43ba 9946
+    ldrh r4,[r3,#0x0]                        @ 080c43bc 1c88
+    .hword 0x46a0    @ 080c43be a046
+    .hword 0x4647    @ 080c43c0 4746
+    lsrs r0,r7,#0x2    @ 080c43c2 b808
+    movs r1,#0x88    @ 080c43c4 8821
+    lsls r1,r1,#0x2    @ 080c43c6 8900
+    adds r6,r5,r1    @ 080c43c8 6e18
+    movs r4,#0x3    @ 080c43ca 0324
+    adds r3,r4,#0x0    @ 080c43cc 231c
+    ldrb r2,[r6,#0x0]                        @ 080c43ce 3278
+    ands r3,r2    @ 080c43d0 1340
+    lsls r3,r3,#0xe    @ 080c43d2 9b03
+    orrs r3,r0    @ 080c43d4 0343
+    ldr r7, ptr_g_ui_effect_arg2_080c4428    @ 080c43d6 144f
+    ldr r0,[r7,#0x0]                         @ 080c43d8 3868
+    lsls r1,r0,#0x1a    @ 080c43da 8106
+    lsrs r1,r1,#0x1b    @ 080c43dc c90e
+    movs r2,#0x1    @ 080c43de 0122
+    lsls r2,r1    @ 080c43e0 8a40
+    lsls r0,r0,#0x1f    @ 080c43e2 c007
+    lsrs r0,r0,#0x1f    @ 080c43e4 c00f
+    lsls r0,r0,#0x3    @ 080c43e6 c000
+    lsls r2,r0    @ 080c43e8 8240
+    orrs r3,r2    @ 080c43ea 1343
+    lsls r3,r3,#0x10    @ 080c43ec 1b04
+    lsls r0,r3,#0x2    @ 080c43ee 9800
+    lsrs r0,r0,#0x10    @ 080c43f0 000c
+    .hword 0x4641    @ 080c43f2 4146
+    ands r4,r1    @ 080c43f4 0c40
+    orrs r4,r0    @ 080c43f6 0443
+    .hword 0x464a    @ 080c43f8 4a46
+    strh r4,[r2,#0x0]                        @ 080c43fa 1480
+    lsrs r3,r3,#0x1e    @ 080c43fc 9b0f
+    movs r0,#0x4    @ 080c43fe 0420
+    rsbs r0,r0,#0    @ 080c4400 4042
+    ldrb r4,[r6,#0x0]                        @ 080c4402 3478
+    ands r0,r4    @ 080c4404 2040
+    orrs r0,r3    @ 080c4406 1843
+    strb r0,[r6,#0x0]                        @ 080c4408 3070
+    ldr r1, ptr_g_ui_effect_state_080c4434   @ 080c440a 0a49
+    movs r0,#0x2    @ 080c440c 0220
+    rsbs r0,r0,#0    @ 080c440e 4042
+    ldrb r7,[r1,#0x19]                       @ 080c4410 4f7e
+    ands r0,r7    @ 080c4412 3840
+    strb r0,[r1,#0x19]                       @ 080c4414 4876
+    ldr r0, duel_field_ui_effect_flags_off_080c4438 @ 080c4416 0848
+    adds r5,r5,r0    @ 080c4418 2d18
+    movs r0,#0x5    @ 080c441a 0520
+    rsbs r0,r0,#0    @ 080c441c 4042
+    ldrb r1,[r5,#0x0]                        @ 080c441e 2978
+    ands r0,r1    @ 080c4420 0840
+    strb r0,[r5,#0x0]                        @ 080c4422 2870
+    bl ui_card_render_return_complete        @ 080c4424 00f049fc  -- Shared return tail consumes the parent frame; do not decode the literal at4428 as fallthrough.
+ptr_g_ui_effect_arg2_080c4428:
+    .word  gUIEffectArg2                  @ 080c4428 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c442c:
+    .word  gDuelFieldState                @ 080c442c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_fadein_flag_off_080c4430:
+    .word  DUEL_FIELD_FADEIN_FLAG_OFF     @ 080c4430 1e020000  DUEL_FIELD_FADEIN_FLAG_OFF: named scalar literal.
+ptr_g_ui_effect_state_080c4434:
+    .word  gUIEffectState                 @ 080c4434 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4438:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4438 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
+ui_card_render_check_source_ref:
+    adds r0,r1,#0x0    @ 080c443c 081c
+    .hword 0x464a    @ 080c443e 4a46
+    ldrh r2,[r2,#0x0]                        @ 080c4440 1288
+    ands r0,r2    @ 080c4442 1040
+    cmp r0,r1                                @ 080c4444 8842
+    bne ui_card_render_check_mode_limit      @ 080c4446 27d1
+    ldr r5, ptr_g_duel_field_state_080c44a8  @ 080c4448 174d
+    ldr r3, duel_field_fadein_flag_off_080c44ac @ 080c444a 184b
+    adds r3,r3,r5    @ 080c444c 5b19
+    .hword 0x4698    @ 080c444e 9846
+    ldrh r6,[r3,#0x0]                        @ 080c4450 1e88
+    lsrs r0,r6,#0x2    @ 080c4452 b008
+    movs r4,#0x88    @ 080c4454 8824
+    lsls r4,r4,#0x2    @ 080c4456 a400
+    adds r5,r5,r4    @ 080c4458 2d19
+    movs r4,#0x3    @ 080c445a 0324
+    adds r3,r4,#0x0    @ 080c445c 231c
+    ldrb r1,[r5,#0x0]                        @ 080c445e 2978
+    ands r3,r1    @ 080c4460 0b40
+    lsls r3,r3,#0xe    @ 080c4462 9b03
+    orrs r3,r0    @ 080c4464 0343
+    .hword 0x464a    @ 080c4466 4a46
+    ldr r0,[r2,#0x0]                         @ 080c4468 1068
+    lsls r1,r0,#0x1a    @ 080c446a 8106
+    lsrs r1,r1,#0x1b    @ 080c446c c90e
+    movs r2,#0x1    @ 080c446e 0122
+    lsls r2,r1    @ 080c4470 8a40
+    lsls r0,r0,#0x1f    @ 080c4472 c007
+    lsrs r0,r0,#0x1f    @ 080c4474 c00f
+    lsls r0,r0,#0x3    @ 080c4476 c000
+    lsls r2,r0    @ 080c4478 8240
+    bics r3,r2    @ 080c447a 9343
+    ldr r0, duel_chain_render_mask_low14_080c44b0 @ 080c447c 0c48
+    ands r0,r3    @ 080c447e 1840
+    lsls r0,r0,#0x2    @ 080c4480 8000
+    ands r4,r6    @ 080c4482 3440
+    orrs r4,r0    @ 080c4484 0443
+    .hword 0x4640    @ 080c4486 4046
+    strh r4,[r0,#0x0]                        @ 080c4488 0480
+    lsrs r3,r3,#0xe    @ 080c448a 9b0b
+    movs r0,#0x4    @ 080c448c 0420
+    rsbs r0,r0,#0    @ 080c448e 4042
+    ldrb r1,[r5,#0x0]                        @ 080c4490 2978
+    ands r0,r1    @ 080c4492 0840
+    orrs r0,r3    @ 080c4494 1843
+    strb r0,[r5,#0x0]                        @ 080c4496 2870
+ui_card_render_check_mode_limit:
+    cmp r7,#0x8                              @ 080c4498 082f
+    bls ui_card_render_dispatch_mode         @ 080c449a 00d9
+    b ui_card_render_advance_phase           @ 080c449c d4e3
+ui_card_render_dispatch_mode:
+    lsls r0,r7,#0x2    @ 080c449e b800
+    ldr r1, ptr_ui_card_render_phase0_mode_table_080c44b4 @ 080c44a0 0449
+    adds r0,r0,r1    @ 080c44a2 4018
+    ldr r0,[r0,#0x0]                         @ 080c44a4 0068
+    .hword 0x4687    @ 080c44a6 8746
+ptr_g_duel_field_state_080c44a8:
+    .word  gDuelFieldState                @ 080c44a8 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_fadein_flag_off_080c44ac:
+    .word  DUEL_FIELD_FADEIN_FLAG_OFF     @ 080c44ac 1e020000  DUEL_FIELD_FADEIN_FLAG_OFF: named scalar literal.
+duel_chain_render_mask_low14_080c44b0:
+    .word  DUEL_CHAIN_RENDER_MASK_LOW14   @ 080c44b0 ff3f0000  DUEL_CHAIN_RENDER_MASK_LOW14: named scalar literal.
+ptr_ui_card_render_phase0_mode_table_080c44b4:
+    .word  ui_card_render_phase0_mode_table @ 080c44b4 b8440c08  ui_card_render_phase0_mode_table: preserve existing operand-0 DATA reference.
+ui_card_render_phase0_mode_table:
+    .word  ui_card_render_phase0_mode0    @ 080c44b8 dc440c08
+    .word  ui_card_render_phase0_common_mode @ 080c44bc 08450c08
+    .word  ui_card_render_phase0_common_mode @ 080c44c0 08450c08
+    .word  ui_card_render_phase0_common_mode @ 080c44c4 08450c08
+    .word  ui_card_render_phase0_common_mode @ 080c44c8 08450c08
+    .word  ui_card_render_phase0_modes5_7_8 @ 080c44cc 74450c08
+    .word  ui_card_render_phase0_common_mode @ 080c44d0 08450c08
+    .word  ui_card_render_phase0_modes5_7_8 @ 080c44d4 74450c08
+    .word  ui_card_render_phase0_modes5_7_8 @ 080c44d8 74450c08
+ui_card_render_phase0_mode0:
+    movs r0,#0x3e    @ 080c44dc 3e20
+    ldr r2, ptr_g_ui_effect_arg2_080c4560    @ 080c44de 204a
+    ldrb r2,[r2,#0x0]                        @ 080c44e0 1278
+    ands r0,r2    @ 080c44e2 1040
+    cmp r0,#0x1e                             @ 080c44e4 1e28
+    bne ui_card_render_phase0_common_mode    @ 080c44e6 0fd1
+    .hword 0x464b    @ 080c44e8 4b46
+    ldrb r3,[r3,#0x1]                        @ 080c44ea 5b78
+    lsrs r1,r3,#0x7    @ 080c44ec d909
+    adds r0,r7,#0x0    @ 080c44ee 381c
+    bl load_pack_aob_gfx_by_mode             @ 080c44f0 faf764fa
+    ldr r2, ptr_g_ui_effect_state_080c4564   @ 080c44f4 1b4a
+    movs r1,#0x1    @ 080c44f6 0121
+    ands r0,r1    @ 080c44f8 0840
+    lsls r0,r0,#0x2    @ 080c44fa 8000
+    movs r1,#0x5    @ 080c44fc 0521
+    rsbs r1,r1,#0    @ 080c44fe 4942
+    ldrb r4,[r2,#0x19]                       @ 080c4500 547e
+    ands r1,r4    @ 080c4502 2140
+    orrs r1,r0    @ 080c4504 0143
+    strb r1,[r2,#0x19]                       @ 080c4506 5176
+ui_card_render_phase0_common_mode:
+    movs r0,#0x3e    @ 080c4508 3e20
+    ldr r7, ptr_g_ui_effect_arg2_080c4560    @ 080c450a 154f
+    ldrb r7,[r7,#0x0]                        @ 080c450c 3f78
+    ands r0,r7    @ 080c450e 3840
+    cmp r0,#0x16                             @ 080c4510 1628
+    bne ui_card_render_prepare_small_image   @ 080c4512 1ad1
+    ldr r1, ptr_g_p1_life_points_080c4568    @ 080c4514 1449
+    ldr r2, ptr_g_ui_effect_arg2_080c4560    @ 080c4516 124a
+    ldr r0,[r2,#0x0]                         @ 080c4518 1068
+    lsls r2,r0,#0x1f    @ 080c451a c207
+    movs r3,#0x1    @ 080c451c 0123
+    lsrs r0,r2,#0x1f    @ 080c451e d00f
+    ldr r5, player_block_stride_080c456c     @ 080c4520 124d
+    muls r0,r5    @ 080c4522 6843
+    adds r4,r1,#0x0    @ 080c4524 0c1c
+    adds r4,#0xc    @ 080c4526 0c34
+    adds r0,r0,r4    @ 080c4528 0019
+    ldr r0,[r0,#0x0]                         @ 080c452a 0068
+    cmp r0,#0x7                              @ 080c452c 0728
+    bls ui_card_render_prepare_small_image   @ 080c452e 0cd9
+    ldr r0, ptr_g_duel_field_state_080c4570  @ 080c4530 0f48
+    lsrs r1,r2,#0x1f    @ 080c4532 d10f
+    lsls r1,r1,#0x1    @ 080c4534 4900
+    adds r0,#0x4c    @ 080c4536 4c30
+    adds r1,r1,r0    @ 080c4538 0918
+    lsrs r0,r2,#0x1f    @ 080c453a d00f
+    ands r3,r0    @ 080c453c 0340
+    adds r0,r3,#0x0    @ 080c453e 181c
+    muls r0,r5    @ 080c4540 6843
+    adds r0,r0,r4    @ 080c4542 0019
+    ldrh r0,[r0,#0x0]                        @ 080c4544 0088
+    subs r0,#0x7    @ 080c4546 0738
+    strh r0,[r1,#0x0]                        @ 080c4548 0880
+ui_card_render_prepare_small_image:
+    ldr r3, ptr_g_ui_effect_arg2_080c4560    @ 080c454a 054b
+    ldr r1,[r3,#0x0]                         @ 080c454c 1968
+    lsls r1,r1,#0x11    @ 080c454e 4904
+    lsrs r1,r1,#0x1f    @ 080c4550 c90f
+    movs r3,#0x80    @ 080c4552 8023
+    lsls r3,r3,#0x2    @ 080c4554 9b00
+    .hword 0x4650    @ 080c4556 5046
+    movs r2,#0x0    @ 080c4558 0022
+    bl load_card_list_small_image            @ 080c455a fef72fff
+    b ui_card_render_advance_phase           @ 080c455e 73e3
+ptr_g_ui_effect_arg2_080c4560:
+    .word  gUIEffectArg2                  @ 080c4560 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c4564:
+    .word  gUIEffectState                 @ 080c4564 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ptr_g_p1_life_points_080c4568:
+    .word  gP1LifePoints                  @ 080c4568 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c456c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c456c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_state_080c4570:
+    .word  gDuelFieldState                @ 080c4570 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ui_card_render_phase0_modes5_7_8:
+    .hword 0x464c    @ 080c4574 4c46
+    ldrb r4,[r4,#0x1]                        @ 080c4576 6478
+    lsrs r1,r4,#0x7    @ 080c4578 e109
+    adds r0,r7,#0x0    @ 080c457a 381c
+    bl load_pack_aob_gfx_by_mode             @ 080c457c faf71efa
+    ldr r2, ptr_g_ui_effect_state_080c45cc   @ 080c4580 124a
+    movs r1,#0x1    @ 080c4582 0121
+    ands r0,r1    @ 080c4584 0840
+    lsls r0,r0,#0x2    @ 080c4586 8000
+    movs r1,#0x5    @ 080c4588 0521
+    rsbs r1,r1,#0    @ 080c458a 4942
+    ldrb r7,[r2,#0x19]                       @ 080c458c 577e
+    ands r1,r7    @ 080c458e 3940
+    orrs r1,r0    @ 080c4590 0143
+    strb r1,[r2,#0x19]                       @ 080c4592 5176
+    movs r0,#0x3e    @ 080c4594 3e20
+    .hword 0x4649    @ 080c4596 4946
+    ldrb r1,[r1,#0x0]                        @ 080c4598 0978
+    ands r0,r1    @ 080c459a 0840
+    cmp r0,#0x16                             @ 080c459c 1628
+    beq ui_card_render_limit_destination_index @ 080c459e 00d0
+    b ui_card_render_advance_phase           @ 080c45a0 52e3
+ui_card_render_limit_destination_index:
+    ldr r2, ptr_g_duel_field_state_080c45d0  @ 080c45a2 0b4a
+    .hword 0x464b    @ 080c45a4 4b46
+    ldr r1,[r3,#0x0]                         @ 080c45a6 1968
+    lsls r6,r1,#0x1f    @ 080c45a8 ce07
+    lsrs r0,r6,#0x1f    @ 080c45aa f00f
+    lsls r0,r0,#0x1    @ 080c45ac 4000
+    adds r7,r2,#0x0    @ 080c45ae 171c
+    adds r7,#0x4c    @ 080c45b0 4c37
+    adds r0,r0,r7    @ 080c45b2 c019
+    ldrh r4,[r0,#0x0]                        @ 080c45b4 0488
+    lsls r5,r1,#0x12    @ 080c45b6 8d04
+    lsrs r0,r5,#0x18    @ 080c45b8 280e
+    adds r3,r2,#0x0    @ 080c45ba 131c
+    cmp r4,r0                                @ 080c45bc 8442
+    bgt ui_card_render_clamp_index_zero      @ 080c45be 11dc
+    adds r1,r4,#0x7    @ 080c45c0 e11d
+    cmp r1,r0                                @ 080c45c2 8142
+    ble ui_card_render_clamp_index_six       @ 080c45c4 06dd
+    subs r4,r0,r4    @ 080c45c6 041b
+    b ui_card_render_store_destination_index @ 080c45c8 17e0
+    .zero  0x2
+ptr_g_ui_effect_state_080c45cc:
+    .word  gUIEffectState                 @ 080c45cc 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c45d0:
+    .word  gDuelFieldState                @ 080c45d0 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ui_card_render_clamp_index_six:
+    movs r4,#0x6    @ 080c45d4 0624
+    lsrs r1,r6,#0x1f    @ 080c45d6 f10f
+    lsls r1,r1,#0x1    @ 080c45d8 4900
+    adds r1,r1,r7    @ 080c45da c919
+    lsrs r0,r5,#0x18    @ 080c45dc 280e
+    subs r0,#0x6    @ 080c45de 0638
+    strh r0,[r1,#0x0]                        @ 080c45e0 0880
+    b ui_card_render_store_destination_index @ 080c45e2 0ae0
+ui_card_render_clamp_index_zero:
+    movs r4,#0x0    @ 080c45e4 0024
+    lsrs r2,r6,#0x1f    @ 080c45e6 f20f
+    lsls r2,r2,#0x1    @ 080c45e8 5200
+    adds r2,r2,r7    @ 080c45ea d219
+    lsrs r1,r6,#0x1f    @ 080c45ec f10f
+    lsls r1,r1,#0x1    @ 080c45ee 4900
+    adds r1,r1,r7    @ 080c45f0 c919
+    lsrs r0,r5,#0x18    @ 080c45f2 280e
+    ldrh r1,[r1,#0x0]                        @ 080c45f4 0988
+    subs r0,r1,r0    @ 080c45f6 081a
+    strh r0,[r2,#0x0]                        @ 080c45f8 1080
+ui_card_render_store_destination_index:
+    movs r0,#0xff    @ 080c45fa ff20
+    ands r4,r0    @ 080c45fc 0440
+    lsls r1,r4,#0x6    @ 080c45fe a101
+    ldr r0, ui_slot_ref_subindex_clear_mask_080c4628 @ 080c4600 0948
+    .hword 0x464c    @ 080c4602 4c46
+    ldrh r4,[r4,#0x0]                        @ 080c4604 2488
+    ands r0,r4    @ 080c4606 2040
+    orrs r0,r1    @ 080c4608 0843
+    .hword 0x464f    @ 080c460a 4f46
+    strh r0,[r7,#0x0]                        @ 080c460c 3880
+    ldr r1,[r7,#0x0]                         @ 080c460e 3968
+    lsls r1,r1,#0x1f    @ 080c4610 c907
+    lsrs r0,r1,#0x1f    @ 080c4612 c80f
+    adds r1,r0,#0x0    @ 080c4614 011c
+    lsls r1,r1,#0x1    @ 080c4616 4900
+    adds r2,r3,#0x0    @ 080c4618 1a1c
+    adds r2,#0x4c    @ 080c461a 4c32
+    adds r1,r1,r2    @ 080c461c 8918
+    ldrh r1,[r1,#0x0]                        @ 080c461e 0988
+    bl refresh_player_field_slot_tiles       @ 080c4620 fff7fefd
+    b ui_card_render_advance_phase           @ 080c4624 10e3
+    .zero  0x2
+ui_slot_ref_subindex_clear_mask_080c4628:
+    .word  UI_SLOT_REF_SUBINDEX_CLEAR_MASK @ 080c4628 3fc0ffff  UI_SLOT_REF_SUBINDEX_CLEAR_MASK: named scalar literal.
+ui_card_render_phase1_draw_source:
+    .hword 0x4648    @ 080c462c 4846
+    ldr r2,[r0,#0x0]                         @ 080c462e 0268
+    lsls r0,r2,#0x1f    @ 080c4630 d007
+    lsrs r0,r0,#0x1f    @ 080c4632 c00f
+    lsls r1,r2,#0x1a    @ 080c4634 9106
+    lsrs r1,r1,#0x1b    @ 080c4636 c90e
+    lsls r2,r2,#0x12    @ 080c4638 9204
+    lsrs r2,r2,#0x18    @ 080c463a 120e
+    bl resolve_zone_oam_base_coords_by_type  @ 080c463c fef7b6ff
+    ldr r2, ptr_g_ui_effect_state_080c4684   @ 080c4640 104a
+    str r0,[r2,#0x10]                        @ 080c4642 1061
+    subs r1,r0,#0x4    @ 080c4644 011f
+    lsls r1,r1,#0x10    @ 080c4646 0904
+    lsrs r5,r1,#0x10    @ 080c4648 0d0c
+    lsrs r0,r0,#0x10    @ 080c464a 000c
+    subs r0,#0x4    @ 080c464c 0438
+    lsls r0,r0,#0x10    @ 080c464e 0004
+    lsrs r0,r0,#0x10    @ 080c4650 000c
+    .hword 0x4682    @ 080c4652 8246
+    movs r0,#0x4    @ 080c4654 0420
+    ldrb r2,[r2,#0x19]                       @ 080c4656 527e
+    ands r0,r2    @ 080c4658 1040
+    cmp r0,#0x0                              @ 080c465a 0028
+    beq ui_card_render_unpack_source_player  @ 080c465c 16d0
+    ldr r4, ptr_g_vija_intro_aob_ctx_a_080c4688 @ 080c465e 0a4c
+    .hword 0x4651    @ 080c4660 5146
+    lsls r0,r1,#0x10    @ 080c4662 0804
+    orrs r5,r0    @ 080c4664 0543
+    adds r0,r4,#0x0    @ 080c4666 201c
+    adds r1,r5,#0x0    @ 080c4668 291c
+    movs r2,#0x0    @ 080c466a 0022
+    movs r3,#0x0    @ 080c466c 0023
+    bl render_aob_frame_to_oam               @ 080c466e 33f0c7fc
+    adds r0,r4,#0x0    @ 080c4672 201c
+    bl tick_aob_frame_counter                @ 080c4674 33f048fc
+    ldrb r4,[r4,#0xd]                        @ 080c4678 647b
+    cmp r4,#0x1                              @ 080c467a 012c
+    bhi ui_card_render_select_source_zone    @ 080c467c 25d8
+ui_card_render_return_active:
+    movs r0,#0x1    @ 080c467e 0120
+    b ui_card_render_restore_saved_frame     @ 080c4680 1ce3
+    .zero  0x2
+ptr_g_ui_effect_state_080c4684:
+    .word  gUIEffectState                 @ 080c4684 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ptr_g_vija_intro_aob_ctx_a_080c4688:
+    .word  gVijaIntroAobCtxA              @ 080c4688 dcfe0102  gVijaIntroAobCtxA: add reviewed operand-0 DATA reference.
+ui_card_render_unpack_source_player:
+    .hword 0x464b    @ 080c468c 4b46
+    ldr r2,[r3,#0x0]                         @ 080c468e 1a68
+    lsls r2,r2,#0x1f    @ 080c4690 d207
+    lsrs r2,r2,#0x1f    @ 080c4692 d20f
+    ldr r0, ptr_g_duel_card_ctx_base_080c46e4 @ 080c4694 1348
+    ldr r0,[r0,#0x4]                         @ 080c4696 4068
+    movs r1,#0x1    @ 080c4698 0121
+    eors r0,r1    @ 080c469a 4840
+    cmp r2,r0                                @ 080c469c 8242
+    bne ui_card_render_apply_source_flag15   @ 080c469e 00d1
+    adds r6,#0x40    @ 080c46a0 4036
+ui_card_render_apply_source_flag15:
+    movs r0,#0x80    @ 080c46a2 8020
+    .hword 0x464c    @ 080c46a4 4c46
+    ldrb r4,[r4,#0x1]                        @ 080c46a6 6478
+    ands r0,r4    @ 080c46a8 2040
+    cmp r0,#0x0                              @ 080c46aa 0028
+    beq ui_card_render_emit_source_sprite    @ 080c46ac 00d0
+    adds r6,#0x20    @ 080c46ae 2036
+ui_card_render_emit_source_sprite:
+    .hword 0x4651    @ 080c46b0 5146
+    lsls r0,r1,#0x10    @ 080c46b2 0804
+    orrs r5,r0    @ 080c46b4 0543
+    movs r2,#0x80    @ 080c46b6 8022
+    lsls r2,r2,#0x1    @ 080c46b8 5200
+    movs r0,#0x80    @ 080c46ba 8020
+    lsls r0,r0,#0x11    @ 080c46bc 4004
+    orrs r6,r0    @ 080c46be 0643
+    adds r0,r5,#0x0    @ 080c46c0 281c
+    movs r1,#0x80    @ 080c46c2 8021
+    adds r3,r6,#0x0    @ 080c46c4 331c
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c46c6 32f001fb
+ui_card_render_select_source_zone:
+    .hword 0x464a    @ 080c46ca 4a46
+    ldr r1,[r2,#0x0]                         @ 080c46cc 1168
+    lsls r0,r1,#0x1a    @ 080c46ce 8806
+    lsrs r0,r0,#0x1b    @ 080c46d0 c00e
+    adds r2,r1,#0x0    @ 080c46d2 0a1c
+    cmp r0,#0xf                              @ 080c46d4 0f28
+    bls ui_card_render_dispatch_source_zone  @ 080c46d6 00d9
+    b ui_card_render_select_source_feedback  @ 080c46d8 bce0
+ui_card_render_dispatch_source_zone:
+    lsls r0,r0,#0x2    @ 080c46da 8000
+    ldr r1, ptr_ui_card_render_phase1_zone_table_080c46e8 @ 080c46dc 0249
+    adds r0,r0,r1    @ 080c46de 4018
+    ldr r0,[r0,#0x0]                         @ 080c46e0 0068
+    .hword 0x4687    @ 080c46e2 8746
+ptr_g_duel_card_ctx_base_080c46e4:
+    .word  gDuelCardCtxBase               @ 080c46e4 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_ui_card_render_phase1_zone_table_080c46e8:
+    .word  ui_card_render_phase1_zone_table @ 080c46e8 ec460c08  ui_card_render_phase1_zone_table: add reviewed operand-0 DATA reference.
+ui_card_render_phase1_zone_table:
+    .word  ui_card_render_phase1_default_zone @ 080c46ec 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c46f0 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c46f4 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c46f8 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c46fc 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c4700 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c4704 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c4708 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c470c 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c4710 2c470c08
+    .word  ui_card_render_phase1_default_zone @ 080c4714 2c470c08
+    .word  ui_card_render_phase1_zone11   @ 080c4718 e4470c08
+    .word  ui_card_render_phase1_zone12   @ 080c471c 3e470c08
+    .word  ui_card_render_phase1_zone13   @ 080c4720 60470c08
+    .word  ui_card_render_phase1_zone14   @ 080c4724 9c470c08
+    .word  ui_card_render_phase1_zone15   @ 080c4728 c0470c08
+ui_card_render_phase1_default_zone:
+    lsls r0,r2,#0x1f    @ 080c472c d007
+    lsrs r0,r0,#0x1f    @ 080c472e c00f
+    lsls r1,r2,#0x1a    @ 080c4730 9106
+    lsrs r1,r1,#0x1b    @ 080c4732 c90e
+    lsls r2,r2,#0x12    @ 080c4734 9204
+    lsrs r2,r2,#0x18    @ 080c4736 120e
+    bl update_field_slot_tile_display        @ 080c4738 fff7a2f8
+    b ui_card_render_select_source_feedback  @ 080c473c 8ae0
+ui_card_render_phase1_zone12:
+    lsls r1,r2,#0x1f    @ 080c473e d107
+    lsrs r0,r1,#0x1f    @ 080c4740 c80f
+    ldr r3, ptr_g_p1_life_points_080c4758    @ 080c4742 054b
+    adds r1,r0,#0x0    @ 080c4744 011c
+    ldr r2, player_block_stride_080c475c     @ 080c4746 054a
+    muls r1,r2    @ 080c4748 5143
+    adds r3,#0x18    @ 080c474a 1833
+    adds r1,r1,r3    @ 080c474c c918
+    ldrh r2,[r1,#0x0]                        @ 080c474e 0a88
+    movs r1,#0xc    @ 080c4750 0c21
+    bl render_field_zone_card_tile_by_type   @ 080c4752 fff753f9
+    b ui_card_render_select_source_feedback  @ 080c4756 7de0
+ptr_g_p1_life_points_080c4758:
+    .word  gP1LifePoints                  @ 080c4758 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c475c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c475c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ui_card_render_phase1_zone13:
+    ldr r1, ptr_g_duel_field_state_080c478c  @ 080c4760 0a49
+    ldr r3, duel_field_ui_effect_flags_off_080c4790 @ 080c4762 0b4b
+    adds r1,r1,r3    @ 080c4764 c918
+    movs r0,#0x41    @ 080c4766 4120
+    rsbs r0,r0,#0    @ 080c4768 4042
+    ldrb r4,[r1,#0x0]                        @ 080c476a 0c78
+    ands r0,r4    @ 080c476c 2040
+    strb r0,[r1,#0x0]                        @ 080c476e 0870
+    lsls r1,r2,#0x1f    @ 080c4770 d107
+    lsrs r0,r1,#0x1f    @ 080c4772 c80f
+    ldr r3, ptr_g_p1_life_points_080c4794    @ 080c4774 074b
+    adds r1,r0,#0x0    @ 080c4776 011c
+    ldr r2, player_block_stride_080c4798     @ 080c4778 074a
+    muls r1,r2    @ 080c477a 5143
+    adds r3,#0x10    @ 080c477c 1033
+    adds r1,r1,r3    @ 080c477e c918
+    ldrh r2,[r1,#0x0]                        @ 080c4780 0a88
+    movs r1,#0xd    @ 080c4782 0d21
+    bl render_field_zone_card_tile_by_type   @ 080c4784 fff73af9
+    b ui_card_render_select_source_feedback  @ 080c4788 64e0
+    .zero  0x2
+ptr_g_duel_field_state_080c478c:
+    .word  gDuelFieldState                @ 080c478c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4790:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4790 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
+ptr_g_p1_life_points_080c4794:
+    .word  gP1LifePoints                  @ 080c4794 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4798:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4798 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ui_card_render_phase1_zone14:
+    lsls r1,r2,#0x1f    @ 080c479c d107
+    lsrs r0,r1,#0x1f    @ 080c479e c80f
+    ldr r3, ptr_g_p1_life_points_080c47b8    @ 080c47a0 054b
+    adds r1,r0,#0x0    @ 080c47a2 011c
+    ldr r2, player_block_stride_080c47bc     @ 080c47a4 054a
+    muls r1,r2    @ 080c47a6 5143
+    adds r3,#0x14    @ 080c47a8 1433
+    adds r1,r1,r3    @ 080c47aa c918
+    ldrh r2,[r1,#0x0]                        @ 080c47ac 0a88
+    movs r1,#0xe    @ 080c47ae 0e21
+    bl render_field_zone_card_tile_by_type   @ 080c47b0 fff724f9
+    b ui_card_render_select_source_feedback  @ 080c47b4 4ee0
+    .zero  0x2
+ptr_g_p1_life_points_080c47b8:
+    .word  gP1LifePoints                  @ 080c47b8 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c47bc:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c47bc 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ui_card_render_phase1_zone15:
+    lsls r1,r2,#0x1f    @ 080c47c0 d107
+    lsrs r0,r1,#0x1f    @ 080c47c2 c80f
+    ldr r3, ptr_g_p1_life_points_080c47dc    @ 080c47c4 054b
+    adds r1,r0,#0x0    @ 080c47c6 011c
+    ldr r2, player_block_stride_080c47e0     @ 080c47c8 054a
+    muls r1,r2    @ 080c47ca 5143
+    adds r3,#0x1c    @ 080c47cc 1c33
+    adds r1,r1,r3    @ 080c47ce c918
+    ldrh r2,[r1,#0x0]                        @ 080c47d0 0a88
+    movs r1,#0xf    @ 080c47d2 0f21
+    bl render_field_zone_card_tile_by_type   @ 080c47d4 fff712f9
+    b ui_card_render_select_source_feedback  @ 080c47d8 3ce0
+    .zero  0x2
+ptr_g_p1_life_points_080c47dc:
+    .word  gP1LifePoints                  @ 080c47dc e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c47e0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c47e0 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ui_card_render_phase1_zone11:
+    ldr r1, ptr_g_p1_life_points_080c4870    @ 080c47e4 2249
+    .hword 0x464a    @ 080c47e6 4a46
+    ldr r0,[r2,#0x0]                         @ 080c47e8 1068
+    lsls r5,r0,#0x1f    @ 080c47ea c507
+    movs r4,#0x1    @ 080c47ec 0124
+    lsrs r0,r5,#0x1f    @ 080c47ee e80f
+    ldr r3, player_block_stride_080c4874     @ 080c47f0 204b
+    .hword 0x469a    @ 080c47f2 9a46
+    .hword 0x4652    @ 080c47f4 5246
+    muls r2,r0    @ 080c47f6 4243
+    adds r1,#0xc    @ 080c47f8 0c31
+    .hword 0x4688    @ 080c47fa 8846
+    add r2,r8                                @ 080c47fc 4244
+    ldr r3, ptr_g_duel_field_state_080c4878  @ 080c47fe 1e4b
+    lsls r0,r0,#0x1    @ 080c4800 4000
+    adds r6,r3,#0x0    @ 080c4802 1e1c
+    adds r6,#0x4c    @ 080c4804 4c36
+    adds r0,r0,r6    @ 080c4806 8019
+    ldrh r1,[r0,#0x0]                        @ 080c4808 0188
+    subs r1,#0x1    @ 080c480a 0139
+    ldr r0,[r2,#0x0]                         @ 080c480c 1068
+    subs r0,r0,r1    @ 080c480e 401a
+    cmp r0,#0x7                              @ 080c4810 0728
+    bhi ui_card_render_refresh_source_list   @ 080c4812 11d8
+    lsrs r0,r5,#0x1f    @ 080c4814 e80f
+    ands r4,r0    @ 080c4816 0440
+    .hword 0x4650    @ 080c4818 5046
+    muls r0,r4    @ 080c481a 6043
+    add r0,r8                                @ 080c481c 4044
+    ldr r0,[r0,#0x0]                         @ 080c481e 0068
+    adds r0,#0x1    @ 080c4820 0130
+    cmp r0,#0x7                              @ 080c4822 0728
+    bls ui_card_render_refresh_source_list   @ 080c4824 08d9
+    lsrs r0,r5,#0x1f    @ 080c4826 e80f
+    lsls r0,r0,#0x1    @ 080c4828 4000
+    adds r0,r0,r6    @ 080c482a 8019
+    lsrs r1,r5,#0x1f    @ 080c482c e90f
+    lsls r1,r1,#0x1    @ 080c482e 4900
+    adds r1,r1,r6    @ 080c4830 8919
+    ldrh r1,[r1,#0x0]                        @ 080c4832 0988
+    subs r1,#0x1    @ 080c4834 0139
+    strh r1,[r0,#0x0]                        @ 080c4836 0180
+ui_card_render_refresh_source_list:
+    .hword 0x464c    @ 080c4838 4c46
+    ldr r1,[r4,#0x0]                         @ 080c483a 2168
+    lsls r1,r1,#0x1f    @ 080c483c c907
+    lsrs r0,r1,#0x1f    @ 080c483e c80f
+    adds r1,r0,#0x0    @ 080c4840 011c
+    lsls r1,r1,#0x1    @ 080c4842 4900
+    adds r2,r3,#0x0    @ 080c4844 1a1c
+    adds r2,#0x4c    @ 080c4846 4c32
+    adds r1,r1,r2    @ 080c4848 8918
+    ldrh r1,[r1,#0x0]                        @ 080c484a 0988
+    bl refresh_player_field_slot_tiles       @ 080c484c fff7e8fc
+    bl update_zone_oam_card_count_tag        @ 080c4850 01f09cff
+ui_card_render_select_source_feedback:
+    ldr r1, ptr_g_ui_effect_state_080c487c   @ 080c4854 0949
+    movs r0,#0x4    @ 080c4856 0420
+    ldrb r1,[r1,#0x19]                       @ 080c4858 497e
+    ands r0,r1    @ 080c485a 0840
+    cmp r0,#0x0                              @ 080c485c 0028
+    beq ui_card_render_emit_feedback_four    @ 080c485e 1cd0
+    cmp r7,#0x5                              @ 080c4860 052f
+    beq ui_card_render_emit_feedback_six     @ 080c4862 12d0
+    cmp r7,#0x5                              @ 080c4864 052f
+    bgt ui_card_render_check_feedback_modes  @ 080c4866 0bdc
+    cmp r7,#0x0                              @ 080c4868 002f
+    beq ui_card_render_emit_feedback_five    @ 080c486a 12d0
+    b ui_card_render_advance_phase           @ 080c486c ece1
+    .zero  0x2
+ptr_g_p1_life_points_080c4870:
+    .word  gP1LifePoints                  @ 080c4870 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4874:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4874 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_state_080c4878:
+    .word  gDuelFieldState                @ 080c4878 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c487c:
+    .word  gUIEffectState                 @ 080c487c 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ui_card_render_check_feedback_modes:
+    cmp r7,#0x7                              @ 080c4880 072f
+    beq ui_card_render_emit_feedback_six     @ 080c4882 02d0
+    cmp r7,#0x8                              @ 080c4884 082f
+    beq ui_card_render_emit_feedback_five    @ 080c4886 04d0
+    b ui_card_render_advance_phase           @ 080c4888 dee1
+ui_card_render_emit_feedback_six:
+    movs r0,#0x6    @ 080c488a 0620
+    bl sync_state_and_init_sprite            @ 080c488c 35f012f9
+    b ui_card_render_advance_phase           @ 080c4890 dae1
+ui_card_render_emit_feedback_five:
+    movs r0,#0x5    @ 080c4892 0520
+    bl sync_state_and_init_sprite            @ 080c4894 35f00ef9
+    b ui_card_render_advance_phase           @ 080c4898 d6e1
+ui_card_render_emit_feedback_four:
+    movs r0,#0x4    @ 080c489a 0420
+    bl sync_state_and_init_sprite            @ 080c489c 35f00af9
+    b ui_card_render_advance_phase           @ 080c48a0 d2e1
+ui_card_render_phase2_interpolate:
+    ldr r4, ptr_g_ui_effect_state_080c4910   @ 080c48a2 1b4c
+    ldr r2,[r4,#0x10]                        @ 080c48a4 2269
+    subs r0,r2,#0x4    @ 080c48a6 101f
+    lsls r0,r0,#0x10    @ 080c48a8 0004
+    lsrs r5,r0,#0x10    @ 080c48aa 050c
+    lsrs r0,r2,#0x10    @ 080c48ac 100c
+    subs r0,#0x4    @ 080c48ae 0438
+    lsls r0,r0,#0x10    @ 080c48b0 0004
+    lsrs r0,r0,#0x10    @ 080c48b2 000c
+    .hword 0x4682    @ 080c48b4 8246
+    ldr r7, ptr_g_ui_effect_arg2_080c4914    @ 080c48b6 174f
+    ldr r2,[r7,#0x0]                         @ 080c48b8 3a68
+    lsls r0,r2,#0x1f    @ 080c48ba d007
+    lsrs r0,r0,#0x1f    @ 080c48bc c00f
+    lsls r1,r2,#0x1a    @ 080c48be 9106
+    lsrs r1,r1,#0x1b    @ 080c48c0 c90e
+    lsls r2,r2,#0x12    @ 080c48c2 9204
+    lsrs r2,r2,#0x18    @ 080c48c4 120e
+    bl resolve_zone_oam_base_coords_by_type  @ 080c48c6 fef771fe
+    adds r2,r0,#0x0    @ 080c48ca 021c
+    subs r0,r2,#0x4    @ 080c48cc 101f
+    lsls r0,r0,#0x10    @ 080c48ce 0004
+    lsrs r3,r0,#0x10    @ 080c48d0 030c
+    lsrs r0,r2,#0x10    @ 080c48d2 100c
+    subs r0,#0x4    @ 080c48d4 0438
+    lsls r0,r0,#0x10    @ 080c48d6 0004
+    lsrs r7,r0,#0x10    @ 080c48d8 070c
+    movs r0,#0x4    @ 080c48da 0420
+    ldrb r1,[r4,#0x19]                       @ 080c48dc 617e
+    ands r0,r1    @ 080c48de 0840
+    .hword 0x46a0    @ 080c48e0 a046
+    cmp r0,#0x0                              @ 080c48e2 0028
+    beq ui_card_render_interpolate_delta     @ 080c48e4 1ad0
+    ldr r4, ptr_g_vija_intro_aob_ctx_a_080c4918 @ 080c48e6 0c4c
+    .hword 0x4652    @ 080c48e8 5246
+    lsls r0,r2,#0x10    @ 080c48ea 1004
+    orrs r5,r0    @ 080c48ec 0543
+    adds r0,r4,#0x0    @ 080c48ee 201c
+    adds r1,r5,#0x0    @ 080c48f0 291c
+    movs r2,#0x0    @ 080c48f2 0022
+    movs r3,#0x0    @ 080c48f4 0023
+    bl render_aob_frame_to_oam               @ 080c48f6 33f083fb
+    adds r0,r4,#0x0    @ 080c48fa 201c
+    bl tick_aob_frame_counter                @ 080c48fc 33f004fb
+    cmp r0,#0x0                              @ 080c4900 0028
+    beq ui_card_render_advance_after_aob     @ 080c4902 00d0
+    b ui_card_render_return_active           @ 080c4904 bbe6
+ui_card_render_advance_after_aob:
+    .hword 0x4643    @ 080c4906 4346
+    ldrh r0,[r3,#0x0]                        @ 080c4908 1888
+    adds r0,#0x1    @ 080c490a 0130
+    strh r0,[r3,#0x0]                        @ 080c490c 1880
+    b ui_card_render_return_active           @ 080c490e b6e6
+ptr_g_ui_effect_state_080c4910:
+    .word  gUIEffectState                 @ 080c4910 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_arg2_080c4914:
+    .word  gUIEffectArg2                  @ 080c4914 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_vija_intro_aob_ctx_a_080c4918:
+    .word  gVijaIntroAobCtxA              @ 080c4918 dcfe0102  gVijaIntroAobCtxA: add reviewed operand-0 DATA reference.
+ui_card_render_interpolate_delta:
+    subs r0,r3,r5    @ 080c491c 581b
+    lsls r0,r0,#0x10    @ 080c491e 0004
+    asrs r0,r0,#0x10    @ 080c4920 0014
+    .hword 0x4641    @ 080c4922 4146
+    ldrb r4,[r1,#0x18]                       @ 080c4924 0c7e
+    muls r0,r4    @ 080c4926 6043
+    cmp r0,#0x0                              @ 080c4928 0028
+    bge ui_card_render_divide_x_delta        @ 080c492a 00da
+    adds r0,#0x3    @ 080c492c 0330
+ui_card_render_divide_x_delta:
+    asrs r0,r0,#0x2    @ 080c492e 8010
+    .hword 0x4684    @ 080c4930 8446
+    .hword 0x4652    @ 080c4932 5246
+    subs r0,r7,r2    @ 080c4934 b81a
+    lsls r0,r0,#0x10    @ 080c4936 0004
+    asrs r0,r0,#0x10    @ 080c4938 0014
+    muls r0,r4    @ 080c493a 6043
+    cmp r0,#0x0                              @ 080c493c 0028
+    bge ui_card_render_divide_y_delta        @ 080c493e 00da
+    adds r0,#0x3    @ 080c4940 0330
+ui_card_render_divide_y_delta:
+    asrs r0,r0,#0x2    @ 080c4942 8010
+    str r0,[sp,#0x8]                         @ 080c4944 0290
+    movs r3,#0x80    @ 080c4946 8023
+    lsls r3,r3,#0x1    @ 080c4948 5b00
+    .hword 0x464f    @ 080c494a 4f46
+    ldr r2,[r7,#0x0]                         @ 080c494c 3a68
+    lsls r2,r2,#0x1f    @ 080c494e d207
+    lsrs r2,r2,#0x1f    @ 080c4950 d20f
+    ldr r0, ptr_g_duel_card_ctx_base_080c4990 @ 080c4952 0f48
+    ldr r0,[r0,#0x4]                         @ 080c4954 4068
+    movs r1,#0x1    @ 080c4956 0121
+    eors r0,r1    @ 080c4958 4840
+    cmp r2,r0                                @ 080c495a 8242
+    bne ui_card_render_read_source_flag15    @ 080c495c 00d1
+    adds r6,#0x40    @ 080c495e 4036
+ui_card_render_read_source_flag15:
+    movs r2,#0x80    @ 080c4960 8022
+    adds r0,r2,#0x0    @ 080c4962 101c
+    .hword 0x4649    @ 080c4964 4946
+    ldrb r1,[r1,#0x1]                        @ 080c4966 4978
+    ands r0,r1    @ 080c4968 0840
+    lsls r0,r0,#0x18    @ 080c496a 0006
+    lsrs r1,r0,#0x18    @ 080c496c 010e
+    cmp r1,#0x0                              @ 080c496e 0029
+    beq ui_card_render_compare_destination_flag15 @ 080c4970 00d0
+    adds r6,#0x20    @ 080c4972 2036
+ui_card_render_compare_destination_flag15:
+    adds r0,r2,#0x0    @ 080c4974 101c
+    ldr r2, ptr_g_ui_effect_arg2_080c4994    @ 080c4976 074a
+    ldrb r2,[r2,#0x1]                        @ 080c4978 5278
+    ands r0,r2    @ 080c497a 1040
+    lsls r0,r0,#0x18    @ 080c497c 0006
+    lsrs r0,r0,#0x18    @ 080c497e 000e
+    cmp r1,r0                                @ 080c4980 8142
+    beq ui_card_render_compare_player_bits   @ 080c4982 0bd0
+    cmp r0,#0x0                              @ 080c4984 0028
+    beq ui_card_render_subtract_step8        @ 080c4986 07d0
+    lsls r0,r4,#0x3    @ 080c4988 e000
+    adds r6,r6,r0    @ 080c498a 3618
+    b ui_card_render_compare_player_bits     @ 080c498c 06e0
+    .zero  0x2
+ptr_g_duel_card_ctx_base_080c4990:
+    .word  gDuelCardCtxBase               @ 080c4990 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_arg2_080c4994:
+    .word  gUIEffectArg2                  @ 080c4994 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ui_card_render_subtract_step8:
+    lsls r0,r4,#0x3    @ 080c4998 e000
+    subs r6,r6,r0    @ 080c499a 361a
+ui_card_render_compare_player_bits:
+    movs r0,#0x1    @ 080c499c 0120
+    adds r1,r0,#0x0    @ 080c499e 011c
+    .hword 0x464c    @ 080c49a0 4c46
+    ldrb r4,[r4,#0x0]                        @ 080c49a2 2478
+    ands r1,r4    @ 080c49a4 2140
+    ldr r7, ptr_g_ui_effect_arg2_080c49d0    @ 080c49a6 0a4f
+    ldrb r7,[r7,#0x0]                        @ 080c49a8 3f78
+    ands r0,r7    @ 080c49aa 3840
+    ldr r2, ptr_g_ui_effect_state_080c49d4   @ 080c49ac 094a
+    .hword 0x4690    @ 080c49ae 9046
+    cmp r1,r0                                @ 080c49b0 8142
+    beq ui_card_render_select_step_half      @ 080c49b2 02d0
+    ldrb r4,[r2,#0x18]                       @ 080c49b4 147e
+    lsls r0,r4,#0x4    @ 080c49b6 2001
+    adds r6,r6,r0    @ 080c49b8 3618
+ui_card_render_select_step_half:
+    .hword 0x4647    @ 080c49ba 4746
+    ldrb r7,[r7,#0x18]                       @ 080c49bc 3f7e
+    cmp r7,#0x2                              @ 080c49be 022f
+    bls ui_card_render_scale_early_step      @ 080c49c0 0ad9
+    movs r0,#0x4    @ 080c49c2 0420
+    .hword 0x4641    @ 080c49c4 4146
+    ldrb r1,[r1,#0x18]                       @ 080c49c6 097e
+    subs r0,r0,r1    @ 080c49c8 401a
+    lsls r0,r0,#0x5    @ 080c49ca 4001
+    b ui_card_render_emit_interpolated_sprite @ 080c49cc 07e0
+    .zero  0x2
+ptr_g_ui_effect_arg2_080c49d0:
+    .word  gUIEffectArg2                  @ 080c49d0 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c49d4:
+    .word  gUIEffectState                 @ 080c49d4 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ui_card_render_scale_early_step:
+    .hword 0x4642    @ 080c49d8 4246
+    ldrb r2,[r2,#0x18]                       @ 080c49da 127e
+    lsls r0,r2,#0x5    @ 080c49dc 5001
+ui_card_render_emit_interpolated_sprite:
+    subs r3,r3,r0    @ 080c49de 1b1a
+    .hword 0x4664    @ 080c49e0 6446
+    adds r0,r5,r4    @ 080c49e2 2819
+    ldr r1,[sp,#0x8]                         @ 080c49e4 0299
+    add r1,r10                               @ 080c49e6 5144
+    movs r7,#0x80    @ 080c49e8 8027
+    lsls r7,r7,#0x2    @ 080c49ea bf00
+    adds r1,r1,r7    @ 080c49ec c919
+    lsls r1,r1,#0x10    @ 080c49ee 0904
+    orrs r0,r1    @ 080c49f0 0843
+    movs r2,#0x80    @ 080c49f2 8022
+    lsls r2,r2,#0x1    @ 080c49f4 5200
+    lsls r3,r3,#0x10    @ 080c49f6 1b04
+    movs r1,#0x7f    @ 080c49f8 7f21
+    ands r6,r1    @ 080c49fa 0e40
+    orrs r3,r6    @ 080c49fc 3343
+    movs r1,#0x80    @ 080c49fe 8021
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c4a00 32f064f9
+    ldr r2, ptr_g_ui_effect_state_080c4a20   @ 080c4a04 064a
+    ldrb r0,[r2,#0x18]                       @ 080c4a06 107e
+    adds r1,r0,#0x1    @ 080c4a08 411c
+    strb r1,[r2,#0x18]                       @ 080c4a0a 1176
+    lsls r0,r0,#0x18    @ 080c4a0c 0006
+    lsrs r0,r0,#0x18    @ 080c4a0e 000e
+    cmp r0,#0x3                              @ 080c4a10 0328
+    bhi ui_card_render_advance_interpolation @ 080c4a12 00d8
+    b ui_card_render_return_active           @ 080c4a14 33e6
+ui_card_render_advance_interpolation:
+    ldrh r0,[r2,#0x0]                        @ 080c4a16 1088
+    adds r0,#0x1    @ 080c4a18 0130
+    strh r0,[r2,#0x0]                        @ 080c4a1a 1080
+    b ui_card_render_return_active           @ 080c4a1c 2fe6
+    .zero  0x2
+ptr_g_ui_effect_state_080c4a20:
+    .word  gUIEffectState                 @ 080c4a20 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ui_card_render_phase3_draw_destination:
+    ldr r0, ptr_g_ui_effect_arg2_080c4ac8    @ 080c4a24 2848
+    ldr r2,[r0,#0x0]                         @ 080c4a26 0268
+    lsls r0,r2,#0x1f    @ 080c4a28 d007
+    lsrs r0,r0,#0x1f    @ 080c4a2a c00f
+    lsls r1,r2,#0x1a    @ 080c4a2c 9106
+    lsrs r1,r1,#0x1b    @ 080c4a2e c90e
+    lsls r2,r2,#0x12    @ 080c4a30 9204
+    lsrs r2,r2,#0x18    @ 080c4a32 120e
+    bl resolve_zone_oam_base_coords_by_type  @ 080c4a34 fef7bafd
+    adds r2,r0,#0x0    @ 080c4a38 021c
+    subs r0,r2,#0x4    @ 080c4a3a 101f
+    lsls r0,r0,#0x10    @ 080c4a3c 0004
+    lsrs r3,r0,#0x10    @ 080c4a3e 030c
+    lsrs r0,r2,#0x10    @ 080c4a40 100c
+    subs r0,#0x4    @ 080c4a42 0438
+    lsls r0,r0,#0x10    @ 080c4a44 0004
+    lsrs r7,r0,#0x10    @ 080c4a46 070c
+    ldr r1, ptr_g_ui_effect_state_080c4acc   @ 080c4a48 2049
+    movs r0,#0x4    @ 080c4a4a 0420
+    ldrb r1,[r1,#0x19]                       @ 080c4a4c 497e
+    ands r0,r1    @ 080c4a4e 0840
+    cmp r0,#0x0                              @ 080c4a50 0028
+    bne ui_card_render_check_card_stats_type @ 080c4a52 1dd1
+    ldr r1, ptr_g_ui_effect_arg2_080c4ac8    @ 080c4a54 1c49
+    ldr r2,[r1,#0x0]                         @ 080c4a56 0a68
+    lsls r2,r2,#0x1f    @ 080c4a58 d207
+    lsrs r2,r2,#0x1f    @ 080c4a5a d20f
+    ldr r0, ptr_g_duel_card_ctx_base_080c4ad0 @ 080c4a5c 1c48
+    ldr r0,[r0,#0x4]                         @ 080c4a5e 4068
+    movs r1,#0x1    @ 080c4a60 0121
+    eors r0,r1    @ 080c4a62 4840
+    cmp r2,r0                                @ 080c4a64 8242
+    bne ui_card_render_read_destination_flag15 @ 080c4a66 00d1
+    adds r6,#0x40    @ 080c4a68 4036
+ui_card_render_read_destination_flag15:
+    movs r0,#0x80    @ 080c4a6a 8020
+    ldr r2, ptr_g_ui_effect_arg2_080c4ac8    @ 080c4a6c 164a
+    ldrb r2,[r2,#0x1]                        @ 080c4a6e 5278
+    ands r0,r2    @ 080c4a70 1040
+    cmp r0,#0x0                              @ 080c4a72 0028
+    beq ui_card_render_emit_destination_sprite @ 080c4a74 00d0
+    adds r6,#0x20    @ 080c4a76 2036
+ui_card_render_emit_destination_sprite:
+    lsls r0,r7,#0x10    @ 080c4a78 3804
+    orrs r3,r0    @ 080c4a7a 0343
+    movs r2,#0x80    @ 080c4a7c 8022
+    lsls r2,r2,#0x1    @ 080c4a7e 5200
+    movs r0,#0x80    @ 080c4a80 8020
+    lsls r0,r0,#0x11    @ 080c4a82 4004
+    orrs r6,r0    @ 080c4a84 0643
+    adds r0,r3,#0x0    @ 080c4a86 181c
+    movs r1,#0x80    @ 080c4a88 8021
+    adds r3,r6,#0x0    @ 080c4a8a 331c
+    bl write_pack_obj_attr_by_dir_stacked    @ 080c4a8c 32f01ef9
+ui_card_render_check_card_stats_type:
+    ldr r1, ptr_card_stats_table_080c4ad4    @ 080c4a90 1049
+    movs r0,#0xb    @ 080c4a92 0b20
+    .hword 0x4653    @ 080c4a94 5346
+    muls r3,r0    @ 080c4a96 4343
+    adds r0,r3,#0x0    @ 080c4a98 181c
+    adds r0,#0x8    @ 080c4a9a 0830
+    lsls r0,r0,#0x1    @ 080c4a9c 4000
+    adds r0,r0,r1    @ 080c4a9e 4018
+    ldr r7, ptr_g_ui_effect_arg2_080c4ac8    @ 080c4aa0 094f
+    ldr r4,[r7,#0x0]                         @ 080c4aa2 3c68
+    ldrh r0,[r0,#0x0]                        @ 080c4aa4 0088
+    cmp r0,#0x9                              @ 080c4aa6 0928
+    bne ui_card_render_select_destination_zone @ 080c4aa8 04d1
+    lsls r0,r4,#0x1a    @ 080c4aaa a006
+    lsrs r0,r0,#0x1b    @ 080c4aac c00e
+    cmp r0,#0xa                              @ 080c4aae 0a28
+    bls ui_card_render_select_destination_zone @ 080c4ab0 00d9
+    b ui_card_render_refresh_zone_info       @ 080c4ab2 c7e0
+ui_card_render_select_destination_zone:
+    lsls r0,r4,#0x1a    @ 080c4ab4 a006
+    lsrs r0,r0,#0x1b    @ 080c4ab6 c00e
+    cmp r0,#0xf                              @ 080c4ab8 0f28
+    bls ui_card_render_dispatch_destination_zone @ 080c4aba 00d9
+    b ui_card_render_advance_phase           @ 080c4abc c4e0
+ui_card_render_dispatch_destination_zone:
+    lsls r0,r0,#0x2    @ 080c4abe 8000
+    ldr r1, ptr_ui_card_render_phase3_zone_table_080c4ad8 @ 080c4ac0 0549
+    adds r0,r0,r1    @ 080c4ac2 4018
+    ldr r0,[r0,#0x0]                         @ 080c4ac4 0068
+    .hword 0x4687    @ 080c4ac6 8746
+ptr_g_ui_effect_arg2_080c4ac8:
+    .word  gUIEffectArg2                  @ 080c4ac8 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_state_080c4acc:
+    .word  gUIEffectState                 @ 080c4acc 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c4ad0:
+    .word  gDuelCardCtxBase               @ 080c4ad0 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_card_stats_table_080c4ad4:
+    .word  card_stats_table               @ 080c4ad4 b8698109  card_stats_table: add reviewed operand-0 DATA reference.
+ptr_ui_card_render_phase3_zone_table_080c4ad8:
+    .word  ui_card_render_phase3_zone_table @ 080c4ad8 dc4a0c08  ui_card_render_phase3_zone_table: preserve existing operand-0 DATA reference.
+ui_card_render_phase3_zone_table:
+    .word  ui_card_render_phase3_default_zone @ 080c4adc 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4ae0 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4ae4 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4ae8 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4aec 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4af0 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4af4 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4af8 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4afc 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4b00 1c4b0c08
+    .word  ui_card_render_phase3_default_zone @ 080c4b04 1c4b0c08
+    .word  ui_card_render_phase3_zone11   @ 080c4b08 ec4b0c08
+    .word  ui_card_render_phase3_zone12   @ 080c4b0c 444b0c08
+    .word  ui_card_render_phase3_zone13   @ 080c4b10 704b0c08
+    .word  ui_card_render_phase3_zone14   @ 080c4b14 944b0c08
+    .word  ui_card_render_phase3_zone15   @ 080c4b18 c04b0c08
+ui_card_render_phase3_default_zone:
+    lsls r0,r4,#0x1f    @ 080c4b1c e007
+    lsrs r0,r0,#0x1f    @ 080c4b1e c00f
+    lsls r1,r4,#0x1a    @ 080c4b20 a106
+    lsrs r1,r1,#0x1b    @ 080c4b22 c90e
+    lsls r2,r4,#0x12    @ 080c4b24 a204
+    lsrs r2,r2,#0x18    @ 080c4b26 120e
+    lsls r3,r4,#0x11    @ 080c4b28 6304
+    lsrs r3,r3,#0x1f    @ 080c4b2a db0f
+    lsls r4,r4,#0x10    @ 080c4b2c 2404
+    lsrs r4,r4,#0x1f    @ 080c4b2e e40f
+    str r4,[sp,#0x0]                         @ 080c4b30 0094
+    .hword 0x4654    @ 080c4b32 5446
+    str r4,[sp,#0x4]                         @ 080c4b34 0194
+    bl render_field_slot_card_tile           @ 080c4b36 fef7c9fe
+    ldr r7, ptr_g_ui_effect_arg2_080c4b40    @ 080c4b3a 014f
+    ldr r2,[r7,#0x0]                         @ 080c4b3c 3a68
+    b ui_card_render_update_destination_oam  @ 080c4b3e 73e0
+ptr_g_ui_effect_arg2_080c4b40:
+    .word  gUIEffectArg2                  @ 080c4b40 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ui_card_render_phase3_zone12:
+    lsls r1,r4,#0x1f    @ 080c4b44 e107
+    lsrs r0,r1,#0x1f    @ 080c4b46 c80f
+    ldr r3, ptr_g_p1_life_points_080c4b64    @ 080c4b48 064b
+    adds r1,r0,#0x0    @ 080c4b4a 011c
+    ldr r2, player_block_stride_080c4b68     @ 080c4b4c 064a
+    muls r1,r2    @ 080c4b4e 5143
+    adds r3,#0x18    @ 080c4b50 1833
+    adds r1,r1,r3    @ 080c4b52 c918
+    ldrh r2,[r1,#0x0]                        @ 080c4b54 0a88
+    movs r1,#0xc    @ 080c4b56 0c21
+    bl render_field_zone_card_tile_by_type   @ 080c4b58 fef750ff
+    ldr r0, ptr_g_ui_effect_arg2_080c4b6c    @ 080c4b5c 0348
+    ldr r2,[r0,#0x0]                         @ 080c4b5e 0268
+    b ui_card_render_update_destination_oam  @ 080c4b60 62e0
+    .zero  0x2
+ptr_g_p1_life_points_080c4b64:
+    .word  gP1LifePoints                  @ 080c4b64 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4b68:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4b68 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_ui_effect_arg2_080c4b6c:
+    .word  gUIEffectArg2                  @ 080c4b6c 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ui_card_render_phase3_zone13:
+    lsls r1,r4,#0x1f    @ 080c4b70 e107
+    lsrs r0,r1,#0x1f    @ 080c4b72 c80f
+    ldr r3, ptr_g_p1_life_points_080c4b8c    @ 080c4b74 054b
+    adds r1,r0,#0x0    @ 080c4b76 011c
+    ldr r2, player_block_stride_080c4b90     @ 080c4b78 054a
+    muls r1,r2    @ 080c4b7a 5143
+    adds r3,#0x10    @ 080c4b7c 1033
+    adds r1,r1,r3    @ 080c4b7e c918
+    ldrh r2,[r1,#0x0]                        @ 080c4b80 0a88
+    movs r1,#0xd    @ 080c4b82 0d21
+    bl render_field_zone_card_tile_by_type   @ 080c4b84 fef73aff
+    b ui_card_render_load_destination_ref    @ 080c4b88 4ce0
+    .zero  0x2
+ptr_g_p1_life_points_080c4b8c:
+    .word  gP1LifePoints                  @ 080c4b8c e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4b90:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4b90 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ui_card_render_phase3_zone14:
+    lsls r1,r4,#0x1f    @ 080c4b94 e107
+    lsrs r0,r1,#0x1f    @ 080c4b96 c80f
+    ldr r3, ptr_g_p1_life_points_080c4bb4    @ 080c4b98 064b
+    adds r1,r0,#0x0    @ 080c4b9a 011c
+    ldr r2, player_block_stride_080c4bb8     @ 080c4b9c 064a
+    muls r1,r2    @ 080c4b9e 5143
+    adds r3,#0x14    @ 080c4ba0 1433
+    adds r1,r1,r3    @ 080c4ba2 c918
+    ldrh r2,[r1,#0x0]                        @ 080c4ba4 0a88
+    movs r1,#0xe    @ 080c4ba6 0e21
+    bl render_field_zone_card_tile_by_type   @ 080c4ba8 fef728ff
+    ldr r3, ptr_g_ui_effect_arg2_080c4bbc    @ 080c4bac 034b
+    ldr r2,[r3,#0x0]                         @ 080c4bae 1a68
+    b ui_card_render_update_destination_oam  @ 080c4bb0 3ae0
+    .zero  0x2
+ptr_g_p1_life_points_080c4bb4:
+    .word  gP1LifePoints                  @ 080c4bb4 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4bb8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4bb8 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_ui_effect_arg2_080c4bbc:
+    .word  gUIEffectArg2                  @ 080c4bbc 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ui_card_render_phase3_zone15:
+    lsls r1,r4,#0x1f    @ 080c4bc0 e107
+    lsrs r0,r1,#0x1f    @ 080c4bc2 c80f
+    ldr r3, ptr_g_p1_life_points_080c4be0    @ 080c4bc4 064b
+    adds r1,r0,#0x0    @ 080c4bc6 011c
+    ldr r2, player_block_stride_080c4be4     @ 080c4bc8 064a
+    muls r1,r2    @ 080c4bca 5143
+    adds r3,#0x1c    @ 080c4bcc 1c33
+    adds r1,r1,r3    @ 080c4bce c918
+    ldrh r2,[r1,#0x0]                        @ 080c4bd0 0a88
+    movs r1,#0xf    @ 080c4bd2 0f21
+    bl render_field_zone_card_tile_by_type   @ 080c4bd4 fef712ff
+    ldr r4, ptr_g_ui_effect_arg2_080c4be8    @ 080c4bd8 034c
+    ldr r2,[r4,#0x0]                         @ 080c4bda 2268
+    b ui_card_render_update_destination_oam  @ 080c4bdc 24e0
+    .zero  0x2
+ptr_g_p1_life_points_080c4be0:
+    .word  gP1LifePoints                  @ 080c4be0 e0c40102  gP1LifePoints: add reviewed operand-0 DATA reference.
+player_block_stride_080c4be4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4be4 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_ui_effect_arg2_080c4be8:
+    .word  gUIEffectArg2                  @ 080c4be8 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ui_card_render_phase3_zone11:
+    ldr r7, ptr_g_ui_effect_arg2_080c4c3c    @ 080c4bec 134f
+    ldr r1,[r7,#0x0]                         @ 080c4bee 3968
+    lsls r2,r1,#0x12    @ 080c4bf0 8a04
+    lsrs r0,r2,#0x18    @ 080c4bf2 100e
+    ldr r3, ptr_g_duel_field_state_080c4c40  @ 080c4bf4 124b
+    cmp r0,#0x6                              @ 080c4bf6 0628
+    bls ui_card_render_refresh_destination_list @ 080c4bf8 08d9
+    lsls r0,r1,#0x1f    @ 080c4bfa c807
+    lsrs r0,r0,#0x1f    @ 080c4bfc c00f
+    lsls r0,r0,#0x1    @ 080c4bfe 4000
+    adds r1,r3,#0x0    @ 080c4c00 191c
+    adds r1,#0x4c    @ 080c4c02 4c31
+    adds r0,r0,r1    @ 080c4c04 4018
+    lsrs r1,r2,#0x18    @ 080c4c06 110e
+    subs r1,#0x6    @ 080c4c08 0639
+    strh r1,[r0,#0x0]                        @ 080c4c0a 0180
+ui_card_render_refresh_destination_list:
+    ldr r0, ptr_g_ui_effect_arg2_080c4c3c    @ 080c4c0c 0b48
+    ldr r1,[r0,#0x0]                         @ 080c4c0e 0168
+    lsls r1,r1,#0x1f    @ 080c4c10 c907
+    lsrs r0,r1,#0x1f    @ 080c4c12 c80f
+    adds r1,r0,#0x0    @ 080c4c14 011c
+    lsls r1,r1,#0x1    @ 080c4c16 4900
+    adds r2,r3,#0x0    @ 080c4c18 1a1c
+    adds r2,#0x4c    @ 080c4c1a 4c32
+    adds r1,r1,r2    @ 080c4c1c 8918
+    ldrh r1,[r1,#0x0]                        @ 080c4c1e 0988
+    bl refresh_player_field_slot_tiles       @ 080c4c20 fff7fefa
+ui_card_render_load_destination_ref:
+    ldr r1, ptr_g_ui_effect_arg2_080c4c3c    @ 080c4c24 0549
+    ldr r2,[r1,#0x0]                         @ 080c4c26 0a68
+ui_card_render_update_destination_oam:
+    lsls r0,r2,#0x1f    @ 080c4c28 d007
+    lsrs r0,r0,#0x1f    @ 080c4c2a c00f
+    lsls r1,r2,#0x1a    @ 080c4c2c 9106
+    lsrs r1,r1,#0x1b    @ 080c4c2e c90e
+    lsls r2,r2,#0x12    @ 080c4c30 9204
+    lsrs r2,r2,#0x18    @ 080c4c32 120e
+    bl write_zone_slot_oam_descriptor        @ 080c4c34 01f0f4fe
+    b ui_card_render_advance_phase           @ 080c4c38 06e0
+    .zero  0x2
+ptr_g_ui_effect_arg2_080c4c3c:
+    .word  gUIEffectArg2                  @ 080c4c3c 1c310202  gUIEffectArg2: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c4c40:
+    .word  gDuelFieldState                @ 080c4c40 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ui_card_render_refresh_zone_info:
+    bl refresh_duel_field_zone_info          @ 080c4c44 07f062f9
+ui_card_render_advance_phase:
+    ldr r1, ptr_g_ui_effect_state_080c4c54   @ 080c4c48 0249
+    ldrh r0,[r1,#0x0]                        @ 080c4c4a 0888
+    adds r0,#0x1    @ 080c4c4c 0130
+    strh r0,[r1,#0x0]                        @ 080c4c4e 0880
+    b ui_card_render_return_active           @ 080c4c50 15e5
+    .zero  0x2
+ptr_g_ui_effect_state_080c4c54:
+    .word  gUIEffectState                 @ 080c4c54 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
+ui_card_render_phase4_finish:
+    ldr r0, ptr_g_duel_field_state_080c4c94  @ 080c4c58 0e48
+    ldr r3, duel_field_ui_effect_flags_off_080c4c98 @ 080c4c5a 0f4b
+    adds r2,r0,r3    @ 080c4c5c c218
+    ldrb r1,[r2,#0x0]                        @ 080c4c5e 1178
+    movs r0,#0x20    @ 080c4c60 2020
+    ands r0,r1    @ 080c4c62 0840
+    cmp r0,#0x0                              @ 080c4c64 0028
+    beq ui_card_render_rebuild_field_caches  @ 080c4c66 06d0
+    movs r0,#0x21    @ 080c4c68 2120
+    rsbs r0,r0,#0    @ 080c4c6a 4042
+    ands r0,r1    @ 080c4c6c 0840
+    movs r1,#0x11    @ 080c4c6e 1121
+    rsbs r1,r1,#0    @ 080c4c70 4942
+    ands r0,r1    @ 080c4c72 0840
+    strb r0,[r2,#0x0]                        @ 080c4c74 1070
+ui_card_render_rebuild_field_caches:
+    bl build_slot_activation_mask_for_player @ 080c4c76 03f0bbff
+    bl refresh_all_zone_slot_tile_display    @ 080c4c7a 03f043fe
+    ldr r0, ptr_g_ui_effect_state_080c4c9c   @ 080c4c7e 0748
+    movs r1,#0x5    @ 080c4c80 0521
+    rsbs r1,r1,#0    @ 080c4c82 4942
+    ldrb r4,[r0,#0x19]                       @ 080c4c84 447e
+    ands r1,r4    @ 080c4c86 2140
+    strb r1,[r0,#0x19]                       @ 080c4c88 4176
+    ldrh r1,[r0,#0x0]                        @ 080c4c8a 0188
+    adds r1,#0x1    @ 080c4c8c 0131
+    strh r1,[r0,#0x0]                        @ 080c4c8e 0180
+    b ui_card_render_return_active           @ 080c4c90 f5e4
+    .zero  0x2
+ptr_g_duel_field_state_080c4c94:
+    .word  gDuelFieldState                @ 080c4c94 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4c98:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4c98 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
+ptr_g_ui_effect_state_080c4c9c:
+    .word  gUIEffectState                 @ 080c4c9c 10310202  gUIEffectState: add reviewed operand-0 DATA reference.
 
-@ 清除 gUIEffectState 中两个标志位, 供 dispatch_ui_effect_by_card_type (0x080c4350) 在判定卡牌类型超出正常范围后调用以重置 UI 效果状态. 操作: (1) 读 r4+0x19 字节, ands ~0x2 (bit1 清零), 写回; (2) 读 [gP1LifePoints+0x215] 字节 (=gDuelFieldCtx+0x215 偏移), ands ~0x5 (bit0/bit2 清零), 写回; (3) 返回 r0=0. r4 为函数外部保存的 gUIEffectState 基址 (callee-save, 由调用者在 prologue 通过 ldr r4, DAT = gUIEffectState 加载). 被 dispatch_ui_effect_by_card_type 在卡牌类型>4 时调用. Constants: gUIEffectState=0x02023110, flag_offset_a=0x19, flag_bit_a=0x2, gDuelFieldCtx=0x02023130, field_offset_b=0x215, flag_bit_b=0x5.
+@ Shared-frame cleanup for run_ui_effect_card_render_state_machine. With r4=UI state, clear UI+0x19 bit0 and field+0x215 bit2. Entry4ca0 sets r0=2 for the mask;4cba sets return0;4cbc releases12 local bytes, restores r8-r10 and r4-r7, then returns through the saved caller PC. This tail consumes the parent frame rather than the BL link register. Keep the existing Function body and flags; local CALL_RETURN is set at the two parent BL sites.
 clear_ui_effect_state_flags:
     movs r0,#0x2    @ 080c4ca0 0220
     rsbs r0,r0,#0    @ 080c4ca2 4042
     ldrb r7,[r4,#0x19]                       @ 080c4ca4 677e
     ands r0,r7    @ 080c4ca6 3840
     strb r0,[r4,#0x19]                       @ 080c4ca8 6076
-    ldr r1, DAT_080c4ccc                     @ 080c4caa 0849
-    ldr r0, DAT_080c4cd0                     @ 080c4cac 0848
+    ldr r1, ptr_g_duel_field_state_080c4ccc  @ 080c4caa 0849
+    ldr r0, duel_field_ui_effect_flags_off_080c4cd0 @ 080c4cac 0848
     adds r1,r1,r0    @ 080c4cae 0918
     movs r0,#0x5    @ 080c4cb0 0520
     rsbs r0,r0,#0    @ 080c4cb2 4042
     ldrb r2,[r1,#0x0]                        @ 080c4cb4 0a78
     ands r0,r2    @ 080c4cb6 1040
     strb r0,[r1,#0x0]                        @ 080c4cb8 0870
+ui_card_render_return_complete:
     movs r0,#0x0    @ 080c4cba 0020
+ui_card_render_restore_saved_frame:
     add sp,#0xc                              @ 080c4cbc 03b0
     pop {r3,r4,r5}                           @ 080c4cbe 38bc
     .hword 0x4698    @ 080c4cc0 9846
@@ -6360,19 +7449,19 @@ clear_ui_effect_state_flags:
     pop {r4,r5,r6,r7}                        @ 080c4cc6 f0bc
     pop {r1}                                 @ 080c4cc8 02bc
     bx r1                                    @ 080c4cca 0847
-DAT_080c4ccc:
-    .word  0x02023130                     @ 080c4ccc 30310202
-DAT_080c4cd0:
-    .word  0x00000215                     @ 080c4cd0 15020000
+ptr_g_duel_field_state_080c4ccc:
+    .word  gDuelFieldState                @ 080c4ccc 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4cd0:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4cd0 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Check whether the LP value of a given player slot meets a threshold. r0 bit0=player_id [0..1]; r1 low16=threshold [0..0xFFFF]. Reads gP1LifePoints[player_id*0x868+0xc] halfword. Returns: 0 if slot empty/zero, 1 if LP < threshold, 2 if LP >= threshold. No side effects (pure read). Called by decode_zone_oam_word_to_slot_fields case 5. Constants: gP1LifePoints=0x0201C4E0, player_stride=0x868, lp_slot_offset=0xc.
-check_lp_threshold_for_zone_slot:
+@ Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from decode_zone_oam_word_to_slot_fields.
+classify_player_hand_count_threshold:
     lsls r1,r1,#0x10    @ 080c4cd4 0904
     lsrs r3,r1,#0x10    @ 080c4cd6 0b0c
-    ldr r2, PTR_gP1LifePoints_080c4cf0       @ 080c4cd8 054a
+    ldr r2, ptr_g_p1_life_points_080c4cf0    @ 080c4cd8 054a
     movs r1,#0x1    @ 080c4cda 0121
     ands r1,r0    @ 080c4cdc 0140
-    ldr r0, DAT_080c4cf4                     @ 080c4cde 0548
+    ldr r0, player_block_stride_080c4cf4     @ 080c4cde 0548
     muls r0,r1    @ 080c4ce0 4843
     adds r2,#0xc    @ 080c4ce2 0c32
     adds r0,r0,r2    @ 080c4ce4 8018
@@ -6381,10 +7470,10 @@ check_lp_threshold_for_zone_slot:
     bne LAB_080c4cf8                         @ 080c4cea 05d1
     movs r0,#0x0    @ 080c4cec 0020
     b LAB_080c4d02                           @ 080c4cee 08e0
-PTR_gP1LifePoints_080c4cf0:
-    .word  gP1LifePoints                  @ 080c4cf0 e0c40102
-DAT_080c4cf4:
-    .word  0x00000868                     @ 080c4cf4 68080000
+ptr_g_p1_life_points_080c4cf0:
+    .word  gP1LifePoints                  @ 080c4cf0 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+player_block_stride_080c4cf4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4cf4 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
 LAB_080c4cf8:
     cmp r0,r3                                @ 080c4cf8 9842
     bcc LAB_080c4d00                         @ 080c4cfa 01d3
@@ -6395,7 +7484,7 @@ LAB_080c4d00:
 LAB_080c4d02:
     bx lr                                    @ 080c4d02 7047
 
-@ 当 duel field 场地需要完整重绘所有 zone 和 slot 的卡牌 tile 时调用 (indeg=1, class D). 函数外层循环 r7=0..1 (两个玩家), 内层循环 r6=0..4 (5 个主要 slot): 对每 (player, slot) 组合, 读取 gDuelAnimState (0x0202334e) 和 gDuelAnimFlags (0x02023350) 合成 zone_mask, 再通过 get_zone_card_attribute_by_type / get_zone_slot_field6_by_type / get_zone_slot_card_ref_by_type + ensure_card_id_cache_entry 获取每槽卡 ID; 调用 render_field_slot_card_tile (FUN_080c38cc) 渲染主 slot. 外层结束后遍历 slot 5..10 同样渲染. 最后对 4 个特殊 zone (0xc/0xd/0xe/0xf) 各调 render_field_zone_card_tile_by_type (FUN_080c39fc). 最终对两个玩家各调 refresh_player_field_slot_tiles (FUN_080c4220) 完成 header/tile 同步. Constants: gDuelAnimState=0x0202334e, gDuelAnimFlags=0x02023350, player_stride=0x868, gDuelFieldSlots=0x0201c510.
+@ Redraw both players field tiles. For slots0..4, combine (u16[gDuelFieldChainRenderBitsPackedLo]>>2) with (u8[gDuelFieldChainRenderBitsPackedHi]&3)<<14; bit(player*8+slot) selects the0xff chain-snapshot getter mode. Draw slots5..10 normally, then zones12..15 from per-player counts. Cache card IDs and pass card, face and field6 data to the tile renderers. Refresh each player list using gDuelZoneFirstVisibleSlotByPlayer.
 redraw_all_field_slot_tiles:
     push {r4,r5,r6,r7,lr}                    @ 080c4d04 f0b5
     .hword 0x4657    @ 080c4d06 5746
@@ -6404,7 +7493,7 @@ redraw_all_field_slot_tiles:
     push {r5,r6,r7}                          @ 080c4d0c e0b4
     sub sp,#0x14                             @ 080c4d0e 85b0
     movs r7,#0x0    @ 080c4d10 0027
-    ldr r0, PTR_gP1LifePoints_080c4e88       @ 080c4d12 5d48
+    ldr r0, ptr_g_p1_life_points_080c4e88    @ 080c4d12 5d48
     .hword 0x4682    @ 080c4d14 8246
 LAB_080c4d16:
     movs r6,#0x0    @ 080c4d16 0026
@@ -6417,11 +7506,11 @@ LAB_080c4d16:
     adds r0,r7,#0x1    @ 080c4d24 781c
     str r0,[sp,#0x8]                         @ 080c4d26 0290
 LAB_080c4d28:
-    ldr r2, DAT_080c4e8c                     @ 080c4d28 584a
+    ldr r2, ptr_g_duel_field_chain_render_bits_packed_lo_080c4e8c @ 080c4d28 584a
     ldrh r2,[r2,#0x0]                        @ 080c4d2a 1288
     lsrs r1,r2,#0x2    @ 080c4d2c 9108
     movs r0,#0x3    @ 080c4d2e 0320
-    ldr r3, DAT_080c4e90                     @ 080c4d30 574b
+    ldr r3, ptr_g_duel_field_chain_render_bits_packed_hi_080c4e90 @ 080c4d30 574b
     ldrb r3,[r3,#0x0]                        @ 080c4d32 1b78
     ands r0,r3    @ 080c4d34 1840
     lsls r0,r0,#0xe    @ 080c4d36 8003
@@ -6442,11 +7531,11 @@ LAB_080c4d4c:
     lsls r0,r0,#0x10    @ 080c4d54 0004
     lsrs r0,r0,#0x10    @ 080c4d56 000c
     .hword 0x4681    @ 080c4d58 8146
-    ldr r2, DAT_080c4e8c                     @ 080c4d5a 4c4a
+    ldr r2, ptr_g_duel_field_chain_render_bits_packed_lo_080c4e8c @ 080c4d5a 4c4a
     ldrh r2,[r2,#0x0]                        @ 080c4d5c 1288
     lsrs r1,r2,#0x2    @ 080c4d5e 9108
     movs r0,#0x3    @ 080c4d60 0320
-    ldr r3, DAT_080c4e90                     @ 080c4d62 4b4b
+    ldr r3, ptr_g_duel_field_chain_render_bits_packed_hi_080c4e90 @ 080c4d62 4b4b
     ldrb r3,[r3,#0x0]                        @ 080c4d64 1b78
     ands r0,r3    @ 080c4d66 1840
     lsls r0,r0,#0xe    @ 080c4d68 8003
@@ -6462,11 +7551,11 @@ LAB_080c4d76:
     bl get_zone_slot_field6_by_type          @ 080c4d7a 76f721fc
     lsls r0,r0,#0x10    @ 080c4d7e 0004
     lsrs r5,r0,#0x10    @ 080c4d80 050c
-    ldr r0, DAT_080c4e8c                     @ 080c4d82 4248
+    ldr r0, ptr_g_duel_field_chain_render_bits_packed_lo_080c4e8c @ 080c4d82 4248
     ldrh r0,[r0,#0x0]                        @ 080c4d84 0088
     lsrs r1,r0,#0x2    @ 080c4d86 8108
     movs r0,#0x3    @ 080c4d88 0320
-    ldr r2, DAT_080c4e90                     @ 080c4d8a 414a
+    ldr r2, ptr_g_duel_field_chain_render_bits_packed_hi_080c4e90 @ 080c4d8a 414a
     ldrb r2,[r2,#0x0]                        @ 080c4d8c 1278
     ands r0,r2    @ 080c4d8e 1040
     lsls r0,r0,#0xe    @ 080c4d90 8003
@@ -6534,7 +7623,7 @@ LAB_080c4dca:
     lsrs r5,r3,#0x10    @ 080c4e18 1d0c
     movs r0,#0x1    @ 080c4e1a 0120
     ands r0,r7    @ 080c4e1c 3840
-    ldr r1, DAT_080c4e94                     @ 080c4e1e 1d49
+    ldr r1, player_block_stride_080c4e94     @ 080c4e1e 1d49
     adds r4,r0,#0x0    @ 080c4e20 041c
     muls r4,r1    @ 080c4e22 4c43
     .hword 0x4650    @ 080c4e24 5046
@@ -6558,14 +7647,14 @@ LAB_080c4dca:
     adds r0,r5,#0x0    @ 080c4e4c 281c
     movs r1,#0xe    @ 080c4e4e 0e21
     bl render_field_zone_card_tile_by_type   @ 080c4e50 fef7d4fd
-    ldr r0, DAT_080c4e98                     @ 080c4e54 1048
+    ldr r0, ptr_g_p1_alt_hand_count_base_080c4e98 @ 080c4e54 1048
     adds r4,r4,r0    @ 080c4e56 2418
     ldrh r2,[r4,#0x0]                        @ 080c4e58 2288
     adds r0,r5,#0x0    @ 080c4e5a 281c
     movs r1,#0xf    @ 080c4e5c 0f21
     bl render_field_zone_card_tile_by_type   @ 080c4e5e fef7cdfd
     ldr r1,[sp,#0xc]                         @ 080c4e62 0399
-    ldr r2, DAT_080c4e9c                     @ 080c4e64 0d4a
+    ldr r2, ptr_g_duel_zone_first_visible_slot_by_player_080c4e9c @ 080c4e64 0d4a
     adds r0,r1,r2    @ 080c4e66 8818
     ldrh r1,[r0,#0x0]                        @ 080c4e68 0188
     adds r0,r7,#0x0    @ 080c4e6a 381c
@@ -6583,25 +7672,25 @@ LAB_080c4e78:
     pop {r4,r5,r6,r7}                        @ 080c4e82 f0bc
     pop {r0}                                 @ 080c4e84 01bc
     bx r0                                    @ 080c4e86 0047
-PTR_gP1LifePoints_080c4e88:
-    .word  gP1LifePoints                  @ 080c4e88 e0c40102
-DAT_080c4e8c:
-    .word  0x0202334e                     @ 080c4e8c 4e330202
-DAT_080c4e90:
-    .word  0x02023350                     @ 080c4e90 50330202
-DAT_080c4e94:
-    .word  0x00000868                     @ 080c4e94 68080000
-DAT_080c4e98:
-    .word  0x0201c4fc                     @ 080c4e98 fcc40102
-DAT_080c4e9c:
-    .word  0x0202317c                     @ 080c4e9c 7c310202
+ptr_g_p1_life_points_080c4e88:
+    .word  gP1LifePoints                  @ 080c4e88 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_chain_render_bits_packed_lo_080c4e8c:
+    .word  gDuelFieldChainRenderBitsPackedLo @ 080c4e8c 4e330202  gDuelFieldChainRenderBitsPackedLo: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_chain_render_bits_packed_hi_080c4e90:
+    .word  gDuelFieldChainRenderBitsPackedHi @ 080c4e90 50330202  gDuelFieldChainRenderBitsPackedHi: add reviewed operand-0 DATA reference.
+player_block_stride_080c4e94:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c4e94 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_alt_hand_count_base_080c4e98:
+    .word  gP1AltHandCountBase            @ 080c4e98 fcc40102  gP1AltHandCountBase: add reviewed operand-0 DATA reference.
+ptr_g_duel_zone_first_visible_slot_by_player_080c4e9c:
+    .word  gDuelZoneFirstVisibleSlotByPlayer @ 080c4e9c 7c310202  gDuelZoneFirstVisibleSlotByPlayer: add reviewed operand-0 DATA reference.
 
-@ Initialises third variant of duel_field slot AOB context (DAT_080c4ed0, 0x1c halfwords=0x38 bytes) for dispatch_card_display_op case 0x19. Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8]. Sets [base+0x19] bit1 (init_flag=0x2). Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. r0=ptr arg_data; r1=ptr arg_target. Returns void. Constants: base_struct=DAT_080c4ed0, zero_len=0x1c halfwords, init_flag=0x2.
-init_field_slot_aob_ctx_c:
+@ Initialize a paired-card UI render request. Save r0/r1, zero28 bytes of gUIEffectState, then write the two packed arguments at UI+4 and UI+8. Set UI+0x19 bit1 and field+0x215 bit2. The UI dispatcher selects run_ui_effect_card_pair_state_machine while bit1 is set. The zero helper takes a byte count; this initializer does not create an AOB context.
+init_ui_effect_card_pair_request:
     push {r4,r5,r6,lr}                       @ 080c4ea0 70b5
     adds r5,r0,#0x0    @ 080c4ea2 051c
     adds r6,r1,#0x0    @ 080c4ea4 0e1c
-    ldr r4, DAT_080c4ed0                     @ 080c4ea6 0a4c
+    ldr r4, ptr_g_ui_effect_state_080c4ed0   @ 080c4ea6 0a4c
     adds r0,r4,#0x0    @ 080c4ea8 201c
     movs r1,#0x1c    @ 080c4eaa 1c21
     bl zero_fill_by_halfword                 @ 080c4eac 2ff0e2ff
@@ -6611,8 +7700,8 @@ init_field_slot_aob_ctx_c:
     ldrb r1,[r4,#0x19]                       @ 080c4eb6 617e
     orrs r0,r1    @ 080c4eb8 0843
     strb r0,[r4,#0x19]                       @ 080c4eba 6076
-    ldr r1, DAT_080c4ed4                     @ 080c4ebc 0549
-    ldr r2, DAT_080c4ed8                     @ 080c4ebe 064a
+    ldr r1, ptr_g_duel_field_state_080c4ed4  @ 080c4ebc 0549
+    ldr r2, duel_field_ui_effect_flags_off_080c4ed8 @ 080c4ebe 064a
     adds r1,r1,r2    @ 080c4ec0 8918
     movs r0,#0x4    @ 080c4ec2 0420
     ldrb r2,[r1,#0x0]                        @ 080c4ec4 0a78
@@ -6621,14 +7710,14 @@ init_field_slot_aob_ctx_c:
     pop {r4,r5,r6}                           @ 080c4eca 70bc
     pop {r0}                                 @ 080c4ecc 01bc
     bx r0                                    @ 080c4ece 0047
-DAT_080c4ed0:
-    .word  gUIEffectState                 @ 080c4ed0 10310202
-DAT_080c4ed4:
-    .word  0x02023130                     @ 080c4ed4 30310202
-DAT_080c4ed8:
-    .word  0x00000215                     @ 080c4ed8 15020000
+ptr_g_ui_effect_state_080c4ed0:
+    .word  gUIEffectState                 @ 080c4ed0 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c4ed4:
+    .word  gDuelFieldState                @ 080c4ed4 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c4ed8:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c4ed8 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ 以 gUIEffectState[0] card_type [0..4] 为 key 进行 switch-dispatch, 分别驱动 5 个卡牌配对展示子状态机. 入口: r1=gUIEffectState[0x19] u8 flag (由 caller 0x0801f0a6 ldrb 传入, mov r9,r1 保存); r0 由内部 ldr DAT_080c4f04 覆盖为 0x02023114 (gUIEffectState+4); r9-4 = gUIEffectState 基址, 读 [0] halfword 作 switch key. 返回 0=完成/1=继续, 转发子状态机 r0. case 0: 解包 gUIEffectState+4 packed word (player/zone_type/sub_idx), 调用 resolve_zone_oam_base_coords_by_type 两次获取两张卡的坐标, 再调用 load_card_list_small_image x2 加载缩略图, 最后 build_slot_activation_mask_for_player. case 1..4: 类似模式, 各自处理不同的卡牌对或坐标组合. 被 play_ui_effect (0x0801ef94) 作为 UI effect 的子状态机入口调用. Constants: gUIEffectState=0x02023110, gUIEffectState_card_ref1=0x02023114, gUIEffectState_card_ref2=0x02023118, card_type_max=4.
+@ Run the paired-card UI request selected by UI flag1. UI+0 is phase0..4; UI+4 and UI+8 hold packed player/zone/index references. Phase0 resolves coordinates, loads two small images and builds masks. Later phases draw paired sprites/backgrounds, advance interpolation and refresh field tiles. Active phases return1. Default clears UI+0x19 bit1 and field+0x215 bit2, returning0. The entry does not require an r1 flag argument.
 run_ui_effect_card_pair_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080c4edc f0b5
     .hword 0x4657    @ 080c4ede 5746
@@ -6636,7 +7725,7 @@ run_ui_effect_card_pair_state_machine:
     .hword 0x4645    @ 080c4ee2 4546
     push {r5,r6,r7}                          @ 080c4ee4 e0b4
     sub sp,#0xc                              @ 080c4ee6 83b0
-    ldr r0, DAT_080c4f04                     @ 080c4ee8 0648
+    ldr r0, ptr_g_ui_effect_args_080c4f04    @ 080c4ee8 0648
     .hword 0x4682    @ 080c4eea 8246
     movs r6,#0x0    @ 080c4eec 0026
     .hword 0x4651    @ 080c4eee 5146
@@ -6648,15 +7737,15 @@ switchD_080c4f02__default:
     b LAB_080c5410                           @ 080c4ef8 8ae2
 LAB_080c4efa:
     lsls r0,r0,#0x2    @ 080c4efa 8000
-    ldr r1, DAT_080c4f08                     @ 080c4efc 0249
+    ldr r1, ptr_switch_d_080c4f02_switchdata_d_080c4f0c_080c4f08 @ 080c4efc 0249
     adds r0,r0,r1    @ 080c4efe 4018
     ldr r0,[r0,#0x0]                         @ 080c4f00 0068
 switchD_080c4f02__switchD:
     .hword 0x4687    @ 080c4f02 8746
-DAT_080c4f04:
-    .word  0x02023114                     @ 080c4f04 14310202
-DAT_080c4f08:
-    .word  0x080c4f0c                     @ 080c4f08 0c4f0c08
+ptr_g_ui_effect_args_080c4f04:
+    .word  gUIEffectArgs                  @ 080c4f04 14310202  gUIEffectArgs: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c4f02_switchdata_d_080c4f0c_080c4f08:
+    .word  switchD_080c4f02__switchdataD_080c4f0c                     @ 080c4f08 0c4f0c08  switchD_080c4f02__switchdataD_080c4f0c: add reviewed operand-0 DATA reference.
 switchD_080c4f02__switchdataD_080c4f0c:
     .word  0x080c4f20                     @ 080c4f0c 204f0c08
     .word  0x080c4ffc                     @ 080c4f10 fc4f0c08
@@ -6674,7 +7763,7 @@ switchD_080c4f02__caseD_0:
     lsrs r4,r0,#0x18    @ 080c4f2e 040e
     cmp r2,#0xb                              @ 080c4f30 0b2a
     bne LAB_080c4f40                         @ 080c4f32 05d1
-    ldr r0, DAT_080c4ff4                     @ 080c4f34 2f48
+    ldr r0, ptr_g_duel_field_state_080c4ff4  @ 080c4f34 2f48
     lsls r1,r3,#0x1    @ 080c4f36 5900
     adds r0,#0x4c    @ 080c4f38 4c30
     adds r1,r1,r0    @ 080c4f3a 0918
@@ -6696,7 +7785,7 @@ LAB_080c4f40:
     orrs r0,r1    @ 080c4f58 0843
     bl resolve_zone_data_ptr_by_oam_word     @ 080c4f5a 01f06dfb
     adds r5,r0,#0x0    @ 080c4f5e 051c
-    ldr r1, DAT_080c4ff8                     @ 080c4f60 2549
+    ldr r1, ptr_g_ui_effect_arg1_080c4ff8    @ 080c4f60 2549
     ldr r0,[r1,#0x0]                         @ 080c4f62 0868
     lsls r1,r0,#0x1f    @ 080c4f64 c107
     lsrs r3,r1,#0x1f    @ 080c4f66 cb0f
@@ -6706,7 +7795,7 @@ LAB_080c4f40:
     lsrs r4,r0,#0x18    @ 080c4f6e 040e
     cmp r2,#0xb                              @ 080c4f70 0b2a
     bne LAB_080c4f80                         @ 080c4f72 05d1
-    ldr r0, DAT_080c4ff4                     @ 080c4f74 1f48
+    ldr r0, ptr_g_duel_field_state_080c4ff4  @ 080c4f74 1f48
     lsls r1,r3,#0x1    @ 080c4f76 5900
     adds r0,#0x4c    @ 080c4f78 4c30
     adds r1,r1,r0    @ 080c4f7a 0918
@@ -6753,7 +7842,7 @@ LAB_080c4f80:
     adds r0,r5,#0x0    @ 080c4fd0 281c
     movs r2,#0x0    @ 080c4fd2 0022
     bl load_card_list_small_image            @ 080c4fd4 fef7f2f9
-    ldr r2, DAT_080c4ff8                     @ 080c4fd8 074a
+    ldr r2, ptr_g_ui_effect_arg1_080c4ff8    @ 080c4fd8 074a
     ldr r1,[r2,#0x0]                         @ 080c4fda 1168
     lsls r1,r1,#0x11    @ 080c4fdc 4904
     lsrs r1,r1,#0x1f    @ 080c4fde c90f
@@ -6765,10 +7854,10 @@ LAB_080c4f80:
     bl build_slot_activation_mask_for_player @ 080c4fec 03f000fe
     b LAB_080c5400                           @ 080c4ff0 06e2
     .zero  0x2
-DAT_080c4ff4:
-    .word  0x02023130                     @ 080c4ff4 30310202
-DAT_080c4ff8:
-    .word  0x02023118                     @ 080c4ff8 18310202
+ptr_g_duel_field_state_080c4ff4:
+    .word  gDuelFieldState                @ 080c4ff4 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_arg1_080c4ff8:
+    .word  gUIEffectArg1                  @ 080c4ff8 18310202  gUIEffectArg1: add reviewed operand-0 DATA reference.
 switchD_080c4f02__caseD_1:
     .hword 0x4653    @ 080c4ffc 5346
     ldr r2,[r3,#0x0]                         @ 080c4ffe 1a68
@@ -6779,9 +7868,9 @@ switchD_080c4f02__caseD_1:
     lsls r2,r2,#0x12    @ 080c5008 9204
     lsrs r2,r2,#0x18    @ 080c500a 120e
     bl resolve_zone_oam_base_coords_by_type  @ 080c500c fef7cefa
-    ldr r5, DAT_080c50f8                     @ 080c5010 394d
+    ldr r5, ptr_g_ui_effect_state_080c50f8   @ 080c5010 394d
     str r0,[r5,#0x10]                        @ 080c5012 2861
-    ldr r0, DAT_080c50fc                     @ 080c5014 3948
+    ldr r0, ptr_g_ui_effect_arg1_080c50fc    @ 080c5014 3948
     ldr r2,[r0,#0x0]                         @ 080c5016 0268
     lsls r0,r2,#0x1f    @ 080c5018 d007
     lsrs r0,r0,#0x1f    @ 080c501a c00f
@@ -6802,7 +7891,7 @@ switchD_080c4f02__caseD_1:
     ldr r1,[r2,#0x0]                         @ 080c503a 1168
     lsls r1,r1,#0x1f    @ 080c503c c907
     lsrs r1,r1,#0x1f    @ 080c503e c90f
-    ldr r2, DAT_080c5100                     @ 080c5040 2f4a
+    ldr r2, ptr_g_duel_card_ctx_base_080c5100 @ 080c5040 2f4a
     ldr r0,[r2,#0x4]                         @ 080c5042 5068
     movs r2,#0x1    @ 080c5044 0122
     .hword 0x4690    @ 080c5046 9046
@@ -6831,7 +7920,7 @@ LAB_080c5060:
     adds r0,r4,#0x0    @ 080c5070 201c
     movs r1,#0x80    @ 080c5072 8021
     bl write_pack_obj_attr_by_dir_stacked    @ 080c5074 31f02afe
-    ldr r3, DAT_080c50fc                     @ 080c5078 204b
+    ldr r3, ptr_g_ui_effect_arg1_080c50fc    @ 080c5078 204b
     ldr r2,[r3,#0x0]                         @ 080c507a 1a68
     lsls r0,r2,#0x1f    @ 080c507c d007
     lsrs r0,r0,#0x1f    @ 080c507e c00f
@@ -6848,11 +7937,11 @@ LAB_080c5060:
     subs r1,#0x4    @ 080c5096 0439
     lsls r1,r1,#0x10    @ 080c5098 0904
     lsrs r3,r1,#0x10    @ 080c509a 0b0c
-    ldr r0, DAT_080c50fc                     @ 080c509c 1748
+    ldr r0, ptr_g_ui_effect_arg1_080c50fc    @ 080c509c 1748
     ldr r1,[r0,#0x0]                         @ 080c509e 0168
     lsls r1,r1,#0x1f    @ 080c50a0 c907
     lsrs r1,r1,#0x1f    @ 080c50a2 c90f
-    ldr r2, DAT_080c5100                     @ 080c50a4 164a
+    ldr r2, ptr_g_duel_card_ctx_base_080c5100 @ 080c50a4 164a
     ldr r0,[r2,#0x4]                         @ 080c50a6 5068
     .hword 0x4642    @ 080c50a8 4246
     eors r0,r2    @ 080c50aa 5040
@@ -6861,7 +7950,7 @@ LAB_080c5060:
     adds r6,#0x40    @ 080c50b0 4036
 LAB_080c50b2:
     .hword 0x4648    @ 080c50b2 4846
-    ldr r1, DAT_080c50fc                     @ 080c50b4 1149
+    ldr r1, ptr_g_ui_effect_arg1_080c50fc    @ 080c50b4 1149
     ldrb r1,[r1,#0x1]                        @ 080c50b6 4978
     ands r0,r1    @ 080c50b8 0840
     cmp r0,#0x0                              @ 080c50ba 0028
@@ -6894,16 +7983,16 @@ LAB_080c50c0:
 LAB_080c50f4:
     movs r0,#0x1    @ 080c50f4 0120
     b LAB_080c542c                           @ 080c50f6 99e1
-DAT_080c50f8:
-    .word  gUIEffectState                 @ 080c50f8 10310202
-DAT_080c50fc:
-    .word  0x02023118                     @ 080c50fc 18310202
-DAT_080c5100:
-    .word  0x0201e2a0                     @ 080c5100 a0e20102
+ptr_g_ui_effect_state_080c50f8:
+    .word  gUIEffectState                 @ 080c50f8 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_ui_effect_arg1_080c50fc:
+    .word  gUIEffectArg1                  @ 080c50fc 18310202  gUIEffectArg1: add reviewed operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c5100:
+    .word  gDuelCardCtxBase               @ 080c5100 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 switchD_080c4f02__caseD_2:
     movs r7,#0x80    @ 080c5104 8027
     lsls r7,r7,#0x1    @ 080c5106 7f00
-    ldr r2, DAT_080c518c                     @ 080c5108 204a
+    ldr r2, ptr_g_ui_effect_state_080c518c   @ 080c5108 204a
     ldr r1,[r2,#0x10]                        @ 080c510a 1169
     subs r0,r1,#0x4    @ 080c510c 081f
     lsls r0,r0,#0x10    @ 080c510e 0004
@@ -6943,11 +8032,11 @@ LAB_080c513e:
 LAB_080c5150:
     asrs r0,r0,#0x2    @ 080c5150 8010
     .hword 0x4684    @ 080c5152 8446
-    ldr r0, DAT_080c5190                     @ 080c5154 0e48
+    ldr r0, ptr_g_ui_effect_arg1_080c5190    @ 080c5154 0e48
     ldr r2,[r0,#0x0]                         @ 080c5156 0268
     lsls r2,r2,#0x1f    @ 080c5158 d207
     lsrs r2,r2,#0x1f    @ 080c515a d20f
-    ldr r0, DAT_080c5194                     @ 080c515c 0d48
+    ldr r0, ptr_g_duel_card_ctx_base_080c5194 @ 080c515c 0d48
     ldr r0,[r0,#0x4]                         @ 080c515e 4068
     movs r1,#0x1    @ 080c5160 0121
     eors r0,r1    @ 080c5162 4840
@@ -6956,7 +8045,7 @@ LAB_080c5150:
     adds r6,#0x40    @ 080c5168 4036
 LAB_080c516a:
     movs r0,#0x80    @ 080c516a 8020
-    ldr r1, DAT_080c5190                     @ 080c516c 0849
+    ldr r1, ptr_g_ui_effect_arg1_080c5190    @ 080c516c 0849
     ldrb r1,[r1,#0x1]                        @ 080c516e 4978
     ands r0,r1    @ 080c5170 0840
     cmp r0,#0x0                              @ 080c5172 0028
@@ -6973,12 +8062,12 @@ LAB_080c5178:
     lsls r0,r0,#0x5    @ 080c5186 4001
     b LAB_080c519a                           @ 080c5188 07e0
     .zero  0x2
-DAT_080c518c:
-    .word  gUIEffectState                 @ 080c518c 10310202
-DAT_080c5190:
-    .word  0x02023118                     @ 080c5190 18310202
-DAT_080c5194:
-    .word  0x0201e2a0                     @ 080c5194 a0e20102
+ptr_g_ui_effect_state_080c518c:
+    .word  gUIEffectState                 @ 080c518c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_ui_effect_arg1_080c5190:
+    .word  gUIEffectArg1                  @ 080c5190 18310202  gUIEffectArg1: add reviewed operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c5194:
+    .word  gDuelCardCtxBase               @ 080c5194 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c5198:
     lsls r0,r5,#0x5    @ 080c5198 6801
 LAB_080c519a:
@@ -7001,7 +8090,7 @@ LAB_080c519a:
     movs r6,#0x0    @ 080c51bc 0026
     movs r7,#0x80    @ 080c51be 8027
     lsls r7,r7,#0x1    @ 080c51c0 7f00
-    ldr r2, DAT_080c5244                     @ 080c51c2 204a
+    ldr r2, ptr_g_ui_effect_state_080c5244   @ 080c51c2 204a
     ldr r1,[r2,#0x14]                        @ 080c51c4 5169
     subs r0,r1,#0x4    @ 080c51c6 081f
     lsls r0,r0,#0x10    @ 080c51c8 0004
@@ -7045,7 +8134,7 @@ LAB_080c520a:
     ldr r2,[r0,#0x0]                         @ 080c5210 0268
     lsls r2,r2,#0x1f    @ 080c5212 d207
     lsrs r2,r2,#0x1f    @ 080c5214 d20f
-    ldr r0, DAT_080c5248                     @ 080c5216 0c48
+    ldr r0, ptr_g_duel_card_ctx_base_080c5248 @ 080c5216 0c48
     ldr r0,[r0,#0x4]                         @ 080c5218 4068
     movs r1,#0x1    @ 080c521a 0121
     eors r0,r1    @ 080c521c 4840
@@ -7070,10 +8159,10 @@ LAB_080c5232:
     subs r0,r0,r5    @ 080c523e 401b
     lsls r0,r0,#0x5    @ 080c5240 4001
     b LAB_080c524e                           @ 080c5242 04e0
-DAT_080c5244:
-    .word  gUIEffectState                 @ 080c5244 10310202
-DAT_080c5248:
-    .word  0x0201e2a0                     @ 080c5248 a0e20102
+ptr_g_ui_effect_state_080c5244:
+    .word  gUIEffectState                 @ 080c5244 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c5248:
+    .word  gDuelCardCtxBase               @ 080c5248 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c524c:
     lsls r0,r5,#0x5    @ 080c524c 6801
 LAB_080c524e:
@@ -7093,7 +8182,7 @@ LAB_080c524e:
     orrs r3,r6    @ 080c5268 3343
     movs r1,#0x80    @ 080c526a 8021
     bl write_pack_obj_attr_by_dir_stacked    @ 080c526c 31f02efd
-    ldr r2, DAT_080c528c                     @ 080c5270 064a
+    ldr r2, ptr_g_ui_effect_state_080c528c   @ 080c5270 064a
     ldrb r0,[r2,#0x18]                       @ 080c5272 107e
     adds r1,r0,#0x1    @ 080c5274 411c
     strb r1,[r2,#0x18]                       @ 080c5276 1176
@@ -7108,8 +8197,8 @@ LAB_080c5282:
     strh r0,[r2,#0x0]                        @ 080c5286 1080
     b LAB_080c50f4                           @ 080c5288 34e7
     .zero  0x2
-DAT_080c528c:
-    .word  gUIEffectState                 @ 080c528c 10310202
+ptr_g_ui_effect_state_080c528c:
+    .word  gUIEffectState                 @ 080c528c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 switchD_080c4f02__caseD_3:
     .hword 0x4651    @ 080c5290 5146
     ldr r0,[r1,#0x0]                         @ 080c5292 0868
@@ -7140,7 +8229,7 @@ switchD_080c4f02__caseD_3:
     bl ensure_card_id_cache_entry            @ 080c52c6 07f0fffa
     lsls r0,r0,#0x10    @ 080c52ca 0004
     lsrs r7,r0,#0x10    @ 080c52cc 070c
-    ldr r0, DAT_080c53f0                     @ 080c52ce 4848
+    ldr r0, ptr_g_ui_effect_state_080c53f0   @ 080c52ce 4848
     .hword 0x4681    @ 080c52d0 8146
     ldr r1,[r0,#0x10]                        @ 080c52d2 0169
     subs r0,r1,#0x4    @ 080c52d4 081f
@@ -7154,7 +8243,7 @@ switchD_080c4f02__caseD_3:
     ldr r1,[r2,#0x0]                         @ 080c52e4 1168
     lsls r1,r1,#0x1f    @ 080c52e6 c907
     lsrs r1,r1,#0x1f    @ 080c52e8 c90f
-    ldr r2, DAT_080c53f4                     @ 080c52ea 424a
+    ldr r2, ptr_g_duel_card_ctx_base_080c53f4 @ 080c52ea 424a
     ldr r0,[r2,#0x4]                         @ 080c52ec 5068
     .hword 0x4642    @ 080c52ee 4246
     eors r0,r2    @ 080c52f0 5040
@@ -7196,7 +8285,7 @@ LAB_080c5306:
     str r4,[sp,#0x0]                         @ 080c5336 0094
     str r7,[sp,#0x4]                         @ 080c5338 0197
     bl render_field_slot_card_tile           @ 080c533a fef7c7fa
-    ldr r2, DAT_080c53f8                     @ 080c533e 2e4a
+    ldr r2, ptr_g_ui_effect_arg1_080c53f8    @ 080c533e 2e4a
     ldr r0,[r2,#0x0]                         @ 080c5340 1068
     lsls r1,r0,#0x1f    @ 080c5342 c107
     lsrs r1,r1,#0x1f    @ 080c5344 c90f
@@ -7234,11 +8323,11 @@ LAB_080c5306:
     subs r1,#0x4    @ 080c5388 0439
     lsls r1,r1,#0x10    @ 080c538a 0904
     lsrs r3,r1,#0x10    @ 080c538c 0b0c
-    ldr r2, DAT_080c53f8                     @ 080c538e 1a4a
+    ldr r2, ptr_g_ui_effect_arg1_080c53f8    @ 080c538e 1a4a
     ldr r1,[r2,#0x0]                         @ 080c5390 1168
     lsls r1,r1,#0x1f    @ 080c5392 c907
     lsrs r1,r1,#0x1f    @ 080c5394 c90f
-    ldr r2, DAT_080c53f4                     @ 080c5396 174a
+    ldr r2, ptr_g_duel_card_ctx_base_080c53f4 @ 080c5396 174a
     ldr r0,[r2,#0x4]                         @ 080c5398 5068
     .hword 0x4642    @ 080c539a 4246
     eors r0,r2    @ 080c539c 5040
@@ -7247,7 +8336,7 @@ LAB_080c5306:
     adds r6,#0x40    @ 080c53a2 4036
 LAB_080c53a4:
     movs r0,#0x80    @ 080c53a4 8020
-    ldr r1, DAT_080c53f8                     @ 080c53a6 1449
+    ldr r1, ptr_g_ui_effect_arg1_080c53f8    @ 080c53a6 1449
     ldrb r1,[r1,#0x1]                        @ 080c53a8 4978
     ands r0,r1    @ 080c53aa 0840
     cmp r0,#0x0                              @ 080c53ac 0028
@@ -7265,7 +8354,7 @@ LAB_080c53b2:
     movs r1,#0x80    @ 080c53c2 8021
     adds r3,r6,#0x0    @ 080c53c4 331c
     bl write_pack_obj_attr_by_dir_stacked    @ 080c53c6 31f081fc
-    ldr r0, DAT_080c53f8                     @ 080c53ca 0b48
+    ldr r0, ptr_g_ui_effect_arg1_080c53f8    @ 080c53ca 0b48
     ldr r4,[r0,#0x0]                         @ 080c53cc 0468
     lsls r0,r4,#0x1f    @ 080c53ce e007
     lsrs r0,r0,#0x1f    @ 080c53d0 c00f
@@ -7283,32 +8372,32 @@ LAB_080c53b2:
     .hword 0x4649    @ 080c53ea 4946
     b LAB_080c5402                           @ 080c53ec 09e0
     .zero  0x2
-DAT_080c53f0:
-    .word  gUIEffectState                 @ 080c53f0 10310202
-DAT_080c53f4:
-    .word  0x0201e2a0                     @ 080c53f4 a0e20102
-DAT_080c53f8:
-    .word  0x02023118                     @ 080c53f8 18310202
+ptr_g_ui_effect_state_080c53f0:
+    .word  gUIEffectState                 @ 080c53f0 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c53f4:
+    .word  gDuelCardCtxBase               @ 080c53f4 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_g_ui_effect_arg1_080c53f8:
+    .word  gUIEffectArg1                  @ 080c53f8 18310202  gUIEffectArg1: add reviewed operand-0 DATA reference.
 switchD_080c4f02__caseD_4:
     bl refresh_duel_field_zone_info          @ 080c53fc 06f086fd
 LAB_080c5400:
-    ldr r1, DAT_080c540c                     @ 080c5400 0249
+    ldr r1, ptr_g_ui_effect_state_080c540c   @ 080c5400 0249
 LAB_080c5402:
     ldrh r0,[r1,#0x0]                        @ 080c5402 0888
     adds r0,#0x1    @ 080c5404 0130
     strh r0,[r1,#0x0]                        @ 080c5406 0880
     b LAB_080c50f4                           @ 080c5408 74e6
     .zero  0x2
-DAT_080c540c:
-    .word  gUIEffectState                 @ 080c540c 10310202
+ptr_g_ui_effect_state_080c540c:
+    .word  gUIEffectState                 @ 080c540c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 LAB_080c5410:
     movs r0,#0x3    @ 080c5410 0320
     rsbs r0,r0,#0    @ 080c5412 4042
     ldrb r2,[r1,#0x19]                       @ 080c5414 4a7e
     ands r0,r2    @ 080c5416 1040
     strb r0,[r1,#0x19]                       @ 080c5418 4876
-    ldr r1, DAT_080c543c                     @ 080c541a 0849
-    ldr r3, DAT_080c5440                     @ 080c541c 084b
+    ldr r1, ptr_g_duel_field_state_080c543c  @ 080c541a 0849
+    ldr r3, duel_field_ui_effect_flags_off_080c5440 @ 080c541c 084b
     adds r1,r1,r3    @ 080c541e c918
     movs r0,#0x5    @ 080c5420 0520
     rsbs r0,r0,#0    @ 080c5422 4042
@@ -7325,12 +8414,12 @@ LAB_080c542c:
     pop {r4,r5,r6,r7}                        @ 080c5436 f0bc
     pop {r1}                                 @ 080c5438 02bc
     bx r1                                    @ 080c543a 0847
-DAT_080c543c:
-    .word  0x02023130                     @ 080c543c 30310202
-DAT_080c5440:
-    .word  0x00000215                     @ 080c5440 15020000
+ptr_g_duel_field_state_080c543c:
+    .word  gDuelFieldState                @ 080c543c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_ui_effect_flags_off_080c5440:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c5440 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: named scalar literal.
 
-@ Read gPrng+0x210 OAM halfword; dispatch on zone_type via DAT_080c54a8 16-entry table; write OAM slots 0x70fb/0x70fc/0x70fd with computed attr0/1/2. r0=void. Returns void. Caller: dispatch_duel_field_zone_oam_by_type; used in duel field OAM init path. Constants: gPrng_oam_word=gPrng+0x210, OAM_SLOT_A=0x70fb, OAM_SLOT_B=0x70fc, OAM_SLOT_C=0x70fd, zone_dispatch_table=DAT_080c54a8.
+@ Set up zone OAM from u16[gDuelFieldState+0x210]. Decode player bit7, zone bits6:0 and index bits14:8, transform coordinates, then dispatch over16 zone cases. Emit up to three entries with write_oam_entry_from_packed_args. Values0x70fb/0x70fc/0x70fd are attr2: tile0xfb/0xfc/0xfd and palette bank7, with priority0. They are written at OAM entry+4, not used as entry indices.
 setup_zone_oam_entry_by_field_slot:
     push {r4,r5,r6,r7,lr}                    @ 080c5444 f0b5
     .hword 0x4657    @ 080c5446 5746
@@ -7338,7 +8427,7 @@ setup_zone_oam_entry_by_field_slot:
     .hword 0x4645    @ 080c544a 4546
     push {r5,r6,r7}                          @ 080c544c e0b4
     sub sp,#0xc                              @ 080c544e 83b0
-    ldr r0, DAT_080c54a4                     @ 080c5450 1448
+    ldr r0, ptr_g_duel_field_state_080c54a4  @ 080c5450 1448
     movs r1,#0x84    @ 080c5452 8421
     lsls r1,r1,#0x2    @ 080c5454 8900
     adds r0,r0,r1    @ 080c5456 4018
@@ -7374,16 +8463,16 @@ setup_zone_oam_entry_by_field_slot:
     cmp r4,#0xf                              @ 080c5494 0f2c
     bhi switchD_080c54a0__caseD_1            @ 080c5496 3cd8
     lsls r0,r4,#0x2    @ 080c5498 a000
-    ldr r1, DAT_080c54a8                     @ 080c549a 0349
+    ldr r1, ptr_switch_d_080c54a0_switchdata_d_080c54ac_080c54a8 @ 080c549a 0349
     adds r0,r0,r1    @ 080c549c 4018
     ldr r0,[r0,#0x0]                         @ 080c549e 0068
 switchD_080c54a0__switchD:
     .hword 0x4687    @ 080c54a0 8746
     .zero  0x2
-DAT_080c54a4:
-    .word  0x02023130                     @ 080c54a4 30310202
-DAT_080c54a8:
-    .word  0x080c54ac                     @ 080c54a8 ac540c08
+ptr_g_duel_field_state_080c54a4:
+    .word  gDuelFieldState                @ 080c54a4 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c54a0_switchdata_d_080c54ac_080c54a8:
+    .word  switchD_080c54a0__switchdataD_080c54ac                     @ 080c54a8 ac540c08  switchD_080c54a0__switchdataD_080c54ac: add reviewed operand-0 DATA reference.
 switchD_080c54a0__switchdataD_080c54ac:
     .word  0x080c54ec                     @ 080c54ac ec540c08
     .word  0x080c5512                     @ 080c54b0 12550c08
@@ -7412,7 +8501,7 @@ switchD_080c54a0__caseD_c:
     movs r2,#0x0    @ 080c54f8 0022
     b LAB_080c550c                           @ 080c54fa 07e0
 switchD_080c54a0__caseD_b:
-    ldr r0, DAT_080c55cc                     @ 080c54fc 3348
+    ldr r0, ptr_g_duel_field_state_080c55cc  @ 080c54fc 3348
     lsls r1,r7,#0x1    @ 080c54fe 7900
     adds r0,#0x4c    @ 080c5500 4c30
     adds r1,r1,r0    @ 080c5502 0918
@@ -7479,7 +8568,7 @@ LAB_080c5554:
     .hword 0x4649    @ 080c5574 4946
     lsls r0,r1,#0x10    @ 080c5576 0804
     orrs r0,r6    @ 080c5578 3043
-    ldr r2, DAT_080c55d0                     @ 080c557a 154a
+    ldr r2, oam_attr2_tile_fb_pal7_080c55d0  @ 080c557a 154a
     movs r1,#0x0    @ 080c557c 0021
     bl write_oam_entry_from_packed_args      @ 080c557e 30f0f5fd
     adds r0,r6,#0x0    @ 080c5582 301c
@@ -7493,7 +8582,7 @@ LAB_080c558a:
     .hword 0x4649    @ 080c5590 4946
     lsls r0,r1,#0x10    @ 080c5592 0804
     orrs r0,r6    @ 080c5594 3043
-    ldr r2, DAT_080c55d4                     @ 080c5596 0f4a
+    ldr r2, oam_attr2_tile_fc_pal7_080c55d4  @ 080c5596 0f4a
     movs r1,#0x0    @ 080c5598 0021
     bl write_oam_entry_from_packed_args      @ 080c559a 30f0e7fd
     adds r0,r6,#0x0    @ 080c559e 301c
@@ -7507,7 +8596,7 @@ LAB_080c55a6:
     .hword 0x4649    @ 080c55ac 4946
     lsls r0,r1,#0x10    @ 080c55ae 0804
     orrs r6,r0    @ 080c55b0 0643
-    ldr r2, DAT_080c55d8                     @ 080c55b2 094a
+    ldr r2, oam_attr2_tile_fd_pal7_080c55d8  @ 080c55b2 094a
     adds r0,r6,#0x0    @ 080c55b4 301c
     movs r1,#0x0    @ 080c55b6 0021
     bl write_oam_entry_from_packed_args      @ 080c55b8 30f0d8fd
@@ -7520,22 +8609,22 @@ LAB_080c55bc:
     pop {r4,r5,r6,r7}                        @ 080c55c6 f0bc
     pop {r0}                                 @ 080c55c8 01bc
     bx r0                                    @ 080c55ca 0047
-DAT_080c55cc:
-    .word  0x02023130                     @ 080c55cc 30310202
-DAT_080c55d0:
-    .word  0x000070fb                     @ 080c55d0 fb700000
-DAT_080c55d4:
-    .word  0x000070fc                     @ 080c55d4 fc700000
-DAT_080c55d8:
-    .word  0x000070fd                     @ 080c55d8 fd700000
+ptr_g_duel_field_state_080c55cc:
+    .word  gDuelFieldState                @ 080c55cc 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+oam_attr2_tile_fb_pal7_080c55d0:
+    .word  OAM_ATTR2_TILE_FB_PAL7         @ 080c55d0 fb700000  OAM_ATTR2_TILE_FB_PAL7: named scalar literal.
+oam_attr2_tile_fc_pal7_080c55d4:
+    .word  OAM_ATTR2_TILE_FC_PAL7         @ 080c55d4 fc700000  OAM_ATTR2_TILE_FC_PAL7: named scalar literal.
+oam_attr2_tile_fd_pal7_080c55d8:
+    .word  OAM_ATTR2_TILE_FD_PAL7         @ 080c55d8 fd700000  OAM_ATTR2_TILE_FD_PAL7: named scalar literal.
 
-@ Zero-fill EWRAM OAM context buffer at 0x0201ff30 (0x2c halfwords). Sets ctx_valid bit0=1 in context header. 16-way zone_type dispatch to initialize type-specific OAM fields. r0=void. Returns void. Caller: setup_zone_oam_entry_by_field_slot and related OAM init path. Side-effects: [0x0201ff30..+0x58]:=0; ctx valid bit set; OAM type fields written. Constants: ctx_base=0x0201ff30, ctx_size=0x2c halfwords, valid_bit=bit0.
+@ Initialize the zone OAM context at gCardCtxSlotData. Zero44 bytes, set header valid bit0 and decode u16[field+0x210] into player/zone/index. Zone cases set conditional flag1 from record availability, current player, record+8 and gDuelFieldSlots+0x1cd0. Activation checks update context data. Flagged zone11 clears activation+0x30/+0x34, stores context+0x28=4 and invokes sync_state_and_init_sprite with code24. The zero helper takes bytes.
 init_zone_oam_ctx_by_type:
     push {r4,r5,r6,r7,lr}                    @ 080c55dc f0b5
     .hword 0x464f    @ 080c55de 4f46
     .hword 0x4646    @ 080c55e0 4646
     push {r6,r7}                             @ 080c55e2 c0b4
-    ldr r0, DAT_080c5630                     @ 080c55e4 1248
+    ldr r0, ptr_g_duel_field_state_080c5630  @ 080c55e4 1248
     movs r1,#0x84    @ 080c55e6 8421
     lsls r1,r1,#0x2    @ 080c55e8 8900
     adds r0,r0,r1    @ 080c55ea 4018
@@ -7555,7 +8644,7 @@ init_zone_oam_ctx_by_type:
     .hword 0x4690    @ 080c5606 9046
     movs r6,#0x0    @ 080c5608 0026
     .hword 0x46b1    @ 080c560a b146
-    ldr r4, DAT_080c5634                     @ 080c560c 094c
+    ldr r4, ptr_g_card_ctx_slot_data_080c5634 @ 080c560c 094c
     adds r0,r4,#0x0    @ 080c560e 201c
     movs r1,#0x2c    @ 080c5610 2c21
     bl zero_fill_by_halfword                 @ 080c5612 2ff02ffc
@@ -7568,18 +8657,18 @@ init_zone_oam_ctx_by_type:
     b switchD_080c562c__caseD_1              @ 080c5622 a3e0
 LAB_080c5624:
     lsls r0,r5,#0x2    @ 080c5624 a800
-    ldr r1, DAT_080c5638                     @ 080c5626 0449
+    ldr r1, ptr_switch_d_080c562c_switchdata_d_080c563c_080c5638 @ 080c5626 0449
     adds r0,r0,r1    @ 080c5628 4018
     ldr r0,[r0,#0x0]                         @ 080c562a 0068
 switchD_080c562c__switchD:
     .hword 0x4687    @ 080c562c 8746
     .zero  0x2
-DAT_080c5630:
-    .word  0x02023130                     @ 080c5630 30310202
-DAT_080c5634:
-    .word  0x0201ff30                     @ 080c5634 30ff0102
-DAT_080c5638:
-    .word  0x080c563c                     @ 080c5638 3c560c08
+ptr_g_duel_field_state_080c5630:
+    .word  gDuelFieldState                @ 080c5630 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_card_ctx_slot_data_080c5634:
+    .word  gCardCtxSlotData               @ 080c5634 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c562c_switchdata_d_080c563c_080c5638:
+    .word  switchD_080c562c__switchdataD_080c563c                     @ 080c5638 3c560c08  switchD_080c562c__switchdataD_080c563c: add reviewed operand-0 DATA reference.
 switchD_080c562c__switchdataD_080c563c:
     .word  0x080c567c                     @ 080c563c 7c560c08
     .word  0x080c576c                     @ 080c5640 6c570c08
@@ -7603,30 +8692,30 @@ switchD_080c562c__caseD_0:
     lsls r0,r2,#0x2    @ 080c5680 9000
     adds r0,r0,r2    @ 080c5682 8018
     lsls r0,r0,#0x2    @ 080c5684 8000
-    ldr r1, DAT_080c56d8                     @ 080c5686 1449
+    ldr r1, player_block_stride_080c56d8     @ 080c5686 1449
     muls r1,r7    @ 080c5688 7943
     adds r0,r0,r1    @ 080c568a 4018
-    ldr r3, DAT_080c56dc                     @ 080c568c 134b
+    ldr r3, ptr_g_duel_field_slots_080c56dc  @ 080c568c 134b
     adds r1,r0,r3    @ 080c568e c118
     ldr r0,[r1,#0x0]                         @ 080c5690 0868
     lsls r0,r0,#0x13    @ 080c5692 c004
     adds r4,r2,#0x0    @ 080c5694 141c
     cmp r0,#0x0                              @ 080c5696 0028
     beq LAB_080c56bc                         @ 080c5698 10d0
-    ldr r0, DAT_080c56e0                     @ 080c569a 1148
+    ldr r0, ptr_g_duel_card_ctx_base_080c56e0 @ 080c569a 1148
     ldr r0,[r0,#0x4]                         @ 080c569c 4068
     cmp r7,r0                                @ 080c569e 8742
     beq LAB_080c56b2                         @ 080c56a0 07d0
     ldrh r0,[r1,#0x8]                        @ 080c56a2 0889
     cmp r0,#0x0                              @ 080c56a4 0028
     bne LAB_080c56b2                         @ 080c56a6 04d1
-    ldr r1, DAT_080c56e4                     @ 080c56a8 0e49
+    ldr r1, field_slot_oam_flag1_gate_off_080c56e4 @ 080c56a8 0e49
     adds r0,r3,r1    @ 080c56aa 5818
     ldr r0,[r0,#0x0]                         @ 080c56ac 0068
     cmp r0,#0x0                              @ 080c56ae 0028
     beq LAB_080c56bc                         @ 080c56b0 04d0
 LAB_080c56b2:
-    ldr r1, DAT_080c56e8                     @ 080c56b2 0d49
+    ldr r1, ptr_g_card_ctx_slot_data_080c56e8 @ 080c56b2 0d49
     movs r0,#0x2    @ 080c56b4 0220
     ldrb r2,[r1,#0x0]                        @ 080c56b6 0a78
     orrs r0,r2    @ 080c56b8 1043
@@ -7645,16 +8734,16 @@ LAB_080c56bc:
     adds r0,r7,#0x0    @ 080c56d2 381c
     adds r1,r4,#0x0    @ 080c56d4 211c
     b LAB_080c5706                           @ 080c56d6 16e0
-DAT_080c56d8:
-    .word  0x00000868                     @ 080c56d8 68080000
-DAT_080c56dc:
-    .word  0x0201c510                     @ 080c56dc 10c50102
-DAT_080c56e0:
-    .word  0x0201e2a0                     @ 080c56e0 a0e20102
-DAT_080c56e4:
-    .word  0x00001cd0                     @ 080c56e4 d01c0000
-DAT_080c56e8:
-    .word  0x0201ff30                     @ 080c56e8 30ff0102
+player_block_stride_080c56d8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c56d8 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_slots_080c56dc:
+    .word  gDuelFieldSlots                @ 080c56dc 10c50102  gDuelFieldSlots: add reviewed operand-0 DATA reference.
+ptr_g_duel_card_ctx_base_080c56e0:
+    .word  gDuelCardCtxBase               @ 080c56e0 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+field_slot_oam_flag1_gate_off_080c56e4:
+    .word  FIELD_SLOT_OAM_FLAG1_GATE_OFF  @ 080c56e4 d01c0000  FIELD_SLOT_OAM_FLAG1_GATE_OFF: named scalar literal.
+ptr_g_card_ctx_slot_data_080c56e8:
+    .word  gCardCtxSlotData               @ 080c56e8 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 switchD_080c562c__caseD_c:
     adds r0,r7,#0x0    @ 080c56ec 381c
     adds r1,r5,#0x0    @ 080c56ee 291c
@@ -7674,7 +8763,7 @@ LAB_080c5706:
     bl init_duel_zone_target_slot_refs       @ 080c570a d1f783fb
     b LAB_080c5772                           @ 080c570e 30e0
 switchD_080c562c__caseD_b:
-    ldr r0, DAT_080c578c                     @ 080c5710 1e48
+    ldr r0, ptr_g_duel_card_ctx_base_080c578c @ 080c5710 1e48
     ldr r0,[r0,#0x4]                         @ 080c5712 4068
     cmp r7,r0                                @ 080c5714 8742
     beq LAB_080c5730                         @ 080c5716 0bd0
@@ -7682,7 +8771,7 @@ switchD_080c562c__caseD_b:
     bl get_player_deck_flag_bit1             @ 080c571a 72f739fa
     cmp r0,#0x0                              @ 080c571e 0028
     bne LAB_080c5730                         @ 080c5720 06d1
-    ldr r0, PTR_gP1LifePoints_080c5790       @ 080c5722 1b48
+    ldr r0, ptr_g_p1_life_points_080c5790    @ 080c5722 1b48
     movs r1,#0xe8    @ 080c5724 e821
     lsls r1,r1,#0x5    @ 080c5726 4901
     adds r0,r0,r1    @ 080c5728 4018
@@ -7690,13 +8779,13 @@ switchD_080c562c__caseD_b:
     cmp r0,#0x0                              @ 080c572c 0028
     beq LAB_080c573a                         @ 080c572e 04d0
 LAB_080c5730:
-    ldr r1, DAT_080c5794                     @ 080c5730 1849
+    ldr r1, ptr_g_card_ctx_slot_data_080c5794 @ 080c5730 1849
     movs r0,#0x2    @ 080c5732 0220
     ldrb r2,[r1,#0x0]                        @ 080c5734 0a78
     orrs r0,r2    @ 080c5736 1043
     strb r0,[r1,#0x0]                        @ 080c5738 0870
 LAB_080c573a:
-    ldr r0, DAT_080c5798                     @ 080c573a 1748
+    ldr r0, ptr_g_duel_field_state_080c5798  @ 080c573a 1748
     lsls r1,r7,#0x1    @ 080c573c 7900
     adds r0,#0x4c    @ 080c573e 4c30
     adds r4,r1,r0    @ 080c5740 0c18
@@ -7724,11 +8813,11 @@ switchD_080c562c__caseD_1:
     cmp r1,#0x0                              @ 080c576e 0029
     beq LAB_080c57a0                         @ 080c5770 16d0
 LAB_080c5772:
-    ldr r1, DAT_080c579c                     @ 080c5772 0a49
+    ldr r1, ptr_g_duel_zone_activation_state_080c579c @ 080c5772 0a49
     movs r0,#0x0    @ 080c5774 0020
     str r0,[r1,#0x30]                        @ 080c5776 0863
     str r0,[r1,#0x34]                        @ 080c5778 4863
-    ldr r0, DAT_080c5794                     @ 080c577a 0648
+    ldr r0, ptr_g_card_ctx_slot_data_080c5794 @ 080c577a 0648
     adds r0,#0x28    @ 080c577c 2830
     movs r1,#0x4    @ 080c577e 0421
     strb r1,[r0,#0x0]                        @ 080c5780 0170
@@ -7736,19 +8825,19 @@ LAB_080c5772:
     bl sync_state_and_init_sprite            @ 080c5784 34f096f9
     b LAB_080c57b4                           @ 080c5788 14e0
     .zero  0x2
-DAT_080c578c:
-    .word  0x0201e2a0                     @ 080c578c a0e20102
-PTR_gP1LifePoints_080c5790:
-    .word  gP1LifePoints                  @ 080c5790 e0c40102
-DAT_080c5794:
-    .word  0x0201ff30                     @ 080c5794 30ff0102
-DAT_080c5798:
-    .word  0x02023130                     @ 080c5798 30310202
-DAT_080c579c:
-    .word  0x020230c0                     @ 080c579c c0300202
+ptr_g_duel_card_ctx_base_080c578c:
+    .word  gDuelCardCtxBase               @ 080c578c a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_g_p1_life_points_080c5790:
+    .word  gP1LifePoints                  @ 080c5790 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+ptr_g_card_ctx_slot_data_080c5794:
+    .word  gCardCtxSlotData               @ 080c5794 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c5798:
+    .word  gDuelFieldState                @ 080c5798 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_duel_zone_activation_state_080c579c:
+    .word  gDuelZoneActivationState       @ 080c579c c0300202  gDuelZoneActivationState: add reviewed operand-0 DATA reference.
 LAB_080c57a0:
     lsls r6,r6,#0x1    @ 080c57a0 7600
-    ldr r1, DAT_080c57c0                     @ 080c57a2 0749
+    ldr r1, ptr_g_card_ctx_slot_data_080c57c0 @ 080c57a2 0749
     movs r0,#0x2    @ 080c57a4 0220
     ldrb r2,[r1,#0x0]                        @ 080c57a6 0a78
     ands r0,r2    @ 080c57a8 1040
@@ -7765,8 +8854,8 @@ LAB_080c57b4:
     pop {r4,r5,r6,r7}                        @ 080c57ba f0bc
     pop {r0}                                 @ 080c57bc 01bc
     bx r0                                    @ 080c57be 0047
-DAT_080c57c0:
-    .word  0x0201ff30                     @ 080c57c0 30ff0102
+ptr_g_card_ctx_slot_data_080c57c0:
+    .word  gCardCtxSlotData               @ 080c57c0 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 
 @ Compute card sprite OAM coords by zone (player_id r5, zone_type r1, zone_idx r2). Calls resolve_zone_oam_base_coords_by_type; applies y offset by card_type [1/3/5]. Loops activation mask bits. Returns void. 3 wrapper callers.
 compute_card_sprite_oam_coords_by_zone:
@@ -9691,7 +10780,7 @@ switchD_080c6a3e__default:
 DAT_080c6b00:
     .word  0x02023130                     @ 080c6b00 30310202
 
-@ Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch to the matching zone slot handler via 16-entry switchD; symmetric to decode_zone_oam_word_to_cursor_fields but focused on slot position decoding and LP checks. r0=packed_oam_word; r1=secondary_param (saved to r8). Reads gDuelFieldCtx[0x0201e2a0+4] for flip flag. Some switchD cases call check_lp_threshold_for_zone_slot. Tail-jumps via switchD; no direct return. Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, duel_field_ctx=0x0201e2a0, zone_type_max=0xf.
+@ Decode a packed zone descriptor: player bit7, zone bits6:0 and sub-index bits31:24. Save r1 as secondary control and use gDuelCardCtxBase+4 for the player-flip flag. Dispatch over16 zone cases to compute slot fields. Seven branches call classify_player_hand_count_threshold with zone-specific thresholds. Other branches read the corresponding slot records and flags. Keep the existing Function body, ABI and return behavior.
 decode_zone_oam_word_to_slot_fields:
     push {r4,r5,r6,r7,lr}                    @ 080c6b04 f0b5
     .hword 0x4647    @ 080c6b06 4746
@@ -9786,7 +10875,7 @@ LAB_080c6bc4:
     adds r1,r4,#0x2    @ 080c6bc4 a11c
     lsls r1,r1,#0x10    @ 080c6bc6 0904
     lsrs r1,r1,#0x10    @ 080c6bc8 090c
-    bl check_lp_threshold_for_zone_slot      @ 080c6bca fef783f8
+    bl classify_player_hand_count_threshold  @ 080c6bca fef783f8
     adds r1,r0,#0x0    @ 080c6bce 011c
     cmp r1,#0x1                              @ 080c6bd0 0129
     beq LAB_080c6be8                         @ 080c6bd2 09d0
@@ -9847,7 +10936,7 @@ LAB_080c6c2e:
     subs r1,r1,r4    @ 080c6c30 091b
     lsls r1,r1,#0x10    @ 080c6c32 0904
     lsrs r1,r1,#0x10    @ 080c6c34 090c
-    bl check_lp_threshold_for_zone_slot      @ 080c6c36 fef74df8
+    bl classify_player_hand_count_threshold  @ 080c6c36 fef74df8
     cmp r0,#0x1                              @ 080c6c3a 0128
     beq LAB_080c6c54                         @ 080c6c3c 0ad0
     cmp r0,#0x1                              @ 080c6c3e 0128
@@ -9916,7 +11005,7 @@ switchD_080c6b58__caseD_c:
     adds r0,r6,#0x0    @ 080c6ca6 301c
 LAB_080c6ca8:
     movs r1,#0x1    @ 080c6ca8 0121
-    bl check_lp_threshold_for_zone_slot      @ 080c6caa fef713f8
+    bl classify_player_hand_count_threshold  @ 080c6caa fef713f8
     cmp r0,#0x0                              @ 080c6cae 0028
     bge LAB_080c6cb4                         @ 080c6cb0 00da
     b switchD_080c6b58__caseD_1              @ 080c6cb2 dfe0
@@ -9941,7 +11030,7 @@ LAB_080c6cd0:
     movs r0,#0x0    @ 080c6cd0 0020
 LAB_080c6cd2:
     movs r1,#0x7    @ 080c6cd2 0721
-    bl check_lp_threshold_for_zone_slot      @ 080c6cd4 fdf7feff
+    bl classify_player_hand_count_threshold  @ 080c6cd4 fdf7feff
     cmp r0,#0x1                              @ 080c6cd8 0128
     beq LAB_080c6cf2                         @ 080c6cda 0ad0
     cmp r0,#0x1                              @ 080c6cdc 0128
@@ -9997,7 +11086,7 @@ switchD_080c6b58__caseD_d:
     adds r0,r6,#0x0    @ 080c6d2e 301c
 LAB_080c6d30:
     movs r1,#0x7    @ 080c6d30 0721
-    bl check_lp_threshold_for_zone_slot      @ 080c6d32 fdf7cfff
+    bl classify_player_hand_count_threshold  @ 080c6d32 fdf7cfff
     adds r1,r0,#0x0    @ 080c6d36 011c
     cmp r1,#0x1                              @ 080c6d38 0129
     beq LAB_080c6d50                         @ 080c6d3a 09d0
@@ -10055,7 +11144,7 @@ LAB_080c6d94:
     movs r0,#0x0    @ 080c6d94 0020
 LAB_080c6d96:
     movs r1,#0x1    @ 080c6d96 0121
-    bl check_lp_threshold_for_zone_slot      @ 080c6d98 fdf79cff
+    bl classify_player_hand_count_threshold  @ 080c6d98 fdf79cff
     cmp r0,#0x0                              @ 080c6d9c 0028
     blt switchD_080c6b58__caseD_1            @ 080c6d9e 69db
     cmp r0,#0x1                              @ 080c6da0 0128
@@ -10099,7 +11188,7 @@ LAB_080c6ddc:
     subs r1,r1,r4    @ 080c6dde 091b
     lsls r1,r1,#0x10    @ 080c6de0 0904
     lsrs r1,r1,#0x10    @ 080c6de2 090c
-    bl check_lp_threshold_for_zone_slot      @ 080c6de4 fdf776ff
+    bl classify_player_hand_count_threshold  @ 080c6de4 fdf776ff
     adds r1,r0,#0x0    @ 080c6de8 011c
     cmp r1,#0x1                              @ 080c6dea 0129
     beq LAB_080c6e02                         @ 080c6dec 09d0

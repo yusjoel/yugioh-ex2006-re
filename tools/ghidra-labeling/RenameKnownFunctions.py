@@ -5736,19 +5736,8 @@ RENAMES = [
     ('FUN_080c39fc', 'render_field_zone_card_tile_by_type',
         'Render BG tiles for u16 player r0, special zone type r1 and presence/index r2. Type12 with nonzero input uses fallback tiles. Type13 checks the field reveal flag or zone attribute before reading gP1SlotSetCodeArray; type14 reads its4-byte word base at index r2; type15 first checks the attribute at r2-1 then reads its word base at r2. Decode the card word through ensure_card_id_cache_entry and region/language index. Copy576 bytes, or refresh the empty slot when no source is selected.'),
 
-    ("FUN_080c4d04", "redraw_all_field_slot_tiles",
-        "当 duel field 场地需要完整重绘所有 zone 和 slot 的卡牌 tile 时调用 (indeg=1, class D). "
-        "函数外层循环 r7=0..1 (两个玩家), 内层循环 r6=0..4 (5 个主要 slot): "
-        "对每 (player, slot) 组合, 读取 gDuelAnimState (0x0202334e) 和 gDuelAnimFlags (0x02023350) "
-        "合成 zone_mask, 再通过 get_zone_card_attribute_by_type / get_zone_slot_field6_by_type / "
-        "get_zone_slot_card_ref_by_type + ensure_card_id_cache_entry 获取每槽卡 ID; "
-        "调用 render_field_slot_card_tile (FUN_080c38cc) 渲染主 slot. "
-        "外层结束后遍历 slot 5..10 同样渲染. "
-        "最后对 4 个特殊 zone (0xc/0xd/0xe/0xf) 各调 render_field_zone_card_tile_by_type "
-        "(FUN_080c39fc). 最终对两个玩家各调 refresh_player_field_slot_tiles (FUN_080c4220) "
-        "完成 header/tile 同步. "
-        "Constants: gDuelAnimState=0x0202334e, gDuelAnimFlags=0x02023350, "
-        "player_stride=0x868, gDuelFieldSlots=0x0201c510."),
+    ('FUN_080c4d04', 'redraw_all_field_slot_tiles',
+        'Redraw both players field tiles. For slots0..4, combine (u16[gDuelFieldChainRenderBitsPackedLo]>>2) with (u8[gDuelFieldChainRenderBitsPackedHi]&3)<<14; bit(player*8+slot) selects the0xff chain-snapshot getter mode. Draw slots5..10 normally, then zones12..15 from per-player counts. Cache card IDs and pass card, face and field6 data to the tile renderers. Refresh each player list using gDuelZoneFirstVisibleSlotByPlayer.'),
 
     ('FUN_080c36a8', 'initialize_duel_field_slot_tilemap',
         'Initialize the two-player field-slot BG tilemap at BG_SCREENBLOCK_29_BASE. For each player and22 coordinate pairs, write a3x3 tile block using x+32*y from duel_field_zone_tile_coords and its y field. Player0 advances tile numbers; player1 reverses each block and ORs0xc00 for horizontal/vertical flip. Copy256 bytes from shared_ui_palette_256 to BG_PALRAM_SLOT_1. No inputs.'),
@@ -5963,13 +5952,8 @@ RENAMES = [
         "r0=void. Returns void. "
         "Caller: tick_card_sprite_oam_phase_dispatch (080c65b0) in card_info phase. "
         "Constants: zone comparison drives sprite sync trigger."),
-    ("FUN_080c5444", "setup_zone_oam_entry_by_field_slot",
-        "Read gPrng+0x210 OAM halfword; dispatch on zone_type via DAT_080c54a8 16-entry table; "
-        "write OAM slots 0x70fb/0x70fc/0x70fd with computed attr0/1/2. "
-        "r0=void. Returns void. "
-        "Caller: dispatch_duel_field_zone_oam_by_type; used in duel field OAM init path. "
-        "Constants: gPrng_oam_word=gPrng+0x210, OAM_SLOT_A=0x70fb, OAM_SLOT_B=0x70fc, OAM_SLOT_C=0x70fd, "
-        "zone_dispatch_table=DAT_080c54a8."),
+    ('FUN_080c5444', 'setup_zone_oam_entry_by_field_slot',
+        'Set up zone OAM from u16[gDuelFieldState+0x210]. Decode player bit7, zone bits6:0 and index bits14:8, transform coordinates, then dispatch over16 zone cases. Emit up to three entries with write_oam_entry_from_packed_args. Values0x70fb/0x70fc/0x70fd are attr2: tile0xfb/0xfc/0xfd and palette bank7, with priority0. They are written at OAM entry+4, not used as entry indices.'),
     ("FUN_08096ecc", "zero_duel_lp_display_counters",
         "Clear two duel LP display animation counters. "
         "Writes 0 to gP1LifePoints+0x1d4c and gP1LifePoints+0x1d5c (str r2=0 twice). "
@@ -6000,14 +5984,8 @@ RENAMES = [
         "Always returns 0. r0=void. "
         "Caller: frame_counter-driven state machine hub. "
         "Constants: phase_state_addr=0x02023360+0x118."),
-    ("FUN_080c55dc", "init_zone_oam_ctx_by_type",
-        "Zero-fill EWRAM OAM context buffer at 0x0201ff30 (0x2c halfwords). "
-        "Sets ctx_valid bit0=1 in context header. "
-        "16-way zone_type dispatch to initialize type-specific OAM fields. "
-        "r0=void. Returns void. "
-        "Caller: setup_zone_oam_entry_by_field_slot and related OAM init path. "
-        "Side-effects: [0x0201ff30..+0x58]:=0; ctx valid bit set; OAM type fields written. "
-        "Constants: ctx_base=0x0201ff30, ctx_size=0x2c halfwords, valid_bit=bit0."),
+    ('FUN_080c55dc', 'init_zone_oam_ctx_by_type',
+        'Initialize the zone OAM context at gCardCtxSlotData. Zero44 bytes, set header valid bit0 and decode u16[field+0x210] into player/zone/index. Zone cases set conditional flag1 from record availability, current player, record+8 and gDuelFieldSlots+0x1cd0. Activation checks update context data. Flagged zone11 clears activation+0x30/+0x34, stores context+0x28=4 and invokes sync_state_and_init_sprite with code24. The zero helper takes bytes.'),
     ("FUN_0802cba0", "init_jp_font_linebuf_for_render",
         "Initialize JP font line buffer for card name rendering. "
         "Calls setup_line_buf_with_font_and_align(font_id=0x1a, width=0x28); "
@@ -6127,22 +6105,10 @@ RENAMES = [
         "Called by apply_zone_cursor_step (0x080c716c) on mode_flag bit path. "
         "Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, "
         "duel_field_ctx=0x0201e2a0, zone_type_max=0xf, jump_table=DAT_080c6ef8."),
-    ("FUN_080c4cd4", "check_lp_threshold_for_zone_slot",
-        "Check whether the LP value of a given player slot meets a threshold. "
-        "r0 bit0=player_id [0..1]; r1 low16=threshold [0..0xFFFF]. "
-        "Reads gP1LifePoints[player_id*0x868+0xc] halfword. "
-        "Returns: 0 if slot empty/zero, 1 if LP < threshold, 2 if LP >= threshold. "
-        "No side effects (pure read). Called by decode_zone_oam_word_to_slot_fields case 5. "
-        "Constants: gP1LifePoints=0x0201C4E0, player_stride=0x868, lp_slot_offset=0xc."),
-    ("FUN_080c6b04", "decode_zone_oam_word_to_slot_fields",
-        "Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch "
-        "to the matching zone slot handler via 16-entry switchD; symmetric to "
-        "decode_zone_oam_word_to_cursor_fields but focused on slot position decoding and LP checks. "
-        "r0=packed_oam_word; r1=secondary_param (saved to r8). "
-        "Reads gDuelFieldCtx[0x0201e2a0+4] for flip flag. Some switchD cases call "
-        "check_lp_threshold_for_zone_slot. Tail-jumps via switchD; no direct return. "
-        "Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, "
-        "duel_field_ctx=0x0201e2a0, zone_type_max=0xf."),
+    ('FUN_080c4cd4', 'classify_player_hand_count_threshold',
+        'Classify the player hand count against a threshold. r0 bit0 selects player; r1 low16 is threshold. Read u16 at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE, the hand-count field. Return0 for zero count,1 for nonzero count below threshold,2 otherwise. Read-only; seven calls from decode_zone_oam_word_to_slot_fields.'),
+    ('FUN_080c6b04', 'decode_zone_oam_word_to_slot_fields',
+        'Decode a packed zone descriptor: player bit7, zone bits6:0 and sub-index bits31:24. Save r1 as secondary control and use gDuelCardCtxBase+4 for the player-flip flag. Dispatch over16 zone cases to compute slot fields. Seven branches call classify_player_hand_count_threshold with zone-specific thresholds. Other branches read the corresponding slot records and flags. Keep the existing Function body, ABI and return behavior.'),
     ("FUN_080c707c", "check_zone_card_id_cache_valid",
         "Check whether the card-ID cache for the zone described by the OAM word is valid (non-empty). "
         "r0=packed_oam_word (same format as decode_zone_oam_word_to_cursor_fields). "
@@ -6359,40 +6325,12 @@ RENAMES = [
         "default 路径: 从 r8 读 player_bit, 拼接 player/zone/sub_idx 位字段写入 gDuelFieldCtx[+0x84*4=0x210] halfword, "
         "再调 render_duel_field_zone_info (r0=packed, r1=zone_type, r2=lp_count). "
         "Constants: gDuelFieldCtx=0x02023130, slot_lp_offset=0x4c, zone_flag_offset=0x84*4=0x210."),
-    ("FUN_080c4ca0", "clear_ui_effect_state_flags",
-        "清除 gUIEffectState 中两个标志位, 供 dispatch_ui_effect_by_card_type (0x080c4350) "
-        "在判定卡牌类型超出正常范围后调用以重置 UI 效果状态. "
-        "操作: (1) 读 r4+0x19 字节, ands ~0x2 (bit1 清零), 写回; "
-        "(2) 读 [gP1LifePoints+0x215] 字节 (=gDuelFieldCtx+0x215 偏移), ands ~0x5 (bit0/bit2 清零), 写回; "
-        "(3) 返回 r0=0. "
-        "r4 为函数外部保存的 gUIEffectState 基址 (callee-save, 由调用者在 prologue 通过 ldr r4, DAT = gUIEffectState 加载). "
-        "被 dispatch_ui_effect_by_card_type 在卡牌类型>4 时调用. "
-        "Constants: gUIEffectState=0x02023110, flag_offset_a=0x19, flag_bit_a=0x2, "
-        "gDuelFieldCtx=0x02023130, field_offset_b=0x215, flag_bit_b=0x5."),
-    ("FUN_080c4350", "dispatch_ui_effect_by_card_type",
-        "读取 gUIEffectState[+0x4] halfword (当前卡牌 slot_ref), "
-        "调用 ensure_card_id_cache_entry 确保卡牌信息已缓存, "
-        "再读 gUIEffectState[+0x6] halfword 作为第二个卡牌引用. "
-        "若 [+0x0] 类型字段 > 4, 调用 clear_ui_effect_state_flags 后返回; "
-        "否则以类型值 [0..4] 为 key 通过 switch-dispatch 分发到 5 个卡牌展示子状态机 "
-        "(地址表 PTR_DAT_080c4390: case 0..4 分别指向 0x080c43a4/0x080c462c/0x080c48a2/0x080c4a24/0x080c4c58). "
-        "返回值转发子状态机 r0: 0=完成, 1=继续/进行中. "
-        "被 play_ui_effect (0x0801ef94) 作为某一 UI effect case 调用, 是卡牌展示动画的顶层 dispatcher. "
-        "Constants: gUIEffectState=0x02023110, card_type_max=4, dispatch_table=PTR_DAT_080c4390."),
-    ("FUN_080c4edc", "run_ui_effect_card_pair_state_machine",
-        "以 gUIEffectState[0] card_type [0..4] 为 key 进行 switch-dispatch, "
-        "分别驱动 5 个卡牌配对展示子状态机. "
-        "入口: r1=gUIEffectState[0x19] u8 flag (由 caller 0x0801f0a6 ldrb 传入, mov r9,r1 保存); "
-        "r0 由内部 ldr DAT_080c4f04 覆盖为 0x02023114 (gUIEffectState+4); "
-        "r9-4 = gUIEffectState 基址, 读 [0] halfword 作 switch key. "
-        "返回 0=完成/1=继续, 转发子状态机 r0. "
-        "case 0: 解包 gUIEffectState+4 packed word (player/zone_type/sub_idx), "
-        "调用 resolve_zone_oam_base_coords_by_type 两次获取两张卡的坐标, "
-        "再调用 load_card_list_small_image x2 加载缩略图, 最后 build_slot_activation_mask_for_player. "
-        "case 1..4: 类似模式, 各自处理不同的卡牌对或坐标组合. "
-        "被 play_ui_effect (0x0801ef94) 作为 UI effect 的子状态机入口调用. "
-        "Constants: gUIEffectState=0x02023110, gUIEffectState_card_ref1=0x02023114, "
-        "gUIEffectState_card_ref2=0x02023118, card_type_max=4."),
+    ('FUN_080c4ca0', 'clear_ui_effect_state_flags',
+        'Shared-frame cleanup for run_ui_effect_card_render_state_machine. With r4=UI state, clear UI+0x19 bit0 and field+0x215 bit2. Entry4ca0 sets r0=2 for the mask;4cba sets return0;4cbc releases12 local bytes, restores r8-r10 and r4-r7, then returns through the saved caller PC. This tail consumes the parent frame rather than the BL link register. Keep the existing Function body and flags; local CALL_RETURN is set at the two parent BL sites.'),
+    ('FUN_080c4350', 'run_ui_effect_card_render_state_machine',
+        'Run the single-card UI render request selected by UI flag0. Cache the card at UI+4; UI+6 is mode. Phase0 prepares masks, images and AOB graphics; phase1 draws the source; phase2 advances AOB or five interpolation steps; phase3 draws the destination; phase4 refreshes the field and advances. Active phases return1. Out-of-range phase calls the shared frame cleanup and returns0. Packed refs are UI+8 and UI+0xc. BL at437a and4424 exits through the original saved frame.'),
+    ('FUN_080c4edc', 'run_ui_effect_card_pair_state_machine',
+        'Run the paired-card UI request selected by UI flag1. UI+0 is phase0..4; UI+4 and UI+8 hold packed player/zone/index references. Phase0 resolves coordinates, loads two small images and builds masks. Later phases draw paired sprites/backgrounds, advance interpolation and refresh field tiles. Active phases return1. Default clears UI+0x19 bit1 and field+0x215 bit2, returning0. The entry does not require an r1 flag argument.'),
     ('FUN_080bd660', 'tick_duel_puzzle_banner_state_machine',
         'Outer duel-puzzle banner dispatcher. Phase0 loads regional assets. Phase1 adds3 to a halfword counter and advances when the new value exceeds0x20. Phase2 waits65 ticks, then gPrng+0x23f bit0 and duel-zone direction(3) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes; phases4..7/invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer. No PRNG advance occurs.'),
     ("FUN_080c8fd8", "init_window_regs_for_campaign_banner",
@@ -7628,14 +7566,8 @@ RENAMES = [
         'Initializes gBannerState. Clears 0xd8 bytes, stores r0/r1/r2 at +4/+8/+0xc, sets gBannerState byte0 bit0, and sets gDuelFieldState+0x215 bit2. Called by dispatch_card_display_op at 0801ef3e and 0801ef66; returns void. It does not write a field-slot AOB context. Evidence: 080bc794-080bc7d0.'),
     ('FUN_080c291c', 'set_zone_display_pair_values',
         'Set pair values for dispatcher opcode0x0c. Rebuild key=(state[3]>>3)|((state[4]&7)<<5). If key is0 store r0/r1 at+0x10/+0x14 and r2 at+0x18. Otherwise swap the two values and store ((r2&0xff)<<8)|((r2>>8)&0xff) at+0x18. Set gDuelFieldState+0x215 bit2. This setter updates gZoneDisplayState and does not emit OAM entries.'),
-    ("FUN_080c4ea0", "init_field_slot_aob_ctx_c",
-        "Initialises third variant of duel_field slot AOB context (DAT_080c4ed0, 0x1c halfwords=0x38 bytes) "
-        "for dispatch_card_display_op case 0x19. "
-        "Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8]. "
-        "Sets [base+0x19] bit1 (init_flag=0x2). "
-        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
-        "r0=ptr arg_data; r1=ptr arg_target. Returns void. "
-        "Constants: base_struct=DAT_080c4ed0, zero_len=0x1c halfwords, init_flag=0x2."),
+    ('FUN_080c4ea0', 'init_ui_effect_card_pair_request',
+        'Initialize a paired-card UI render request. Save r0/r1, zero28 bytes of gUIEffectState, then write the two packed arguments at UI+4 and UI+8. Set UI+0x19 bit1 and field+0x215 bit2. The UI dispatcher selects run_ui_effect_card_pair_state_machine while bit1 is set. The zero helper takes a byte count; this initializer does not create an AOB context.'),
     ('FUN_080c412c', 'render_field_slot_card_tile_by_id',
         'Decode packed r0: player bit0,type bits5:1,subindex bits13:6,flags14/15. r1 is an internal card ID and r2 a card-cache index. Compute the BG slot and inspect its halfword at+0x120. If zero, convert/store the ID in gCardIdCache and render the slot; if nonzero, rerender only when gP1LifePoints+0x1d08 is nonzero, using current zone attributes. A valid-slot path then refreshes buff and activation caches. The tested VRAM halfword is separate from the EWRAM card-ID cache.'),
     ('FUN_080c2840', 'reset_zone_display_state_from_packed_key',

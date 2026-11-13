@@ -704,3 +704,7 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gP1Zone15CardWordBase, 0x0201caac
 .equ gUIEffectArgs, 0x02023114
 .equ gDuelZoneActivationState, 0x020230c0
+.equ gUIEffectArg1, 0x02023118
+.equ gUIEffectArg2, 0x0202311c
+.equ gDuelFieldChainRenderBitsPackedLo, 0x0202334e
+.equ gDuelFieldChainRenderBitsPackedHi, 0x02023350
