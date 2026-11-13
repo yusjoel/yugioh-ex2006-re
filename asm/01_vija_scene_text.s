@@ -4776,7 +4776,7 @@ switchD_0801ecbc__caseD_11:
     ldrh r1,[r0,#0x0]                        @ 0801ef08 0188
     adds r0,r6,#0x0    @ 0801ef0a 301c
     bl refresh_player_field_slot_tiles       @ 0801ef0c a5f088f9
-    bl update_zone_oam_card_count_tag        @ 0801ef10 a7f03cfc
+    bl repair_hand_zone_cursor_after_card_update @ 0801ef10 a7f03cfc
     bl refresh_duel_field_zone_info          @ 0801ef14 acf0faff
     b switchD_0801ecbc__caseD_1              @ 0801ef18 22e0
     .zero  0x2

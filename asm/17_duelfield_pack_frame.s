@@ -1848,7 +1848,7 @@ PTR_gPrng_080cccbc:
 DAT_080cccc0:
     .word  0x0201e2a0                     @ 080cccc0 a0e20102
 switchD_080ccab0__caseD_1:
-    bl tick_card_sprite_oam_phase_dispatch   @ 080cccc4 f9f774fc
+    bl tick_duel_action_menu_state_machine   @ 080cccc4 f9f774fc
     cmp r0,#0x0                              @ 080cccc8 0028
     bne LAB_080cccce                         @ 080cccca 00d1
     b switchD_080ccab0__default              @ 080ccccc 8ee0
@@ -1899,7 +1899,7 @@ switchD_080ccab0__caseD_3:
     orrs r1,r2    @ 080ccd22 1143
     strb r1,[r0,#0x0]                        @ 080ccd24 0170
 LAB_080ccd26:
-    bl dispatch_duel_zone_pair_to_oam        @ 080ccd26 f9f7c7fb
+    bl run_duel_action_menu_card_info_transition @ 080ccd26 f9f7c7fb
     cmp r0,#0x0                              @ 080ccd2a 0028
     beq switchD_080ccab0__default            @ 080ccd2c 5ed0
     ldr r2, DAT_080ccd5c                     @ 080ccd2e 0b4a

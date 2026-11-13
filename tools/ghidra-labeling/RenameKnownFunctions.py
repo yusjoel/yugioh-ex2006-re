@@ -5881,77 +5881,38 @@ RENAMES = [
         "Init duel_field zone slot ref cache in gP1LifePoints+0x1d68 area. "
         "Calls get_zone_slot_ptr 3x; extracts card_id bits[12:0]; sets active flag at +0x1d54=1. "
         "11 callers in duel_field scene."),
-    ("FUN_080c6800", "transform_zone_oam_coords_by_player",
-        "Mirror OAM coords (r2=x, r3=y) by player_id vs ctx.current_player^1; 16-case zone_type switch. "
-        "Returns packed (y<<16|x). Pure calc, no external writes. "
-        "Callers: render_duel_field_slot_oam_grid, compute_card_sprite_oam_coords_by_zone."),
+    ('FUN_080c6800', 'transform_zone_oam_coords_by_player',
+        'Resolve packed zone coordinates from r0=player, r1=zone and r2=index. Compare player with gDuelCardCtxBase+4 XOR1 to choose mirrored anchor coordinates, then apply the 16-case zone layout and indexed spacing. Return (y<<16)|x with wrapped u16 coordinates. No external writes. Register r3 is scratch.'),
     ('FUN_080c35ac', 'resolve_zone_oam_base_coords_by_type',
         'Resolve packed pixel coordinates (y<<16)|x for player r0, zone type r1 and subindex r2; subindex0xff becomes0. Read s32 tile-coordinate pairs from duel_field_zone_tile_coords at player stride0xb0, then multiply x/y by8. Types0..10 index type+subindex, types12..15 index type+6. Type11 subtracts the player-oriented field+0x4c scroll origin and clamps indices<=10 to11. Out-of-range types return0. The16 switch words and all case aliases remain intact.'),
     ("FUN_080c8aa8", "render_duel_field_slot_oam_grid",
         "Iterate all duel_field zone slots (type 0..10 + b..f), compute OAM coords via "
         "resolve_zone_oam_base_coords_by_type + transform_zone_oam_coords_by_player, "
         "write OAM via write_oam_entry_from_packed_args. void input. Caller: play_ui_effect_03."),
-    ("FUN_080c57c4", "compute_card_sprite_oam_coords_by_zone",
-        "Compute card sprite OAM coords by zone (player_id r5, zone_type r1, zone_idx r2). "
-        "Calls resolve_zone_oam_base_coords_by_type; applies y offset by card_type [1/3/5]. "
-        "Loops activation mask bits. Returns void. 3 wrapper callers."),
-    ("FUN_080c6240", "tick_card_sprite_oam_step_a",
-        "Call compute_card_sprite_oam_coords_by_zone, increment ctx+0x2a counter, "
-        "return 1 if counter>3 (done) else 0 (continue). void input. Caller: FUN_080c65b0."),
+    ('FUN_080c57c4', 'render_duel_action_menu_oam',
+        'Render OAM for action-menu rows selected by ctx+4 bits 0..13. Decode the current packed field selection from field+0x210 and resolve its anchor coordinates. Use ctx+0x26 and row widths at +0xa to position and clip each row. Phase 1 uses the opening step; phases 3/5 use the closing step at ctx+0x2a. Emit row and highlight OAM entries. Inputs come from global state; callers ignore the return value.'),
+    ('FUN_080c6240', 'tick_duel_action_menu_open_step',
+        'Opening action-menu step. Render menu OAM, increment the u8 animation step at ctx+0x2a, and return 1 if the updated byte exceeds 3; otherwise return 0. Phase 1 handler. Global state input; no APCS parameters. The state-machine driver resets the step when advancing phases.'),
     ("FUN_080f7528", "write_tile_rows_to_vram_by_mode",
         "Conditional copy/zero OBJ VRAM rows: src==0 calls zero_fill_by_halfword per row, "
         "src!=0 calls copy_bytes_by_halfword. Row stride 0x400 (OBJ 2D mode). "
         "r2>>0xb=halfword stride, [sp+0x18]=col offset. Callers: FUN_080c5b78, FUN_080dc4ec."),
 
     # 2026-05-09: batch #26 (campaign-26, topo=583-604, 19 functions)
-    ("FUN_080c5b78", "dispatch_duel_field_zone_oam_by_type",
-        "Dispatches OAM update for a single duel field zone slot by zone_type. "
-        "Reads gPrng+0x214 halfword to extract zone_type [0..0xd]; "
-        "16-way jump table routes each type to a dedicated OAM write sub-function. "
-        "No APCS input (all state from gPrng+0x214). Returns void. "
-        "Called by init_duel_field_card_sprite_vram (080c6184) and setup_zone_oam_entry_by_field_slot (080c5444). "
-        "Constants: gPrng_zone_halfword=gPrng+0x214, zone_type_max=0xd."),
-    ("FUN_080c6184", "init_duel_field_card_sprite_vram",
-        "Initialize card sprite VRAM for a duel field slot: "
-        "copies tile data to VRAM 0x06013800 via write_tile_rows_to_vram_by_mode, "
-        "copies palettes to PAL VRAM 0x05000280 and 0x050002a0, "
-        "calls dispatch_duel_field_zone_oam_by_type to configure OAM, "
-        "updates slot_phase counter at ctx+0x2a. "
-        "r0=u16 player_id [0..1]. Returns void. "
-        "Side-effects: OBJ VRAM 0x06013800, PAL VRAM 0x05000280/0x050002a0, OAM updated. "
-        "Constants: VRAM_CARD_SPRITE=0x06013800, PAL_A=0x05000280, PAL_B=0x050002a0."),
-    ("FUN_080c6268", "tick_card_sprite_oam_step_b",
-        "OAM animation second step for duel field card sprite. "
-        "Reads gPrng+0x210 packed halfword; extracts player_flag (bit15), "
-        "x_coord (bits[14:8]), y_coord (bits[6:0]); writes OAM entry. "
-        "r0=void. Returns void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). "
-        "Constants: gPrng_oam_word=gPrng+0x210, player_flag_bit=15, x_bits=[14:8], y_bits=[6:0]."),
-    ("FUN_080c6490", "tick_card_sprite_oam_step_c",
-        "OAM animation third step for duel field card sprite; symmetric to tick_card_sprite_oam_step_a. "
-        "Increments ctx+0x2a step counter; returns 1 when counter > 3 (done), else 0 (continue). "
-        "r0=void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). "
-        "Constants: step_done_threshold=3."),
-    ("FUN_080c65b0", "tick_card_sprite_oam_phase_dispatch",
-        "4-phase card sprite OAM state machine: "
-        "phase 0=fadein (tick_card_sprite_oam_step_a), "
-        "phase 1=card_info (tick_card_sprite_oam_step_b), "
-        "phase 2=vram_refresh (init_duel_field_card_sprite_vram), "
-        "phase 3=fadeout (tick_card_sprite_oam_step_c). "
-        "Reads phase index from ctx+0x28; advances phase on step completion. "
-        "r0=void. Returns void."),
-    ("FUN_080c6638", "resolve_zone_data_ptr_by_oam_word",
-        "Decode packed OAM halfword and return zone data pointer via 16-way zone_type dispatch. "
-        "Reads gPrng+0x210 (oam_word); extracts zone_type [0..0xd]; "
-        "jump table returns pointer to zone data block for each type. "
-        "Pure lookup; no side-effects. "
-        "r0=void. Returns u32* zone_data_ptr. "
-        "Constants: gPrng_oam_word=gPrng+0x210, zone_type_max=0xd."),
-    ("FUN_080c64b8", "dispatch_duel_zone_pair_to_oam",
-        "Calls resolve_zone_data_ptr_by_oam_word twice, compares the two zone data pointers; "
-        "if they differ, calls sync_state_and_init_sprite to commit the OAM update. "
-        "r0=void. Returns void. "
-        "Caller: tick_card_sprite_oam_phase_dispatch (080c65b0) in card_info phase. "
-        "Constants: zone comparison drives sprite sync trigger."),
+    ('FUN_080c5b78', 'render_duel_action_menu_labels',
+        'Render up to 14 action-menu labels selected by ctx+4. The even case table selects localized game-string rows from language bits 0..2 at EWRAM_BASE+GSETTINGS_OFFSET; language 5 adds a reviewed JA-to-ES delta. Measure each string, cache tile widths, copy left/middle/right frame columns to OBJ VRAM and render the text twice with glyph styles 0x8008/7. No APCS input.'),
+    ('FUN_080c6184', 'init_duel_action_menu_vram',
+        'Initialize action-menu graphics: copy 28 by 2 tiles from duel_action_menu_oam_tiles to VIJA_INTRO_TILE_VRAM, then 32 bytes each of panel/shared palettes to OBJ palette banks 4/5. Render localized labels. Update the ctx+8 selected-index nibble to an active ctx+4 bit, optionally advancing first according to field+0x21e bit 1. Return 1. Phase 0 handler; no player argument is read.'),
+    ('FUN_080c6268', 'tick_duel_action_menu_input_step',
+        'Handle action-menu input after rendering its OAM. Decode player bit 7, zone bits 6:0 and index bits 14:8 from field+0x210. Field+0x222 bits 0xc complete this step. Navigation bits 0x20/0x10 scan previous/next active menu entries. Confirmation prepares target-slot refs with selection-1. Selection 0 instead sets phase 4; the driver increments it to 5 for close-and-card-info phases. Return 0 while active or 1 on completion.'),
+    ('FUN_080c6490', 'tick_duel_action_menu_close_step',
+        'Closing action-menu step used at phases 3 and 5. Render menu OAM, increment the u8 step at ctx+0x2a, and return 1 if the updated byte exceeds 3; otherwise return 0. The operation sequence matches the opening step with relocated operands; the renderer chooses closing geometry from the phase.'),
+    ('FUN_080c65b0', 'tick_duel_action_menu_state_machine',
+        'Tick action-menu phases via the 8-entry handler table. Normal path: 0 initialize, 1 open, 2 input, 3 close, 4 NULL. Card-view path writes phase 4 during input, then driver increment reaches 5 close, 6 card-info, 7 NULL. Nonzero handler results increment phase and clear ctx+0x29/+0x2a; NULL clears valid bit 0 and returns 1. Active handlers return 0. If (u32[gPrng+0x214]&0x7fffffff)/60>179, set field+0x222 bit 2 and clear bit 3.'),
+    ('FUN_080c6638', 'resolve_zone_data_ptr_by_oam_word',
+        'Resolve a card-record pointer from r0 low 16 packed selection: player bit 7, zone bits 6:0 and index bits 14:8. For zones 0..4, the packed chain-render mask can substitute index 0xff for get_zone_slot_ptr. Other cases address per-player field/hand arrays or fixed special-zone records. Return the selected pointer or 0 for unsupported cases. Reads global tables.'),
+    ('FUN_080c64b8', 'run_duel_action_menu_card_info_transition',
+        'Run the card-info transition for the selected zone record. Extract the card-info key, apply the zone 11 visible-index adjustment, and use ctx+0x29 substates to fade in, open/tick the card-info page, rebuild field VRAM and render the zone, then fade out. Return 0 while waiting and 1 when done. This is primary menu phase 6.'),
     ('FUN_080c5444', 'setup_zone_oam_entry_by_field_slot',
         'Set up zone OAM from u16[gDuelFieldState+0x210]. Decode player bit7, zone bits6:0 and index bits14:8, transform coordinates, then dispatch over16 zone cases. Emit up to three entries with write_oam_entry_from_packed_args. Values0x70fb/0x70fc/0x70fd are attr2: tile0xfb/0xfc/0xfd and palette bank7, with priority0. They are written at OAM entry+4, not used as entry indices.'),
     ("FUN_08096ecc", "zero_duel_lp_display_counters",
@@ -6275,8 +6236,8 @@ RENAMES = [
         "返回值: 0=停止/中性待定, 1=正向, 2=反向, 3=中性激活."),
     ('FUN_080bd0a8', 'dispatch_banner_scene_tick_by_state',
         'Outer banner scene dispatcher. Phase1 runs 8 motion ticks; phases2/3 run 17 white-ramp ticks each; phase4 waits 65 ticks, then gPrng+0x23f bit0 and duel-zone direction(1) in {1,2} route to phase8 and store +8, else phase5. Phases5/6 advance on nonzero blend results; phase7 or invalid cleans up and returns0. Phase8 calls the inner renderer; inner0 advances outer but this call returns1. It does not advance PRNG.'),
-    ('FUN_080c678c', 'update_zone_oam_card_count_tag',
-        'Refresh the zone-type11 count tag in gDuelFieldState+0x210. Decode player from bit7 and read its zone count at gP1LifePoints+player*0x868+0xc. Ignore other zone types or counts above6. Count0 stores only player<<7. Otherwise resolve the descriptor to zone data; when its first word has low13 bits zero, store (player<<7)|11|((count-1)<<8). Called by dispatch_card_display_op, field refresh and play_player_zone_card_refresh_effect.'),
+    ('FUN_080c678c', 'repair_hand_zone_cursor_after_card_update',
+        'Repair the packed hand-zone cursor in field+0x210 after a card update. Only zone 11 is handled. Read the u32 count at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE. Count 0 selects zone 0 for that player. For count 1..6, an empty selected low13-bit card ID moves the cursor to hand index count-1; larger counts remain unchanged. No APCS input; callers ignore the return value.'),
     ('FUN_080f64dc', 'write_obj_attr_256color_affine',
         'Emit256-color OBJ attributes for play_player_zone_card_refresh_effect. r0 packs x/y; r1 supplies shape/size flags, r2 tile/priority and r3 attr1 flags. Get OAM base through gPrng+0x1bc; exit when its slot byte at+0x400 is0x80. attr0=(y&0xff)|(r1&0xff00)|0x2000; attr1=(x&0x1ff)|((r1<<8)&0xfe00)|u16(r3); attr2=(r2&0xc00)|((r2&0x1ff)<<1). Write the selected8-byte entry and increment the slot byte.'),
     # --- batch #29 (campaign-29) ---

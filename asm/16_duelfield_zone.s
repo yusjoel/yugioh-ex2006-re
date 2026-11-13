@@ -2554,7 +2554,7 @@ LAB_080c27d2:
     ldrh r1,[r4,#0x0]                        @ 080c27e2 2188
     adds r0,r6,#0x0    @ 080c27e4 301c
     bl refresh_player_field_slot_tiles       @ 080c27e6 01f01bfd
-    bl update_zone_oam_card_count_tag        @ 080c27ea 03f0cfff
+    bl repair_hand_zone_cursor_after_card_update @ 080c27ea 03f0cfff
     b LAB_080c27fc                           @ 080c27ee 05e0
 ptr_g_duel_zone_first_visible_slot_by_player_080c27f0:
     .word  gDuelZoneFirstVisibleSlotByPlayer @ 080c27f0 7c310202  gDuelZoneFirstVisibleSlotByPlayer: add reviewed operand-0 DATA reference.
@@ -6868,7 +6868,7 @@ ui_card_render_refresh_source_list:
     adds r1,r1,r2    @ 080c4848 8918
     ldrh r1,[r1,#0x0]                        @ 080c484a 0988
     bl refresh_player_field_slot_tiles       @ 080c484c fff7e8fc
-    bl update_zone_oam_card_count_tag        @ 080c4850 01f09cff
+    bl repair_hand_zone_cursor_after_card_update @ 080c4850 01f09cff
 ui_card_render_select_source_feedback:
     ldr r1, ptr_g_ui_effect_state_080c487c   @ 080c4854 0949
     movs r0,#0x4    @ 080c4856 0420
@@ -8857,15 +8857,15 @@ LAB_080c57b4:
 ptr_g_card_ctx_slot_data_080c57c0:
     .word  gCardCtxSlotData               @ 080c57c0 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 
-@ Compute card sprite OAM coords by zone (player_id r5, zone_type r1, zone_idx r2). Calls resolve_zone_oam_base_coords_by_type; applies y offset by card_type [1/3/5]. Loops activation mask bits. Returns void. 3 wrapper callers.
-compute_card_sprite_oam_coords_by_zone:
+@ Render OAM for action-menu rows selected by ctx+4 bits 0..13. Decode the current packed field selection from field+0x210 and resolve its anchor coordinates. Use ctx+0x26 and row widths at +0xa to position and clip each row. Phase 1 uses the opening step; phases 3/5 use the closing step at ctx+0x2a. Emit row and highlight OAM entries. Inputs come from global state; callers ignore the return value.
+render_duel_action_menu_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c57c4 f0b5
     .hword 0x4657    @ 080c57c6 5746
     .hword 0x464e    @ 080c57c8 4e46
     .hword 0x4645    @ 080c57ca 4546
     push {r5,r6,r7}                          @ 080c57cc e0b4
     sub sp,#0x24                             @ 080c57ce 89b0
-    ldr r3, DAT_080c5810                     @ 080c57d0 0f4b
+    ldr r3, ptr_g_duel_field_state_080c5810  @ 080c57d0 0f4b
     movs r1,#0x84    @ 080c57d2 8421
     lsls r1,r1,#0x2    @ 080c57d4 8900
     adds r0,r3,r1    @ 080c57d6 5818
@@ -8897,8 +8897,8 @@ compute_card_sprite_oam_coords_by_zone:
     movs r1,#0xb    @ 080c580a 0b21
     b LAB_080c5816                           @ 080c580c 03e0
     .zero  0x2
-DAT_080c5810:
-    .word  0x02023130                     @ 080c5810 30310202
+ptr_g_duel_field_state_080c5810:
+    .word  gDuelFieldState                @ 080c5810 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
 LAB_080c5814:
     adds r0,r5,#0x0    @ 080c5814 281c
 LAB_080c5816:
@@ -8907,7 +8907,7 @@ LAB_080c5816:
     lsls r3,r4,#0x10    @ 080c581c 2304
     lsrs r1,r3,#0x10    @ 080c581e 190c
     str r1,[sp,#0x0]                         @ 080c5820 0091
-    ldr r2, DAT_080c583c                     @ 080c5822 064a
+    ldr r2, ptr_g_duel_card_ctx_base_080c583c @ 080c5822 064a
     ldr r1,[r2,#0x4]                         @ 080c5824 5168
     movs r0,#0x1    @ 080c5826 0120
     eors r1,r0    @ 080c5828 4140
@@ -8920,8 +8920,8 @@ LAB_080c5816:
     adds r0,#0x2a    @ 080c5836 2a30
     b LAB_080c584a                           @ 080c5838 07e0
     .zero  0x2
-DAT_080c583c:
-    .word  0x0201e2a0                     @ 080c583c a0e20102
+ptr_g_duel_card_ctx_base_080c583c:
+    .word  gDuelCardCtxBase               @ 080c583c a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
 LAB_080c5840:
     lsrs r0,r4,#0x10    @ 080c5840 200c
     adds r1,r0,#0x0    @ 080c5842 011c
@@ -8930,7 +8930,7 @@ LAB_080c5840:
     subs r0,#0x22    @ 080c5848 2238
 LAB_080c584a:
     str r0,[sp,#0x8]                         @ 080c584a 0290
-    ldr r4, DAT_080c5880                     @ 080c584c 0c4c
+    ldr r4, ptr_g_card_ctx_slot_data_080c5880 @ 080c584c 0c4c
     ldrb r6,[r4,#0x8]                        @ 080c584e 267a
     lsls r1,r6,#0x1c    @ 080c5850 3107
     lsrs r1,r1,#0x1b    @ 080c5852 c90e
@@ -8956,8 +8956,8 @@ LAB_080c584a:
     cmp r1,#0x1                              @ 080c587a 0129
     beq LAB_080c588a                         @ 080c587c 05d0
     b LAB_080c58ea                           @ 080c587e 34e0
-DAT_080c5880:
-    .word  0x0201ff30                     @ 080c5880 30ff0102
+ptr_g_card_ctx_slot_data_080c5880:
+    .word  gCardCtxSlotData               @ 080c5880 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c5884:
     cmp r1,#0x5                              @ 080c5884 0529
     beq LAB_080c58be                         @ 080c5886 1ad0
@@ -9022,7 +9022,7 @@ LAB_080c58ea:
     lsrs r0,r3,#0x1    @ 080c58ee 5808
     subs r1,r1,r0    @ 080c58f0 091a
     str r1,[sp,#0x0]                         @ 080c58f2 0091
-    ldr r0, DAT_080c590c                     @ 080c58f4 0548
+    ldr r0, ptr_g_card_ctx_slot_data_080c590c @ 080c58f4 0548
     ldrh r0,[r0,#0x26]                       @ 080c58f6 c08c
     lsls r0,r0,#0x4    @ 080c58f8 0001
     adds r1,r1,r0    @ 080c58fa 0918
@@ -9034,8 +9034,8 @@ LAB_080c58ea:
     str r0,[sp,#0x0]                         @ 080c5906 0090
     b LAB_080c591a                           @ 080c5908 07e0
     .zero  0x2
-DAT_080c590c:
-    .word  0x0201ff30                     @ 080c590c 30ff0102
+ptr_g_card_ctx_slot_data_080c590c:
+    .word  gCardCtxSlotData               @ 080c590c 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c5910:
     ldr r5,[sp,#0x0]                         @ 080c5910 009d
     cmp r5,#0x27                             @ 080c5912 272d
@@ -9044,7 +9044,7 @@ LAB_080c5910:
     str r6,[sp,#0x0]                         @ 080c5918 0096
 LAB_080c591a:
     movs r4,#0x0    @ 080c591a 0024
-    ldr r0, DAT_080c594c                     @ 080c591c 0b48
+    ldr r0, ptr_g_card_ctx_slot_data_080c594c @ 080c591c 0b48
     str r0,[sp,#0x1c]                        @ 080c591e 0790
     str r0,[sp,#0x10]                        @ 080c5920 0490
 LAB_080c5922:
@@ -9070,8 +9070,8 @@ LAB_080c5936:
     cmp r1,#0x1                              @ 080c5946 0129
     beq LAB_080c5956                         @ 080c5948 05d0
     b LAB_080c5a54                           @ 080c594a 83e0
-DAT_080c594c:
-    .word  0x0201ff30                     @ 080c594c 30ff0102
+ptr_g_card_ctx_slot_data_080c594c:
+    .word  gCardCtxSlotData               @ 080c594c 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c5950:
     cmp r1,#0x5                              @ 080c5950 0529
     beq LAB_080c59d8                         @ 080c5952 41d0
@@ -9088,34 +9088,34 @@ LAB_080c5956:
     .hword 0x4641    @ 080c5966 4146
     subs r0,r0,r1    @ 080c5968 401a
     movs r5,#0x4    @ 080c596a 0425
-    ldr r2, DAT_080c5978                     @ 080c596c 024a
+    ldr r2, ptr_g_duel_action_menu_anim_step_080c5978 @ 080c596c 024a
     ldrb r2,[r2,#0x0]                        @ 080c596e 1278
     subs r1,r5,r2    @ 080c5970 a91a
     lsls r1,r1,#0x2    @ 080c5972 8900
     b LAB_080c59f4                           @ 080c5974 3ee0
     .zero  0x2
-DAT_080c5978:
-    .word  0x0201ff5a                     @ 080c5978 5aff0102
+ptr_g_duel_action_menu_anim_step_080c5978:
+    .word  gDuelActionMenuAnimStep        @ 080c5978 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c597c:
     cmp r8,r0                                @ 080c597c 8045
     ble LAB_080c5a54                         @ 080c597e 69dd
     .hword 0x4645    @ 080c5980 4546
     subs r0,r5,r0    @ 080c5982 281a
     movs r2,#0x4    @ 080c5984 0422
-    ldr r6, DAT_080c5990                     @ 080c5986 024e
+    ldr r6, ptr_g_duel_action_menu_anim_step_080c5990 @ 080c5986 024e
     ldrb r6,[r6,#0x0]                        @ 080c5988 3678
     subs r1,r2,r6    @ 080c598a 911b
     lsls r1,r1,#0x2    @ 080c598c 8900
     b LAB_080c5a0e                           @ 080c598e 3ee0
-DAT_080c5990:
-    .word  0x0201ff5a                     @ 080c5990 5aff0102
+ptr_g_duel_action_menu_anim_step_080c5990:
+    .word  gDuelActionMenuAnimStep        @ 080c5990 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c5994:
     lsrs r0,r0,#0x1    @ 080c5994 4008
     cmp r8,r0                                @ 080c5996 8045
     bge LAB_080c59b8                         @ 080c5998 0eda
     .hword 0x4641    @ 080c599a 4146
     subs r2,r0,r1    @ 080c599c 421a
-    ldr r5, DAT_080c59b4                     @ 080c599e 054d
+    ldr r5, ptr_g_duel_action_menu_anim_step_080c59b4 @ 080c599e 054d
     ldrb r1,[r5,#0x0]                        @ 080c59a0 2978
     movs r6,#0x4    @ 080c59a2 0426
     subs r0,r6,r1    @ 080c59a4 701a
@@ -9126,12 +9126,12 @@ LAB_080c5994:
     adds r0,r0,r1    @ 080c59ae 4018
     adds r3,r3,r0    @ 080c59b0 1b18
     b LAB_080c5a54                           @ 080c59b2 4fe0
-DAT_080c59b4:
-    .word  0x0201ff5a                     @ 080c59b4 5aff0102
+ptr_g_duel_action_menu_anim_step_080c59b4:
+    .word  gDuelActionMenuAnimStep        @ 080c59b4 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c59b8:
     .hword 0x4641    @ 080c59b8 4146
     subs r2,r1,r0    @ 080c59ba 0a1a
-    ldr r5, DAT_080c59d4                     @ 080c59bc 054d
+    ldr r5, ptr_g_duel_action_menu_anim_step_080c59d4 @ 080c59bc 054d
     ldrb r1,[r5,#0x0]                        @ 080c59be 2978
     movs r6,#0x4    @ 080c59c0 0426
     subs r0,r6,r1    @ 080c59c2 701a
@@ -9143,8 +9143,8 @@ LAB_080c59b8:
     subs r3,r3,r0    @ 080c59ce 1b1a
     b LAB_080c5a54                           @ 080c59d0 40e0
     .zero  0x2
-DAT_080c59d4:
-    .word  0x0201ff5a                     @ 080c59d4 5aff0102
+ptr_g_duel_action_menu_anim_step_080c59d4:
+    .word  gDuelActionMenuAnimStep        @ 080c59d4 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c59d8:
     ldr r0,[sp,#0x1c]                        @ 080c59d8 0798
     ldrh r2,[r0,#0x26]                       @ 080c59da c28c
@@ -9157,7 +9157,7 @@ LAB_080c59d8:
     bge LAB_080c5a00                         @ 080c59e8 0ada
     .hword 0x4641    @ 080c59ea 4146
     subs r0,r0,r1    @ 080c59ec 401a
-    ldr r2, DAT_080c59fc                     @ 080c59ee 034a
+    ldr r2, ptr_g_duel_action_menu_anim_step_080c59fc @ 080c59ee 034a
     ldrb r2,[r2,#0x0]                        @ 080c59f0 1278
     lsls r1,r2,#0x2    @ 080c59f2 9100
 LAB_080c59f4:
@@ -9165,29 +9165,29 @@ LAB_080c59f4:
     adds r3,r3,r0    @ 080c59f6 1b18
     b LAB_080c5a54                           @ 080c59f8 2ce0
     .zero  0x2
-DAT_080c59fc:
-    .word  0x0201ff5a                     @ 080c59fc 5aff0102
+ptr_g_duel_action_menu_anim_step_080c59fc:
+    .word  gDuelActionMenuAnimStep        @ 080c59fc 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c5a00:
     cmp r8,r0                                @ 080c5a00 8045
     ble LAB_080c5a54                         @ 080c5a02 27dd
     .hword 0x4645    @ 080c5a04 4546
     subs r0,r5,r0    @ 080c5a06 281a
-    ldr r6, DAT_080c5a14                     @ 080c5a08 024e
+    ldr r6, ptr_g_duel_action_menu_anim_step_080c5a14 @ 080c5a08 024e
     ldrb r6,[r6,#0x0]                        @ 080c5a0a 3678
     lsls r1,r6,#0x2    @ 080c5a0c b100
 LAB_080c5a0e:
     muls r0,r1    @ 080c5a0e 4843
     subs r3,r3,r0    @ 080c5a10 1b1a
     b LAB_080c5a54                           @ 080c5a12 1fe0
-DAT_080c5a14:
-    .word  0x0201ff5a                     @ 080c5a14 5aff0102
+ptr_g_duel_action_menu_anim_step_080c5a14:
+    .word  gDuelActionMenuAnimStep        @ 080c5a14 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c5a18:
     lsrs r0,r2,#0x1    @ 080c5a18 5008
     cmp r8,r0                                @ 080c5a1a 8045
     bge LAB_080c5a3c                         @ 080c5a1c 0eda
     .hword 0x4641    @ 080c5a1e 4146
     subs r2,r0,r1    @ 080c5a20 421a
-    ldr r5, DAT_080c5a38                     @ 080c5a22 054d
+    ldr r5, ptr_g_duel_action_menu_anim_step_080c5a38 @ 080c5a22 054d
     ldrb r0,[r5,#0x0]                        @ 080c5a24 2878
     lsls r1,r0,#0x2    @ 080c5a26 8100
     muls r1,r2    @ 080c5a28 5143
@@ -9198,12 +9198,12 @@ LAB_080c5a18:
     adds r1,r1,r0    @ 080c5a32 0918
     adds r3,r3,r1    @ 080c5a34 5b18
     b LAB_080c5a54                           @ 080c5a36 0de0
-DAT_080c5a38:
-    .word  0x0201ff5a                     @ 080c5a38 5aff0102
+ptr_g_duel_action_menu_anim_step_080c5a38:
+    .word  gDuelActionMenuAnimStep        @ 080c5a38 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c5a3c:
     .hword 0x4641    @ 080c5a3c 4146
     subs r2,r1,r0    @ 080c5a3e 0a1a
-    ldr r5, DAT_080c5ad0                     @ 080c5a40 234d
+    ldr r5, ptr_g_duel_action_menu_anim_step_080c5ad0 @ 080c5a40 234d
     ldrb r0,[r5,#0x0]                        @ 080c5a42 2878
     lsls r1,r0,#0x2    @ 080c5a44 8100
     muls r1,r2    @ 080c5a46 5143
@@ -9276,8 +9276,8 @@ LAB_080c5a6a:
     subs r0,r0,r1    @ 080c5aca 401a
     .hword 0x4682    @ 080c5acc 8246
     b LAB_080c5ade                           @ 080c5ace 06e0
-DAT_080c5ad0:
-    .word  0x0201ff5a                     @ 080c5ad0 5aff0102
+ptr_g_duel_action_menu_anim_step_080c5ad0:
+    .word  gDuelActionMenuAnimStep        @ 080c5ad0 5aff0102  gDuelActionMenuAnimStep: add reviewed operand-0 DATA reference.
 LAB_080c5ad4:
     .hword 0x4650    @ 080c5ad4 5046
     cmp r0,#0x27                             @ 080c5ad6 2728
@@ -9372,8 +9372,8 @@ LAB_080c5b66:
     bx r0                                    @ 080c5b74 0047
     .zero  0x2
 
-@ Dispatches OAM update for a single duel field zone slot by zone_type. Reads gPrng+0x214 halfword to extract zone_type [0..0xd]; 16-way jump table routes each type to a dedicated OAM write sub-function. No APCS input (all state from gPrng+0x214). Returns void. Called by init_duel_field_card_sprite_vram (080c6184) and setup_zone_oam_entry_by_field_slot (080c5444). Constants: gPrng_zone_halfword=gPrng+0x214, zone_type_max=0xd.
-dispatch_duel_field_zone_oam_by_type:
+@ Render up to 14 action-menu labels selected by ctx+4. The even case table selects localized game-string rows from language bits 0..2 at EWRAM_BASE+GSETTINGS_OFFSET; language 5 adds a reviewed JA-to-ES delta. Measure each string, cache tile widths, copy left/middle/right frame columns to OBJ VRAM and render the text twice with glyph styles 0x8008/7. No APCS input.
+render_duel_action_menu_labels:
     push {r4,r5,r6,r7,lr}                    @ 080c5b78 f0b5
     .hword 0x4657    @ 080c5b7a 5746
     .hword 0x464e    @ 080c5b7c 4e46
@@ -9383,12 +9383,12 @@ dispatch_duel_field_zone_oam_by_type:
     movs r0,#0x82    @ 080c5b84 8220
     lsls r0,r0,#0x2    @ 080c5b86 8000
     .hword 0x4680    @ 080c5b88 8046
-    ldr r0, DWORD_080c5bec                   @ 080c5b8a 1848
+    ldr r0, ptr_g_card_ctx_slot_data_080c5bec @ 080c5b8a 1848
     ldr r0,[r0,#0x4]                         @ 080c5b8c 4068
     str r0,[sp,#0x4]                         @ 080c5b8e 0190
-    ldr r2, DWORD_080c5bf0                   @ 080c5b90 174a
-    ldr r0, DWORD_080c5bf4                   @ 080c5b92 1848
-    ldr r1, DWORD_080c5bf8                   @ 080c5b94 1849
+    ldr r2, ptr_g_font_jp_ctx_080c5bf0       @ 080c5b90 174a
+    ldr r0, ptr_ewram_base_080c5bf4          @ 080c5b92 1848
+    ldr r1, gsettings_offset_080c5bf8        @ 080c5b94 1849
     adds r0,r0,r1    @ 080c5b96 4018
     movs r1,#0x7    @ 080c5b98 0721
     ldrb r0,[r0,#0x0]                        @ 080c5b9a 0078
@@ -9403,7 +9403,7 @@ dispatch_duel_field_zone_oam_by_type:
     movs r1,#0x2    @ 080c5bac 0221
     orrs r0,r1    @ 080c5bae 0843
     strb r0,[r2,#0x8]                        @ 080c5bb0 1072
-    ldr r3, DWORD_080c5bfc                   @ 080c5bb2 124b
+    ldr r3, ptr_font_jp_base_table_080c5bfc  @ 080c5bb2 124b
     lsls r1,r0,#0x1e    @ 080c5bb4 8107
     lsrs r1,r1,#0x1f    @ 080c5bb6 c90f
     lsls r1,r1,#0x2    @ 080c5bb8 8900
@@ -9431,45 +9431,669 @@ LAB_080c5bdc:
     b LAB_080c608a                           @ 080c5be0 53e2
 LAB_080c5be2:
     lsls r0,r6,#0x2    @ 080c5be2 b000
-    ldr r1, DWORD_080c5c00                   @ 080c5be4 0649
+    ldr r1, ptr_duel_action_menu_label_case_table_080c5c00 @ 080c5be4 0649
     adds r0,r0,r1    @ 080c5be6 4018
     ldr r0,[r0,#0x0]                         @ 080c5be8 0068
     .hword 0x4687    @ 080c5bea 8746
-DWORD_080c5bec:
-    .word  0x0201ff30                     @ 080c5bec 30ff0102
-DWORD_080c5bf0:
-    .word  0x02006ed0                     @ 080c5bf0 d06e0002
-DWORD_080c5bf4:
-    .word  0x02000000                     @ 080c5bf4 00000002
-DWORD_080c5bf8:
-    .word  0x00006c2c                     @ 080c5bf8 2c6c0000
-DWORD_080c5bfc:
-    .word  font_jp_base_table             @ 080c5bfc 54f8e509
-DWORD_080c5c00:
-    .word  0x080c5c04                     @ 080c5c00 045c0c08
-    .word  0x080c5c3c                     @ 080c5c04 3c5c0c08
-    .word  0x080c5c88                     @ 080c5c08 885c0c08
-    .word  0x080c5cd4                     @ 080c5c0c d45c0c08
-    .word  0x080c5d30                     @ 080c5c10 305d0c08
-    .word  0x080c5d8c                     @ 080c5c14 8c5d0c08
-    .word  0x080c5dd8                     @ 080c5c18 d85d0c08
-    .word  0x080c5e24                     @ 080c5c1c 245e0c08
-    .word  0x080c5e80                     @ 080c5c20 805e0c08
-    .word  0x080c5e80                     @ 080c5c24 805e0c08
-    .word  0x080c5ecc                     @ 080c5c28 cc5e0c08
-    .word  0x080c5f28                     @ 080c5c2c 285f0c08
-    .word  0x080c5f84                     @ 080c5c30 845f0c08
-    .word  0x080c5fe0                     @ 080c5c34 e05f0c08
-    .word  0x080c6038                     @ 080c5c38 38600c08
-DAT_080c5c3c:
-    ROM_INCBIN 0xc5c3c, 0x44e
+ptr_g_card_ctx_slot_data_080c5bec:
+    .word  gCardCtxSlotData               @ 080c5bec 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_g_font_jp_ctx_080c5bf0:
+    .word  gFontJpCtx                     @ 080c5bf0 d06e0002  gFontJpCtx: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c5bf4:
+    .word  EWRAM_BASE                     @ 080c5bf4 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5bf8:
+    .word  GSETTINGS_OFFSET               @ 080c5bf8 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_font_jp_base_table_080c5bfc:
+    .word  font_jp_base_table             @ 080c5bfc 54f8e509  font_jp_base_table: preserve existing operand-0 DATA reference.
+ptr_duel_action_menu_label_case_table_080c5c00:
+    .word  duel_action_menu_label_case_table @ 080c5c00 045c0c08  duel_action_menu_label_case_table: add reviewed operand-0 DATA reference.
+duel_action_menu_label_case_table:
+    .word  duel_action_label_card_view_select_language @ 080c5c04 3c5c0c08
+    .word  duel_action_label_attack_select_language @ 080c5c08 885c0c08
+    .word  duel_action_label_list_select_language @ 080c5c0c d45c0c08
+    .word  duel_action_label_special_summon_select_language @ 080c5c10 305d0c08
+    .word  duel_action_label_activate_select_language @ 080c5c14 8c5d0c08
+    .word  duel_action_label_summon_select_language @ 080c5c18 d85d0c08
+    .word  duel_action_label_flip_summon_select_language @ 080c5c1c 245e0c08
+    .word  duel_action_label_set_select_language @ 080c5c20 805e0c08
+    .word  duel_action_label_set_select_language @ 080c5c24 805e0c08
+    .word  duel_action_label_attack_position_select_language @ 080c5c28 cc5e0c08
+    .word  duel_action_label_defense_position_select_language @ 080c5c2c 285f0c08
+    .word  duel_action_label_surrender_select_language @ 080c5c30 845f0c08
+    .word  duel_action_label_ok_select_language @ 080c5c34 e05f0c08
+    .word  duel_action_label_draw_select_language @ 080c5c38 38600c08
+duel_action_label_card_view_select_language:
+    ldr r0, ptr_ewram_base_080c5c5c          @ 080c5c3c 0748
+    ldr r1, gsettings_offset_080c5c60        @ 080c5c3e 0849
+    adds r0,r0,r1    @ 080c5c40 4018
+    movs r1,#0x7    @ 080c5c42 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5c44 0078
+    ands r1,r0    @ 080c5c46 0140
+    cmp r1,#0x1                              @ 080c5c48 0129
+    beq duel_action_label_card_view_en       @ 080c5c4a 19d0
+    cmp r1,#0x2                              @ 080c5c4c 0229
+    beq duel_action_label_card_view_de       @ 080c5c4e 13d0
+    cmp r1,#0x3                              @ 080c5c50 0329
+    beq duel_action_label_card_view_fr       @ 080c5c52 0dd0
+    cmp r1,#0x4                              @ 080c5c54 0429
+    beq duel_action_label_card_view_it       @ 080c5c56 07d0
+    ldr r5, ptr_game_str_ja_0476_080c5c64    @ 080c5c58 024d
+    b duel_action_label_test_es_0476_0477    @ 080c5c5a 74e1
+ptr_ewram_base_080c5c5c:
+    .word  EWRAM_BASE                     @ 080c5c5c 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5c60:
+    .word  GSETTINGS_OFFSET               @ 080c5c60 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0476_080c5c64:
+    .word  game_str_ja_0476               @ 080c5c64 d0e2db09  game_str_ja_0476: add reviewed operand-0 DATA reference.
+duel_action_label_card_view_it:
+    ldr r5, ptr_game_str_it_0476_080c5c6c    @ 080c5c68 004d
+    b LAB_080c608a                           @ 080c5c6a 0ee2
+ptr_game_str_it_0476_080c5c6c:
+    .word  game_str_it_0476               @ 080c5c6c 94d0de09  game_str_it_0476: add reviewed operand-0 DATA reference.
+duel_action_label_card_view_fr:
+    ldr r5, ptr_game_str_fr_0476_080c5c74    @ 080c5c70 004d
+    b LAB_080c608a                           @ 080c5c72 0ae2
+ptr_game_str_fr_0476_080c5c74:
+    .word  game_str_fr_0476               @ 080c5c74 4a0cde09  game_str_fr_0476: add reviewed operand-0 DATA reference.
+duel_action_label_card_view_de:
+    ldr r5, ptr_game_str_de_0476_080c5c7c    @ 080c5c78 004d
+    b LAB_080c608a                           @ 080c5c7a 06e2
+ptr_game_str_de_0476_080c5c7c:
+    .word  game_str_de_0476               @ 080c5c7c ba49dd09  game_str_de_0476: add reviewed operand-0 DATA reference.
+duel_action_label_card_view_en:
+    ldr r5, ptr_game_str_en_0476_080c5c84    @ 080c5c80 004d
+    b LAB_080c608a                           @ 080c5c82 02e2
+ptr_game_str_en_0476_080c5c84:
+    .word  game_str_en_0476               @ 080c5c84 8093dc09  game_str_en_0476: add reviewed operand-0 DATA reference.
+duel_action_label_attack_select_language:
+    ldr r0, ptr_ewram_base_080c5ca8          @ 080c5c88 0748
+    ldr r1, gsettings_offset_080c5cac        @ 080c5c8a 0849
+    adds r0,r0,r1    @ 080c5c8c 4018
+    movs r1,#0x7    @ 080c5c8e 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5c90 0078
+    ands r1,r0    @ 080c5c92 0140
+    cmp r1,#0x1                              @ 080c5c94 0129
+    beq duel_action_label_attack_en          @ 080c5c96 19d0
+    cmp r1,#0x2                              @ 080c5c98 0229
+    beq duel_action_label_attack_de          @ 080c5c9a 13d0
+    cmp r1,#0x3                              @ 080c5c9c 0329
+    beq duel_action_label_attack_fr          @ 080c5c9e 0dd0
+    cmp r1,#0x4                              @ 080c5ca0 0429
+    beq duel_action_label_attack_it          @ 080c5ca2 07d0
+    ldr r5, ptr_game_str_ja_0483_080c5cb0    @ 080c5ca4 024d
+    b duel_action_label_test_es_0480_0481_0483_0485 @ 080c5ca6 7ce1
+ptr_ewram_base_080c5ca8:
+    .word  EWRAM_BASE                     @ 080c5ca8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5cac:
+    .word  GSETTINGS_OFFSET               @ 080c5cac 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0483_080c5cb0:
+    .word  game_str_ja_0483               @ 080c5cb0 10e3db09  game_str_ja_0483: add reviewed operand-0 DATA reference.
+duel_action_label_attack_it:
+    ldr r5, ptr_game_str_it_0483_080c5cb8    @ 080c5cb4 004d
+    b LAB_080c608a                           @ 080c5cb6 e8e1
+ptr_game_str_it_0483_080c5cb8:
+    .word  game_str_it_0483               @ 080c5cb8 ecd0de09  game_str_it_0483: add reviewed operand-0 DATA reference.
+duel_action_label_attack_fr:
+    ldr r5, ptr_game_str_fr_0483_080c5cc0    @ 080c5cbc 004d
+    b LAB_080c608a                           @ 080c5cbe e4e1
+ptr_game_str_fr_0483_080c5cc0:
+    .word  game_str_fr_0483               @ 080c5cc0 920cde09  game_str_fr_0483: add reviewed operand-0 DATA reference.
+duel_action_label_attack_de:
+    ldr r5, ptr_game_str_de_0483_080c5cc8    @ 080c5cc4 004d
+    b LAB_080c608a                           @ 080c5cc6 e0e1
+ptr_game_str_de_0483_080c5cc8:
+    .word  game_str_de_0483               @ 080c5cc8 124add09  game_str_de_0483: add reviewed operand-0 DATA reference.
+duel_action_label_attack_en:
+    ldr r5, ptr_game_str_en_0483_080c5cd0    @ 080c5ccc 004d
+    b LAB_080c608a                           @ 080c5cce dce1
+ptr_game_str_en_0483_080c5cd0:
+    .word  game_str_en_0483               @ 080c5cd0 c093dc09  game_str_en_0483: add reviewed operand-0 DATA reference.
+duel_action_label_list_select_language:
+    ldr r0, ptr_ewram_base_080c5d00          @ 080c5cd4 0a48
+    ldr r1, gsettings_offset_080c5d04        @ 080c5cd6 0b49
+    adds r0,r0,r1    @ 080c5cd8 4018
+    movs r1,#0x7    @ 080c5cda 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5cdc 0078
+    ands r1,r0    @ 080c5cde 0140
+    cmp r1,#0x1                              @ 080c5ce0 0129
+    beq duel_action_label_list_en            @ 080c5ce2 21d0
+    cmp r1,#0x2                              @ 080c5ce4 0229
+    beq duel_action_label_list_de            @ 080c5ce6 1bd0
+    cmp r1,#0x3                              @ 080c5ce8 0329
+    beq duel_action_label_list_fr            @ 080c5cea 15d0
+    cmp r1,#0x4                              @ 080c5cec 0429
+    beq duel_action_label_list_it            @ 080c5cee 0fd0
+    ldr r5, ptr_game_str_ja_0491_080c5d08    @ 080c5cf0 054d
+    cmp r1,#0x5                              @ 080c5cf2 0529
+    beq duel_action_label_es_delta_0491      @ 080c5cf4 00d0
+    b LAB_080c608a                           @ 080c5cf6 c8e1
+duel_action_label_es_delta_0491:
+    ldr r3, duel_action_label_es_ja_delta_0491_080c5d0c @ 080c5cf8 044b
+    adds r5,r5,r3    @ 080c5cfa ed18
+    b LAB_080c608a                           @ 080c5cfc c5e1
+    .zero  0x2
+ptr_ewram_base_080c5d00:
+    .word  EWRAM_BASE                     @ 080c5d00 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5d04:
+    .word  GSETTINGS_OFFSET               @ 080c5d04 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0491_080c5d08:
+    .word  game_str_ja_0491               @ 080c5d08 4ee3db09  game_str_ja_0491: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0491_080c5d0c:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0491 @ 080c5d0c c4aa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0491: named scalar literal.
+duel_action_label_list_it:
+    ldr r5, ptr_game_str_it_0491_080c5d14    @ 080c5d10 004d
+    b LAB_080c608a                           @ 080c5d12 bae1
+ptr_game_str_it_0491_080c5d14:
+    .word  game_str_it_0491               @ 080c5d14 34d1de09  game_str_it_0491: add reviewed operand-0 DATA reference.
+duel_action_label_list_fr:
+    ldr r5, ptr_game_str_fr_0491_080c5d1c    @ 080c5d18 004d
+    b LAB_080c608a                           @ 080c5d1a b6e1
+ptr_game_str_fr_0491_080c5d1c:
+    .word  game_str_fr_0491               @ 080c5d1c f60cde09  game_str_fr_0491: add reviewed operand-0 DATA reference.
+duel_action_label_list_de:
+    ldr r5, ptr_game_str_de_0491_080c5d24    @ 080c5d20 004d
+    b LAB_080c608a                           @ 080c5d22 b2e1
+ptr_game_str_de_0491_080c5d24:
+    .word  game_str_de_0491               @ 080c5d24 5c4add09  game_str_de_0491: add reviewed operand-0 DATA reference.
+duel_action_label_list_en:
+    ldr r5, ptr_game_str_en_0491_080c5d2c    @ 080c5d28 004d
+    b LAB_080c608a                           @ 080c5d2a aee1
+ptr_game_str_en_0491_080c5d2c:
+    .word  game_str_en_0491               @ 080c5d2c 0294dc09  game_str_en_0491: add reviewed operand-0 DATA reference.
+duel_action_label_special_summon_select_language:
+    ldr r0, ptr_ewram_base_080c5d5c          @ 080c5d30 0a48
+    ldr r1, gsettings_offset_080c5d60        @ 080c5d32 0b49
+    adds r0,r0,r1    @ 080c5d34 4018
+    movs r1,#0x7    @ 080c5d36 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5d38 0078
+    ands r1,r0    @ 080c5d3a 0140
+    cmp r1,#0x1                              @ 080c5d3c 0129
+    beq duel_action_label_special_summon_en  @ 080c5d3e 21d0
+    cmp r1,#0x2                              @ 080c5d40 0229
+    beq duel_action_label_special_summon_de  @ 080c5d42 1bd0
+    cmp r1,#0x3                              @ 080c5d44 0329
+    beq duel_action_label_special_summon_fr  @ 080c5d46 15d0
+    cmp r1,#0x4                              @ 080c5d48 0429
+    beq duel_action_label_special_summon_it  @ 080c5d4a 0fd0
+    ldr r5, ptr_game_str_ja_0487_080c5d64    @ 080c5d4c 054d
+    cmp r1,#0x5                              @ 080c5d4e 0529
+    beq duel_action_label_es_delta_0487      @ 080c5d50 00d0
+    b LAB_080c608a                           @ 080c5d52 9ae1
+duel_action_label_es_delta_0487:
+    ldr r3, duel_action_label_es_ja_delta_0487_080c5d68 @ 080c5d54 044b
+    adds r5,r5,r3    @ 080c5d56 ed18
+    b LAB_080c608a                           @ 080c5d58 97e1
+    .zero  0x2
+ptr_ewram_base_080c5d5c:
+    .word  EWRAM_BASE                     @ 080c5d5c 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5d60:
+    .word  GSETTINGS_OFFSET               @ 080c5d60 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0487_080c5d64:
+    .word  game_str_ja_0487               @ 080c5d64 2ae3db09  game_str_ja_0487: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0487_080c5d68:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0487 @ 080c5d68 b8aa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0487: named scalar literal.
+duel_action_label_special_summon_it:
+    ldr r5, ptr_game_str_it_0487_080c5d70    @ 080c5d6c 004d
+    b LAB_080c608a                           @ 080c5d6e 8ce1
+ptr_game_str_it_0487_080c5d70:
+    .word  game_str_it_0487               @ 080c5d70 0ed1de09  game_str_it_0487: add reviewed operand-0 DATA reference.
+duel_action_label_special_summon_fr:
+    ldr r5, ptr_game_str_fr_0487_080c5d78    @ 080c5d74 004d
+    b LAB_080c608a                           @ 080c5d76 88e1
+ptr_game_str_fr_0487_080c5d78:
+    .word  game_str_fr_0487               @ 080c5d78 b80cde09  game_str_fr_0487: add reviewed operand-0 DATA reference.
+duel_action_label_special_summon_de:
+    ldr r5, ptr_game_str_de_0487_080c5d80    @ 080c5d7c 004d
+    b LAB_080c608a                           @ 080c5d7e 84e1
+ptr_game_str_de_0487_080c5d80:
+    .word  game_str_de_0487               @ 080c5d80 364add09  game_str_de_0487: add reviewed operand-0 DATA reference.
+duel_action_label_special_summon_en:
+    ldr r5, ptr_game_str_en_0487_080c5d88    @ 080c5d84 004d
+    b LAB_080c608a                           @ 080c5d86 80e1
+ptr_game_str_en_0487_080c5d88:
+    .word  game_str_en_0487               @ 080c5d88 e093dc09  game_str_en_0487: add reviewed operand-0 DATA reference.
+duel_action_label_activate_select_language:
+    ldr r0, ptr_ewram_base_080c5dac          @ 080c5d8c 0748
+    ldr r1, gsettings_offset_080c5db0        @ 080c5d8e 0849
+    adds r0,r0,r1    @ 080c5d90 4018
+    movs r1,#0x7    @ 080c5d92 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5d94 0078
+    ands r1,r0    @ 080c5d96 0140
+    cmp r1,#0x1                              @ 080c5d98 0129
+    beq duel_action_label_activate_en        @ 080c5d9a 19d0
+    cmp r1,#0x2                              @ 080c5d9c 0229
+    beq duel_action_label_activate_de        @ 080c5d9e 13d0
+    cmp r1,#0x3                              @ 080c5da0 0329
+    beq duel_action_label_activate_fr        @ 080c5da2 0dd0
+    cmp r1,#0x4                              @ 080c5da4 0429
+    beq duel_action_label_activate_it        @ 080c5da6 07d0
+    ldr r5, ptr_game_str_ja_0482_080c5db4    @ 080c5da8 024d
+    b duel_action_label_test_es_0482_0484    @ 080c5daa 54e1
+ptr_ewram_base_080c5dac:
+    .word  EWRAM_BASE                     @ 080c5dac 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5db0:
+    .word  GSETTINGS_OFFSET               @ 080c5db0 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0482_080c5db4:
+    .word  game_str_ja_0482               @ 080c5db4 06e3db09  game_str_ja_0482: add reviewed operand-0 DATA reference.
+duel_action_label_activate_it:
+    ldr r5, ptr_game_str_it_0482_080c5dbc    @ 080c5db8 004d
+    b LAB_080c608a                           @ 080c5dba 66e1
+ptr_game_str_it_0482_080c5dbc:
+    .word  game_str_it_0482               @ 080c5dbc e0d0de09  game_str_it_0482: add reviewed operand-0 DATA reference.
+duel_action_label_activate_fr:
+    ldr r5, ptr_game_str_fr_0482_080c5dc4    @ 080c5dc0 004d
+    b LAB_080c608a                           @ 080c5dc2 62e1
+ptr_game_str_fr_0482_080c5dc4:
+    .word  game_str_fr_0482               @ 080c5dc4 8a0cde09  game_str_fr_0482: add reviewed operand-0 DATA reference.
+duel_action_label_activate_de:
+    ldr r5, ptr_game_str_de_0482_080c5dcc    @ 080c5dc8 004d
+    b LAB_080c608a                           @ 080c5dca 5ee1
+ptr_game_str_de_0482_080c5dcc:
+    .word  game_str_de_0482               @ 080c5dcc 064add09  game_str_de_0482: add reviewed operand-0 DATA reference.
+duel_action_label_activate_en:
+    ldr r5, ptr_game_str_en_0482_080c5dd4    @ 080c5dd0 004d
+    b LAB_080c608a                           @ 080c5dd2 5ae1
+ptr_game_str_en_0482_080c5dd4:
+    .word  game_str_en_0482               @ 080c5dd4 b693dc09  game_str_en_0482: add reviewed operand-0 DATA reference.
+duel_action_label_summon_select_language:
+    ldr r0, ptr_ewram_base_080c5df8          @ 080c5dd8 0748
+    ldr r1, gsettings_offset_080c5dfc        @ 080c5dda 0849
+    adds r0,r0,r1    @ 080c5ddc 4018
+    movs r1,#0x7    @ 080c5dde 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5de0 0078
+    ands r1,r0    @ 080c5de2 0140
+    cmp r1,#0x1                              @ 080c5de4 0129
+    beq duel_action_label_summon_en          @ 080c5de6 19d0
+    cmp r1,#0x2                              @ 080c5de8 0229
+    beq duel_action_label_summon_de          @ 080c5dea 13d0
+    cmp r1,#0x3                              @ 080c5dec 0329
+    beq duel_action_label_summon_fr          @ 080c5dee 0dd0
+    cmp r1,#0x4                              @ 080c5df0 0429
+    beq duel_action_label_summon_it          @ 080c5df2 07d0
+    ldr r5, ptr_game_str_ja_0481_080c5e00    @ 080c5df4 024d
+    b duel_action_label_test_es_0480_0481_0483_0485 @ 080c5df6 d4e0
+ptr_ewram_base_080c5df8:
+    .word  EWRAM_BASE                     @ 080c5df8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5dfc:
+    .word  GSETTINGS_OFFSET               @ 080c5dfc 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0481_080c5e00:
+    .word  game_str_ja_0481               @ 080c5e00 00e3db09  game_str_ja_0481: add reviewed operand-0 DATA reference.
+duel_action_label_summon_it:
+    ldr r5, ptr_game_str_it_0481_080c5e08    @ 080c5e04 004d
+    b LAB_080c608a                           @ 080c5e06 40e1
+ptr_game_str_it_0481_080c5e08:
+    .word  game_str_it_0481               @ 080c5e08 d4d0de09  game_str_it_0481: add reviewed operand-0 DATA reference.
+duel_action_label_summon_fr:
+    ldr r5, ptr_game_str_fr_0481_080c5e10    @ 080c5e0c 004d
+    b LAB_080c608a                           @ 080c5e0e 3ce1
+ptr_game_str_fr_0481_080c5e10:
+    .word  game_str_fr_0481               @ 080c5e10 800cde09  game_str_fr_0481: add reviewed operand-0 DATA reference.
+duel_action_label_summon_de:
+    ldr r5, ptr_game_str_de_0481_080c5e18    @ 080c5e14 004d
+    b LAB_080c608a                           @ 080c5e16 38e1
+ptr_game_str_de_0481_080c5e18:
+    .word  game_str_de_0481               @ 080c5e18 fa49dd09  game_str_de_0481: add reviewed operand-0 DATA reference.
+duel_action_label_summon_en:
+    ldr r5, ptr_game_str_en_0481_080c5e20    @ 080c5e1c 004d
+    b LAB_080c608a                           @ 080c5e1e 34e1
+ptr_game_str_en_0481_080c5e20:
+    .word  game_str_en_0481               @ 080c5e20 ae93dc09  game_str_en_0481: add reviewed operand-0 DATA reference.
+duel_action_label_flip_summon_select_language:
+    ldr r0, ptr_ewram_base_080c5e50          @ 080c5e24 0a48
+    ldr r1, gsettings_offset_080c5e54        @ 080c5e26 0b49
+    adds r0,r0,r1    @ 080c5e28 4018
+    movs r1,#0x7    @ 080c5e2a 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5e2c 0078
+    ands r1,r0    @ 080c5e2e 0140
+    cmp r1,#0x1                              @ 080c5e30 0129
+    beq duel_action_label_flip_summon_en     @ 080c5e32 21d0
+    cmp r1,#0x2                              @ 080c5e34 0229
+    beq duel_action_label_flip_summon_de     @ 080c5e36 1bd0
+    cmp r1,#0x3                              @ 080c5e38 0329
+    beq duel_action_label_flip_summon_fr     @ 080c5e3a 15d0
+    cmp r1,#0x4                              @ 080c5e3c 0429
+    beq duel_action_label_flip_summon_it     @ 080c5e3e 0fd0
+    ldr r5, ptr_game_str_ja_0479_080c5e58    @ 080c5e40 054d
+    cmp r1,#0x5                              @ 080c5e42 0529
+    beq duel_action_label_es_delta_0479      @ 080c5e44 00d0
+    b LAB_080c608a                           @ 080c5e46 20e1
+duel_action_label_es_delta_0479:
+    ldr r3, duel_action_label_es_ja_delta_0479_080c5e5c @ 080c5e48 044b
+    adds r5,r5,r3    @ 080c5e4a ed18
+    b LAB_080c608a                           @ 080c5e4c 1de1
+    .zero  0x2
+ptr_ewram_base_080c5e50:
+    .word  EWRAM_BASE                     @ 080c5e50 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5e54:
+    .word  GSETTINGS_OFFSET               @ 080c5e54 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0479_080c5e58:
+    .word  game_str_ja_0479               @ 080c5e58 eee2db09  game_str_ja_0479: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0479_080c5e5c:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0479 @ 080c5e5c aeaa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0479: named scalar literal.
+duel_action_label_flip_summon_it:
+    ldr r5, ptr_game_str_it_0479_080c5e64    @ 080c5e60 004d
+    b LAB_080c608a                           @ 080c5e62 12e1
+ptr_game_str_it_0479_080c5e64:
+    .word  game_str_it_0479               @ 080c5e64 bad0de09  game_str_it_0479: add reviewed operand-0 DATA reference.
+duel_action_label_flip_summon_fr:
+    ldr r5, ptr_game_str_fr_0479_080c5e6c    @ 080c5e68 004d
+    b LAB_080c608a                           @ 080c5e6a 0ee1
+ptr_game_str_fr_0479_080c5e6c:
+    .word  game_str_fr_0479               @ 080c5e6c 6a0cde09  game_str_fr_0479: add reviewed operand-0 DATA reference.
+duel_action_label_flip_summon_de:
+    ldr r5, ptr_game_str_de_0479_080c5e74    @ 080c5e70 004d
+    b LAB_080c608a                           @ 080c5e72 0ae1
+ptr_game_str_de_0479_080c5e74:
+    .word  game_str_de_0479               @ 080c5e74 e449dd09  game_str_de_0479: add reviewed operand-0 DATA reference.
+duel_action_label_flip_summon_en:
+    ldr r5, ptr_game_str_en_0479_080c5e7c    @ 080c5e78 004d
+    b LAB_080c608a                           @ 080c5e7a 06e1
+ptr_game_str_en_0479_080c5e7c:
+    .word  game_str_en_0479               @ 080c5e7c 9e93dc09  game_str_en_0479: add reviewed operand-0 DATA reference.
+duel_action_label_set_select_language:
+    ldr r0, ptr_ewram_base_080c5ea0          @ 080c5e80 0748
+    ldr r1, gsettings_offset_080c5ea4        @ 080c5e82 0849
+    adds r0,r0,r1    @ 080c5e84 4018
+    movs r1,#0x7    @ 080c5e86 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5e88 0078
+    ands r1,r0    @ 080c5e8a 0140
+    cmp r1,#0x1                              @ 080c5e8c 0129
+    beq duel_action_label_set_en             @ 080c5e8e 19d0
+    cmp r1,#0x2                              @ 080c5e90 0229
+    beq duel_action_label_set_de             @ 080c5e92 13d0
+    cmp r1,#0x3                              @ 080c5e94 0329
+    beq duel_action_label_set_fr             @ 080c5e96 0dd0
+    cmp r1,#0x4                              @ 080c5e98 0429
+    beq duel_action_label_set_it             @ 080c5e9a 07d0
+    ldr r5, ptr_game_str_ja_0480_080c5ea8    @ 080c5e9c 024d
+    b duel_action_label_test_es_0480_0481_0483_0485 @ 080c5e9e 80e0
+ptr_ewram_base_080c5ea0:
+    .word  EWRAM_BASE                     @ 080c5ea0 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5ea4:
+    .word  GSETTINGS_OFFSET               @ 080c5ea4 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0480_080c5ea8:
+    .word  game_str_ja_0480               @ 080c5ea8 f8e2db09  game_str_ja_0480: add reviewed operand-0 DATA reference.
+duel_action_label_set_it:
+    ldr r5, ptr_game_str_it_0480_080c5eb0    @ 080c5eac 004d
+    b LAB_080c608a                           @ 080c5eae ece0
+ptr_game_str_it_0480_080c5eb0:
+    .word  game_str_it_0480               @ 080c5eb0 c8d0de09  game_str_it_0480: add reviewed operand-0 DATA reference.
+duel_action_label_set_fr:
+    ldr r5, ptr_game_str_fr_0480_080c5eb8    @ 080c5eb4 004d
+    b LAB_080c608a                           @ 080c5eb6 e8e0
+ptr_game_str_fr_0480_080c5eb8:
+    .word  game_str_fr_0480               @ 080c5eb8 780cde09  game_str_fr_0480: add reviewed operand-0 DATA reference.
+duel_action_label_set_de:
+    ldr r5, ptr_game_str_de_0480_080c5ec0    @ 080c5ebc 004d
+    b LAB_080c608a                           @ 080c5ebe e4e0
+ptr_game_str_de_0480_080c5ec0:
+    .word  game_str_de_0480               @ 080c5ec0 f249dd09  game_str_de_0480: add reviewed operand-0 DATA reference.
+duel_action_label_set_en:
+    ldr r5, ptr_game_str_en_0480_080c5ec8    @ 080c5ec4 004d
+    b LAB_080c608a                           @ 080c5ec6 e0e0
+ptr_game_str_en_0480_080c5ec8:
+    .word  game_str_en_0480               @ 080c5ec8 aa93dc09  game_str_en_0480: add reviewed operand-0 DATA reference.
+duel_action_label_attack_position_select_language:
+    ldr r0, ptr_ewram_base_080c5ef8          @ 080c5ecc 0a48
+    ldr r1, gsettings_offset_080c5efc        @ 080c5ece 0b49
+    adds r0,r0,r1    @ 080c5ed0 4018
+    movs r1,#0x7    @ 080c5ed2 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5ed4 0078
+    ands r1,r0    @ 080c5ed6 0140
+    cmp r1,#0x1                              @ 080c5ed8 0129
+    beq duel_action_label_attack_position_en @ 080c5eda 21d0
+    cmp r1,#0x2                              @ 080c5edc 0229
+    beq duel_action_label_attack_position_de @ 080c5ede 1bd0
+    cmp r1,#0x3                              @ 080c5ee0 0329
+    beq duel_action_label_attack_position_fr @ 080c5ee2 15d0
+    cmp r1,#0x4                              @ 080c5ee4 0429
+    beq duel_action_label_attack_position_it @ 080c5ee6 0fd0
+    ldr r5, ptr_game_str_ja_0478_080c5f00    @ 080c5ee8 054d
+    cmp r1,#0x5                              @ 080c5eea 0529
+    beq duel_action_label_es_delta_0478      @ 080c5eec 00d0
+    b LAB_080c608a                           @ 080c5eee cce0
+duel_action_label_es_delta_0478:
+    ldr r3, duel_action_label_es_ja_delta_0478_080c5f04 @ 080c5ef0 044b
+    adds r5,r5,r3    @ 080c5ef2 ed18
+    b LAB_080c608a                           @ 080c5ef4 c9e0
+    .zero  0x2
+ptr_ewram_base_080c5ef8:
+    .word  EWRAM_BASE                     @ 080c5ef8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5efc:
+    .word  GSETTINGS_OFFSET               @ 080c5efc 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0478_080c5f00:
+    .word  game_str_ja_0478               @ 080c5f00 e4e2db09  game_str_ja_0478: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0478_080c5f04:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0478 @ 080c5f04 acaa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0478: named scalar literal.
+duel_action_label_attack_position_it:
+    ldr r5, ptr_game_str_it_0478_080c5f0c    @ 080c5f08 004d
+    b LAB_080c608a                           @ 080c5f0a bee0
+ptr_game_str_it_0478_080c5f0c:
+    .word  game_str_it_0478               @ 080c5f0c aed0de09  game_str_it_0478: add reviewed operand-0 DATA reference.
+duel_action_label_attack_position_fr:
+    ldr r5, ptr_game_str_fr_0478_080c5f14    @ 080c5f10 004d
+    b LAB_080c608a                           @ 080c5f12 bae0
+ptr_game_str_fr_0478_080c5f14:
+    .word  game_str_fr_0478               @ 080c5f14 600cde09  game_str_fr_0478: add reviewed operand-0 DATA reference.
+duel_action_label_attack_position_de:
+    ldr r5, ptr_game_str_de_0478_080c5f1c    @ 080c5f18 004d
+    b LAB_080c608a                           @ 080c5f1a b6e0
+ptr_game_str_de_0478_080c5f1c:
+    .word  game_str_de_0478               @ 080c5f1c d649dd09  game_str_de_0478: add reviewed operand-0 DATA reference.
+duel_action_label_attack_position_en:
+    ldr r5, ptr_game_str_en_0478_080c5f24    @ 080c5f20 004d
+    b LAB_080c608a                           @ 080c5f22 b2e0
+ptr_game_str_en_0478_080c5f24:
+    .word  game_str_en_0478               @ 080c5f24 9493dc09  game_str_en_0478: add reviewed operand-0 DATA reference.
+duel_action_label_defense_position_select_language:
+    ldr r0, ptr_ewram_base_080c5f54          @ 080c5f28 0a48
+    ldr r1, gsettings_offset_080c5f58        @ 080c5f2a 0b49
+    adds r0,r0,r1    @ 080c5f2c 4018
+    movs r1,#0x7    @ 080c5f2e 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5f30 0078
+    ands r1,r0    @ 080c5f32 0140
+    cmp r1,#0x1                              @ 080c5f34 0129
+    beq duel_action_label_defense_position_en @ 080c5f36 21d0
+    cmp r1,#0x2                              @ 080c5f38 0229
+    beq duel_action_label_defense_position_de @ 080c5f3a 1bd0
+    cmp r1,#0x3                              @ 080c5f3c 0329
+    beq duel_action_label_defense_position_fr @ 080c5f3e 15d0
+    cmp r1,#0x4                              @ 080c5f40 0429
+    beq duel_action_label_defense_position_it @ 080c5f42 0fd0
+    ldr r5, ptr_game_str_ja_0477_080c5f5c    @ 080c5f44 054d
+duel_action_label_test_es_0476_0477:
+    cmp r1,#0x5                              @ 080c5f46 0529
+    beq duel_action_label_es_delta_0476_0477 @ 080c5f48 00d0
+    b LAB_080c608a                           @ 080c5f4a 9ee0
+duel_action_label_es_delta_0476_0477:
+    ldr r3, duel_action_label_es_ja_delta_0476_0477_080c5f60 @ 080c5f4c 044b
+    adds r5,r5,r3    @ 080c5f4e ed18
+    b LAB_080c608a                           @ 080c5f50 9be0
+    .zero  0x2
+ptr_ewram_base_080c5f54:
+    .word  EWRAM_BASE                     @ 080c5f54 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5f58:
+    .word  GSETTINGS_OFFSET               @ 080c5f58 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0477_080c5f5c:
+    .word  game_str_ja_0477               @ 080c5f5c dae2db09  game_str_ja_0477: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0476_0477_080c5f60:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0476_0477 @ 080c5f60 a8aa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0476_0477: named scalar literal.
+duel_action_label_defense_position_it:
+    ldr r5, ptr_game_str_it_0477_080c5f68    @ 080c5f64 004d
+    b LAB_080c608a                           @ 080c5f66 90e0
+ptr_game_str_it_0477_080c5f68:
+    .word  game_str_it_0477               @ 080c5f68 a2d0de09  game_str_it_0477: add reviewed operand-0 DATA reference.
+duel_action_label_defense_position_fr:
+    ldr r5, ptr_game_str_fr_0477_080c5f70    @ 080c5f6c 004d
+    b LAB_080c608a                           @ 080c5f6e 8ce0
+ptr_game_str_fr_0477_080c5f70:
+    .word  game_str_fr_0477               @ 080c5f70 560cde09  game_str_fr_0477: add reviewed operand-0 DATA reference.
+duel_action_label_defense_position_de:
+    ldr r5, ptr_game_str_de_0477_080c5f78    @ 080c5f74 004d
+    b LAB_080c608a                           @ 080c5f76 88e0
+ptr_game_str_de_0477_080c5f78:
+    .word  game_str_de_0477               @ 080c5f78 c849dd09  game_str_de_0477: add reviewed operand-0 DATA reference.
+duel_action_label_defense_position_en:
+    ldr r5, ptr_game_str_en_0477_080c5f80    @ 080c5f7c 004d
+    b LAB_080c608a                           @ 080c5f7e 84e0
+ptr_game_str_en_0477_080c5f80:
+    .word  game_str_en_0477               @ 080c5f80 8a93dc09  game_str_en_0477: add reviewed operand-0 DATA reference.
+duel_action_label_surrender_select_language:
+    ldr r0, ptr_ewram_base_080c5fb0          @ 080c5f84 0a48
+    ldr r1, gsettings_offset_080c5fb4        @ 080c5f86 0b49
+    adds r0,r0,r1    @ 080c5f88 4018
+    movs r1,#0x7    @ 080c5f8a 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5f8c 0078
+    ands r1,r0    @ 080c5f8e 0140
+    cmp r1,#0x1                              @ 080c5f90 0129
+    beq duel_action_label_surrender_en       @ 080c5f92 21d0
+    cmp r1,#0x2                              @ 080c5f94 0229
+    beq duel_action_label_surrender_de       @ 080c5f96 1bd0
+    cmp r1,#0x3                              @ 080c5f98 0329
+    beq duel_action_label_surrender_fr       @ 080c5f9a 15d0
+    cmp r1,#0x4                              @ 080c5f9c 0429
+    beq duel_action_label_surrender_it       @ 080c5f9e 0fd0
+    ldr r5, ptr_game_str_ja_0485_080c5fb8    @ 080c5fa0 054d
+duel_action_label_test_es_0480_0481_0483_0485:
+    cmp r1,#0x5                              @ 080c5fa2 0529
+    beq duel_action_label_es_delta_0480_0481_0483_0485 @ 080c5fa4 00d0
+    b LAB_080c608a                           @ 080c5fa6 70e0
+duel_action_label_es_delta_0480_0481_0483_0485:
+    ldr r3, duel_action_label_es_ja_delta_0480_0481_0483_0485_080c5fbc @ 080c5fa8 044b
+    adds r5,r5,r3    @ 080c5faa ed18
+    b LAB_080c608a                           @ 080c5fac 6de0
+    .zero  0x2
+ptr_ewram_base_080c5fb0:
+    .word  EWRAM_BASE                     @ 080c5fb0 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c5fb4:
+    .word  GSETTINGS_OFFSET               @ 080c5fb4 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0485_080c5fb8:
+    .word  game_str_ja_0485               @ 080c5fb8 1ee3db09  game_str_ja_0485: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0480_0481_0483_0485_080c5fbc:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0480_0481_0483_0485 @ 080c5fbc b2aa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0480_0481_0483_0485: named scalar literal.
+duel_action_label_surrender_it:
+    ldr r5, ptr_game_str_it_0485_080c5fc4    @ 080c5fc0 004d
+    b LAB_080c608a                           @ 080c5fc2 62e0
+ptr_game_str_it_0485_080c5fc4:
+    .word  game_str_it_0485               @ 080c5fc4 00d1de09  game_str_it_0485: add reviewed operand-0 DATA reference.
+duel_action_label_surrender_fr:
+    ldr r5, ptr_game_str_fr_0485_080c5fcc    @ 080c5fc8 004d
+    b LAB_080c608a                           @ 080c5fca 5ee0
+ptr_game_str_fr_0485_080c5fcc:
+    .word  game_str_fr_0485               @ 080c5fcc a20cde09  game_str_fr_0485: add reviewed operand-0 DATA reference.
+duel_action_label_surrender_de:
+    ldr r5, ptr_game_str_de_0485_080c5fd4    @ 080c5fd0 004d
+    b LAB_080c608a                           @ 080c5fd2 5ae0
+ptr_game_str_de_0485_080c5fd4:
+    .word  game_str_de_0485               @ 080c5fd4 244add09  game_str_de_0485: add reviewed operand-0 DATA reference.
+duel_action_label_surrender_en:
+    ldr r5, ptr_game_str_en_0485_080c5fdc    @ 080c5fd8 004d
+    b LAB_080c608a                           @ 080c5fda 56e0
+ptr_game_str_en_0485_080c5fdc:
+    .word  game_str_en_0485               @ 080c5fdc ce93dc09  game_str_en_0485: add reviewed operand-0 DATA reference.
+duel_action_label_ok_select_language:
+    ldr r0, ptr_ewram_base_080c6008          @ 080c5fe0 0948
+    ldr r1, gsettings_offset_080c600c        @ 080c5fe2 0a49
+    adds r0,r0,r1    @ 080c5fe4 4018
+    movs r1,#0x7    @ 080c5fe6 0721
+    ldrb r0,[r0,#0x0]                        @ 080c5fe8 0078
+    ands r1,r0    @ 080c5fea 0140
+    cmp r1,#0x1                              @ 080c5fec 0129
+    beq duel_action_label_ok_en              @ 080c5fee 1fd0
+    cmp r1,#0x2                              @ 080c5ff0 0229
+    beq duel_action_label_ok_de              @ 080c5ff2 19d0
+    cmp r1,#0x3                              @ 080c5ff4 0329
+    beq duel_action_label_ok_fr              @ 080c5ff6 13d0
+    cmp r1,#0x4                              @ 080c5ff8 0429
+    beq duel_action_label_ok_it              @ 080c5ffa 0dd0
+    ldr r5, ptr_game_str_ja_0960_080c6010    @ 080c5ffc 044d
+    cmp r1,#0x5                              @ 080c5ffe 0529
+    bne LAB_080c608a                         @ 080c6000 43d1
+    ldr r3, duel_action_label_es_ja_delta_0960_080c6014 @ 080c6002 044b
+    adds r5,r5,r3    @ 080c6004 ed18
+    b LAB_080c608a                           @ 080c6006 40e0
+ptr_ewram_base_080c6008:
+    .word  EWRAM_BASE                     @ 080c6008 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c600c:
+    .word  GSETTINGS_OFFSET               @ 080c600c 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0960_080c6010:
+    .word  game_str_ja_0960               @ 080c6010 dc05dc09  game_str_ja_0960: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0960_080c6014:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0960 @ 080c6014 7eaa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0960: named scalar literal.
+duel_action_label_ok_it:
+    ldr r5, ptr_game_str_it_0960_080c601c    @ 080c6018 004d
+    b LAB_080c608a                           @ 080c601a 36e0
+ptr_game_str_it_0960_080c601c:
+    .word  game_str_it_0960               @ 080c601c d0f4de09  game_str_it_0960: add reviewed operand-0 DATA reference.
+duel_action_label_ok_fr:
+    ldr r5, ptr_game_str_fr_0960_080c6024    @ 080c6020 004d
+    b LAB_080c608a                           @ 080c6022 32e0
+ptr_game_str_fr_0960_080c6024:
+    .word  game_str_fr_0960               @ 080c6024 0630de09  game_str_fr_0960: add reviewed operand-0 DATA reference.
+duel_action_label_ok_de:
+    ldr r5, ptr_game_str_de_0960_080c602c    @ 080c6028 004d
+    b LAB_080c608a                           @ 080c602a 2ee0
+ptr_game_str_de_0960_080c602c:
+    .word  game_str_de_0960               @ 080c602c 9e6cdd09  game_str_de_0960: add reviewed operand-0 DATA reference.
+duel_action_label_ok_en:
+    ldr r5, ptr_game_str_en_0960_080c6034    @ 080c6030 004d
+    b LAB_080c608a                           @ 080c6032 2ae0
+ptr_game_str_en_0960_080c6034:
+    .word  game_str_en_0960               @ 080c6034 80b2dc09  game_str_en_0960: add reviewed operand-0 DATA reference.
+duel_action_label_draw_select_language:
+    ldr r0, ptr_ewram_base_080c6060          @ 080c6038 0948
+    ldr r1, gsettings_offset_080c6064        @ 080c603a 0a49
+    adds r0,r0,r1    @ 080c603c 4018
+    movs r1,#0x7    @ 080c603e 0721
+    ldrb r0,[r0,#0x0]                        @ 080c6040 0078
+    ands r1,r0    @ 080c6042 0140
+    cmp r1,#0x1                              @ 080c6044 0129
+    beq duel_action_label_draw_en            @ 080c6046 1fd0
+    cmp r1,#0x2                              @ 080c6048 0229
+    beq duel_action_label_draw_de            @ 080c604a 19d0
+    cmp r1,#0x3                              @ 080c604c 0329
+    beq duel_action_label_draw_fr            @ 080c604e 13d0
+    cmp r1,#0x4                              @ 080c6050 0429
+    beq duel_action_label_draw_it            @ 080c6052 0dd0
+    ldr r5, ptr_game_str_ja_0484_080c6068    @ 080c6054 044d
+duel_action_label_test_es_0482_0484:
+    cmp r1,#0x5                              @ 080c6056 0529
+    bne LAB_080c608a                         @ 080c6058 17d1
+    ldr r3, duel_action_label_es_ja_delta_0482_0484_080c606c @ 080c605a 044b
+    adds r5,r5,r3    @ 080c605c ed18
+    b LAB_080c608a                           @ 080c605e 14e0
+ptr_ewram_base_080c6060:
+    .word  EWRAM_BASE                     @ 080c6060 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c6064:
+    .word  GSETTINGS_OFFSET               @ 080c6064 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_game_str_ja_0484_080c6068:
+    .word  game_str_ja_0484               @ 080c6068 16e3db09  game_str_ja_0484: add reviewed operand-0 DATA reference.
+duel_action_label_es_ja_delta_0482_0484_080c606c:
+    .word  DUEL_ACTION_LABEL_ES_JA_DELTA_0482_0484 @ 080c606c b4aa0300  DUEL_ACTION_LABEL_ES_JA_DELTA_0482_0484: named scalar literal.
+duel_action_label_draw_it:
+    ldr r5, ptr_game_str_it_0484_080c6074    @ 080c6070 004d
+    b LAB_080c608a                           @ 080c6072 0ae0
+ptr_game_str_it_0484_080c6074:
+    .word  game_str_it_0484               @ 080c6074 f4d0de09  game_str_it_0484: add reviewed operand-0 DATA reference.
+duel_action_label_draw_fr:
+    ldr r5, ptr_game_str_fr_0484_080c607c    @ 080c6078 004d
+    b LAB_080c608a                           @ 080c607a 06e0
+ptr_game_str_fr_0484_080c607c:
+    .word  game_str_fr_0484               @ 080c607c 9c0cde09  game_str_fr_0484: add reviewed operand-0 DATA reference.
+duel_action_label_draw_de:
+    ldr r5, ptr_game_str_de_0484_080c6084    @ 080c6080 004d
+    b LAB_080c608a                           @ 080c6082 02e0
+ptr_game_str_de_0484_080c6084:
+    .word  game_str_de_0484               @ 080c6084 1c4add09  game_str_de_0484: add reviewed operand-0 DATA reference.
+duel_action_label_draw_en:
+    ldr r5, ptr_game_str_en_0484_080c60f4    @ 080c6088 1a4d
 LAB_080c608a:
     adds r0,r5,#0x0    @ 080c608a 281c
     bl measure_string_pixel_width            @ 080c608c 2af0f2f8
     adds r3,r0,#0x0    @ 080c6090 031c
     adds r2,r3,#0x4    @ 080c6092 1a1d
-    ldr r1, DWORD_080c60f8                   @ 080c6094 1849
-    ldr r0, DWORD_080c60fc                   @ 080c6096 1948
+    ldr r1, ptr_ewram_base_080c60f8          @ 080c6094 1849
+    ldr r0, gsettings_offset_080c60fc        @ 080c6096 1948
     adds r1,r1,r0    @ 080c6098 0918
     movs r0,#0x7    @ 080c609a 0720
     ldrb r1,[r1,#0x0]                        @ 080c609c 0978
@@ -9478,7 +10102,7 @@ LAB_080c608a:
     beq LAB_080c60a6                         @ 080c60a2 00d0
     adds r2,r3,#0x6    @ 080c60a4 9a1d
 LAB_080c60a6:
-    ldr r1, DWORD_080c6100                   @ 080c60a6 1649
+    ldr r1, ptr_g_card_ctx_slot_data_080c6100 @ 080c60a6 1649
     ldrh r0,[r1,#0x26]                       @ 080c60a8 c88c
     adds r0,#0x1    @ 080c60aa 0130
     strh r0,[r1,#0x26]                       @ 080c60ac c884
@@ -9512,26 +10136,27 @@ LAB_080c60b6:
     bge LAB_080c612a                         @ 080c60e2 22da
     subs r0,r4,#0x1    @ 080c60e4 601e
     .hword 0x4680    @ 080c60e6 8046
-    ldr r6, DWORD_080c6104                   @ 080c60e8 064e
+    ldr r6, ptr_obj_tile_vram_base_080c6104  @ 080c60e8 064e
     add r6,r9                                @ 080c60ea 4e44
 LAB_080c60ec:
     cmp r7,#0x0                              @ 080c60ec 002f
     bne LAB_080c610c                         @ 080c60ee 0dd1
-    ldr r1, DWORD_080c6108                   @ 080c60f0 0549
+    ldr r1, ptr_duel_action_menu_row_frame_left_tiles_080c6108 @ 080c60f0 0549
     b LAB_080c6114                           @ 080c60f2 0fe0
-    .byte  0xc8, 0x93, 0xdc, 0x09
-DWORD_080c60f8:
-    .word  0x02000000                     @ 080c60f8 00000002
-DWORD_080c60fc:
-    .word  0x00006c2c                     @ 080c60fc 2c6c0000
-DWORD_080c6100:
-    .word  0x0201ff30                     @ 080c6100 30ff0102
-DWORD_080c6104:
-    .word  0x06010000                     @ 080c6104 00000106
-DWORD_080c6108:
-    .word  0x098532bc                     @ 080c6108 bc328509
+ptr_game_str_en_0484_080c60f4:
+    .word  game_str_en_0484               @ 080c60f4 c893dc09  game_str_en_0484: add reviewed operand-0 DATA reference.
+ptr_ewram_base_080c60f8:
+    .word  EWRAM_BASE                     @ 080c60f8 00000002  EWRAM_BASE: add reviewed operand-0 DATA reference.
+gsettings_offset_080c60fc:
+    .word  GSETTINGS_OFFSET               @ 080c60fc 2c6c0000  GSETTINGS_OFFSET: named scalar literal.
+ptr_g_card_ctx_slot_data_080c6100:
+    .word  gCardCtxSlotData               @ 080c6100 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_obj_tile_vram_base_080c6104:
+    .word  OBJ_TILE_VRAM_BASE                     @ 080c6104 00000106  OBJ_TILE_VRAM_BASE: add reviewed operand-0 DATA reference.
+ptr_duel_action_menu_row_frame_left_tiles_080c6108:
+    .word  duel_action_menu_row_frame_left_tiles @ 080c6108 bc328509  duel_action_menu_row_frame_left_tiles: add reviewed operand-0 DATA reference.
 LAB_080c610c:
-    ldr r1, DWORD_080c6178                   @ 080c610c 1a49
+    ldr r1, ptr_duel_action_menu_row_frame_middle_tiles_080c6178 @ 080c610c 1a49
     cmp r7,r8                                @ 080c610e 4745
     bne LAB_080c6114                         @ 080c6110 00d1
     adds r1,#0x20    @ 080c6112 2031
@@ -9552,7 +10177,7 @@ LAB_080c612a:
     bl setup_line_buf_pos_and_font           @ 080c612e 2af041fd
     .hword 0x4654    @ 080c6132 5446
     adds r4,#0x2    @ 080c6134 0234
-    ldr r2, DWORD_080c617c                   @ 080c6136 114a
+    ldr r2, card_desc_render_param_080c617c  @ 080c6136 114a
     adds r0,r4,#0x0    @ 080c6138 201c
     movs r1,#0x3    @ 080c613a 0321
     adds r3,r5,#0x0    @ 080c613c 2b1c
@@ -9562,7 +10187,7 @@ LAB_080c612a:
     movs r2,#0x7    @ 080c6146 0722
     adds r3,r5,#0x0    @ 080c6148 2b1c
     bl text_render_wrapper                   @ 080c614a 2cf097fc
-    ldr r0, DWORD_080c6180                   @ 080c614e 0c48
+    ldr r0, ptr_obj_tile_vram_base_080c6180  @ 080c614e 0c48
     add r0,r9                                @ 080c6150 4844
     movs r1,#0x0    @ 080c6152 0021
     bl write_line_buf_to_bg_tile_vram        @ 080c6154 2df03efb
@@ -9584,39 +10209,39 @@ LAB_080c6168:
     pop {r4,r5,r6,r7}                        @ 080c6172 f0bc
     pop {r0}                                 @ 080c6174 01bc
     bx r0                                    @ 080c6176 0047
-DWORD_080c6178:
-    .word  0x098532dc                     @ 080c6178 dc328509
-DWORD_080c617c:
-    .word  0x00008008                     @ 080c617c 08800000
-DWORD_080c6180:
-    .word  0x06010000                     @ 080c6180 00000106
+ptr_duel_action_menu_row_frame_middle_tiles_080c6178:
+    .word  duel_action_menu_row_frame_middle_tiles @ 080c6178 dc328509  duel_action_menu_row_frame_middle_tiles: add reviewed operand-0 DATA reference.
+card_desc_render_param_080c617c:
+    .word  CARD_DESC_RENDER_PARAM         @ 080c617c 08800000  CARD_DESC_RENDER_PARAM: named scalar literal.
+ptr_obj_tile_vram_base_080c6180:
+    .word  OBJ_TILE_VRAM_BASE                     @ 080c6180 00000106  OBJ_TILE_VRAM_BASE: add reviewed operand-0 DATA reference.
 
-@ Initialize card sprite VRAM for a duel field slot: copies tile data to VRAM 0x06013800 via write_tile_rows_to_vram_by_mode, copies palettes to PAL VRAM 0x05000280 and 0x050002a0, calls dispatch_duel_field_zone_oam_by_type to configure OAM, updates slot_phase counter at ctx+0x2a. r0=u16 player_id [0..1]. Returns void. Side-effects: OBJ VRAM 0x06013800, PAL VRAM 0x05000280/0x050002a0, OAM updated. Constants: VRAM_CARD_SPRITE=0x06013800, PAL_A=0x05000280, PAL_B=0x050002a0.
-init_duel_field_card_sprite_vram:
+@ Initialize action-menu graphics: copy 28 by 2 tiles from duel_action_menu_oam_tiles to VIJA_INTRO_TILE_VRAM, then 32 bytes each of panel/shared palettes to OBJ palette banks 4/5. Render localized labels. Update the ctx+8 selected-index nibble to an active ctx+4 bit, optionally advancing first according to field+0x21e bit 1. Return 1. Phase 0 handler; no player argument is read.
+init_duel_action_menu_vram:
     push {r4,r5,r6,r7,lr}                    @ 080c6184 f0b5
-    ldr r0, DWORD_080c621c                   @ 080c6186 2548
-    ldr r1, DWORD_080c6220                   @ 080c6188 2549
+    ldr r0, ptr_vija_intro_tile_vram_080c621c @ 080c6186 2548
+    ldr r1, ptr_duel_action_menu_oam_tiles_080c6220 @ 080c6188 2549
     movs r2,#0x1c    @ 080c618a 1c22
     movs r3,#0x2    @ 080c618c 0223
     bl tile_2d_row_copy                      @ 080c618e 31f0a1f9
-    ldr r0, DWORD_080c6224                   @ 080c6192 2448
-    ldr r1, DWORD_080c6228                   @ 080c6194 2449
+    ldr r0, ptr_obj_palram_slot_4_080c6224   @ 080c6192 2448
+    ldr r1, ptr_duel_field_panel_obj_palette_080c6228 @ 080c6194 2449
     movs r2,#0x20    @ 080c6196 2022
     bl copy_bytes_by_halfword                @ 080c6198 2ef084fe
-    ldr r0, DWORD_080c622c                   @ 080c619c 2348
-    ldr r1, DWORD_080c6230                   @ 080c619e 2449
+    ldr r0, ptr_obj_palram_slot_5_080c622c   @ 080c619c 2348
+    ldr r1, ptr_duel_field_shared_obj_palette_080c6230 @ 080c619e 2449
     movs r2,#0x20    @ 080c61a0 2022
     bl copy_bytes_by_halfword                @ 080c61a2 2ef07ffe
-    bl dispatch_duel_field_zone_oam_by_type  @ 080c61a6 fff7e7fc
-    ldr r1, DWORD_080c6234                   @ 080c61aa 2249
-    ldr r0, DWORD_080c6238                   @ 080c61ac 2248
+    bl render_duel_action_menu_labels        @ 080c61a6 fff7e7fc
+    ldr r1, ptr_g_duel_field_state_080c6234  @ 080c61aa 2249
+    ldr r0, duel_field_fadein_flag_off_080c6238 @ 080c61ac 2248
     adds r1,r1,r0    @ 080c61ae 0918
     movs r0,#0x2    @ 080c61b0 0220
     ldrb r1,[r1,#0x0]                        @ 080c61b2 0978
     ands r0,r1    @ 080c61b4 0840
     cmp r0,#0x0                              @ 080c61b6 0028
     beq LAB_080c61d2                         @ 080c61b8 0bd0
-    ldr r3, DWORD_080c623c                   @ 080c61ba 204b
+    ldr r3, ptr_g_card_ctx_slot_data_080c623c @ 080c61ba 204b
     ldrb r2,[r3,#0x8]                        @ 080c61bc 1a7a
     lsls r1,r2,#0x1c    @ 080c61be 1107
     lsrs r1,r1,#0x1c    @ 080c61c0 090f
@@ -9629,7 +10254,7 @@ init_duel_field_card_sprite_vram:
     orrs r0,r1    @ 080c61ce 0843
     strb r0,[r3,#0x8]                        @ 080c61d0 1872
 LAB_080c61d2:
-    ldr r2, DWORD_080c623c                   @ 080c61d2 1a4a
+    ldr r2, ptr_g_card_ctx_slot_data_080c623c @ 080c61d2 1a4a
     ldrb r3,[r2,#0x8]                        @ 080c61d4 137a
     lsls r1,r3,#0x1c    @ 080c61d6 1907
     lsrs r1,r1,#0x1c    @ 080c61d8 090f
@@ -9668,30 +10293,30 @@ LAB_080c6214:
     pop {r4,r5,r6,r7}                        @ 080c6216 f0bc
     pop {r1}                                 @ 080c6218 02bc
     bx r1                                    @ 080c621a 0847
-DWORD_080c621c:
-    .word  0x06013800                     @ 080c621c 00380106
-DWORD_080c6220:
-    .word  0x09852b9c                     @ 080c6220 9c2b8509
-DWORD_080c6224:
-    .word  0x05000280                     @ 080c6224 80020005
-DWORD_080c6228:
-    .word  0x0985329c                     @ 080c6228 9c328509
-DWORD_080c622c:
-    .word  0x050002a0                     @ 080c622c a0020005
-DWORD_080c6230:
-    .word  0x09850c5c                     @ 080c6230 5c0c8509
-DWORD_080c6234:
-    .word  0x02023130                     @ 080c6234 30310202
-DWORD_080c6238:
-    .word  0x0000021e                     @ 080c6238 1e020000
-DWORD_080c623c:
-    .word  0x0201ff30                     @ 080c623c 30ff0102
+ptr_vija_intro_tile_vram_080c621c:
+    .word  VIJA_INTRO_TILE_VRAM                     @ 080c621c 00380106  VIJA_INTRO_TILE_VRAM: add reviewed operand-0 DATA reference.
+ptr_duel_action_menu_oam_tiles_080c6220:
+    .word  duel_action_menu_oam_tiles     @ 080c6220 9c2b8509  duel_action_menu_oam_tiles: add reviewed operand-0 DATA reference.
+ptr_obj_palram_slot_4_080c6224:
+    .word  OBJ_PALRAM_SLOT_4                     @ 080c6224 80020005  OBJ_PALRAM_SLOT_4: add reviewed operand-0 DATA reference.
+ptr_duel_field_panel_obj_palette_080c6228:
+    .word  duel_field_panel_obj_palette   @ 080c6228 9c328509  duel_field_panel_obj_palette: add reviewed operand-0 DATA reference.
+ptr_obj_palram_slot_5_080c622c:
+    .word  OBJ_PALRAM_SLOT_5                     @ 080c622c a0020005  OBJ_PALRAM_SLOT_5: add reviewed operand-0 DATA reference.
+ptr_duel_field_shared_obj_palette_080c6230:
+    .word  duel_field_shared_obj_palette  @ 080c6230 5c0c8509  duel_field_shared_obj_palette: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c6234:
+    .word  gDuelFieldState                @ 080c6234 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_fadein_flag_off_080c6238:
+    .word  DUEL_FIELD_FADEIN_FLAG_OFF     @ 080c6238 1e020000  DUEL_FIELD_FADEIN_FLAG_OFF: named scalar literal.
+ptr_g_card_ctx_slot_data_080c623c:
+    .word  gCardCtxSlotData               @ 080c623c 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 
-@ Call compute_card_sprite_oam_coords_by_zone, increment ctx+0x2a counter, return 1 if counter>3 (done) else 0 (continue). void input. Caller: FUN_080c65b0.
-tick_card_sprite_oam_step_a:
+@ Opening action-menu step. Render menu OAM, increment the u8 animation step at ctx+0x2a, and return 1 if the updated byte exceeds 3; otherwise return 0. Phase 1 handler. Global state input; no APCS parameters. The state-machine driver resets the step when advancing phases.
+tick_duel_action_menu_open_step:
     push {lr}                                @ 080c6240 00b5
-    bl compute_card_sprite_oam_coords_by_zone @ 080c6242 fff7bffa
-    ldr r1, DWORD_080c625c                   @ 080c6246 0549
+    bl render_duel_action_menu_oam           @ 080c6242 fff7bffa
+    ldr r1, ptr_g_card_ctx_slot_data_080c625c @ 080c6246 0549
     adds r1,#0x2a    @ 080c6248 2a31
     ldrb r0,[r1,#0x0]                        @ 080c624a 0878
     adds r0,#0x1    @ 080c624c 0130
@@ -9702,8 +10327,8 @@ tick_card_sprite_oam_step_a:
     bhi LAB_080c6260                         @ 080c6256 03d8
     movs r0,#0x0    @ 080c6258 0020
     b LAB_080c6262                           @ 080c625a 02e0
-DWORD_080c625c:
-    .word  0x0201ff30                     @ 080c625c 30ff0102
+ptr_g_card_ctx_slot_data_080c625c:
+    .word  gCardCtxSlotData               @ 080c625c 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c6260:
     movs r0,#0x1    @ 080c6260 0120
 LAB_080c6262:
@@ -9711,15 +10336,15 @@ LAB_080c6262:
     bx r1                                    @ 080c6264 0847
     .zero  0x2
 
-@ OAM animation second step for duel field card sprite. Reads gPrng+0x210 packed halfword; extracts player_flag (bit15), x_coord (bits[14:8]), y_coord (bits[6:0]); writes OAM entry. r0=void. Returns void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). Constants: gPrng_oam_word=gPrng+0x210, player_flag_bit=15, x_bits=[14:8], y_bits=[6:0].
-tick_card_sprite_oam_step_b:
+@ Handle action-menu input after rendering its OAM. Decode player bit 7, zone bits 6:0 and index bits 14:8 from field+0x210. Field+0x222 bits 0xc complete this step. Navigation bits 0x20/0x10 scan previous/next active menu entries. Confirmation prepares target-slot refs with selection-1. Selection 0 instead sets phase 4; the driver increments it to 5 for close-and-card-info phases. Return 0 while active or 1 on completion.
+tick_duel_action_menu_input_step:
     push {r4,r5,r6,r7,lr}                    @ 080c6268 f0b5
     .hword 0x4657    @ 080c626a 5746
     .hword 0x464e    @ 080c626c 4e46
     .hword 0x4645    @ 080c626e 4546
     push {r5,r6,r7}                          @ 080c6270 e0b4
     sub sp,#0x4                              @ 080c6272 81b0
-    ldr r4, DWORD_080c62b0                   @ 080c6274 0e4c
+    ldr r4, ptr_g_duel_field_state_080c62b0  @ 080c6274 0e4c
     movs r1,#0x84    @ 080c6276 8421
     lsls r1,r1,#0x2    @ 080c6278 8900
     adds r0,r4,r1    @ 080c627a 6018
@@ -9738,8 +10363,8 @@ tick_card_sprite_oam_step_b:
     movs r0,#0x7f    @ 080c6294 7f20
     ands r2,r0    @ 080c6296 0240
     .hword 0x4691    @ 080c6298 9146
-    bl compute_card_sprite_oam_coords_by_zone @ 080c629a fff793fa
-    ldr r0, DWORD_080c62b4                   @ 080c629e 0548
+    bl render_duel_action_menu_oam           @ 080c629a fff793fa
+    ldr r0, duel_field_prng_anim_flag_off_080c62b4 @ 080c629e 0548
     adds r4,r4,r0    @ 080c62a0 2418
     movs r0,#0xc    @ 080c62a2 0c20
     ldrb r4,[r4,#0x0]                        @ 080c62a4 2478
@@ -9748,12 +10373,12 @@ tick_card_sprite_oam_step_b:
     beq LAB_080c62b8                         @ 080c62aa 05d0
     movs r0,#0x1    @ 080c62ac 0120
     b LAB_080c647e                           @ 080c62ae e6e0
-DWORD_080c62b0:
-    .word  0x02023130                     @ 080c62b0 30310202
-DWORD_080c62b4:
-    .word  0x00000222                     @ 080c62b4 22020000
+ptr_g_duel_field_state_080c62b0:
+    .word  gDuelFieldState                @ 080c62b0 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_prng_anim_flag_off_080c62b4:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 080c62b4 22020000  DUEL_FIELD_PRNG_ANIM_FLAG_OFF: named scalar literal.
 LAB_080c62b8:
-    ldr r2, DWORD_080c6360                   @ 080c62b8 294a
+    ldr r2, ptr_g_prng_080c6360              @ 080c62b8 294a
     movs r0,#0xa4    @ 080c62ba a420
     lsls r0,r0,#0x1    @ 080c62bc 4000
     adds r1,r2,r0    @ 080c62be 1118
@@ -9763,7 +10388,7 @@ LAB_080c62b8:
     str r2,[sp,#0x0]                         @ 080c62c6 0092
     cmp r0,#0x0                              @ 080c62c8 0028
     beq LAB_080c62fc                         @ 080c62ca 17d0
-    ldr r4, DWORD_080c6364                   @ 080c62cc 254c
+    ldr r4, ptr_g_card_ctx_slot_data_080c6364 @ 080c62cc 254c
     movs r1,#0xf    @ 080c62ce 0f21
     .hword 0x468c    @ 080c62d0 8c46
     movs r2,#0x10    @ 080c62d2 1022
@@ -9798,7 +10423,7 @@ LAB_080c62fc:
     ands r0,r1    @ 080c6308 0840
     cmp r0,#0x0                              @ 080c630a 0028
     beq LAB_080c633e                         @ 080c630c 17d0
-    ldr r4, DWORD_080c6364                   @ 080c630e 154c
+    ldr r4, ptr_g_card_ctx_slot_data_080c6364 @ 080c630e 154c
     movs r1,#0xf    @ 080c6310 0f21
     .hword 0x4688    @ 080c6312 8846
     movs r2,#0x10    @ 080c6314 1022
@@ -9833,7 +10458,7 @@ LAB_080c633e:
     ands r0,r1    @ 080c634a 0840
     cmp r0,#0x0                              @ 080c634c 0028
     beq LAB_080c6368                         @ 080c634e 0bd0
-    ldr r1, DWORD_080c6364                   @ 080c6350 0449
+    ldr r1, ptr_g_card_ctx_slot_data_080c6364 @ 080c6350 0449
     movs r0,#0x4    @ 080c6352 0420
     ldrb r2,[r1,#0x0]                        @ 080c6354 0a78
     orrs r0,r2    @ 080c6356 1043
@@ -9841,10 +10466,10 @@ LAB_080c633e:
     movs r0,#0x1    @ 080c635a 0120
     b LAB_080c646c                           @ 080c635c 86e0
     .zero  0x2
-DWORD_080c6360:
-    .word  gPrng                          @ 080c6360 40000003
-DWORD_080c6364:
-    .word  0x0201ff30                     @ 080c6364 30ff0102
+ptr_g_prng_080c6360:
+    .word  gPrng                          @ 080c6360 40000003  gPrng: preserve existing operand-0 DATA reference.
+ptr_g_card_ctx_slot_data_080c6364:
+    .word  gCardCtxSlotData               @ 080c6364 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c6368:
     movs r0,#0x1    @ 080c6368 0120
     ands r0,r1    @ 080c636a 0840
@@ -9857,7 +10482,7 @@ LAB_080c6368:
     bne LAB_080c637c                         @ 080c6378 00d1
     b LAB_080c647c                           @ 080c637a 7fe0
 LAB_080c637c:
-    ldr r0, DWORD_080c6398                   @ 080c637c 0648
+    ldr r0, ptr_g_card_ctx_slot_data_080c6398 @ 080c637c 0648
     ldrb r0,[r0,#0x8]                        @ 080c637e 007a
     lsls r0,r0,#0x1c    @ 080c6380 0007
     lsrs r0,r0,#0x1c    @ 080c6382 000f
@@ -9868,40 +10493,101 @@ LAB_080c638a:
     cmp r6,#0xf                              @ 080c638a 0f2e
     bhi LAB_080c6456                         @ 080c638c 63d8
     lsls r0,r6,#0x2    @ 080c638e b000
-    ldr r1, DWORD_080c639c                   @ 080c6390 0249
+    ldr r1, ptr_duel_action_menu_selection_case_table_080c639c @ 080c6390 0249
     adds r0,r0,r1    @ 080c6392 4018
     ldr r0,[r0,#0x0]                         @ 080c6394 0068
     .hword 0x4687    @ 080c6396 8746
-DWORD_080c6398:
-    .word  0x0201ff30                     @ 080c6398 30ff0102
-DWORD_080c639c:
-    .word  0x080c63a0                     @ 080c639c a0630c08
-    .word  0x080c63e0                     @ 080c63a0 e0630c08
+ptr_g_card_ctx_slot_data_080c6398:
+    .word  gCardCtxSlotData               @ 080c6398 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_duel_action_menu_selection_case_table_080c639c:
+    .word  duel_action_menu_selection_case_table @ 080c639c a0630c08  duel_action_menu_selection_case_table: add reviewed operand-0 DATA reference.
+duel_action_menu_selection_case_table:
+    .word  duel_action_menu_prepare_field_target @ 080c63a0 e0630c08
     .word  0x080c6456                     @ 080c63a4 56640c08
     .word  0x080c6456                     @ 080c63a8 56640c08
     .word  0x080c6456                     @ 080c63ac 56640c08
     .word  0x080c6456                     @ 080c63b0 56640c08
-    .word  0x080c63e0                     @ 080c63b4 e0630c08
+    .word  duel_action_menu_prepare_field_target @ 080c63b4 e0630c08
     .word  0x080c6456                     @ 080c63b8 56640c08
     .word  0x080c6456                     @ 080c63bc 56640c08
     .word  0x080c6456                     @ 080c63c0 56640c08
     .word  0x080c6456                     @ 080c63c4 56640c08
-    .word  0x080c63e0                     @ 080c63c8 e0630c08
-    .word  0x080c641c                     @ 080c63cc 1c640c08
-    .word  0x080c6400                     @ 080c63d0 00640c08
-    .word  0x080c6400                     @ 080c63d4 00640c08
-    .word  0x080c6400                     @ 080c63d8 00640c08
-    .word  0x080c6400                     @ 080c63dc 00640c08
-DAT_080c63e0:
-    ROM_INCBIN 0xc63e0, 0x76
+    .word  duel_action_menu_prepare_field_target @ 080c63c8 e0630c08
+    .word  duel_action_menu_prepare_hand_target @ 080c63cc 1c640c08
+    .word  duel_action_menu_prepare_special_zone_target @ 080c63d0 00640c08
+    .word  duel_action_menu_prepare_special_zone_target @ 080c63d4 00640c08
+    .word  duel_action_menu_prepare_special_zone_target @ 080c63d8 00640c08
+    .word  duel_action_menu_prepare_special_zone_target @ 080c63dc 00640c08
+duel_action_menu_prepare_field_target:
+    ldr r1, ptr_g_card_ctx_slot_data_080c63fc @ 080c63e0 0649
+    ldrb r3,[r1,#0x8]                        @ 080c63e2 0b7a
+    movs r0,#0xf    @ 080c63e4 0f20
+    ands r0,r3    @ 080c63e6 1840
+    cmp r0,#0x0                              @ 080c63e8 0028
+    beq duel_action_menu_route_card_info     @ 080c63ea 31d0
+    .hword 0x4648    @ 080c63ec 4846
+    adds r1,r6,r0    @ 080c63ee 3118
+    lsls r3,r3,#0x1c    @ 080c63f0 1b07
+    lsrs r3,r3,#0x1c    @ 080c63f2 1b0f
+    subs r3,#0x1    @ 080c63f4 013b
+    .hword 0x4650    @ 080c63f6 5046
+    b duel_action_menu_commit_target_refs    @ 080c63f8 09e0
+    .zero  0x2
+ptr_g_card_ctx_slot_data_080c63fc:
+    .word  gCardCtxSlotData               @ 080c63fc 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+duel_action_menu_prepare_special_zone_target:
+    ldr r0, ptr_g_card_ctx_slot_data_080c6418 @ 080c6400 0548
+    ldrb r0,[r0,#0x8]                        @ 080c6402 007a
+    lsls r3,r0,#0x1c    @ 080c6404 0307
+    lsrs r3,r3,#0x1c    @ 080c6406 1b0f
+    subs r3,#0x1    @ 080c6408 013b
+    .hword 0x4650    @ 080c640a 5046
+    adds r1,r6,#0x0    @ 080c640c 311c
+duel_action_menu_commit_target_refs:
+    movs r2,#0x0    @ 080c640e 0022
+    bl init_duel_zone_target_slot_refs       @ 080c6410 d0f700fd
+    b LAB_080c6456                           @ 080c6414 1fe0
+    .zero  0x2
+ptr_g_card_ctx_slot_data_080c6418:
+    .word  gCardCtxSlotData               @ 080c6418 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+duel_action_menu_prepare_hand_target:
+    ldr r1, ptr_g_card_ctx_slot_data_080c6448 @ 080c641c 0a49
+    ldrb r3,[r1,#0x8]                        @ 080c641e 0b7a
+    movs r0,#0xf    @ 080c6420 0f20
+    ands r0,r3    @ 080c6422 1840
+    cmp r0,#0x0                              @ 080c6424 0028
+    beq duel_action_menu_route_card_info     @ 080c6426 13d0
+    ldr r0, ptr_g_duel_field_state_080c644c  @ 080c6428 0848
+    .hword 0x4652    @ 080c642a 5246
+    lsls r1,r2,#0x1    @ 080c642c 5100
+    adds r0,#0x4c    @ 080c642e 4c30
+    adds r1,r1,r0    @ 080c6430 0918
+    ldrh r2,[r1,#0x0]                        @ 080c6432 0a88
+    add r2,r9                                @ 080c6434 4a44
+    lsls r3,r3,#0x1c    @ 080c6436 1b07
+    lsrs r3,r3,#0x1c    @ 080c6438 1b0f
+    subs r3,#0x1    @ 080c643a 013b
+    .hword 0x4650    @ 080c643c 5046
+    adds r1,r6,#0x0    @ 080c643e 311c
+    bl init_duel_zone_target_slot_refs       @ 080c6440 d0f7e8fc
+    b LAB_080c6456                           @ 080c6444 07e0
+    .zero  0x2
+ptr_g_card_ctx_slot_data_080c6448:
+    .word  gCardCtxSlotData               @ 080c6448 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c644c:
+    .word  gDuelFieldState                @ 080c644c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_action_menu_route_card_info:
+    adds r1,#0x28    @ 080c6450 2831
+    movs r0,#0x4    @ 080c6452 0420
+    strb r0,[r1,#0x0]                        @ 080c6454 0870
 LAB_080c6456:
-    ldr r0, DWORD_080c6474                   @ 080c6456 0748
+    ldr r0, ptr_g_card_ctx_slot_data_080c6474 @ 080c6456 0748
     ldrb r0,[r0,#0x8]                        @ 080c6458 007a
     lsls r0,r0,#0x1c    @ 080c645a 0007
     lsrs r0,r0,#0x1c    @ 080c645c 000f
     cmp r0,#0xc                              @ 080c645e 0c28
     bne LAB_080c646a                         @ 080c6460 03d1
-    ldr r1, DWORD_080c6478                   @ 080c6462 0549
+    ldr r1, ptr_g_duel_zone_activation_state_080c6478 @ 080c6462 0549
     movs r0,#0x0    @ 080c6464 0020
     str r0,[r1,#0x30]                        @ 080c6466 0863
     str r0,[r1,#0x34]                        @ 080c6468 4863
@@ -9911,10 +10597,10 @@ LAB_080c646c:
     bl sync_state_and_init_sprite            @ 080c646c 33f022fb
     movs r0,#0x1    @ 080c6470 0120
     b LAB_080c647e                           @ 080c6472 04e0
-DWORD_080c6474:
-    .word  0x0201ff30                     @ 080c6474 30ff0102
-DWORD_080c6478:
-    .word  0x020230c0                     @ 080c6478 c0300202
+ptr_g_card_ctx_slot_data_080c6474:
+    .word  gCardCtxSlotData               @ 080c6474 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
+ptr_g_duel_zone_activation_state_080c6478:
+    .word  gDuelZoneActivationState       @ 080c6478 c0300202  gDuelZoneActivationState: add reviewed operand-0 DATA reference.
 LAB_080c647c:
     movs r0,#0x0    @ 080c647c 0020
 LAB_080c647e:
@@ -9928,11 +10614,11 @@ LAB_080c647e:
     bx r1                                    @ 080c648c 0847
     .zero  0x2
 
-@ OAM animation third step for duel field card sprite; symmetric to tick_card_sprite_oam_step_a. Increments ctx+0x2a step counter; returns 1 when counter > 3 (done), else 0 (continue). r0=void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). Constants: step_done_threshold=3.
-tick_card_sprite_oam_step_c:
+@ Closing action-menu step used at phases 3 and 5. Render menu OAM, increment the u8 step at ctx+0x2a, and return 1 if the updated byte exceeds 3; otherwise return 0. The operation sequence matches the opening step with relocated operands; the renderer chooses closing geometry from the phase.
+tick_duel_action_menu_close_step:
     push {lr}                                @ 080c6490 00b5
-    bl compute_card_sprite_oam_coords_by_zone @ 080c6492 fff797f9
-    ldr r1, DWORD_080c64ac                   @ 080c6496 0549
+    bl render_duel_action_menu_oam           @ 080c6492 fff797f9
+    ldr r1, ptr_g_card_ctx_slot_data_080c64ac @ 080c6496 0549
     adds r1,#0x2a    @ 080c6498 2a31
     ldrb r0,[r1,#0x0]                        @ 080c649a 0878
     adds r0,#0x1    @ 080c649c 0130
@@ -9943,8 +10629,8 @@ tick_card_sprite_oam_step_c:
     bhi LAB_080c64b0                         @ 080c64a6 03d8
     movs r0,#0x0    @ 080c64a8 0020
     b LAB_080c64b2                           @ 080c64aa 02e0
-DWORD_080c64ac:
-    .word  0x0201ff30                     @ 080c64ac 30ff0102
+ptr_g_card_ctx_slot_data_080c64ac:
+    .word  gCardCtxSlotData               @ 080c64ac 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c64b0:
     movs r0,#0x1    @ 080c64b0 0120
 LAB_080c64b2:
@@ -9952,14 +10638,14 @@ LAB_080c64b2:
     bx r1                                    @ 080c64b4 0847
     .zero  0x2
 
-@ Calls resolve_zone_data_ptr_by_oam_word twice, compares the two zone data pointers; if they differ, calls sync_state_and_init_sprite to commit the OAM update. r0=void. Returns void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0) in card_info phase. Constants: zone comparison drives sprite sync trigger.
-dispatch_duel_zone_pair_to_oam:
+@ Run the card-info transition for the selected zone record. Extract the card-info key, apply the zone 11 visible-index adjustment, and use ctx+0x29 substates to fade in, open/tick the card-info page, rebuild field VRAM and render the zone, then fade out. Return 0 while waiting and 1 when done. This is primary menu phase 6.
+run_duel_action_menu_card_info_transition:
     push {r4,r5,r6,r7,lr}                    @ 080c64b8 f0b5
     .hword 0x4657    @ 080c64ba 5746
     .hword 0x464e    @ 080c64bc 4e46
     .hword 0x4645    @ 080c64be 4546
     push {r5,r6,r7}                          @ 080c64c0 e0b4
-    ldr r0, DAT_080c6530                     @ 080c64c2 1b48
+    ldr r0, ptr_g_duel_field_state_080c6530  @ 080c64c2 1b48
     .hword 0x4682    @ 080c64c4 8246
     movs r4,#0x84    @ 080c64c6 8424
     lsls r4,r4,#0x2    @ 080c64c8 a400
@@ -10002,7 +10688,7 @@ dispatch_duel_zone_pair_to_oam:
     lsls r0,r0,#0x10    @ 080c6516 0004
     lsrs r6,r0,#0x10    @ 080c6518 060c
 LAB_080c651a:
-    ldr r0, DAT_080c6534                     @ 080c651a 0648
+    ldr r0, ptr_g_card_ctx_slot_data_080c6534 @ 080c651a 0648
     adds r5,r0,#0x0    @ 080c651c 051c
     adds r5,#0x29    @ 080c651e 2935
     ldrb r4,[r5,#0x0]                        @ 080c6520 2c78
@@ -10013,10 +10699,10 @@ LAB_080c651a:
     cmp r4,#0x0                              @ 080c652a 002c
     beq LAB_080c6542                         @ 080c652c 09d0
     b LAB_080c65a0                           @ 080c652e 37e0
-DAT_080c6530:
-    .word  0x02023130                     @ 080c6530 30310202
-DAT_080c6534:
-    .word  0x0201ff30                     @ 080c6534 30ff0102
+ptr_g_duel_field_state_080c6530:
+    .word  gDuelFieldState                @ 080c6530 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_card_ctx_slot_data_080c6534:
+    .word  gCardCtxSlotData               @ 080c6534 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c6538:
     cmp r4,#0x2                              @ 080c6538 022c
     beq LAB_080c657a                         @ 080c653a 1ed0
@@ -10031,8 +10717,8 @@ LAB_080c6542:
     bl ensure_card_id_cache_entry            @ 080c654c 06f0bcf9
     lsls r0,r0,#0x10    @ 080c6550 0004
     lsrs r0,r0,#0x10    @ 080c6552 000c
-    ldr r2, DAT_080c6568                     @ 080c6554 044a
-    ldr r3, DAT_080c656c                     @ 080c6556 054b
+    ldr r2, ptr_g_duel_disp_ctx_080c6568     @ 080c6554 044a
+    ldr r3, ptr_g_vija_state_080c656c        @ 080c6556 054b
     movs r1,#0x0    @ 080c6558 0021
     bl open_card_info_page_from_list         @ 080c655a 58f7cbf8
     movs r0,#0x80    @ 080c655e 8020
@@ -10040,10 +10726,10 @@ LAB_080c6542:
     strh r4,[r0,#0x0]                        @ 080c6562 0480
     b LAB_080c6588                           @ 080c6564 10e0
     .zero  0x2
-DAT_080c6568:
-    .word  0x0203eeb0                     @ 080c6568 b0ee0302
-DAT_080c656c:
-    .word  0x02029eb0                     @ 080c656c b09e0202
+ptr_g_duel_disp_ctx_080c6568:
+    .word  gDuelDispCtx                   @ 080c6568 b0ee0302  gDuelDispCtx: add reviewed operand-0 DATA reference.
+ptr_g_vija_state_080c656c:
+    .word  gVijaState                     @ 080c656c b09e0202  gVijaState: add reviewed operand-0 DATA reference.
 LAB_080c6570:
     bl tick_card_info_page_by_state          @ 080c6570 58f7d0f8
     cmp r0,#0x0                              @ 080c6574 0028
@@ -10080,10 +10766,10 @@ LAB_080c65a2:
     pop {r1}                                 @ 080c65ac 02bc
     bx r1                                    @ 080c65ae 0847
 
-@ 4-phase card sprite OAM state machine: phase 0=fadein (tick_card_sprite_oam_step_a), phase 1=card_info (tick_card_sprite_oam_step_b), phase 2=vram_refresh (init_duel_field_card_sprite_vram), phase 3=fadeout (tick_card_sprite_oam_step_c). Reads phase index from ctx+0x28; advances phase on step completion. r0=void. Returns void.
-tick_card_sprite_oam_phase_dispatch:
+@ Tick action-menu phases via the 8-entry handler table. Normal path: 0 initialize, 1 open, 2 input, 3 close, 4 NULL. Card-view path writes phase 4 during input, then driver increment reaches 5 close, 6 card-info, 7 NULL. Nonzero handler results increment phase and clear ctx+0x29/+0x2a; NULL clears valid bit 0 and returns 1. Active handlers return 0. If (u32[gPrng+0x214]&0x7fffffff)/60>179, set field+0x222 bit 2 and clear bit 3.
+tick_duel_action_menu_state_machine:
     push {r4,r5,lr}                          @ 080c65b0 30b5
-    ldr r0, PTR_gPrng_080c6610               @ 080c65b2 1748
+    ldr r0, ptr_g_prng_080c6610              @ 080c65b2 1748
     movs r1,#0x85    @ 080c65b4 8521
     lsls r1,r1,#0x2    @ 080c65b6 8900
     adds r0,r0,r1    @ 080c65b8 4018
@@ -10094,8 +10780,8 @@ tick_card_sprite_oam_phase_dispatch:
     bl __divsi3                              @ 080c65c2 48f01ff8
     cmp r0,#0xb3                             @ 080c65c6 b328
     ble LAB_080c65de                         @ 080c65c8 09dd
-    ldr r0, DAT_080c6614                     @ 080c65ca 1248
-    ldr r2, DAT_080c6618                     @ 080c65cc 124a
+    ldr r0, ptr_g_duel_field_state_080c6614  @ 080c65ca 1248
+    ldr r2, duel_field_prng_anim_flag_off_080c6618 @ 080c65cc 124a
     adds r0,r0,r2    @ 080c65ce 8018
     movs r1,#0xd    @ 080c65d0 0d21
     rsbs r1,r1,#0    @ 080c65d2 4942
@@ -10105,8 +10791,8 @@ tick_card_sprite_oam_phase_dispatch:
     orrs r1,r2    @ 080c65da 1143
     strb r1,[r0,#0x0]                        @ 080c65dc 0170
 LAB_080c65de:
-    ldr r1, DAT_080c661c                     @ 080c65de 0f49
-    ldr r4, DAT_080c6620                     @ 080c65e0 0f4c
+    ldr r1, ptr_duel_action_menu_phase_handlers_080c661c @ 080c65de 0f49
+    ldr r4, ptr_g_card_ctx_slot_data_080c6620 @ 080c65e0 0f4c
     adds r5,r4,#0x0    @ 080c65e2 251c
     adds r5,#0x28    @ 080c65e4 2835
     ldrb r2,[r5,#0x0]                        @ 080c65e6 2a78
@@ -10130,16 +10816,16 @@ LAB_080c65de:
 LAB_080c660c:
     movs r0,#0x0    @ 080c660c 0020
     b LAB_080c6630                           @ 080c660e 0fe0
-PTR_gPrng_080c6610:
-    .word  gPrng                          @ 080c6610 40000003
-DAT_080c6614:
-    .word  0x02023130                     @ 080c6614 30310202
-DAT_080c6618:
-    .word  0x00000222                     @ 080c6618 22020000
-DAT_080c661c:
-    .word  0x09e5ab84                     @ 080c661c 84abe509
-DAT_080c6620:
-    .word  0x0201ff30                     @ 080c6620 30ff0102
+ptr_g_prng_080c6610:
+    .word  gPrng                          @ 080c6610 40000003  gPrng: preserve existing operand-0 DATA reference.
+ptr_g_duel_field_state_080c6614:
+    .word  gDuelFieldState                @ 080c6614 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_prng_anim_flag_off_080c6618:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 080c6618 22020000  DUEL_FIELD_PRNG_ANIM_FLAG_OFF: named scalar literal.
+ptr_duel_action_menu_phase_handlers_080c661c:
+    .word  duel_action_menu_phase_handlers @ 080c661c 84abe509  duel_action_menu_phase_handlers: add reviewed operand-0 DATA reference.
+ptr_g_card_ctx_slot_data_080c6620:
+    .word  gCardCtxSlotData               @ 080c6620 30ff0102  gCardCtxSlotData: add reviewed operand-0 DATA reference.
 LAB_080c6624:
     movs r0,#0x2    @ 080c6624 0220
     rsbs r0,r0,#0    @ 080c6626 4042
@@ -10153,7 +10839,7 @@ LAB_080c6630:
     bx r1                                    @ 080c6634 0847
     .zero  0x2
 
-@ Decode packed OAM halfword and return zone data pointer via 16-way zone_type dispatch. Reads gPrng+0x210 (oam_word); extracts zone_type [0..0xd]; jump table returns pointer to zone data block for each type. Pure lookup; no side-effects. r0=void. Returns u32* zone_data_ptr. Constants: gPrng_oam_word=gPrng+0x210, zone_type_max=0xd.
+@ Resolve a card-record pointer from r0 low 16 packed selection: player bit 7, zone bits 6:0 and index bits 14:8. For zones 0..4, the packed chain-render mask can substitute index 0xff for get_zone_slot_ptr. Other cases address per-player field/hand arrays or fixed special-zone records. Return the selected pointer or 0 for unsupported cases. Reads global tables.
 resolve_zone_data_ptr_by_oam_word:
     push {r4,r5,lr}                          @ 080c6638 30b5
     lsls r0,r0,#0x10    @ 080c663a 0004
@@ -10174,13 +10860,13 @@ resolve_zone_data_ptr_by_oam_word:
     b switchD_080c6662__caseD_c              @ 080c6658 8ee0
 LAB_080c665a:
     lsls r0,r3,#0x2    @ 080c665a 9800
-    ldr r1, DAT_080c6664                     @ 080c665c 0149
+    ldr r1, ptr_switch_d_080c6662_switchdata_d_080c6668_080c6664 @ 080c665c 0149
     adds r0,r0,r1    @ 080c665e 4018
     ldr r0,[r0,#0x0]                         @ 080c6660 0068
 switchD_080c6662__switchD:
     .hword 0x4687    @ 080c6662 8746
-DAT_080c6664:
-    .word  0x080c6668                     @ 080c6664 68660c08
+ptr_switch_d_080c6662_switchdata_d_080c6668_080c6664:
+    .word  switchD_080c6662__switchdataD_080c6668                     @ 080c6664 68660c08  switchD_080c6662__switchdataD_080c6668: add reviewed operand-0 DATA reference.
 switchD_080c6662__switchdataD_080c6668:
     .word  0x080c66a8                     @ 080c6668 a8660c08
     .word  0x080c66a8                     @ 080c666c a8660c08
@@ -10200,8 +10886,8 @@ switchD_080c6662__switchdataD_080c6668:
     .word  0x080c6760                     @ 080c66a4 60670c08
 switchD_080c6662__caseD_0:
     adds r3,r3,r5    @ 080c66a8 5b19
-    ldr r1, DAT_080c66e4                     @ 080c66aa 0e49
-    ldr r2, DAT_080c66e8                     @ 080c66ac 0e4a
+    ldr r1, ptr_g_duel_field_state_080c66e4  @ 080c66aa 0e49
+    ldr r2, duel_field_fadein_flag_off_080c66e8 @ 080c66ac 0e4a
     adds r0,r1,r2    @ 080c66ae 8818
     ldrh r0,[r0,#0x0]                        @ 080c66b0 0088
     lsrs r2,r0,#0x2    @ 080c66b2 8208
@@ -10229,32 +10915,32 @@ LAB_080c66d6:
     adds r2,r0,#0x0    @ 080c66de 021c
     b switchD_080c6662__caseD_c              @ 080c66e0 4ae0
     .zero  0x2
-DAT_080c66e4:
-    .word  0x02023130                     @ 080c66e4 30310202
-DAT_080c66e8:
-    .word  0x0000021e                     @ 080c66e8 1e020000
+ptr_g_duel_field_state_080c66e4:
+    .word  gDuelFieldState                @ 080c66e4 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+duel_field_fadein_flag_off_080c66e8:
+    .word  DUEL_FIELD_FADEIN_FLAG_OFF     @ 080c66e8 1e020000  DUEL_FIELD_FADEIN_FLAG_OFF: named scalar literal.
 switchD_080c6662__caseD_5:
-    ldr r0, DAT_080c6700                     @ 080c66ec 0448
+    ldr r0, player_block_stride_080c6700     @ 080c66ec 0448
     adds r2,r4,#0x0    @ 080c66ee 221c
     muls r2,r0    @ 080c66f0 4243
-    ldr r0, DAT_080c6704                     @ 080c66f2 0448
+    ldr r0, ptr_g_duel_field_slots_080c6704  @ 080c66f2 0448
     adds r2,r2,r0    @ 080c66f4 1218
     adds r1,r3,r5    @ 080c66f6 5919
     lsls r0,r1,#0x2    @ 080c66f8 8800
     adds r0,r0,r1    @ 080c66fa 4018
     lsls r0,r0,#0x2    @ 080c66fc 8000
     b LAB_080c6776                           @ 080c66fe 3ae0
-DAT_080c6700:
-    .word  0x00000868                     @ 080c6700 68080000
-DAT_080c6704:
-    .word  0x0201c510                     @ 080c6704 10c50102
+player_block_stride_080c6700:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6700 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_duel_field_slots_080c6704:
+    .word  gDuelFieldSlots                @ 080c6704 10c50102  gDuelFieldSlots: add reviewed operand-0 DATA reference.
 switchD_080c6662__caseD_b:
-    ldr r0, DAT_080c6724                     @ 080c6708 0648
+    ldr r0, player_block_stride_080c6724     @ 080c6708 0648
     adds r2,r4,#0x0    @ 080c670a 221c
     muls r2,r0    @ 080c670c 4243
-    ldr r0, DAT_080c6728                     @ 080c670e 0648
+    ldr r0, ptr_g_p1_field_array_c_base_080c6728 @ 080c670e 0648
     adds r2,r2,r0    @ 080c6710 1218
-    ldr r0, DAT_080c672c                     @ 080c6712 0648
+    ldr r0, ptr_g_duel_field_state_080c672c  @ 080c6712 0648
     lsls r1,r4,#0x1    @ 080c6714 6100
     adds r0,#0x4c    @ 080c6716 4c30
     adds r1,r1,r0    @ 080c6718 0918
@@ -10263,45 +10949,45 @@ switchD_080c6662__caseD_b:
     lsls r0,r0,#0x2    @ 080c671e 8000
     b LAB_080c6776                           @ 080c6720 29e0
     .zero  0x2
-DAT_080c6724:
-    .word  0x00000868                     @ 080c6724 68080000
-DAT_080c6728:
-    .word  0x0201c600                     @ 080c6728 00c60102
-DAT_080c672c:
-    .word  0x02023130                     @ 080c672c 30310202
+player_block_stride_080c6724:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6724 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_field_array_c_base_080c6728:
+    .word  gP1FieldArrayCBase             @ 080c6728 00c60102  gP1FieldArrayCBase: add reviewed operand-0 DATA reference.
+ptr_g_duel_field_state_080c672c:
+    .word  gDuelFieldState                @ 080c672c 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
 switchD_080c6662__caseD_d:
-    ldr r0, DAT_080c673c                     @ 080c6730 0248
+    ldr r0, player_block_stride_080c673c     @ 080c6730 0248
     adds r1,r4,#0x0    @ 080c6732 211c
     muls r1,r0    @ 080c6734 4143
-    ldr r0, DAT_080c6740                     @ 080c6736 0248
+    ldr r0, ptr_g_p1_slot_set_code_array_080c6740 @ 080c6736 0248
     adds r2,r1,r0    @ 080c6738 0a18
     b switchD_080c6662__caseD_c              @ 080c673a 1de0
-DAT_080c673c:
-    .word  0x00000868                     @ 080c673c 68080000
-DAT_080c6740:
-    .word  0x0201c740                     @ 080c6740 40c70102
+player_block_stride_080c673c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c673c 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_slot_set_code_array_080c6740:
+    .word  gP1SlotSetCodeArray            @ 080c6740 40c70102  gP1SlotSetCodeArray: add reviewed operand-0 DATA reference.
 switchD_080c6662__caseD_e:
-    ldr r0, DAT_080c6754                     @ 080c6744 0348
+    ldr r0, player_block_stride_080c6754     @ 080c6744 0348
     adds r1,r4,#0x0    @ 080c6746 211c
     muls r1,r0    @ 080c6748 4143
-    ldr r0, DAT_080c6758                     @ 080c674a 0348
+    ldr r0, ptr_g_p1_hand_slot_array_080c6758 @ 080c674a 0348
     adds r2,r1,r0    @ 080c674c 0a18
-    ldr r3, DAT_080c675c                     @ 080c674e 034b
+    ldr r3, hand_array_to_count_neg_off_080c675c @ 080c674e 034b
     b LAB_080c676c                           @ 080c6750 0ce0
     .zero  0x2
-DAT_080c6754:
-    .word  0x00000868                     @ 080c6754 68080000
-DAT_080c6758:
-    .word  0x0201c8f8                     @ 080c6758 f8c80102
-DAT_080c675c:
-    .word  0xfffffbfc                     @ 080c675c fcfbffff
+player_block_stride_080c6754:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6754 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_hand_slot_array_080c6758:
+    .word  gP1HandSlotArray               @ 080c6758 f8c80102  gP1HandSlotArray: add reviewed operand-0 DATA reference.
+hand_array_to_count_neg_off_080c675c:
+    .word  HAND_ARRAY_TO_COUNT_NEG_OFF    @ 080c675c fcfbffff  HAND_ARRAY_TO_COUNT_NEG_OFF: named scalar literal.
 switchD_080c6662__caseD_f:
-    ldr r0, DAT_080c6780                     @ 080c6760 0748
+    ldr r0, player_block_stride_080c6780     @ 080c6760 0748
     adds r1,r4,#0x0    @ 080c6762 211c
     muls r1,r0    @ 080c6764 4143
-    ldr r0, DAT_080c6784                     @ 080c6766 0748
+    ldr r0, ptr_g_p1_alt_hand_slot_array_080c6784 @ 080c6766 0748
     adds r2,r1,r0    @ 080c6768 0a18
-    ldr r3, DAT_080c6788                     @ 080c676a 074b
+    ldr r3, alt_hand_array_to_count_neg_off_080c6788 @ 080c676a 074b
 LAB_080c676c:
     adds r0,r0,r3    @ 080c676c c018
     adds r1,r1,r0    @ 080c676e 0918
@@ -10315,17 +11001,17 @@ switchD_080c6662__caseD_c:
     pop {r4,r5}                              @ 080c677a 30bc
     pop {r1}                                 @ 080c677c 02bc
     bx r1                                    @ 080c677e 0847
-DAT_080c6780:
-    .word  0x00000868                     @ 080c6780 68080000
-DAT_080c6784:
-    .word  0x0201cab0                     @ 080c6784 b0ca0102
-DAT_080c6788:
-    .word  0xfffffa4c                     @ 080c6788 4cfaffff
+player_block_stride_080c6780:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c6780 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
+ptr_g_p1_alt_hand_slot_array_080c6784:
+    .word  gP1AltHandSlotArray            @ 080c6784 b0ca0102  gP1AltHandSlotArray: add reviewed operand-0 DATA reference.
+alt_hand_array_to_count_neg_off_080c6788:
+    .word  ALT_HAND_ARRAY_TO_COUNT_NEG_OFF @ 080c6788 4cfaffff  ALT_HAND_ARRAY_TO_COUNT_NEG_OFF: named scalar literal.
 
-@ Refresh the zone-type11 count tag in gDuelFieldState+0x210. Decode player from bit7 and read its zone count at gP1LifePoints+player*0x868+0xc. Ignore other zone types or counts above6. Count0 stores only player<<7. Otherwise resolve the descriptor to zone data; when its first word has low13 bits zero, store (player<<7)|11|((count-1)<<8). Called by dispatch_card_display_op, field refresh and play_player_zone_card_refresh_effect.
-update_zone_oam_card_count_tag:
+@ Repair the packed hand-zone cursor in field+0x210 after a card update. Only zone 11 is handled. Read the u32 count at gP1LifePoints+0xc+player*PLAYER_BLOCK_STRIDE. Count 0 selects zone 0 for that player. For count 1..6, an empty selected low13-bit card ID moves the cursor to hand index count-1; larger counts remain unchanged. No APCS input; callers ignore the return value.
+repair_hand_zone_cursor_after_card_update:
     push {r4,r5,r6,lr}                       @ 080c678c 70b5
-    ldr r0, DAT_080c67cc                     @ 080c678e 0f48
+    ldr r0, ptr_g_duel_field_state_080c67cc  @ 080c678e 0f48
     movs r1,#0x84    @ 080c6790 8421
     lsls r1,r1,#0x2    @ 080c6792 8900
     adds r6,r0,r1    @ 080c6794 4618
@@ -10339,9 +11025,9 @@ update_zone_oam_card_count_tag:
     ands r0,r1    @ 080c67a4 0840
     cmp r0,#0xb                              @ 080c67a6 0b28
     bne LAB_080c67f8                         @ 080c67a8 26d1
-    ldr r0, PTR_gP1LifePoints_080c67d0       @ 080c67aa 0948
+    ldr r0, ptr_g_p1_life_points_080c67d0    @ 080c67aa 0948
     adds r4,r2,#0x0    @ 080c67ac 141c
-    ldr r1, DAT_080c67d4                     @ 080c67ae 0949
+    ldr r1, player_block_stride_080c67d4     @ 080c67ae 0949
     muls r1,r2    @ 080c67b0 5143
     adds r0,#0xc    @ 080c67b2 0c30
     adds r5,r1,r0    @ 080c67b4 0d18
@@ -10356,12 +11042,12 @@ update_zone_oam_card_count_tag:
     lsrs r0,r0,#0x18    @ 080c67c6 000e
     strh r0,[r6,#0x0]                        @ 080c67c8 3080
     b LAB_080c67f8                           @ 080c67ca 15e0
-DAT_080c67cc:
-    .word  0x02023130                     @ 080c67cc 30310202
-PTR_gP1LifePoints_080c67d0:
-    .word  gP1LifePoints                  @ 080c67d0 e0c40102
-DAT_080c67d4:
-    .word  0x00000868                     @ 080c67d4 68080000
+ptr_g_duel_field_state_080c67cc:
+    .word  gDuelFieldState                @ 080c67cc 30310202  gDuelFieldState: add reviewed operand-0 DATA reference.
+ptr_g_p1_life_points_080c67d0:
+    .word  gP1LifePoints                  @ 080c67d0 e0c40102  gP1LifePoints: preserve existing operand-0 DATA reference.
+player_block_stride_080c67d4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c67d4 68080000  PLAYER_BLOCK_STRIDE: named scalar literal.
 LAB_080c67d8:
     ldrh r0,[r6,#0x0]                        @ 080c67d8 3088
     bl resolve_zone_data_ptr_by_oam_word     @ 080c67da fff72dff
@@ -10384,13 +11070,13 @@ LAB_080c67f8:
     bx r0                                    @ 080c67fc 0047
     .zero  0x2
 
-@ Mirror OAM coords (r2=x, r3=y) by player_id vs ctx.current_player^1; 16-case zone_type switch. Returns packed (y<<16|x). Pure calc, no external writes. Callers: render_duel_field_slot_oam_grid, compute_card_sprite_oam_coords_by_zone.
+@ Resolve packed zone coordinates from r0=player, r1=zone and r2=index. Compare player with gDuelCardCtxBase+4 XOR1 to choose mirrored anchor coordinates, then apply the 16-case zone layout and indexed spacing. Return (y<<16)|x with wrapped u16 coordinates. No external writes. Register r3 is scratch.
 transform_zone_oam_coords_by_player:
     push {r4,r5,r6,r7,lr}                    @ 080c6800 f0b5
     adds r5,r0,#0x0    @ 080c6802 051c
     adds r7,r1,#0x0    @ 080c6804 0f1c
     adds r4,r2,#0x0    @ 080c6806 141c
-    ldr r1, DAT_080c6838                     @ 080c6808 0b49
+    ldr r1, ptr_g_duel_card_ctx_base_080c6838 @ 080c6808 0b49
     ldr r3,[r1,#0x4]                         @ 080c680a 4b68
     movs r0,#0x1    @ 080c680c 0120
     eors r3,r0    @ 080c680e 4340
@@ -10412,16 +11098,16 @@ LAB_080c6824:
     b switchD_080c6834__caseD_1              @ 080c682a b2e0
 LAB_080c682c:
     lsls r0,r7,#0x2    @ 080c682c b800
-    ldr r1, DAT_080c683c                     @ 080c682e 0349
+    ldr r1, ptr_switch_d_080c6834_switchdata_d_080c6840_080c683c @ 080c682e 0349
     adds r0,r0,r1    @ 080c6830 4018
     ldr r0,[r0,#0x0]                         @ 080c6832 0068
 switchD_080c6834__switchD:
     .hword 0x4687    @ 080c6834 8746
     .zero  0x2
-DAT_080c6838:
-    .word  0x0201e2a0                     @ 080c6838 a0e20102
-DAT_080c683c:
-    .word  0x080c6840                     @ 080c683c 40680c08
+ptr_g_duel_card_ctx_base_080c6838:
+    .word  gDuelCardCtxBase               @ 080c6838 a0e20102  gDuelCardCtxBase: add reviewed operand-0 DATA reference.
+ptr_switch_d_080c6834_switchdata_d_080c6840_080c683c:
+    .word  switchD_080c6834__switchdataD_080c6840                     @ 080c683c 40680c08  switchD_080c6834__switchdataD_080c6840: add reviewed operand-0 DATA reference.
 switchD_080c6834__switchdataD_080c6840:
     .word  0x080c6880                     @ 080c6840 80680c08
     .word  0x080c6992                     @ 080c6844 92690c08
@@ -10510,7 +11196,7 @@ LAB_080c68f8:
     lsls r0,r4,#0x1    @ 080c68f8 6000
     adds r0,r0,r4    @ 080c68fa 0019
     lsls r0,r0,#0x3    @ 080c68fc c000
-    ldr r1, DAT_080c6910                     @ 080c68fe 0449
+    ldr r1, zone_coord_x_neg24_u16_080c6910  @ 080c68fe 0449
     adds r0,r0,r1    @ 080c6900 4018
     adds r0,r2,r0    @ 080c6902 1018
     lsls r0,r0,#0x10    @ 080c6904 0004
@@ -10519,8 +11205,8 @@ LAB_080c68f8:
     adds r0,#0x30    @ 080c690a 3030
     b LAB_080c695e                           @ 080c690c 27e0
     .zero  0x2
-DAT_080c6910:
-    .word  0x0000ffe8                     @ 080c6910 e8ff0000
+zone_coord_x_neg24_u16_080c6910:
+    .word  ZONE_COORD_X_NEG24_U16         @ 080c6910 e8ff0000  ZONE_COORD_X_NEG24_U16: named scalar literal.
 switchD_080c6834__caseD_c:
     ldr r0,[r6,#0x4]                         @ 080c6914 7068
     movs r1,#0x1    @ 080c6916 0121

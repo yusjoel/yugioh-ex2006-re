@@ -2077,7 +2077,18 @@ duel_field_ai_state_callback_table:
     .word eval_field_spell_equip_activation_candidate+1
 duel_field_ai_state_callback_table_end:
     .word 0
-.incbin "roms/2343.gba", 0x1E5AB84, 0x78
+@ 决斗操作菜单阶段回调；阶段4与7为空。
+.global duel_action_menu_phase_handlers
+duel_action_menu_phase_handlers:
+    .word init_duel_action_menu_vram+1
+    .word tick_duel_action_menu_open_step+1
+    .word tick_duel_action_menu_input_step+1
+    .word tick_duel_action_menu_close_step+1
+    .word 0
+    .word tick_duel_action_menu_close_step+1
+    .word run_duel_action_menu_card_info_transition+1
+    .word 0
+.incbin "roms/2343.gba", 0x1E5ABA4, 0x58
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

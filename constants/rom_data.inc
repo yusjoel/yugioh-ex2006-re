@@ -3873,3 +3873,8 @@
 .equ duel_field_zone_tile_coords, 0x09e49254
 .equ duel_field_zone_tile_y_coords, 0x09e49258
 .equ field_slot_bg_tile_pattern, 0x09854df0
+.equ duel_field_shared_obj_palette, 0x09850c5c
+.equ duel_action_menu_oam_tiles, 0x09852b9c
+.equ duel_field_panel_obj_palette, 0x0985329c
+.equ duel_action_menu_row_frame_left_tiles, 0x098532bc
+.equ duel_action_menu_row_frame_middle_tiles, 0x098532dc

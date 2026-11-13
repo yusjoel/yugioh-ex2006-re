@@ -21082,7 +21082,7 @@ LAB_080beeb8:
     ldrh r1,[r0,#0x0]                        @ 080beebe 0188
     adds r0,r7,#0x0    @ 080beec0 381c
     bl refresh_player_field_slot_tiles       @ 080beec2 05f0adf9
-    bl update_zone_oam_card_count_tag        @ 080beec6 07f061fc
+    bl repair_hand_zone_cursor_after_card_update @ 080beec6 07f061fc
     b LAB_080befaa                           @ 080beeca 6ee0
 player_block_stride_lit_eecc:
     .word  PLAYER_BLOCK_STRIDE            @ 080beecc 68080000  PLAYER_BLOCK_STRIDE = 0x00000868; PC literal.

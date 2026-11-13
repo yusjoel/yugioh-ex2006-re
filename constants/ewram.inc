@@ -708,3 +708,4 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gUIEffectArg2, 0x0202311c
 .equ gDuelFieldChainRenderBitsPackedLo, 0x0202334e
 .equ gDuelFieldChainRenderBitsPackedHi, 0x02023350
+.equ gDuelActionMenuAnimStep, 0x0201ff5a
