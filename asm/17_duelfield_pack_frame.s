@@ -1455,7 +1455,7 @@ LAB_080cc9be:
     movs r0,#0x0    @ 080cc9be 0020
     strh r0,[r4,#0x8]                        @ 080cc9c0 2081
     bl initialize_duel_field_slot_tilemap    @ 080cc9c2 f6f771fe
-    bl init_duel_field_tile_indices          @ 080cc9c6 fdf791ff
+    bl init_duel_field_hud_tiles_and_palettes @ 080cc9c6 fdf791ff
     bl redraw_all_field_slot_tiles           @ 080cc9ca f8f79bf9
     ldrh r0,[r5,#0x0]                        @ 080cc9ce 2888
     movs r2,#0xf8    @ 080cc9d0 f822
@@ -1861,7 +1861,7 @@ LAB_080cccce:
 DAT_080cccd8:
     .word  0x02023130                     @ 080cccd8 30310202
 switchD_080ccab0__caseD_2:
-    bl advance_card_display_effect_step      @ 080cccdc fcf7daff
+    bl tick_card_description_window_effect   @ 080cccdc fcf7daff
     cmp r0,#0x0                              @ 080ccce0 0028
     bne LAB_080ccce6                         @ 080ccce2 00d1
     b switchD_080ccab0__default              @ 080ccce4 82e0
@@ -2059,7 +2059,7 @@ LAB_080cce3c:
     bl render_zone_list_order_oam            @ 080cce52 fcf7e1f9
 LAB_080cce56:
     bl render_duel_field_zone_oam_grid       @ 080cce56 fbf787ff
-    bl render_lp_zone_oam_full               @ 080cce5a fdf7e7fa
+    bl render_duel_hud_oam                   @ 080cce5a fdf7e7fa
     ldr r1, DAT_080ccea0                     @ 080cce5e 1049
     movs r2,#0x1    @ 080cce60 0122
     adds r0,r2,#0x0    @ 080cce62 101c

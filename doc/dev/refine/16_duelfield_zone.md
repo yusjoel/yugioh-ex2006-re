@@ -1,6 +1,6 @@
 # 函数和数据细化计划 · `asm/16_duelfield_zone.s`
 
-> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。主序完成16/25个模块，历史正引用补漏1项。当前模块完成8/10段，下一任务F16-Seg-9 `[0x080c9c94,0x080cad78)`；逐段验收、单独提交并持续推进。
+> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。主序完成16/25个模块，历史正引用补漏1项。当前模块完成9/10段，下一任务F16-Seg-10 `[0x080cad78,0x080cbf0c)`；逐段验收、单独提交并持续推进。
 
 ## 一、规则
 
@@ -12,7 +12,7 @@
 
 ## 三、当前进度
 
-Seg-1至Seg-8均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。当前8/10段，112个Function、1747个池字；剩余302个自动数据名（DAT246、DWORD0、PTR56），下一段为Seg-9。
+Seg-1至Seg-9均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。当前9/10段，112个Function、1747个池字；剩余144个自动数据名（DAT118、DWORD0、PTR26），下一段为Seg-10。
 
 Seg-4、Seg-5和Seg-7的8个原始块共3410字节已全部结构化。当前模块无ROM_INCBIN/.byte原始块，§5.1登记为0。
 
@@ -219,6 +219,32 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 
 模块完成8/10段，112个Function、1747个池字；剩余302个自动数据名（DAT246、DWORD0、PTR56），raw0、§5.1为0。单段提交后继续F16-Seg-9 `[0x080c9c94,0x080cad78)`，13个Function、167个池字、158个自动名，无raw块。
 
+### 4.09 Seg-9（2026-11-14）
+
+范围 `[0x080c9c94,0x080cad78)`，4324字节、13个既有Function、167个池字及158个自动名。完成39 EQ_ADD、89 REF_ADD、30 REF_PRESERVE和9 CASE保持；158个源槽加45个全局目标共203个新USER，订正9个函数名、16个ASCII PLATE和210条EOL（158源槽、52指令）。新增11个Ghidra equate；无R4、R7、Function增删、数据类型、body/ABI或flow override动作。
+
+倒计时、Deck/Graveyard/Removed Cards计数、turn/phase图标、result历史、卡片HUD和比较stat字形均按实际消费者与ROM图形核对。117条Thumb高寄存器指令按真实编码解码；独立R8核对15组bank/palette、14400像素，通道差为0。首轮独审订正phase高亮实际坐标x31/y=8+22*phase，以及八位result计数、跳过零状态而包含非零第0项；两项所有PLATE/EOL与registry文本同步后，独立第二轮C1-C13通过。
+
+两个既有DEFAULT派生身份完整保持：D70CC按新目标标签显示为PTR_BG_SCREENBLOCK_28_BASE_080d70cc，word值仍为raw0x0600e000且无outside pin；0985117e按原offcut身份显示为card_stat_equal_digit_tiles+2，CA884指令字节不变。两者都无USER setter、新别名或新DEFAULT ID。
+
+实际prestate、dry和owned fullrollback通过，完整后态0 FAIL；end(False)后同Program的完整前态及84208个原符号ID恢复，DB15/source237及副本保持。正式保存恰一次，新进程check和三份独立Java完整后验通过。保护246个主Function及18个完整even_function（8个仅在nested holder，共254个完整Function DTO）、1962word、4332完整地址状态、34748条指令属性、17649闭包行和1957条typed pointer边；incoming15594→15683。52条指令EOL均进入完整Function评论集合，其中40条以实际Function逐地址评论getter证明原空值。DDE1C既有Function入口无InstructionAt的事实保持，显式instruction seed为245。全局Equate2542个、绑定12983条。
+
+源码精确变化13个路径（含3个忽略中间文件）：4份ASM、4份constants、registry、doc CSV、两份temp inventory及all.s。54个GNU定义、222个pins（180继承+42新增）与167项表达式（125 native+42 fallback）核验通过；registry12替换+4追加，两份CSV各9个名称单元格变化，其余单元格与Function长度完整保持。rom.s、gba_io及4份独立untracked重复inventory保持，rom_data原LF前缀保留。
+
+只读源码导出、49/49资产导出、构建及33554432字节整ROM逐字节相等，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
+
+证据目录：`output/refine-run-20261028-105948/`。
+
+| 验收记录 | SHA256 |
+|---|---|
+| `f16-seg9-phase1-static-review-v1.json` | `287d716f913d26fb5f3ead739c795d29c9122b50559f64df526f6b491b96e4e5` |
+| `f16-seg9-apply-v1.json` | `8e4b9018d3ff048145f9df5f6b0e573e85ab46186069f311433efc21527a799f` |
+| `f16-seg9-persisted-check-v1.json` | `c5b07063549460311af240e297a121f5795d02195fadb98a1516db7be225aec5` |
+| `root-f16-seg9-saved-native-gate-v1.json` | `0e9ba3db641a51c4368c5ed0f463c1b50226ed4bf52b8037fcf332dd8990158c` |
+| `f16-seg9-source-landing-final-v1.json` | `7b7b03d79241243d8192f465201390d80229400fb0c3152db0dc14e400783485` |
+
+模块完成9/10段，112个Function、1747个池字；剩余144个自动名（DAT118、DWORD0、PTR26），raw0、§5.1为0。单段提交后继续F16-Seg-10 `[0x080cad78,0x080cbf0c)`，5个Function、173个池字及144个自动名，无raw块。
+
 ## 五、地址序路线图
 
 | 段 | 范围 | 字节 | 既有 Function | word | 自动数据名 | raw 块/字节 | 状态 |
@@ -231,7 +257,7 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 | 6 | `0x080c699c..0x080c7af8` | 4444 | 13 | 176 | 98 | 0/0 | ✅ root验收通过，单段提交 |
 | 7 | `0x080c7af8..0x080c8bf0` | 4344 | 12 | 223 | 152 | 1/58 | ✅ root验收通过，单段提交 |
 | 8 | `0x080c8bf0..0x080c9c94` | 4260 | 16 | 110 | 95 | 0/0 | ✅ root验收通过，单段提交 |
-| 9 | `0x080c9c94..0x080cad78` | 4324 | 13 | 167 | 158 | 0/0 | 未开始 |
+| 9 | `0x080c9c94..0x080cad78` | 4324 | 13 | 167 | 158 | 0/0 | ✅ root验收通过，单段提交 |
 | 10 | `0x080cad78..0x080cbf0c` | 4500 | 5 | 173 | 144 | 0/0 | 未开始 |
 
 ### 原始块初始化清单

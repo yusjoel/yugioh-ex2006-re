@@ -716,3 +716,4 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ gEquipTargetEligibilityCache, 0x020230c4
 .equ gCardDescriptionScrollState, 0x02023348
 .equ gSceneWorkArea, 0x02039eb0
+.equ gDuelNumericTileScratch, 0x020232c0

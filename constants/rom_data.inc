@@ -3887,3 +3887,15 @@
 .equ duel_field_aux_obj_tile_data_4x1, 0x0990c42c
 .equ field_spell_background_tiles, 0x09867580
 .equ field_spell_background_palettes, 0x09889180
+.equ duel_hud_decimal_bg_tile_data, 0x09850e9c
+.equ duel_hud_number_bg_tile_data, 0x09850fdc
+.equ card_stat_equal_digit_tiles, 0x0985117c
+.equ card_stat_greater_digit_tiles, 0x0985131c
+.equ card_stat_less_digit_tiles, 0x0985145c
+.equ duel_hud_obj_palettes, 0x0985159c
+.equ duel_player_count_label_obj_tile_data, 0x0985263c
+.equ duel_decimal_digit_obj_tile_data, 0x0985273c
+.equ duel_timer_frame_obj_tile_data, 0x0985289c
+.equ duel_main_phase_timer_obj_tile_data, 0x0985299c
+.equ duel_end_phase_timer_obj_tile_data, 0x09852a9c
+.equ duel_result_history_obj_tile_data, 0x09854d90

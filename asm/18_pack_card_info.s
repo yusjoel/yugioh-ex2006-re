@@ -2325,7 +2325,7 @@ init_pack_card_info_bg_and_vram:
     movs r1,#0x80    @ 080d707e 8021
     lsls r1,r1,#0x7    @ 080d7080 c901
     bl zero_fill_halfword_wrapper            @ 080d7082 1df009ff
-    ldr r0, PTR_DAT_080d70cc                 @ 080d7086 1148
+    ldr r0, PTR_BG_SCREENBLOCK_28_BASE_080d70cc @ 080d7086 1148
     movs r4,#0x80    @ 080d7088 8024
     lsls r4,r4,#0x4    @ 080d708a 2401
     adds r1,r4,#0x0    @ 080d708c 211c
@@ -2354,7 +2354,7 @@ DAT_080d70c4:
     .word  0x00001d0d                     @ 080d70c4 0d1d0000
 DAT_080d70c8:
     .word  0x00001e8a                     @ 080d70c8 8a1e0000
-PTR_DAT_080d70cc:
+PTR_BG_SCREENBLOCK_28_BASE_080d70cc:
     .word  0x0600e000                     @ 080d70cc 00e00006
 PTR_DAT_080d70d0:
     .word  0x0600d000                     @ 080d70d0 00d00006

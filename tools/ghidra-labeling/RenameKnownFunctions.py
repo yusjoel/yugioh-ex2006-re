@@ -4357,12 +4357,8 @@ RENAMES = [
         "cleanup_slot_score_entry_epilogue. "
         "Side effects: writes r7[+0x14] (atk_score) and r7[+0x18] (def_score) via callees. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes."),
-    ("FUN_080ca660", "decode_card_image_tiles_to_vram",
-        "Decompress and decode card image tile data into VRAM for card display. "
-        "Reads tile data source pointer, calls decompression routine, then writes decoded "
-        "tile data to VRAM destination. r0: card_id [0..0x19b7]; r1: vram_dest ptr. "
-        "Returns void. Side effects: VRAM region at r1 written with decompressed tile data. "
-        "Constants: card_tile_table_base=ROM tile index table."),
+    ('FUN_080ca660', 'compose_compared_stat_digit_tiles',
+        'Compose comparison-styled stat digits into four BG tiles. r0=value,r1=baseline,r2=selector; selector chooses VRAM0x06008120 or0x060081a0 and the prefix glyph. Clamp above99999. Use distinct digit banks for value above/equal/below baseline;(-1,-1) uses the unknown-value glyph. Pack the narrow decimal glyphs through gDuelNumericTileScratch and transpose its128 bytes into four8x8 4bpp tiles. No card-image decoding or decompression.'),
     ("FUN_0804bf20", "check_card_id_is_equip_set_b",
         "Check if card_id (r0) belongs to equip card set B (second hardcoded ID range/list). "
         "Pure BST leaf over card IDs in set B. Returns 1=member, 0=not member. "
@@ -4373,18 +4369,10 @@ RENAMES = [
         "Pure BST leaf over card IDs in set A. Returns 1=member, 0=not member. "
         "Sibling: check_card_id_is_equip_set_b (set B range). "
         "r0: card_id [0..0x19b7]. Returns u32 bool."),
-    ("FUN_080cae84", "write_card_digit_tiles_to_vram",
-        "Write prebuilt digit tile data for card number display into VRAM. "
-        "r0: digit_tile_src ptr; r1: vram_dest ptr; r2: tile_count [1..N]. "
-        "Iterates tile_count entries, copying digit tile words to VRAM destination. "
-        "Returns void. Side effects: VRAM region written with digit tiles. "
-        "Constants: tile_word_size=4 bytes per tile entry."),
-    ("FUN_080cace8", "zero_card_display_vram_regions",
-        "Zero-fill VRAM regions used for card display (card image, digits, name strip). "
-        "No APCS params; reads display region base addresses from global state. "
-        "Calls bios_cpu_set fill=0 for each subregion. Returns void. "
-        "Side effects: card display VRAM zeroed before redraw. "
-        "Constants: uses bios_cpu_set fill mode (bit24=1)."),
+    ('FUN_080cae84', 'write_card_digit_tiles_to_vram',
+        'Render a field-card counter into four BG entries at card_effect_counter_bg_map. r0 low bit selects player,r1 selects a20-byte slot; read its low13-bit card ID and halfword+0xc counter. Reverse the counter as3-count for CID0x1909, clamp above999, and choose a prefix for effect/equip categories. Write decimal tiles based at0x1a6 right-to-left. A nonpositive counter clears all four entries. No source/destination pointer arguments.'),
+    ('FUN_080cace8', 'zero_card_display_vram_regions',
+        'Always clear0x800 bytes at0x0600a8e0. When field+8 is nonzero, also clear0x600 bytes at0x06006340 and0x100 bytes at each stat/name region, zero two level-map entries and four adjacent counter-map entries, clear the two stat prefixes, then reset field+8 to0. Calls zero_fill_by_halfword with byte counts; no BIOS fill call. No inputs.'),
     ("FUN_080caf68", "render_card_name_to_sprite_vram",
         "Render card name string tiles into sprite VRAM for card name display strip. "
         "r0: card_id [0..0x19b7]; r1: sprite_vram_dest ptr. "
@@ -4416,13 +4404,8 @@ RENAMES = [
         "Constants: gDuelFieldSlots=0x0201c510."),
     ('FUN_080c933c', 'get_trap_monster_level_by_card_id',
         'Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_large_card_display_by_mode uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.'),
-    ("FUN_080cb1cc", "render_large_card_display_by_mode",
-        "Top-level dispatcher for large card display rendering. "
-        "r0: display_mode [0..N]; r1: card_id [0..0x19b7]. "
-        "Dispatches to sub-renderers: decode_card_image_tiles_to_vram, "
-        "render_card_name_to_sprite_vram, write_card_digit_tiles_to_vram, etc. "
-        "Returns void. Side effects: VRAM and OAM written for card display. "
-        "Constants: mode dispatch table in ROM."),
+    ('FUN_080cb1cc', 'render_large_card_display_by_mode',
+        'Render the selected card BG detail panel. r0=internal card ID,r1=card-record pointer,r2=render override. Read type, level, attributes and signed ATK/DEF from card_stats_table and the runtime record. Draw the name, frame, compared stat digits through compose_compared_stat_digit_tiles, level and counter/type glyphs according to record flags. Hidden and non-monster paths clear or replace the relevant fields. Writes fixed BG VRAM/palette regions; no OAM enqueue.'),
     ("FUN_080f2c4c", "render_decimal_digits_jp_signed",
         "Render signed decimal integer as digit tiles in JP glyph style. "
         "r0: value (s32 signed integer); r1: dest_ptr (sprite VRAM or BG tile dest). "
@@ -4442,12 +4425,8 @@ RENAMES = [
         'Tick card-description scrolling while input bit0x100 at gPrng+0x146 is set and field flags permit it. Up/down bits0x40/0x80 select two-step four-pixel motion; at offset+8 or-8 refill one row of the14-row OBJ tile ring and reset the phase. Scroll-state bits6:0 hold total rows, bits13:7 the text row, bits15:14 the phase; bytes2/3 hold pixel offset and ring index. Always draw normal OAM; argument0x800 also draws a mosaic copy. Return1 when input/field guards block scrolling, otherwise0.'),
 
     # --- batch #16 (campaign-16, 2026-05-08) card display VRAM rendering pipeline ---
-    ("FUN_080c9c94", "advance_card_display_effect_step",
-        "Advance one step of the card display effect animation (fade/slide/flip). "
-        "Called by the card display scene state machine; reads current effect phase from "
-        "EWRAM card display state struct, increments phase counter, triggers VRAM/OAM updates. "
-        "r0: card_display_state_ptr. Returns void. "
-        "Side effects: phase counter incremented; OAM and/or VRAM updated per effect step."),
+    ('FUN_080c9c94', 'tick_card_description_window_effect',
+        'Run the nine-phase card-description window effect using gDuelFieldState+1 and its halfword counter at+2. Initialize the description tiles from card ID at+0x21c, enable WIN0/WIN1, fade into scrolling, wait for tick_card_description_scroll(0), then fade out and clear window bounds. Return0 while active. After phase8, clear field+0x215 bit2 and the card ID, disable blending, reset phase0, and return1. No inputs.'),
     ("FUN_080f0720", "test_char_kinsoku_tail",
         "Test whether a character code is a kinsoku tail character (cannot start a line in JP typography). "
         "r0: char_code (u16 JP character code). "
@@ -4533,13 +4512,8 @@ RENAMES = [
         'Set UI-effect flag 0x10 at gDuelFieldState+0x215. Store the low8 initial selection index in bits11:4 of gFontState+0xa0e, preserving other bits. Clear 0x4000 OBJ bytes at AOB_CARD_TILE_VRAM, copy four label tiles and one overlay tile, then copy 0x20 palette bytes to OBJ palette slot3. Set gFontState display mode to 0x0d. Only r0 is an input.'),
     ('FUN_080c3b50', 'render_zone_list_scroll_arrows',
         'Draw zone-list scroll-arrow OAM for both players when their zone/hand count exceeds7. Omit the backward arrow at origin0 and the forward arrow when origin>=count-7. Read the visible origin from gDuelFieldState+0x4c+2*player. Use tile0x20, side-dependent positions/flip, phase jitter from u16(0x0300024c), and palette cycling0..2 when the selected type11 list has the matching held direction key. This renderer reads no card tile data and writes no BG VRAM.'),
-    ("FUN_080c9eb8", "write_decimal_digits_to_oam",
-        "Write decimal digit OAM entries for a numeric value (LP/ATK/DEF) to OAM buffer. "
-        "Decomposes r0 into decimal digits, looks up digit tile indices, "
-        "writes OAM attr0/1/2 entries for each digit sprite. "
-        "r0: value [0..9999]; r1: oam_dest ptr; r2: x_start [0..239]; r3: y_pos [0..159]. "
-        "Returns void. Side effects: OAM buffer entries written. "
-        "Constants: digit_tile_base_idx in OBJ VRAM tile map."),
+    ('FUN_080c9eb8', 'write_decimal_digits_to_oam',
+        'Append decimal digit sprites right-to-left, spaced4 pixels, through write_oam_entry_from_packed_args. r0=x, r1=y, r2=value, r3=minimum_digits, fifth stack argument=palette. Use tile0xae+digit and palette<<12; emit at least one digit, then pad with leading zero tiles to minimum_digits. Digits use signed division/remainder by10. Writes the active OAM buffer; no destination pointer argument.'),
     ("FUN_08095b50", "check_player_side_condition",
         "Check whether the player_side condition flag is set for a given slot. "
         "Reads gDuelFieldSlots[player_side][slot_idx] condition byte and tests a specific bit. "
@@ -5675,34 +5649,14 @@ RENAMES = [
         "Constants: TILE_INDEX_MASK=0x3ff, PALETTE_BANK_MASK=0xf000, "
         "PALETTE_FIELD_MASK=0xf0000000 (sp[4] palette_mask)."),
 
-    ("FUN_080ca4f4", "upload_player_icon_gfx_to_vram",
-        "当 duel field scene 需要将某玩家的 LP/图标数字 tile 数据和调色板上传到 VRAM 时调用 "
-        "(indeg=1, tags: vram palette scene_duel_field). "
-        "函数根据 player_side (r0) 与当前激活玩家 (gDuelState[+0x4] XOR 1) 是否匹配, "
-        "在两个 VRAM 目标地址间选择 (0x0600fb80=player 1 位置, 0x0600f840=player 2 位置). "
-        "以 r4 (tile_row start = 0x1CE 或 0x1D7) / r3 (步进) 为基准, "
-        "外层循环 r3=3..0 (3 次) 写入 3 列 tile halfword 到 BG tile map. "
-        "然后读 gDuelState 判断当前玩家, 根据是否对侧从 icon_palettes_base (ROM) "
-        "选择 +0x20 偏移的调色板, 以 copy_bytes_by_halfword 复制 0x40 字节到 "
-        "BG_PAL_VRAM (0x05000180). "
-        "若当前玩家==对侧, 还从 icon_tiles_base (ROM asset 0x0600bae0 或 0x0600b9c0) "
-        "+ player offset 复制 0x120 字节 icon tile. "
-        "Constants: gDuelState=0x0201e2a0, BG_TILE_MAP_P1=0x0600fb80, "
-        "BG_TILE_MAP_P2=0x0600f840, BG_PALETTE_ICON=0x05000180, "
-        "ICON_TILE_SIZE=0x120 bytes, PALETTE_COPY_SIZE=0x40 bytes, "
-        "tile_row_start_local=0x1CE, tile_row_start_remote=0x1D7."),
+    ('FUN_080ca4f4', 'upload_player_icon_gfx_to_vram',
+        'Write a selected player portrait as a3x3 BG tilemap and copy its tiles/palette. r0=player,r1=icon_index; r2 is unused. Opponent comparison selects map0x0600f840 versus0x0600fb80, base tile0x1d7 versus0x1ce, and palette13 versus12. Copy0x120 bytes from icon_tiles_base+0x120*icon_index. Copy0x40 bytes from icon_palettes_base+32*icon_index into the selected BG palette destination. No decompression.'),
 
     # 2026-05-09: campaign-24 batch (topo=539-560, 20 functions)
     ('FUN_080ca5f8', 'write_lp_digit_tiles_to_vram',
-        'Writes five decimal LP digits for player_id r0 and value r1, clamped to99999, into the selected LP VRAM row. The opponent comparison selects offset+8 or+0x448; each digit writes a tile index based at0x134. Called by play_life_point_change_effect and two other display paths.'),
-    ("FUN_080ca8ec", "init_duel_field_tile_indices",
-        "在 duel field 初始化流程中被 init_duel_field_vram_layout (indeg=8) 调用, "
-        "向 VRAM 两块 tile 索引区写入连续递增 tile 编号序列, "
-        "以及向 palette VRAM 区写入带高位 OR 掩码 (0xe000) 的 tile 属性 halfword. "
-        "双层嵌套循环填充两组 tile 区 (各 6 行 x 4 列), 再以第三组循环写入 palette 属性. "
-        "无外部参数 (void). "
-        "Constants: VRAM_TILE_AREA_A=DAT_080caac4, VRAM_TILE_AREA_B=DAT_080caad0, "
-        "TILE_ATTR_PAL_MASK=0xe000, row_stride=0x40 bytes."),
+        'Write five decimal LP digits into the selected BG tilemap row. r0=player,r1=value; clamp values above99999. Start at card_display_frame_bg_map+8 for local_player XOR1, otherwise+0x448. Store tile0x134+digit and step backward2 bytes, using signed remainder/division by10. No inputs beyond r0/r1; no OAM writes.'),
+    ('FUN_080ca8ec', 'init_duel_field_hud_tiles_and_palettes',
+        'Initialize duel-field HUD BG maps, LP digit tiles, outer-field resources, player portraits, background tiles/palette, and shared OBJ glyph sheets. Select outer resources from the mode in field+0x220 and inner resources from field+0x212. Build the15x12 inner map with palette10. Copy phase labels and count/timer/result glyphs into fixed OBJ regions using tile_2d_row_copy. No inputs.'),
     ("FUN_080f7e0c", "resolve_aob_pattern_entry_ptr",
         "来自 system/s_opdobj.c line 188. "
         "给定 AOB 上下文指针 (r0) 和图案编号 (r1, u16), "
@@ -6167,27 +6121,10 @@ RENAMES = [
         'Finish the field-background transition. AND DISPCNT with0x9fff to disable WIN0 and WIN1 while preserving OBJWIN and the other display bits. Clear BLDCNT and BLDY; BLDALPHA is not written. Return1 for the phase callback.'),
     ('FUN_080bd3f4', 'tick_banner_display_state_machine',
         'Outer banner display dispatcher. Phase1 runs 16 motion ticks. Phase2 waits 89 ticks; then gPrng+0x23f bit0 and duel-zone direction(2) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes. Phases4..7 and invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer but the current call returns1. It does not advance PRNG.'),
-    ("FUN_0803bc58", "check_card_play_condition_eligible",
-        "检查给定卡牌播放/效果条件是否满足. "
-        "r0 为来自调用方的索引 (从 FUN_080c9f50 传入 ldr r0,[r0,#0x4] 的值). "
-        "首先检查 gBannerState 相关结构体 (0x0201bcc0 + 0x80c/0x808 偏移) 是否均为 0; "
-        "若非 0 则直接返回 0 (不满足). "
-        "通过后检查 gP1LifePoints 结构中对应玩家的 LP 字段, 激活状态字段, 以及特定状态码; "
-        "还会调用 check_player_side_condition 判断玩家阵营条件. "
-        "最终返回 0 (不满足) 或 1 (满足). "
-        "Constants: BASE=0x0201bcc0, OFFSET_STATE_A=0x80c, OFFSET_STATE_B=0x808, "
-        "gP1LifePoints=0x0201c4e0, LP_OFFSET_PLAYER=0x1ce8, LP_OFFSET_ACTIVE=0x1d10, "
-        "LP_OFFSET_TARGET=0x1d4c."),
-    ("FUN_080c9f50", "render_card_view_scene_by_lp_time",
-        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 和 FUN_080ca42c 调用. "
-        "首先检查 gP1LifePoints+0x1d08 是否非零 (LP 存在); 若为零直接跳到函数末尾. "
-        "然后调用 check_card_play_condition_eligible (FUN_0803bc58) 判断卡牌播放条件; 不满足则跳转. "
-        "满足后, 从 LP 结构读取时间字段 (gP1LifePoints+r8*4+0x214), "
-        "除以 0x3c (60) 得到分钟 r5 和秒数 r7, "
-        "再调用各卡牌渲染子程序 (render_jp_string_to_tile_line 等) 将卡牌信息绘制到 BG tile VRAM. "
-        "函数使用 r8/r9 作为 high-register callee-save 参数别名. "
-        "Constants: gP1LifePoints=0x0201c4e0, OFFSET_LP_CHECK=0x1d08, TIME_DIV=0x3c (60), "
-        "gPrng=0x03000040, TIME_LAYOUT=0x00660028."),
+    ('FUN_0803bc58', 'check_card_play_condition_eligible',
+        'Eligibility predicate used by render_duel_timer_oam. r0=player. Reject nonzero display-sequence+0x808/+0x80c. If card-context[8+4*player]==1, require matching turn player and gP1LifePoints+0x1d10 nonzero,+0x1d18 equal3. For the local player, accept nonzero+0x1d4c or successful UI effect0x31/0x32. Otherwise require sprite-state+0x300 bit0 clear and check_player_side_condition nonzero. Return0/1; may trigger UI effects.'),
+    ('FUN_080c9f50', 'render_duel_timer_oam',
+        'Render two MM:SS countdowns from the masked frame counters at gPrng+0x214 and+0x210. Require gP1LifePoints+0x1d08 nonzero. The first has a180-second limit and calls check_card_play_condition_eligible(local_player). The second uses300 times scene+0x37 bits4:2 seconds, unless field+0x224 or scene+0x36 bit6 blocks it. Blink the final minute via gPrng+0x20c bit2. No inputs.'),
     ("FUN_080cd250", "init_field_bg_tile_vram_layout",
         "由 FUN_080c7950 (vram/card_stats/font_jp) 和 FUN_080c7ea0 (window/vram/display/card) 调用. "
         "函数入口将 r0 低 16 位 (r5=u16_lo) 和高 16 位 (r4=u16_hi) 分别提取作为 palette index 和 tile 偏移参数. "
@@ -6255,16 +6192,8 @@ RENAMES = [
         "函数使用 r8/r9 callee-save high-register 别名, 由 .hword 0x4657/464e/4645/4682 搬移. "
         "Constants: STATE_BASE=0x02006ed0, STATE_DATA=0x0201f441, "
         "VRAM_BG=0x06014000, FONT_SIZE=0x200, LOOP_RANGE=[0..1]."),
-    ("FUN_080ca160", "render_lp_zone_digit_oam_row",
-        "由 FUN_080c7ea0 (window/vram/display/card) 和 FUN_080ca42c (card_data/card_frame/..) 调用. "
-        "函数在结构体 0x0201e2a0 中循环查找 slot.id == 0; "
-        "比较键 r10 由函数内部 movs r0,#0; mov r10,r0 设置为 0 (非 caller-set). "
-        "每次命中 (slot.id==0) 后: 调用 write_oam_entry_from_packed_args 写一个 OAM 精灵条目; "
-        "然后三次调用 write_decimal_digits_to_oam 分别在 OAM 偏移 0x74/0x6c/0x64 写入 3 组十进制数字 (来自 r4 计算的 data 地址). "
-        "最终跳到 LAB_080ca266 结束. "
-        "Constants: STRUCT_BASE=0x0201e2a0, gP1LifePoints=0x0201c4e0, "
-        "OAM_SHAPE_SIZE=0xc4<<0xf|0xe0, DIGIT_OAM_OFF_A=0x74, DIGIT_OAM_OFF_B=0x6c, DIGIT_OAM_OFF_C=0x64, "
-        "DATA_STRIDE=0x868, ZONE_ENTRY_STRIDE=0xec, LOOP_KEY=0."),
+    ('FUN_080ca160', 'render_player_zone_count_oam',
+        'Render both players deck, Graveyard and Removed Cards counts from player-block+0x10,+0x14,+0x1c, with PLAYER_BLOCK_STRIDE. Compare loop index0..1 with gDuelCardCtxBase+4 to select upper/lower positions; use the player low bit for block lookup. Draw a16x32 marker, then the three counts at x236 with y116/108/100 or y41/33/25. No inputs.'),
     ("FUN_080ccfe4", "render_jp_two_line_text_to_bg_vram_alt",
         "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
         "与 080d04dc 结构完全对称: 初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
@@ -11914,6 +11843,14 @@ RENAMES = [
         'Render a horizontal slot-count gauge. Read count bits11:4 from gFontState+0xa0e and save the value from get_duel_field_card_count. Center count eight-pixel entries at x140-4*count,y68. Indices before count-value use palette0, the rest palette3. Append four frame pieces at x100,116,132,148. Set gDuelFieldState+0x215 bit5 when the saved value is0. Emit OAM directly. No inputs.'),
     ('FUN_080c9218', 'render_zone_list_order_oam',
         'Render list ordinals for the field+0xa zone records at field+0xc, stride4, in reverse order. Each record supplies zone and player; the displayed number is record index+1. Group zone types0..4 and5..9 before coordinate lookup, retain types10..15, and use fixed coordinates for larger types. Draw decimal digits with tile base0x8e and a frame with attr2=0xda. All digits of one ordinal use the same computed x coordinate. No inputs.'),
+    ('FUN_080ca28c', 'render_duel_turn_count_oam',
+        'Render the duel turn-count marker and number. Read the turn counter at gP1LifePoints+0x1cec and display count+1 by default. Compare field+0x224 and scene+0x36 bit6 to select the alternate display count-(field_counter-1), tile0x12 and one-pixel vertical shift. Put the marker at x23, y11 or115 according to the turn player, then emit at least two decimal digits at x28. No inputs.'),
+    ('FUN_080ca348', 'render_duel_phase_highlight_oam',
+        'Append the current duel-phase highlight sprite. Read the phase from gP1LifePoints+0x1cf4 and the turn player from+0x1ce8. Use x31,y=8+22*phase, a16x32 shape, and tile0x14+2*phase. Select palette2 when the turn player equals local_player XOR1, otherwise palette1. No inputs; writes the active OAM buffer.'),
+    ('FUN_080ca3a4', 'render_duel_result_history_oam',
+        'Render result-history bytes at gPrng+0x241, including index0 when nonzero. The eight-bit count is(gPrng[0x23f]>>1)|((gPrng[0x240]&1)<<7). Skip state0. For each other state append tiles0xf7+state and0xf7+mapped_state at x8*index,y128 and24. Map1->2,2->1,3->3; other nonzero states map to0. No inputs.'),
+    ('FUN_080ca42c', 'render_duel_hud_oam',
+        'Render the duel HUD OAM unless field+0x21e bit0 masks it. With gP1LifePoints+0x1d14 nonzero, draw the phase and turn count, plus result history when enabled and scene+0x36 bit6 is clear. Three further context flags gate the player-counter rows. Render countdown timers only when scene+0x37 bits4:2 is nonzero. No inputs.'),
 ]
 
 
