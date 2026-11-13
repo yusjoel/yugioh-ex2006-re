@@ -2341,7 +2341,7 @@ init_pack_card_info_bg_and_vram:
     ldr r0, PTR_DAT_080d70d8                 @ 080d70a6 0c48
     adds r1,r5,#0x0    @ 080d70a8 291c
     bl zero_fill_halfword_wrapper            @ 080d70aa 1df0f5fe
-    ldr r0, PTR_DAT_080d70dc                 @ 080d70ae 0b48
+    ldr r0, PTR_card_display_frame_bg_map_080d70dc @ 080d70ae 0b48
     adds r1,r4,#0x0    @ 080d70b0 211c
     bl zero_fill_halfword_wrapper            @ 080d70b2 1df0f1fe
     bl reset_all_bg_scroll_regs_and_shadows  @ 080d70b6 1ef0e7fc
@@ -2362,7 +2362,7 @@ PTR_BG_SCREENBLOCK_29_BASE_080d70d4:
     .word  0x0600e800                     @ 080d70d4 00e80006
 PTR_DAT_080d70d8:
     .word  0x06008000                     @ 080d70d8 00800006
-PTR_DAT_080d70dc:
+PTR_card_display_frame_bg_map_080d70dc:
     .word  0x0600f000                     @ 080d70dc 00f00006
 
 @ Maps pack card slot index r0 to screen Y pixel coordinate. r0==0 or r0==2/3: returns 0x28 (40 px, top row); r0==1: returns 0x78 (120 px, bottom row). No push/pop, pure combinational leaf function. Called by pack card info page when computing OAM sprite Y coordinate.

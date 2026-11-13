@@ -11738,7 +11738,7 @@ get_zone_slot_ptr_stride_f:
 get_zone_slot_ptr_field_slots_a:
     .word  gDuelFieldSlots                @ 0803b3a4 10c50102
 
-@ Reads the entity_ref field from a zone slot selected by zone_type_code (r1) via switch-dispatch. Switch covers type_code 0xb..0xf (5 cases) plus default (two paths: r1+r2<=10 / >10). Symmetric sibling of get_zone_slot_card_ref_by_type (0x0803b4b0): both return [slot+0], but this function extracts bits[22..16]<<1 | bit[13] (entity/player reference bits) via lsls/lsrs. Params: r0=zone_idx, r1=zone_type_code, r2=slot_idx, r3=player_id (bit0). Bases: gDuelFieldSlots(0x0201c510)/gP1FieldArrayCBase(0x0201c600)/gP1ChainZoneArray(0x0201c880)/        gP1SlotSetCodeArray(0x0201c740)/gP1HandSlotArray(0x0201c8f8)/gP1AltHandSlotArray(0x0201cab0)/        gDuelEffectChainSlots(0x0201bc54). indeg=11. Constants: player_stride=0x868.
+@ Read the low13-bit entity reference from a selected zone slot. r0=player, r1=zone type and r2=subindex; r3 is scratch. Types11..15 select the field-array, chain, set-code, hand or alternate-hand arrays. Other types use type+subindex: indices0..10 address gDuelFieldSlots at stride20, and higher indices select gDuelEffectChainSlots through the current chain context. Per-player arrays use PLAYER_BLOCK_STRIDE. Return the selected word masked with0x1fff.
 get_zone_slot_entity_ref_by_type:
     push {r4,lr}                             @ 0803b3a8 10b5
     adds r3,r0,#0x0    @ 0803b3aa 031c

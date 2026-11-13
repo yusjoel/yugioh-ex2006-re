@@ -3878,3 +3878,10 @@
 .equ duel_field_panel_obj_palette, 0x0985329c
 .equ duel_action_menu_row_frame_left_tiles, 0x098532bc
 .equ duel_action_menu_row_frame_middle_tiles, 0x098532dc
+.equ duel_field_aux_obj_tile_data_10x1, 0x09850c7c
+.equ duel_field_aux_obj_tile_data_16x4, 0x09854590
+.equ duel_field_aux_obj_tile_data_14x2_a, 0x09889480
+.equ duel_field_aux_obj_tile_data_14x2_b, 0x09889800
+.equ duel_field_aux_obj_tile_data_6x4, 0x09889cd8
+.equ card_display_frame_bg_tile_data, 0x09889fd8
+.equ duel_field_aux_obj_tile_data_4x1, 0x0990c42c

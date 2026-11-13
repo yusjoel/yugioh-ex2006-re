@@ -4865,7 +4865,7 @@ write_oam_entry_attr_pairs:
 PTR_gPrng_080f6168:
     .word  gPrng                          @ 080f6168 40000003
 
-@ High-frequency OAM write primitive (indeg=83), called by card_stats/font_jp/opp_wins. r0 low16=x_coord (9-bit), high16=oam_y; r1=tile_index; r2=attr2. Locates gPrng sprite table entry, writes attr0/attr1/attr2 halfwords, increments tile count byte. DAT_080f61dc=0xfffffe00 masks attr1 X field. Same structure as write_oam_entry_with_tile_inc but different arg layout.
+@ Append one OAM entry to the buffer addressed by gPrng+0x1bc. r0 packs x in low16 and y in high16; r1 packs attr0 upper bits in its high byte and attr1 upper bits in its low byte; r2 supplies attr2. Merge y low8 and x low9, store the three halfwords at stride8, then increment the byte count at buffer+0x400. r1 encodes OBJ shape/size and other upper attribute bits, rather than a tile index.
 write_oam_entry_from_packed_args:
     push {r4,r5,r6,lr}                       @ 080f616c 70b5
     .hword 0x4656    @ 080f616e 5646
@@ -8975,7 +8975,7 @@ copy_anim_palette_to_obj_pal_slot:
 DWORD_080f7da0:
     .word  0x05000200                     @ 080f7da0 00020005
 
-@ 来自 system/s_opdobj.c. AOB 对象生命周期初始化入口, 被 14 个调用方共享. 清零 ctx 前 0x14 字节 (zero_fill_halfword_wrapper), 写入 p_ptnsect 到 [ctx+0x0], 从 mode_param 分离 tile_count (bits[31:16] -> [ctx+0x10]) 与 ptn_mode (bits[3:0] -> [ctx+0x12]), 检测图案数量 > 0x10 设 AOB_FLAG_LARGE (bit7), 写 init_flag 到 bit6, 最后调用 resolve_aob_pattern_entry_ptr(ctx, 0) 设置初始图案指针. Constants: AOB_CTX_SIZE_HALF=0x14, AOB_LARGE_TILE_THRESHOLD=0x10, AOB_FLAG_LARGE=0x80, AOB_FLAG_INIT=0x40.
+@ Initialize the0x14-byte AOB context r0 from the pattern section r1. r2 high16 supplies the tile base at ctx+0x10; its low4 supplies the palette index in ctx+0x12 bits3:0. Set ctx+0x12 bit7 when u16(r1+u32(r1+8)) exceeds16; render_aob_frame_to_oam maps it to attr0 bit13. Copy r3 bit0 into bit6, set ctx+0xe to1, then resolve pattern0.
 init_aob_ctx_from_ptnsect:
     push {r4,r5,r6,r7,lr}                    @ 080f7da4 f0b5
     .hword 0x4647    @ 080f7da6 4746

@@ -2088,7 +2088,14 @@ duel_action_menu_phase_handlers:
     .word tick_duel_action_menu_close_step+1
     .word run_duel_action_menu_card_info_transition+1
     .word 0
-.incbin "roms/2343.gba", 0x1E5ABA4, 0x58
+.global card_display_scene_phase_handlers
+card_display_scene_phase_handlers:
+    .word init_card_display_frame_by_mode+1
+    .word animate_card_display_frame_open+1
+    .word tick_card_list_display_master+1
+    .word animate_card_display_frame_close+1
+    .word 0
+.incbin "roms/2343.gba", 0x1E5ABB8, 0x44
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

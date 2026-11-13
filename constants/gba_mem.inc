@@ -94,3 +94,11 @@
 .equ DUEL_FIELD_OPP_SLOT_TILE_VRAM, 0x060031c0
 .equ card_selection_panel_label_obj_tiles, 0x06013400
 .equ card_selection_panel_overlay_obj_tile, 0x06010800
+.equ card_display_frame_bg_tiles, 0x0600a7c0
+.equ card_display_frame_bg_map, 0x0600f000
+.equ card_display_frame_bg_map_left, 0x0600f00a
+.equ card_display_frame_bg_map_right, 0x0600f020
+.equ duel_field_aux_obj_tiles_6x4, 0x06010140
+.equ duel_field_aux_obj_tiles_10x1, 0x060111c0
+.equ duel_field_aux_obj_tiles_4x1, 0x06011b40
+.equ duel_field_aux_obj_tiles_14x2_a, 0x06012240
