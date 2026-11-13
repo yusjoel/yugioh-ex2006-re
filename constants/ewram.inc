@@ -713,3 +713,6 @@ gDuelPhaseFlags_criteria_arr_base = 0x0201b850  @ gDuelPhaseFlags+0x5c0: base ad
 .equ DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF, 0x00000212
 .equ gCardDisplayFrameStepLo, 0x0201fe5b
 .equ gCardDisplayFrameStepHi, 0x0201fe5c
+.equ gEquipTargetEligibilityCache, 0x020230c4
+.equ gCardDescriptionScrollState, 0x02023348
+.equ gSceneWorkArea, 0x02039eb0

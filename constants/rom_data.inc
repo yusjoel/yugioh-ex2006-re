@@ -3885,3 +3885,5 @@
 .equ duel_field_aux_obj_tile_data_6x4, 0x09889cd8
 .equ card_display_frame_bg_tile_data, 0x09889fd8
 .equ duel_field_aux_obj_tile_data_4x1, 0x0990c42c
+.equ field_spell_background_tiles, 0x09867580
+.equ field_spell_background_palettes, 0x09889180

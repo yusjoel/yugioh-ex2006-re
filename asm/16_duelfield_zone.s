@@ -6067,7 +6067,7 @@ LAB_080c419c:
     adds r3,r5,#0x0    @ 080c41f6 2b1c
     bl render_field_slot_card_tile           @ 080c41f8 fff768fb
 LAB_080c41fc:
-    bl refresh_zone_effect_buff_cache        @ 080c41fc 04f098fd
+    bl refresh_equip_target_eligibility_cache @ 080c41fc 04f098fd
     bl build_slot_activation_mask_for_player @ 080c4200 04f0f6fc
 LAB_080c4204:
     add sp,#0x8                              @ 080c4204 02b0
@@ -15902,27 +15902,27 @@ LAB_080c8bdc:
 render_duel_field_slot_oam_grid_card_image_right_column_obj_attr_080c8bec:
     .word  CARD_IMAGE_RIGHT_COLUMN_OBJ_ATTR @ 080c8bec 80800000  CARD_IMAGE_RIGHT_COLUMN_OBJ_ATTR: operand-0 data equate, value0x00008080.
 
-@ Build slot activation bitmask at 0x020230c0+3 for current player. Only runs when player_state==3 (duel phase check). Loops slot 0..4 calling eval_slot_activation_guard_full; clears mask if gPrng+0x1d10==-1.
+@ Clear gDuelZoneActivationState+3, then build its five-slot activation mask when gP1LifePoints+0x1cf4 equals3. Use the player stored at gP1LifePoints+0x1ce8 and eval_slot_activation_guard_full(player,slot,1). Independently, if gZoneDisplayState+0xc equals-1, clear bit0 of gZoneDisplayState. The final guard does not clear the activation mask. No inputs.
 build_slot_activation_mask_for_player:
     push {r4,r5,r6,lr}                       @ 080c8bf0 70b5
-    ldr r2, DAT_080c8c44                     @ 080c8bf2 144a
+    ldr r2, build_slot_activation_mask_for_player_ptr_g_duel_zone_activation_state_080c8c44 @ 080c8bf2 144a
     movs r0,#0x0    @ 080c8bf4 0020
     strb r0,[r2,#0x3]                        @ 080c8bf6 d070
-    ldr r1, PTR_gP1LifePoints_080c8c48       @ 080c8bf8 1349
-    ldr r3, DAT_080c8c4c                     @ 080c8bfa 144b
+    ldr r1, build_slot_activation_mask_for_player_ptr_g_p1_life_points_080c8c48 @ 080c8bf8 1349
+    ldr r3, build_slot_activation_mask_for_player_duel_field_cursor_state_off_080c8c4c @ 080c8bfa 144b
     adds r0,r1,r3    @ 080c8bfc c818
-    ldr r0,[r0,#0x0]                         @ 080c8bfe 0068
+    ldr r0,[r0,#0x0]                         @ 080c8bfe 0068  -- Require the cursor/field state at gP1LifePoints+0x1cf4 to equal3.
     cmp r0,#0x3                              @ 080c8c00 0328
     bne LAB_080c8c2a                         @ 080c8c02 12d1
     movs r4,#0x0    @ 080c8c04 0024
-    ldr r0, DAT_080c8c50                     @ 080c8c06 1248
+    ldr r0, build_slot_activation_mask_for_player_p1lp_block2_off_1ce8_080c8c50 @ 080c8c06 1248
     adds r6,r1,r0    @ 080c8c08 0e18
     adds r5,r2,#0x0    @ 080c8c0a 151c
 LAB_080c8c0c:
     ldr r0,[r6,#0x0]                         @ 080c8c0c 3068
     adds r1,r4,#0x0    @ 080c8c0e 211c
     movs r2,#0x1    @ 080c8c10 0122
-    bl eval_slot_activation_guard_full       @ 080c8c12 6bf7a3fe
+    bl eval_slot_activation_guard_full       @ 080c8c12 6bf7a3fe  -- Evaluate activation for player at+0x1ce8, slot0..4, argument r2=1.
     cmp r0,#0x0                              @ 080c8c16 0028
     beq LAB_080c8c24                         @ 080c8c18 04d0
     movs r0,#0x1    @ 080c8c1a 0120
@@ -15935,8 +15935,8 @@ LAB_080c8c24:
     cmp r4,#0x4                              @ 080c8c26 042c
     ble LAB_080c8c0c                         @ 080c8c28 f0dd
 LAB_080c8c2a:
-    ldr r2, DAT_080c8c54                     @ 080c8c2a 0a4a
-    ldr r1,[r2,#0xc]                         @ 080c8c2c d168
+    ldr r2, build_slot_activation_mask_for_player_ptr_g_zone_display_state_080c8c54 @ 080c8c2a 0a4a
+    ldr r1,[r2,#0xc]                         @ 080c8c2c d168  -- Test gZoneDisplayState+0xc against-1; this address is not gPrng.
     movs r0,#0x1    @ 080c8c2e 0120
     rsbs r0,r0,#0    @ 080c8c30 4042
     cmp r1,r0                                @ 080c8c32 8142
@@ -15944,42 +15944,34 @@ LAB_080c8c2a:
     subs r0,#0x1    @ 080c8c36 0138
     ldrb r3,[r2,#0x0]                        @ 080c8c38 1378
     ands r0,r3    @ 080c8c3a 1840
-    strb r0,[r2,#0x0]                        @ 080c8c3c 1070
+    strb r0,[r2,#0x0]                        @ 080c8c3c 1070  -- Clear gZoneDisplayState bit0, leaving the slot activation mask intact.
 LAB_080c8c3e:
     pop {r4,r5,r6}                           @ 080c8c3e 70bc
     pop {r0}                                 @ 080c8c40 01bc
     bx r0                                    @ 080c8c42 0047
-DAT_080c8c44:
-    .word  0x020230c0                     @ 080c8c44 c0300202
-PTR_gP1LifePoints_080c8c48:
-    .word  gP1LifePoints                  @ 080c8c48 e0c40102
-DAT_080c8c4c:
-    .word  0x00001cf4                     @ 080c8c4c f41c0000
-DAT_080c8c50:
-    .word  0x00001ce8                     @ 080c8c50 e81c0000
-DAT_080c8c54:
-    .word  0x0201fe60                     @ 080c8c54 60fe0102
+build_slot_activation_mask_for_player_ptr_g_duel_zone_activation_state_080c8c44:
+    .word  gDuelZoneActivationState       @ 080c8c44 c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
+build_slot_activation_mask_for_player_ptr_g_p1_life_points_080c8c48:
+    .word  gP1LifePoints                  @ 080c8c48 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+build_slot_activation_mask_for_player_duel_field_cursor_state_off_080c8c4c:
+    .word  DUEL_FIELD_CURSOR_STATE_OFF    @ 080c8c4c f41c0000  DUEL_FIELD_CURSOR_STATE_OFF: operand-0 data equate, value0x00001cf4.
+build_slot_activation_mask_for_player_p1lp_block2_off_1ce8_080c8c50:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 080c8c50 e81c0000  P1LP_BLOCK2_OFF_1CE8: operand-0 data equate, value0x00001ce8.
+build_slot_activation_mask_for_player_ptr_g_zone_display_state_080c8c54:
+    .word  gZoneDisplayState              @ 080c8c54 60fe0102  Pointer to gZoneDisplayState; operand-0 DATA reference added.
 
-@ Called by render_duel_field_oam_all (0x080ccdf4) when gP1LifePoints+0x1cf4 field==3. First checks two global flags: [0x02023130+0x215] bit2 and [0x0201ff30] bit0 -> if either nonzero jumps to exit. Loops r5=0..4 (5 AOB zone slots): reads [0x020230c0+3] byte, shifts by r5 to get bit -> if 0 skips. Reads [0x0201e1c8]=AOB slot coord table base, calls resolve_zone_oam_base_coords_by_type(zone=0, player=0) for coords r1. Reads [0x0201fe60] bit1: if set and [0x0201fe60+8]==r5 -> calls write_zone_pair_oam_with_coords; else if bit0 set -> calls render_aob_frame_to_oam. If [0x0201fe60] bit1 set -> calls tick_aob_frame_counter. Finally calls tick_aob_frame_counter(AOB_ptr). Exit: void.
-@ 
-@ Constants:
-@ - BASE=0x02023130
-@ - RENDER_GUARD_OFFSET=0x215 (bit2=render disabled)
-@ - SECOND_GUARD=0x0201ff30 (bit0=another mask flag)
-@ - AOB_STATUS_BYTE=0x020230c0+3 (5-bit slot status byte)
-@ - AOB_SLOT_BASE=0x0201e1c8 (AOB slot data table)
-@ - AOB_FRAME_STATE=0x0201fe60 (bit0=anim frame active, bit1=active pair)
+@ Render the five slots enabled by gDuelZoneActivationState+3. Abort on field+0x215 bit2 or gCardCtxSlotData bit0. Resolve zone0 coordinates using the player in gEquipZoneCountTable. For the selected slot in gZoneDisplayState+8, bit1 selects its special display: bit0 chooses explicit pair coordinates, otherwise render its AOB at state+0x48. Other slots use gDuelFieldAuxAobCtx. Tick the selected AOB when bit1 is set, and always tick the shared auxiliary AOB.
 render_aob_zone_slot_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c8c58 f0b5
-    ldr r1, DAT_080c8cc0                     @ 080c8c5a 1949
-    ldr r0, DAT_080c8cc4                     @ 080c8c5c 1948
+    ldr r1, render_aob_zone_slot_oam_ptr_g_duel_field_state_080c8cc0 @ 080c8c5a 1949
+    ldr r0, render_aob_zone_slot_oam_duel_field_ui_effect_flags_off_080c8cc4 @ 080c8c5c 1948
     adds r1,r1,r0    @ 080c8c5e 0918
     movs r0,#0x4    @ 080c8c60 0420
     ldrb r1,[r1,#0x0]                        @ 080c8c62 0978
     ands r0,r1    @ 080c8c64 0840
     cmp r0,#0x0                              @ 080c8c66 0028
     bne LAB_080c8d20                         @ 080c8c68 5ad1
-    ldr r1, DAT_080c8cc8                     @ 080c8c6a 1749
+    ldr r1, render_aob_zone_slot_oam_ptr_g_card_ctx_slot_data_080c8cc8 @ 080c8c6a 1749
     movs r0,#0x1    @ 080c8c6c 0120
     ldrb r1,[r1,#0x0]                        @ 080c8c6e 0978
     ands r0,r1    @ 080c8c70 0840
@@ -15987,9 +15979,9 @@ render_aob_zone_slot_oam:
     bne LAB_080c8d20                         @ 080c8c74 54d1
     movs r5,#0x0    @ 080c8c76 0025
     movs r6,#0x1    @ 080c8c78 0126
-    ldr r7, DAT_080c8ccc                     @ 080c8c7a 144f
+    ldr r7, render_aob_zone_slot_oam_ptr_g_equip_zone_count_table_080c8ccc @ 080c8c7a 144f
 LAB_080c8c7c:
-    ldr r0, DAT_080c8cd0                     @ 080c8c7c 1448
+    ldr r0, render_aob_zone_slot_oam_ptr_g_duel_zone_activation_state_080c8cd0 @ 080c8c7c 1448
     ldrb r0,[r0,#0x3]                        @ 080c8c7e c078
     asrs r0,r5    @ 080c8c80 2841
     ands r0,r6    @ 080c8c82 3040
@@ -15998,11 +15990,11 @@ LAB_080c8c7c:
     ldr r0,[r7,#0x0]                         @ 080c8c88 3868
     movs r1,#0x0    @ 080c8c8a 0021
     adds r2,r5,#0x0    @ 080c8c8c 2a1c
-    bl resolve_zone_oam_base_coords_by_type  @ 080c8c8e faf78dfc
+    bl resolve_zone_oam_base_coords_by_type  @ 080c8c8e faf78dfc  -- Resolve coordinates for player=gEquipZoneCountTable[0], zone0, subindex=slot.
     lsls r1,r0,#0x10    @ 080c8c92 0104
     lsrs r1,r1,#0x10    @ 080c8c94 090c
     lsrs r4,r0,#0x10    @ 080c8c96 040c
-    ldr r3, DAT_080c8cd4                     @ 080c8c98 0e4b
+    ldr r3, render_aob_zone_slot_oam_ptr_g_zone_display_state_080c8cd4 @ 080c8c98 0e4b
     ldrb r2,[r3,#0x0]                        @ 080c8c9a 1a78
     movs r0,#0x2    @ 080c8c9c 0220
     ands r0,r2    @ 080c8c9e 1040
@@ -16014,25 +16006,25 @@ LAB_080c8c7c:
     adds r0,r6,#0x0    @ 080c8caa 301c
     ands r0,r2    @ 080c8cac 1040
     cmp r0,#0x0                              @ 080c8cae 0028
-    beq LAB_080c8cd8                         @ 080c8cb0 12d0
+    beq LAB_080c8cd8                         @ 080c8cb0 12d0  -- Selected slot: bit0 chooses explicit pair coordinates; clear bit0 selects the AOB branch.
     ldrh r0,[r3,#0x1c]                       @ 080c8cb2 988b
     ldrh r1,[r3,#0x1e]                       @ 080c8cb4 d98b
     movs r2,#0x8    @ 080c8cb6 0822
     bl write_zone_pair_oam_with_coords       @ 080c8cb8 f9f76afe
     b LAB_080c8d00                           @ 080c8cbc 20e0
     .zero  0x2
-DAT_080c8cc0:
-    .word  0x02023130                     @ 080c8cc0 30310202
-DAT_080c8cc4:
-    .word  0x00000215                     @ 080c8cc4 15020000
-DAT_080c8cc8:
-    .word  0x0201ff30                     @ 080c8cc8 30ff0102
-DAT_080c8ccc:
-    .word  0x0201e1c8                     @ 080c8ccc c8e10102
-DAT_080c8cd0:
-    .word  0x020230c0                     @ 080c8cd0 c0300202
-DAT_080c8cd4:
-    .word  0x0201fe60                     @ 080c8cd4 60fe0102
+render_aob_zone_slot_oam_ptr_g_duel_field_state_080c8cc0:
+    .word  gDuelFieldState                @ 080c8cc0 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_aob_zone_slot_oam_duel_field_ui_effect_flags_off_080c8cc4:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c8cc4 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: operand-0 data equate, value0x00000215.
+render_aob_zone_slot_oam_ptr_g_card_ctx_slot_data_080c8cc8:
+    .word  gCardCtxSlotData               @ 080c8cc8 30ff0102  Pointer to gCardCtxSlotData; operand-0 DATA reference added.
+render_aob_zone_slot_oam_ptr_g_equip_zone_count_table_080c8ccc:
+    .word  gEquipZoneCountTable           @ 080c8ccc c8e10102  Pointer to gEquipZoneCountTable; operand-0 DATA reference added.
+render_aob_zone_slot_oam_ptr_g_duel_zone_activation_state_080c8cd0:
+    .word  gDuelZoneActivationState       @ 080c8cd0 c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
+render_aob_zone_slot_oam_ptr_g_zone_display_state_080c8cd4:
+    .word  gZoneDisplayState              @ 080c8cd4 60fe0102  Pointer to gZoneDisplayState; operand-0 DATA reference added.
 LAB_080c8cd8:
     adds r1,#0x4    @ 080c8cd8 0431
     adds r0,r4,#0x4    @ 080c8cda 201d
@@ -16042,14 +16034,14 @@ LAB_080c8cd8:
     adds r0,#0x48    @ 080c8ce2 4830
     movs r2,#0x0    @ 080c8ce4 0022
     movs r3,#0x1    @ 080c8ce6 0123
-    bl render_aob_frame_to_oam               @ 080c8ce8 2ff08af9
+    bl render_aob_frame_to_oam               @ 080c8ce8 2ff08af9  -- Render the selected AOB at gZoneDisplayState+0x48 with x+4/y+4.
     b LAB_080c8d00                           @ 080c8cec 08e0
 LAB_080c8cee:
     adds r1,#0x4    @ 080c8cee 0431
     adds r0,r4,#0x4    @ 080c8cf0 201d
     lsls r0,r0,#0x10    @ 080c8cf2 0004
     orrs r1,r0    @ 080c8cf4 0143
-    ldr r0, DAT_080c8d28                     @ 080c8cf6 0c48
+    ldr r0, render_aob_zone_slot_oam_ptr_g_duel_field_aux_aob_ctx_080c8d28 @ 080c8cf6 0c48
     movs r2,#0x0    @ 080c8cf8 0022
     movs r3,#0x1    @ 080c8cfa 0123
     bl render_aob_frame_to_oam               @ 080c8cfc 2ff080f9
@@ -16057,7 +16049,7 @@ LAB_080c8d00:
     adds r5,#0x1    @ 080c8d00 0135
     cmp r5,#0x4                              @ 080c8d02 042d
     ble LAB_080c8c7c                         @ 080c8d04 badd
-    ldr r1, DAT_080c8d2c                     @ 080c8d06 0949
+    ldr r1, render_aob_zone_slot_oam_ptr_g_zone_display_state_080c8d2c @ 080c8d06 0949
     movs r0,#0x2    @ 080c8d08 0220
     ldrb r2,[r1,#0x0]                        @ 080c8d0a 0a78
     ands r0,r2    @ 080c8d0c 1040
@@ -16067,22 +16059,22 @@ LAB_080c8d00:
     adds r0,#0x48    @ 080c8d14 4830
     bl tick_aob_frame_counter                @ 080c8d16 2ff0f7f8
 LAB_080c8d1a:
-    ldr r0, DAT_080c8d28                     @ 080c8d1a 0348
+    ldr r0, render_aob_zone_slot_oam_ptr_g_duel_field_aux_aob_ctx_080c8d28 @ 080c8d1a 0348
     bl tick_aob_frame_counter                @ 080c8d1c 2ff0f4f8
 LAB_080c8d20:
     pop {r4,r5,r6,r7}                        @ 080c8d20 f0bc
     pop {r0}                                 @ 080c8d22 01bc
     bx r0                                    @ 080c8d24 0047
     .zero  0x2
-DAT_080c8d28:
-    .word  0x020230f8                     @ 080c8d28 f8300202
-DAT_080c8d2c:
-    .word  0x0201fe60                     @ 080c8d2c 60fe0102
+render_aob_zone_slot_oam_ptr_g_duel_field_aux_aob_ctx_080c8d28:
+    .word  gDuelFieldAuxAobCtx            @ 080c8d28 f8300202  Pointer to gDuelFieldAuxAobCtx; operand-0 DATA reference added.
+render_aob_zone_slot_oam_ptr_g_zone_display_state_080c8d2c:
+    .word  gZoneDisplayState              @ 080c8d2c 60fe0102  Pointer to gZoneDisplayState; operand-0 DATA reference added.
 
-@ Reads packed render state from gPageState[+0x210] (0x02023340): bit7=player_flag, bits[0..6]=mode, bits[8..14]=sub_idx. Unpacks to player_flag(r0), mode+sub_idx combined(r1), cache_ptr=0x020230c4(r2), then calls build_equip_target_eligibility_table to recompute all zone ATK/DEF buff deltas and write into effect_buff_cache. Called by 4 callers immediately after zone display update or scene transition. No input parameters (reads all state from gPageState). Returns build_equip_target_eligibility_table return value (callers discard). Side-effect: [0x020230c4..] rewritten with fresh zone effect buff values. Constants: gPageState=0x02023130, render_state_offset=0x210, effect_buff_cache=0x020230c4.
-refresh_zone_effect_buff_cache:
+@ Refresh gEquipTargetEligibilityCache, a two-player by11-slot u16 table. Decode gDuelFieldState+0x210: player bit7, zone bits6:0, subindex bits14:8. Call build_equip_target_eligibility_table(player,zone+subindex,cache). The cache contains equip-target eligibility codes used to select indicator tiles, rather than ATK/DEF deltas. No inputs or return value.
+refresh_equip_target_eligibility_cache:
     push {r4,lr}                             @ 080c8d30 10b5
-    ldr r0, DAT_080c8d60                     @ 080c8d32 0b48
+    ldr r0, refresh_equip_target_eligibility_cache_ptr_g_duel_field_state_080c8d60 @ 080c8d32 0b48
     movs r1,#0x84    @ 080c8d34 8421
     lsls r1,r1,#0x2    @ 080c8d36 8900
     adds r0,r0,r1    @ 080c8d38 4018
@@ -16098,35 +16090,25 @@ refresh_zone_effect_buff_cache:
     lsrs r2,r2,#0x8    @ 080c8d4c 120a
     ands r2,r3    @ 080c8d4e 1a40
     adds r1,r1,r2    @ 080c8d50 8918
-    ldr r2, DAT_080c8d64                     @ 080c8d52 044a
-    bl build_equip_target_eligibility_table  @ 080c8d54 71f74cfd
+    ldr r2, refresh_equip_target_eligibility_cache_ptr_g_equip_target_eligibility_cache_080c8d64 @ 080c8d52 044a
+    bl build_equip_target_eligibility_table  @ 080c8d54 71f74cfd  -- Write two rows of11 equip-target eligibility codes, not ATK/DEF buffs.
     pop {r4}                                 @ 080c8d58 10bc
     pop {r0}                                 @ 080c8d5a 01bc
     bx r0                                    @ 080c8d5c 0047
     .zero  0x2
-DAT_080c8d60:
-    .word  0x02023130                     @ 080c8d60 30310202
-DAT_080c8d64:
-    .word  0x020230c4                     @ 080c8d64 c4300202
+refresh_equip_target_eligibility_cache_ptr_g_duel_field_state_080c8d60:
+    .word  gDuelFieldState                @ 080c8d60 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+refresh_equip_target_eligibility_cache_ptr_g_equip_target_eligibility_cache_080c8d64:
+    .word  gEquipTargetEligibilityCache   @ 080c8d64 c4300202  Pointer to gEquipTargetEligibilityCache; operand-0 DATA reference added.
 
-@ Called by render_duel_field_oam_all (0x080ccdf4). Reads 16-bit OAM word from [0x02023130+0x84*4=0x210], decodes: bits[6:0]=zone_type (r4), bits[14:8]=zone_col (r5), bit7>>7=player_id (r6). Calls resolve_zone_data_ptr_by_oam_word to get zone data ptr r0; if null exits. Checks [0x02023130+0x215] bit2; if set exits. Checks zone_type+zone_col<=0xa (valid range) else exits. In nested loop (player 0..1, slot 0..0xa): reads ROM slot table [DAT_0201c510 + player*0x868 + slot*0x14] bit19; if set calls resolve_zone_oam_base_coords_by_type for coords, then calls write_oam_entry_from_packed_args to write zone grid OAM to buffer. Exit: void.
-@ 
-@ Constants:
-@ - BASE=0x02023130 (IWRAM duel field state base)
-@ - OAM_WORD_OFFSET=0x84*4=0x210 (zone OAM word offset)
-@ - ZONE_FLAG_OFFSET=0x215 (bit2 = render-disable flag)
-@ - ZONE_MAX=0xa (max zone index)
-@ - SLOT_TABLE_BASE=0x0201c510 (slot data table)
-@ - STRIDE=0x868 (per-player stride)
-@ - SLOT_SIZE=0x14 (per-slot stride)
-@ - ACTIVE_BIT=bit19 (slot active flag)
+@ Render cached equip-target indicators for both players and slots0..10. Require a valid selected zone reference, field+0x215 bit2 clear, selected zone+subindex at most10 and a nonzero low13-bit card reference. Each drawn slot must also have a nonzero low13-bit reference and eligibility code. Resolve coordinates, add x3/y4, and use attr2=(2*code+0x110)|0x2400 with shape/size0x40. gEquipTargetEligibilityCache has player stride0x16; slot data uses stride20 and PLAYER_BLOCK_STRIDE.
 render_duel_field_zone_oam_grid:
     push {r4,r5,r6,r7,lr}                    @ 080c8d68 f0b5
     .hword 0x4657    @ 080c8d6a 5746
     .hword 0x464e    @ 080c8d6c 4e46
     .hword 0x4645    @ 080c8d6e 4546
     push {r5,r6,r7}                          @ 080c8d70 e0b4
-    ldr r7, DAT_080c8e58                     @ 080c8d72 394f
+    ldr r7, render_duel_field_zone_oam_grid_ptr_g_duel_field_state_080c8e58 @ 080c8d72 394f
     movs r0,#0x84    @ 080c8d74 8420
     lsls r0,r0,#0x2    @ 080c8d76 8000
     adds r2,r7,r0    @ 080c8d78 3a18
@@ -16146,7 +16128,7 @@ render_duel_field_zone_oam_grid:
     adds r4,r4,r5    @ 080c8d96 6419
     cmp r0,#0x0                              @ 080c8d98 0028
     beq LAB_080c8e4a                         @ 080c8d9a 56d0
-    ldr r2, DAT_080c8e5c                     @ 080c8d9c 2f4a
+    ldr r2, render_duel_field_zone_oam_grid_duel_field_ui_effect_flags_off_080c8e5c @ 080c8d9c 2f4a
     adds r1,r7,r2    @ 080c8d9e b918
     movs r0,#0x4    @ 080c8da0 0420
     ldrb r1,[r1,#0x0]                        @ 080c8da2 0978
@@ -16158,18 +16140,18 @@ render_duel_field_zone_oam_grid:
     lsls r0,r4,#0x2    @ 080c8dae a000
     adds r0,r0,r4    @ 080c8db0 0019
     lsls r0,r0,#0x2    @ 080c8db2 8000
-    ldr r2, DAT_080c8e60                     @ 080c8db4 2a4a
+    ldr r2, render_duel_field_zone_oam_grid_player_block_stride_080c8e60 @ 080c8db4 2a4a
     adds r1,r6,#0x0    @ 080c8db6 311c
     muls r1,r2    @ 080c8db8 5143
     adds r0,r0,r1    @ 080c8dba 4018
-    ldr r1, DAT_080c8e64                     @ 080c8dbc 2949
+    ldr r1, render_duel_field_zone_oam_grid_ptr_g_duel_field_slots_080c8e64 @ 080c8dbc 2949
     adds r0,r0,r1    @ 080c8dbe 4018
     ldr r0,[r0,#0x0]                         @ 080c8dc0 0068
-    lsls r0,r0,#0x13    @ 080c8dc2 c004
+    lsls r0,r0,#0x13    @ 080c8dc2 c004  -- Shift out all but the low13-bit card reference; this is not a bit19 flag test.
     cmp r0,#0x0                              @ 080c8dc4 0028
     beq LAB_080c8e4a                         @ 080c8dc6 40d0
     movs r6,#0x0    @ 080c8dc8 0026
-    ldr r3, DAT_080c8e68                     @ 080c8dca 274b
+    ldr r3, render_duel_field_zone_oam_grid_ptr_g_equip_target_eligibility_cache_080c8e68 @ 080c8dca 274b
     .hword 0x469a    @ 080c8dcc 9a46
 LAB_080c8dce:
     movs r5,#0x0    @ 080c8dce 0025
@@ -16179,14 +16161,14 @@ LAB_080c8dce:
     movs r1,#0x1    @ 080c8dd6 0121
     ands r0,r1    @ 080c8dd8 0840
     movs r7,#0x0    @ 080c8dda 0027
-    ldr r3, DAT_080c8e60                     @ 080c8ddc 204b
+    ldr r3, render_duel_field_zone_oam_grid_player_block_stride_080c8e60 @ 080c8ddc 204b
     adds r2,r0,#0x0    @ 080c8dde 021c
     muls r2,r3    @ 080c8de0 5a43
     .hword 0x4690    @ 080c8de2 9046
 LAB_080c8de4:
     .hword 0x4641    @ 080c8de4 4146
     adds r0,r7,r1    @ 080c8de6 7818
-    ldr r1, DAT_080c8e64                     @ 080c8de8 1e49
+    ldr r1, render_duel_field_zone_oam_grid_ptr_g_duel_field_slots_080c8e64 @ 080c8de8 1e49
     adds r0,r0,r1    @ 080c8dea 4018
     ldr r0,[r0,#0x0]                         @ 080c8dec 0068
     lsls r0,r0,#0x13    @ 080c8dee c004
@@ -16213,14 +16195,14 @@ LAB_080c8de4:
     lsls r0,r0,#0x10    @ 080c8e1a 0004
     orrs r1,r0    @ 080c8e1c 0143
     ldrh r4,[r4,#0x0]                        @ 080c8e1e 2488
-    lsls r2,r4,#0x1    @ 080c8e20 6200
+    lsls r2,r4,#0x1    @ 080c8e20 6200  -- Choose indicator tile from twice the eligibility code.
     movs r3,#0x88    @ 080c8e22 8823
     lsls r3,r3,#0x1    @ 080c8e24 5b00
     adds r2,r2,r3    @ 080c8e26 d218
     movs r3,#0x90    @ 080c8e28 9023
     lsls r3,r3,#0x6    @ 080c8e2a 9b01
     adds r0,r3,#0x0    @ 080c8e2c 181c
-    orrs r2,r0    @ 080c8e2e 0243
+    orrs r2,r0    @ 080c8e2e 0243  -- Attribute2=(2*code+0x110)|0x2400.
     lsls r2,r2,#0x10    @ 080c8e30 1204
     lsrs r2,r2,#0x10    @ 080c8e32 120c
     adds r0,r1,#0x0    @ 080c8e34 081c
@@ -16242,51 +16224,41 @@ LAB_080c8e4a:
     pop {r4,r5,r6,r7}                        @ 080c8e52 f0bc
     pop {r0}                                 @ 080c8e54 01bc
     bx r0                                    @ 080c8e56 0047
-DAT_080c8e58:
-    .word  0x02023130                     @ 080c8e58 30310202
-DAT_080c8e5c:
-    .word  0x00000215                     @ 080c8e5c 15020000
-DAT_080c8e60:
-    .word  0x00000868                     @ 080c8e60 68080000
-DAT_080c8e64:
-    .word  0x0201c510                     @ 080c8e64 10c50102
-DAT_080c8e68:
-    .word  0x020230c4                     @ 080c8e68 c4300202
+render_duel_field_zone_oam_grid_ptr_g_duel_field_state_080c8e58:
+    .word  gDuelFieldState                @ 080c8e58 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_duel_field_zone_oam_grid_duel_field_ui_effect_flags_off_080c8e5c:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c8e5c 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: operand-0 data equate, value0x00000215.
+render_duel_field_zone_oam_grid_player_block_stride_080c8e60:
+    .word  PLAYER_BLOCK_STRIDE            @ 080c8e60 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_duel_field_zone_oam_grid_ptr_g_duel_field_slots_080c8e64:
+    .word  gDuelFieldSlots                @ 080c8e64 10c50102  Pointer to gDuelFieldSlots; operand-0 DATA reference added.
+render_duel_field_zone_oam_grid_ptr_g_equip_target_eligibility_cache_080c8e68:
+    .word  gEquipTargetEligibilityCache   @ 080c8e68 c4300202  Pointer to gEquipTargetEligibilityCache; operand-0 DATA reference added.
 
-@ Called by render_duel_field_oam_all (0x080ccdf4) when bit4 condition is met. Reads [0x0201f440+0xa0e*2] 16-bit value, extracts bits[20..24] (lsls/lsrs) as slot_count r5 (max active AOB slots). Calls get_duel_field_card_count to get card_count stored as r10. Computes Y coord r0=(0xc8-slot_count*8)/2+0x28, X stride=0x64. If slot_count==0 skips loop. In loop (slot 0..slot_count-1): if slot_idx < r8 (=card_count, highlight boundary) then OAM_attr2|=0x3000 (highlight palette), else 0x0000; calls write_oam_entry_from_packed_args to write slot OAM. After loop writes 4 exit/arrow sprite entries (tile +0x10/+0x20/+0x30 and last via write_oam_entry_with_slot_check). If last returns 0 then strb [flag]+0x20 sets flag. Exit: void.
-@ 
-@ Constants:
-@ - BASE=0x0201f440 (play_ui_effect state IWRAM)
-@ - SLOT_WORD_OFFSET=0xa0e*2=0x141c (slot count packed word)
-@ - SLOT_COUNT_BITS=bits[20..24] (lsls #0xb; lsrs #0x1b)
-@ - Y_CENTER=0xc8=200 (pixels, screen vertical center)
-@ - Y_OFFSET=0x28=40
-@ - X_STRIDE=0x64=100
-@ - HLPALETTE=0x3000 (highlight palette attr2 bits)
-@ - TILE_ARROW=0x01a1 (arrow/border sprite tile base)
+@ Render a horizontal slot-count gauge. Read count bits11:4 from gFontState+0xa0e and save the value from get_duel_field_card_count. Center count eight-pixel entries at x140-4*count,y68. Indices before count-value use palette0, the rest palette3. Append four frame pieces at x100,116,132,148. Set gDuelFieldState+0x215 bit5 when the saved value is0. Emit OAM directly. No inputs.
 render_field_aob_slot_oam_row:
     push {r4,r5,r6,r7,lr}                    @ 080c8e6c f0b5
     .hword 0x4657    @ 080c8e6e 5746
     .hword 0x464e    @ 080c8e70 4e46
     .hword 0x4645    @ 080c8e72 4546
     push {r5,r6,r7}                          @ 080c8e74 e0b4
-    ldr r0, DAT_080c8f30                     @ 080c8e76 2e48
-    ldr r1, DAT_080c8f34                     @ 080c8e78 2e49
+    ldr r0, render_field_aob_slot_oam_row_ptr_g_font_state_080c8f30 @ 080c8e76 2e48
+    ldr r1, render_field_aob_slot_oam_row_font_state_selection_index_off_080c8f34 @ 080c8e78 2e49
     adds r0,r0,r1    @ 080c8e7a 4018
     ldrh r0,[r0,#0x0]                        @ 080c8e7c 0088
     lsls r0,r0,#0x14    @ 080c8e7e 0005
-    lsrs r5,r0,#0x18    @ 080c8e80 050e
+    lsrs r5,r0,#0x18    @ 080c8e80 050e  -- Extract count bits11:4 from the halfword at gFontState+0xa0e.
     bl get_duel_field_card_count             @ 080c8e82 bdf7f3fd
     .hword 0x4682    @ 080c8e86 8246
     .hword 0x4652    @ 080c8e88 5246
-    subs r2,r5,r2    @ 080c8e8a aa1a
+    subs r2,r5,r2    @ 080c8e8a aa1a  -- Palette split index = displayed count minus the value returned by get_duel_field_card_count.
     .hword 0x4690    @ 080c8e8c 9046
     movs r7,#0x44    @ 080c8e8e 4427
     lsls r1,r5,#0x3    @ 080c8e90 e900
     movs r0,#0xc8    @ 080c8e92 c820
     subs r0,r0,r1    @ 080c8e94 401a
     asrs r0,r0,#0x1    @ 080c8e96 4010
-    adds r0,#0x28    @ 080c8e98 2830
+    adds r0,#0x28    @ 080c8e98 2830  -- The computed value is x=140-4*count; y is fixed at68.
     movs r1,#0x64    @ 080c8e9a 6421
     .hword 0x4689    @ 080c8e9c 8946
     movs r6,#0x0    @ 080c8e9e 0026
@@ -16299,7 +16271,7 @@ LAB_080c8ea6:
     bge LAB_080c8eae                         @ 080c8eaa 00da
     movs r2,#0x0    @ 080c8eac 0022
 LAB_080c8eae:
-    lsls r0,r7,#0x10    @ 080c8eae 3804
+    lsls r0,r7,#0x10    @ 080c8eae 3804  -- Indices before count-occupied use palette0; remaining entries use palette3.
     orrs r0,r4    @ 080c8eb0 2043
     lsls r2,r2,#0xc    @ 080c8eb2 1203
     movs r1,#0x40    @ 080c8eb4 4021
@@ -16320,11 +16292,11 @@ LAB_080c8ec6:
     lsls r2,r2,#0x1    @ 080c8ed2 5200
     .hword 0x4690    @ 080c8ed4 9046
     adds r1,r4,#0x0    @ 080c8ed6 211c
-    bl write_oam_entry_from_packed_args      @ 080c8ed8 2df048f9
+    bl write_oam_entry_from_packed_args      @ 080c8ed8 2df048f9  -- First frame piece at x100,y68 with attr2=0x1a0.
     .hword 0x4648    @ 080c8edc 4846
     adds r0,#0x10    @ 080c8ede 1030
     orrs r0,r5    @ 080c8ee0 2843
-    ldr r6, DAT_080c8f38                     @ 080c8ee2 154e
+    ldr r6, render_field_aob_slot_oam_row_field_card_gauge_middle_attr2_080c8f38 @ 080c8ee2 154e
     adds r1,r4,#0x0    @ 080c8ee4 211c
     adds r2,r6,#0x0    @ 080c8ee6 321c
     bl write_oam_entry_from_packed_args      @ 080c8ee8 2df040f9
@@ -16337,7 +16309,7 @@ LAB_080c8ec6:
     .hword 0x4648    @ 080c8efa 4846
     adds r0,#0x30    @ 080c8efc 3030
     orrs r0,r5    @ 080c8efe 2843
-    ldr r1, DAT_080c8f3c                     @ 080c8f00 0e49
+    ldr r1, render_field_aob_slot_oam_row_obj_shape_size_horizontal_32x8_080c8f3c @ 080c8f00 0e49
     movs r3,#0x80    @ 080c8f02 8023
     lsls r3,r3,#0x5    @ 080c8f04 5b01
     .hword 0x4642    @ 080c8f06 4246
@@ -16345,13 +16317,13 @@ LAB_080c8ec6:
     .hword 0x4650    @ 080c8f0c 5046
     cmp r0,#0x0                              @ 080c8f0e 0028
     bne LAB_080c8f20                         @ 080c8f10 06d1
-    ldr r1, DAT_080c8f40                     @ 080c8f12 0b49
-    ldr r2, DAT_080c8f44                     @ 080c8f14 0b4a
+    ldr r1, render_field_aob_slot_oam_row_ptr_g_duel_field_state_080c8f40 @ 080c8f12 0b49
+    ldr r2, render_field_aob_slot_oam_row_duel_field_ui_effect_flags_off_080c8f44 @ 080c8f14 0b4a
     adds r1,r1,r2    @ 080c8f16 8918
     movs r0,#0x20    @ 080c8f18 2020
     ldrb r2,[r1,#0x0]                        @ 080c8f1a 0a78
     orrs r0,r2    @ 080c8f1c 1043
-    strb r0,[r1,#0x0]                        @ 080c8f1e 0870
+    strb r0,[r1,#0x0]                        @ 080c8f1e 0870  -- Set gDuelFieldState+0x215 bit5 when the saved get_duel_field_card_count result is0.
 LAB_080c8f20:
     pop {r3,r4,r5}                           @ 080c8f20 38bc
     .hword 0x4698    @ 080c8f22 9846
@@ -16361,55 +16333,55 @@ LAB_080c8f20:
     pop {r0}                                 @ 080c8f2a 01bc
     bx r0                                    @ 080c8f2c 0047
     .zero  0x2
-DAT_080c8f30:
-    .word  0x0201f440                     @ 080c8f30 40f40102
-DAT_080c8f34:
-    .word  0x00000a0e                     @ 080c8f34 0e0a0000
-DAT_080c8f38:
-    .word  0x000001a1                     @ 080c8f38 a1010000
-DAT_080c8f3c:
-    .word  0x00004040                     @ 080c8f3c 40400000
-DAT_080c8f40:
-    .word  0x02023130                     @ 080c8f40 30310202
-DAT_080c8f44:
-    .word  0x00000215                     @ 080c8f44 15020000
+render_field_aob_slot_oam_row_ptr_g_font_state_080c8f30:
+    .word  gFontState                     @ 080c8f30 40f40102  Pointer to gFontState; operand-0 DATA reference added.
+render_field_aob_slot_oam_row_font_state_selection_index_off_080c8f34:
+    .word  FONT_STATE_SELECTION_INDEX_OFF @ 080c8f34 0e0a0000  FONT_STATE_SELECTION_INDEX_OFF: operand-0 data equate, value0x00000a0e.
+render_field_aob_slot_oam_row_field_card_gauge_middle_attr2_080c8f38:
+    .word  FIELD_CARD_GAUGE_MIDDLE_ATTR2  @ 080c8f38 a1010000  FIELD_CARD_GAUGE_MIDDLE_ATTR2: operand-0 data equate, value0x000001a1.
+render_field_aob_slot_oam_row_obj_shape_size_horizontal_32x8_080c8f3c:
+    .word  OBJ_SHAPE_SIZE_HORIZONTAL_32X8 @ 080c8f3c 40400000  OBJ_SHAPE_SIZE_HORIZONTAL_32X8: operand-0 data equate, value0x00004040.
+render_field_aob_slot_oam_row_ptr_g_duel_field_state_080c8f40:
+    .word  gDuelFieldState                @ 080c8f40 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_field_aob_slot_oam_row_duel_field_ui_effect_flags_off_080c8f44:
+    .word  DUEL_FIELD_UI_EFFECT_FLAGS_OFF @ 080c8f44 15020000  DUEL_FIELD_UI_EFFECT_FLAGS_OFF: operand-0 data equate, value0x00000215.
 
-@ Initialises card-effect AOB context (DAT_080c8fb4, 0x4c halfwords=0x98 bytes) for dispatch_card_display_op case 0x06. Calls zero_fill_by_halfword(base, 0x4c), then classify_card_effect_category(r0) to get effect category byte. Writes category<<1 into gDuelActivation halfword bits[2:1]. Calls init_aob_ctx_from_ptnsect([base+0x38], ...). Sets [base+0x4b] bit0 (init done). Reads gP1LifePoints[0x1ce8] vs (gDuelActivation[4]^1) to select anm_entry param. r0=u16 card_id [0..0x1fff]. Returns void. Constants: base_struct=DAT_080c8fb4, zero_len=0x4c halfwords=0x98 bytes, gDuelActivation=0x0201e2a0, category_mask=0xff.
-init_card_effect_aob_ctx:
+@ Initialize field-background change state for card ID r0. Clear0x4c bytes at gDuelZoneActivationState, classify the field card, and store its eight-bit background index in field+0x212 bits8:1 while preserving adjacent bits. Initialize gDuelFieldAuxAobCtx at state+0x38 from zone_display_pair_marker_ptnsect, tile base128/palette2. Set ctx+0x13 bit0, select animation0 or1 by the player comparison with gDuelCardCtxBase+4 XOR1, then set ctx+0xe to2.
+init_field_background_change_state:
     push {r4,r5,lr}                          @ 080c8f48 30b5
     adds r4,r0,#0x0    @ 080c8f4a 041c
-    ldr r5, DAT_080c8fb4                     @ 080c8f4c 194d
+    ldr r5, init_field_background_change_state_ptr_g_duel_zone_activation_state_080c8fb4 @ 080c8f4c 194d
     adds r0,r5,#0x0    @ 080c8f4e 281c
     movs r1,#0x4c    @ 080c8f50 4c21
-    bl zero_fill_by_halfword                 @ 080c8f52 2bf08fff
+    bl zero_fill_by_halfword                 @ 080c8f52 2bf08fff  -- Clear0x4c bytes, exactly through the auxiliary AOB context end.
     adds r0,r4,#0x0    @ 080c8f56 201c
-    bl classify_card_effect_category         @ 080c8f58 69f7fef9
-    ldr r2, DAT_080c8fb8                     @ 080c8f5c 164a
-    ldr r1, DAT_080c8fbc                     @ 080c8f5e 1749
+    bl classify_card_effect_category         @ 080c8f58 69f7fef9  -- Classify the card for the field-spell background image index.
+    ldr r2, init_field_background_change_state_ptr_g_duel_field_state_080c8fb8 @ 080c8f5c 164a
+    ldr r1, init_field_background_change_state_duel_field_cursor_group_toggle_off_080c8fbc @ 080c8f5e 1749
     adds r2,r2,r1    @ 080c8f60 5218
     movs r1,#0xff    @ 080c8f62 ff21
     ands r0,r1    @ 080c8f64 0840
     lsls r0,r0,#0x1    @ 080c8f66 4000
-    ldr r1, DAT_080c8fc0                     @ 080c8f68 1549
+    ldr r1, init_field_background_change_state_equip_state_clear_bits_8_1_mask_080c8fc0 @ 080c8f68 1549
     ldrh r3,[r2,#0x0]                        @ 080c8f6a 1388
     ands r1,r3    @ 080c8f6c 1940
     orrs r1,r0    @ 080c8f6e 0143
-    strh r1,[r2,#0x0]                        @ 080c8f70 1180
+    strh r1,[r2,#0x0]                        @ 080c8f70 1180  -- Store background index in field+0x212 bits8:1, preserving bit0 and upper bits.
     adds r5,#0x38    @ 080c8f72 3835
-    ldr r1, DAT_080c8fc4                     @ 080c8f74 1349
-    ldr r2, DAT_080c8fc8                     @ 080c8f76 144a
+    ldr r1, init_field_background_change_state_ptr_zone_display_pair_marker_ptnsect_080c8fc4 @ 080c8f74 1349
+    ldr r2, init_field_background_change_state_aob_mode_tile_base_128_pal2_080c8fc8 @ 080c8f76 144a
     adds r0,r5,#0x0    @ 080c8f78 281c
     movs r3,#0x1    @ 080c8f7a 0123
-    bl init_aob_ctx_from_ptnsect             @ 080c8f7c 2ef012ff
+    bl init_aob_ctx_from_ptnsect             @ 080c8f7c 2ef012ff  -- Initialize the shared auxiliary AOB: tile base128, palette2, init flag1.
     movs r0,#0x1    @ 080c8f80 0120
     ldrb r1,[r5,#0x13]                       @ 080c8f82 e97c
     orrs r0,r1    @ 080c8f84 0843
     strb r0,[r5,#0x13]                       @ 080c8f86 e874
     movs r3,#0x0    @ 080c8f88 0023
-    ldr r2, PTR_gP1LifePoints_080c8fcc       @ 080c8f8a 104a
-    ldr r0, DAT_080c8fd0                     @ 080c8f8c 1048
+    ldr r2, init_field_background_change_state_ptr_g_p1_life_points_080c8fcc @ 080c8f8a 104a
+    ldr r0, init_field_background_change_state_p1lp_block2_off_1ce8_080c8fd0 @ 080c8f8c 1048
     adds r2,r2,r0    @ 080c8f8e 1218
-    ldr r0, DAT_080c8fd4                     @ 080c8f90 1048
+    ldr r0, init_field_background_change_state_ptr_g_duel_card_ctx_base_080c8fd4 @ 080c8f90 1048
     ldr r0,[r0,#0x4]                         @ 080c8f92 4068
     movs r1,#0x1    @ 080c8f94 0121
     eors r0,r1    @ 080c8f96 4840
@@ -16427,41 +16399,41 @@ LAB_080c8fa0:
     pop {r4,r5}                              @ 080c8fae 30bc
     pop {r0}                                 @ 080c8fb0 01bc
     bx r0                                    @ 080c8fb2 0047
-DAT_080c8fb4:
-    .word  0x020230c0                     @ 080c8fb4 c0300202
-DAT_080c8fb8:
-    .word  0x02023130                     @ 080c8fb8 30310202
-DAT_080c8fbc:
-    .word  0x00000212                     @ 080c8fbc 12020000
-DAT_080c8fc0:
-    .word  0xfffffe01                     @ 080c8fc0 01feffff
-DAT_080c8fc4:
-    .word  0x09889b80                     @ 080c8fc4 809b8809
-DAT_080c8fc8:
-    .word  0x00800002                     @ 080c8fc8 02008000
-PTR_gP1LifePoints_080c8fcc:
-    .word  gP1LifePoints                  @ 080c8fcc e0c40102
-DAT_080c8fd0:
-    .word  0x00001ce8                     @ 080c8fd0 e81c0000
-DAT_080c8fd4:
-    .word  0x0201e2a0                     @ 080c8fd4 a0e20102
+init_field_background_change_state_ptr_g_duel_zone_activation_state_080c8fb4:
+    .word  gDuelZoneActivationState       @ 080c8fb4 c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
+init_field_background_change_state_ptr_g_duel_field_state_080c8fb8:
+    .word  gDuelFieldState                @ 080c8fb8 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+init_field_background_change_state_duel_field_cursor_group_toggle_off_080c8fbc:
+    .word  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF @ 080c8fbc 12020000  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF: operand-0 data equate, value0x00000212.
+init_field_background_change_state_equip_state_clear_bits_8_1_mask_080c8fc0:
+    .word  EQUIP_STATE_CLEAR_BITS_8_1_MASK @ 080c8fc0 01feffff  EQUIP_STATE_CLEAR_BITS_8_1_MASK: operand-0 data equate, value0xfffffe01.
+init_field_background_change_state_ptr_zone_display_pair_marker_ptnsect_080c8fc4:
+    .word  zone_display_pair_marker_ptnsect @ 080c8fc4 809b8809  Pointer to zone_display_pair_marker_ptnsect; operand-0 DATA reference added.
+init_field_background_change_state_aob_mode_tile_base_128_pal2_080c8fc8:
+    .word  AOB_MODE_TILE_BASE_128_PAL2    @ 080c8fc8 02008000  AOB_MODE_TILE_BASE_128_PAL2: operand-0 data equate, value0x00800002.
+init_field_background_change_state_ptr_g_p1_life_points_080c8fcc:
+    .word  gP1LifePoints                  @ 080c8fcc e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+init_field_background_change_state_p1lp_block2_off_1ce8_080c8fd0:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 080c8fd0 e81c0000  P1LP_BLOCK2_OFF_1CE8: operand-0 data equate, value0x00001ce8.
+init_field_background_change_state_ptr_g_duel_card_ctx_base_080c8fd4:
+    .word  gDuelCardCtxBase               @ 080c8fd4 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
 
-@ 为 campaign banner 场景设置 GBA 窗口和混合寄存器初值. 写入 WIN0H=WIN1H=0x50c8 (left=0x50, right=0xc8), WIN0V=WIN1V=0x1878 (top=0x18, bottom=0x78), WININ=0x3f1f (all effects in window), WINOUT=0x1f; 读 DISPCNT 置 bit14|bit15 (Window display enable) 后写回; 写 BLDCNT=0x0088 (blend enable). 最后返回 1. 被 play_ui_effect_06 (0x080c91e0) 唯一调用, 是 campaign banner 显示初始化序列的第一步 (配对后续 tick_campaign_banner_slide_state_machine). Constants: WIN0H=0x04000040, WIN1H=0x04000042, WIN0V=0x04000044, WIN1V=0x04000046, WININ=0x04000048, WINOUT=0x0400004a, BLDCNT=0x04000050, DISPCNT=0x04000000, win_h=0x50c8, win_v=0x1878, winin=0x3f1f, winout=0x1f, bldcnt=0x0088, dispcnt_mask=0xc000.
-init_window_regs_for_campaign_banner:
-    ldr r0, DWORD_080c9018                   @ 080c8fd8 0f48
-    ldr r1, DWORD_080c901c                   @ 080c8fda 1049
+@ Initialize the field-background transition windows. Set both horizontal bounds to0x50c8 and both vertical bounds to0x1878, WININ to0x3f1f and WINOUT to0x1f. Enable WIN0 and WIN1 by ORing DISPCNT with0x6000, then set BLDCNT to0x88. These are bits13 and14, not WIN1 and OBJWIN. Return1 for the phase callback.
+init_field_background_window_regs:
+    ldr r0, init_field_background_window_regs_ptr_w_i_n0_h_080c9018 @ 080c8fd8 0f48
+    ldr r1, init_field_background_window_regs_field_background_win_h_bounds_080c901c @ 080c8fda 1049
     adds r2,r1,#0x0    @ 080c8fdc 0a1c
-    strh r2,[r0,#0x0]                        @ 080c8fde 0280
+    strh r2,[r0,#0x0]                        @ 080c8fde 0280  -- WIN0H=0x50c8: left80,right200.
     adds r0,#0x4    @ 080c8fe0 0430
-    ldr r3, DWORD_080c9020                   @ 080c8fe2 0f4b
+    ldr r3, init_field_background_window_regs_field_background_win_v_bounds_080c9020 @ 080c8fe2 0f4b
     adds r1,r3,#0x0    @ 080c8fe4 191c
-    strh r1,[r0,#0x0]                        @ 080c8fe6 0180
+    strh r1,[r0,#0x0]                        @ 080c8fe6 0180  -- WIN0V=0x1878: top24,bottom120.
     subs r0,#0x2    @ 080c8fe8 0238
-    strh r2,[r0,#0x0]                        @ 080c8fea 0280
+    strh r2,[r0,#0x0]                        @ 080c8fea 0280  -- WIN1H receives the same horizontal bounds.
     adds r0,#0x4    @ 080c8fec 0430
-    strh r1,[r0,#0x0]                        @ 080c8fee 0180
-    ldr r1, DWORD_080c9024                   @ 080c8ff0 0c49
-    ldr r2, DWORD_080c9028                   @ 080c8ff2 0d4a
+    strh r1,[r0,#0x0]                        @ 080c8fee 0180  -- WIN1V receives the same vertical bounds.
+    ldr r1, init_field_background_window_regs_ptr_w_i_n_i_n_080c9024 @ 080c8ff0 0c49
+    ldr r2, init_field_background_window_regs_field_background_winin_flags_080c9028 @ 080c8ff2 0d4a
     adds r0,r2,#0x0    @ 080c8ff4 101c
     strh r0,[r1,#0x0]                        @ 080c8ff6 0880
     adds r1,#0x2    @ 080c8ff8 0231
@@ -16474,29 +16446,29 @@ init_window_regs_for_campaign_banner:
     lsls r3,r3,#0x7    @ 080c9006 db01
     adds r1,r3,#0x0    @ 080c9008 191c
     orrs r0,r1    @ 080c900a 0843
-    strh r0,[r2,#0x0]                        @ 080c900c 1080
-    ldr r1, DWORD_080c902c                   @ 080c900e 0749
+    strh r0,[r2,#0x0]                        @ 080c900c 1080  -- Enable WIN0 and WIN1 with DISPCNT bits13/14 (0x6000).
+    ldr r1, init_field_background_window_regs_ptr_b_l_d_c_n_t_080c902c @ 080c900e 0749
     movs r0,#0x88    @ 080c9010 8820
-    strh r0,[r1,#0x0]                        @ 080c9012 0880
+    strh r0,[r1,#0x0]                        @ 080c9012 0880  -- BLDCNT=0x88; OBJWIN is not enabled by this function.
     movs r0,#0x1    @ 080c9014 0120
     bx lr                                    @ 080c9016 7047
-DWORD_080c9018:
-    .word  WIN0H                          @ 080c9018 40000004
-DWORD_080c901c:
-    .word  0x000050c8                     @ 080c901c c8500000
-DWORD_080c9020:
-    .word  0x00001878                     @ 080c9020 78180000
-DWORD_080c9024:
-    .word  WININ                          @ 080c9024 48000004
-DWORD_080c9028:
-    .word  0x00003f1f                     @ 080c9028 1f3f0000
-DWORD_080c902c:
-    .word  BLDCNT                         @ 080c902c 50000004
+init_field_background_window_regs_ptr_w_i_n0_h_080c9018:
+    .word  WIN0H                          @ 080c9018 40000004  Pointer to WIN0H; operand-0 DATA reference preserved.
+init_field_background_window_regs_field_background_win_h_bounds_080c901c:
+    .word  FIELD_BACKGROUND_WIN_H_BOUNDS  @ 080c901c c8500000  FIELD_BACKGROUND_WIN_H_BOUNDS: operand-0 data equate, value0x000050c8.
+init_field_background_window_regs_field_background_win_v_bounds_080c9020:
+    .word  FIELD_BACKGROUND_WIN_V_BOUNDS  @ 080c9020 78180000  FIELD_BACKGROUND_WIN_V_BOUNDS: operand-0 data equate, value0x00001878.
+init_field_background_window_regs_ptr_w_i_n_i_n_080c9024:
+    .word  WININ                          @ 080c9024 48000004  Pointer to WININ; operand-0 DATA reference preserved.
+init_field_background_window_regs_field_background_winin_flags_080c9028:
+    .word  FIELD_BACKGROUND_WININ_FLAGS   @ 080c9028 1f3f0000  FIELD_BACKGROUND_WININ_FLAGS: operand-0 data equate, value0x00003f1f.
+init_field_background_window_regs_ptr_b_l_d_c_n_t_080c902c:
+    .word  BLDCNT                         @ 080c902c 50000004  Pointer to BLDCNT; operand-0 DATA reference preserved.
 
-@ campaign banner 滑入/滑出动画状态机, 每帧由 play_ui_effect_06 (0x080c91e0) 调用. 读 [0x020230c0+1] (u8 phase) 进行 4-case dispatch (0/1/2/3). phase 0: 写 BLDY=0x1f (全黑); phase 1: 每帧 WIN0V.y_top 递减 (0xc*step/2, 中心点移动), 读 [0x020230c0+2] 累计 8 次后 phase++. phase 2: 拷贝 campaign_inner_image 到 BG VRAM 0x06009000 (size=0xb4*32=0x1680 bytes via copy_bytes_by_halfword), 再写 WININ=0x3f1f / WINOUT=0x8c8c / WIN0V, 读 [0x020230c0+2] 累计 8 次后 phase++. phase 3: 同 phase 1 方向逆滑, 每帧 WIN0H y_bot 递增直到 [+2]>=8 后 phase++. default (phase>3): 返回 1 (busy, 未完成状态). 返回 0=完成 / 1=进行中. Constants: campaign_state=0x020230c0, WIN0H=0x04000040, WIN0V=0x04000044, BLDY=0x04000054, WININ=0x04000048, WINOUT=0x0400004a, campaign_inner_image=0x0985d720, VRAM=0x06009000.
-tick_campaign_banner_slide_state_machine:
+@ Tick field-background transition subphase state+1 and counter state+2. Phase0 sets BLDY=31. Phase1 contracts WIN0V about y72 by six pixels per edge for counter0..8. Phase2 copies0x1680 tile bytes and32 palette bytes from the selected default or field-spell bank, then resets WIN0V and collapses WIN0H at x140. Phase3 opens WIN0H by floor(15*counter/2) per edge for counter0..8. Return0 during phases0..3 and1 afterward.
+tick_field_background_window_transition:
     push {r4,r5,lr}                          @ 080c9030 30b5
-    ldr r4, DWORD_080c9044                   @ 080c9032 044c
+    ldr r4, tick_field_background_window_transition_ptr_g_duel_zone_activation_state_080c9044 @ 080c9032 044c
     ldrb r0,[r4,#0x1]                        @ 080c9034 6078
     cmp r0,#0x1                              @ 080c9036 0128
     beq LAB_080c9060                         @ 080c9038 12d0
@@ -16505,8 +16477,8 @@ tick_campaign_banner_slide_state_machine:
     cmp r0,#0x0                              @ 080c903e 0028
     beq LAB_080c9054                         @ 080c9040 08d0
     b LAB_080c91b4                           @ 080c9042 b7e0
-DWORD_080c9044:
-    .word  0x020230c0                     @ 080c9044 c0300202
+tick_field_background_window_transition_ptr_g_duel_zone_activation_state_080c9044:
+    .word  gDuelZoneActivationState       @ 080c9044 c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
 LAB_080c9048:
     cmp r0,#0x2                              @ 080c9048 0228
     beq LAB_080c909c                         @ 080c904a 27d0
@@ -16516,15 +16488,15 @@ LAB_080c9048:
 LAB_080c9052:
     b LAB_080c91b4                           @ 080c9052 afe0
 LAB_080c9054:
-    ldr r0, DWORD_080c905c                   @ 080c9054 0148
+    ldr r0, tick_field_background_window_transition_ptr_b_l_d_y_080c905c @ 080c9054 0148
     movs r1,#0x1f    @ 080c9056 1f21
     strh r1,[r0,#0x0]                        @ 080c9058 0180
     b LAB_080c91a6                           @ 080c905a a4e0
-DWORD_080c905c:
-    .word  BLDY                           @ 080c905c 54000004
+tick_field_background_window_transition_ptr_b_l_d_y_080c905c:
+    .word  BLDY                           @ 080c905c 54000004  Pointer to BLDY; operand-0 DATA reference preserved.
 LAB_080c9060:
     movs r0,#0xc    @ 080c9060 0c20
-    ldr r2, DWORD_080c9098                   @ 080c9062 0d4a
+    ldr r2, tick_field_background_window_transition_ptr_w_i_n0_v_080c9098 @ 080c9062 0d4a
     ldrb r3,[r4,#0x2]                        @ 080c9064 a378
     adds r1,r3,#0x0    @ 080c9066 191c
     muls r1,r0    @ 080c9068 4143
@@ -16537,25 +16509,25 @@ LAB_080c9060:
     lsls r1,r1,#0x18    @ 080c9076 0906
     lsrs r1,r1,#0x10    @ 080c9078 090c
     orrs r0,r1    @ 080c907a 0843
-    strh r0,[r2,#0x0]                        @ 080c907c 1080
+    strh r0,[r2,#0x0]                        @ 080c907c 1080  -- WIN0V top=24+6*counter,bottom=120-6*counter, counter0..8.
     ldrb r0,[r4,#0x2]                        @ 080c907e a078
     adds r0,#0x1    @ 080c9080 0130
     strb r0,[r4,#0x2]                        @ 080c9082 a070
     lsls r0,r0,#0x18    @ 080c9084 0006
     lsrs r0,r0,#0x18    @ 080c9086 000e
     cmp r0,#0x8                              @ 080c9088 0828
-    bls LAB_080c9152                         @ 080c908a 62d9
+    bls LAB_080c9152                         @ 080c908a 62d9  -- Stay in phase1 through counter8; advance after the ninth call.
     movs r0,#0x0    @ 080c908c 0020
     strb r0,[r4,#0x2]                        @ 080c908e a070
     ldrb r0,[r4,#0x1]                        @ 080c9090 6078
     adds r0,#0x1    @ 080c9092 0130
     strb r0,[r4,#0x1]                        @ 080c9094 6070
     b LAB_080c9152                           @ 080c9096 5ce0
-DWORD_080c9098:
-    .word  WIN0V                          @ 080c9098 44000004
+tick_field_background_window_transition_ptr_w_i_n0_v_080c9098:
+    .word  WIN0V                          @ 080c9098 44000004  Pointer to WIN0V; operand-0 DATA reference preserved.
 LAB_080c909c:
-    ldr r2, DWORD_080c90c8                   @ 080c909c 0a4a
-    ldr r5, DWORD_080c90cc                   @ 080c909e 0b4d
+    ldr r2, tick_field_background_window_transition_ptr_g_duel_field_state_080c90c8 @ 080c909c 0a4a
+    ldr r5, tick_field_background_window_transition_duel_field_cursor_group_toggle_off_080c90cc @ 080c909e 0b4d
     adds r0,r2,r5    @ 080c90a0 5019
     ldrh r1,[r0,#0x0]                        @ 080c90a2 0188
     movs r0,#0xff    @ 080c90a4 ff20
@@ -16568,37 +16540,37 @@ LAB_080c909c:
     adds r0,r2,r1    @ 080c90b2 5018
     ldr r0,[r0,#0x0]                         @ 080c90b4 0068
     lsls r0,r0,#0xe    @ 080c90b6 8003
-    lsrs r0,r0,#0x18    @ 080c90b8 000e
+    lsrs r0,r0,#0x18    @ 080c90b8 000e  -- Fallback background index is field+0x220 word bits17:10.
     lsls r1,r0,#0x1    @ 080c90ba 4100
     adds r1,r1,r0    @ 080c90bc 0918
     lsls r0,r1,#0x4    @ 080c90be 0801
     subs r0,r0,r1    @ 080c90c0 401a
     lsls r0,r0,#0x7    @ 080c90c2 c001
-    ldr r1, DWORD_080c90d0                   @ 080c90c4 0249
+    ldr r1, tick_field_background_window_transition_ptr_campaign_inner_image_080c90d0 @ 080c90c4 0249
     b LAB_080c90e4                           @ 080c90c6 0de0
-DWORD_080c90c8:
-    .word  0x02023130                     @ 080c90c8 30310202
-DWORD_080c90cc:
-    .word  0x00000212                     @ 080c90cc 12020000
-DWORD_080c90d0:
-    .word  campaign_inner_image           @ 080c90d0 20d78509
+tick_field_background_window_transition_ptr_g_duel_field_state_080c90c8:
+    .word  gDuelFieldState                @ 080c90c8 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+tick_field_background_window_transition_duel_field_cursor_group_toggle_off_080c90cc:
+    .word  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF @ 080c90cc 12020000  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF: operand-0 data equate, value0x00000212.
+tick_field_background_window_transition_ptr_campaign_inner_image_080c90d0:
+    .word  campaign_inner_image           @ 080c90d0 20d78509  Pointer to campaign_inner_image; operand-0 DATA reference preserved.
 LAB_080c90d4:
     lsls r0,r1,#0x17    @ 080c90d4 c805
-    lsrs r0,r0,#0x18    @ 080c90d6 000e
+    lsrs r0,r0,#0x18    @ 080c90d6 000e  -- Field-spell background index is field+0x212 bits8:1.
     lsls r1,r0,#0x1    @ 080c90d8 4100
     adds r1,r1,r0    @ 080c90da 0918
     lsls r0,r1,#0x4    @ 080c90dc 0801
     subs r0,r0,r1    @ 080c90de 401a
-    lsls r0,r0,#0x7    @ 080c90e0 c001
-    ldr r1, DWORD_080c9114                   @ 080c90e2 0c49
+    lsls r0,r0,#0x7    @ 080c90e0 c001  -- Tile-bank entry stride = (3*index*16-3*index)*128 =0x1680*index.
+    ldr r1, tick_field_background_window_transition_ptr_field_spell_background_tiles_080c9114 @ 080c90e2 0c49
 LAB_080c90e4:
     adds r1,r0,r1    @ 080c90e4 4118
     movs r2,#0xb4    @ 080c90e6 b422
     lsls r2,r2,#0x5    @ 080c90e8 5201
-    ldr r0, DWORD_080c9118                   @ 080c90ea 0b48
-    bl copy_bytes_by_halfword                @ 080c90ec 2bf0dafe
-    ldr r2, DWORD_080c911c                   @ 080c90f0 0a4a
-    ldr r3, DWORD_080c9120                   @ 080c90f2 0b4b
+    ldr r0, tick_field_background_window_transition_ptr_field_background_tile_vram_080c9118 @ 080c90ea 0b48
+    bl copy_bytes_by_halfword                @ 080c90ec 2bf0dafe  -- Copy0x1680 bytes to field_background_tile_vram.
+    ldr r2, tick_field_background_window_transition_ptr_g_duel_field_state_080c911c @ 080c90f0 0a4a
+    ldr r3, tick_field_background_window_transition_duel_field_cursor_group_toggle_off_080c9120 @ 080c90f2 0b4b
     adds r0,r2,r3    @ 080c90f4 d018
     ldrh r1,[r0,#0x0]                        @ 080c90f6 0188
     movs r0,#0xff    @ 080c90f8 ff20
@@ -16613,37 +16585,37 @@ LAB_080c90e4:
     lsls r0,r0,#0xe    @ 080c910a 8003
     lsrs r0,r0,#0x18    @ 080c910c 000e
     lsls r0,r0,#0x5    @ 080c910e 4001
-    ldr r1, DWORD_080c9124                   @ 080c9110 0449
+    ldr r1, tick_field_background_window_transition_ptr_campaign_inner_palette_080c9124 @ 080c9110 0449
     b LAB_080c9130                           @ 080c9112 0de0
-DWORD_080c9114:
-    .word  0x09867580                     @ 080c9114 80758609
-DWORD_080c9118:
-    .word  0x06009000                     @ 080c9118 00900006
-DWORD_080c911c:
-    .word  0x02023130                     @ 080c911c 30310202
-DWORD_080c9120:
-    .word  0x00000212                     @ 080c9120 12020000
-DWORD_080c9124:
-    .word  campaign_inner_palette         @ 080c9124 a0748609
+tick_field_background_window_transition_ptr_field_spell_background_tiles_080c9114:
+    .word  field_spell_background_tiles   @ 080c9114 80758609  Pointer to field_spell_background_tiles; operand-0 DATA reference added.
+tick_field_background_window_transition_ptr_field_background_tile_vram_080c9118:
+    .word  field_background_tile_vram                     @ 080c9118 00900006  Pointer to field_background_tile_vram; operand-0 DATA reference added.
+tick_field_background_window_transition_ptr_g_duel_field_state_080c911c:
+    .word  gDuelFieldState                @ 080c911c 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+tick_field_background_window_transition_duel_field_cursor_group_toggle_off_080c9120:
+    .word  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF @ 080c9120 12020000  DUEL_FIELD_CURSOR_GROUP_TOGGLE_OFF: operand-0 data equate, value0x00000212.
+tick_field_background_window_transition_ptr_campaign_inner_palette_080c9124:
+    .word  campaign_inner_palette         @ 080c9124 a0748609  Pointer to campaign_inner_palette; operand-0 DATA reference preserved.
 LAB_080c9128:
     lsls r0,r1,#0x17    @ 080c9128 c805
     lsrs r0,r0,#0x18    @ 080c912a 000e
     lsls r0,r0,#0x5    @ 080c912c 4001
-    ldr r1, DWORD_080c9158                   @ 080c912e 0a49
+    ldr r1, tick_field_background_window_transition_ptr_field_spell_background_palettes_080c9158 @ 080c912e 0a49
 LAB_080c9130:
     adds r1,r0,r1    @ 080c9130 4118
-    ldr r0, DWORD_080c915c                   @ 080c9132 0a48
+    ldr r0, tick_field_background_window_transition_ptr_field_background_palette_ram_080c915c @ 080c9132 0a48
     movs r2,#0x20    @ 080c9134 2022
-    bl copy_bytes_by_halfword                @ 080c9136 2bf0b5fe
-    ldr r1, DWORD_080c9160                   @ 080c913a 0949
-    ldr r2, DWORD_080c9164                   @ 080c913c 094a
+    bl copy_bytes_by_halfword                @ 080c9136 2bf0b5fe  -- Copy32 palette bytes to BG palette row10.
+    ldr r1, tick_field_background_window_transition_ptr_w_i_n0_v_080c9160 @ 080c913a 0949
+    ldr r2, tick_field_background_window_transition_field_background_win_v_bounds_080c9164 @ 080c913c 094a
     adds r0,r2,#0x0    @ 080c913e 101c
-    strh r0,[r1,#0x0]                        @ 080c9140 0880
+    strh r0,[r1,#0x0]                        @ 080c9140 0880  -- Reset WIN0V to top24,bottom120.
     subs r1,#0x4    @ 080c9142 0439
-    ldr r3, DWORD_080c9168                   @ 080c9144 084b
+    ldr r3, tick_field_background_window_transition_field_background_win_h_collapsed_080c9168 @ 080c9144 084b
     adds r0,r3,#0x0    @ 080c9146 181c
-    strh r0,[r1,#0x0]                        @ 080c9148 0880
-    ldr r1, DWORD_080c916c                   @ 080c914a 0849
+    strh r0,[r1,#0x0]                        @ 080c9148 0880  -- WIN0H=0x8c8c collapses the horizontal window at x140.
+    ldr r1, tick_field_background_window_transition_ptr_g_duel_zone_activation_state_080c916c @ 080c914a 0849
     ldrb r0,[r1,#0x1]                        @ 080c914c 4878
     adds r0,#0x1    @ 080c914e 0130
     strb r0,[r1,#0x1]                        @ 080c9150 4870
@@ -16651,21 +16623,21 @@ LAB_080c9152:
     movs r0,#0x0    @ 080c9152 0020
     b LAB_080c91b6                           @ 080c9154 2fe0
     .zero  0x2
-DWORD_080c9158:
-    .word  0x09889180                     @ 080c9158 80918809
-DWORD_080c915c:
-    .word  0x05000140                     @ 080c915c 40010005
-DWORD_080c9160:
-    .word  WIN0V                          @ 080c9160 44000004
-DWORD_080c9164:
-    .word  0x00001878                     @ 080c9164 78180000
-DWORD_080c9168:
-    .word  0x00008c8c                     @ 080c9168 8c8c0000
-DWORD_080c916c:
-    .word  0x020230c0                     @ 080c916c c0300202
+tick_field_background_window_transition_ptr_field_spell_background_palettes_080c9158:
+    .word  field_spell_background_palettes @ 080c9158 80918809  Pointer to field_spell_background_palettes; operand-0 DATA reference added.
+tick_field_background_window_transition_ptr_field_background_palette_ram_080c915c:
+    .word  field_background_palette_ram                     @ 080c915c 40010005  Pointer to field_background_palette_ram; operand-0 DATA reference added.
+tick_field_background_window_transition_ptr_w_i_n0_v_080c9160:
+    .word  WIN0V                          @ 080c9160 44000004  Pointer to WIN0V; operand-0 DATA reference preserved.
+tick_field_background_window_transition_field_background_win_v_bounds_080c9164:
+    .word  FIELD_BACKGROUND_WIN_V_BOUNDS  @ 080c9164 78180000  FIELD_BACKGROUND_WIN_V_BOUNDS: operand-0 data equate, value0x00001878.
+tick_field_background_window_transition_field_background_win_h_collapsed_080c9168:
+    .word  FIELD_BACKGROUND_WIN_H_COLLAPSED @ 080c9168 8c8c0000  FIELD_BACKGROUND_WIN_H_COLLAPSED: operand-0 data equate, value0x00008c8c.
+tick_field_background_window_transition_ptr_g_duel_zone_activation_state_080c916c:
+    .word  gDuelZoneActivationState       @ 080c916c c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
 LAB_080c9170:
     movs r0,#0xf    @ 080c9170 0f20
-    ldr r3, DWORD_080c91b0                   @ 080c9172 0f4b
+    ldr r3, tick_field_background_window_transition_ptr_w_i_n0_h_080c91b0 @ 080c9172 0f4b
     ldrb r5,[r4,#0x2]                        @ 080c9174 a578
     adds r2,r5,#0x0    @ 080c9176 2a1c
     muls r2,r0    @ 080c9178 4243
@@ -16681,14 +16653,14 @@ LAB_080c9170:
     lsls r0,r0,#0x18    @ 080c918c 0006
     lsrs r0,r0,#0x10    @ 080c918e 000c
     orrs r1,r0    @ 080c9190 0143
-    strh r1,[r3,#0x0]                        @ 080c9192 1980
+    strh r1,[r3,#0x0]                        @ 080c9192 1980  -- WIN0H left=(140-floor(15*counter/2))&255,right=(140+floor(15*counter/2))&255.
     ldrb r0,[r4,#0x2]                        @ 080c9194 a078
     adds r0,#0x1    @ 080c9196 0130
     strb r0,[r4,#0x2]                        @ 080c9198 a070
     lsls r0,r0,#0x18    @ 080c919a 0006
     lsrs r0,r0,#0x18    @ 080c919c 000e
     cmp r0,#0x8                              @ 080c919e 0828
-    bls LAB_080c9152                         @ 080c91a0 d7d9
+    bls LAB_080c9152                         @ 080c91a0 d7d9  -- Stay in phase3 through counter8; advance after the ninth call.
     movs r0,#0x0    @ 080c91a2 0020
     strb r0,[r4,#0x2]                        @ 080c91a4 a070
 LAB_080c91a6:
@@ -16697,8 +16669,8 @@ LAB_080c91a6:
     strb r0,[r4,#0x1]                        @ 080c91aa 6070
     b LAB_080c9152                           @ 080c91ac d1e7
     .zero  0x2
-DWORD_080c91b0:
-    .word  WIN0H                          @ 080c91b0 40000004
+tick_field_background_window_transition_ptr_w_i_n0_h_080c91b0:
+    .word  WIN0H                          @ 080c91b0 40000004  Pointer to WIN0H; operand-0 DATA reference preserved.
 LAB_080c91b4:
     movs r0,#0x1    @ 080c91b4 0120
 LAB_080c91b6:
@@ -16706,36 +16678,36 @@ LAB_080c91b6:
     pop {r1}                                 @ 080c91b8 02bc
     bx r1                                    @ 080c91ba 0847
 
-@ 当 play_ui_effect_06 (case 0x06 UI 效果子状态机) 调用本函数时, 执行如下操作: 读 BLDCNT (0x04000050) 并与掩码 0x9fff AND 清除 blend 模式字段[15:13]; 将 BLDCOEF (0x04000052) 与 BLDALPHA (0x04000054) 均写为 0, 关闭 alpha 混合系数. 副作用目的: 禁用 GBA 图层混合效果, 使画面回到正常直通模式. 函数固定返回 1, 供调用方判断操作是否已执行. Constants: BLDCNT=0x04000050, MASK_9FFF=0x9fff (清除 BLDCNT[15:13]=blend mode), BLDCOEF=+2, BLDALPHA=+4 (相对 BLDCNT 偏移).
-reset_blend_control_regs:
+@ Finish the field-background transition. AND DISPCNT with0x9fff to disable WIN0 and WIN1 while preserving OBJWIN and the other display bits. Clear BLDCNT and BLDY; BLDALPHA is not written. Return1 for the phase callback.
+reset_field_background_window_regs:
     movs r2,#0x80    @ 080c91bc 8022
     lsls r2,r2,#0x13    @ 080c91be d204
     ldrh r1,[r2,#0x0]                        @ 080c91c0 1188
-    ldr r0, DWORD_080c91d8                   @ 080c91c2 0548
+    ldr r0, reset_field_background_window_regs_dispcnt_win0_win1_clear_mask_080c91d8 @ 080c91c2 0548
     ands r0,r1    @ 080c91c4 0840
-    strh r0,[r2,#0x0]                        @ 080c91c6 1080
-    ldr r0, DWORD_080c91dc                   @ 080c91c8 0448
+    strh r0,[r2,#0x0]                        @ 080c91c6 1080  -- Disable WIN0/WIN1 by clearing DISPCNT bits13/14, preserving OBJWIN.
+    ldr r0, reset_field_background_window_regs_ptr_b_l_d_c_n_t_080c91dc @ 080c91c8 0448
     movs r1,#0x0    @ 080c91ca 0021
-    strh r1,[r0,#0x0]                        @ 080c91cc 0180
+    strh r1,[r0,#0x0]                        @ 080c91cc 0180  -- Clear BLDCNT.
     adds r0,#0x4    @ 080c91ce 0430
-    strh r1,[r0,#0x0]                        @ 080c91d0 0180
+    strh r1,[r0,#0x0]                        @ 080c91d0 0180  -- Clear BLDY at BLDCNT+4; BLDALPHA at+2 is untouched.
     movs r0,#0x1    @ 080c91d2 0120
     bx lr                                    @ 080c91d4 7047
     .zero  0x2
-DWORD_080c91d8:
-    .word  0x00009fff                     @ 080c91d8 ff9f0000
-DWORD_080c91dc:
-    .word  BLDCNT                         @ 080c91dc 50000004
+reset_field_background_window_regs_dispcnt_win0_win1_clear_mask_080c91d8:
+    .word  DISPCNT_WIN0_WIN1_CLEAR_MASK   @ 080c91d8 ff9f0000  DISPCNT_WIN0_WIN1_CLEAR_MASK: operand-0 data equate, value0x00009fff.
+reset_field_background_window_regs_ptr_b_l_d_c_n_t_080c91dc:
+    .word  BLDCNT                         @ 080c91dc 50000004  Pointer to BLDCNT; operand-0 DATA reference preserved.
 
-@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析.
-play_ui_effect_06:
+@ Run field_background_transition_handlers using the byte at gDuelZoneActivationState. Invoke the selected Thumb callback through invoke_r0. A nonzero callback result increments the phase byte and clears the subphase byte at+1. Return1 while a callback exists and0 at the fourth null entry. The three callbacks initialize windows, tick the background transition, then reset window registers.
+tick_field_background_change_effect:
     push {r4,lr}                             @ 080c91e0 10b5
-    ldr r1, DAT_080c9208                     @ 080c91e2 0949
-    ldr r4, DAT_080c920c                     @ 080c91e4 094c
+    ldr r1, tick_field_background_change_effect_ptr_field_background_transition_handlers_080c9208 @ 080c91e2 0949
+    ldr r4, tick_field_background_change_effect_ptr_g_duel_zone_activation_state_080c920c @ 080c91e4 094c
     ldrb r2,[r4,#0x0]                        @ 080c91e6 2278
     lsls r0,r2,#0x2    @ 080c91e8 9000
     adds r0,r0,r1    @ 080c91ea 4018
-    ldr r0,[r0,#0x0]                         @ 080c91ec 0068
+    ldr r0,[r0,#0x0]                         @ 080c91ec 0068  -- Read a stored Thumb callback; the three callbacks are followed by null.
     cmp r0,#0x0                              @ 080c91ee 0028
     beq LAB_080c9210                         @ 080c91f0 0ed0
     bl invoke_r0                             @ 080c91f2 45f0e9f9
@@ -16744,15 +16716,15 @@ play_ui_effect_06:
     ldrb r0,[r4,#0x0]                        @ 080c91fa 2078
     adds r0,#0x1    @ 080c91fc 0130
     movs r1,#0x0    @ 080c91fe 0021
-    strb r0,[r4,#0x0]                        @ 080c9200 2070
-    strb r1,[r4,#0x1]                        @ 080c9202 6170
+    strb r0,[r4,#0x0]                        @ 080c9200 2070  -- Advance outer phase only when the callback returns nonzero.
+    strb r1,[r4,#0x1]                        @ 080c9202 6170  -- Clear transition subphase at state+1 on outer-phase advance.
 LAB_080c9204:
     movs r0,#0x1    @ 080c9204 0120
     b LAB_080c9212                           @ 080c9206 04e0
-DAT_080c9208:
-    .word  0x09e5abb8                     @ 080c9208 b8abe509
-DAT_080c920c:
-    .word  0x020230c0                     @ 080c920c c0300202
+tick_field_background_change_effect_ptr_field_background_transition_handlers_080c9208:
+    .word  field_background_transition_handlers @ 080c9208 b8abe509  Pointer to field_background_transition_handlers; operand-0 DATA reference added.
+tick_field_background_change_effect_ptr_g_duel_zone_activation_state_080c920c:
+    .word  gDuelZoneActivationState       @ 080c920c c0300202  Pointer to gDuelZoneActivationState; operand-0 DATA reference added.
 LAB_080c9210:
     movs r0,#0x0    @ 080c9210 0020
 LAB_080c9212:
@@ -16760,28 +16732,20 @@ LAB_080c9212:
     pop {r1}                                 @ 080c9214 02bc
     bx r1                                    @ 080c9216 0847
 
-@ Called by render_duel_field_oam_all (0x080ccdf4) when [0x02023130+0xa] byte is nonzero (has card count). Reads [BASE+0xa]-1 as r8 (card count minus 1), switches on zone_col r2 (0-4 -> r1=0; 5-9 -> r1=5; 0xa-0xe -> r1=0xa, r2=0), calls resolve_zone_oam_base_coords_by_type for coords. With r4=count%10+0x8e as tile index, loops calling write_oam_entry_from_packed_args for each digit OAM, dividing r4 by 10 each iteration. Finally calls write_oam_entry_from_packed_args(r5_coord|r6_player_flag, 0, 0xda) to write background tile OAM. Exit: void.
-@ 
-@ Constants:
-@ - BASE=0x02023130
-@ - CARD_COUNT_OFFSET=0xa (card count byte)
-@ - ZONE_RANGES: [0..4]=bottom, [5..9]=middle, [0xa..0xe]=top
-@ - DIGIT_BASE=0x8e (OAM tile index base, plus count%10 per digit)
-@ - BG_TILE=0xda (deck background OAM tile)
-@ - PLAYER_FLAG=0x88*4 (player 2 coordinate offset 0x110)
-render_deck_zone_count_oam:
+@ Render list ordinals for the field+0xa zone records at field+0xc, stride4, in reverse order. Each record supplies zone and player; the displayed number is record index+1. Group zone types0..4 and5..9 before coordinate lookup, retain types10..15, and use fixed coordinates for larger types. Draw decimal digits with tile base0x8e and a frame with attr2=0xda. All digits of one ordinal use the same computed x coordinate. No inputs.
+render_zone_list_order_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c9218 f0b5
     .hword 0x4647    @ 080c921a 4746
     push {r7}                                @ 080c921c 80b4
-    ldr r0, DAT_080c924c                     @ 080c921e 0b48
+    ldr r0, render_zone_list_order_oam_ptr_g_duel_field_state_080c924c @ 080c921e 0b48
     ldrb r0,[r0,#0xa]                        @ 080c9220 807a
     subs r0,#0x1    @ 080c9222 0138
-    .hword 0x4680    @ 080c9224 8046
+    .hword 0x4680    @ 080c9224 8046  -- Start from list record count-1 and iterate toward0.
     cmp r0,#0x0                              @ 080c9226 0028
     bge LAB_080c922c                         @ 080c9228 00da
     b LAB_080c9328                           @ 080c922a 7de0
 LAB_080c922c:
-    ldr r0, DAT_080c924c                     @ 080c922c 0748
+    ldr r0, render_zone_list_order_oam_ptr_g_duel_field_state_080c924c @ 080c922c 0748
     .hword 0x4642    @ 080c922e 4246
     lsls r1,r2,#0x2    @ 080c9230 9100
     adds r0,#0xc    @ 080c9232 0c30
@@ -16789,19 +16753,19 @@ LAB_080c922c:
     ldrb r6,[r1,#0x1]                        @ 080c9236 4e78
     ldrb r3,[r1,#0x0]                        @ 080c9238 0b78
     .hword 0x4644    @ 080c923a 4446
-    adds r4,#0x1    @ 080c923c 0134
+    adds r4,#0x1    @ 080c923c 0134  -- Display ordinal = record index+1, not a card count field.
     cmp r3,#0xe                              @ 080c923e 0e2b
     bhi switchD_080c924a__caseD_a            @ 080c9240 2cd8
     lsls r0,r3,#0x2    @ 080c9242 9800
-    ldr r1, DAT_080c9250                     @ 080c9244 0249
+    ldr r1, render_zone_list_order_oam_ptr_switch_d_080c924a_switchdata_d_080c9254_080c9250 @ 080c9244 0249
     adds r0,r0,r1    @ 080c9246 4018
     ldr r0,[r0,#0x0]                         @ 080c9248 0068
 switchD_080c924a__switchD:
     .hword 0x4687    @ 080c924a 8746
-DAT_080c924c:
-    .word  0x02023130                     @ 080c924c 30310202
-DAT_080c9250:
-    .word  0x080c9254                     @ 080c9250 54920c08
+render_zone_list_order_oam_ptr_g_duel_field_state_080c924c:
+    .word  gDuelFieldState                @ 080c924c 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_zone_list_order_oam_ptr_switch_d_080c924a_switchdata_d_080c9254_080c9250:
+    .word  switchD_080c924a__switchdataD_080c9254                     @ 080c9250 54920c08  Pointer to switchD_080c924a__switchdataD_080c9254; operand-0 DATA reference added.
 switchD_080c924a__switchdataD_080c9254:
     .word  0x080c9290                     @ 080c9254 90920c08
     .word  0x080c9290                     @ 080c9258 90920c08
@@ -16837,7 +16801,7 @@ LAB_080c92a0:
     lsls r1,r0,#0x10    @ 080c92aa 0104
     lsrs r5,r1,#0x10    @ 080c92ac 0d0c
     lsrs r2,r0,#0x10    @ 080c92ae 020c
-    ldr r0, DAT_080c92c0                     @ 080c92b0 0348
+    ldr r0, render_zone_list_order_oam_ptr_g_duel_card_ctx_base_080c92c0 @ 080c92b0 0348
     ldr r0,[r0,#0x4]                         @ 080c92b2 4068
     movs r1,#0x1    @ 080c92b4 0121
     eors r0,r1    @ 080c92b6 4840
@@ -16845,11 +16809,11 @@ LAB_080c92a0:
     beq LAB_080c92d6                         @ 080c92ba 0cd0
     adds r2,#0x10    @ 080c92bc 1032
     b LAB_080c92d6                           @ 080c92be 0ae0
-DAT_080c92c0:
-    .word  0x0201e2a0                     @ 080c92c0 a0e20102
+render_zone_list_order_oam_ptr_g_duel_card_ctx_base_080c92c0:
+    .word  gDuelCardCtxBase               @ 080c92c0 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
 LAB_080c92c4:
     movs r5,#0xd8    @ 080c92c4 d825
-    ldr r0, DAT_080c9334                     @ 080c92c6 1b48
+    ldr r0, render_zone_list_order_oam_ptr_g_duel_card_ctx_base_080c9334 @ 080c92c6 1b48
     ldr r1,[r0,#0x4]                         @ 080c92c8 4168
     movs r0,#0x1    @ 080c92ca 0120
     eors r1,r0    @ 080c92cc 4140
@@ -16873,7 +16837,7 @@ LAB_080c92e0:
 LAB_080c92ec:
     adds r0,r4,#0x0    @ 080c92ec 201c
     movs r1,#0xa    @ 080c92ee 0a21
-    bl __modsi3                              @ 080c92f0 45f0d4f9
+    bl __modsi3                              @ 080c92f0 45f0d4f9  -- Take the ordinal decimal remainder; r7 stays fixed for every digit.
     adds r2,r0,#0x0    @ 080c92f4 021c
     adds r2,#0x8e    @ 080c92f6 8e32
     lsls r2,r2,#0x10    @ 080c92f8 1204
@@ -16890,7 +16854,7 @@ LAB_080c92ec:
     bgt LAB_080c92ec                         @ 080c9312 ebdc
 LAB_080c9314:
     orrs r5,r6    @ 080c9314 3543
-    ldr r1, DAT_080c9338                     @ 080c9316 0849
+    ldr r1, render_zone_list_order_oam_obj_shape_size_horizontal_32x8_080c9338 @ 080c9316 0849
     adds r0,r5,#0x0    @ 080c9318 281c
     movs r2,#0xda    @ 080c931a da22
     bl write_oam_entry_from_packed_args      @ 080c931c 2cf026ff
@@ -16905,39 +16869,39 @@ LAB_080c9328:
     pop {r0}                                 @ 080c932e 01bc
     bx r0                                    @ 080c9330 0047
     .zero  0x2
-DAT_080c9334:
-    .word  0x0201e2a0                     @ 080c9334 a0e20102
-DAT_080c9338:
-    .word  0x00004040                     @ 080c9338 40400000
+render_zone_list_order_oam_ptr_g_duel_card_ctx_base_080c9334:
+    .word  gDuelCardCtxBase               @ 080c9334 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_zone_list_order_oam_obj_shape_size_horizontal_32x8_080c9338:
+    .word  OBJ_SHAPE_SIZE_HORIZONTAL_32X8 @ 080c9338 40400000  OBJ_SHAPE_SIZE_HORIZONTAL_32X8: operand-0 data equate, value0x00004040.
 
-@ Map card_id (r0) to the ROM tile offset for card number digit display. Looks up card number digits from card attribute table, returns byte offset into digit tile ROM data. r0: card_id [0..0x19b7]. Returns u32 tile_offset. Pure read-only. Constants: card_number_table_base=ROM digit tile index table.
-map_card_id_to_digit_tile_offset:
+@ Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_large_card_display_by_mode uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.
+get_trap_monster_level_by_card_id:
     adds r1,r0,#0x0    @ 080c933c 011c
-    ldr r0, DAT_080c9350                     @ 080c933e 0448
+    ldr r0, get_trap_monster_level_by_card_id_metal_reflect_slime_cid_080c9350 @ 080c933e 0448  -- Metal Reflect Slime CID selects level10.
     cmp r1,r0                                @ 080c9340 8142
     beq LAB_080c936c                         @ 080c9342 13d0
     cmp r1,r0                                @ 080c9344 8142
     bgt LAB_080c9358                         @ 080c9346 07dc
-    ldr r0, DAT_080c9354                     @ 080c9348 0248
+    ldr r0, get_trap_monster_level_by_card_id_embodiment_of_apophis_cid_080c9354 @ 080c9348 0248  -- Embodiment of Apophis CID selects level4.
     cmp r1,r0                                @ 080c934a 8142
     beq LAB_080c9364                         @ 080c934c 0ad0
     b LAB_080c9370                           @ 080c934e 0fe0
-DAT_080c9350:
-    .word  0x00001636                     @ 080c9350 36160000
-DAT_080c9354:
-    .word  0x00001472                     @ 080c9354 72140000
+get_trap_monster_level_by_card_id_metal_reflect_slime_cid_080c9350:
+    .word  METAL_REFLECT_SLIME_CID        @ 080c9350 36160000  METAL_REFLECT_SLIME_CID: operand-0 data equate, value0x00001636.
+get_trap_monster_level_by_card_id_embodiment_of_apophis_cid_080c9354:
+    .word  EMBODIMENT_OF_APOPHIS_CID      @ 080c9354 72140000  EMBODIMENT_OF_APOPHIS_CID: operand-0 data equate, value0x00001472.
 LAB_080c9358:
-    ldr r0, DAT_080c9368                     @ 080c9358 0348
+    ldr r0, get_trap_monster_level_by_card_id_skull_zoma_cid_080c9368 @ 080c9358 0348
     cmp r1,r0                                @ 080c935a 8142
     beq LAB_080c9364                         @ 080c935c 02d0
-    adds r0,#0xda    @ 080c935e da30
+    adds r0,#0xda    @ 080c935e da30  -- SKULL_ZOMA_CID+0xda equals STRONGHOLD_CID; both select level4.
     cmp r1,r0                                @ 080c9360 8142
     bne LAB_080c9370                         @ 080c9362 05d1
 LAB_080c9364:
     movs r0,#0x4    @ 080c9364 0420
     b LAB_080c9372                           @ 080c9366 04e0
-DAT_080c9368:
-    .word  0x0000172f                     @ 080c9368 2f170000
+get_trap_monster_level_by_card_id_skull_zoma_cid_080c9368:
+    .word  SKULL_ZOMA_CID                 @ 080c9368 2f170000  SKULL_ZOMA_CID: operand-0 data equate, value0x0000172f.
 LAB_080c936c:
     movs r0,#0xa    @ 080c936c 0a20
     b LAB_080c9372                           @ 080c936e 00e0
@@ -16946,8 +16910,8 @@ LAB_080c9370:
 LAB_080c9372:
     bx lr                                    @ 080c9372 7047
 
-@ Write 4bpp nibble palette row data to VRAM for card display tiles. r0: src_palette_data ptr; r1: vram_dest ptr; r2: row_count [1..N]. Iterates row_count rows, packing nibble pairs into halfwords, writing to VRAM. Returns void. Side effects: VRAM tile palette region written. Constants: nibble_mask=0xf, halfword_shift=4.
-write_nibble_palette_rows_to_vram:
+@ Pack font pixel tiles into contiguous4bpp data at r0. Truncate r1 to the starting tile index and r2 to an eight-bit row count. Process row_count times the tile width in gFontJpCtx+8 bits9:2, reading64 bytes per source tile from ctx[0]+(first_tile+i)*64 and writing32 bytes per tile. Each four source bytes occupy one halfword at shifts0,4,8,12. Destination halfwords start at0; source zeroes remain transparent. Source values are not explicitly masked to four bits.
+pack_font_buffer_tiles_to_4bpp:
     push {r4,r5,r6,r7,lr}                    @ 080c9374 f0b5
     .hword 0x4657    @ 080c9376 5746
     .hword 0x464e    @ 080c9378 4e46
@@ -16963,10 +16927,10 @@ write_nibble_palette_rows_to_vram:
     .hword 0x4691    @ 080c938c 9146
     movs r0,#0x0    @ 080c938e 0020
     .hword 0x4680    @ 080c9390 8046
-    ldr r1, DAT_080c96e0                     @ 080c9392 d349
+    ldr r1, pack_font_buffer_tiles_to_4bpp_ptr_g_font_jp_ctx_080c96e0 @ 080c9392 d349
     ldrh r2,[r1,#0x8]                        @ 080c9394 0a89
     lsls r0,r2,#0x16    @ 080c9396 9005
-    lsrs r0,r0,#0x18    @ 080c9398 000e
+    lsrs r0,r0,#0x18    @ 080c9398 000e  -- Tile width = (gFontJpCtx halfword+8 >>2)&255.
     .hword 0x464c    @ 080c939a 4c46
     muls r4,r0    @ 080c939c 4443
     adds r0,r4,#0x0    @ 080c939e 201c
@@ -16976,17 +16940,17 @@ write_nibble_palette_rows_to_vram:
 LAB_080c93a6:
     movs r0,#0x0    @ 080c93a6 0020
     .hword 0x4684    @ 080c93a8 8446
-    ldr r7, DAT_080c96e4                     @ 080c93aa ce4f
-    ldr r6, DAT_080c96e8                     @ 080c93ac ce4e
-    ldr r5, DAT_080c96ec                     @ 080c93ae cf4d
+    ldr r7, pack_font_buffer_tiles_to_4bpp_font_4bpp_clear_pixel1_mask_080c96e4 @ 080c93aa ce4f
+    ldr r6, pack_font_buffer_tiles_to_4bpp_font_4bpp_clear_pixel2_mask_080c96e8 @ 080c93ac ce4e
+    ldr r5, pack_font_buffer_tiles_to_4bpp_scene_slot_mask_lo_080c96ec @ 080c93ae cf4d
 LAB_080c93b0:
     .hword 0x4640    @ 080c93b0 4046
     add r0,r10                               @ 080c93b2 5044
-    lsls r0,r0,#0x6    @ 080c93b4 8001
+    lsls r0,r0,#0x6    @ 080c93b4 8001  -- Read64 source bytes per font tile, beginning at first_tile+i.
     ldr r1,[r1,#0x0]                         @ 080c93b6 0968
     adds r2,r1,r0    @ 080c93b8 0a18
     .hword 0x4661    @ 080c93ba 6146
-    strh r1,[r3,#0x0]                        @ 080c93bc 1980
+    strh r1,[r3,#0x0]                        @ 080c93bc 1980  -- Initialize each destination halfword to zero before placing four pixel values.
     ldrb r0,[r2,#0x0]                        @ 080c93be 1078
     cmp r0,#0x0                              @ 080c93c0 0028
     beq LAB_080c93c6                         @ 080c93c2 00d0
@@ -17000,7 +16964,7 @@ LAB_080c93c6:
     ands r0,r4    @ 080c93d0 2040
     strh r0,[r3,#0x0]                        @ 080c93d2 1880
     ldrb r4,[r2,#0x1]                        @ 080c93d4 5478
-    lsls r1,r4,#0x4    @ 080c93d6 2101
+    lsls r1,r4,#0x4    @ 080c93d6 2101  -- Place source pixel1 at halfword bits7:4.
     orrs r0,r1    @ 080c93d8 0843
     strh r0,[r3,#0x0]                        @ 080c93da 1880
 LAB_080c93dc:
@@ -17012,7 +16976,7 @@ LAB_080c93dc:
     ands r0,r1    @ 080c93e6 0840
     strh r0,[r3,#0x0]                        @ 080c93e8 1880
     ldrb r4,[r2,#0x2]                        @ 080c93ea 9478
-    lsls r1,r4,#0x8    @ 080c93ec 2102
+    lsls r1,r4,#0x8    @ 080c93ec 2102  -- Place source pixel2 at halfword bits11:8.
     orrs r0,r1    @ 080c93ee 0843
     strh r0,[r3,#0x0]                        @ 080c93f0 1880
 LAB_080c93f2:
@@ -17024,7 +16988,7 @@ LAB_080c93f2:
     ands r0,r1    @ 080c93fc 0840
     strh r0,[r3,#0x0]                        @ 080c93fe 1880
     ldrb r4,[r2,#0x3]                        @ 080c9400 d478
-    lsls r1,r4,#0xc    @ 080c9402 2103
+    lsls r1,r4,#0xc    @ 080c9402 2103  -- Place source pixel3 at halfword bits15:12.
     orrs r0,r1    @ 080c9404 0843
     strh r0,[r3,#0x0]                        @ 080c9406 1880
 LAB_080c9408:
@@ -17426,14 +17390,14 @@ LAB_080c96ca:
     lsls r1,r4,#0x8    @ 080c96da 2102
     b LAB_080c96f0                           @ 080c96dc 08e0
     .zero  0x2
-DAT_080c96e0:
-    .word  0x02006ed0                     @ 080c96e0 d06e0002
-DAT_080c96e4:
-    .word  0x0000ff0f                     @ 080c96e4 0fff0000
-DAT_080c96e8:
-    .word  0x0000f0ff                     @ 080c96e8 fff00000
-DAT_080c96ec:
-    .word  0x00000fff                     @ 080c96ec ff0f0000
+pack_font_buffer_tiles_to_4bpp_ptr_g_font_jp_ctx_080c96e0:
+    .word  gFontJpCtx                     @ 080c96e0 d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
+pack_font_buffer_tiles_to_4bpp_font_4bpp_clear_pixel1_mask_080c96e4:
+    .word  FONT_4BPP_CLEAR_PIXEL1_MASK    @ 080c96e4 0fff0000  FONT_4BPP_CLEAR_PIXEL1_MASK: operand-0 data equate, value0x0000ff0f.
+pack_font_buffer_tiles_to_4bpp_font_4bpp_clear_pixel2_mask_080c96e8:
+    .word  FONT_4BPP_CLEAR_PIXEL2_MASK    @ 080c96e8 fff00000  FONT_4BPP_CLEAR_PIXEL2_MASK: operand-0 data equate, value0x0000f0ff.
+pack_font_buffer_tiles_to_4bpp_scene_slot_mask_lo_080c96ec:
+    .word  SCENE_SLOT_MASK_LO             @ 080c96ec ff0f0000  SCENE_SLOT_MASK_LO: operand-0 data equate, value0x00000fff.
 LAB_080c96f0:
     orrs r0,r1    @ 080c96f0 0843
     strh r0,[r3,#0x0]                        @ 080c96f2 1880
@@ -17726,8 +17690,8 @@ LAB_080c98e8:
 LAB_080c98fe:
     adds r3,#0x2    @ 080c98fe 0233
     movs r2,#0x1    @ 080c9900 0122
-    add r8,r2                                @ 080c9902 9044
-    ldr r1, DAT_080c9928                     @ 080c9904 0849
+    add r8,r2                                @ 080c9902 9044  -- One unrolled tile consumes64 source bytes and writes32 destination bytes.
+    ldr r1, pack_font_buffer_tiles_to_4bpp_ptr_g_font_jp_ctx_080c9928 @ 080c9904 0849
     ldrh r4,[r1,#0x8]                        @ 080c9906 0c89
     lsls r0,r4,#0x16    @ 080c9908 a005
     lsrs r0,r0,#0x18    @ 080c990a 000e
@@ -17746,34 +17710,34 @@ LAB_080c9918:
     pop {r4,r5,r6,r7}                        @ 080c9922 f0bc
     pop {r0}                                 @ 080c9924 01bc
     bx r0                                    @ 080c9926 0047
-DAT_080c9928:
-    .word  0x02006ed0                     @ 080c9928 d06e0002
+pack_font_buffer_tiles_to_4bpp_ptr_g_font_jp_ctx_080c9928:
+    .word  gFontJpCtx                     @ 080c9928 d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
 
-@ Render card type icon tile into VRAM for card display. r0: card_type [0..N]; r1: vram_dest ptr. Looks up type icon tile source from ROM table, copies tile data to vram_dest. Returns void. Side effects: VRAM region written with type icon tiles. Constants: card_type_icon_table_base=ROM icon tile table.
-render_card_type_icon_to_vram:
+@ Initialize scrolling card-description tiles for internal card index r0. Clear the four-byte scroll state and0x5000 bytes of gSceneWorkArea, and clear seven full OBJ tile rows at card_description_scroll_obj_tiles. Configure the font context with16 tile columns and84 rows, select its language/font flags, and render the localized description from card_data_query. Pack up to13 text rows starting at OBJ row1. Store ceil(rendered_height/8)+1 in scroll-state bits6:0, preserving bit7.
+init_card_description_scroll_tiles:
     push {r4,r5,r6,r7,lr}                    @ 080c992c f0b5
     adds r6,r0,#0x0    @ 080c992e 061c
-    ldr r7, DAT_080c99f0                     @ 080c9930 2f4f
+    ldr r7, init_card_description_scroll_tiles_ptr_g_card_description_scroll_state_080c99f0 @ 080c9930 2f4f
     adds r0,r7,#0x0    @ 080c9932 381c
     movs r1,#0x4    @ 080c9934 0421
-    bl zero_fill_by_halfword                 @ 080c9936 2bf09dfa
-    ldr r0, DAT_080c99f4                     @ 080c993a 2e48
+    bl zero_fill_by_halfword                 @ 080c9936 2bf09dfa  -- Clear exactly four bytes of card-description scroll state.
+    ldr r0, init_card_description_scroll_tiles_ptr_g_scene_work_area_080c99f4 @ 080c993a 2e48
     movs r1,#0xa0    @ 080c993c a021
     lsls r1,r1,#0x7    @ 080c993e c901
-    bl zero_fill_by_halfword                 @ 080c9940 2bf098fa
-    ldr r0, DAT_080c99f8                     @ 080c9944 2c48
+    bl zero_fill_by_halfword                 @ 080c9940 2bf098fa  -- Clear0x5000 bytes of the shared scene work area.
+    ldr r0, init_card_description_scroll_tiles_ptr_card_description_scroll_obj_tiles_080c99f8 @ 080c9944 2c48
     movs r1,#0x0    @ 080c9946 0021
     movs r2,#0x20    @ 080c9948 2022
     movs r3,#0x7    @ 080c994a 0723
-    bl tile_2d_row_copy                      @ 080c994c 2df0c2fd
+    bl tile_2d_row_copy                      @ 080c994c 2df0c2fd  -- Null-source tile copy clears seven rows of32 tiles,0x400 bytes per row.
     movs r0,#0x10    @ 080c9950 1020
     movs r1,#0x54    @ 080c9952 5421
     movs r2,#0x1    @ 080c9954 0122
     movs r3,#0x2    @ 080c9956 0223
-    bl setup_line_buf_with_font_and_align    @ 080c9958 27f0b2f9
-    ldr r4, DAT_080c99fc                     @ 080c995c 274c
-    ldr r0, DAT_080c9a00                     @ 080c995e 2848
-    ldr r1, DAT_080c9a04                     @ 080c9960 2849
+    bl setup_line_buf_with_font_and_align    @ 080c9958 27f0b2f9  -- Configure16 tile columns and84 tile rows with font/alignment arguments1/2.
+    ldr r4, init_card_description_scroll_tiles_ptr_g_font_jp_ctx_080c99fc @ 080c995c 274c
+    ldr r0, init_card_description_scroll_tiles_ptr_e_w_r_a_m_b_a_s_e_080c9a00 @ 080c995e 2848
+    ldr r1, init_card_description_scroll_tiles_gsettings_offset_080c9a04 @ 080c9960 2849
     adds r0,r0,r1    @ 080c9962 4018
     ldrb r1,[r0,#0x0]                        @ 080c9964 0178
     movs r5,#0x7    @ 080c9966 0725
@@ -17789,7 +17753,7 @@ render_card_type_icon_to_vram:
     movs r2,#0x2    @ 080c997a 0222
     orrs r0,r2    @ 080c997c 1043
     strb r0,[r4,#0x8]                        @ 080c997e 2072
-    ldr r3, PTR_font_jp_base_table_080c9a08  @ 080c9980 214b
+    ldr r3, init_card_description_scroll_tiles_ptr_font_jp_base_table_080c9a08 @ 080c9980 214b
     lsls r2,r0,#0x1e    @ 080c9982 8207
     lsrs r2,r2,#0x1f    @ 080c9984 d20f
     lsls r2,r2,#0x2    @ 080c9986 9200
@@ -17803,11 +17767,11 @@ render_card_type_icon_to_vram:
     movs r0,#0x40    @ 080c9996 4020
     ldrb r2,[r4,#0x15]                       @ 080c9998 627d
     orrs r0,r2    @ 080c999a 1043
-    strb r0,[r4,#0x15]                       @ 080c999c 6075
+    strb r0,[r4,#0x15]                       @ 080c999c 6075  -- Enable font-context bit6 at+0x15 for this description rendering path.
     lsls r1,r1,#0x1d    @ 080c999e 4907
     lsrs r1,r1,#0x1d    @ 080c99a0 490f
     adds r0,r6,#0x0    @ 080c99a2 301c
-    bl card_data_query                       @ 080c99a4 25f0d6f8
+    bl card_data_query                       @ 080c99a4 25f0d6f8  -- Fetch the localized card-description string for internal card index and language.
     adds r3,r0,#0x0    @ 080c99a8 031c
     movs r0,#0x1    @ 080c99aa 0120
     movs r1,#0x0    @ 080c99ac 0021
@@ -17829,9 +17793,9 @@ LAB_080c99c4:
 LAB_080c99cc:
     lsls r2,r2,#0x18    @ 080c99cc 1206
     lsrs r2,r2,#0x18    @ 080c99ce 120e
-    ldr r0, DAT_080c9a0c                     @ 080c99d0 0e48
+    ldr r0, init_card_description_scroll_tiles_ptr_card_description_scroll_obj_tiles_row1_080c9a0c @ 080c99d0 0e48
     movs r1,#0x0    @ 080c99d2 0021
-    bl write_nibble_palette_rows_to_vram     @ 080c99d4 fff7cefc
+    bl pack_font_buffer_tiles_to_4bpp        @ 080c99d4 fff7cefc  -- Pack up to13 rendered description rows, starting at circular OBJ row1.
     adds r1,r4,#0x1    @ 080c99d8 611c
     movs r0,#0x7f    @ 080c99da 7f20
     ands r1,r0    @ 080c99dc 0140
@@ -17840,29 +17804,29 @@ LAB_080c99cc:
     ldrb r3,[r7,#0x0]                        @ 080c99e2 3b78
     ands r0,r3    @ 080c99e4 1840
     orrs r0,r1    @ 080c99e6 0843
-    strb r0,[r7,#0x0]                        @ 080c99e8 3870
+    strb r0,[r7,#0x0]                        @ 080c99e8 3870  -- Store ceil(rendered text height/8)+1 in low7 bits; preserve bit7.
     pop {r4,r5,r6,r7}                        @ 080c99ea f0bc
     pop {r0}                                 @ 080c99ec 01bc
     bx r0                                    @ 080c99ee 0047
-DAT_080c99f0:
-    .word  0x02023348                     @ 080c99f0 48330202
-DAT_080c99f4:
-    .word  0x02039eb0                     @ 080c99f4 b09e0302
-DAT_080c99f8:
-    .word  0x06016400                     @ 080c99f8 00640106
-DAT_080c99fc:
-    .word  0x02006ed0                     @ 080c99fc d06e0002
-DAT_080c9a00:
-    .word  0x02000000                     @ 080c9a00 00000002
-DAT_080c9a04:
-    .word  0x00006c2c                     @ 080c9a04 2c6c0000
-PTR_font_jp_base_table_080c9a08:
-    .word  font_jp_base_table             @ 080c9a08 54f8e509
-DAT_080c9a0c:
-    .word  0x06016600                     @ 080c9a0c 00660106
+init_card_description_scroll_tiles_ptr_g_card_description_scroll_state_080c99f0:
+    .word  gCardDescriptionScrollState    @ 080c99f0 48330202  Pointer to gCardDescriptionScrollState; operand-0 DATA reference added.
+init_card_description_scroll_tiles_ptr_g_scene_work_area_080c99f4:
+    .word  gSceneWorkArea                 @ 080c99f4 b09e0302  Pointer to gSceneWorkArea; operand-0 DATA reference added.
+init_card_description_scroll_tiles_ptr_card_description_scroll_obj_tiles_080c99f8:
+    .word  card_description_scroll_obj_tiles                     @ 080c99f8 00640106  Pointer to card_description_scroll_obj_tiles; operand-0 DATA reference added.
+init_card_description_scroll_tiles_ptr_g_font_jp_ctx_080c99fc:
+    .word  gFontJpCtx                     @ 080c99fc d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
+init_card_description_scroll_tiles_ptr_e_w_r_a_m_b_a_s_e_080c9a00:
+    .word  EWRAM_BASE                     @ 080c9a00 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+init_card_description_scroll_tiles_gsettings_offset_080c9a04:
+    .word  GSETTINGS_OFFSET               @ 080c9a04 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+init_card_description_scroll_tiles_ptr_font_jp_base_table_080c9a08:
+    .word  font_jp_base_table             @ 080c9a08 54f8e509  Pointer to font_jp_base_table; operand-0 DATA reference preserved.
+init_card_description_scroll_tiles_ptr_card_description_scroll_obj_tiles_row1_080c9a0c:
+    .word  card_description_scroll_obj_tiles_row1                     @ 080c9a0c 00660106  Pointer to card_description_scroll_obj_tiles_row1; operand-0 DATA reference added.
 
-@ Write OAM entries for card type/attribute icon strip in card display. r0: oam_base ptr; r1: icon_count [1..N]; r2: start_x [0..239]; r3: start_y [0..159]. For each icon: compute OAM attr0/attr1/attr2, write to oam_base + index*8. Returns void. Side effects: OAM region written. Constants: OAM_ATTR0_Y_MASK=0xff, OAM_ATTR1_X_MASK=0x1ff.
-write_oam_card_icon_strip:
+@ Render the14-row circular card-description tile buffer. r0 low16 supplies extra OBJ flags, ORed with shape/size0x4040. Draw at most14 rows, four32x8 sprites per row at x76,108,140,172; y advances by8 and includes the signed scroll offset. Short text is vertically centered; longer text starts at y16. Advance the circular tile-row index modulo14, with attr2 starting at0x320+row*16. No OAM pointer, count or coordinate parameters are accepted.
+render_card_description_scroll_oam:
     push {r4,r5,r6,r7,lr}                    @ 080c9a10 f0b5
     .hword 0x4657    @ 080c9a12 5746
     .hword 0x464e    @ 080c9a14 4e46
@@ -17871,13 +17835,13 @@ write_oam_card_icon_strip:
     sub sp,#0x8                              @ 080c9a1a 82b0
     lsls r0,r0,#0x10    @ 080c9a1c 0004
     lsrs r4,r0,#0x10    @ 080c9a1e 040c
-    ldr r0, DAT_080c9a44                     @ 080c9a20 0848
+    ldr r0, render_card_description_scroll_oam_ptr_g_card_description_scroll_state_080c9a44 @ 080c9a20 0848
     ldrb r3,[r0,#0x3]                        @ 080c9a22 c378
     ldr r0,[r0,#0x0]                         @ 080c9a24 0068
     lsls r0,r0,#0x19    @ 080c9a26 4006
     lsrs r1,r0,#0x19    @ 080c9a28 410e
     str r1,[sp,#0x0]                         @ 080c9a2a 0091
-    cmp r1,#0xe                              @ 080c9a2c 0e29
+    cmp r1,#0xe                              @ 080c9a2c 0e29  -- Cap the number of visible text rows at14.
     ble LAB_080c9a34                         @ 080c9a2e 01dd
     movs r2,#0xe    @ 080c9a30 0e22
     str r2,[sp,#0x0]                         @ 080c9a32 0092
@@ -17890,8 +17854,8 @@ LAB_080c9a34:
     subs r0,r0,r1    @ 080c9a3e 401a
     asrs r0,r0,#0x1    @ 080c9a40 4010
     b LAB_080c9a4a                           @ 080c9a42 02e0
-DAT_080c9a44:
-    .word  0x02023348                     @ 080c9a44 48330202
+render_card_description_scroll_oam_ptr_g_card_description_scroll_state_080c9a44:
+    .word  gCardDescriptionScrollState    @ 080c9a44 48330202  Pointer to gCardDescriptionScrollState; operand-0 DATA reference added.
 LAB_080c9a48:
     movs r0,#0x10    @ 080c9a48 1020
 LAB_080c9a4a:
@@ -17900,7 +17864,7 @@ LAB_080c9a4a:
     ldr r1,[sp,#0x0]                         @ 080c9a4e 0099
     cmp r2,r1                                @ 080c9a50 8a42
     bge LAB_080c9aae                         @ 080c9a52 2cda
-    ldr r0, DAT_080c9ac0                     @ 080c9a54 1a48
+    ldr r0, render_card_description_scroll_oam_obj_shape_size_horizontal_32x8_080c9ac0 @ 080c9a54 1a48
     adds r1,r0,#0x0    @ 080c9a56 011c
     adds r0,r4,#0x0    @ 080c9a58 201c
     orrs r0,r1    @ 080c9a5a 0843
@@ -17916,15 +17880,15 @@ LAB_080c9a60:
     .hword 0x4691    @ 080c9a6c 9146
     ldr r2,[sp,#0x4]                         @ 080c9a6e 019a
     adds r7,r2,r0    @ 080c9a70 1718
-    movs r5,#0x4c    @ 080c9a72 4c25
+    movs r5,#0x4c    @ 080c9a72 4c25  -- Four horizontal32x8 OBJ entries per text row, beginning at x76.
     movs r3,#0xc8    @ 080c9a74 c823
     lsls r3,r3,#0x2    @ 080c9a76 9b00
     adds r4,r1,r3    @ 080c9a78 cc18
 LAB_080c9a7a:
-    ldr r0, DAT_080c9ac4                     @ 080c9a7a 1248
+    ldr r0, render_card_description_scroll_oam_ptr_g_card_description_scroll_state_080c9ac4 @ 080c9a7a 1248
     ldrb r0,[r0,#0x2]                        @ 080c9a7c 8078
     lsls r0,r0,#0x18    @ 080c9a7e 0006
-    asrs r0,r0,#0x18    @ 080c9a80 0016
+    asrs r0,r0,#0x18    @ 080c9a80 0016  -- Interpret scroll-state byte2 as a signed pixel offset.
     adds r0,r7,r0    @ 080c9a82 3818
     lsls r0,r0,#0x10    @ 080c9a84 0004
     orrs r0,r5    @ 080c9a86 2843
@@ -17932,10 +17896,10 @@ LAB_080c9a7a:
     lsrs r2,r2,#0x10    @ 080c9a8a 120c
     .hword 0x4653    @ 080c9a8c 5346
     lsrs r1,r3,#0x10    @ 080c9a8e 190c
-    bl write_oam_entry_from_packed_args      @ 080c9a90 2cf06cfb
+    bl write_oam_entry_from_packed_args      @ 080c9a90 2cf06cfb  -- Emit one text-strip OBJ; r1 is shape/size plus extra OBJ flags.
     adds r5,#0x20    @ 080c9a94 2035
     adds r4,#0x4    @ 080c9a96 0434
-    adds r6,#0x1    @ 080c9a98 0136
+    adds r6,#0x1    @ 080c9a98 0136  -- Each visible text row uses four OBJ entries.
     cmp r6,#0x3                              @ 080c9a9a 032e
     ble LAB_080c9a7a                         @ 080c9a9c eddd
     .hword 0x4643    @ 080c9a9e 4346
@@ -17957,17 +17921,17 @@ LAB_080c9aae:
     pop {r0}                                 @ 080c9aba 01bc
     bx r0                                    @ 080c9abc 0047
     .zero  0x2
-DAT_080c9ac0:
-    .word  0x00004040                     @ 080c9ac0 40400000
-DAT_080c9ac4:
-    .word  0x02023348                     @ 080c9ac4 48330202
+render_card_description_scroll_oam_obj_shape_size_horizontal_32x8_080c9ac0:
+    .word  OBJ_SHAPE_SIZE_HORIZONTAL_32X8 @ 080c9ac0 40400000  OBJ_SHAPE_SIZE_HORIZONTAL_32X8: operand-0 data equate, value0x00004040.
+render_card_description_scroll_oam_ptr_g_card_description_scroll_state_080c9ac4:
+    .word  gCardDescriptionScrollState    @ 080c9ac4 48330202  Pointer to gCardDescriptionScrollState; operand-0 DATA reference added.
 
-@ Advance card icon animation by one step, updating OAM and VRAM tile indices. r0: anim_state_ptr (struct with frame_counter, tile_idx, oam_ptr). Increments frame counter; on threshold, advances tile_idx and writes updated OAM attr2 tile field. Returns void. Side effects: anim_state frame_counter and tile_idx updated; OAM attr2 written. Constants: anim_frame_threshold from anim_state struct.
-tick_card_icon_anim_step:
+@ Tick card-description scrolling while input bit0x100 at gPrng+0x146 is set and field flags permit it. Up/down bits0x40/0x80 select two-step four-pixel motion; at offset+8 or-8 refill one row of the14-row OBJ tile ring and reset the phase. Scroll-state bits6:0 hold total rows, bits13:7 the text row, bits15:14 the phase; bytes2/3 hold pixel offset and ring index. Always draw normal OAM; argument0x800 also draws a mosaic copy. Return1 when input/field guards block scrolling, otherwise0.
+tick_card_description_scroll:
     push {r4,r5,r6,r7,lr}                    @ 080c9ac8 f0b5
     lsls r0,r0,#0x10    @ 080c9aca 0004
     lsrs r7,r0,#0x10    @ 080c9acc 070c
-    ldr r1, PTR_gPrng_080c9b30               @ 080c9ace 1849
+    ldr r1, tick_card_description_scroll_ptr_g_prng_080c9b30 @ 080c9ace 1849
     movs r2,#0xa3    @ 080c9ad0 a322
     lsls r2,r2,#0x1    @ 080c9ad2 5200
     adds r0,r1,r2    @ 080c9ad4 8818
@@ -17975,14 +17939,14 @@ tick_card_icon_anim_step:
     movs r5,#0x0    @ 080c9ad8 0025
     movs r0,#0x80    @ 080c9ada 8020
     lsls r0,r0,#0x1    @ 080c9adc 4000
-    ands r0,r2    @ 080c9ade 1040
+    ands r0,r2    @ 080c9ade 1040  -- Input bit0x100 at gPrng+0x146 enables description scrolling.
     adds r6,r1,#0x0    @ 080c9ae0 0e1c
     cmp r0,#0x0                              @ 080c9ae2 0028
     bne LAB_080c9ae8                         @ 080c9ae4 00d1
     b LAB_080c9c74                           @ 080c9ae6 c5e0
 LAB_080c9ae8:
-    ldr r3, DAT_080c9b34                     @ 080c9ae8 124b
-    ldr r0, DAT_080c9b38                     @ 080c9aea 1348
+    ldr r3, tick_card_description_scroll_ptr_g_duel_field_state_080c9b34 @ 080c9ae8 124b
+    ldr r0, tick_card_description_scroll_duel_field_prng_anim_flag_off_080c9b38 @ 080c9aea 1348
     adds r1,r3,r0    @ 080c9aec 1918
     movs r0,#0xc    @ 080c9aee 0c20
     ldrb r1,[r1,#0x0]                        @ 080c9af0 0978
@@ -17991,7 +17955,7 @@ LAB_080c9ae8:
     beq LAB_080c9afa                         @ 080c9af6 00d0
     b LAB_080c9c74                           @ 080c9af8 bce0
 LAB_080c9afa:
-    ldr r0, DAT_080c9b3c                     @ 080c9afa 1048
+    ldr r0, tick_card_description_scroll_duel_field_state_226_off_080c9b3c @ 080c9afa 1048
     adds r1,r3,r0    @ 080c9afc 1918
     movs r0,#0x1    @ 080c9afe 0120
     ldrb r1,[r1,#0x0]                        @ 080c9b00 0978
@@ -18011,7 +17975,7 @@ LAB_080c9b0a:
     b LAB_080c9c76                           @ 080c9b1a ace0
 LAB_080c9b1c:
     lsls r0,r1,#0x10    @ 080c9b1c 0804
-    lsrs r0,r0,#0x1e    @ 080c9b1e 800f
+    lsrs r0,r0,#0x1e    @ 080c9b1e 800f  -- Description scroll phase occupies bits15:14, not a separate state pointer.
     cmp r0,#0x1                              @ 080c9b20 0128
     beq LAB_080c9bd8                         @ 080c9b22 59d0
     cmp r0,#0x1                              @ 080c9b24 0128
@@ -18020,21 +17984,21 @@ LAB_080c9b1c:
     beq LAB_080c9b46                         @ 080c9b2a 0cd0
     b LAB_080c9c76                           @ 080c9b2c a3e0
     .zero  0x2
-PTR_gPrng_080c9b30:
-    .word  gPrng                          @ 080c9b30 40000003
-DAT_080c9b34:
-    .word  0x02023130                     @ 080c9b34 30310202
-DAT_080c9b38:
-    .word  0x00000222                     @ 080c9b38 22020000
-DAT_080c9b3c:
-    .word  0x00000226                     @ 080c9b3c 26020000
+tick_card_description_scroll_ptr_g_prng_080c9b30:
+    .word  gPrng                          @ 080c9b30 40000003  Pointer to gPrng; operand-0 DATA reference preserved.
+tick_card_description_scroll_ptr_g_duel_field_state_080c9b34:
+    .word  gDuelFieldState                @ 080c9b34 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+tick_card_description_scroll_duel_field_prng_anim_flag_off_080c9b38:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 080c9b38 22020000  DUEL_FIELD_PRNG_ANIM_FLAG_OFF: operand-0 data equate, value0x00000222.
+tick_card_description_scroll_duel_field_state_226_off_080c9b3c:
+    .word  DUEL_FIELD_STATE_226_OFF       @ 080c9b3c 26020000  DUEL_FIELD_STATE_226_OFF: operand-0 data equate, value0x00000226.
 LAB_080c9b40:
     cmp r0,#0x2                              @ 080c9b40 0228
     beq LAB_080c9c28                         @ 080c9b42 71d0
     b LAB_080c9c76                           @ 080c9b44 97e0
 LAB_080c9b46:
     movs r0,#0x40    @ 080c9b46 4020
-    ands r2,r0    @ 080c9b48 0240
+    ands r2,r0    @ 080c9b48 0240  -- Input bit0x40 requests the previous text row when row offset is nonzero.
     cmp r2,#0x0                              @ 080c9b4a 002a
     beq LAB_080c9b80                         @ 080c9b4c 18d0
     lsls r0,r1,#0x12    @ 080c9b4e 8804
@@ -18057,7 +18021,7 @@ LAB_080c9b46:
     movs r1,#0x7f    @ 080c9b70 7f21
     ands r0,r1    @ 080c9b72 0840
     lsls r0,r0,#0x7    @ 080c9b74 c001
-    ldr r1, DAT_080c9bd0                     @ 080c9b76 1649
+    ldr r1, tick_card_description_scroll_gfx_attr_clear_bits_13_7_080c9bd0 @ 080c9b76 1649
     ldrh r3,[r4,#0x0]                        @ 080c9b78 2388
     ands r1,r3    @ 080c9b7a 1940
     orrs r1,r0    @ 080c9b7c 0143
@@ -18068,10 +18032,10 @@ LAB_080c9b80:
     adds r1,r6,r0    @ 080c9b84 3118
     movs r0,#0x80    @ 080c9b86 8020
     ldrh r1,[r1,#0x0]                        @ 080c9b88 0988
-    ands r0,r1    @ 080c9b8a 0840
+    ands r0,r1    @ 080c9b8a 0840  -- Input bit0x80 requests the next row when offset+13 is below total rows.
     cmp r0,#0x0                              @ 080c9b8c 0028
     beq LAB_080c9c76                         @ 080c9b8e 72d0
-    ldr r2, DAT_080c9bd4                     @ 080c9b90 104a
+    ldr r2, tick_card_description_scroll_ptr_g_card_description_scroll_state_080c9bd4 @ 080c9b90 104a
     ldr r1,[r2,#0x0]                         @ 080c9b92 1168
     lsls r0,r1,#0x12    @ 080c9b94 8804
     lsrs r0,r0,#0x19    @ 080c9b96 400e
@@ -18096,17 +18060,17 @@ LAB_080c9b80:
     movs r1,#0x7f    @ 080c9bbc 7f21
     ands r0,r1    @ 080c9bbe 0840
     lsls r0,r0,#0x7    @ 080c9bc0 c001
-    ldr r1, DAT_080c9bd0                     @ 080c9bc2 0349
+    ldr r1, tick_card_description_scroll_gfx_attr_clear_bits_13_7_080c9bd0 @ 080c9bc2 0349
     ldrh r3,[r2,#0x0]                        @ 080c9bc4 1388
     ands r1,r3    @ 080c9bc6 1940
     orrs r1,r0    @ 080c9bc8 0143
     strh r1,[r2,#0x0]                        @ 080c9bca 1180
     b LAB_080c9c76                           @ 080c9bcc 53e0
     .zero  0x2
-DAT_080c9bd0:
-    .word  0xffffc07f                     @ 080c9bd0 7fc0ffff
-DAT_080c9bd4:
-    .word  0x02023348                     @ 080c9bd4 48330202
+tick_card_description_scroll_gfx_attr_clear_bits_13_7_080c9bd0:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 080c9bd0 7fc0ffff  GFX_ATTR_CLEAR_BITS_13_7: operand-0 data equate, value0xffffc07f.
+tick_card_description_scroll_ptr_g_card_description_scroll_state_080c9bd4:
+    .word  gCardDescriptionScrollState    @ 080c9bd4 48330202  Pointer to gCardDescriptionScrollState; operand-0 DATA reference added.
 LAB_080c9bd8:
     ldrb r0,[r4,#0x2]                        @ 080c9bd8 a078
     adds r0,#0x4    @ 080c9bda 0430
@@ -18126,7 +18090,7 @@ LAB_080c9bd8:
     lsrs r0,r0,#0x18    @ 080c9bf6 000e
 LAB_080c9bf8:
     lsls r0,r0,#0x9    @ 080c9bf8 4002
-    ldr r1, DAT_080c9c24                     @ 080c9bfa 0a49
+    ldr r1, tick_card_description_scroll_ptr_card_description_scroll_obj_tiles_080c9c24 @ 080c9bfa 0a49
     adds r0,r0,r1    @ 080c9bfc 4018
     ldr r1,[r4,#0x0]                         @ 080c9bfe 2168
     lsls r1,r1,#0x12    @ 080c9c00 8904
@@ -18135,7 +18099,7 @@ LAB_080c9bf8:
     lsls r1,r1,#0x14    @ 080c9c06 0905
     lsrs r1,r1,#0x10    @ 080c9c08 090c
     movs r2,#0x1    @ 080c9c0a 0122
-    bl write_nibble_palette_rows_to_vram     @ 080c9c0c fff7b2fb
+    bl pack_font_buffer_tiles_to_4bpp        @ 080c9c0c fff7b2fb  -- At pixel offset+8, refill the preceding row of the14-row circular OBJ buffer.
     ldrb r0,[r4,#0x3]                        @ 080c9c10 e078
     subs r0,#0x1    @ 080c9c12 0138
     strb r0,[r4,#0x3]                        @ 080c9c14 e070
@@ -18146,8 +18110,8 @@ LAB_080c9bf8:
     strb r0,[r4,#0x3]                        @ 080c9c1e e070
     b LAB_080c9c62                           @ 080c9c20 1fe0
     .zero  0x2
-DAT_080c9c24:
-    .word  0x06016400                     @ 080c9c24 00640106
+tick_card_description_scroll_ptr_card_description_scroll_obj_tiles_080c9c24:
+    .word  card_description_scroll_obj_tiles                     @ 080c9c24 00640106  Pointer to card_description_scroll_obj_tiles; operand-0 DATA reference added.
 LAB_080c9c28:
     ldrb r0,[r4,#0x2]                        @ 080c9c28 a078
     subs r0,#0x4    @ 080c9c2a 0438
@@ -18160,7 +18124,7 @@ LAB_080c9c28:
     bne LAB_080c9c76                         @ 080c9c38 1dd1
     ldrb r3,[r4,#0x3]                        @ 080c9c3a e378
     lsls r0,r3,#0x9    @ 080c9c3c 5802
-    ldr r1, DAT_080c9c70                     @ 080c9c3e 0c49
+    ldr r1, tick_card_description_scroll_ptr_card_description_scroll_obj_tiles_080c9c70 @ 080c9c3e 0c49
     adds r0,r0,r1    @ 080c9c40 4018
     ldr r1,[r4,#0x0]                         @ 080c9c42 2168
     lsls r1,r1,#0x12    @ 080c9c44 8904
@@ -18168,7 +18132,7 @@ LAB_080c9c28:
     adds r1,#0xc    @ 080c9c48 0c31
     lsls r1,r1,#0x4    @ 080c9c4a 0901
     movs r2,#0x1    @ 080c9c4c 0122
-    bl write_nibble_palette_rows_to_vram     @ 080c9c4e fff791fb
+    bl pack_font_buffer_tiles_to_4bpp        @ 080c9c4e fff791fb  -- At pixel offset-8, refill the next row of the14-row circular OBJ buffer.
     ldrb r0,[r4,#0x3]                        @ 080c9c52 e078
     adds r0,#0x1    @ 080c9c54 0130
     strb r0,[r4,#0x3]                        @ 080c9c56 e070
@@ -18185,8 +18149,8 @@ LAB_080c9c62:
     strb r0,[r4,#0x1]                        @ 080c9c6a 6070
     b LAB_080c9c76                           @ 080c9c6c 03e0
     .zero  0x2
-DAT_080c9c70:
-    .word  0x06016400                     @ 080c9c70 00640106
+tick_card_description_scroll_ptr_card_description_scroll_obj_tiles_080c9c70:
+    .word  card_description_scroll_obj_tiles                     @ 080c9c70 00640106  Pointer to card_description_scroll_obj_tiles; operand-0 DATA reference added.
 LAB_080c9c74:
     movs r5,#0x1    @ 080c9c74 0125
 LAB_080c9c76:
@@ -18195,10 +18159,10 @@ LAB_080c9c76:
     cmp r7,r0                                @ 080c9c7a 8742
     bne LAB_080c9c84                         @ 080c9c7c 02d1
     adds r0,r7,#0x0    @ 080c9c7e 381c
-    bl write_oam_card_icon_strip             @ 080c9c80 fff7c6fe
+    bl render_card_description_scroll_oam    @ 080c9c80 fff7c6fe  -- Argument0x800 draws an extra OBJ-mosaic copy.
 LAB_080c9c84:
     movs r0,#0x0    @ 080c9c84 0020
-    bl write_oam_card_icon_strip             @ 080c9c86 fff7c3fe
+    bl render_card_description_scroll_oam    @ 080c9c86 fff7c3fe  -- Always draw the normal card-description OAM strip.
     adds r0,r5,#0x0    @ 080c9c8a 281c
     pop {r4,r5,r6,r7}                        @ 080c9c8c f0bc
     pop {r1}                                 @ 080c9c8e 02bc
@@ -18274,7 +18238,7 @@ switchD_080c9cb2__caseD_0:
     adds r0,#0x2    @ 080c9d1c 0230
     strh r1,[r0,#0x0]                        @ 080c9d1e 0180
     adds r0,r3,#0x0    @ 080c9d20 181c
-    bl render_card_type_icon_to_vram         @ 080c9d22 fff703fe
+    bl init_card_description_scroll_tiles    @ 080c9d22 fff703fe
     ldr r0, DAT_080c9d50                     @ 080c9d26 0a48
     ldrb r1,[r0,#0x1]                        @ 080c9d28 4178
     adds r1,#0x1    @ 080c9d2a 0131
@@ -18361,7 +18325,7 @@ PTR_BLDY_080c9dc0:
     .word  BLDY                           @ 080c9dc0 54000004
 switchD_080c9cb2__caseD_4:
     movs r0,#0x0    @ 080c9dc4 0020
-    bl tick_card_icon_anim_step              @ 080c9dc6 fff77ffe
+    bl tick_card_description_scroll          @ 080c9dc6 fff77ffe
     cmp r0,#0x0                              @ 080c9dca 0028
     beq LAB_080c9d32                         @ 080c9dcc b1d0
     ldr r1, DAT_080c9dd8                     @ 080c9dce 0249
@@ -18432,7 +18396,7 @@ LAB_080c9e46:
     movs r0,#0x80    @ 080c9e46 8020
     lsls r0,r0,#0x3    @ 080c9e48 c000
 LAB_080c9e4a:
-    bl write_oam_card_icon_strip             @ 080c9e4a fff7e1fd
+    bl render_card_description_scroll_oam    @ 080c9e4a fff7e1fd
     b LAB_080c9d32                           @ 080c9e4e 70e7
 PTR_BLDALPHA_080c9e50:
     .word  BLDALPHA                       @ 080c9e50 52000004
@@ -21140,7 +21104,7 @@ switchD_080cb250__caseD_0:
     adds r0,r5,#0x0    @ 080cb2e0 281c
     adds r0,r0,r1    @ 080cb2e2 4018
     ldrh r0,[r0,#0x0]                        @ 080cb2e4 0088
-    bl map_card_id_to_digit_tile_offset      @ 080cb2e6 fef729f8
+    bl get_trap_monster_level_by_card_id     @ 080cb2e6 fef729f8  -- Get the trap-monster baseline level from the card ID stored in the stats record.
     lsls r0,r0,#0x10    @ 080cb2ea 0004
     lsrs r0,r0,#0x10    @ 080cb2ec 000c
     str r0,[sp,#0x48]                        @ 080cb2ee 1290
@@ -21892,7 +21856,7 @@ LAB_080cb898:
     strh r0,[r2,#0x0]                        @ 080cb8b2 1080
     adds r2,#0x2    @ 080cb8b4 0232
     ldr r4,[sp,#0x34]                        @ 080cb8b6 0d9c
-    ldr r5,[sp,#0x48]                        @ 080cb8b8 129d
+    ldr r5,[sp,#0x48]                        @ 080cb8b8 129d  -- Compare the current level with the trap-monster baseline level for the change marker.
     cmp r4,r5                                @ 080cb8ba ac42
     bne LAB_080cb8d0                         @ 080cb8bc 08d1
     movs r7,#0xd3    @ 080cb8be d327
@@ -22689,7 +22653,7 @@ LAB_080cbec8:
     .hword 0x4669    @ 080cbef0 6946
     movs r2,#0x0    @ 080cbef2 0022
     bl render_large_card_display_by_mode     @ 080cbef4 fff76af9  -- FUN_080cb1cc(value, sp_ptr, 0): 最终 sprite 渲染提交
-    bl refresh_zone_effect_buff_cache        @ 080cbef8 fcf71aff  -- FUN_080c8d30(): 渲染收尾 helper
+    bl refresh_equip_target_eligibility_cache @ 080cbef8 fcf71aff  -- FUN_080c8d30(): 渲染收尾 helper
 LAB_080cbefc:
     add sp,#0x10                             @ 080cbefc 04b0  -- LAB_080cbefc: epilogue (无返回值; pop+bx 是 LR 还原)
     pop {r3,r4,r5}                           @ 080cbefe 38bc

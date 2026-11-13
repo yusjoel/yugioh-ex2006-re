@@ -10308,7 +10308,7 @@ DAT_080eeb4c:
 DAT_080eeb50:
     .word  0x0983a924                     @ 080eeb50 24a98309
 
-@ 按 card_id 查卡片属性表 (0x098169B6 基址), 返回 ATK/DEF/type 等
+@ Return a localized card-description string for r0=internal card index and r1=language. Normally read card_desc_pointer_table[index*6+language] and add card_descs_table. For language0 outside regionJ, CID0x1468 uses a fixed localized substitute selected by gSettings. The result is a string pointer consumed by text_render_wrapper, not a numeric ATK/DEF/type query.
 card_data_query:
     adds r2,r0,#0x0    @ 080eeb54 021c
     adds r3,r1,#0x0    @ 080eeb56 0b1c

@@ -10167,7 +10167,7 @@ LAB_0803a7de:
     bx r1                                    @ 0803a7ec 0847
     .zero  0x2
 
-@ Builds the equip target eligibility table for slot (r0=player_side, r1=slot_idx [0..9]). Output: r2=ptr output_table (2 players x 11 slots, u16 per cell, stride 0x16 per player). Init: zeros all 22 halfwords per player; exits early if slot_idx>9. Main loop 2 players x 10 slots: reads active bit from gDuelFieldSlots; active slots in monster zone (slot<=4): call find_paired_zone_entry_for_card (write 7 on hit); magic/trap zone (slot>4): call find_effect_entry_by_player_zone (write 6 on hit); then call classify_equip_target_eligibility for precise type code (write 0..6). r0=u32 player_side [0..1], r1=u32 slot_idx [0..9] (>9 zeros only), r2=ptr output_table (44+ bytes). Returns void (output via r2 side-effect). Side-effect: [output_table + player*0x16 + slot*2] := eligibility_type_code for all slots. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20, row_stride=0x16, output_buf=0x020230c4 (from caller FUN_080c8d30).
+@ Build a two-player by11-slot u16 equip-target eligibility table at r2 for source player r0 and source slot r1. Zero all22 cells first. A source slot above10 or an empty low13-bit source card reference leaves the table zero. For each nonempty target slot, preserve special relation codes7 or6 when found; otherwise try classify_equip_target_eligibility in each direction until nonzero. Output player stride is0x16 bytes. refresh_equip_target_eligibility_cache supplies gEquipTargetEligibilityCache.
 build_equip_target_eligibility_table:
     push {r4,r5,r6,r7,lr}                    @ 0803a7f0 f0b5
     .hword 0x4657    @ 0803a7f2 5746

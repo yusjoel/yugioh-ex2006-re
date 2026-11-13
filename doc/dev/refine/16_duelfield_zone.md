@@ -1,6 +1,6 @@
 # 函数和数据细化计划 · `asm/16_duelfield_zone.s`
 
-> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。主序完成16/25个模块，历史正引用补漏1项。当前模块完成7/10段，下一任务F16-Seg-8 `[0x080c8bf0,0x080c9c94)`；逐段验收、单独提交并持续推进。
+> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。主序完成16/25个模块，历史正引用补漏1项。当前模块完成8/10段，下一任务F16-Seg-9 `[0x080c9c94,0x080cad78)`；逐段验收、单独提交并持续推进。
 
 ## 一、规则
 
@@ -12,7 +12,7 @@
 
 ## 三、当前进度
 
-Seg-1至Seg-7均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。当前7/10段，112个Function、1747个池字；剩余397个自动数据名（DAT311、DWORD26、PTR60），下一段为Seg-8。
+Seg-1至Seg-8均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。当前8/10段，112个Function、1747个池字；剩余302个自动数据名（DAT246、DWORD0、PTR56），下一段为Seg-9。
 
 Seg-4、Seg-5和Seg-7的8个原始块共3410字节已全部结构化。当前模块无ROM_INCBIN/.byte原始块，§5.1登记为0。
 
@@ -191,6 +191,34 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 
 模块完成7/10段，112个Function、1747个池字；剩余397个自动数据名（DAT311、DWORD26、PTR60）。初始8个原始块3410字节已全部结构化，§5.1为0。单段提交后继续F16-Seg-8 `[0x080c8bf0,0x080c9c94)`。
 
+### 4.08 Seg-8（2026-11-14）
+
+范围 `[0x080c8bf0,0x080c9c94)`，4260字节、16个既有Function、110个池字及95个自动名。完成33 EQ_ADD、48 REF_ADD、14 REF_PRESERVE和15 CASE核心保持；95个源标签加10个全局目标共105个新USER，订正12个函数名、18个ASCII PLATE及179条EOL（95源槽、80指令、4外表项）。无R4、Function增删、body/ABI或flow override动作。
+
+装备显示缓存按实际2×11个u16资格码订正，933C按四种陷阱怪兽等级4/10命名，9374明确64字节源tile转换32字节4bpp目的；992C/9A10/9AC8按说明文字和14行环形缓冲滚动订正。场地背景bank的森林、荒野、山地资源经ROM像素与RGB555调色板独立核对；原活动横幅名称改为场地背景窗口切换。共享02039EB0按跨scene工作区命名。首轮独审发现8E6C保存的卡片计数经r10控制field+215 bit5，原文误指OAM helper返回值；仅该PLATE与8F1E EOL修正，独立重审C1-C13通过，所有before及动作保持。
+
+外表 `[09e5abb8,09e5abc8)` 精确carve16字节，三个Function+1后跟NULL。首项/dword保持，后三项新建/dword；三个非零项新增指向存储奇地址的USER DATA，NULL不建引用。三种DEFAULT offcut身份预先由公开getter固定，POST只接受105个新USER ID且与84203个旧身份及三个预知odd ID分离。后52字节是另外两张有独立消费者的表，原字节保留，不登记为零引用。
+
+真实prestate、dry和owned fullrollback均通过；事务1242的完整后态为0 FAIL，end(False)后同Program完整前态和84203个旧ID恢复，DB15/source232与副本逐字节相等。80个拟写指令EOL的真实前态均为空，其中8个有完整state交叉核对，72个由完整Function body逐地址评论getter证明；全部80项进入完整Function.eol_comments，未以缺失state代替null。
+
+实际Phase1独立终审后唯一保存一次，新进程check和三份独立Java后验通过。核226个主Function、18个完整even_function（8个仅在nested holder，共234个完整Function DTO）、1961个word、3643个完整地址状态及31805处指令属性；ABI/body完整保持。闭包16998行、1940条typed pointer边保持，incoming15079→15130；全局Equate2531个、绑定12944条。只有批准的符号元数据、注释、33个equate绑定、51条DATA及三项/dword变化。
+
+源码精确变化17个路径（含3个忽略中间文件）：5份ASM、6份constants、rom.s、registry、doc CSV、两份temp inventory及all.s。六constants追加17个equate，另加R7 global label，共18个GNU定义；180个pins为173继承加7新增，110项表达式为103 native加7 fallback。registry精确14替换、4追加，两份CSV各12个名称单元格变化，其余单元格及所有Function长度保持。gba_io和rom_data原完整LF前缀保留，仅追加批准定义；4份独立untracked重复inventory保持。
+
+准备阶段磁盘不足的空输出物证与旧版本全部保留，正式source计划改用独立v2；对364份已关闭证据做NTFS压缩并逐文件核验逻辑字节/SHA256保持后继续。只读源码导出、49/49资产导出、构建和33554432字节整ROM逐字节相等，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`，ELF SHA256 `3553a11bd5340f13cba3214e3abc101cf7350b335daaf71cc302ab82c00771ac`。
+
+证据目录：`output/refine-run-20261028-105948/`。
+
+| 验收记录 | SHA256 |
+|---|---|
+| `f16-seg8-phase1-static-review-v1.json` | `7a1c57ad02f9eee9eedeb01aa0529f9b248ae0ce77f02ac532d67b684479cd3e` |
+| `f16-seg8-apply-v1.json` | `78b169c69f931c36596c24675c8121f03a1986fb84881d2c4f13393bc1491b96` |
+| `f16-seg8-persisted-check-v1.json` | `5c8460ef6fba4a1b33cf5d76ef452ecd147c95cb442ee4c1508f38d8002b31d2` |
+| `root-f16-seg8-saved-native-gate-v1.json` | `5f330bc1276bd7ad60e917b65ba5934e2d890e0b74cd68c9b8fe668257cf8f9c` |
+| `f16-seg8-source-landing-final-v1.json` | `40d0f8a23703f8f47ea088137224cbd25fef1059a24254e36c6369c3d11573c9` |
+
+模块完成8/10段，112个Function、1747个池字；剩余302个自动数据名（DAT246、DWORD0、PTR56），raw0、§5.1为0。单段提交后继续F16-Seg-9 `[0x080c9c94,0x080cad78)`，13个Function、167个池字、158个自动名，无raw块。
+
 ## 五、地址序路线图
 
 | 段 | 范围 | 字节 | 既有 Function | word | 自动数据名 | raw 块/字节 | 状态 |
@@ -202,7 +230,7 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 | 5 | `0x080c57c4..0x080c699c` | 4568 | 11 | 139 | 79 | 3/1224 | ✅ root 验收通过，单段提交后停止 |
 | 6 | `0x080c699c..0x080c7af8` | 4444 | 13 | 176 | 98 | 0/0 | ✅ root验收通过，单段提交 |
 | 7 | `0x080c7af8..0x080c8bf0` | 4344 | 12 | 223 | 152 | 1/58 | ✅ root验收通过，单段提交 |
-| 8 | `0x080c8bf0..0x080c9c94` | 4260 | 16 | 110 | 95 | 0/0 | 未开始 |
+| 8 | `0x080c8bf0..0x080c9c94` | 4260 | 16 | 110 | 95 | 0/0 | ✅ root验收通过，单段提交 |
 | 9 | `0x080c9c94..0x080cad78` | 4324 | 13 | 167 | 158 | 0/0 | 未开始 |
 | 10 | `0x080cad78..0x080cbf0c` | 4500 | 5 | 173 | 144 | 0/0 | 未开始 |
 

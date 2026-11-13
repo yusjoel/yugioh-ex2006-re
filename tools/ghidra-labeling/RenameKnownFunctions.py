@@ -42,8 +42,8 @@ RENAMES = [
         "p1: FUN_0801e640 的首个 bl"),
     ("FUN_0801dbdc", "card_info_page_step_03_unknown",
         "p1/p2: 页面动画/过渡 (非 tile 写入), 待细化"),
-    ("FUN_080eeb54", "card_data_query",
-        "按 card_id 查卡片属性表 (0x098169B6 基址), 返回 ATK/DEF/type 等"),
+    ('FUN_080eeb54', 'card_data_query',
+        'Return a localized card-description string for r0=internal card index and r1=language. Normally read card_desc_pointer_table[index*6+language] and add card_descs_table. For language0 outside regionJ, CID0x1468 uses a fixed localized substitute selected by gSettings. The result is a string pointer consumed by text_render_wrapper, not a numeric ATK/DEF/type query.'),
     ("FUN_0801e000", "render_card_description_text",
         "p2: 字段/描述绘制入口, 字面量池含 .word 0x06010040"),
     ("FUN_0801e100", "card_info_page_finalize",
@@ -232,8 +232,8 @@ RENAMES = [
         'UI effect0x04 banner state machine. Phases0..5 configure resources, OAM, windows, and blend state; palette phases call blend_palette_block_toward_white. Each phase0..5 returns1. For phase>5, bit3 of byte[0x0201ff30] is set only when halfword[gBannerState+8]==0, dword[gP1LifePoints+0x1ce8]==dword[0x0201e2a4], and dword[gP1LifePoints+0x1d00]==0; otherwise it is cleared with AND0xf7. Then banner bit0 and field+0x215 bit2 are cleared and 0 is returned.'),
     ('FUN_080bfe0c', 'play_lp_timer_aob_effect',
         'LP-timer AOB effect. If gP1LifePoints+0x1cec is0, it clears banner bit0 and field+0x215 bit2 and returns0 without aux init or masking. Otherwise phase0 loads resources and uses anm1 when player==ctx+4; phase1 renders, advances when tick returns0, and still returns1. Final aux init uses anm1 when player==(ctx+4 XOR1), applies u32[0x03000254]&=0x80000000, clears both flags, and returns0.'),
-    ("FUN_080c91e0", "play_ui_effect_06",
-        "占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析."),
+    ('FUN_080c91e0', 'tick_field_background_change_effect',
+        'Run field_background_transition_handlers using the byte at gDuelZoneActivationState. Invoke the selected Thumb callback through invoke_r0. A nonzero callback result increments the phase byte and clears the subphase byte at+1. Return1 while a callback exists and0 at the fourth null entry. The three callbacks initialize windows, tick the background transition, then reset window registers.'),
     ('FUN_080c2acc', 'play_zone_pair_oam_transition_effect',
         'UI effect0x0b zone-pair OAM transition. Decode phase/subphase/timer from gZoneDisplayState. Phase0 saves descriptors and clears the first zone slot. Phase1 draws the pair, advances an8-call interpolation, runs a pack-banner submachine, then holds until timer24 and clears field bit2. A second slot of-1 bypasses phase1. Phase2 redraws the second slot when <=4. Active phases return1; other phases clear packed counters and return0.'),
     ('FUN_080c3080', 'play_card_pair_number_window_effect',
@@ -3984,31 +3984,10 @@ RENAMES = [
         "Returns u32 bool (1=matching entry found, 0=not found). "
         "Constants: effect_entry_array=0x0201b590, effect_entry_stride=0x18, "
         "gDuelPhaseFlags=0x0201b290, effect_count_offset=0x594."),
-    ("FUN_0803a7f0", "build_equip_target_eligibility_table",
-        "Builds the equip target eligibility table for slot (r0=player_side, r1=slot_idx [0..9]). "
-        "Output: r2=ptr output_table (2 players x 11 slots, u16 per cell, stride 0x16 per player). "
-        "Init: zeros all 22 halfwords per player; exits early if slot_idx>9. "
-        "Main loop 2 players x 10 slots: reads active bit from gDuelFieldSlots; "
-        "active slots in monster zone (slot<=4): call find_paired_zone_entry_for_card (write 7 on hit); "
-        "magic/trap zone (slot>4): call find_effect_entry_by_player_zone (write 6 on hit); "
-        "then call classify_equip_target_eligibility for precise type code (write 0..6). "
-        "r0=u32 player_side [0..1], r1=u32 slot_idx [0..9] (>9 zeros only), "
-        "r2=ptr output_table (44+ bytes). Returns void (output via r2 side-effect). "
-        "Side-effect: [output_table + player*0x16 + slot*2] := eligibility_type_code for all slots. "
-        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20, "
-        "row_stride=0x16, output_buf=0x020230c4 (from caller FUN_080c8d30)."),
-    ("FUN_080c8d30", "refresh_zone_effect_buff_cache",
-        "Reads packed render state from gPageState[+0x210] (0x02023340): "
-        "bit7=player_flag, bits[0..6]=mode, bits[8..14]=sub_idx. "
-        "Unpacks to player_flag(r0), mode+sub_idx combined(r1), cache_ptr=0x020230c4(r2), "
-        "then calls build_equip_target_eligibility_table to recompute all zone ATK/DEF buff deltas "
-        "and write into effect_buff_cache. "
-        "Called by 4 callers immediately after zone display update or scene transition. "
-        "No input parameters (reads all state from gPageState). "
-        "Returns build_equip_target_eligibility_table return value (callers discard). "
-        "Side-effect: [0x020230c4..] rewritten with fresh zone effect buff values. "
-        "Constants: gPageState=0x02023130, render_state_offset=0x210, "
-        "effect_buff_cache=0x020230c4."),
+    ('FUN_0803a7f0', 'build_equip_target_eligibility_table',
+        'Build a two-player by11-slot u16 equip-target eligibility table at r2 for source player r0 and source slot r1. Zero all22 cells first. A source slot above10 or an empty low13-bit source card reference leaves the table zero. For each nonempty target slot, preserve special relation codes7 or6 when found; otherwise try classify_equip_target_eligibility in each direction until nonzero. Output player stride is0x16 bytes. refresh_equip_target_eligibility_cache supplies gEquipTargetEligibilityCache.'),
+    ('FUN_080c8d30', 'refresh_equip_target_eligibility_cache',
+        'Refresh gEquipTargetEligibilityCache, a two-player by11-slot u16 table. Decode gDuelFieldState+0x210: player bit7, zone bits6:0, subindex bits14:8. Call build_equip_target_eligibility_table(player,zone+subindex,cache). The cache contains equip-target eligibility codes used to select indicator tiles, rather than ATK/DEF deltas. No inputs or return value.'),
     # 2026-05-08: BATCH campaign-13 (duel field count/cost util cluster)
     ("FUN_0802f5b0", "find_equip_chain_node_by_slot_pair",
         "In the equip chain of slot (r0 bit0=player_side, r1=slot_idx), find a node that matches "
@@ -4435,12 +4414,8 @@ RENAMES = [
         "Returns r0=bonus_score [0..N]. "
         "r0: player_side [0..1]; r1: slot_idx [0..4]. "
         "Constants: gDuelFieldSlots=0x0201c510."),
-    ("FUN_080c933c", "map_card_id_to_digit_tile_offset",
-        "Map card_id (r0) to the ROM tile offset for card number digit display. "
-        "Looks up card number digits from card attribute table, returns byte offset into "
-        "digit tile ROM data. r0: card_id [0..0x19b7]. "
-        "Returns u32 tile_offset. Pure read-only. "
-        "Constants: card_number_table_base=ROM digit tile index table."),
+    ('FUN_080c933c', 'get_trap_monster_level_by_card_id',
+        'Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_large_card_display_by_mode uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.'),
     ("FUN_080cb1cc", "render_large_card_display_by_mode",
         "Top-level dispatcher for large card display rendering. "
         "r0: display_mode [0..N]; r1: card_id [0..0x19b7]. "
@@ -4457,31 +4432,14 @@ RENAMES = [
         "Constants: JP digit tile base index in glyph tile set."),
     ('FUN_080c7894', 'clear_card_display_obj_tiles_mode_12',
         'Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0c. The helper count is in bytes. No input parameters.'),
-    ("FUN_080c9a10", "write_oam_card_icon_strip",
-        "Write OAM entries for card type/attribute icon strip in card display. "
-        "r0: oam_base ptr; r1: icon_count [1..N]; r2: start_x [0..239]; r3: start_y [0..159]. "
-        "For each icon: compute OAM attr0/attr1/attr2, write to oam_base + index*8. "
-        "Returns void. Side effects: OAM region written. "
-        "Constants: OAM_ATTR0_Y_MASK=0xff, OAM_ATTR1_X_MASK=0x1ff."),
-    ("FUN_080c9374", "write_nibble_palette_rows_to_vram",
-        "Write 4bpp nibble palette row data to VRAM for card display tiles. "
-        "r0: src_palette_data ptr; r1: vram_dest ptr; r2: row_count [1..N]. "
-        "Iterates row_count rows, packing nibble pairs into halfwords, writing to VRAM. "
-        "Returns void. Side effects: VRAM tile palette region written. "
-        "Constants: nibble_mask=0xf, halfword_shift=4."),
-    ("FUN_080c992c", "render_card_type_icon_to_vram",
-        "Render card type icon tile into VRAM for card display. "
-        "r0: card_type [0..N]; r1: vram_dest ptr. "
-        "Looks up type icon tile source from ROM table, copies tile data to vram_dest. "
-        "Returns void. Side effects: VRAM region written with type icon tiles. "
-        "Constants: card_type_icon_table_base=ROM icon tile table."),
-    ("FUN_080c9ac8", "tick_card_icon_anim_step",
-        "Advance card icon animation by one step, updating OAM and VRAM tile indices. "
-        "r0: anim_state_ptr (struct with frame_counter, tile_idx, oam_ptr). "
-        "Increments frame counter; on threshold, advances tile_idx and writes updated "
-        "OAM attr2 tile field. Returns void. "
-        "Side effects: anim_state frame_counter and tile_idx updated; OAM attr2 written. "
-        "Constants: anim_frame_threshold from anim_state struct."),
+    ('FUN_080c9a10', 'render_card_description_scroll_oam',
+        'Render the14-row circular card-description tile buffer. r0 low16 supplies extra OBJ flags, ORed with shape/size0x4040. Draw at most14 rows, four32x8 sprites per row at x76,108,140,172; y advances by8 and includes the signed scroll offset. Short text is vertically centered; longer text starts at y16. Advance the circular tile-row index modulo14, with attr2 starting at0x320+row*16. No OAM pointer, count or coordinate parameters are accepted.'),
+    ('FUN_080c9374', 'pack_font_buffer_tiles_to_4bpp',
+        'Pack font pixel tiles into contiguous4bpp data at r0. Truncate r1 to the starting tile index and r2 to an eight-bit row count. Process row_count times the tile width in gFontJpCtx+8 bits9:2, reading64 bytes per source tile from ctx[0]+(first_tile+i)*64 and writing32 bytes per tile. Each four source bytes occupy one halfword at shifts0,4,8,12. Destination halfwords start at0; source zeroes remain transparent. Source values are not explicitly masked to four bits.'),
+    ('FUN_080c992c', 'init_card_description_scroll_tiles',
+        'Initialize scrolling card-description tiles for internal card index r0. Clear the four-byte scroll state and0x5000 bytes of gSceneWorkArea, and clear seven full OBJ tile rows at card_description_scroll_obj_tiles. Configure the font context with16 tile columns and84 rows, select its language/font flags, and render the localized description from card_data_query. Pack up to13 text rows starting at OBJ row1. Store ceil(rendered_height/8)+1 in scroll-state bits6:0, preserving bit7.'),
+    ('FUN_080c9ac8', 'tick_card_description_scroll',
+        'Tick card-description scrolling while input bit0x100 at gPrng+0x146 is set and field flags permit it. Up/down bits0x40/0x80 select two-step four-pixel motion; at offset+8 or-8 refill one row of the14-row OBJ tile ring and reset the phase. Scroll-state bits6:0 hold total rows, bits13:7 the text row, bits15:14 the phase; bytes2/3 hold pixel offset and ring index. Always draw normal OAM; argument0x800 also draws a mosaic copy. Return1 when input/field guards block scrolling, otherwise0.'),
 
     # --- batch #16 (campaign-16, 2026-05-08) card display VRAM rendering pipeline ---
     ("FUN_080c9c94", "advance_card_display_effect_step",
@@ -5808,10 +5766,8 @@ RENAMES = [
         'Decrease the low-six-bit blend step at gPrng+0x200 by r0, flooring at0 and preserving bits6/7. If the result is0, call disable_blend_and_clear_step and return1. Otherwise write the step to BLDY, write u16(r1) to BLDCNT, and return0. The negative0x40 immediate is a mask; it is not installed as a new step.'),
     ('FUN_080c2d24', 'blit_card_frame_tile_row_to_vram',
         'Upload a medium card image to OBJ VRAM at0x06010000+32*u16(r1). Index card_image_index with2*u16(r0)+variant: variant0 only when header byte0xaf==0x4a and (gSettings.language&7)==0, else1. A nonzero card ID copies six rows of128 halfwords from card_medium_frame_tile_data+index*1536, adding0x70 to each nonzero byte modulo256; destination row stride is0x400. Card ID0 clears an8x6 tile rectangle.'),
-    ("FUN_080c8bf0", "build_slot_activation_mask_for_player",
-        "Build slot activation bitmask at 0x020230c0+3 for current player. "
-        "Only runs when player_state==3 (duel phase check). "
-        "Loops slot 0..4 calling eval_slot_activation_guard_full; clears mask if gPrng+0x1d10==-1."),
+    ('FUN_080c8bf0', 'build_slot_activation_mask_for_player',
+        'Clear gDuelZoneActivationState+3, then build its five-slot activation mask when gP1LifePoints+0x1cf4 equals3. Use the player stored at gP1LifePoints+0x1ce8 and eval_slot_activation_guard_full(player,slot,1). Independently, if gZoneDisplayState+0xc equals-1, clear bit0 of gZoneDisplayState. The final guard does not clear the activation mask. No inputs.'),
     ("FUN_080f70c4", "push_oam_entry_to_aob_slot",
         "Write OAM attr0/1/2 (from r2 ptr) to AOB slot array at gPrng+0x1bc, then increment slot write ptr. "
         "Skips if slot ptr byte==0x80 (full). Slot stride 8 bytes (lsls r1,#3)."),
@@ -6202,38 +6158,13 @@ RENAMES = [
         'Run the paired-card UI request selected by UI flag1. UI+0 is phase0..4; UI+4 and UI+8 hold packed player/zone/index references. Phase0 resolves coordinates, loads two small images and builds masks. Later phases draw paired sprites/backgrounds, advance interpolation and refresh field tiles. Active phases return1. Default clears UI+0x19 bit1 and field+0x215 bit2, returning0. The entry does not require an r1 flag argument.'),
     ('FUN_080bd660', 'tick_duel_puzzle_banner_state_machine',
         'Outer duel-puzzle banner dispatcher. Phase0 loads regional assets. Phase1 adds3 to a halfword counter and advances when the new value exceeds0x20. Phase2 waits65 ticks, then gPrng+0x23f bit0 and duel-zone direction(3) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes; phases4..7/invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer. No PRNG advance occurs.'),
-    ("FUN_080c8fd8", "init_window_regs_for_campaign_banner",
-        "为 campaign banner 场景设置 GBA 窗口和混合寄存器初值. "
-        "写入 WIN0H=WIN1H=0x50c8 (left=0x50, right=0xc8), WIN0V=WIN1V=0x1878 (top=0x18, bottom=0x78), "
-        "WININ=0x3f1f (all effects in window), WINOUT=0x1f; "
-        "读 DISPCNT 置 bit14|bit15 (Window display enable) 后写回; 写 BLDCNT=0x0088 (blend enable). "
-        "最后返回 1. 被 play_ui_effect_06 (0x080c91e0) 唯一调用, "
-        "是 campaign banner 显示初始化序列的第一步 (配对后续 tick_campaign_banner_slide_state_machine). "
-        "Constants: WIN0H=0x04000040, WIN1H=0x04000042, WIN0V=0x04000044, WIN1V=0x04000046, "
-        "WININ=0x04000048, WINOUT=0x0400004a, BLDCNT=0x04000050, DISPCNT=0x04000000, "
-        "win_h=0x50c8, win_v=0x1878, winin=0x3f1f, winout=0x1f, bldcnt=0x0088, dispcnt_mask=0xc000."),
-    ("FUN_080c9030", "tick_campaign_banner_slide_state_machine",
-        "campaign banner 滑入/滑出动画状态机, 每帧由 play_ui_effect_06 (0x080c91e0) 调用. "
-        "读 [0x020230c0+1] (u8 phase) 进行 4-case dispatch (0/1/2/3). "
-        "phase 0: 写 BLDY=0x1f (全黑); "
-        "phase 1: 每帧 WIN0V.y_top 递减 (0xc*step/2, 中心点移动), 读 [0x020230c0+2] 累计 8 次后 phase++. "
-        "phase 2: 拷贝 campaign_inner_image 到 BG VRAM 0x06009000 (size=0xb4*32=0x1680 bytes via copy_bytes_by_halfword), "
-        "再写 WININ=0x3f1f / WINOUT=0x8c8c / WIN0V, 读 [0x020230c0+2] 累计 8 次后 phase++. "
-        "phase 3: 同 phase 1 方向逆滑, 每帧 WIN0H y_bot 递增直到 [+2]>=8 后 phase++. "
-        "default (phase>3): 返回 1 (busy, 未完成状态). "
-        "返回 0=完成 / 1=进行中. "
-        "Constants: campaign_state=0x020230c0, WIN0H=0x04000040, WIN0V=0x04000044, "
-        "BLDY=0x04000054, WININ=0x04000048, WINOUT=0x0400004a, "
-        "campaign_inner_image=0x0985d720, VRAM=0x06009000."),
+    ('FUN_080c8fd8', 'init_field_background_window_regs',
+        'Initialize the field-background transition windows. Set both horizontal bounds to0x50c8 and both vertical bounds to0x1878, WININ to0x3f1f and WINOUT to0x1f. Enable WIN0 and WIN1 by ORing DISPCNT with0x6000, then set BLDCNT to0x88. These are bits13 and14, not WIN1 and OBJWIN. Return1 for the phase callback.'),
+    ('FUN_080c9030', 'tick_field_background_window_transition',
+        'Tick field-background transition subphase state+1 and counter state+2. Phase0 sets BLDY=31. Phase1 contracts WIN0V about y72 by six pixels per edge for counter0..8. Phase2 copies0x1680 tile bytes and32 palette bytes from the selected default or field-spell bank, then resets WIN0V and collapses WIN0H at x140. Phase3 opens WIN0H by floor(15*counter/2) per edge for counter0..8. Return0 during phases0..3 and1 afterward.'),
     # --- batch #30 (campaign-30) ---
-    ("FUN_080c91bc", "reset_blend_control_regs",
-        "当 play_ui_effect_06 (case 0x06 UI 效果子状态机) 调用本函数时, 执行如下操作: "
-        "读 BLDCNT (0x04000050) 并与掩码 0x9fff AND 清除 blend 模式字段[15:13]; "
-        "将 BLDCOEF (0x04000052) 与 BLDALPHA (0x04000054) 均写为 0, 关闭 alpha 混合系数. "
-        "副作用目的: 禁用 GBA 图层混合效果, 使画面回到正常直通模式. "
-        "函数固定返回 1, 供调用方判断操作是否已执行. "
-        "Constants: BLDCNT=0x04000050, MASK_9FFF=0x9fff (清除 BLDCNT[15:13]=blend mode), "
-        "BLDCOEF=+2, BLDALPHA=+4 (相对 BLDCNT 偏移)."),
+    ('FUN_080c91bc', 'reset_field_background_window_regs',
+        'Finish the field-background transition. AND DISPCNT with0x9fff to disable WIN0 and WIN1 while preserving OBJWIN and the other display bits. Clear BLDCNT and BLDY; BLDALPHA is not written. Return1 for the phase callback.'),
     ('FUN_080bd3f4', 'tick_banner_display_state_machine',
         'Outer banner display dispatcher. Phase1 runs 16 motion ticks. Phase2 waits 89 ticks; then gPrng+0x23f bit0 and duel-zone direction(2) in {1,2} route to phase8 and store +8, else phase3. Phase3 advances to4 when fade completes. Phases4..7 and invalid clean up and return0. Phase8 only calls the inner renderer; inner0 advances outer but the current call returns1. It does not advance PRNG.'),
     ("FUN_0803bc58", "check_card_play_condition_eligible",
@@ -7152,16 +7083,8 @@ RENAMES = [
         'Decode packed r0: player bit0,type bits5:1,subindex bits13:6,flags14/15. r1 is an internal card ID and r2 a card-cache index. Compute the BG slot and inspect its halfword at+0x120. If zero, convert/store the ID in gCardIdCache and render the slot; if nonzero, rerender only when gP1LifePoints+0x1d08 is nonzero, using current zone attributes. A valid-slot path then refreshes buff and activation caches. The tested VRAM halfword is separate from the EWRAM card-ID cache.'),
     ('FUN_080c2840', 'reset_zone_display_state_from_packed_key',
         'Reset gZoneDisplayState by clearing0x5c bytes (92). Split u16(r0): bits4:0 go to state byte+3 bits7:3; bits7:5 go to byte+4 bits2:0. These two fields reconstruct the original low byte. Called by dispatch_card_display_op opcode0x09 after rebuilding the separate activation mask; this function stores a packed zone key, not that mask.'),
-    ("FUN_080c8f48", "init_card_effect_aob_ctx",
-        "Initialises card-effect AOB context (DAT_080c8fb4, 0x4c halfwords=0x98 bytes) "
-        "for dispatch_card_display_op case 0x06. "
-        "Calls zero_fill_by_halfword(base, 0x4c), then classify_card_effect_category(r0) "
-        "to get effect category byte. Writes category<<1 into gDuelActivation halfword bits[2:1]. "
-        "Calls init_aob_ctx_from_ptnsect([base+0x38], ...). Sets [base+0x4b] bit0 (init done). "
-        "Reads gP1LifePoints[0x1ce8] vs (gDuelActivation[4]^1) to select anm_entry param. "
-        "r0=u16 card_id [0..0x1fff]. Returns void. "
-        "Constants: base_struct=DAT_080c8fb4, zero_len=0x4c halfwords=0x98 bytes, "
-        "gDuelActivation=0x0201e2a0, category_mask=0xff."),
+    ('FUN_080c8f48', 'init_field_background_change_state',
+        'Initialize field-background change state for card ID r0. Clear0x4c bytes at gDuelZoneActivationState, classify the field card, and store its eight-bit background index in field+0x212 bits8:1 while preserving adjacent bits. Initialize gDuelFieldAuxAobCtx at state+0x38 from zone_display_pair_marker_ptnsect, tile base128/palette2. Set ctx+0x13 bit0, select animation0 or1 by the player comparison with gDuelCardCtxBase+4 XOR1, then set ctx+0xe to2.'),
     ('FUN_080c786c', 'clear_card_display_obj_tiles_mode_11',
         'Clear 0x4000 bytes at AOB_CARD_TILE_VRAM using zero_fill_by_halfword, then set gFontState display mode at +0xa01 to 0x0b. The helper count is in bytes. No input parameters.'),
     ('FUN_080c7950', 'init_card_display_mode_with_game_text',
@@ -11983,6 +11906,14 @@ RENAMES = [
         'No APCS input. Uses phase gEquipLpScoreBase+8. In one call, phase0 scans 57 rows; failure increments and falls through phase1. Phase1 runs the full activation sequence; failure increments and falls through phase2. Phase2 calls try_activate_equip_from_field_array_for_player(mode=0); failure increments and returns1. Any success returns0 without incrementing its current phase; earlier increments remain. Invalid phase returns1. Evidence: 080bb2d4-080bb356.'),
     ('FUN_080c8870', 'render_player_zone_active_oam',
         'Render a zone-type13 indicator for each player using gP1SlotCountBase+player*PLAYER_BLOCK_STRIDE. Counts above24 use attr2 base0xcc4; counts11..24 use0xcc0; other counts draw nothing. Add8 to attr2 for the player equal to gDuelCardCtxBase+4 XOR1. Coordinates come from resolve_zone_oam_base_coords_by_type(player,13,0); write_oam_entry_from_packed_args receives shape/size0x80. There is no LP comparison or coordinate highlight shift.'),
+    ('FUN_080c8c58', 'render_aob_zone_slot_oam',
+        'Render the five slots enabled by gDuelZoneActivationState+3. Abort on field+0x215 bit2 or gCardCtxSlotData bit0. Resolve zone0 coordinates using the player in gEquipZoneCountTable. For the selected slot in gZoneDisplayState+8, bit1 selects its special display: bit0 chooses explicit pair coordinates, otherwise render its AOB at state+0x48. Other slots use gDuelFieldAuxAobCtx. Tick the selected AOB when bit1 is set, and always tick the shared auxiliary AOB.'),
+    ('FUN_080c8d68', 'render_duel_field_zone_oam_grid',
+        'Render cached equip-target indicators for both players and slots0..10. Require a valid selected zone reference, field+0x215 bit2 clear, selected zone+subindex at most10 and a nonzero low13-bit card reference. Each drawn slot must also have a nonzero low13-bit reference and eligibility code. Resolve coordinates, add x3/y4, and use attr2=(2*code+0x110)|0x2400 with shape/size0x40. gEquipTargetEligibilityCache has player stride0x16; slot data uses stride20 and PLAYER_BLOCK_STRIDE.'),
+    ('FUN_080c8e6c', 'render_field_aob_slot_oam_row',
+        'Render a horizontal slot-count gauge. Read count bits11:4 from gFontState+0xa0e and save the value from get_duel_field_card_count. Center count eight-pixel entries at x140-4*count,y68. Indices before count-value use palette0, the rest palette3. Append four frame pieces at x100,116,132,148. Set gDuelFieldState+0x215 bit5 when the saved value is0. Emit OAM directly. No inputs.'),
+    ('FUN_080c9218', 'render_zone_list_order_oam',
+        'Render list ordinals for the field+0xa zone records at field+0xc, stride4, in reverse order. Each record supplies zone and player; the displayed number is record index+1. Group zone types0..4 and5..9 before coordinate lookup, retain types10..15, and use fixed coordinates for larger types. Draw decimal digits with tile base0x8e and a frame with attr2=0xda. All digits of one ordinal use the same computed x coordinate. No inputs.'),
 ]
 
 

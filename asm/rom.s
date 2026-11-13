@@ -2095,7 +2095,13 @@ card_display_scene_phase_handlers:
     .word tick_card_list_display_master+1
     .word animate_card_display_frame_close+1
     .word 0
-.incbin "roms/2343.gba", 0x1E5ABB8, 0x44
+.global field_background_transition_handlers
+field_background_transition_handlers:
+    .word init_field_background_window_regs+1
+    .word tick_field_background_window_transition+1
+    .word reset_field_background_window_regs+1
+    .word 0
+.incbin "roms/2343.gba", 0x1E5ABC8, 0x34
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

@@ -102,3 +102,7 @@
 .equ duel_field_aux_obj_tiles_10x1, 0x060111c0
 .equ duel_field_aux_obj_tiles_4x1, 0x06011b40
 .equ duel_field_aux_obj_tiles_14x2_a, 0x06012240
+.equ field_background_palette_ram, 0x05000140
+.equ field_background_tile_vram, 0x06009000
+.equ card_description_scroll_obj_tiles, 0x06016400
+.equ card_description_scroll_obj_tiles_row1, 0x06016600

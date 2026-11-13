@@ -1973,7 +1973,7 @@ LAB_080ccdac:
 LAB_080ccdb2:
     bl init_duel_field_vram_layout           @ 080ccdb2 fff7a7fd
     bl refresh_duel_field_zone_info          @ 080ccdb6 fff7a9f8
-    bl refresh_zone_effect_buff_cache        @ 080ccdba fbf7b9ff
+    bl refresh_equip_target_eligibility_cache @ 080ccdba fbf7b9ff
     ldr r1, DAT_080ccdd0                     @ 080ccdbe 0449
     adds r0,r4,r1    @ 080ccdc0 6018
     movs r1,#0x5    @ 080ccdc2 0521
@@ -2056,7 +2056,7 @@ LAB_080cce3c:
     ldrb r0,[r2,#0xa]                        @ 080cce4c 907a
     cmp r0,#0x0                              @ 080cce4e 0028
     beq LAB_080cce56                         @ 080cce50 01d0
-    bl render_deck_zone_count_oam            @ 080cce52 fcf7e1f9
+    bl render_zone_list_order_oam            @ 080cce52 fcf7e1f9
 LAB_080cce56:
     bl render_duel_field_zone_oam_grid       @ 080cce56 fbf787ff
     bl render_lp_zone_oam_full               @ 080cce5a fdf7e7fa

@@ -4756,7 +4756,7 @@ dispatch_card_display_op_p1_zone_hand_count:
     .word  gP1ZoneHandCount               @ 0801eee0 ecc40102  gP1ZoneHandCount = gP1LifePoints+0xc; player zone/hand count table base; 23 raw refs
 switchD_0801ecbc__caseD_6:
     adds r0,r6,#0x0    @ 0801eee4 301c
-    bl init_card_effect_aob_ctx              @ 0801eee6 aaf02ff8
+    bl init_field_background_change_state    @ 0801eee6 aaf02ff8
     b switchD_0801ecbc__caseD_a              @ 0801eeea 6ae7
 switchD_0801ecbc__caseD_11:
     ldr r2, dispatch_card_display_op_duel_field_state_a @ 0801eeec 0b4a
@@ -4808,7 +4808,7 @@ LAB_0801ef48:
     b switchD_0801ecbc__caseD_a              @ 0801ef4c 39e7
 switchD_0801ecbc__caseD_24:
     bl refresh_duel_field_zone_info          @ 0801ef4e acf0ddff
-    bl refresh_zone_effect_buff_cache        @ 0801ef52 a9f0edfe
+    bl refresh_equip_target_eligibility_cache @ 0801ef52 a9f0edfe
     bl build_slot_activation_mask_for_player @ 0801ef56 a9f04bfe
     bl refresh_all_zone_slot_tile_display    @ 0801ef5a a9f0d3fc
     b switchD_0801ecbc__caseD_a              @ 0801ef5e 30e7
@@ -4993,7 +4993,7 @@ play_ui_effect_duel_ctx_b:
 play_ui_effect_zone_state_off_b:
     .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801f128 512f0000
 switchD_0801efa4__caseD_6:
-    bl play_ui_effect_06                     @ 0801f12c aaf058f8
+    bl tick_field_background_change_effect   @ 0801f12c aaf058f8
     b LAB_0801f234                           @ 0801f130 80e0
 switchD_0801efa4__caseD_5:
     bl play_lp_timer_aob_effect              @ 0801f132 a0f06bfe
