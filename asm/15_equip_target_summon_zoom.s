@@ -20910,7 +20910,7 @@ LAB_080bed24:
     bl ensure_card_id_cache_entry            @ 080bed6e 0df0abfd
     add r1,sp,#0xc                           @ 080bed72 03a9
     movs r2,#0x1    @ 080bed74 0122
-    bl render_large_card_display_by_mode     @ 080bed76 0cf029fa
+    bl render_selected_card_bg_panel         @ 080bed76 0cf029fa
     b LAB_080beda0                           @ 080bed7a 11e0
 g_p1_life_points_ptr_ed7c:
     .word  gP1LifePoints                  @ 080bed7c e0c40102  gP1LifePoints = 0x0201c4e0; PC literal.
@@ -21371,7 +21371,7 @@ switchD_080bf004__default:
     bl ensure_card_id_cache_entry            @ 080bf10c 0df0dcfb
     .hword 0x4669    @ 080bf110 6946
     movs r2,#0x1    @ 080bf112 0122
-    bl render_large_card_display_by_mode     @ 080bf114 0cf05af8
+    bl render_selected_card_bg_panel         @ 080bf114 0cf05af8
 LAB_080bf118:
     ldr r1, g_banner_state_ptr_f12c          @ 080bf118 0449
     ldrb r0,[r1,#0x10]                       @ 080bf11a 087c
@@ -25136,7 +25136,7 @@ switchD_080c0cb8__caseD_0:
     .hword 0x4650    @ 080c0d70 5046
     ldr r1, play_card_display_window_effect_gbannereffectargs_0d9c @ 080c0d72 0a49
     movs r2,#0x1    @ 080c0d74 0122
-    bl render_large_card_display_by_mode     @ 080c0d76 0af029fa
+    bl render_selected_card_bg_panel         @ 080c0d76 0af029fa
     b LAB_080c0ef0                           @ 080c0d7a b9e0
 play_card_display_window_effect_card_display_overlay_tile_vram_0d7c:
     .word  card_display_overlay_tile_vram                     @ 080c0d7c 00410106  card_display_overlay_tile_vram = 0x06014100; PC literal.

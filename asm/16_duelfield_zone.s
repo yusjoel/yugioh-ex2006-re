@@ -216,7 +216,7 @@ LAB_080c15e2:
     bl ensure_card_id_cache_entry            @ 080c15fc 0bf064f9
     add r1,sp,#0x4                           @ 080c1600 01a9
     movs r2,#0x0    @ 080c1602 0022
-    bl render_large_card_display_by_mode     @ 080c1604 09f0e2fd
+    bl render_selected_card_bg_panel         @ 080c1604 09f0e2fd
     b LAB_080c178c                           @ 080c1608 c0e0
 switchD_080c14ac__caseD_1:
     ldr r1, ptr_bldy_080c1630                @ 080c160a 0949
@@ -632,7 +632,7 @@ LAB_080c191c:
     bl ensure_card_id_cache_entry            @ 080c1936 0af0c7ff
     add r1,sp,#0x4                           @ 080c193a 01a9
     movs r2,#0x0    @ 080c193c 0022
-    bl render_large_card_display_by_mode     @ 080c193e 09f045fc
+    bl render_selected_card_bg_panel         @ 080c193e 09f045fc
     b LAB_080c1a88                           @ 080c1942 a1e0
 switchD_080c180a__caseD_1:
     ldr r1, ptr_bldy_080c196c                @ 080c1944 0949
@@ -5431,7 +5431,7 @@ init_field_slot_ctx_zoom:
 ptr_g_ui_effect_state_080c3d1c:
     .word  gUIEffectState                 @ 080c3d1c 10310202  gUIEffectState: preserve existing operand-0 DATA reference.
 
-@ Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_large_card_display_by_mode. Steps0..4 return1; other steps return0.
+@ Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_selected_card_bg_panel. Steps0..4 return1; other steps return0.
 play_card_zoom_in:
     push {r4,r5,r6,r7,lr}                    @ 080c3d20 f0b5
     .hword 0x4657    @ 080c3d22 5746
@@ -5904,7 +5904,7 @@ switchD_080c3e02__caseD_4:
     .hword 0x4648    @ 080c40b2 4846
     adds r1,r7,#0x0    @ 080c40b4 391c
     movs r2,#0x0    @ 080c40b6 0022
-    bl render_large_card_display_by_mode     @ 080c40b8 07f088f8  -- render_large_card_display_by_mode(cached ID,gUIEffectArgs,0).
+    bl render_selected_card_bg_panel         @ 080c40b8 07f088f8  -- render_selected_card_bg_panel(cached ID,gUIEffectArgs,0).
 LAB_080c40bc:
     ldr r1, ptr_g_ui_effect_state_080c40c8   @ 080c40bc 0249  -- Common main-step advancement.
     ldrh r0,[r1,#0x0]                        @ 080c40be 0888
@@ -16874,7 +16874,7 @@ render_zone_list_order_oam_ptr_g_duel_card_ctx_base_080c9334:
 render_zone_list_order_oam_obj_shape_size_horizontal_32x8_080c9338:
     .word  OBJ_SHAPE_SIZE_HORIZONTAL_32X8 @ 080c9338 40400000  OBJ_SHAPE_SIZE_HORIZONTAL_32X8: operand-0 data equate, value0x00004040.
 
-@ Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_large_card_display_by_mode uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.
+@ Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_selected_card_bg_panel uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.
 get_trap_monster_level_by_card_id:
     adds r1,r0,#0x0    @ 080c933c 011c
     ldr r0, get_trap_monster_level_by_card_id_metal_reflect_slime_cid_080c9350 @ 080c933e 0448  -- Metal Reflect Slime CID selects level10.
@@ -20378,27 +20378,27 @@ zero_card_display_vram_regions_ptr_card_effect_counter_bg_map_080cad70:
 zero_card_display_vram_regions_ptr_card_stat_digit_bg_tiles_b_080cad74:
     .word  card_stat_digit_bg_tiles_b                     @ 080cad74 a0810006  Pointer to card_stat_digit_bg_tiles_b; operand-0 DATA reference added.
 
-@ Render duel field zone card JP text panel (card name + description); indeg=1. r0=card_str_base [0..N] (JP string lookup index). Step 1: bl zero_card_display_vram_regions -> clear old display. Step 2: copy_bytes_by_halfword(dst=0x06006340, src=0x0984f5cc, size=0x600) -> BG tile frame. Step 3: setup_line_buf_with_font_and_align(0x20, 2, 1, 2) -> JP font config. Step 4: read gDuelCtx+0x6c2c card_attr bits[2:0], update card_info_ctx+0x8/+0x4/+0x15. Step 5: card_str_variant = (r0+1) & 0xff | 0x8000; game_str page base = 0x3e8. Step 6: bl game_str_id_to_row -> text_render_wrapper (first JP line). Step 7: same for second JP line (text_render_wrapper r2=7). Step 8: bl commit_line_buffer_to_sprite_vram -> commit to OBJ tile VRAM. Constants: FONT_ID=0x20; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c; GAME_STR_PAGE=0x3e8; DISPLAY_FLAG=0x8000; LINE2_OFFSET=7.
-render_zone_card_jp_text_panel:
+@ Render the hidden-card BG panel. r0 selects the text color: use0x8000|u8(r0+1) for the first pass and7 for the second. Clear the old detail panel, copy the0x600-byte card-back image to card_detail_frame_bg_tiles, select the font and logical string0x3e8 using gSettings low3 bits, draw both passes at(2,2), then commit to card_detail_name_bg_tiles. The input is not a card ID or string index; language is not fixed to Japanese.
+render_hidden_card_bg_panel:
     push {r4,r5,r6,lr}                       @ 080cad78 70b5
     .hword 0x464e    @ 080cad7a 4e46
     .hword 0x4645    @ 080cad7c 4546
     push {r5,r6}                             @ 080cad7e 60b4
-    adds r4,r0,#0x0    @ 080cad80 041c
+    adds r4,r0,#0x0    @ 080cad80 041c  -- Save the input color selector; the logical message ID remains0x3e8.
     bl zero_card_display_vram_regions        @ 080cad82 fff7b1ff
-    ldr r0, DAT_080cae60                     @ 080cad86 3648
-    ldr r1, DAT_080cae64                     @ 080cad88 3649
+    ldr r0, render_hidden_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cae60 @ 080cad86 3648
+    ldr r1, render_hidden_card_bg_panel_ptr_card_glyph_table_3_080cae64 @ 080cad88 3649
     movs r2,#0xc0    @ 080cad8a c022
     lsls r2,r2,#0x3    @ 080cad8c d200
-    bl copy_bytes_by_halfword                @ 080cad8e 2af089f8
+    bl copy_bytes_by_halfword                @ 080cad8e 2af089f8  -- Copy the0x600-byte card-back image into fixed BG tiles.
     movs r0,#0x20    @ 080cad92 2020
     movs r1,#0x2    @ 080cad94 0221
     movs r2,#0x1    @ 080cad96 0122
     movs r3,#0x2    @ 080cad98 0223
     bl setup_line_buf_with_font_and_align    @ 080cad9a 25f091ff
-    ldr r2, DAT_080cae68                     @ 080cad9e 324a
-    ldr r5, DAT_080cae6c                     @ 080cada0 324d
-    ldr r0, DAT_080cae70                     @ 080cada2 3348
+    ldr r2, render_hidden_card_bg_panel_ptr_g_font_jp_ctx_080cae68 @ 080cad9e 324a
+    ldr r5, render_hidden_card_bg_panel_ptr_e_w_r_a_m_b_a_s_e_080cae6c @ 080cada0 324d
+    ldr r0, render_hidden_card_bg_panel_gsettings_offset_080cae70 @ 080cada2 3348
     adds r5,r5,r0    @ 080cada4 2d18
     movs r1,#0x7    @ 080cada6 0721
     ldrb r3,[r5,#0x0]                        @ 080cada8 2b78
@@ -20412,8 +20412,8 @@ render_zone_card_jp_text_panel:
     orrs r0,r1    @ 080cadb8 0843
     movs r1,#0x2    @ 080cadba 0221
     orrs r0,r1    @ 080cadbc 0843
-    strb r0,[r2,#0x8]                        @ 080cadbe 1072
-    ldr r3, PTR_font_jp_base_table_080cae74  @ 080cadc0 2c4b
+    strb r0,[r2,#0x8]                        @ 080cadbe 1072  -- Set font bit0 from language!=0 and set bit1; preserve the other context bits.
+    ldr r3, render_hidden_card_bg_panel_ptr_font_jp_base_table_080cae74 @ 080cadc0 2c4b
     lsls r1,r0,#0x1e    @ 080cadc2 8107
     lsrs r1,r1,#0x1f    @ 080cadc4 c90f
     lsls r1,r1,#0x2    @ 080cadc6 8900
@@ -20437,10 +20437,10 @@ render_zone_card_jp_text_panel:
     orrs r4,r0    @ 080cadea 0443
     movs r3,#0xfa    @ 080cadec fa23
     lsls r3,r3,#0x2    @ 080cadee 9b00
-    .hword 0x4698    @ 080cadf0 9846
+    .hword 0x4698    @ 080cadf0 9846  -- mov r8,r3: retain logical message ID0x3e8, not a card ID.
     .hword 0x4640    @ 080cadf2 4046
     bl game_str_id_to_row                    @ 080cadf4 2af010f8
-    ldr r1, PTR_game_str_pointer_table_080cae78 @ 080cadf8 1f49
+    ldr r1, render_hidden_card_bg_panel_ptr_game_str_pointer_table_080cae78 @ 080cadf8 1f49
     .hword 0x4689    @ 080cadfa 8946
     lsls r0,r0,#0x10    @ 080cadfc 0004
     lsrs r0,r0,#0x10    @ 080cadfe 000c
@@ -20454,7 +20454,7 @@ render_zone_card_jp_text_panel:
     lsls r1,r1,#0x2    @ 080cae0e 8900
     add r1,r9                                @ 080cae10 4944
     ldr r3,[r1,#0x0]                         @ 080cae12 0b68
-    ldr r6, PTR_game_str_ja_080cae7c         @ 080cae14 194e
+    ldr r6, render_hidden_card_bg_panel_ptr_game_str_ja_080cae7c @ 080cae14 194e
     adds r3,r3,r6    @ 080cae16 9b19
     movs r0,#0x2    @ 080cae18 0220
     movs r1,#0x2    @ 080cae1a 0221
@@ -20479,36 +20479,36 @@ render_zone_card_jp_text_panel:
     movs r1,#0x2    @ 080cae44 0221
     movs r2,#0x7    @ 080cae46 0722
     bl text_render_wrapper                   @ 080cae48 27f018fe
-    ldr r0, DAT_080cae80                     @ 080cae4c 0c48
+    ldr r0, render_hidden_card_bg_panel_ptr_card_detail_name_bg_tiles_080cae80 @ 080cae4c 0c48
     movs r1,#0x0    @ 080cae4e 0021
-    bl commit_line_buffer_to_sprite_vram     @ 080cae50 27f0fcff
+    bl commit_line_buffer_to_sprite_vram     @ 080cae50 27f0fcff  -- Commit both placeholder-text passes to card_detail_name_bg_tiles.
     pop {r3,r4}                              @ 080cae54 18bc
     .hword 0x4698    @ 080cae56 9846
     .hword 0x46a1    @ 080cae58 a146
     pop {r4,r5,r6}                           @ 080cae5a 70bc
     pop {r0}                                 @ 080cae5c 01bc
     bx r0                                    @ 080cae5e 0047
-DAT_080cae60:
-    .word  0x06006340                     @ 080cae60 40630006
-DAT_080cae64:
-    .word  0x0984f5cc                     @ 080cae64 ccf58409
-DAT_080cae68:
-    .word  0x02006ed0                     @ 080cae68 d06e0002
-DAT_080cae6c:
-    .word  0x02000000                     @ 080cae6c 00000002
-DAT_080cae70:
-    .word  0x00006c2c                     @ 080cae70 2c6c0000
-PTR_font_jp_base_table_080cae74:
-    .word  font_jp_base_table             @ 080cae74 54f8e509
-PTR_game_str_pointer_table_080cae78:
-    .word  game_str_pointer_table         @ 080cae78 400f0008
-PTR_game_str_ja_080cae7c:
-    .word  game_str_ja                    @ 080cae7c 109cdb09
-DAT_080cae80:
-    .word  0x0600a8e0                     @ 080cae80 e0a80006
+render_hidden_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cae60:
+    .word  card_detail_frame_bg_tiles                     @ 080cae60 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
+render_hidden_card_bg_panel_ptr_card_glyph_table_3_080cae64:
+    .word  card_glyph_table_3             @ 080cae64 ccf58409  Pointer to card_glyph_table_3; operand-0 DATA reference added.
+render_hidden_card_bg_panel_ptr_g_font_jp_ctx_080cae68:
+    .word  gFontJpCtx                     @ 080cae68 d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
+render_hidden_card_bg_panel_ptr_e_w_r_a_m_b_a_s_e_080cae6c:
+    .word  EWRAM_BASE                     @ 080cae6c 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_hidden_card_bg_panel_gsettings_offset_080cae70:
+    .word  GSETTINGS_OFFSET               @ 080cae70 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_hidden_card_bg_panel_ptr_font_jp_base_table_080cae74:
+    .word  font_jp_base_table             @ 080cae74 54f8e509  Pointer to font_jp_base_table; operand-0 DATA reference preserved.
+render_hidden_card_bg_panel_ptr_game_str_pointer_table_080cae78:
+    .word  game_str_pointer_table         @ 080cae78 400f0008  Pointer to game_str_pointer_table; operand-0 DATA reference preserved.
+render_hidden_card_bg_panel_ptr_game_str_ja_080cae7c:
+    .word  game_str_ja                    @ 080cae7c 109cdb09  Pointer to game_str_ja; operand-0 DATA reference preserved.
+render_hidden_card_bg_panel_ptr_card_detail_name_bg_tiles_080cae80:
+    .word  card_detail_name_bg_tiles                     @ 080cae80 e0a80006  Pointer to card_detail_name_bg_tiles; operand-0 DATA reference added.
 
-@ Render a field-card counter into four BG entries at card_effect_counter_bg_map. r0 low bit selects player,r1 selects a20-byte slot; read its low13-bit card ID and halfword+0xc counter. Reverse the counter as3-count for CID0x1909, clamp above999, and choose a prefix for effect/equip categories. Write decimal tiles based at0x1a6 right-to-left. A nonpositive counter clears all four entries. No source/destination pointer arguments.
-write_card_digit_tiles_to_vram:
+@ Render a field-card counter at card_effect_counter_bg_map. r0 lowbit=player,r1=20-byte slot index. Read slot+0xc and its low13-bit ICID; for SPARK_BLASTER_CID use3-count. Nonpositive values clear four entries; cap positive values at999. Only cards recognized by get_card_effect_category or equip-set A/B write a category prefix and right-aligned decimal tiles based at0x1a6. Unrecognized positive counters leave the map unchanged.
+render_card_counter_bg_map:
     push {r4,r5,r6,r7,lr}                    @ 080cae84 f0b5
     movs r7,#0x2    @ 080cae86 0227
     movs r2,#0x1    @ 080cae88 0122
@@ -20516,24 +20516,24 @@ write_card_digit_tiles_to_vram:
     lsls r0,r1,#0x2    @ 080cae8c 8800
     adds r0,r0,r1    @ 080cae8e 4018
     lsls r0,r0,#0x2    @ 080cae90 8000
-    ldr r1, DAT_080caec0                     @ 080cae92 0b49
+    ldr r1, render_card_counter_bg_map_player_block_stride_080caec0 @ 080cae92 0b49
     muls r1,r2    @ 080cae94 5143
     adds r0,r0,r1    @ 080cae96 4018
-    ldr r1, DAT_080caec4                     @ 080cae98 0a49
+    ldr r1, render_card_counter_bg_map_ptr_g_duel_field_slots_080caec4 @ 080cae98 0a49
     adds r0,r0,r1    @ 080cae9a 4018
-    ldrh r5,[r0,#0xc]                        @ 080cae9c 8589
+    ldrh r5,[r0,#0xc]                        @ 080cae9c 8589  -- Read the selected20-byte field slot counter at+0xc.
     ldr r0,[r0,#0x0]                         @ 080cae9e 0068
     lsls r0,r0,#0x13    @ 080caea0 c004
     lsrs r6,r0,#0x13    @ 080caea2 c60c
-    ldr r0, DAT_080caec8                     @ 080caea4 0848
+    ldr r0, render_card_counter_bg_map_spark_blaster_cid_080caec8 @ 080caea4 0848
     cmp r6,r0                                @ 080caea6 8642
     bne LAB_080caeae                         @ 080caea8 01d1
     movs r0,#0x3    @ 080caeaa 0320
-    subs r5,r0,r5    @ 080caeac 451b
+    subs r5,r0,r5    @ 080caeac 451b  -- SPARK_BLASTER_CID displays3 minus the stored counter.
 LAB_080caeae:
     cmp r5,#0x0                              @ 080caeae 002d
-    ble LAB_080caf50                         @ 080caeb0 4edd
-    ldr r0, DAT_080caecc                     @ 080caeb2 0648
+    ble LAB_080caf50                         @ 080caeb0 4edd  -- Nonpositive counters clear four BG entries.
+    ldr r0, render_card_counter_bg_map_card_count_display_max_999_080caecc @ 080caeb2 0648
     cmp r5,r0                                @ 080caeb4 8542
     ble LAB_080caeba                         @ 080caeb6 00dd
     adds r5,r0,#0x0    @ 080caeb8 051c
@@ -20541,14 +20541,14 @@ LAB_080caeba:
     movs r4,#0xa    @ 080caeba 0a24
     b LAB_080caed8                           @ 080caebc 0ce0
     .zero  0x2
-DAT_080caec0:
-    .word  0x00000868                     @ 080caec0 68080000
-DAT_080caec4:
-    .word  0x0201c510                     @ 080caec4 10c50102
-DAT_080caec8:
-    .word  0x00001909                     @ 080caec8 09190000
-DAT_080caecc:
-    .word  0x000003e7                     @ 080caecc e7030000
+render_card_counter_bg_map_player_block_stride_080caec0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080caec0 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_card_counter_bg_map_ptr_g_duel_field_slots_080caec4:
+    .word  gDuelFieldSlots                @ 080caec4 10c50102  Pointer to gDuelFieldSlots; operand-0 DATA reference added.
+render_card_counter_bg_map_spark_blaster_cid_080caec8:
+    .word  SPARK_BLASTER_CID              @ 080caec8 09190000  SPARK_BLASTER_CID: operand-0 data equate, value0x00001909.
+render_card_counter_bg_map_card_count_display_max_999_080caecc:
+    .word  CARD_COUNT_DISPLAY_MAX_999     @ 080caecc e7030000  CARD_COUNT_DISPLAY_MAX_999: operand-0 data equate, value0x000003e7.
 LAB_080caed0:
     subs r7,#0x1    @ 080caed0 013f
     lsls r0,r4,#0x2    @ 080caed2 a000
@@ -20562,19 +20562,19 @@ LAB_080caed8:
     bgt LAB_080caed0                         @ 080caee2 f5dc
     lsls r0,r7,#0x10    @ 080caee4 3804
     lsrs r0,r0,#0xf    @ 080caee6 c00b
-    ldr r1, DAT_080caefc                     @ 080caee8 0449
+    ldr r1, render_card_counter_bg_map_ptr_card_effect_counter_bg_map_080caefc @ 080caee8 0449
     adds r4,r0,r1    @ 080caeea 4418
     adds r0,r6,#0x0    @ 080caeec 301c
-    bl get_card_effect_category              @ 080caeee 80f7a3ff
+    bl get_card_effect_category              @ 080caeee 80f7a3ff  -- A nonzero effect category selects the0x1b5 prefix.
     cmp r0,#0x0                              @ 080caef2 0028
     beq LAB_080caf04                         @ 080caef4 06d0
-    ldr r1, DAT_080caf00                     @ 080caef6 0249
+    ldr r1, render_card_counter_bg_map_card_effect_counter_prefix_bg_tile_080caf00 @ 080caef6 0249
     b LAB_080caf22                           @ 080caef8 13e0
     .zero  0x2
-DAT_080caefc:
-    .word  0x0600fa40                     @ 080caefc 40fa0006
-DAT_080caf00:
-    .word  0x000001b5                     @ 080caf00 b5010000
+render_card_counter_bg_map_ptr_card_effect_counter_bg_map_080caefc:
+    .word  card_effect_counter_bg_map                     @ 080caefc 40fa0006  Pointer to card_effect_counter_bg_map; operand-0 DATA reference added.
+render_card_counter_bg_map_card_effect_counter_prefix_bg_tile_080caf00:
+    .word  CARD_EFFECT_COUNTER_PREFIX_BG_TILE @ 080caf00 b5010000  CARD_EFFECT_COUNTER_PREFIX_BG_TILE: operand-0 data equate, value0x000001b5.
 LAB_080caf04:
     adds r0,r6,#0x0    @ 080caf04 301c
     bl check_card_id_is_equip_set_b          @ 080caf06 81f70bf8
@@ -20587,13 +20587,13 @@ LAB_080caf14:
     adds r0,r6,#0x0    @ 080caf14 301c
     bl check_card_id_is_equip_set_a          @ 080caf16 80f72fff
     cmp r0,#0x0                              @ 080caf1a 0028
-    beq LAB_080caf5e                         @ 080caf1c 1fd0
+    beq LAB_080caf5e                         @ 080caf1c 1fd0  -- A positive counter outside all recognized sets leaves the BG map unchanged.
     movs r1,#0xda    @ 080caf1e da21
     lsls r1,r1,#0x1    @ 080caf20 4900
 LAB_080caf22:
     adds r0,r1,#0x0    @ 080caf22 081c
     strh r0,[r4,#0x0]                        @ 080caf24 2080
-    ldr r4, DAT_080caf4c                     @ 080caf26 094c
+    ldr r4, render_card_counter_bg_map_ptr_card_effect_counter_bg_map_last_entry_080caf4c @ 080caf26 094c
 LAB_080caf28:
     adds r0,r5,#0x0    @ 080caf28 281c
     movs r1,#0xa    @ 080caf2a 0a21
@@ -20601,7 +20601,7 @@ LAB_080caf28:
     movs r1,#0xd3    @ 080caf30 d321
     lsls r1,r1,#0x1    @ 080caf32 4900
     adds r0,r0,r1    @ 080caf34 4018
-    strh r0,[r4,#0x0]                        @ 080caf36 2080
+    strh r0,[r4,#0x0]                        @ 080caf36 2080  -- Write one decimal digit, then move left one BG entry.
     subs r4,#0x2    @ 080caf38 023c
     adds r0,r5,#0x0    @ 080caf3a 281c
     movs r1,#0xa    @ 080caf3c 0a21
@@ -20611,14 +20611,14 @@ LAB_080caf28:
     bgt LAB_080caf28                         @ 080caf46 efdc
     b LAB_080caf5e                           @ 080caf48 09e0
     .zero  0x2
-DAT_080caf4c:
-    .word  0x0600fa46                     @ 080caf4c 46fa0006
+render_card_counter_bg_map_ptr_card_effect_counter_bg_map_last_entry_080caf4c:
+    .word  card_effect_counter_bg_map_last_entry                     @ 080caf4c 46fa0006  Pointer to card_effect_counter_bg_map_last_entry; operand-0 DATA reference added.
 LAB_080caf50:
-    ldr r4, DAT_080caf64                     @ 080caf50 044c
+    ldr r4, render_card_counter_bg_map_ptr_card_effect_counter_bg_map_080caf64 @ 080caf50 044c
     movs r1,#0x0    @ 080caf52 0021
     adds r0,r4,#0x6    @ 080caf54 a01d
 LAB_080caf56:
-    strh r1,[r0,#0x0]                        @ 080caf56 0180
+    strh r1,[r0,#0x0]                        @ 080caf56 0180  -- Clear the four entries from card_effect_counter_bg_map through+6.
     subs r0,#0x2    @ 080caf58 0238
     cmp r0,r4                                @ 080caf5a a042
     bge LAB_080caf56                         @ 080caf5c fbda
@@ -20626,37 +20626,37 @@ LAB_080caf5e:
     pop {r4,r5,r6,r7}                        @ 080caf5e f0bc
     pop {r0}                                 @ 080caf60 01bc
     bx r0                                    @ 080caf62 0047
-DAT_080caf64:
-    .word  0x0600fa40                     @ 080caf64 40fa0006
+render_card_counter_bg_map_ptr_card_effect_counter_bg_map_080caf64:
+    .word  card_effect_counter_bg_map                     @ 080caf64 40fa0006  Pointer to card_effect_counter_bg_map; operand-0 DATA reference added.
 
-@ Render card name string tiles into sprite VRAM for card name display strip. r0: card_id [0..0x19b7]; r1: sprite_vram_dest ptr. Looks up name string, converts characters to tile indices, writes to sprite VRAM. Returns void. Side effects: sprite VRAM region written with name tile data.
-render_card_name_to_sprite_vram:
+@ Render the card name to card_detail_name_bg_tiles. r0=player,r1=card-stats index. select_charset_then_load_name chooses the name from the selected language. Configure gFontJpCtx and clear0x800 bytes at the fixed BG destination. Short names use two text_render_wrapper passes; long names use wide or narrow glyph loops with dot truncation. The foreground color compares player with gDuelCardCtxBase+4 xor1. Commit the line buffer to BG VRAM; r1 is not a destination pointer.
+render_card_name_bg_tiles:
     push {r4,r5,r6,r7,lr}                    @ 080caf68 f0b5
     .hword 0x4657    @ 080caf6a 5746
     .hword 0x464e    @ 080caf6c 4e46
     .hword 0x4645    @ 080caf6e 4546
     push {r5,r6,r7}                          @ 080caf70 e0b4
-    .hword 0x4681    @ 080caf72 8146
+    .hword 0x4681    @ 080caf72 8146  -- mov r9,r0: save player; r1 supplies the card-stats index.
     adds r0,r1,#0x0    @ 080caf74 081c
     movs r7,#0x2    @ 080caf76 0227
     movs r1,#0x2    @ 080caf78 0221
     .hword 0x4688    @ 080caf7a 8846
     movs r2,#0xc    @ 080caf7c 0c22
     .hword 0x4692    @ 080caf7e 9246
-    ldr r4, DAT_080cb018                     @ 080caf80 254c
-    ldr r3, DAT_080cb01c                     @ 080caf82 264b
+    ldr r4, render_card_name_bg_tiles_ptr_e_w_r_a_m_b_a_s_e_080cb018 @ 080caf80 254c
+    ldr r3, render_card_name_bg_tiles_gsettings_offset_080cb01c @ 080caf82 264b
     adds r4,r4,r3    @ 080caf84 e418
     ldrb r5,[r4,#0x0]                        @ 080caf86 2578
     lsls r1,r5,#0x1d    @ 080caf88 6907
     lsrs r1,r1,#0x1d    @ 080caf8a 490f
-    bl select_charset_then_load_name         @ 080caf8c 23f00efc
+    bl select_charset_then_load_name         @ 080caf8c 23f00efc  -- Look up the card name using the card-stats index and selected language.
     adds r5,r0,#0x0    @ 080caf90 051c
     movs r0,#0x20    @ 080caf92 2020
     movs r1,#0x2    @ 080caf94 0221
     movs r2,#0x1    @ 080caf96 0122
     movs r3,#0x2    @ 080caf98 0223
     bl setup_line_buf_with_font_and_align    @ 080caf9a 25f091fe
-    ldr r2, DAT_080cb020                     @ 080caf9e 204a
+    ldr r2, render_card_name_bg_tiles_ptr_g_font_jp_ctx_080cb020 @ 080caf9e 204a
     movs r1,#0x7    @ 080cafa0 0721
     ldrb r4,[r4,#0x0]                        @ 080cafa2 2478
     ands r1,r4    @ 080cafa4 2140
@@ -20670,7 +20670,7 @@ render_card_name_to_sprite_vram:
     movs r1,#0x2    @ 080cafb4 0221
     orrs r0,r1    @ 080cafb6 0843
     strb r0,[r2,#0x8]                        @ 080cafb8 1072
-    ldr r3, PTR_font_jp_base_table_080cb024  @ 080cafba 1a4b
+    ldr r3, render_card_name_bg_tiles_ptr_font_jp_base_table_080cb024 @ 080cafba 1a4b
     lsls r1,r0,#0x1e    @ 080cafbc 8107
     lsrs r1,r1,#0x1f    @ 080cafbe c90f
     lsls r1,r1,#0x2    @ 080cafc0 8900
@@ -20685,22 +20685,22 @@ render_card_name_to_sprite_vram:
     ldrb r4,[r2,#0x15]                       @ 080cafd2 547d
     orrs r0,r4    @ 080cafd4 2043
     strb r0,[r2,#0x15]                       @ 080cafd6 5075
-    ldr r0, DAT_080cb028                     @ 080cafd8 1348
+    ldr r0, render_card_name_bg_tiles_ptr_card_detail_name_bg_tiles_080cb028 @ 080cafd8 1348
     movs r1,#0x80    @ 080cafda 8021
     lsls r1,r1,#0x4    @ 080cafdc 0901
-    bl zero_fill_by_halfword                 @ 080cafde 29f049ff
+    bl zero_fill_by_halfword                 @ 080cafde 29f049ff  -- Clear0x800 bytes of fixed BG name tiles; no destination pointer argument.
     adds r0,r5,#0x0    @ 080cafe2 281c
     bl measure_string_pixel_width            @ 080cafe4 25f046f9
     adds r0,#0x3    @ 080cafe8 0330
     cmp r0,#0xef                             @ 080cafea ef28
-    ble LAB_080caff0                         @ 080cafec 00dd
+    ble LAB_080caff0                         @ 080cafec 00dd  -- Use the whole-string path when measured width+3 is at most239.
     b LAB_080cb1aa                           @ 080cafee dce0
 LAB_080caff0:
-    ldr r0, DAT_080cb02c                     @ 080caff0 0e48
+    ldr r0, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb02c @ 080caff0 0e48
     ldr r0,[r0,#0x4]                         @ 080caff2 4068
     movs r1,#0x1    @ 080caff4 0121
     eors r0,r1    @ 080caff6 4840
-    ldr r2, DAT_080cb030                     @ 080caff8 0d4a
+    ldr r2, render_card_name_bg_tiles_text_render_color_mode_1_080cb030 @ 080caff8 0d4a
     cmp r9,r0                                @ 080caffa 8145
     bne LAB_080cb000                         @ 080caffc 00d1
     adds r2,#0x1    @ 080caffe 0132
@@ -20715,23 +20715,23 @@ LAB_080cb000:
     adds r3,r5,#0x0    @ 080cb010 2b1c
     bl text_render_wrapper                   @ 080cb012 27f033fd
     b LAB_080cb1b2                           @ 080cb016 cce0
-DAT_080cb018:
-    .word  0x02000000                     @ 080cb018 00000002
-DAT_080cb01c:
-    .word  0x00006c2c                     @ 080cb01c 2c6c0000
-DAT_080cb020:
-    .word  0x02006ed0                     @ 080cb020 d06e0002
-PTR_font_jp_base_table_080cb024:
-    .word  font_jp_base_table             @ 080cb024 54f8e509
-DAT_080cb028:
-    .word  0x0600a8e0                     @ 080cb028 e0a80006
-DAT_080cb02c:
-    .word  0x0201e2a0                     @ 080cb02c a0e20102
-DAT_080cb030:
-    .word  0x00008001                     @ 080cb030 01800000
+render_card_name_bg_tiles_ptr_e_w_r_a_m_b_a_s_e_080cb018:
+    .word  EWRAM_BASE                     @ 080cb018 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_card_name_bg_tiles_gsettings_offset_080cb01c:
+    .word  GSETTINGS_OFFSET               @ 080cb01c 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_card_name_bg_tiles_ptr_g_font_jp_ctx_080cb020:
+    .word  gFontJpCtx                     @ 080cb020 d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
+render_card_name_bg_tiles_ptr_font_jp_base_table_080cb024:
+    .word  font_jp_base_table             @ 080cb024 54f8e509  Pointer to font_jp_base_table; operand-0 DATA reference preserved.
+render_card_name_bg_tiles_ptr_card_detail_name_bg_tiles_080cb028:
+    .word  card_detail_name_bg_tiles                     @ 080cb028 e0a80006  Pointer to card_detail_name_bg_tiles; operand-0 DATA reference added.
+render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb02c:
+    .word  gDuelCardCtxBase               @ 080cb02c a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_card_name_bg_tiles_text_render_color_mode_1_080cb030:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 080cb030 01800000  TEXT_RENDER_COLOR_MODE_1: operand-0 data equate, value0x00008001.
 LAB_080cb034:
-    ldr r1, DAT_080cb0e8                     @ 080cb034 2c49
-    ldr r2, DAT_080cb0ec                     @ 080cb036 2d4a
+    ldr r1, render_card_name_bg_tiles_ptr_e_w_r_a_m_b_a_s_e_080cb0e8 @ 080cb034 2c49
+    ldr r2, render_card_name_bg_tiles_gsettings_offset_080cb0ec @ 080cb036 2d4a
     adds r1,r1,r2    @ 080cb038 8918
     movs r0,#0x7    @ 080cb03a 0720
     ldrb r1,[r1,#0x0]                        @ 080cb03c 0978
@@ -20744,7 +20744,7 @@ LAB_080cb034:
     orrs r4,r0    @ 080cb04a 0443
     movs r2,#0x8c    @ 080cb04c 8c22
     lsls r1,r2,#0x8    @ 080cb04e 1102
-    ldr r3, DAT_080cb0f0                     @ 080cb050 274b
+    ldr r3, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb0f0 @ 080cb050 274b
     ldr r0,[r3,#0x4]                         @ 080cb052 5868
     movs r3,#0x1    @ 080cb054 0123
     eors r0,r3    @ 080cb056 5840
@@ -20756,11 +20756,11 @@ LAB_080cb05e:
     adds r0,r4,#0x0    @ 080cb060 201c
     adds r1,r7,#0x0    @ 080cb062 391c
     .hword 0x4642    @ 080cb064 4246
-    bl render_glyph_jp_dual_layer            @ 080cb066 26f00dfc
+    bl render_glyph_jp_dual_layer            @ 080cb066 26f00dfc  -- Render a two-byte wide glyph at the current x and y coordinates.
     adds r0,r4,#0x0    @ 080cb06a 201c
     adds r1,r7,#0x0    @ 080cb06c 391c
     .hword 0x4642    @ 080cb06e 4246
-    ldr r4, DAT_080cb0f4                     @ 080cb070 204c
+    ldr r4, render_card_name_bg_tiles_card_name_shadow_param_high16_080cb0f4 @ 080cb070 204c
     lsrs r3,r4,#0x10    @ 080cb072 230c
     bl render_glyph_jp_dual_layer            @ 080cb074 26f006fc
     add r7,r10                               @ 080cb078 5744
@@ -20774,7 +20774,7 @@ LAB_080cb05e:
 LAB_080cb088:
     movs r2,#0x8c    @ 080cb088 8c22
     lsls r1,r2,#0x8    @ 080cb08a 1102
-    ldr r3, DAT_080cb0f0                     @ 080cb08c 184b
+    ldr r3, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb0f0 @ 080cb08c 184b
     ldr r0,[r3,#0x4]                         @ 080cb08e 5868
     movs r3,#0x1    @ 080cb090 0123
     eors r0,r3    @ 080cb092 5840
@@ -20799,7 +20799,7 @@ LAB_080cb09a:
     adds r1,r7,r0    @ 080cb0ba 3918
     movs r3,#0x8c    @ 080cb0bc 8c23
     lsls r2,r3,#0x8    @ 080cb0be 1a02
-    ldr r5, DAT_080cb0f0                     @ 080cb0c0 0b4d
+    ldr r5, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb0f0 @ 080cb0c0 0b4d
     ldr r0,[r5,#0x4]                         @ 080cb0c2 6868
     movs r3,#0x1    @ 080cb0c4 0123
     eors r0,r3    @ 080cb0c6 5840
@@ -20819,14 +20819,14 @@ LAB_080cb0d0:
     movs r2,#0x7    @ 080cb0e2 0722
     orrs r3,r2    @ 080cb0e4 1343
     b LAB_080cb196                           @ 080cb0e6 56e0
-DAT_080cb0e8:
-    .word  0x02000000                     @ 080cb0e8 00000002
-DAT_080cb0ec:
-    .word  0x00006c2c                     @ 080cb0ec 2c6c0000
-DAT_080cb0f0:
-    .word  0x0201e2a0                     @ 080cb0f0 a0e20102
-DAT_080cb0f4:
-    .word  0x0c070000                     @ 080cb0f4 0000070c
+render_card_name_bg_tiles_ptr_e_w_r_a_m_b_a_s_e_080cb0e8:
+    .word  EWRAM_BASE                     @ 080cb0e8 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_card_name_bg_tiles_gsettings_offset_080cb0ec:
+    .word  GSETTINGS_OFFSET               @ 080cb0ec 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb0f0:
+    .word  gDuelCardCtxBase               @ 080cb0f0 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_card_name_bg_tiles_card_name_shadow_param_high16_080cb0f4:
+    .word  CARD_NAME_SHADOW_PARAM_HIGH16  @ 080cb0f4 0000070c  CARD_NAME_SHADOW_PARAM_HIGH16: operand-0 data equate, value0x0c070000.
 LAB_080cb0f8:
     ldrb r3,[r5,#0x0]                        @ 080cb0f8 2b78
     cmp r3,#0x20                             @ 080cb0fa 202b
@@ -20834,7 +20834,7 @@ LAB_080cb0f8:
     ldrb r2,[r5,#0x0]                        @ 080cb0fe 2a78
     movs r4,#0x8c    @ 080cb100 8c24
     lsls r1,r4,#0x8    @ 080cb102 2102
-    ldr r3, DAT_080cb1a0                     @ 080cb104 264b
+    ldr r3, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb1a0 @ 080cb104 264b
     ldr r0,[r3,#0x4]                         @ 080cb106 5868
     movs r3,#0x1    @ 080cb108 0123
     eors r0,r3    @ 080cb10a 5840
@@ -20846,11 +20846,11 @@ LAB_080cb112:
     adds r0,r2,#0x0    @ 080cb114 101c
     adds r1,r7,#0x0    @ 080cb116 391c
     .hword 0x4642    @ 080cb118 4246
-    bl render_glyph_jp_single_layer          @ 080cb11a 26f043fc
+    bl render_glyph_jp_single_layer          @ 080cb11a 26f043fc  -- Render a one-byte narrow glyph; spaces only advance x.
     ldrb r0,[r5,#0x0]                        @ 080cb11e 2878
     adds r1,r7,#0x0    @ 080cb120 391c
     .hword 0x4642    @ 080cb122 4246
-    ldr r4, DAT_080cb1a4                     @ 080cb124 1f4c
+    ldr r4, render_card_name_bg_tiles_card_name_shadow_param_high16_080cb1a4 @ 080cb124 1f4c
     lsrs r3,r4,#0x10    @ 080cb126 230c
     bl render_glyph_jp_single_layer          @ 080cb128 26f03cfc
 LAB_080cb12c:
@@ -20863,7 +20863,7 @@ LAB_080cb12c:
     ble LAB_080cb1a8                         @ 080cb138 36dd
     movs r2,#0x8c    @ 080cb13a 8c22
     lsls r1,r2,#0x8    @ 080cb13c 1102
-    ldr r3, DAT_080cb1a0                     @ 080cb13e 184b
+    ldr r3, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb1a0 @ 080cb13e 184b
     ldr r0,[r3,#0x4]                         @ 080cb140 5868
     movs r3,#0x1    @ 080cb142 0123
     eors r0,r3    @ 080cb144 5840
@@ -20879,7 +20879,7 @@ LAB_080cb14c:
     movs r0,#0x2e    @ 080cb158 2e20
     adds r1,r7,#0x0    @ 080cb15a 391c
     .hword 0x4642    @ 080cb15c 4246
-    ldr r4, DAT_080cb1a4                     @ 080cb15e 114c
+    ldr r4, render_card_name_bg_tiles_card_name_shadow_param_high16_080cb1a4 @ 080cb15e 114c
     lsrs r3,r4,#0x10    @ 080cb160 230c
     bl render_glyph_jp_single_layer          @ 080cb162 26f01ffc
     .hword 0x4655    @ 080cb166 5546
@@ -20887,7 +20887,7 @@ LAB_080cb14c:
     adds r1,r7,r0    @ 080cb16a 3918
     movs r0,#0x8c    @ 080cb16c 8c20
     lsls r2,r0,#0x8    @ 080cb16e 0202
-    ldr r3, DAT_080cb1a0                     @ 080cb170 0b4b
+    ldr r3, render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb1a0 @ 080cb170 0b4b
     ldr r0,[r3,#0x4]                         @ 080cb172 5868
     movs r3,#0x1    @ 080cb174 0123
     eors r0,r3    @ 080cb176 5840
@@ -20911,10 +20911,10 @@ LAB_080cb196:
     .hword 0x4642    @ 080cb198 4246
     bl render_glyph_jp_single_layer          @ 080cb19a 26f003fc
     b LAB_080cb1b2                           @ 080cb19e 08e0
-DAT_080cb1a0:
-    .word  0x0201e2a0                     @ 080cb1a0 a0e20102
-DAT_080cb1a4:
-    .word  0x0c070000                     @ 080cb1a4 0000070c
+render_card_name_bg_tiles_ptr_g_duel_card_ctx_base_080cb1a0:
+    .word  gDuelCardCtxBase               @ 080cb1a0 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_card_name_bg_tiles_card_name_shadow_param_high16_080cb1a4:
+    .word  CARD_NAME_SHADOW_PARAM_HIGH16  @ 080cb1a4 0000070c  CARD_NAME_SHADOW_PARAM_HIGH16: operand-0 data equate, value0x0c070000.
 LAB_080cb1a8:
     adds r5,#0x1    @ 080cb1a8 0135
 LAB_080cb1aa:
@@ -20923,9 +20923,9 @@ LAB_080cb1aa:
     beq LAB_080cb1b2                         @ 080cb1ae 00d0
     b LAB_080cb034                           @ 080cb1b0 40e7
 LAB_080cb1b2:
-    ldr r0, DAT_080cb1c8                     @ 080cb1b2 0548
+    ldr r0, render_card_name_bg_tiles_ptr_card_detail_name_bg_tiles_080cb1c8 @ 080cb1b2 0548
     movs r1,#0x0    @ 080cb1b4 0021
-    bl commit_line_buffer_to_sprite_vram     @ 080cb1b6 27f049fe
+    bl commit_line_buffer_to_sprite_vram     @ 080cb1b6 27f049fe  -- Commit the name buffer to card_detail_name_bg_tiles.
     pop {r3,r4,r5}                           @ 080cb1ba 38bc
     .hword 0x4698    @ 080cb1bc 9846
     .hword 0x46a1    @ 080cb1be a146
@@ -20933,21 +20933,21 @@ LAB_080cb1b2:
     pop {r4,r5,r6,r7}                        @ 080cb1c2 f0bc
     pop {r0}                                 @ 080cb1c4 01bc
     bx r0                                    @ 080cb1c6 0047
-DAT_080cb1c8:
-    .word  0x0600a8e0                     @ 080cb1c8 e0a80006
+render_card_name_bg_tiles_ptr_card_detail_name_bg_tiles_080cb1c8:
+    .word  card_detail_name_bg_tiles                     @ 080cb1c8 e0a80006  Pointer to card_detail_name_bg_tiles; operand-0 DATA reference added.
 
-@ Render the selected card BG detail panel. r0=internal card ID,r1=card-record pointer,r2=render override. Read type, level, attributes and signed ATK/DEF from card_stats_table and the runtime record. Draw the name, frame, compared stat digits through compose_compared_stat_digit_tiles, level and counter/type glyphs according to record flags. Hidden and non-monster paths clear or replace the relevant fields. Writes fixed BG VRAM/palette regions; no OAM enqueue.
-render_large_card_display_by_mode:
+@ Render the selected card BG panel. r0=card-stats index,r1=packed selection descriptor pointer,r2=force redraw. Decode player bit0,zone bits5:1,subindex bits13:6 and visibility flags. Read base race,attribute,level and signed ATK/DEF from card_stats_table; field paths can evaluate current and baseline values. Respect hidden-card checks and gDuelFieldState+8 cache. Draw the name,32x48 card image,compared stat digits,level/counter and type icons in fixed BG VRAM and palettes.
+render_selected_card_bg_panel:
     push {r4,r5,r6,r7,lr}                    @ 080cb1cc f0b5
     .hword 0x4657    @ 080cb1ce 5746
     .hword 0x464e    @ 080cb1d0 4e46
     .hword 0x4645    @ 080cb1d2 4546
     push {r5,r6,r7}                          @ 080cb1d4 e0b4
     sub sp,#0x54                             @ 080cb1d6 95b0
-    .hword 0x4681    @ 080cb1d8 8146
+    .hword 0x4681    @ 080cb1d8 8146  -- mov r9,r0: save the card-stats index; r1 is a packed selection descriptor pointer.
     adds r6,r1,#0x0    @ 080cb1da 0e1c
     str r2,[sp,#0x24]                        @ 080cb1dc 0992
-    ldr r2, PTR_card_stats_table_080cb254    @ 080cb1de 1d4a
+    ldr r2, render_selected_card_bg_panel_ptr_card_stats_table_080cb254 @ 080cb1de 1d4a
     movs r0,#0xb    @ 080cb1e0 0b20
     .hword 0x4649    @ 080cb1e2 4946
     muls r1,r0    @ 080cb1e4 4143
@@ -20996,22 +20996,22 @@ render_large_card_display_by_mode:
     movs r2,#0x1    @ 080cb23a 0122
     str r2,[sp,#0x4c]                        @ 080cb23c 1392
     lsls r3,r3,#0x1a    @ 080cb23e 9b06
-    lsrs r0,r3,#0x1b    @ 080cb240 d80e
+    lsrs r0,r3,#0x1b    @ 080cb240 d80e  -- Extract descriptor bits5:1 as the zone type for the17-entry switch.
     cmp r0,#0x10                             @ 080cb242 1028
     bls LAB_080cb248                         @ 080cb244 00d9
     b switchD_080cb250__default              @ 080cb246 57e2
 LAB_080cb248:
     lsls r0,r0,#0x2    @ 080cb248 8000
-    ldr r1, DAT_080cb258                     @ 080cb24a 0349
+    ldr r1, render_selected_card_bg_panel_ptr_switch_d_080cb250_switchdata_d_080cb25c_080cb258 @ 080cb24a 0349
     adds r0,r0,r1    @ 080cb24c 4018
     ldr r0,[r0,#0x0]                         @ 080cb24e 0068
 switchD_080cb250__switchD:
     .hword 0x4687    @ 080cb250 8746
     .zero  0x2
-PTR_card_stats_table_080cb254:
-    .word  card_stats_table               @ 080cb254 b8698109
-DAT_080cb258:
-    .word  0x080cb25c                     @ 080cb258 5cb20c08
+render_selected_card_bg_panel_ptr_card_stats_table_080cb254:
+    .word  card_stats_table               @ 080cb254 b8698109  Pointer to card_stats_table; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_ptr_switch_d_080cb250_switchdata_d_080cb25c_080cb258:
+    .word  switchD_080cb250__switchdataD_080cb25c                     @ 080cb258 5cb20c08  Pointer to switchD_080cb250__switchdataD_080cb25c; operand-0 DATA reference added.
 switchD_080cb250__switchdataD_080cb25c:
     .word  0x080cb2c0                     @ 080cb25c c0b20c08
     .word  0x080cb2c0                     @ 080cb260 c0b20c08
@@ -21031,7 +21031,7 @@ switchD_080cb250__switchdataD_080cb25c:
     .word  0x080cb578                     @ 080cb298 78b50c08
     .word  0x080cb2a0                     @ 080cb29c a0b20c08
 switchD_080cb250__caseD_10:
-    ldr r0, DAT_080cb2bc                     @ 080cb2a0 0648
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb2bc @ 080cb2a0 0648
     ldrh r7,[r0,#0x8]                        @ 080cb2a2 0789
     movs r0,#0x40    @ 080cb2a4 4020
     ldrb r3,[r6,#0x1]                        @ 080cb2a6 7378
@@ -21047,8 +21047,8 @@ LAB_080cb2b0:
 LAB_080cb2b8:
     b LAB_080cb962                           @ 080cb2b8 53e3
     .zero  0x2
-DAT_080cb2bc:
-    .word  0x02023130                     @ 080cb2bc 30310202
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb2bc:
+    .word  gDuelFieldState                @ 080cb2bc 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
 switchD_080cb250__caseD_0:
     ldr r2,[r6,#0x0]                         @ 080cb2c0 3268
     lsls r0,r2,#0x1f    @ 080cb2c2 d007
@@ -21061,7 +21061,7 @@ switchD_080cb250__caseD_0:
     bl check_slot_card_is_equip_whitelist    @ 080cb2d0 65f7aefb
     cmp r0,#0x0                              @ 080cb2d4 0028
     beq LAB_080cb2f0                         @ 080cb2d6 0bd0
-    ldr r1, PTR_card_stats_table_080cb3f4    @ 080cb2d8 4649
+    ldr r1, render_selected_card_bg_panel_ptr_card_stats_table_080cb3f4 @ 080cb2d8 4649
     movs r0,#0x16    @ 080cb2da 1620
     .hword 0x464d    @ 080cb2dc 4d46
     muls r5,r0    @ 080cb2de 4543
@@ -21083,11 +21083,11 @@ LAB_080cb2f0:
     lsrs r0,r2,#0x18    @ 080cb2fe 100e
     adds r1,r1,r0    @ 080cb300 0918
     .hword 0x468c    @ 080cb302 8c46
-    ldr r1, DAT_080cb3f8                     @ 080cb304 3c49
+    ldr r1, render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_lo_080cb3f8 @ 080cb304 3c49
     ldrh r1,[r1,#0x0]                        @ 080cb306 0988
     lsrs r0,r1,#0x2    @ 080cb308 8808
     movs r1,#0x3    @ 080cb30a 0321
-    ldr r5, DAT_080cb3fc                     @ 080cb30c 3b4d
+    ldr r5, render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_hi_080cb3fc @ 080cb30c 3b4d
     ldrb r5,[r5,#0x0]                        @ 080cb30e 2d78
     ands r1,r5    @ 080cb310 2940
     lsls r1,r1,#0xe    @ 080cb312 8903
@@ -21119,11 +21119,11 @@ LAB_080cb334:
     lsrs r1,r1,#0x18    @ 080cb346 090e
     lsls r7,r1,#0x1    @ 080cb348 4f00
     orrs r7,r0    @ 080cb34a 0743
-    ldr r1, DAT_080cb3f8                     @ 080cb34c 2a49
+    ldr r1, render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_lo_080cb3f8 @ 080cb34c 2a49
     ldrh r1,[r1,#0x0]                        @ 080cb34e 0988
     lsrs r0,r1,#0x2    @ 080cb350 8808
     movs r2,#0x3    @ 080cb352 0322
-    ldr r3, DAT_080cb3fc                     @ 080cb354 294b
+    ldr r3, render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_hi_080cb3fc @ 080cb354 294b
     ldrb r3,[r3,#0x0]                        @ 080cb356 1b78
     ands r2,r3    @ 080cb358 1a40
     lsls r2,r2,#0xe    @ 080cb35a 9203
@@ -21150,7 +21150,7 @@ LAB_080cb334:
     lsrs r2,r5,#0x18    @ 080cb384 2a0e
     adds r1,r1,r2    @ 080cb386 8918
     .hword 0x466a    @ 080cb388 6a46
-    bl eval_slot_score_entry_full            @ 080cb38a 6cf799fd
+    bl eval_slot_score_entry_full            @ 080cb38a 6cf799fd  -- Evaluate the slot into stack fields for current and baseline stats.
     ldr r0,[sp,#0x4]                         @ 080cb38e 0198
     lsls r0,r0,#0x10    @ 080cb390 0004
     lsrs r0,r0,#0x10    @ 080cb392 000c
@@ -21175,7 +21175,7 @@ LAB_080cb3b6:
     ldr r0,[r6,#0x0]                         @ 080cb3b6 3068
     lsls r0,r0,#0x1f    @ 080cb3b8 c007
     lsrs r0,r0,#0x1f    @ 080cb3ba c00f
-    ldr r1, DAT_080cb400                     @ 080cb3bc 1049
+    ldr r1, render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb400 @ 080cb3bc 1049
     ldr r1,[r1,#0x4]                         @ 080cb3be 4968
     .hword 0x4642    @ 080cb3c0 4246
     eors r1,r2    @ 080cb3c2 5140
@@ -21186,7 +21186,7 @@ LAB_080cb3b6:
     ands r0,r3    @ 080cb3cc 1840
     cmp r0,#0x0                              @ 080cb3ce 0028
     bne LAB_080cb40c                         @ 080cb3d0 1cd1
-    ldr r0, PTR_gP1LifePoints_080cb404       @ 080cb3d2 0c48
+    ldr r0, render_selected_card_bg_panel_ptr_g_p1_life_points_080cb404 @ 080cb3d2 0c48
     movs r4,#0xe8    @ 080cb3d4 e824
     lsls r4,r4,#0x5    @ 080cb3d6 6401
     adds r0,r0,r4    @ 080cb3d8 0019
@@ -21199,22 +21199,22 @@ LAB_080cb3b6:
     beq LAB_080cb3ec                         @ 080cb3e8 00d0
     b LAB_080cb6d2                           @ 080cb3ea 72e1
 LAB_080cb3ec:
-    ldr r7, DAT_080cb408                     @ 080cb3ec 064f
+    ldr r7, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb408 @ 080cb3ec 064f
     ldrh r0,[r7,#0x8]                        @ 080cb3ee 3889
     b LAB_080cb5ee                           @ 080cb3f0 fde0
     .zero  0x2
-PTR_card_stats_table_080cb3f4:
-    .word  card_stats_table               @ 080cb3f4 b8698109
-DAT_080cb3f8:
-    .word  0x0202334e                     @ 080cb3f8 4e330202
-DAT_080cb3fc:
-    .word  0x02023350                     @ 080cb3fc 50330202
-DAT_080cb400:
-    .word  0x0201e2a0                     @ 080cb400 a0e20102
-PTR_gP1LifePoints_080cb404:
-    .word  gP1LifePoints                  @ 080cb404 e0c40102
-DAT_080cb408:
-    .word  0x02023130                     @ 080cb408 30310202
+render_selected_card_bg_panel_ptr_card_stats_table_080cb3f4:
+    .word  card_stats_table               @ 080cb3f4 b8698109  Pointer to card_stats_table; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_lo_080cb3f8:
+    .word  gDuelFieldChainRenderBitsPackedLo @ 080cb3f8 4e330202  Pointer to gDuelFieldChainRenderBitsPackedLo; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_field_chain_render_bits_packed_hi_080cb3fc:
+    .word  gDuelFieldChainRenderBitsPackedHi @ 080cb3fc 50330202  Pointer to gDuelFieldChainRenderBitsPackedHi; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb400:
+    .word  gDuelCardCtxBase               @ 080cb400 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_p1_life_points_080cb404:
+    .word  gP1LifePoints                  @ 080cb404 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb408:
+    .word  gDuelFieldState                @ 080cb408 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
 LAB_080cb40c:
     .hword 0x4648    @ 080cb40c 4846
     cmp r0,#0x0                              @ 080cb40e 0028
@@ -21244,7 +21244,7 @@ switchD_080cb250__caseD_5:
     ldr r2,[r6,#0x0]                         @ 080cb43c 3268
     lsls r2,r2,#0x1f    @ 080cb43e d207
     lsrs r2,r2,#0x1f    @ 080cb440 d20f
-    ldr r0, DAT_080cb474                     @ 080cb442 0c48
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb474 @ 080cb442 0c48
     ldr r0,[r0,#0x4]                         @ 080cb444 4068
     movs r1,#0x1    @ 080cb446 0121
     eors r0,r1    @ 080cb448 4840
@@ -21255,7 +21255,7 @@ switchD_080cb250__caseD_5:
     ands r0,r1    @ 080cb452 0840
     cmp r0,#0x0                              @ 080cb454 0028
     bne LAB_080cb47c                         @ 080cb456 11d1
-    ldr r0, PTR_gP1LifePoints_080cb478       @ 080cb458 0748
+    ldr r0, render_selected_card_bg_panel_ptr_g_p1_life_points_080cb478 @ 080cb458 0748
     movs r2,#0xe8    @ 080cb45a e822
     lsls r2,r2,#0x5    @ 080cb45c 5201
     adds r0,r0,r2    @ 080cb45e 8018
@@ -21269,10 +21269,10 @@ switchD_080cb250__caseD_5:
     b LAB_080cb6d2                           @ 080cb470 2fe1
 LAB_080cb472:
     b LAB_080cb5ea                           @ 080cb472 bae0
-DAT_080cb474:
-    .word  0x0201e2a0                     @ 080cb474 a0e20102
-PTR_gP1LifePoints_080cb478:
-    .word  gP1LifePoints                  @ 080cb478 e0c40102
+render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb474:
+    .word  gDuelCardCtxBase               @ 080cb474 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_p1_life_points_080cb478:
+    .word  gP1LifePoints                  @ 080cb478 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
 LAB_080cb47c:
     .hword 0x464c    @ 080cb47c 4c46
     cmp r4,#0x0                              @ 080cb47e 002c
@@ -21286,15 +21286,15 @@ switchD_080cb250__caseD_c:
     beq LAB_080cb48e                         @ 080cb48a 00d0
     b switchD_080cb250__default              @ 080cb48c 34e1
 LAB_080cb48e:
-    ldr r0, DAT_080cb4a0                     @ 080cb48e 0448
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb4a0 @ 080cb48e 0448
     movs r1,#0xc0    @ 080cb490 c021
     lsls r1,r1,#0x3    @ 080cb492 c900
     bl zero_fill_by_halfword                 @ 080cb494 29f0eefc
     bl zero_card_display_vram_regions        @ 080cb498 fff726fc
     b LAB_080cb962                           @ 080cb49c 61e2
     .zero  0x2
-DAT_080cb4a0:
-    .word  0x06006340                     @ 080cb4a0 40630006
+render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb4a0:
+    .word  card_detail_frame_bg_tiles                     @ 080cb4a0 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
 switchD_080cb250__caseD_d:
     ldr r2,[r6,#0x0]                         @ 080cb4a4 3268
     lsls r0,r2,#0x1f    @ 080cb4a6 d007
@@ -21316,19 +21316,19 @@ switchD_080cb250__caseD_d:
     ands r0,r1    @ 080cb4c8 0840
     cmp r0,#0x0                              @ 080cb4ca 0028
     beq LAB_080cb53c                         @ 080cb4cc 36d0
-    ldr r2, PTR_gP1LifePoints_080cb4e0       @ 080cb4ce 044a
+    ldr r2, render_selected_card_bg_panel_ptr_g_p1_life_points_080cb4e0 @ 080cb4ce 044a
     ldr r0,[r6,#0x0]                         @ 080cb4d0 3068
     lsls r0,r0,#0x1f    @ 080cb4d2 c007
     lsrs r0,r0,#0x1f    @ 080cb4d4 c00f
-    ldr r1, DAT_080cb4e4                     @ 080cb4d6 0349
+    ldr r1, render_selected_card_bg_panel_player_block_stride_080cb4e4 @ 080cb4d6 0349
     muls r0,r1    @ 080cb4d8 4843
     adds r2,#0x10    @ 080cb4da 1032
     b LAB_080cb532                           @ 080cb4dc 29e0
     .zero  0x2
-PTR_gP1LifePoints_080cb4e0:
-    .word  gP1LifePoints                  @ 080cb4e0 e0c40102
-DAT_080cb4e4:
-    .word  0x00000868                     @ 080cb4e4 68080000
+render_selected_card_bg_panel_ptr_g_p1_life_points_080cb4e0:
+    .word  gP1LifePoints                  @ 080cb4e0 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_player_block_stride_080cb4e4:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cb4e4 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
 switchD_080cb250__caseD_e:
     ldr r2,[r6,#0x0]                         @ 080cb4e8 3268
     lsls r0,r2,#0x1f    @ 080cb4ea d007
@@ -21348,7 +21348,7 @@ switchD_080cb250__caseD_e:
     ldr r0,[r6,#0x0]                         @ 080cb508 3068
     lsls r3,r0,#0x1f    @ 080cb50a c307
     lsrs r1,r3,#0x1f    @ 080cb50c d90f
-    ldr r0, DAT_080cb564                     @ 080cb50e 1548
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb564 @ 080cb50e 1548
     ldr r0,[r0,#0x4]                         @ 080cb510 4068
     movs r4,#0x1    @ 080cb512 0124
     eors r0,r4    @ 080cb514 6040
@@ -21360,11 +21360,11 @@ switchD_080cb250__caseD_e:
     cmp r0,#0x0                              @ 080cb520 0028
     beq LAB_080cb53c                         @ 080cb522 0bd0
 LAB_080cb524:
-    ldr r2, PTR_gP1LifePoints_080cb568       @ 080cb524 104a
+    ldr r2, render_selected_card_bg_panel_ptr_g_p1_life_points_080cb568 @ 080cb524 104a
     lsrs r1,r3,#0x1f    @ 080cb526 d90f
     adds r0,r4,#0x0    @ 080cb528 201c
     ands r0,r1    @ 080cb52a 0840
-    ldr r1, DAT_080cb56c                     @ 080cb52c 0f49
+    ldr r1, render_selected_card_bg_panel_player_block_stride_080cb56c @ 080cb52c 0f49
     muls r0,r1    @ 080cb52e 4843
     adds r2,#0x14    @ 080cb530 1432
 LAB_080cb532:
@@ -21374,14 +21374,14 @@ LAB_080cb532:
     beq LAB_080cb53c                         @ 080cb538 00d0
     b switchD_080cb250__default              @ 080cb53a dde0
 LAB_080cb53c:
-    ldr r4, DAT_080cb570                     @ 080cb53c 0c4c
+    ldr r4, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb570 @ 080cb53c 0c4c
     movs r5,#0xc0    @ 080cb53e c025
     lsls r5,r5,#0x3    @ 080cb540 ed00
     adds r0,r4,#0x0    @ 080cb542 201c
     adds r1,r5,#0x0    @ 080cb544 291c
     bl zero_fill_by_halfword                 @ 080cb546 29f095fc
     bl zero_card_display_vram_regions        @ 080cb54a fff7cdfb
-    ldr r0, DAT_080cb574                     @ 080cb54e 0948
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb574 @ 080cb54e 0948
     ldrh r0,[r0,#0x8]                        @ 080cb550 0089
     cmp r0,#0x0                              @ 080cb552 0028
     beq LAB_080cb558                         @ 080cb554 00d0
@@ -21392,16 +21392,16 @@ LAB_080cb558:
     bl zero_fill_by_halfword                 @ 080cb55c 29f08afc
     b LAB_080cb962                           @ 080cb560 ffe1
     .zero  0x2
-DAT_080cb564:
-    .word  0x0201e2a0                     @ 080cb564 a0e20102
-PTR_gP1LifePoints_080cb568:
-    .word  gP1LifePoints                  @ 080cb568 e0c40102
-DAT_080cb56c:
-    .word  0x00000868                     @ 080cb56c 68080000
-DAT_080cb570:
-    .word  0x06006340                     @ 080cb570 40630006
-DAT_080cb574:
-    .word  0x02023130                     @ 080cb574 30310202
+render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb564:
+    .word  gDuelCardCtxBase               @ 080cb564 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_p1_life_points_080cb568:
+    .word  gP1LifePoints                  @ 080cb568 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_player_block_stride_080cb56c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cb56c 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb570:
+    .word  card_detail_frame_bg_tiles                     @ 080cb570 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb574:
+    .word  gDuelFieldState                @ 080cb574 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
 switchD_080cb250__caseD_f:
     ldr r2,[r6,#0x0]                         @ 080cb578 3268
     lsls r0,r2,#0x1f    @ 080cb57a d007
@@ -21421,7 +21421,7 @@ switchD_080cb250__caseD_f:
     ldr r2,[r6,#0x0]                         @ 080cb598 3268
     lsls r2,r2,#0x1f    @ 080cb59a d207
     lsrs r2,r2,#0x1f    @ 080cb59c d20f
-    ldr r0, DAT_080cb5bc                     @ 080cb59e 0748
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb5bc @ 080cb59e 0748
     ldr r0,[r0,#0x4]                         @ 080cb5a0 4068
     movs r1,#0x1    @ 080cb5a2 0121
     eors r0,r1    @ 080cb5a4 4840
@@ -21435,14 +21435,14 @@ switchD_080cb250__caseD_f:
     bl zero_card_display_vram_regions        @ 080cb5b4 fff798fb
     b LAB_080cb6d2                           @ 080cb5b8 8be0
     .zero  0x2
-DAT_080cb5bc:
-    .word  0x0201e2a0                     @ 080cb5bc a0e20102
+render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb5bc:
+    .word  gDuelCardCtxBase               @ 080cb5bc a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
 LAB_080cb5c0:
-    ldr r2, PTR_gP1LifePoints_080cb600       @ 080cb5c0 0f4a
+    ldr r2, render_selected_card_bg_panel_ptr_g_p1_life_points_080cb600 @ 080cb5c0 0f4a
     ldr r0,[r6,#0x0]                         @ 080cb5c2 3068
     lsls r0,r0,#0x1f    @ 080cb5c4 c007
     lsrs r0,r0,#0x1f    @ 080cb5c6 c00f
-    ldr r1, DAT_080cb604                     @ 080cb5c8 0e49
+    ldr r1, render_selected_card_bg_panel_player_block_stride_080cb604 @ 080cb5c8 0e49
     muls r0,r1    @ 080cb5ca 4843
     adds r2,#0x1c    @ 080cb5cc 1c32
     adds r0,r0,r2    @ 080cb5ce 8018
@@ -21451,7 +21451,7 @@ LAB_080cb5c0:
     beq LAB_080cb5d8                         @ 080cb5d4 00d0
     b switchD_080cb250__default              @ 080cb5d6 8fe0
 LAB_080cb5d8:
-    ldr r4, DAT_080cb608                     @ 080cb5d8 0b4c
+    ldr r4, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb608 @ 080cb5d8 0b4c
     movs r5,#0xc0    @ 080cb5da c025
     lsls r5,r5,#0x3    @ 080cb5dc ed00
     adds r0,r4,#0x0    @ 080cb5de 201c
@@ -21460,26 +21460,26 @@ LAB_080cb5d8:
 LAB_080cb5e6:
     bl zero_card_display_vram_regions        @ 080cb5e6 fff77ffb
 LAB_080cb5ea:
-    ldr r0, DAT_080cb60c                     @ 080cb5ea 0848
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb60c @ 080cb5ea 0848
     ldrh r0,[r0,#0x8]                        @ 080cb5ec 0089
 LAB_080cb5ee:
     cmp r0,#0x0                              @ 080cb5ee 0028
     beq LAB_080cb5f4                         @ 080cb5f0 00d0
     b LAB_080cb962                           @ 080cb5f2 b6e1
 LAB_080cb5f4:
-    ldr r0, DAT_080cb608                     @ 080cb5f4 0448
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb608 @ 080cb5f4 0448
     movs r1,#0xc0    @ 080cb5f6 c021
     lsls r1,r1,#0x3    @ 080cb5f8 c900
     bl zero_fill_by_halfword                 @ 080cb5fa 29f03bfc
     b LAB_080cb962                           @ 080cb5fe b0e1
-PTR_gP1LifePoints_080cb600:
-    .word  gP1LifePoints                  @ 080cb600 e0c40102
-DAT_080cb604:
-    .word  0x00000868                     @ 080cb604 68080000
-DAT_080cb608:
-    .word  0x06006340                     @ 080cb608 40630006
-DAT_080cb60c:
-    .word  0x02023130                     @ 080cb60c 30310202
+render_selected_card_bg_panel_ptr_g_p1_life_points_080cb600:
+    .word  gP1LifePoints                  @ 080cb600 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_player_block_stride_080cb604:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cb604 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb608:
+    .word  card_detail_frame_bg_tiles                     @ 080cb608 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb60c:
+    .word  gDuelFieldState                @ 080cb60c 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
 switchD_080cb250__caseD_b:
     ldr r2,[r6,#0x0]                         @ 080cb610 3268
     lsls r0,r2,#0x1f    @ 080cb612 d007
@@ -21504,10 +21504,10 @@ switchD_080cb250__caseD_b:
     lsls r3,r3,#0x12    @ 080cb63a 9b04
     lsrs r1,r3,#0x18    @ 080cb63c 190e
     lsls r1,r1,#0x2    @ 080cb63e 8900
-    ldr r5, DAT_080cb6e0                     @ 080cb640 274d
+    ldr r5, render_selected_card_bg_panel_player_block_stride_080cb6e0 @ 080cb640 274d
     muls r2,r5    @ 080cb642 6a43
     adds r1,r1,r2    @ 080cb644 8918
-    ldr r2, DAT_080cb6e4                     @ 080cb646 274a
+    ldr r2, render_selected_card_bg_panel_ptr_g_p1_field_array_c_base_080cb6e4 @ 080cb646 274a
     .hword 0x4690    @ 080cb648 9046
     add r1,r8                                @ 080cb64a 4144
     ldr r1,[r1,#0x0]                         @ 080cb64c 0968
@@ -21537,7 +21537,7 @@ switchD_080cb250__caseD_b:
     ldr r0,[r6,#0x0]                         @ 080cb67e 3068
     lsls r2,r0,#0x1f    @ 080cb680 c207
     lsrs r1,r2,#0x1f    @ 080cb682 d10f
-    ldr r0, DAT_080cb6e8                     @ 080cb684 1848
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb6e8 @ 080cb684 1848
     ldr r0,[r0,#0x4]                         @ 080cb686 4068
     ldr r4,[sp,#0x50]                        @ 080cb688 149c
     eors r0,r4    @ 080cb68a 6040
@@ -21547,7 +21547,7 @@ switchD_080cb250__caseD_b:
     bl get_player_deck_flag_bit1             @ 080cb692 6cf77dfa
     cmp r0,#0x0                              @ 080cb696 0028
     bne switchD_080cb250__default            @ 080cb698 2ed1
-    ldr r3, DAT_080cb6ec                     @ 080cb69a 144b
+    ldr r3, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb6ec @ 080cb69a 144b
     ldr r1,[r6,#0x0]                         @ 080cb69c 3168
     lsls r2,r1,#0x12    @ 080cb69e 8a04
     lsrs r2,r2,#0x18    @ 080cb6a0 120e
@@ -21575,32 +21575,32 @@ switchD_080cb250__caseD_b:
     bne LAB_080cb6d2                         @ 080cb6ce 00d1
     b LAB_080cb962                           @ 080cb6d0 47e1
 LAB_080cb6d2:
-    ldr r0, DAT_080cb6f0                     @ 080cb6d2 0748
-    ldr r1, DAT_080cb6f4                     @ 080cb6d4 0749
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb6f0 @ 080cb6d2 0748
+    ldr r1, render_selected_card_bg_panel_ptr_card_glyph_table_3_080cb6f4 @ 080cb6d4 0749
     movs r2,#0xc0    @ 080cb6d6 c022
     lsls r2,r2,#0x3    @ 080cb6d8 d200
     bl copy_bytes_by_halfword                @ 080cb6da 29f0e3fb
     b LAB_080cb962                           @ 080cb6de 40e1
-DAT_080cb6e0:
-    .word  0x00000868                     @ 080cb6e0 68080000
-DAT_080cb6e4:
-    .word  0x0201c600                     @ 080cb6e4 00c60102
-DAT_080cb6e8:
-    .word  0x0201e2a0                     @ 080cb6e8 a0e20102
-DAT_080cb6ec:
-    .word  0x02023130                     @ 080cb6ec 30310202
-DAT_080cb6f0:
-    .word  0x06006340                     @ 080cb6f0 40630006
-DAT_080cb6f4:
-    .word  0x0984f5cc                     @ 080cb6f4 ccf58409
+render_selected_card_bg_panel_player_block_stride_080cb6e0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cb6e0 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_selected_card_bg_panel_ptr_g_p1_field_array_c_base_080cb6e4:
+    .word  gP1FieldArrayCBase             @ 080cb6e4 00c60102  Pointer to gP1FieldArrayCBase; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_card_ctx_base_080cb6e8:
+    .word  gDuelCardCtxBase               @ 080cb6e8 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb6ec:
+    .word  gDuelFieldState                @ 080cb6ec 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb6f0:
+    .word  card_detail_frame_bg_tiles                     @ 080cb6f0 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_glyph_table_3_080cb6f4:
+    .word  card_glyph_table_3             @ 080cb6f4 ccf58409  Pointer to card_glyph_table_3; operand-0 DATA reference added.
 switchD_080cb250__default:
-    ldr r0, DAT_080cb7b4                     @ 080cb6f8 2e48
+    ldr r0, render_selected_card_bg_panel_ptr_g_duel_field_state_080cb7b4 @ 080cb6f8 2e48
     ldrh r1,[r0,#0x8]                        @ 080cb6fa 0189
     cmp r7,r1                                @ 080cb6fc 8f42
     beq LAB_080cb706                         @ 080cb6fe 02d0
     movs r2,#0x0    @ 080cb700 0022
     str r2,[sp,#0x4c]                        @ 080cb702 1392
-    strh r7,[r0,#0x8]                        @ 080cb704 0781
+    strh r7,[r0,#0x8]                        @ 080cb704 0781  -- Update the cached packed card reference and request a frame/name redraw.
 LAB_080cb706:
     ldr r3,[sp,#0x24]                        @ 080cb706 099b
     cmp r3,#0x0                              @ 080cb708 002b
@@ -21622,19 +21622,19 @@ LAB_080cb710:
 LAB_080cb726:
     .hword 0x4650    @ 080cb726 5046
     .hword 0x4649    @ 080cb728 4946
-    bl render_card_name_to_sprite_vram       @ 080cb72a fff71dfc
+    bl render_card_name_bg_tiles             @ 080cb72a fff71dfc  -- render_card_name_bg_tiles(player,card-stats index).
 LAB_080cb72e:
-    ldr r4, PTR_card_image_index_080cb7b8    @ 080cb72e 224c
+    ldr r4, render_selected_card_bg_panel_ptr_card_image_index_080cb7b8 @ 080cb72e 224c
     .hword 0x4648    @ 080cb730 4846
     lsls r2,r0,#0x1    @ 080cb732 4200
     movs r3,#0x0    @ 080cb734 0023
-    ldr r0, DAT_080cb7bc                     @ 080cb736 2148
+    ldr r0, render_selected_card_bg_panel_ptr_r_o_m_r_e_g_i_o_n_c_o_d_e_a_d_d_r_080cb7bc @ 080cb736 2148
     ldrh r0,[r0,#0x0]                        @ 080cb738 0088
     lsrs r0,r0,#0x8    @ 080cb73a 000a
     cmp r0,#0x4a                             @ 080cb73c 4a28
     bne LAB_080cb750                         @ 080cb73e 07d1
-    ldr r1, DAT_080cb7c0                     @ 080cb740 1f49
-    ldr r5, DAT_080cb7c4                     @ 080cb742 204d
+    ldr r1, render_selected_card_bg_panel_ptr_e_w_r_a_m_b_a_s_e_080cb7c0 @ 080cb740 1f49
+    ldr r5, render_selected_card_bg_panel_gsettings_offset_080cb7c4 @ 080cb742 204d
     adds r1,r1,r5    @ 080cb744 4919
     movs r0,#0x7    @ 080cb746 0720
     ldrb r1,[r1,#0x0]                        @ 080cb748 0978
@@ -21652,12 +21652,12 @@ LAB_080cb752:
     adds r0,r7,#0x0    @ 080cb75c 381c
     adds r1,r1,r0    @ 080cb75e 0918
     lsls r1,r1,#0x9    @ 080cb760 4902
-    ldr r0, PTR_card_medium_frame_tile_data_080cb7c8 @ 080cb762 1948
+    ldr r0, render_selected_card_bg_panel_ptr_card_medium_frame_tile_data_080cb7c8 @ 080cb762 1948
     adds r1,r1,r0    @ 080cb764 0918
     movs r2,#0xc0    @ 080cb766 c022
     lsls r2,r2,#0x3    @ 080cb768 d200
-    ldr r0, DAT_080cb7cc                     @ 080cb76a 1848
-    bl copy_bytes_by_halfword                @ 080cb76c 29f09afb
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb7cc @ 080cb76a 1848
+    bl copy_bytes_by_halfword                @ 080cb76c 29f09afb  -- Copy the selected0x600-byte32x48 card tile block to BG VRAM.
 LAB_080cb770:
     ldr r0,[sp,#0x28]                        @ 080cb770 0a98
     cmp r0,#0x1                              @ 080cb772 0128
@@ -21685,33 +21685,33 @@ LAB_080cb784:
     movs r1,#0x0    @ 080cb79a 0021
     movs r2,#0x1    @ 080cb79c 0122
     bl compose_compared_stat_digit_tiles     @ 080cb79e fef75fff
-    ldr r0, DAT_080cb7d0                     @ 080cb7a2 0b48
+    ldr r0, render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb7d0 @ 080cb7a2 0b48
     movs r1,#0x80    @ 080cb7a4 8021
     bl zero_fill_by_halfword                 @ 080cb7a6 29f065fb
-    ldr r0, DAT_080cb7d4                     @ 080cb7aa 0a48
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb7d4 @ 080cb7aa 0a48
     movs r1,#0x80    @ 080cb7ac 8021
     bl zero_fill_by_halfword                 @ 080cb7ae 29f061fb
     b LAB_080cb846                           @ 080cb7b2 48e0
-DAT_080cb7b4:
-    .word  0x02023130                     @ 080cb7b4 30310202
-PTR_card_image_index_080cb7b8:
-    .word  card_image_index               @ 080cb7b8 005c5b09
-DAT_080cb7bc:
-    .word  0x080000ae                     @ 080cb7bc ae000008
-DAT_080cb7c0:
-    .word  0x02000000                     @ 080cb7c0 00000002
-DAT_080cb7c4:
-    .word  0x00006c2c                     @ 080cb7c4 2c6c0000
-PTR_card_medium_frame_tile_data_080cb7c8:
-    .word  card_medium_frame_tile_data    @ 080cb7c8 80c0fb08
-DAT_080cb7cc:
-    .word  0x06006340                     @ 080cb7cc 40630006
-DAT_080cb7d0:
-    .word  0x06008020                     @ 080cb7d0 20800006
-DAT_080cb7d4:
-    .word  0x060080a0                     @ 080cb7d4 a0800006
+render_selected_card_bg_panel_ptr_g_duel_field_state_080cb7b4:
+    .word  gDuelFieldState                @ 080cb7b4 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_image_index_080cb7b8:
+    .word  card_image_index               @ 080cb7b8 005c5b09  Pointer to card_image_index; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_ptr_r_o_m_r_e_g_i_o_n_c_o_d_e_a_d_d_r_080cb7bc:
+    .word  ROM_REGION_CODE_ADDR           @ 080cb7bc ae000008  Pointer to ROM_REGION_CODE_ADDR; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_e_w_r_a_m_b_a_s_e_080cb7c0:
+    .word  EWRAM_BASE                     @ 080cb7c0 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_selected_card_bg_panel_gsettings_offset_080cb7c4:
+    .word  GSETTINGS_OFFSET               @ 080cb7c4 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_selected_card_bg_panel_ptr_card_medium_frame_tile_data_080cb7c8:
+    .word  card_medium_frame_tile_data    @ 080cb7c8 80c0fb08  Pointer to card_medium_frame_tile_data; operand-0 DATA reference preserved.
+render_selected_card_bg_panel_ptr_card_detail_frame_bg_tiles_080cb7cc:
+    .word  card_detail_frame_bg_tiles                     @ 080cb7cc 40630006  Pointer to card_detail_frame_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb7d0:
+    .word  PUZZLE_NAME_SPRITE_VRAM                     @ 080cb7d0 20800006  Pointer to PUZZLE_NAME_SPRITE_VRAM; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb7d4:
+    .word  card_detail_type_bg_tiles                     @ 080cb7d4 a0800006  Pointer to card_detail_type_bg_tiles; operand-0 DATA reference added.
 LAB_080cb7d8:
-    ldr r2, DAT_080cb808                     @ 080cb7d8 0b4a
+    ldr r2, render_selected_card_bg_panel_ptr_card_stat_digit_bg_tiles_a_080cb808 @ 080cb7d8 0b4a
     movs r1,#0x80    @ 080cb7da 8021
     lsls r1,r1,#0x1    @ 080cb7dc 4900
     adds r0,r2,#0x0    @ 080cb7de 101c
@@ -21719,51 +21719,51 @@ LAB_080cb7d8:
     ldr r1,[sp,#0x30]                        @ 080cb7e4 0c99
     cmp r1,#0x0                              @ 080cb7e6 0029
     beq LAB_080cb81c                         @ 080cb7e8 18d0
-    ldr r0, DAT_080cb80c                     @ 080cb7ea 0848
+    ldr r0, render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb80c @ 080cb7ea 0848
     subs r1,#0x1    @ 080cb7ec 0139
     lsls r1,r1,#0x7    @ 080cb7ee c901
-    ldr r2, DAT_080cb810                     @ 080cb7f0 074a
+    ldr r2, render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_t_i_l_e_s_r_c_i_c_o_n_080cb810 @ 080cb7f0 074a
     adds r1,r1,r2    @ 080cb7f2 8918
     movs r2,#0x80    @ 080cb7f4 8022
     bl copy_bytes_by_halfword                @ 080cb7f6 29f055fb
-    ldr r0, DAT_080cb814                     @ 080cb7fa 0648
-    ldr r1, DAT_080cb818                     @ 080cb7fc 0649
+    ldr r0, render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t14_b_a_s_e_080cb814 @ 080cb7fa 0648
+    ldr r1, render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_p_a_l_s_r_c_i_c_o_n_b_080cb818 @ 080cb7fc 0649
     movs r2,#0x20    @ 080cb7fe 2022
     bl copy_bytes_by_halfword                @ 080cb800 29f050fb
     b LAB_080cb824                           @ 080cb804 0ee0
     .zero  0x2
-DAT_080cb808:
-    .word  0x06008120                     @ 080cb808 20810006
-DAT_080cb80c:
-    .word  0x06008020                     @ 080cb80c 20800006
-DAT_080cb810:
-    .word  0x0984f0ac                     @ 080cb810 acf08409
-DAT_080cb814:
-    .word  0x050001c0                     @ 080cb814 c0010005
-DAT_080cb818:
-    .word  0x0984f3ac                     @ 080cb818 acf38409
+render_selected_card_bg_panel_ptr_card_stat_digit_bg_tiles_a_080cb808:
+    .word  card_stat_digit_bg_tiles_a                     @ 080cb808 20810006  Pointer to card_stat_digit_bg_tiles_a; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb80c:
+    .word  PUZZLE_NAME_SPRITE_VRAM                     @ 080cb80c 20800006  Pointer to PUZZLE_NAME_SPRITE_VRAM; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_t_i_l_e_s_r_c_i_c_o_n_080cb810:
+    .word  CARD_FRAME_TILE_SRC_ICON       @ 080cb810 acf08409  Pointer to CARD_FRAME_TILE_SRC_ICON; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t14_b_a_s_e_080cb814:
+    .word  BG_PALRAM_SLOT14_BASE                     @ 080cb814 c0010005  Pointer to BG_PALRAM_SLOT14_BASE; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_p_a_l_s_r_c_i_c_o_n_b_080cb818:
+    .word  CARD_FRAME_PAL_SRC_ICON_B      @ 080cb818 acf38409  Pointer to CARD_FRAME_PAL_SRC_ICON_B; operand-0 DATA reference added.
 LAB_080cb81c:
-    ldr r0, DAT_080cb86c                     @ 080cb81c 1348
+    ldr r0, render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb86c @ 080cb81c 1348
     movs r1,#0x80    @ 080cb81e 8021
     bl zero_fill_by_halfword                 @ 080cb820 29f028fb
 LAB_080cb824:
-    ldr r0, DAT_080cb870                     @ 080cb824 1248
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb870 @ 080cb824 1248
     ldr r4,[sp,#0x28]                        @ 080cb826 0a9c
     subs r4,#0xf    @ 080cb828 0f3c
     lsls r1,r4,#0x7    @ 080cb82a e101
-    ldr r2, DAT_080cb874                     @ 080cb82c 114a
+    ldr r2, render_selected_card_bg_panel_ptr_card_attribute_icon_tiles_080cb874 @ 080cb82c 114a
     adds r1,r1,r2    @ 080cb82e 8918
     movs r2,#0x80    @ 080cb830 8022
     bl copy_bytes_by_halfword                @ 080cb832 29f037fb
-    ldr r0, DAT_080cb878                     @ 080cb836 1048
+    ldr r0, render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t15_b_a_s_e_080cb878 @ 080cb836 1048
     lsls r4,r4,#0x5    @ 080cb838 6401
-    ldr r1, DAT_080cb87c                     @ 080cb83a 1049
+    ldr r1, render_selected_card_bg_panel_ptr_card_attribute_icon_palettes_080cb87c @ 080cb83a 1049
     adds r4,r4,r1    @ 080cb83c 6418
     adds r1,r4,#0x0    @ 080cb83e 211c
     movs r2,#0x20    @ 080cb840 2022
     bl copy_bytes_by_halfword                @ 080cb842 29f02ffb
 LAB_080cb846:
-    ldr r2, DAT_080cb880                     @ 080cb846 0e4a
+    ldr r2, render_selected_card_bg_panel_ptr_card_level_bg_map_080cb880 @ 080cb846 0e4a
     movs r0,#0x0    @ 080cb848 0020
     strh r0,[r2,#0x0]                        @ 080cb84a 1080
     adds r2,#0x2    @ 080cb84c 0232
@@ -21779,22 +21779,22 @@ LAB_080cb846:
     lsls r2,r2,#0x12    @ 080cb860 9204
     lsrs r2,r2,#0x18    @ 080cb862 120e
     adds r1,r1,r2    @ 080cb864 8918
-    bl write_card_digit_tiles_to_vram        @ 080cb866 fff70dfb
+    bl render_card_counter_bg_map            @ 080cb866 fff70dfb  -- render_card_counter_bg_map(player,zone+subindex).
     b LAB_080cb962                           @ 080cb86a 7ae0
-DAT_080cb86c:
-    .word  0x06008020                     @ 080cb86c 20800006
-DAT_080cb870:
-    .word  0x060080a0                     @ 080cb870 a0800006
-DAT_080cb874:
-    .word  0x0984de8c                     @ 080cb874 8cde8409
-DAT_080cb878:
-    .word  0x050001e0                     @ 080cb878 e0010005
-DAT_080cb87c:
-    .word  0x0984e30c                     @ 080cb87c 0ce38409
-DAT_080cb880:
-    .word  0x0600f904                     @ 080cb880 04f90006
+render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb86c:
+    .word  PUZZLE_NAME_SPRITE_VRAM                     @ 080cb86c 20800006  Pointer to PUZZLE_NAME_SPRITE_VRAM; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb870:
+    .word  card_detail_type_bg_tiles                     @ 080cb870 a0800006  Pointer to card_detail_type_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_attribute_icon_tiles_080cb874:
+    .word  card_attribute_icon_tiles      @ 080cb874 8cde8409  Pointer to card_attribute_icon_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t15_b_a_s_e_080cb878:
+    .word  BG_PALRAM_SLOT15_BASE                     @ 080cb878 e0010005  Pointer to BG_PALRAM_SLOT15_BASE; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_attribute_icon_palettes_080cb87c:
+    .word  card_attribute_icon_palettes   @ 080cb87c 0ce38409  Pointer to card_attribute_icon_palettes; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_level_bg_map_080cb880:
+    .word  card_level_bg_map                     @ 080cb880 04f90006  Pointer to card_level_bg_map; operand-0 DATA reference added.
 LAB_080cb884:
-    ldr r2, DAT_080cb894                     @ 080cb884 034a
+    ldr r2, render_selected_card_bg_panel_ptr_card_effect_counter_bg_map_080cb894 @ 080cb884 034a
     movs r1,#0x0    @ 080cb886 0021
     adds r0,r2,#0x6    @ 080cb888 901d
 LAB_080cb88a:
@@ -21803,8 +21803,8 @@ LAB_080cb88a:
     cmp r0,r2                                @ 080cb88e 9042
     bge LAB_080cb88a                         @ 080cb890 fbda
     b LAB_080cb962                           @ 080cb892 66e0
-DAT_080cb894:
-    .word  0x0600fa40                     @ 080cb894 40fa0006
+render_selected_card_bg_panel_ptr_card_effect_counter_bg_map_080cb894:
+    .word  card_effect_counter_bg_map                     @ 080cb894 40fa0006  Pointer to card_effect_counter_bg_map; operand-0 DATA reference added.
 LAB_080cb898:
     ldr r0,[sp,#0x38]                        @ 080cb898 0e98
     ldr r1,[sp,#0x40]                        @ 080cb89a 1099
@@ -21814,8 +21814,8 @@ LAB_080cb898:
     ldr r1,[sp,#0x44]                        @ 080cb8a4 1199
     movs r2,#0x1    @ 080cb8a6 0122
     bl compose_compared_stat_digit_tiles     @ 080cb8a8 fef7dafe
-    ldr r2, DAT_080cb8c8                     @ 080cb8ac 064a
-    ldr r3, DAT_080cb8cc                     @ 080cb8ae 074b
+    ldr r2, render_selected_card_bg_panel_ptr_card_level_bg_map_080cb8c8 @ 080cb8ac 064a
+    ldr r3, render_selected_card_bg_panel_card_level_prefix_bg_tile_080cb8cc @ 080cb8ae 074b
     adds r0,r3,#0x0    @ 080cb8b0 181c
     strh r0,[r2,#0x0]                        @ 080cb8b2 1080
     adds r2,#0x2    @ 080cb8b4 0232
@@ -21828,24 +21828,24 @@ LAB_080cb898:
     adds r0,r4,r7    @ 080cb8c2 e019
     b LAB_080cb8ea                           @ 080cb8c4 11e0
     .zero  0x2
-DAT_080cb8c8:
-    .word  0x0600f904                     @ 080cb8c8 04f90006
-DAT_080cb8cc:
-    .word  0x000001b3                     @ 080cb8cc b3010000
+render_selected_card_bg_panel_ptr_card_level_bg_map_080cb8c8:
+    .word  card_level_bg_map                     @ 080cb8c8 04f90006  Pointer to card_level_bg_map; operand-0 DATA reference added.
+render_selected_card_bg_panel_card_level_prefix_bg_tile_080cb8cc:
+    .word  CARD_LEVEL_PREFIX_BG_TILE      @ 080cb8cc b3010000  CARD_LEVEL_PREFIX_BG_TILE: operand-0 data equate, value0x000001b3.
 LAB_080cb8d0:
     ldr r0,[sp,#0x34]                        @ 080cb8d0 0d98
     ldr r1,[sp,#0x48]                        @ 080cb8d2 1299
     cmp r0,r1                                @ 080cb8d4 8842
     bcs LAB_080cb8e4                         @ 080cb8d6 05d2
-    ldr r3, DAT_080cb8e0                     @ 080cb8d8 014b
+    ldr r3, render_selected_card_bg_panel_card_level_decreased_digit_bg_base_080cb8e0 @ 080cb8d8 014b
     adds r0,r0,r3    @ 080cb8da c018
     b LAB_080cb8ea                           @ 080cb8dc 05e0
     .zero  0x2
-DAT_080cb8e0:
-    .word  0x000001c1                     @ 080cb8e0 c1010000
+render_selected_card_bg_panel_card_level_decreased_digit_bg_base_080cb8e0:
+    .word  CARD_LEVEL_DECREASED_DIGIT_BG_BASE @ 080cb8e0 c1010000  CARD_LEVEL_DECREASED_DIGIT_BG_BASE: operand-0 data equate, value0x000001c1.
 LAB_080cb8e4:
     ldr r4,[sp,#0x34]                        @ 080cb8e4 0d9c
-    ldr r5, DAT_080cb910                     @ 080cb8e6 0a4d
+    ldr r5, render_selected_card_bg_panel_card_level_increased_digit_bg_base_080cb910 @ 080cb8e6 0a4d
     adds r0,r4,r5    @ 080cb8e8 6019
 LAB_080cb8ea:
     strh r0,[r2,#0x0]                        @ 080cb8ea 1080
@@ -21860,16 +21860,16 @@ LAB_080cb8ea:
     lsls r2,r2,#0x12    @ 080cb8fc 9204
     lsrs r2,r2,#0x18    @ 080cb8fe 120e
     adds r1,r1,r2    @ 080cb900 8918
-    bl write_card_digit_tiles_to_vram        @ 080cb902 fff7bffa
+    bl render_card_counter_bg_map            @ 080cb902 fff7bffa  -- render_card_counter_bg_map(player,zone+subindex).
     ldr r4,[sp,#0x28]                        @ 080cb906 0a9c
     subs r4,#0x1    @ 080cb908 013c
     ldr r5,[sp,#0x2c]                        @ 080cb90a 0b9d
     subs r5,#0x1    @ 080cb90c 013d
     b LAB_080cb92a                           @ 080cb90e 0ce0
-DAT_080cb910:
-    .word  0x000001b7                     @ 080cb910 b7010000
+render_selected_card_bg_panel_card_level_increased_digit_bg_base_080cb910:
+    .word  CARD_LEVEL_INCREASED_DIGIT_BG_BASE @ 080cb910 b7010000  CARD_LEVEL_INCREASED_DIGIT_BG_BASE: operand-0 data equate, value0x000001b7.
 LAB_080cb914:
-    ldr r2, DAT_080cb974                     @ 080cb914 174a
+    ldr r2, render_selected_card_bg_panel_ptr_card_effect_counter_bg_map_080cb974 @ 080cb914 174a
     ldr r4,[sp,#0x28]                        @ 080cb916 0a9c
     subs r4,#0x1    @ 080cb918 013c
     ldr r5,[sp,#0x2c]                        @ 080cb91a 0b9d
@@ -21882,27 +21882,27 @@ LAB_080cb922:
     cmp r0,r2                                @ 080cb926 9042
     bge LAB_080cb922                         @ 080cb928 fbda
 LAB_080cb92a:
-    ldr r0, DAT_080cb978                     @ 080cb92a 1348
+    ldr r0, render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb978 @ 080cb92a 1348
     lsls r1,r4,#0x7    @ 080cb92c e101
-    ldr r2, DAT_080cb97c                     @ 080cb92e 134a
+    ldr r2, render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_t_i_l_e_s_r_c_s_p_e_l_l_b_080cb97c @ 080cb92e 134a
     adds r1,r1,r2    @ 080cb930 8918
     movs r2,#0x80    @ 080cb932 8022
     bl copy_bytes_by_halfword                @ 080cb934 29f0b6fa
-    ldr r0, DAT_080cb980                     @ 080cb938 1148
+    ldr r0, render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t14_b_a_s_e_080cb980 @ 080cb938 1148
     lsls r1,r4,#0x5    @ 080cb93a 6101
-    ldr r2, DAT_080cb984                     @ 080cb93c 114a
+    ldr r2, render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_p_a_l_s_r_c_i_c_o_n_a_080cb984 @ 080cb93c 114a
     adds r1,r1,r2    @ 080cb93e 8918
     movs r2,#0x20    @ 080cb940 2022
     bl copy_bytes_by_halfword                @ 080cb942 29f0affa
-    ldr r0, DAT_080cb988                     @ 080cb946 1048
+    ldr r0, render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb988 @ 080cb946 1048
     lsls r1,r5,#0x7    @ 080cb948 e901
-    ldr r2, DAT_080cb98c                     @ 080cb94a 104a
+    ldr r2, render_selected_card_bg_panel_ptr_card_attribute_icon_tiles_080cb98c @ 080cb94a 104a
     adds r1,r1,r2    @ 080cb94c 8918
     movs r2,#0x80    @ 080cb94e 8022
     bl copy_bytes_by_halfword                @ 080cb950 29f0a8fa
-    ldr r0, DAT_080cb990                     @ 080cb954 0e48
+    ldr r0, render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t15_b_a_s_e_080cb990 @ 080cb954 0e48
     lsls r1,r5,#0x5    @ 080cb956 6901
-    ldr r2, DAT_080cb994                     @ 080cb958 0e4a
+    ldr r2, render_selected_card_bg_panel_ptr_card_attribute_icon_palettes_080cb994 @ 080cb958 0e4a
     adds r1,r1,r2    @ 080cb95a 8918
     movs r2,#0x20    @ 080cb95c 2022
     bl copy_bytes_by_halfword                @ 080cb95e 29f0a1fa
@@ -21916,26 +21916,26 @@ LAB_080cb962:
     pop {r0}                                 @ 080cb96e 01bc
     bx r0                                    @ 080cb970 0047
     .zero  0x2
-DAT_080cb974:
-    .word  0x0600fa40                     @ 080cb974 40fa0006
-DAT_080cb978:
-    .word  0x06008020                     @ 080cb978 20800006
-DAT_080cb97c:
-    .word  0x0984e42c                     @ 080cb97c 2ce48409
-DAT_080cb980:
-    .word  0x050001c0                     @ 080cb980 c0010005
-DAT_080cb984:
-    .word  0x0984ee2c                     @ 080cb984 2cee8409
-DAT_080cb988:
-    .word  0x060080a0                     @ 080cb988 a0800006
-DAT_080cb98c:
-    .word  0x0984de8c                     @ 080cb98c 8cde8409
-DAT_080cb990:
-    .word  0x050001e0                     @ 080cb990 e0010005
-DAT_080cb994:
-    .word  0x0984e30c                     @ 080cb994 0ce38409
+render_selected_card_bg_panel_ptr_card_effect_counter_bg_map_080cb974:
+    .word  card_effect_counter_bg_map                     @ 080cb974 40fa0006  Pointer to card_effect_counter_bg_map; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_p_u_z_z_l_e_n_a_m_e_s_p_r_i_t_e_v_r_a_m_080cb978:
+    .word  PUZZLE_NAME_SPRITE_VRAM                     @ 080cb978 20800006  Pointer to PUZZLE_NAME_SPRITE_VRAM; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_t_i_l_e_s_r_c_s_p_e_l_l_b_080cb97c:
+    .word  CARD_FRAME_TILE_SRC_SPELL_B    @ 080cb97c 2ce48409  Pointer to CARD_FRAME_TILE_SRC_SPELL_B; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t14_b_a_s_e_080cb980:
+    .word  BG_PALRAM_SLOT14_BASE                     @ 080cb980 c0010005  Pointer to BG_PALRAM_SLOT14_BASE; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_c_a_r_d_f_r_a_m_e_p_a_l_s_r_c_i_c_o_n_a_080cb984:
+    .word  CARD_FRAME_PAL_SRC_ICON_A      @ 080cb984 2cee8409  Pointer to CARD_FRAME_PAL_SRC_ICON_A; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_detail_type_bg_tiles_080cb988:
+    .word  card_detail_type_bg_tiles                     @ 080cb988 a0800006  Pointer to card_detail_type_bg_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_attribute_icon_tiles_080cb98c:
+    .word  card_attribute_icon_tiles      @ 080cb98c 8cde8409  Pointer to card_attribute_icon_tiles; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_b_g_p_a_l_r_a_m_s_l_o_t15_b_a_s_e_080cb990:
+    .word  BG_PALRAM_SLOT15_BASE                     @ 080cb990 e0010005  Pointer to BG_PALRAM_SLOT15_BASE; operand-0 DATA reference added.
+render_selected_card_bg_panel_ptr_card_attribute_icon_palettes_080cb994:
+    .word  card_attribute_icon_palettes   @ 080cb994 0ce38409  Pointer to card_attribute_icon_palettes; operand-0 DATA reference added.
 
-@ 决斗场 hover-zone info 渲染派发器. 入参 (r0=player_flag 0=P1/1=P2, r1=mode 0..0x7f, r2=sub_idx). 主表 (table @ 0x080cb9cc) 12 entries 实际4 个 case body: mode 0..4 调 FUN_0803b618/5c0/4b0 helper 链; mode 5..a 读 0x0201c510 决斗场卡 struct (P1/P2 stride 0x868); mode b 用 0x0201c600 + 0x02023130+0x50 复杂 lookup. 二级 if/else: mode c=Fusion Deck:, d=Deck:, e=Graveyard:, f=Removed Cards: (各 P1/P2 一份, logical_id 0x3ea..0x3f1) 调 game_str_id_to_row 取标签 + 数值. default(>=0x10) 经 LAB_080cbcfc 公共数字位拆分. 公共渲染路径调 text_render_wrapper x2 + commit_line_buffer_to_sprite_vram(0x0600a8e0) 或 FUN_080cb1cc + FUN_080c8d30. 字体按 gSettings 语言切. 无返回值, 纯写 OBJ VRAM 0x0600a8e0 (右对齐 240px).
+@ Render duel-field hover information. r0=player,r1=zone type,r2=subindex. Types0..4 use the chain-aware slot helpers;5..10 read20-byte field slots;11 uses the hand reference and visibility lookup. Types12..15 draw localized Fusion Deck,Deck,Graveyard or Removed Cards labels and counts. Pack player,zone,subindex and flags for render_selected_card_bg_panel; type12 clears the detail cache instead. Render labels/counts into card_detail_name_bg_tiles. The card path refreshes equip-target eligibility.
 render_duel_field_zone_info:
     push {r4,r5,r6,r7,lr}                    @ 080cb998 f0b5
     .hword 0x4657    @ 080cb99a 5746
@@ -21943,9 +21943,9 @@ render_duel_field_zone_info:
     .hword 0x4645    @ 080cb99e 4546
     push {r5,r6,r7}                          @ 080cb9a0 e0b4
     sub sp,#0x10                             @ 080cb9a2 84b0
-    adds r6,r0,#0x0    @ 080cb9a4 061c  -- r6 = arg0 = player_flag (0=P1, 1=P2; bit0 控制 0x868 stride)
-    adds r7,r1,#0x0    @ 080cb9a6 0f1c  -- r7 = arg1 = mode (0..0x7f+)
-    adds r5,r2,#0x0    @ 080cb9a8 151c  -- r5 = arg2 = sub_idx
+    adds r6,r0,#0x0    @ 080cb9a4 061c  -- Save player; array addressing uses its low bit and PLAYER_BLOCK_STRIDE.
+    adds r7,r1,#0x0    @ 080cb9a6 0f1c  -- Save the zone type; types0..11 use the primary switch.
+    adds r5,r2,#0x0    @ 080cb9a8 151c  -- Save the subindex for the selected zone.
     movs r0,#0x0    @ 080cb9aa 0020
     str r0,[sp,#0x4]                         @ 080cb9ac 0190
     .hword 0x4681    @ 080cb9ae 8146
@@ -21953,19 +21953,19 @@ render_duel_field_zone_info:
     str r1,[sp,#0x8]                         @ 080cb9b2 0291
     str r0,[sp,#0x0]                         @ 080cb9b4 0090
     .hword 0x468a    @ 080cb9b6 8a46
-    cmp r7,#0xb                              @ 080cb9b8 0b2f  -- mode > 0xb -> secondary if/else (LAB_080cbb48)
+    cmp r7,#0xb                              @ 080cb9b8 0b2f  -- Types above11 enter the localized container-label paths.
     bls LAB_080cb9be                         @ 080cb9ba 00d9
 switchD_080cb9c6__default:
     b LAB_080cbb48                           @ 080cb9bc c4e0
 LAB_080cb9be:
     lsls r0,r7,#0x2    @ 080cb9be b800
-    ldr r1, DAT_080cb9c8                     @ 080cb9c0 0149
+    ldr r1, render_duel_field_zone_info_ptr_switch_d_080cb9c6_switchdata_d_080cb9cc_080cb9c8 @ 080cb9c0 0149
     adds r0,r0,r1    @ 080cb9c2 4018
-    ldr r0,[r0,#0x0]                         @ 080cb9c4 0068  -- switch dispatch: jump_table @ 0x080cb9cc (12 entries, 4 distinct bodies)
+    ldr r0,[r0,#0x0]                         @ 080cb9c4 0068  -- Read the12-entry even-address switch table with four distinct bodies.
 switchD_080cb9c6__switchD:
     .hword 0x4687    @ 080cb9c6 8746
-DAT_080cb9c8:
-    .word  0x080cb9cc                     @ 080cb9c8 ccb90c08
+render_duel_field_zone_info_ptr_switch_d_080cb9c6_switchdata_d_080cb9cc_080cb9c8:
+    .word  switchD_080cb9c6__switchdataD_080cb9cc                     @ 080cb9c8 ccb90c08  Pointer to switchD_080cb9c6__switchdataD_080cb9cc; operand-0 DATA reference added.
 switchD_080cb9c6__switchdataD_080cb9cc:
     .word  0x080cb9fc                     @ 080cb9cc fcb90c08
     .word  0x080cb9fc                     @ 080cb9d0 fcb90c08
@@ -21980,10 +21980,10 @@ switchD_080cb9c6__switchdataD_080cb9cc:
     .word  0x080cbab4                     @ 080cb9f4 b4ba0c08
     .word  0x080cbae8                     @ 080cb9f8 e8ba0c08
 switchD_080cb9c6__caseD_0:
-    adds r2,r7,r5    @ 080cb9fc 7a19  -- case 0..4: 调 helper 链 (FUN_0803b618/5c0/4b0) + gPageState[+0x220] bit field
+    adds r2,r7,r5    @ 080cb9fc 7a19  -- Types0..4: resolve zone+subindex through chain-aware attribute and card-reference helpers.
     .hword 0x4690    @ 080cb9fe 9046
-    ldr r0, DAT_080cba88                     @ 080cba00 2148
-    ldr r3, DAT_080cba8c                     @ 080cba02 224b
+    ldr r0, render_duel_field_zone_info_ptr_g_duel_field_state_080cba88 @ 080cba00 2148
+    ldr r3, render_duel_field_zone_info_ptr_g_duel_field_chain_render_bits_packed_lo_080cba8c @ 080cba02 224b
     ldrh r3,[r3,#0x0]                        @ 080cba04 1b88
     lsrs r1,r3,#0x2    @ 080cba06 9908
     movs r2,#0x88    @ 080cba08 8822
@@ -22010,7 +22010,7 @@ LAB_080cba2e:
     .hword 0x4641    @ 080cba30 4146
     bl get_zone_card_attribute_by_type       @ 080cba32 6ff7f1fd
     .hword 0x4681    @ 080cba36 8146
-    ldr r2, DAT_080cba8c                     @ 080cba38 144a
+    ldr r2, render_duel_field_zone_info_ptr_g_duel_field_chain_render_bits_packed_lo_080cba8c @ 080cba38 144a
     ldrh r2,[r2,#0x0]                        @ 080cba3a 1288
     lsrs r1,r2,#0x2    @ 080cba3c 9108
     movs r0,#0x3    @ 080cba3e 0320
@@ -22029,7 +22029,7 @@ LAB_080cba54:
     .hword 0x4641    @ 080cba56 4146
     bl get_zone_slot_field6_by_type          @ 080cba58 6ff7b2fd
     str r0,[sp,#0x8]                         @ 080cba5c 0290
-    ldr r0, DAT_080cba8c                     @ 080cba5e 0b48
+    ldr r0, render_duel_field_zone_info_ptr_g_duel_field_chain_render_bits_packed_lo_080cba8c @ 080cba5e 0b48
     ldrh r0,[r0,#0x0]                        @ 080cba60 0088
     lsrs r1,r0,#0x2    @ 080cba62 8108
     movs r0,#0x3    @ 080cba64 0320
@@ -22050,40 +22050,40 @@ LAB_080cba7a:
     adds r4,r0,#0x0    @ 080cba82 041c
     b LAB_080cbebc                           @ 080cba84 1ae2
     .zero  0x2
-DAT_080cba88:
-    .word  0x02023130                     @ 080cba88 30310202
-DAT_080cba8c:
-    .word  0x0202334e                     @ 080cba8c 4e330202
+render_duel_field_zone_info_ptr_g_duel_field_state_080cba88:
+    .word  gDuelFieldState                @ 080cba88 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_duel_field_zone_info_ptr_g_duel_field_chain_render_bits_packed_lo_080cba8c:
+    .word  gDuelFieldChainRenderBitsPackedLo @ 080cba8c 4e330202  Pointer to gDuelFieldChainRenderBitsPackedLo; operand-0 DATA reference added.
 switchD_080cb9c6__caseD_5:
-    movs r2,#0x1    @ 080cba90 0122  -- case 5..9: 读 0x0201c510 + (player&1)*0x868 决斗场卡 struct
+    movs r2,#0x1    @ 080cba90 0122  -- Types5..9: read gDuelFieldSlots+(player&1)*0x868+(zone+subindex)*20.
     ands r2,r6    @ 080cba92 3240
     adds r1,r7,r5    @ 080cba94 7919
     lsls r0,r1,#0x2    @ 080cba96 8800
     adds r0,r0,r1    @ 080cba98 4018
     lsls r0,r0,#0x2    @ 080cba9a 8000
-    ldr r1, DAT_080cbaac                     @ 080cba9c 0349
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbaac @ 080cba9c 0349
     muls r1,r2    @ 080cba9e 5143
     adds r0,r0,r1    @ 080cbaa0 4018
-    ldr r1, DAT_080cbab0                     @ 080cbaa2 0349
+    ldr r1, render_duel_field_zone_info_ptr_g_duel_field_slots_080cbab0 @ 080cbaa2 0349
     adds r0,r0,r1    @ 080cbaa4 4018
     ldrh r3,[r0,#0x8]                        @ 080cbaa6 0389
     .hword 0x4699    @ 080cbaa8 9946
     b LAB_080cbace                           @ 080cbaaa 10e0
-DAT_080cbaac:
-    .word  0x00000868                     @ 080cbaac 68080000
-DAT_080cbab0:
-    .word  0x0201c510                     @ 080cbab0 10c50102
+render_duel_field_zone_info_player_block_stride_080cbaac:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbaac 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_duel_field_zone_info_ptr_g_duel_field_slots_080cbab0:
+    .word  gDuelFieldSlots                @ 080cbab0 10c50102  Pointer to gDuelFieldSlots; operand-0 DATA reference added.
 switchD_080cb9c6__caseD_a:
-    movs r2,#0x1    @ 080cbab4 0122  -- case 0xa: 类似 5..9 但不同 offset
+    movs r2,#0x1    @ 080cbab4 0122  -- Type10 uses the same20-byte field-slot addressing formula.
     ands r2,r6    @ 080cbab6 3240
     adds r1,r7,r5    @ 080cbab8 7919
     lsls r0,r1,#0x2    @ 080cbaba 8800
     adds r0,r0,r1    @ 080cbabc 4018
     lsls r0,r0,#0x2    @ 080cbabe 8000
-    ldr r1, DAT_080cbae0                     @ 080cbac0 0749
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbae0 @ 080cbac0 0749
     muls r1,r2    @ 080cbac2 5143
     adds r0,r0,r1    @ 080cbac4 4018
-    ldr r1, DAT_080cbae4                     @ 080cbac6 0749
+    ldr r1, render_duel_field_zone_info_ptr_g_duel_field_slots_080cbae4 @ 080cbac6 0749
     adds r0,r0,r1    @ 080cbac8 4018
     ldrh r1,[r0,#0x8]                        @ 080cbaca 0189
     .hword 0x4689    @ 080cbacc 8946
@@ -22097,18 +22097,18 @@ LAB_080cbace:
     adds r4,r0,r1    @ 080cbada 4418
     b LAB_080cbebc                           @ 080cbadc eee1
     .zero  0x2
-DAT_080cbae0:
-    .word  0x00000868                     @ 080cbae0 68080000
-DAT_080cbae4:
-    .word  0x0201c510                     @ 080cbae4 10c50102
+render_duel_field_zone_info_player_block_stride_080cbae0:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbae0 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_duel_field_zone_info_ptr_g_duel_field_slots_080cbae4:
+    .word  gDuelFieldSlots                @ 080cbae4 10c50102  Pointer to gDuelFieldSlots; operand-0 DATA reference added.
 switchD_080cb9c6__caseD_b:
-    movs r0,#0x1    @ 080cbae8 0120  -- case 0xb: 用 0x0201c600 + gPageState[+0x50] lookup, 比对 gActiveCardId
+    movs r0,#0x1    @ 080cbae8 0120  -- Type11 reads gP1FieldArrayCBase plus player stride and subindex*4, then checks visibility.
     ands r0,r6    @ 080cbaea 3040
     lsls r1,r5,#0x2    @ 080cbaec a900
-    ldr r2, DAT_080cbb38                     @ 080cbaee 124a
+    ldr r2, render_duel_field_zone_info_player_block_stride_080cbb38 @ 080cbaee 124a
     muls r0,r2    @ 080cbaf0 5043
     adds r1,r1,r0    @ 080cbaf2 0918
-    ldr r0, DAT_080cbb3c                     @ 080cbaf4 1148
+    ldr r0, render_duel_field_zone_info_ptr_g_p1_field_array_c_base_080cbb3c @ 080cbaf4 1148
     adds r1,r1,r0    @ 080cbaf6 0918
     ldr r1,[r1,#0x0]                         @ 080cbaf8 0968
     lsls r0,r1,#0x2    @ 080cbafa 8800
@@ -22117,7 +22117,7 @@ switchD_080cb9c6__caseD_b:
     lsls r1,r1,#0x12    @ 080cbb00 8904
     lsrs r1,r1,#0x1f    @ 080cbb02 c90f
     adds r4,r0,r1    @ 080cbb04 4418
-    ldr r0, DAT_080cbb40                     @ 080cbb06 0e48
+    ldr r0, render_duel_field_zone_info_ptr_g_duel_card_ctx_base_080cbb40 @ 080cbb06 0e48
     ldr r0,[r0,#0x4]                         @ 080cbb08 4068
     cmp r6,r0                                @ 080cbb0a 8642
     beq LAB_080cbb30                         @ 080cbb0c 10d0
@@ -22125,7 +22125,7 @@ switchD_080cb9c6__caseD_b:
     bl get_player_deck_flag_bit1             @ 080cbb10 6cf73ef8
     cmp r0,#0x0                              @ 080cbb14 0028
     bne LAB_080cbb30                         @ 080cbb16 0bd1
-    ldr r2, DAT_080cbb44                     @ 080cbb18 0a4a
+    ldr r2, render_duel_field_zone_info_ptr_g_duel_field_state_080cbb44 @ 080cbb18 0a4a
     lsls r1,r5,#0x1    @ 080cbb1a 6900
     lsls r0,r6,#0x2    @ 080cbb1c b000
     adds r0,r0,r6    @ 080cbb1e 8019
@@ -22142,16 +22142,16 @@ LAB_080cbb30:
     .hword 0x4691    @ 080cbb32 9146
     b LAB_080cbebc                           @ 080cbb34 c2e1
     .zero  0x2
-DAT_080cbb38:
-    .word  0x00000868                     @ 080cbb38 68080000
-DAT_080cbb3c:
-    .word  0x0201c600                     @ 080cbb3c 00c60102
-DAT_080cbb40:
-    .word  0x0201e2a0                     @ 080cbb40 a0e20102
-DAT_080cbb44:
-    .word  0x02023130                     @ 080cbb44 30310202
+render_duel_field_zone_info_player_block_stride_080cbb38:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbb38 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_duel_field_zone_info_ptr_g_p1_field_array_c_base_080cbb3c:
+    .word  gP1FieldArrayCBase             @ 080cbb3c 00c60102  Pointer to gP1FieldArrayCBase; operand-0 DATA reference added.
+render_duel_field_zone_info_ptr_g_duel_card_ctx_base_080cbb40:
+    .word  gDuelCardCtxBase               @ 080cbb40 a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_duel_field_zone_info_ptr_g_duel_field_state_080cbb44:
+    .word  gDuelFieldState                @ 080cbb44 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
 LAB_080cbb48:
-    cmp r7,#0xd                              @ 080cbb48 0d2f  -- secondary dispatch: mode 0xc/d/e/f / default
+    cmp r7,#0xd                              @ 080cbb48 0d2f  -- Dispatch container types12,13,14,15; other values reach the common label path.
     beq LAB_080cbb62                         @ 080cbb4a 0ad0
     cmp r7,#0xd                              @ 080cbb4c 0d2f
     bgt LAB_080cbb58                         @ 080cbb4e 03dc
@@ -22167,18 +22167,18 @@ LAB_080cbb58:
     beq LAB_080cbc38                         @ 080cbb5e 6bd0
     b LAB_080cbcfc                           @ 080cbb60 cce0
 LAB_080cbb62:
-    movs r3,#0xfb    @ 080cbb62 fb23  -- case 0xd: game_str_id_to_row(0x3ec + player) -> 'Deck:' (P1/P2)
+    movs r3,#0xfb    @ 080cbb62 fb23  -- Type13 uses logical text0x3ec+player for Deck and the count at player block+0x10.
     lsls r3,r3,#0x2    @ 080cbb64 9b00
     adds r0,r6,r3    @ 080cbb66 f018
     bl game_str_id_to_row                    @ 080cbb68 29f056f9
-    ldr r2, PTR_game_str_pointer_table_080cbbb4 @ 080cbb6c 114a
+    ldr r2, render_duel_field_zone_info_ptr_game_str_pointer_table_080cbbb4 @ 080cbb6c 114a
     lsls r0,r0,#0x10    @ 080cbb6e 0004
     lsrs r0,r0,#0x10    @ 080cbb70 000c
     lsls r1,r0,#0x1    @ 080cbb72 4100
     adds r1,r1,r0    @ 080cbb74 0918
     lsls r1,r1,#0x1    @ 080cbb76 4900
-    ldr r0, DAT_080cbbb8                     @ 080cbb78 0f48
-    ldr r3, DAT_080cbbbc                     @ 080cbb7a 104b
+    ldr r0, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbbb8 @ 080cbb78 0f48
+    ldr r3, render_duel_field_zone_info_gsettings_offset_080cbbbc @ 080cbb7a 104b
     adds r0,r0,r3    @ 080cbb7c c018
     ldrb r0,[r0,#0x0]                        @ 080cbb7e 0078
     lsls r0,r0,#0x1d    @ 080cbb80 4007
@@ -22187,13 +22187,13 @@ LAB_080cbb62:
     lsls r1,r1,#0x2    @ 080cbb86 8900
     adds r1,r1,r2    @ 080cbb88 8918
     ldr r1,[r1,#0x0]                         @ 080cbb8a 0968
-    ldr r0, PTR_game_str_ja_080cbbc0         @ 080cbb8c 0c48
+    ldr r0, render_duel_field_zone_info_ptr_game_str_ja_080cbbc0 @ 080cbb8c 0c48
     adds r1,r1,r0    @ 080cbb8e 0918
     str r1,[sp,#0xc]                         @ 080cbb90 0391
-    ldr r2, PTR_gP1LifePoints_080cbbc4       @ 080cbb92 0c4a
+    ldr r2, render_duel_field_zone_info_ptr_g_p1_life_points_080cbbc4 @ 080cbb92 0c4a
     movs r0,#0x1    @ 080cbb94 0120
     ands r0,r6    @ 080cbb96 3040
-    ldr r1, DAT_080cbbc8                     @ 080cbb98 0b49
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbbc8 @ 080cbb98 0b49
     muls r1,r0    @ 080cbb9a 4143
     adds r0,r2,#0x0    @ 080cbb9c 101c
     adds r0,#0x10    @ 080cbb9e 1030
@@ -22207,30 +22207,30 @@ LAB_080cbb62:
     adds r1,r1,r0    @ 080cbbae 0918
     ldr r1,[r1,#0x0]                         @ 080cbbb0 0968
     b LAB_080cbc8e                           @ 080cbbb2 6ce0
-PTR_game_str_pointer_table_080cbbb4:
-    .word  game_str_pointer_table         @ 080cbbb4 400f0008
-DAT_080cbbb8:
-    .word  0x02000000                     @ 080cbbb8 00000002
-DAT_080cbbbc:
-    .word  0x00006c2c                     @ 080cbbbc 2c6c0000
-PTR_game_str_ja_080cbbc0:
-    .word  game_str_ja                    @ 080cbbc0 109cdb09
-PTR_gP1LifePoints_080cbbc4:
-    .word  gP1LifePoints                  @ 080cbbc4 e0c40102
-DAT_080cbbc8:
-    .word  0x00000868                     @ 080cbbc8 68080000
+render_duel_field_zone_info_ptr_game_str_pointer_table_080cbbb4:
+    .word  game_str_pointer_table         @ 080cbbb4 400f0008  Pointer to game_str_pointer_table; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbbb8:
+    .word  EWRAM_BASE                     @ 080cbbb8 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbbbc:
+    .word  GSETTINGS_OFFSET               @ 080cbbbc 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_duel_field_zone_info_ptr_game_str_ja_080cbbc0:
+    .word  game_str_ja                    @ 080cbbc0 109cdb09  Pointer to game_str_ja; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_g_p1_life_points_080cbbc4:
+    .word  gP1LifePoints                  @ 080cbbc4 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_duel_field_zone_info_player_block_stride_080cbbc8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbbc8 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
 LAB_080cbbcc:
-    ldr r1, DAT_080cbc1c                     @ 080cbbcc 1349  -- case 0xe: game_str_id_to_row(0x3ee + player) -> 'Graveyard:' (P1/P2)
+    ldr r1, render_duel_field_zone_info_game_str_graveyard_player0_id_080cbc1c @ 080cbbcc 1349  -- Type14 uses logical text0x3ee+player for Graveyard and the count at player block+0x14.
     adds r0,r6,r1    @ 080cbbce 7018
     bl game_str_id_to_row                    @ 080cbbd0 29f022f9
-    ldr r2, PTR_game_str_pointer_table_080cbc20 @ 080cbbd4 124a
+    ldr r2, render_duel_field_zone_info_ptr_game_str_pointer_table_080cbc20 @ 080cbbd4 124a
     lsls r0,r0,#0x10    @ 080cbbd6 0004
     lsrs r0,r0,#0x10    @ 080cbbd8 000c
     lsls r1,r0,#0x1    @ 080cbbda 4100
     adds r1,r1,r0    @ 080cbbdc 0918
     lsls r1,r1,#0x1    @ 080cbbde 4900
-    ldr r0, DAT_080cbc24                     @ 080cbbe0 1048
-    ldr r3, DAT_080cbc28                     @ 080cbbe2 114b
+    ldr r0, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbc24 @ 080cbbe0 1048
+    ldr r3, render_duel_field_zone_info_gsettings_offset_080cbc28 @ 080cbbe2 114b
     adds r0,r0,r3    @ 080cbbe4 c018
     ldrb r0,[r0,#0x0]                        @ 080cbbe6 0078
     lsls r0,r0,#0x1d    @ 080cbbe8 4007
@@ -22239,13 +22239,13 @@ LAB_080cbbcc:
     lsls r1,r1,#0x2    @ 080cbbee 8900
     adds r1,r1,r2    @ 080cbbf0 8918
     ldr r1,[r1,#0x0]                         @ 080cbbf2 0968
-    ldr r0, PTR_game_str_ja_080cbc2c         @ 080cbbf4 0d48
+    ldr r0, render_duel_field_zone_info_ptr_game_str_ja_080cbc2c @ 080cbbf4 0d48
     adds r1,r1,r0    @ 080cbbf6 0918
     str r1,[sp,#0xc]                         @ 080cbbf8 0391
-    ldr r2, PTR_gP1LifePoints_080cbc30       @ 080cbbfa 0d4a
+    ldr r2, render_duel_field_zone_info_ptr_g_p1_life_points_080cbc30 @ 080cbbfa 0d4a
     movs r0,#0x1    @ 080cbbfc 0120
     ands r0,r6    @ 080cbbfe 3040
-    ldr r1, DAT_080cbc34                     @ 080cbc00 0c49
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbc34 @ 080cbc00 0c49
     muls r1,r0    @ 080cbc02 4143
     adds r0,r2,#0x0    @ 080cbc04 101c
     adds r0,#0x14    @ 080cbc06 1430
@@ -22259,33 +22259,33 @@ LAB_080cbbcc:
     movs r1,#0x83    @ 080cbc16 8321
     lsls r1,r1,#0x3    @ 080cbc18 c900
     b LAB_080cbc88                           @ 080cbc1a 35e0
-DAT_080cbc1c:
-    .word  0x000003ee                     @ 080cbc1c ee030000
-PTR_game_str_pointer_table_080cbc20:
-    .word  game_str_pointer_table         @ 080cbc20 400f0008
-DAT_080cbc24:
-    .word  0x02000000                     @ 080cbc24 00000002
-DAT_080cbc28:
-    .word  0x00006c2c                     @ 080cbc28 2c6c0000
-PTR_game_str_ja_080cbc2c:
-    .word  game_str_ja                    @ 080cbc2c 109cdb09
-PTR_gP1LifePoints_080cbc30:
-    .word  gP1LifePoints                  @ 080cbc30 e0c40102
-DAT_080cbc34:
-    .word  0x00000868                     @ 080cbc34 68080000
+render_duel_field_zone_info_game_str_graveyard_player0_id_080cbc1c:
+    .word  GAME_STR_GRAVEYARD_PLAYER0_ID  @ 080cbc1c ee030000  GAME_STR_GRAVEYARD_PLAYER0_ID: operand-0 data equate, value0x000003ee.
+render_duel_field_zone_info_ptr_game_str_pointer_table_080cbc20:
+    .word  game_str_pointer_table         @ 080cbc20 400f0008  Pointer to game_str_pointer_table; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbc24:
+    .word  EWRAM_BASE                     @ 080cbc24 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbc28:
+    .word  GSETTINGS_OFFSET               @ 080cbc28 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_duel_field_zone_info_ptr_game_str_ja_080cbc2c:
+    .word  game_str_ja                    @ 080cbc2c 109cdb09  Pointer to game_str_ja; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_g_p1_life_points_080cbc30:
+    .word  gP1LifePoints                  @ 080cbc30 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_duel_field_zone_info_player_block_stride_080cbc34:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbc34 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
 LAB_080cbc38:
-    movs r2,#0xfc    @ 080cbc38 fc22  -- case 0xf: game_str_id_to_row(0x3f0 + player) -> 'Removed Cards:' (P1/P2)
+    movs r2,#0xfc    @ 080cbc38 fc22  -- Type15 uses logical text0x3f0+player for Removed Cards and the count at player block+0x1c.
     lsls r2,r2,#0x2    @ 080cbc3a 9200
     adds r0,r6,r2    @ 080cbc3c b018
     bl game_str_id_to_row                    @ 080cbc3e 29f0ebf8
-    ldr r2, PTR_game_str_pointer_table_080cbca4 @ 080cbc42 184a
+    ldr r2, render_duel_field_zone_info_ptr_game_str_pointer_table_080cbca4 @ 080cbc42 184a
     lsls r0,r0,#0x10    @ 080cbc44 0004
     lsrs r0,r0,#0x10    @ 080cbc46 000c
     lsls r1,r0,#0x1    @ 080cbc48 4100
     adds r1,r1,r0    @ 080cbc4a 0918
     lsls r1,r1,#0x1    @ 080cbc4c 4900
-    ldr r0, DAT_080cbca8                     @ 080cbc4e 1648
-    ldr r3, DAT_080cbcac                     @ 080cbc50 164b
+    ldr r0, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbca8 @ 080cbc4e 1648
+    ldr r3, render_duel_field_zone_info_gsettings_offset_080cbcac @ 080cbc50 164b
     adds r0,r0,r3    @ 080cbc52 c018
     ldrb r0,[r0,#0x0]                        @ 080cbc54 0078
     lsls r0,r0,#0x1d    @ 080cbc56 4007
@@ -22294,13 +22294,13 @@ LAB_080cbc38:
     lsls r1,r1,#0x2    @ 080cbc5c 8900
     adds r1,r1,r2    @ 080cbc5e 8918
     ldr r1,[r1,#0x0]                         @ 080cbc60 0968
-    ldr r0, PTR_game_str_ja_080cbcb0         @ 080cbc62 1348
+    ldr r0, render_duel_field_zone_info_ptr_game_str_ja_080cbcb0 @ 080cbc62 1348
     adds r1,r1,r0    @ 080cbc64 0918
     str r1,[sp,#0xc]                         @ 080cbc66 0391
-    ldr r2, PTR_gP1LifePoints_080cbcb4       @ 080cbc68 124a
+    ldr r2, render_duel_field_zone_info_ptr_g_p1_life_points_080cbcb4 @ 080cbc68 124a
     movs r0,#0x1    @ 080cbc6a 0120
     ands r0,r6    @ 080cbc6c 3040
-    ldr r1, DAT_080cbcb8                     @ 080cbc6e 1249
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbcb8 @ 080cbc6e 1249
     muls r1,r0    @ 080cbc70 4143
     adds r0,r2,#0x0    @ 080cbc72 101c
     adds r0,#0x1c    @ 080cbc74 1c30
@@ -22328,30 +22328,30 @@ LAB_080cbc8e:
     str r0,[sp,#0x4]                         @ 080cbc9e 0190
     b LAB_080cbcfc                           @ 080cbca0 2ce0
     .zero  0x2
-PTR_game_str_pointer_table_080cbca4:
-    .word  game_str_pointer_table         @ 080cbca4 400f0008
-DAT_080cbca8:
-    .word  0x02000000                     @ 080cbca8 00000002
-DAT_080cbcac:
-    .word  0x00006c2c                     @ 080cbcac 2c6c0000
-PTR_game_str_ja_080cbcb0:
-    .word  game_str_ja                    @ 080cbcb0 109cdb09
-PTR_gP1LifePoints_080cbcb4:
-    .word  gP1LifePoints                  @ 080cbcb4 e0c40102
-DAT_080cbcb8:
-    .word  0x00000868                     @ 080cbcb8 68080000
+render_duel_field_zone_info_ptr_game_str_pointer_table_080cbca4:
+    .word  game_str_pointer_table         @ 080cbca4 400f0008  Pointer to game_str_pointer_table; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbca8:
+    .word  EWRAM_BASE                     @ 080cbca8 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbcac:
+    .word  GSETTINGS_OFFSET               @ 080cbcac 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_duel_field_zone_info_ptr_game_str_ja_080cbcb0:
+    .word  game_str_ja                    @ 080cbcb0 109cdb09  Pointer to game_str_ja; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_g_p1_life_points_080cbcb4:
+    .word  gP1LifePoints                  @ 080cbcb4 e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_duel_field_zone_info_player_block_stride_080cbcb8:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbcb8 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
 LAB_080cbcbc:
-    ldr r2, DAT_080cbd58                     @ 080cbcbc 264a  -- case 0xc: game_str_id_to_row(0x3ea + player) -> 'Fusion Deck:' (P1/P2)
+    ldr r2, render_duel_field_zone_info_game_str_fusion_deck_player0_id_080cbd58 @ 080cbcbc 264a  -- Type12 uses logical text0x3ea+player for Fusion Deck and the count at player block+0x18.
     adds r0,r6,r2    @ 080cbcbe b018
     bl game_str_id_to_row                    @ 080cbcc0 29f0aaf8
-    ldr r2, PTR_game_str_pointer_table_080cbd5c @ 080cbcc4 254a
+    ldr r2, render_duel_field_zone_info_ptr_game_str_pointer_table_080cbd5c @ 080cbcc4 254a
     lsls r0,r0,#0x10    @ 080cbcc6 0004
     lsrs r0,r0,#0x10    @ 080cbcc8 000c
     lsls r1,r0,#0x1    @ 080cbcca 4100
     adds r1,r1,r0    @ 080cbccc 0918
     lsls r1,r1,#0x1    @ 080cbcce 4900
-    ldr r0, DAT_080cbd60                     @ 080cbcd0 2348
-    ldr r3, DAT_080cbd64                     @ 080cbcd2 244b
+    ldr r0, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbd60 @ 080cbcd0 2348
+    ldr r3, render_duel_field_zone_info_gsettings_offset_080cbd64 @ 080cbcd2 244b
     adds r0,r0,r3    @ 080cbcd4 c018
     ldrb r0,[r0,#0x0]                        @ 080cbcd6 0078
     lsls r0,r0,#0x1d    @ 080cbcd8 4007
@@ -22360,23 +22360,23 @@ LAB_080cbcbc:
     lsls r1,r1,#0x2    @ 080cbcde 8900
     adds r1,r1,r2    @ 080cbce0 8918
     ldr r1,[r1,#0x0]                         @ 080cbce2 0968
-    ldr r0, PTR_game_str_ja_080cbd68         @ 080cbce4 2048
+    ldr r0, render_duel_field_zone_info_ptr_game_str_ja_080cbd68 @ 080cbce4 2048
     adds r1,r1,r0    @ 080cbce6 0918
     str r1,[sp,#0xc]                         @ 080cbce8 0391
-    ldr r2, PTR_gP1LifePoints_080cbd6c       @ 080cbcea 204a
+    ldr r2, render_duel_field_zone_info_ptr_g_p1_life_points_080cbd6c @ 080cbcea 204a
     movs r0,#0x1    @ 080cbcec 0120
     ands r0,r6    @ 080cbcee 3040
-    ldr r1, DAT_080cbd70                     @ 080cbcf0 1f49
+    ldr r1, render_duel_field_zone_info_player_block_stride_080cbd70 @ 080cbcf0 1f49
     muls r0,r1    @ 080cbcf2 4843
     adds r2,#0x18    @ 080cbcf4 1832
     adds r0,r0,r2    @ 080cbcf6 8018
     ldr r0,[r0,#0x0]                         @ 080cbcf8 0068
     .hword 0x4682    @ 080cbcfa 8246
 LAB_080cbcfc:
-    adds r0,r6,#0x0    @ 080cbcfc 301c  -- LAB_080cbcfc: default (>=0x10) 公共路径 / case c..f 文本渲染入口
+    adds r0,r6,#0x0    @ 080cbcfc 301c  -- Common container-label path: resolve the attribute and pack a selection descriptor.
     adds r1,r7,#0x0    @ 080cbcfe 391c
     adds r2,r5,#0x0    @ 080cbd00 2a1c
-    bl get_zone_card_attribute_by_type       @ 080cbd02 6ff789fc  -- FUN_0803b618(player, mode, sub_idx): 通用属性提取
+    bl get_zone_card_attribute_by_type       @ 080cbd02 6ff789fc  -- get_zone_card_attribute_by_type(player,zone,subindex).
     .hword 0x4681    @ 080cbd06 8146
     movs r2,#0x1    @ 080cbd08 0122
     adds r1,r6,#0x0    @ 080cbd0a 311c
@@ -22398,7 +22398,7 @@ LAB_080cbcfc:
     .hword 0x4688    @ 080cbd2a 8846
     .hword 0x4650    @ 080cbd2c 5046
 LAB_080cbd2e:
-    movs r1,#0xa    @ 080cbd2e 0a21  -- 数字位数计算: r0 /= 10 循环, r8 = digit_count
+    movs r1,#0xa    @ 080cbd2e 0a21  -- Count at least one decimal digit by repeated signed division by10.
     bl __divsi3                              @ 080cbd30 42f068fc
     movs r2,#0x1    @ 080cbd34 0122
     add r8,r2                                @ 080cbd36 9044
@@ -22409,43 +22409,43 @@ LAB_080cbd2e:
     ldr r0,[sp,#0x4]                         @ 080cbd40 0198
     .hword 0x4669    @ 080cbd42 6946
     movs r2,#0x0    @ 080cbd44 0022
-    bl render_large_card_display_by_mode     @ 080cbd46 fff741fa
-    ldr r0, DAT_080cbd74                     @ 080cbd4a 0a48
+    bl render_selected_card_bg_panel         @ 080cbd46 fff741fa  -- render_selected_card_bg_panel(cached card-stats index,stack descriptor,0).
+    ldr r0, render_duel_field_zone_info_ptr_card_detail_name_bg_tiles_080cbd74 @ 080cbd4a 0a48
     movs r1,#0x80    @ 080cbd4c 8021
     lsls r1,r1,#0x4    @ 080cbd4e 0901
     bl zero_fill_by_halfword                 @ 080cbd50 29f090f8
     b LAB_080cbd82                           @ 080cbd54 15e0
     .zero  0x2
-DAT_080cbd58:
-    .word  0x000003ea                     @ 080cbd58 ea030000
-PTR_game_str_pointer_table_080cbd5c:
-    .word  game_str_pointer_table         @ 080cbd5c 400f0008
-DAT_080cbd60:
-    .word  0x02000000                     @ 080cbd60 00000002
-DAT_080cbd64:
-    .word  0x00006c2c                     @ 080cbd64 2c6c0000
-PTR_game_str_ja_080cbd68:
-    .word  game_str_ja                    @ 080cbd68 109cdb09
-PTR_gP1LifePoints_080cbd6c:
-    .word  gP1LifePoints                  @ 080cbd6c e0c40102
-DAT_080cbd70:
-    .word  0x00000868                     @ 080cbd70 68080000
-DAT_080cbd74:
-    .word  0x0600a8e0                     @ 080cbd74 e0a80006
+render_duel_field_zone_info_game_str_fusion_deck_player0_id_080cbd58:
+    .word  GAME_STR_FUSION_DECK_PLAYER0_ID @ 080cbd58 ea030000  GAME_STR_FUSION_DECK_PLAYER0_ID: operand-0 data equate, value0x000003ea.
+render_duel_field_zone_info_ptr_game_str_pointer_table_080cbd5c:
+    .word  game_str_pointer_table         @ 080cbd5c 400f0008  Pointer to game_str_pointer_table; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbd60:
+    .word  EWRAM_BASE                     @ 080cbd60 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbd64:
+    .word  GSETTINGS_OFFSET               @ 080cbd64 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_duel_field_zone_info_ptr_game_str_ja_080cbd68:
+    .word  game_str_ja                    @ 080cbd68 109cdb09  Pointer to game_str_ja; operand-0 DATA reference preserved.
+render_duel_field_zone_info_ptr_g_p1_life_points_080cbd6c:
+    .word  gP1LifePoints                  @ 080cbd6c e0c40102  Pointer to gP1LifePoints; operand-0 DATA reference preserved.
+render_duel_field_zone_info_player_block_stride_080cbd70:
+    .word  PLAYER_BLOCK_STRIDE            @ 080cbd70 68080000  PLAYER_BLOCK_STRIDE: operand-0 data equate, value0x00000868.
+render_duel_field_zone_info_ptr_card_detail_name_bg_tiles_080cbd74:
+    .word  card_detail_name_bg_tiles                     @ 080cbd74 e0a80006  Pointer to card_detail_name_bg_tiles; operand-0 DATA reference added.
 LAB_080cbd78:
-    ldr r1, DAT_080cbdec                     @ 080cbd78 1c49
-    ldr r0, DAT_080cbdf0                     @ 080cbd7a 1d48
+    ldr r1, render_duel_field_zone_info_ptr_g_duel_field_state_080cbdec @ 080cbd78 1c49
+    ldr r0, render_duel_field_zone_info_duel_field_detail_cache_invalid_080cbdf0 @ 080cbd7a 1d48
     strh r0,[r1,#0x8]                        @ 080cbd7c 0881
     bl zero_card_display_vram_regions        @ 080cbd7e fef7b3ff
 LAB_080cbd82:
-    movs r0,#0x20    @ 080cbd82 2020  -- LAB_080cbd82: 准备字体 + measure_string_pixel_width + 渲染
+    movs r0,#0x20    @ 080cbd82 2020  -- Prepare the localized container label and right-aligned count.
     movs r1,#0x2    @ 080cbd84 0221
     movs r2,#0x1    @ 080cbd86 0122
     movs r3,#0x2    @ 080cbd88 0223
-    bl setup_line_buf_with_font_and_align    @ 080cbd8a 24f099ff  -- FUN_080f0cc0(0x20, 2, 1, 2): 准备 sprite/text 渲染上下文
-    ldr r2, DAT_080cbdf4                     @ 080cbd8e 194a
-    ldr r5, DAT_080cbdf8                     @ 080cbd90 194d
-    ldr r3, DAT_080cbdfc                     @ 080cbd92 1a4b
+    bl setup_line_buf_with_font_and_align    @ 080cbd8a 24f099ff  -- Configure the line buffer with arguments(0x20,2,1,2).
+    ldr r2, render_duel_field_zone_info_ptr_g_font_jp_ctx_080cbdf4 @ 080cbd8e 194a
+    ldr r5, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbdf8 @ 080cbd90 194d
+    ldr r3, render_duel_field_zone_info_gsettings_offset_080cbdfc @ 080cbd92 1a4b
     adds r5,r5,r3    @ 080cbd94 ed18
     movs r4,#0x7    @ 080cbd96 0724
     adds r1,r4,#0x0    @ 080cbd98 211c
@@ -22461,7 +22461,7 @@ LAB_080cbd82:
     movs r1,#0x2    @ 080cbdac 0221
     orrs r0,r1    @ 080cbdae 0843
     strb r0,[r2,#0x8]                        @ 080cbdb0 1072
-    ldr r3, PTR_font_jp_base_table_080cbe00  @ 080cbdb2 134b
+    ldr r3, render_duel_field_zone_info_ptr_font_jp_base_table_080cbe00 @ 080cbdb2 134b
     lsls r1,r0,#0x1e    @ 080cbdb4 8107
     lsrs r1,r1,#0x1f    @ 080cbdb6 c90f
     lsls r1,r1,#0x2    @ 080cbdb8 8900
@@ -22469,7 +22469,7 @@ LAB_080cbd82:
     lsrs r0,r0,#0x1f    @ 080cbdbc c00f
     lsls r0,r0,#0x3    @ 080cbdbe c000
     adds r1,r1,r0    @ 080cbdc0 0918
-    adds r1,r1,r3    @ 080cbdc2 c918  -- PTR_font_jp_base_table: 按 gSettings 语言选字体 ptr
+    adds r1,r1,r3    @ 080cbdc2 c918  -- Select a font base using gSettings language low3 bits and gFontJpCtx flags.
     ldr r0,[r1,#0x0]                         @ 080cbdc4 0868
     str r0,[r2,#0x4]                         @ 080cbdc6 5060
     movs r0,#0x40    @ 080cbdc8 4020
@@ -22477,7 +22477,7 @@ LAB_080cbd82:
     orrs r0,r1    @ 080cbdcc 0843
     strb r0,[r2,#0x15]                       @ 080cbdce 5075
     ldr r0,[sp,#0xc]                         @ 080cbdd0 0398
-    bl measure_string_pixel_width            @ 080cbdd2 24f04ffa  -- measure_string_pixel_width(string_addr) -> r7 = pixel width
+    bl measure_string_pixel_width            @ 080cbdd2 24f04ffa  -- Measure the localized label width in pixels.
     adds r7,r0,#0x0    @ 080cbdd6 071c
     ldrb r5,[r5,#0x0]                        @ 080cbdd8 2d78
     ands r4,r5    @ 080cbdda 2c40
@@ -22488,18 +22488,18 @@ LAB_080cbd82:
     muls r2,r0    @ 080cbde6 4243
     adds r0,r2,#0x0    @ 080cbde8 101c
     b LAB_080cbe0e                           @ 080cbdea 10e0
-DAT_080cbdec:
-    .word  0x02023130                     @ 080cbdec 30310202
-DAT_080cbdf0:
-    .word  0x0000ffff                     @ 080cbdf0 ffff0000
-DAT_080cbdf4:
-    .word  0x02006ed0                     @ 080cbdf4 d06e0002
-DAT_080cbdf8:
-    .word  0x02000000                     @ 080cbdf8 00000002
-DAT_080cbdfc:
-    .word  0x00006c2c                     @ 080cbdfc 2c6c0000
-PTR_font_jp_base_table_080cbe00:
-    .word  font_jp_base_table             @ 080cbe00 54f8e509
+render_duel_field_zone_info_ptr_g_duel_field_state_080cbdec:
+    .word  gDuelFieldState                @ 080cbdec 30310202  Pointer to gDuelFieldState; operand-0 DATA reference added.
+render_duel_field_zone_info_duel_field_detail_cache_invalid_080cbdf0:
+    .word  DUEL_FIELD_DETAIL_CACHE_INVALID @ 080cbdf0 ffff0000  DUEL_FIELD_DETAIL_CACHE_INVALID: operand-0 data equate, value0x0000ffff.
+render_duel_field_zone_info_ptr_g_font_jp_ctx_080cbdf4:
+    .word  gFontJpCtx                     @ 080cbdf4 d06e0002  Pointer to gFontJpCtx; operand-0 DATA reference added.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbdf8:
+    .word  EWRAM_BASE                     @ 080cbdf8 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbdfc:
+    .word  GSETTINGS_OFFSET               @ 080cbdfc 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
+render_duel_field_zone_info_ptr_font_jp_base_table_080cbe00:
+    .word  font_jp_base_table             @ 080cbe00 54f8e509  Pointer to font_jp_base_table; operand-0 DATA reference preserved.
 LAB_080cbe04:
     bl char_width_narrow_5                   @ 080cbe04 24f0fcf9
     .hword 0x4643    @ 080cbe08 4346
@@ -22509,14 +22509,14 @@ LAB_080cbe0e:
     adds r0,#0xa    @ 080cbe0e 0a30
     adds r4,r7,r0    @ 080cbe10 3c18
     movs r0,#0xf0    @ 080cbe12 f020
-    subs r4,r0,r4    @ 080cbe14 041b  -- r4 = 0xf0 - text_width  (右对齐到 240px)
-    ldr r5, DAT_080cbe78                     @ 080cbe16 184d
+    subs r4,r0,r4    @ 080cbe14 041b  -- x=240-label_width-count_digit_width-10; reserve space for the count.
+    ldr r5, render_duel_field_zone_info_card_desc_render_param_080cbe78 @ 080cbe16 184d
     adds r0,r4,#0x0    @ 080cbe18 201c
     movs r1,#0x2    @ 080cbe1a 0221
     adds r2,r5,#0x0    @ 080cbe1c 2a1c
     ldr r3,[sp,#0xc]                         @ 080cbe1e 039b
-    bl text_render_wrapper                   @ 080cbe20 26f02cfe  -- text_render_wrapper(pos, 2, color, string): 主层文本渲染
-    ldr r0, DAT_080cbe7c                     @ 080cbe24 1548
+    bl text_render_wrapper                   @ 080cbe20 26f02cfe  -- Draw the label at(x,2) with CARD_DESC_RENDER_PARAM.
+    ldr r0, render_duel_field_zone_info_ptr_g_duel_card_ctx_base_080cbe7c @ 080cbe24 1548
     ldr r0,[r0,#0x4]                         @ 080cbe26 4068
     movs r1,#0x1    @ 080cbe28 0121
     eors r0,r1    @ 080cbe2a 4840
@@ -22528,10 +22528,10 @@ LAB_080cbe34:
     adds r0,r4,#0x0    @ 080cbe34 201c
     movs r1,#0x2    @ 080cbe36 0221
     ldr r3,[sp,#0xc]                         @ 080cbe38 039b
-    bl text_render_wrapper                   @ 080cbe3a 26f01ffe  -- text_render_wrapper(pos, 2, color2, string): 描边/阴影层
+    bl text_render_wrapper                   @ 080cbe3a 26f01ffe  -- Draw its player-dependent foreground pass at the same coordinates.
     adds r4,r4,r7    @ 080cbe3e e419
-    ldr r1, DAT_080cbe80                     @ 080cbe40 0f49
-    ldr r0, DAT_080cbe84                     @ 080cbe42 1048
+    ldr r1, render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbe80 @ 080cbe40 0f49
+    ldr r0, render_duel_field_zone_info_gsettings_offset_080cbe84 @ 080cbe42 1048
     adds r1,r1,r0    @ 080cbe44 0918
     movs r0,#0x7    @ 080cbe46 0720
     ldrb r1,[r1,#0x0]                        @ 080cbe48 0978
@@ -22555,14 +22555,14 @@ LAB_080cbe34:
     bl render_decimal_digits_jp_signed       @ 080cbe70 26f0ecfe
     b LAB_080cbeac                           @ 080cbe74 1ae0
     .zero  0x2
-DAT_080cbe78:
-    .word  0x00008008                     @ 080cbe78 08800000
-DAT_080cbe7c:
-    .word  0x0201e2a0                     @ 080cbe7c a0e20102
-DAT_080cbe80:
-    .word  0x02000000                     @ 080cbe80 00000002
-DAT_080cbe84:
-    .word  0x00006c2c                     @ 080cbe84 2c6c0000
+render_duel_field_zone_info_card_desc_render_param_080cbe78:
+    .word  CARD_DESC_RENDER_PARAM         @ 080cbe78 08800000  CARD_DESC_RENDER_PARAM: operand-0 data equate, value0x00008008.
+render_duel_field_zone_info_ptr_g_duel_card_ctx_base_080cbe7c:
+    .word  gDuelCardCtxBase               @ 080cbe7c a0e20102  Pointer to gDuelCardCtxBase; operand-0 DATA reference added.
+render_duel_field_zone_info_ptr_e_w_r_a_m_b_a_s_e_080cbe80:
+    .word  EWRAM_BASE                     @ 080cbe80 00000002  Pointer to EWRAM_BASE; operand-0 DATA reference added.
+render_duel_field_zone_info_gsettings_offset_080cbe84:
+    .word  GSETTINGS_OFFSET               @ 080cbe84 2c6c0000  GSETTINGS_OFFSET: operand-0 data equate, value0x00006c2c.
 LAB_080cbe88:
     bl char_width_narrow_5                   @ 080cbe88 24f0baf9
     .hword 0x4641    @ 080cbe8c 4146
@@ -22580,21 +22580,21 @@ LAB_080cbe88:
     .hword 0x4653    @ 080cbea6 5346
     bl render_decimal_digits_jp              @ 080cbea8 26f0f0fe
 LAB_080cbeac:
-    ldr r0, DAT_080cbeb8                     @ 080cbeac 0248
+    ldr r0, render_duel_field_zone_info_ptr_card_detail_name_bg_tiles_080cbeb8 @ 080cbeac 0248
     movs r1,#0x0    @ 080cbeae 0021
-    bl commit_line_buffer_to_sprite_vram     @ 080cbeb0 26f0ccff  -- commit_line_buffer_to_sprite_vram(0x0600a8e0, 0): ★ 写 OBJ VRAM
+    bl commit_line_buffer_to_sprite_vram     @ 080cbeb0 26f0ccff  -- Commit the label/count line buffer to fixed BG name tiles, not OBJ VRAM.
     b LAB_080cbefc                           @ 080cbeb4 22e0
     .zero  0x2
-DAT_080cbeb8:
-    .word  0x0600a8e0                     @ 080cbeb8 e0a80006
+render_duel_field_zone_info_ptr_card_detail_name_bg_tiles_080cbeb8:
+    .word  card_detail_name_bg_tiles                     @ 080cbeb8 e0a80006  Pointer to card_detail_name_bg_tiles; operand-0 DATA reference added.
 LAB_080cbebc:
-    cmp r4,#0x0                              @ 080cbebc 002c  -- LAB_080cbebc: case 0..b 出口公共包装
+    cmp r4,#0x0                              @ 080cbebc 002c  -- Types0..11: cache a nonzero card reference before packing the descriptor.
     beq LAB_080cbec8                         @ 080cbebe 03d0
     adds r0,r4,#0x0    @ 080cbec0 201c
-    bl ensure_card_id_cache_entry            @ 080cbec2 00f001fd  -- FUN_080cc8c8(r4): 处理 r4 中的 packed 提取值
+    bl ensure_card_id_cache_entry            @ 080cbec2 00f001fd  -- Resolve the packed card reference through ensure_card_id_cache_entry.
     str r0,[sp,#0x4]                         @ 080cbec6 0190
 LAB_080cbec8:
-    movs r2,#0x1    @ 080cbec8 0122  -- 重组 (player, mode, sub_idx, sl, sp+8) 成 [sp+0] packed value
+    movs r2,#0x1    @ 080cbec8 0122  -- Pack player bit0,zone bits5:1,subindex bits13:6 and attribute flags14/15.
     ands r6,r2    @ 080cbeca 1640
     movs r0,#0x1f    @ 080cbecc 1f20
     ands r7,r0    @ 080cbece 0740
@@ -22616,10 +22616,10 @@ LAB_080cbec8:
     ldr r0,[sp,#0x4]                         @ 080cbeee 0198
     .hword 0x4669    @ 080cbef0 6946
     movs r2,#0x0    @ 080cbef2 0022
-    bl render_large_card_display_by_mode     @ 080cbef4 fff76af9  -- FUN_080cb1cc(value, sp_ptr, 0): 最终 sprite 渲染提交
-    bl refresh_equip_target_eligibility_cache @ 080cbef8 fcf71aff  -- FUN_080c8d30(): 渲染收尾 helper
+    bl render_selected_card_bg_panel         @ 080cbef4 fff76af9  -- render_selected_card_bg_panel(cached card-stats index,stack descriptor,0).
+    bl refresh_equip_target_eligibility_cache @ 080cbef8 fcf71aff  -- Refresh equip-target eligibility after rendering the card panel.
 LAB_080cbefc:
-    add sp,#0x10                             @ 080cbefc 04b0  -- LAB_080cbefc: epilogue (无返回值; pop+bx 是 LR 还原)
+    add sp,#0x10                             @ 080cbefc 04b0  -- Restore the stack and callee-saved high registers; no result value is specified.
     pop {r3,r4,r5}                           @ 080cbefe 38bc
     .hword 0x4698    @ 080cbf00 9846
     .hword 0x46a1    @ 080cbf02 a146

@@ -136,3 +136,6 @@
 .equ duel_player_count_label_obj_tiles, 0x060113c0
 .equ duel_decimal_digit_obj_tiles, 0x060115c0
 .equ duel_result_history_obj_tiles, 0x06011f00
+.equ BG_PALRAM_SLOT14_BASE, 0x050001c0
+.equ card_detail_type_bg_tiles, 0x060080a0
+.equ card_effect_counter_bg_map_last_entry, 0x0600fa46

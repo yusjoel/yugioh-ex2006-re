@@ -183,18 +183,8 @@ RENAMES = [
         "最后 FUN_080dcb54/FUN_080dced0 完成绘制. 被 13+ pack/save/dialog game_str 函数共用."),
 
     # 2026-04-30: 决斗场 hover-zone info 渲染 (HUD)
-    ("FUN_080cb998", "render_duel_field_zone_info",
-        "决斗场 hover-zone info 渲染派发器. 入参 (r0=player_flag 0=P1/1=P2, "
-        "r1=mode 0..0x7f, r2=sub_idx). 主表 (table @ 0x080cb9cc) 12 entries 实际"
-        "4 个 case body: mode 0..4 调 FUN_0803b618/5c0/4b0 helper 链; mode 5..a "
-        "读 0x0201c510 决斗场卡 struct (P1/P2 stride 0x868); mode b 用 "
-        "0x0201c600 + 0x02023130+0x50 复杂 lookup. 二级 if/else: mode c=Fusion "
-        "Deck:, d=Deck:, e=Graveyard:, f=Removed Cards: (各 P1/P2 一份, "
-        "logical_id 0x3ea..0x3f1) 调 game_str_id_to_row 取标签 + 数值. "
-        "default(>=0x10) 经 LAB_080cbcfc 公共数字位拆分. 公共渲染路径调 "
-        "text_render_wrapper x2 + commit_line_buffer_to_sprite_vram(0x0600a8e0) "
-        "或 FUN_080cb1cc + FUN_080c8d30. 字体按 gSettings 语言切. 无返回值, "
-        "纯写 OBJ VRAM 0x0600a8e0 (右对齐 240px)."),
+    ('FUN_080cb998', 'render_duel_field_zone_info',
+        'Render duel-field hover information. r0=player,r1=zone type,r2=subindex. Types0..4 use the chain-aware slot helpers;5..10 read20-byte field slots;11 uses the hand reference and visibility lookup. Types12..15 draw localized Fusion Deck,Deck,Graveyard or Removed Cards labels and counts. Pack player,zone,subindex and flags for render_selected_card_bg_panel; type12 clears the detail cache instead. Render labels/counts into card_detail_name_bg_tiles. The card path refreshes equip-target eligibility.'),
     ("FUN_080cbf0c", "refresh_duel_field_zone_info",
         "render_duel_field_zone_info 的 state-driven wrapper. 读 gPageState "
         "[+0x210] u16 packed (bit7=player_flag, low7=mode, high7=sub_idx), "
@@ -223,7 +213,7 @@ RENAMES = [
 
     # 2026-04-30: 卡牌小图→大图缩放/旋转过渡动画 (play_ui_effect case 0x1a)
     ('FUN_080c3d20', 'play_card_zoom_in',
-        'Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_large_card_display_by_mode. Steps0..4 return1; other steps return0.'),
+        'Play the field-card zoom transition using gUIEffectState. Decode arg0 as player bit0,type bits5:1,subindex bits13:6 and flags14/15. Cache the card and load paired OBJ images. Step1 draws the source and refreshes its BG slot. Step2 performs five slide or affine calls using curve0,1,8,15,16; advance after the old tick exceeds3. Step3 restores BG card tiles, step4 conditionally calls render_selected_card_bg_panel. Steps0..4 return1; other steps return0.'),
 
     # 2026-04-30: play_ui_effect 子 handler 占位名 (按 case_id hex 编号, 待详细分析)
     ("FUN_080cca80", "play_ui_effect_03",
@@ -4369,15 +4359,12 @@ RENAMES = [
         "Pure BST leaf over card IDs in set A. Returns 1=member, 0=not member. "
         "Sibling: check_card_id_is_equip_set_b (set B range). "
         "r0: card_id [0..0x19b7]. Returns u32 bool."),
-    ('FUN_080cae84', 'write_card_digit_tiles_to_vram',
-        'Render a field-card counter into four BG entries at card_effect_counter_bg_map. r0 low bit selects player,r1 selects a20-byte slot; read its low13-bit card ID and halfword+0xc counter. Reverse the counter as3-count for CID0x1909, clamp above999, and choose a prefix for effect/equip categories. Write decimal tiles based at0x1a6 right-to-left. A nonpositive counter clears all four entries. No source/destination pointer arguments.'),
+    ('FUN_080cae84', 'render_card_counter_bg_map',
+        'Render a field-card counter at card_effect_counter_bg_map. r0 lowbit=player,r1=20-byte slot index. Read slot+0xc and its low13-bit ICID; for SPARK_BLASTER_CID use3-count. Nonpositive values clear four entries; cap positive values at999. Only cards recognized by get_card_effect_category or equip-set A/B write a category prefix and right-aligned decimal tiles based at0x1a6. Unrecognized positive counters leave the map unchanged.'),
     ('FUN_080cace8', 'zero_card_display_vram_regions',
         'Always clear0x800 bytes at0x0600a8e0. When field+8 is nonzero, also clear0x600 bytes at0x06006340 and0x100 bytes at each stat/name region, zero two level-map entries and four adjacent counter-map entries, clear the two stat prefixes, then reset field+8 to0. Calls zero_fill_by_halfword with byte counts; no BIOS fill call. No inputs.'),
-    ("FUN_080caf68", "render_card_name_to_sprite_vram",
-        "Render card name string tiles into sprite VRAM for card name display strip. "
-        "r0: card_id [0..0x19b7]; r1: sprite_vram_dest ptr. "
-        "Looks up name string, converts characters to tile indices, writes to sprite VRAM. "
-        "Returns void. Side effects: sprite VRAM region written with name tile data."),
+    ('FUN_080caf68', 'render_card_name_bg_tiles',
+        'Render the card name to card_detail_name_bg_tiles. r0=player,r1=card-stats index. select_charset_then_load_name chooses the name from the selected language. Configure gFontJpCtx and clear0x800 bytes at the fixed BG destination. Short names use two text_render_wrapper passes; long names use wide or narrow glyph loops with dot truncation. The foreground color compares player with gDuelCardCtxBase+4 xor1. Commit the line buffer to BG VRAM; r1 is not a destination pointer.'),
     ("FUN_08030b70", "check_card_stat_field7_equals",
         "Read card stat field7 for card_id (r0) and compare to r1 (target_value). "
         "Returns 1 if field7==target_value, 0 otherwise. "
@@ -4403,9 +4390,9 @@ RENAMES = [
         "r0: player_side [0..1]; r1: slot_idx [0..4]. "
         "Constants: gDuelFieldSlots=0x0201c510."),
     ('FUN_080c933c', 'get_trap_monster_level_by_card_id',
-        'Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_large_card_display_by_mode uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.'),
-    ('FUN_080cb1cc', 'render_large_card_display_by_mode',
-        'Render the selected card BG detail panel. r0=internal card ID,r1=card-record pointer,r2=render override. Read type, level, attributes and signed ATK/DEF from card_stats_table and the runtime record. Draw the name, frame, compared stat digits through compose_compared_stat_digit_tiles, level and counter/type glyphs according to record flags. Hidden and non-monster paths clear or replace the relevant fields. Writes fixed BG VRAM/palette regions; no OAM enqueue.'),
+        'Return the trap-monster level override for card ID r0: Metal Reflect Slime gives10; Embodiment of Apophis, Skull Zoma and Stronghold give4; all other IDs give0. render_selected_card_bg_panel uses this as the baseline level for its level-change display. This leaf function performs only immediate comparisons, without reading a digit table.'),
+    ('FUN_080cb1cc', 'render_selected_card_bg_panel',
+        'Render the selected card BG panel. r0=card-stats index,r1=packed selection descriptor pointer,r2=force redraw. Decode player bit0,zone bits5:1,subindex bits13:6 and visibility flags. Read base race,attribute,level and signed ATK/DEF from card_stats_table; field paths can evaluate current and baseline values. Respect hidden-card checks and gDuelFieldState+8 cache. Draw the name,32x48 card image,compared stat digits,level/counter and type icons in fixed BG VRAM and palettes.'),
     ("FUN_080f2c4c", "render_decimal_digits_jp_signed",
         "Render signed decimal integer as digit tiles in JP glyph style. "
         "r0: value (s32 signed integer); r1: dest_ptr (sprite VRAM or BG tile dest). "
@@ -6169,20 +6156,8 @@ RENAMES = [
         "r0: u32 packed_params (低 16 位=palette_index [0..0x7fff], 高 16 位=tile_offset [0..0x7f]). "
         "Constants: VRAM_BG_BASE=0x06014000, STATE_BASE=0x0201f440, "
         "OFFSET_FLAG_A=0x0a17, OFFSET_FLAG_B=0x0a18, MASK_15BIT_LO=0x7fff, STATE_DONE=7."),
-    ("FUN_080cffd4", "render_duel_zone_card_detail_to_vram",
-        "由 FUN_080c7ea0 (window/vram/display/card_data/duel_field 全标签主控) 独占调用 (indeg=1). "
-        "综合执行以下操作: (1) 读状态字段 (0x0201f440+0x0a0c) 的卡牌 ID (15 位), "
-        "调用 ensure_card_id_cache_entry 确保卡牌数据已缓存; "
-        "(2) 读下一个槽位 ID, 调用 find_zone_descriptor_by_slot_id 和 get_zone_slot_ptr 获取区域插槽指针; "
-        "(3) 读插槽中卡牌 face_down bit, 与 0x4020 合并存入 sp+4; "
-        "(4) 初始化 JP 文字行缓冲 (setup_line_buf_with_font_and_align); "
-        "(5) 设置语言模式 flag (font_jp_base_table 查找); "
-        "(6) render_jp_string_to_tile_line 渲染卡牌名称 JP 文字; "
-        "(7) write_line_buf_to_bg_tile_vram 写 BG tile VRAM; "
-        "(8) 两次 load_card_list_small_image 加载小图; "
-        "(9) render_large_card_display_by_mode 渲染大卡图. "
-        "Constants: STATE_BASE=0x0201f440, OFFSET_CARD_SLOT=0x0a0c, "
-        "FLAG_FACE_DOWN=0x4020, VRAM_BG=0x06014000, gP1LifePoints_BASE=0x02023130."),
+    ('FUN_080cffd4', 'render_duel_zone_card_detail_to_vram',
+        'Refresh the selected zone detail using gFontState+0xa0c. Cache the referenced card ID and resolve its slot descriptor and visibility. Prepare the selected-language font and write the name line to OBJ tiles at0x06014000. Load the paired small card images, then call render_selected_card_bg_panel(card-stats index,packed descriptor,1) to force the BG detail refresh. The packed descriptor includes player,zone and visibility bits.'),
     ("FUN_080d04dc", "render_jp_two_line_text_to_bg_vram",
         "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
         "与 080ccfe4 结构完全对称: 初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
@@ -6456,33 +6431,10 @@ RENAMES = [
         "No APCS input (void); callee-save r7/r6/r5 via .hword 0x4657/464e/4645. "
         "Constants: BG_TILE_DST=0x0600b0e0; PAL_DST=0x05000160; SPRITE_BUF=0x0600bc00; "
         "FONT_ID=0x1b; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c+0x2e40; GAME_STR_ID=0x3e9."),
-    ("FUN_080cad78", "render_zone_card_jp_text_panel",
-        "Render duel field zone card JP text panel (card name + description); indeg=1. "
-        "r0=card_str_base [0..N] (JP string lookup index). "
-        "Step 1: bl zero_card_display_vram_regions -> clear old display. "
-        "Step 2: copy_bytes_by_halfword(dst=0x06006340, src=0x0984f5cc, size=0x600) -> BG tile frame. "
-        "Step 3: setup_line_buf_with_font_and_align(0x20, 2, 1, 2) -> JP font config. "
-        "Step 4: read gDuelCtx+0x6c2c card_attr bits[2:0], update card_info_ctx+0x8/+0x4/+0x15. "
-        "Step 5: card_str_variant = (r0+1) & 0xff | 0x8000; game_str page base = 0x3e8. "
-        "Step 6: bl game_str_id_to_row -> text_render_wrapper (first JP line). "
-        "Step 7: same for second JP line (text_render_wrapper r2=7). "
-        "Step 8: bl commit_line_buffer_to_sprite_vram -> commit to OBJ tile VRAM. "
-        "Constants: FONT_ID=0x20; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c; "
-        "GAME_STR_PAGE=0x3e8; DISPLAY_FLAG=0x8000; LINE2_OFFSET=7."),
-    ("FUN_080d0818", "dispatch_zone_card_display_by_mode",
-        "Duel field zone slot card display dispatcher by mode (indeg=5). "
-        "r0=slot_index; r1=display_mode [0..1]. "
-        "Step 1: compute gDuelCtx+0x24+slot*0x28 -> read card_status/card_attr/card_type bytes. "
-        "Step 2: build OAM_attr0 halfword and strh to stack temp slot. "
-        "Step 3: .hword 0x4684=mov r12,r0 saves slot_index; ldmia/stmia copies 9 slot words to stack. "
-        "Step 4: strh 0 to [0x02023130+8] -> clear display_pending_flag. "
-        "Step 5: compare r1 (display_mode): "
-        "mode=0 -> if slot card_id matches gDuelCtx active_card_id: "
-        "bl render_zone_card_jp_text_panel(r0=1); else bl render_large_card_display_by_mode. "
-        "mode=1 -> bl render_zone_card_jp_text_panel(r0=1). "
-        "No return value (void). "
-        "Constants: DUEL_CTX=0x02020160; SLOT_STRIDE=0x28; CARD_STATUS_OFFSET=0x24; "
-        "DISPLAY_FLAG_ADDR=0x02023130+8; MODE_LARGE=0; MODE_JP=1."),
+    ('FUN_080cad78', 'render_hidden_card_bg_panel',
+        'Render the hidden-card BG panel. r0 selects the text color: use0x8000|u8(r0+1) for the first pass and7 for the second. Clear the old detail panel, copy the0x600-byte card-back image to card_detail_frame_bg_tiles, select the font and logical string0x3e8 using gSettings low3 bits, draw both passes at(2,2), then commit to card_detail_name_bg_tiles. The input is not a card ID or string index; language is not fixed to Japanese.'),
+    ('FUN_080d0818', 'dispatch_zone_card_display_by_mode',
+        'Dispatch a zone card display. r0 selects a40-byte record at gDuelCtx; r1 selects display mode. Pack player,zone,subindex and bit14 on the stack and clear gDuelFieldState+8. Nonzero mode calls render_hidden_card_bg_panel with color0 or1 according to the player relationship. Zero mode calls render_selected_card_bg_panel(record card-stats index,packed descriptor,1). The hidden path uses fixed placeholder text; neither branch accepts a VRAM pointer.'),
     ("FUN_080d2c60", "tick_zone_card_detail_view",
         "4-state machine tick for duel field zone card detail view (indeg=1). "
         "Called by FUN_080d2ef4 (duel scene outer state machine). "

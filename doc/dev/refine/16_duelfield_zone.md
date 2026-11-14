@@ -1,6 +1,6 @@
 # 函数和数据细化计划 · `asm/16_duelfield_zone.s`
 
-> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。主序完成16/25个模块，历史正引用补漏1项。当前模块完成9/10段，下一任务F16-Seg-10 `[0x080cad78,0x080cbf0c)`；逐段验收、单独提交并持续推进。
+> 范围 `[0x080c1448,0x080cbf0c)`，共43716字节。模块16全10段完成，主序完成17/25个模块，历史正引用补漏1项。按用户最新要求，本段验收并提交后停止；下次任务为模块17 `[0x080cbf0c,0x080d5e84)` 建档分段。
 
 ## 一、规则
 
@@ -8,11 +8,11 @@
 
 ## 二、验收流程
 
-源码和数据库备份后，依次执行分析、独立复核、真实只读全后态和同 Program 强制回滚核验。持久保存须单次门禁，保存后由新进程及独立采集器核验。随后重导汇编、同步常量与命名清单、完成资产导出和构建，并逐字节比较整个 ROM，最终验收通过后更新路线表。按 2026-11-12 用户指令，每段最终验收通过后单独提交。按 2026-11-13 最新续接指令，从 Seg-6 恢复，提交后依地址序持续推进。
+源码和数据库备份后，依次执行分析、独立复核、真实只读全后态和同 Program 强制回滚核验。持久保存须单次门禁，保存后由新进程及独立采集器核验。随后重导汇编、同步常量与命名清单、完成资产导出和构建，并逐字节比较整个 ROM，最终验收通过后更新路线表。按 2026-11-12 用户指令，每段最终验收通过后单独提交。按 2026-11-13 续接指令，从 Seg-6 恢复并依地址序推进；按 2026-11-14 最新要求，当前 Seg-10 完成验证并提交后停止。
 
 ## 三、当前进度
 
-Seg-1至Seg-9均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。当前9/10段，112个Function、1747个池字；剩余144个自动数据名（DAT118、DWORD0、PTR26），下一段为Seg-10。
+Seg-1至Seg-10均已完成独立复核、实际落地、保存后核验和整ROM逐字节验证。全10/10段完成，112个Function、1747个池字；DAT/DWORD/UNK/PTR自动槽、ROM_INCBIN/.byte原始块和§5.1均为0。下一文件为17_duelfield_pack_frame.s。
 
 Seg-4、Seg-5和Seg-7的8个原始块共3410字节已全部结构化。当前模块无ROM_INCBIN/.byte原始块，§5.1登记为0。
 
@@ -245,6 +245,34 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 
 模块完成9/10段，112个Function、1747个池字；剩余144个自动名（DAT118、DWORD0、PTR26），raw0、§5.1为0。单段提交后继续F16-Seg-10 `[0x080cad78,0x080cbf0c)`，5个Function、173个池字及144个自动名，无raw块。
 
+### 4.10 Seg-10（2026-11-14）
+
+范围 `[0x080cad78,0x080cbf0c)`，4500字节、5个既有Function、173个池字及144个自动名。完成35 EQ_ADD、83 REF_ADD、26 REF_PRESERVE、29 CASE保持；144个源槽加11个目标共155个新USER，订正4个函数名、9个ASCII PLATE和204条EOL（144源槽、60指令）。新增8个Ghidra equate；无R4/R7、Function增删、数据类型、body/ABI或flow override动作。
+
+CAD78按固定逻辑文本0x3e8/row499问号和输入样式命名hidden BG panel；CAE84按player/slot及Spark Blaster反向计数命名卡片counter BG map；CAF68按player/card-stats index和固定A8E0目的命名名称BG tiles；CB1CC按packed descriptor和强制刷新条件命名selected-card BG panel。CB998保留名称，订正Fusion Deck/Deck/Graveyard/Removed Cards分支、计数和装备资格刷新注释。130条高寄存器格式指令按ROM位域解码；9属性、20种族、6细分图标与32×48卡背独立核对69824像素、差异0。卡背候选调色板只用于辨识形状。
+
+独立C1-C13首轮发现CFFD4名称行目的误称BG，按实际D0084/D0088至F3842写入链修正为OBJ tiles at0x06014000，并保留后续selected BG panel独立刷新。唯一PLATE及formal/registry同步后，第二轮完整语义复核通过。原版40份物证精确归档；before源码引用绑定不可变副本，合法源码落地后不追索旧工作区文件。
+
+60个拟写指令EOL的真实前态为32条非空改写、28条空值新增；15条fullstate交叉核对、45条由完整Function评论遍历证明，全部进入完整Function.eol_comments。实际prestate、dry、owned fullrollback及同Program完整前态和84210个原ID恢复通过；物理DB15/source242及副本保持。独立Phase1终审后唯一保存一次，新进程check及三份独立Java后验通过。
+
+保护274个主Function和18个完整even_function（7个在主表外，共281个完整DTO）、1962word、4296slot、4650完整状态、39103条指令属性、19409闭包行及2236条typed pointer边；incoming18210→18293。DDE1C既有Function入口无InstructionAt的事实保持，显式instruction seed为273。155个新USER仅ID从POST绑定，必须互异并与84210个原身份分离；无新增odd或DEFAULT派生，历史两个DEFAULT观察节点原名/原ID保持。全局Equate2550个、绑定13018条。
+
+源码精确变化11个路径：3份ASM、3份constants、registry、doc CSV、两份temp inventory及all.s；其中3个为忽略中间文件。新增GNU13项（8数值、5地址），复用5个地址equate和既有rom.s标签card_glyph_table_3，不改变该标签边界；254个pins为222继承加32新增，173表达式为141 native加32 fallback。registry9替换、0追加，两CSV各4个name cell，其余单元格和Function长度保持。rom.s、ASM18的历史DEFAULT拼写、gba_io及4份重复untracked清单不变；rom_data完整LF前缀保持。
+
+只读源码导出、49/49资产导出、构建及33554432字节整ROM逐字节相等，SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。ELF SHA256 `6063b4ab7939aaa848c9555e397dfd2d48136ce5dd63b8c212d50bba59c0c9e9`。
+
+证据目录：`output/refine-run-20261028-105948/`。
+
+| 验收记录 | SHA256 |
+|---|---|
+| `f16-seg10-phase1-static-review-v1.json` | `c17ad6607dcdf0fbae081aadac1dfb648bcb1b36148a62dfa0201fb6d93a6037` |
+| `f16-seg10-apply-v1.json` | `b41dbf9ed43e104ba7b02bd98d6494020779634b35aac45b595a6cb766510450` |
+| `f16-seg10-persisted-check-v1.json` | `3fd63b39373b7f835a04fcb595355f32335cad3f33442bbc410e44732ff39df8` |
+| `root-f16-seg10-saved-native-gate-v1.json` | `396eca72055bfdf2653b94dc5a102183f09bfd6cee5f636cc6d5ad8896be6d37` |
+| `f16-seg10-source-landing-final-v1.json` | `13f90c5615c30785a5264c3117a8352e537210bae46334bf71d3fc6b0871a98d` |
+
+模块16全10段完成：112个Function、1747个池字、自动数据名0、raw0、§5.1为0；8个初始raw块3410字节均已结构化。主序完成17/25模块，历史正引用补漏1项仍按总进度保留。按用户最新指令，本段提交后停止，不启动模块17。下次任务为模块17 `[0x080cbf0c,0x080d5e84)` 建档分段。
+
 ## 五、地址序路线图
 
 | 段 | 范围 | 字节 | 既有 Function | word | 自动数据名 | raw 块/字节 | 状态 |
@@ -258,7 +286,7 @@ v2 的 21 个产物实际双回放逐字节相同，两次独立 validator 通�
 | 7 | `0x080c7af8..0x080c8bf0` | 4344 | 12 | 223 | 152 | 1/58 | ✅ root验收通过，单段提交 |
 | 8 | `0x080c8bf0..0x080c9c94` | 4260 | 16 | 110 | 95 | 0/0 | ✅ root验收通过，单段提交 |
 | 9 | `0x080c9c94..0x080cad78` | 4324 | 13 | 167 | 158 | 0/0 | ✅ root验收通过，单段提交 |
-| 10 | `0x080cad78..0x080cbf0c` | 4500 | 5 | 173 | 144 | 0/0 | 未开始 |
+| 10 | `0x080cad78..0x080cbf0c` | 4500 | 5 | 173 | 144 | 0/0 | ✅ root验收通过，单段提交 |
 
 ### 原始块初始化清单
 

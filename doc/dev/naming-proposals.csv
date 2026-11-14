@@ -3671,10 +3671,10 @@ address,name,proposed_name,score,tags
 0x080ca660,compose_compared_stat_digit_tiles,,,vram
 0x080ca8ec,init_duel_field_hud_tiles_and_palettes,,,vram;palette;duel_field
 0x080cace8,zero_card_display_vram_regions,,,vram
-0x080cad78,render_zone_card_jp_text_panel,,,vram;font_jp;game_str
-0x080cae84,write_card_digit_tiles_to_vram,,,vram
-0x080caf68,render_card_name_to_sprite_vram,,,vram;font_jp
-0x080cb1cc,render_large_card_display_by_mode,,,vram;palette;card_stats;duel_field;font_jp
+0x080cad78,render_hidden_card_bg_panel,,,vram;font_jp;game_str
+0x080cae84,render_card_counter_bg_map,,,vram
+0x080caf68,render_card_name_bg_tiles,,,vram;font_jp
+0x080cb1cc,render_selected_card_bg_panel,,,vram;palette;card_stats;duel_field;font_jp
 0x080cb998,render_duel_field_zone_info,,,vram;card_ids;card_stats;duel_field;font_jp;game_str
 0x080cbf0c,refresh_duel_field_zone_info,,,card_ids;card_stats;duel_field;font_jp;game_str
 0x080cbf58,build_field_zone_display_state,,,card_ids;card_stats;duel_field;game_str;settings

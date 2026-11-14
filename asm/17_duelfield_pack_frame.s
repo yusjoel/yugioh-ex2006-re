@@ -8586,7 +8586,7 @@ DAT_080cffcc:
 DAT_080cffd0:
     .word  0x00000a01                     @ 080cffd0 010a0000
 
-@ 由 FUN_080c7ea0 (window/vram/display/card_data/duel_field 全标签主控) 独占调用 (indeg=1). 综合执行以下操作: (1) 读状态字段 (0x0201f440+0x0a0c) 的卡牌 ID (15 位), 调用 ensure_card_id_cache_entry 确保卡牌数据已缓存; (2) 读下一个槽位 ID, 调用 find_zone_descriptor_by_slot_id 和 get_zone_slot_ptr 获取区域插槽指针; (3) 读插槽中卡牌 face_down bit, 与 0x4020 合并存入 sp+4; (4) 初始化 JP 文字行缓冲 (setup_line_buf_with_font_and_align); (5) 设置语言模式 flag (font_jp_base_table 查找); (6) render_jp_string_to_tile_line 渲染卡牌名称 JP 文字; (7) write_line_buf_to_bg_tile_vram 写 BG tile VRAM; (8) 两次 load_card_list_small_image 加载小图; (9) render_large_card_display_by_mode 渲染大卡图. Constants: STATE_BASE=0x0201f440, OFFSET_CARD_SLOT=0x0a0c, FLAG_FACE_DOWN=0x4020, VRAM_BG=0x06014000, gP1LifePoints_BASE=0x02023130.
+@ Refresh the selected zone detail using gFontState+0xa0c. Cache the referenced card ID and resolve its slot descriptor and visibility. Prepare the selected-language font and write the name line to OBJ tiles at0x06014000. Load the paired small card images, then call render_selected_card_bg_panel(card-stats index,packed descriptor,1) to force the BG detail refresh. The packed descriptor includes player,zone and visibility bits.
 render_duel_zone_card_detail_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 080cffd4 f0b5
     .hword 0x4657    @ 080cffd6 5746
@@ -8703,7 +8703,7 @@ render_duel_zone_card_detail_to_vram:
     adds r0,r6,#0x0    @ 080d00c4 301c
     add r1,sp,#0x4                           @ 080d00c6 01a9
     movs r2,#0x1    @ 080d00c8 0122
-    bl render_large_card_display_by_mode     @ 080d00ca fbf77ff8
+    bl render_selected_card_bg_panel         @ 080d00ca fbf77ff8
     ldr r2, DAT_080d0144                     @ 080d00ce 1d4a
     adds r0,r5,r2    @ 080d00d0 a818
     ldrb r0,[r0,#0x0]                        @ 080d00d2 0078
@@ -9681,7 +9681,7 @@ LAB_080d0810:
     pop {r1}                                 @ 080d0814 02bc
     bx r1                                    @ 080d0816 0847
 
-@ Duel field zone slot card display dispatcher by mode (indeg=5). r0=slot_index; r1=display_mode [0..1]. Step 1: compute gDuelCtx+0x24+slot*0x28 -> read card_status/card_attr/card_type bytes. Step 2: build OAM_attr0 halfword and strh to stack temp slot. Step 3: .hword 0x4684=mov r12,r0 saves slot_index; ldmia/stmia copies 9 slot words to stack. Step 4: strh 0 to [0x02023130+8] -> clear display_pending_flag. Step 5: compare r1 (display_mode): mode=0 -> if slot card_id matches gDuelCtx active_card_id: bl render_zone_card_jp_text_panel(r0=1); else bl render_large_card_display_by_mode. mode=1 -> bl render_zone_card_jp_text_panel(r0=1). No return value (void). Constants: DUEL_CTX=0x02020160; SLOT_STRIDE=0x28; CARD_STATUS_OFFSET=0x24; DISPLAY_FLAG_ADDR=0x02023130+8; MODE_LARGE=0; MODE_JP=1.
+@ Dispatch a zone card display. r0 selects a40-byte record at gDuelCtx; r1 selects display mode. Pack player,zone,subindex and bit14 on the stack and clear gDuelFieldState+8. Nonzero mode calls render_hidden_card_bg_panel with color0 or1 according to the player relationship. Zero mode calls render_selected_card_bg_panel(record card-stats index,packed descriptor,1). The hidden path uses fixed placeholder text; neither branch accepts a VRAM pointer.
 dispatch_zone_card_display_by_mode:
     push {r4,r5,r6,r7,lr}                    @ 080d0818 f0b5
     sub sp,#0x2c                             @ 080d081a 8bb0
@@ -9735,7 +9735,7 @@ dispatch_zone_card_display_by_mode:
     movs r1,#0x1    @ 080d087a 0121
 LAB_080d087c:
     adds r0,r1,#0x0    @ 080d087c 081c
-    bl render_zone_card_jp_text_panel        @ 080d087e faf77bfa
+    bl render_hidden_card_bg_panel           @ 080d087e faf77bfa
     b LAB_080d089a                           @ 080d0882 0ae0
 DWORD_080d0884:
     .word  0x02020160                     @ 080d0884 60010202
@@ -9747,7 +9747,7 @@ LAB_080d0890:
     ldr r0,[sp,#0x4]                         @ 080d0890 0198
     add r1,sp,#0x28                          @ 080d0892 0aa9
     movs r2,#0x1    @ 080d0894 0122
-    bl render_large_card_display_by_mode     @ 080d0896 faf799fc
+    bl render_selected_card_bg_panel         @ 080d0896 faf799fc
 LAB_080d089a:
     add sp,#0x2c                             @ 080d089a 0bb0
     pop {r4,r5,r6,r7}                        @ 080d089c f0bc

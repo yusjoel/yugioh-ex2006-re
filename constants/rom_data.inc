@@ -3899,3 +3899,5 @@
 .equ duel_main_phase_timer_obj_tile_data, 0x0985299c
 .equ duel_end_phase_timer_obj_tile_data, 0x09852a9c
 .equ duel_result_history_obj_tile_data, 0x09854d90
+.equ card_attribute_icon_tiles, 0x0984de8c
+.equ card_attribute_icon_palettes, 0x0984e30c
